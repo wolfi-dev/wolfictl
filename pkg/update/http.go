@@ -1,9 +1,10 @@
-package foo
+package update
 
 import (
 	"context"
-	"golang.org/x/time/rate"
 	"net/http"
+
+	"golang.org/x/time/rate"
 )
 
 // RLHTTPClient Rate Limited HTTP Client

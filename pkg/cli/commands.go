@@ -6,12 +6,12 @@ import (
 
 func New() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:               "foo",
+		Use:               "update",
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		Short:             "Attempts to converts files into melange configuration files",
 	}
 
-	cmd.AddCommand(ApkBuild())
+	cmd.AddCommand(Update())
 	return cmd
 }
