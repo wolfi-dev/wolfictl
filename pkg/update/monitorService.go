@@ -1,6 +1,7 @@
 package update
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -19,9 +20,15 @@ type Row struct {
 	Identifier  string
 	ServiceName string
 }
+
+type ReleaseMonitorVersions struct {
+	LatestVersion  string   `json:"latest_version"`
+	StableVersions []string `json:"stable_versions"`
+}
 type MonitorServiceName int
 
 const dataURL = "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/README.md"
+const releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%s"
 
 func (m MonitorService) getMonitorServiceData() (map[string]Row, error) {
 
@@ -68,6 +75,36 @@ func (m MonitorService) parseData(rawdata string) (map[string]Row, error) {
 
 }
 
-func (m MonitorService) getLatestReleaseVersion(identifier string) string {
-	return ""
+func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {
+	req, _ := http.NewRequest("GET", fmt.Sprintf(releaseMonitorURL, identifier), nil)
+	resp, err := m.Client.Do(req)
+
+	if err != nil {
+		return "", errors.Wrapf(err, "failed getting URI %s", dataURL)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("non ok http response for URI %s code: %v", dataURL, resp.StatusCode)
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.Wrap(err, "reading monitor service mapper data file")
+	}
+	return m.parseVersions(b)
+}
+
+func (m MonitorService) parseVersions(rawdata []byte) (string, error) {
+
+	versions := ReleaseMonitorVersions{}
+	err := json.Unmarshal(rawdata, &versions)
+	if err != nil {
+		return "", errors.Wrap(err, "unmarshalling version data")
+	}
+
+	if len(versions.StableVersions) == 0 {
+		return "", errors.Wrap(err, "no stable version found")
+	}
+	return versions.StableVersions[0], nil
 }

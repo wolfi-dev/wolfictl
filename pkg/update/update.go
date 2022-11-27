@@ -97,7 +97,10 @@ func (c Context) Update() error {
 
 	for _, config := range c.Packages {
 		item := mapperData[config.Package.Name]
-		latestVersion := m.getLatestReleaseVersion(item.Identifier)
+		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
+		if err != nil {
+			return errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
+		}
 
 		c.Logger.Printf("package %s, latest available version %s, current version %s", config.Package.Name, config.Package.Version, latestVersion)
 	}

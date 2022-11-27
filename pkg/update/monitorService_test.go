@@ -19,3 +19,12 @@ func TestMonitorService_parseData(t *testing.T) {
 	assert.Equal(t, "16", mapperData["acl"].Identifier)
 	assert.Equal(t, "7981", mapperData["binutils"].Identifier)
 }
+
+func TestMonitorService_parseVersions(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("testdata", "versions.json"))
+	assert.NoError(t, err)
+
+	m := MonitorService{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
+	version, err := m.parseVersions(data)
+	assert.Equal(t, "2.3.1", version)
+}
