@@ -1,14 +1,11 @@
 package update
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
-
-	"gopkg.in/yaml.v3"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/pkg/errors"
@@ -69,12 +66,13 @@ func New() (Context, error) {
 
 func (c Context) Update() error {
 
+	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wupdater")
 	if err != nil {
 		return errors.Wrapf(err, "failed to create temporary folder to clone package configs into")
 	}
 	c.Logger.Printf("using temp dir %s", tempDir)
-	//defer os.Remove(tempDir)
+	defer os.Remove(tempDir)
 
 	_, err = git.PlainClone(tempDir, false, &git.CloneOptions{
 		URL:      c.RepoURI,
@@ -85,49 +83,24 @@ func (c Context) Update() error {
 	}
 
 	// first, let's get the package(s) we want to check for updates
-	if c.PackageName != "" {
-		filename := filepath.Join(tempDir, c.PackageName+".yaml")
-		err = c.readPackageConfig(filename)
-		if err != nil {
-			return errors.Wrapf(err, "failed to read package config %s", filename)
-		}
-	} else {
-
-		var fileList []string
-		err := filepath.Walk(tempDir, func(path string, fi os.FileInfo, err error) error {
-			c.Logger.Printf("path: %s", path)
-			c.Logger.Printf("fi: %s", fi.Name())
-			c.Logger.Printf("fi: %s", fi.Mode())
-			if fi.IsDir() && path != tempDir {
-				return filepath.SkipDir
-			}
-			if filepath.Ext(path) == ".yaml" {
-				fileList = append(fileList, path)
-			}
-
-			return nil
-		})
-
-		if err != nil {
-			return errors.Wrapf(err, "failed walking files in cloned directory %s", tempDir)
-		}
-
-		fmt.Printf("Found %[1]d packages.\n", len(fileList))
-
-		for _, fi := range fileList {
-			fmt.Printf("reading packages %s \n", fi)
-			err = c.readPackageConfig(fi)
-			if err != nil {
-				return errors.Wrapf(err, "failed to read package config %s", fi)
-			}
-		}
-
+	err = c.getPackageConfigs(tempDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to get package configs")
 	}
-	for _, config := range c.Packages {
-		c.Logger.Printf("found %s / %s", config.Package.Name, config.Package.Version)
-	}
+
 	// second, check service for new package versions
+	m := MonitorService{Client: c.Client, Logger: c.Logger}
+	mapperData, err := m.getMonitorServiceData()
+	if err != nil {
+		return errors.Wrapf(err, "failed getting release monitor service mapping data")
+	}
 
+	for _, config := range c.Packages {
+		item := mapperData[config.Package.Name]
+		latestVersion := m.getLatestReleaseVersion(item.Identifier)
+
+		c.Logger.Printf("package %s, latest available version %s, current version %s", config.Package.Name, config.Package.Version, latestVersion)
+	}
 	// if new versions are available, create a pull request
 
 	// if package name is empty let's get all packages from the git repo containing melange configs
@@ -135,18 +108,21 @@ func (c Context) Update() error {
 	return nil
 }
 
-func (c Context) readPackageConfig(filename string) error {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return errors.Wrapf(err, "failed to read package config %s", filename)
+func (c Context) getPackageConfigs(tempDir string) error {
+	var err error
+	if c.PackageName != "" {
+		// get a single package
+		filename := filepath.Join(tempDir, c.PackageName+".yaml")
+		err = c.readPackageConfig(filename)
+		if err != nil {
+			return errors.Wrapf(err, "failed to read package config %s", filename)
+		}
+	} else {
+		// get all packages in the provided git repo
+		err = c.readAllPackagesFromRepo(tempDir)
+		if err != nil {
+			return errors.Wrapf(err, "failed to read package configs from repo %s", c.RepoURI)
+		}
 	}
-
-	packageConfig := MelageConfig{}
-
-	err = yaml.Unmarshal(data, &packageConfig)
-	if err != nil {
-		return errors.Wrapf(err, "failed to unmarshal package data from filename %s", filename)
-	}
-	c.Packages[packageConfig.Package.Name] = packageConfig
 	return nil
 }

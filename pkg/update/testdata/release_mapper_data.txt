@@ -1,0 +1,15 @@
+| package name | identifier | release service   | notes |
+|--------------|-----------------|------|------ |
+|acl|16|https://release-monitoring.org||
+|alsa-lib|38|||
+|apk-tools|20466|||
+|attr|137|||
+|autoconf|141|||
+|automake|144|||
+|bash|166|||
+|bazel-5|15227|| bazel - 5 version stream|
+|binutils|7981|||
+|bison|193|||
+|brotli|15235|||
+|bubblewrap|10937|||
+|busybox|230|||
