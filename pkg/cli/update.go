@@ -30,7 +30,7 @@ func Update() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&o.dryRun, "dry-run", false, "prints proposed package updates rather than creating a pull request")
-	cmd.Flags().BoolVar(&o.dryRun, "batch", true, "creates a single pull request with package updates rather than individual pull request per package update")
+	cmd.Flags().BoolVar(&o.batch, "batch", true, "creates a single pull request with package updates rather than individual pull request per package update")
 	cmd.Flags().StringVar(&o.packageName, "package-name", "", "Optional: provide a specific package name to check for updates rather than searching all packages in a repo URI")
 
 	return cmd

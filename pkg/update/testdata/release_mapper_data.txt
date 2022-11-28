@@ -13,4 +13,3 @@
 |brotli|15235|||
 |bubblewrap|10937|||
 |busybox|230|||
-|ncurses|2057||SKIP check melange config as fetch URL includes the date https://release-monitoring.org/project/2057/|

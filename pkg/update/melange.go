@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"chainguard.dev/melange/pkg/renovate"
+	"chainguard.dev/melange/pkg/renovate/bump"
+
 	"chainguard.dev/melange/pkg/build"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -36,7 +39,6 @@ func (c Context) readAllPackagesFromRepo(tempDir string) error {
 	fmt.Printf("found %[1]d packages\n", len(fileList))
 
 	for _, fi := range fileList {
-		fmt.Printf("reading packages %s \n", fi)
 		err = c.readPackageConfig(fi)
 		if err != nil {
 			return errors.Wrapf(err, "failed to read package config %s", fi)
@@ -59,5 +61,21 @@ func (c Context) readPackageConfig(filename string) error {
 		return errors.Wrapf(err, "failed to unmarshal package data from filename %s", filename)
 	}
 	c.Packages[packageConfig.Package.Name] = packageConfig
+	return nil
+}
+
+func (c Context) bump(configFile, version string) error {
+	ctx, err := renovate.New(renovate.WithConfig(configFile))
+	if err != nil {
+		return err
+	}
+
+	bumpRenovator := bump.New(
+		bump.WithTargetVersion(version),
+	)
+
+	if err := ctx.Renovate(bumpRenovator); err != nil {
+		return err
+	}
 	return nil
 }
