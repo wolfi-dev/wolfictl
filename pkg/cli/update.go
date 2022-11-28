@@ -11,9 +11,8 @@ import (
 
 type options struct {
 	packageName string
-	//repoURI     string
-	batch  bool
-	dryRun bool
+	batch       bool
+	dryRun      bool
 }
 
 func Update() *cobra.Command {
@@ -32,7 +31,6 @@ func Update() *cobra.Command {
 
 	cmd.Flags().BoolVar(&o.dryRun, "dry-run", false, "prints proposed package updates rather than creating a pull request")
 	cmd.Flags().BoolVar(&o.dryRun, "batch", true, "creates a single pull request with package updates rather than individual pull request per package update")
-	//cmd.Flags().StringVar(&o.repoURI, "repo-uri", "https://github.com/wolfi-dev/os", "URI to use for querying packages and proposing updates to")
 	cmd.Flags().StringVar(&o.packageName, "package-name", "", "Optional: provide a specific package name to check for updates rather than searching all packages in a repo URI")
 
 	return cmd

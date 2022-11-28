@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/hashicorp/go-version"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/pkg/errors"
 
@@ -30,36 +32,13 @@ func New() (Context, error) {
 		Client: &RLHTTPClient{
 			client: http.DefaultClient,
 
-			// 1 request every second to avoid DOS'ing server
-			Ratelimiter: rate.NewLimiter(rate.Every(1*time.Second), 1),
+			// 1 request every (n) second(s) to avoid DOS'ing server
+			Ratelimiter: rate.NewLimiter(rate.Every(1*time.Second), 5),
 		},
 		Logger: log.New(log.Writer(), "wupdater: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
 	context.Packages = make(map[string]MelageConfig)
-
-	//req, _ := http.NewRequest("GET", wolfios.WolfiosPackageRepository, nil)
-	//resp, err := context.Client.Do(req)
-	//
-	//if err != nil {
-	//	return context, errors.Wrapf(err, "failed getting URI %s", wolfios.WolfiosPackageRepository)
-	//}
-	//defer resp.Body.Close()
-	//
-	//if resp.StatusCode != http.StatusOK {
-	//	return context, fmt.Errorf("non ok http response for URI %s code: %v", wolfios.WolfiosPackageRepository, resp.StatusCode)
-	//}
-	//
-	//b, err := io.ReadAll(resp.Body)
-	//if err != nil {
-	//	return context, errors.Wrap(err, "reading APKBUILD file")
-	//}
-
-	// keep the map of wolfi packages on the main struct so it's easy to check if we already have any ABKBUILD dependencies
-	//context.WolfiOSPackages, err = wolfios.ParseWolfiPackages(b)
-	//if err != nil {
-	//	return context, errors.Wrapf(err, "parsing wolfi packages")
-	//}
 
 	return context, nil
 }
@@ -97,16 +76,32 @@ func (c Context) Update() error {
 
 	for _, config := range c.Packages {
 		item := mapperData[config.Package.Name]
+		if item.Identifier == "" {
+			continue
+		}
 		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
 		if err != nil {
 			return errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
 		}
 
-		c.Logger.Printf("package %s, latest available version %s, current version %s", config.Package.Name, config.Package.Version, latestVersion)
-	}
-	// if new versions are available, create a pull request
+		currentVersionSemver, err := version.NewVersion(config.Package.Version)
+		if err != nil {
+			c.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err)
+			continue
+		}
+		latestVersionSemver, err := version.NewVersion(latestVersion)
+		if err != nil {
+			c.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err)
+			continue
+		}
+		//c.Logger.Printf("package %s, latest available version %s, current version %s", config.Package.Name, config.Package.Version, latestVersion)
 
-	// if package name is empty let's get all packages from the git repo containing melange configs
+		if currentVersionSemver.LessThan(latestVersionSemver) {
+			c.Logger.Printf("there is a new stable version available %s %s, current wolfi version %s", config.Package.Name, latestVersion, config.Package.Version)
+		}
+
+		// if new versions are available, create a pull request
+	}
 
 	return nil
 }

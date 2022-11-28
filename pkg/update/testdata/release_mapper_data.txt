@@ -7,9 +7,10 @@
 |autoconf|141|||
 |automake|144|||
 |bash|166|||
-|bazel-5|15227|| bazel - 5 version stream|
+|bazel-5|15227||SKIP bazel - 5 version stream|
 |binutils|7981|||
 |bison|193|||
 |brotli|15235|||
 |bubblewrap|10937|||
 |busybox|230|||
+|ncurses|2057||SKIP check melange config as fetch URL includes the date https://release-monitoring.org/project/2057/|

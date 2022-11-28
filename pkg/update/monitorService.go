@@ -61,7 +61,13 @@ func (m MonitorService) parseData(rawdata string) (map[string]Row, error) {
 		line := lines[i]
 		parts := strings.Split(line, "|")
 		if len(parts) != 6 {
-			m.Logger.Printf("found %d parts, expected 4 in line %s", len(parts), line)
+			m.Logger.Printf("found %d parts, expected 6 in line %s", len(parts), line)
+			continue
+		}
+
+		// if notes say to skip then lets not include this row in the update checks
+		notes := strings.TrimSpace(parts[4])
+		if strings.HasPrefix(notes, "SKIP") {
 			continue
 		}
 
@@ -76,16 +82,17 @@ func (m MonitorService) parseData(rawdata string) (map[string]Row, error) {
 }
 
 func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {
-	req, _ := http.NewRequest("GET", fmt.Sprintf(releaseMonitorURL, identifier), nil)
+	targetURL := fmt.Sprintf(releaseMonitorURL, identifier)
+	req, _ := http.NewRequest("GET", targetURL, nil)
 	resp, err := m.Client.Do(req)
 
 	if err != nil {
-		return "", errors.Wrapf(err, "failed getting URI %s", dataURL)
+		return "", errors.Wrapf(err, "failed getting URI %s", targetURL)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("non ok http response for URI %s code: %v", dataURL, resp.StatusCode)
+		return "", fmt.Errorf("non ok http response for URI %s code: %v", targetURL, resp.StatusCode)
 	}
 
 	b, err := io.ReadAll(resp.Body)

@@ -10,6 +10,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/time v0.2.0
 	gopkg.in/yaml.v2 v2.4.0
+	github.com/hashicorp/go-version v1.6.0
 )
 
 require (
