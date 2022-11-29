@@ -18,7 +18,7 @@ type MelageConfig struct {
 	Pipeline []build.Pipeline `yaml:"pipeline,omitempty"`
 }
 
-func (c Context) readAllPackagesFromRepo(tempDir string) error {
+func (o Options) readAllPackagesFromRepo(tempDir string) error {
 	var fileList []string
 
 	err := filepath.Walk(tempDir, func(path string, fi os.FileInfo, err error) error {
@@ -39,7 +39,7 @@ func (c Context) readAllPackagesFromRepo(tempDir string) error {
 	fmt.Printf("found %[1]d packages\n", len(fileList))
 
 	for _, fi := range fileList {
-		err = c.readPackageConfig(fi)
+		err = o.readPackageConfig(fi)
 		if err != nil {
 			return errors.Wrapf(err, "failed to read package config %s", fi)
 		}
@@ -48,7 +48,7 @@ func (c Context) readAllPackagesFromRepo(tempDir string) error {
 }
 
 // read a single melange config using the package name to match the filename
-func (c Context) readPackageConfig(filename string) error {
+func (o Options) readPackageConfig(filename string) error {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read package config %s", filename)
@@ -60,11 +60,11 @@ func (c Context) readPackageConfig(filename string) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to unmarshal package data from filename %s", filename)
 	}
-	c.Packages[packageConfig.Package.Name] = packageConfig
+	o.Packages[packageConfig.Package.Name] = packageConfig
 	return nil
 }
 
-func (c Context) bump(configFile, version string) error {
+func (o Options) bump(configFile, version string) error {
 	ctx, err := renovate.New(renovate.WithConfig(configFile))
 	if err != nil {
 		return err

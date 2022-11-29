@@ -1,37 +1,52 @@
 package update
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
-	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
-
-	"github.com/go-git/go-git/v5/plumbing"
-
-	"github.com/hashicorp/go-version"
-
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/google/go-github/github"
+	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
-
+	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 )
 
-type Context struct {
-	PackageName string
-	RepoURI     string
-	Batch       bool
-	DryRun      bool
-	Packages    map[string]MelageConfig
-	Client      *RLHTTPClient
-	Logger      *log.Logger
+type Options struct {
+	PackageName           string
+	PullRequestBaseBranch string
+	PullRequestTitle      string
+	RepoURI               string
+	Batch                 bool
+	DryRun                bool
+	Packages              map[string]MelageConfig
+	Client                *RLHTTPClient
+	Logger                *log.Logger
+	GitHubHTTPClient      *http.Client
 }
 
+const wolfiImage = `
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wolfi-dev/.github/main/profile/wolfi-logo-light-mode.svg" />
+</p>
+`
+
 // New initialise including a map of existing wolfios packages
-func New() (Context, error) {
-	context := Context{
+func New() (Options, error) {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+	)
+
+	options := Options{
 
 		Client: &RLHTTPClient{
 			client: http.DefaultClient,
@@ -39,50 +54,51 @@ func New() (Context, error) {
 			// 1 request every (n) second(s) to avoid DOS'ing server
 			Ratelimiter: rate.NewLimiter(rate.Every(2*time.Second), 1),
 		},
-		Logger: log.New(log.Writer(), "wupdater: ", log.LstdFlags|log.Lmsgprefix),
+		GitHubHTTPClient: oauth2.NewClient(context.Background(), ts),
+		Logger:           log.New(log.Writer(), "wupdater: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
-	context.Packages = make(map[string]MelageConfig)
+	options.Packages = make(map[string]MelageConfig)
 
-	return context, nil
+	return options, nil
 }
 
-func (c Context) Update() error {
+func (o Options) Update() error {
 
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wupdater")
 	if err != nil {
 		return errors.Wrapf(err, "failed to create temporary folder to clone package configs into")
 	}
-	if c.DryRun {
-		c.Logger.Printf("using working directory %s", tempDir)
+	if o.DryRun {
+		o.Logger.Printf("using working directory %s", tempDir)
 	} else {
 		defer os.Remove(tempDir)
 	}
 
 	repo, err := git.PlainClone(tempDir, false, &git.CloneOptions{
-		URL:      c.RepoURI,
+		URL:      o.RepoURI,
 		Progress: os.Stdout,
 	})
 	if err != nil {
-		return errors.Wrapf(err, "failed to clone repository %s into %s", c.RepoURI, tempDir)
+		return errors.Wrapf(err, "failed to clone repository %s into %s", o.RepoURI, tempDir)
 	}
 
 	// first, let's get the package(s) we want to check for updates
-	err = c.getPackageConfigs(tempDir)
+	err = o.getPackageConfigs(tempDir)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get package configs")
 	}
 
 	// second, check service for new package versions
-	m := MonitorService{Client: c.Client, Logger: c.Logger}
+	m := MonitorService{Client: o.Client, Logger: o.Logger}
 	mapperData, err := m.getMonitorServiceData()
 	if err != nil {
 		return errors.Wrapf(err, "failed getting release monitor service mapping data")
 	}
 
 	packagesToUpdate := make(map[string]string)
-	for _, config := range c.Packages {
+	for _, config := range o.Packages {
 		item := mapperData[config.Package.Name]
 		if item.Identifier == "" {
 			continue
@@ -94,25 +110,31 @@ func (c Context) Update() error {
 
 		currentVersionSemver, err := version.NewVersion(config.Package.Version)
 		if err != nil {
-			c.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err)
+			o.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err)
 			continue
 		}
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
-			c.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err)
+			o.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err)
 			continue
 		}
 
 		if currentVersionSemver.LessThan(latestVersionSemver) {
-			c.Logger.Printf("there is a new stable version available %s %s, current wolfi version %s", config.Package.Name, latestVersion, config.Package.Version)
+			o.Logger.Printf("there is a new stable version available %s %s, current wolfi version %s", config.Package.Name, latestVersion, config.Package.Version)
 			packagesToUpdate[config.Package.Name] = latestVersion
 		}
 
 	}
 
-	err = c.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
+	// let's work on a branch when updating package versions, so we can create a PR from that branch later
+	ref, err := o.switchBranch(repo)
 	if err != nil {
-		return errors.Wrapf(err, "failed to make updates on %s", c.RepoURI)
+		return errors.Wrapf(err, "failed to switch to working git branch")
+	}
+
+	err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to make updates on %s", o.RepoURI)
 	}
 
 	// diff any changes
@@ -126,7 +148,7 @@ func (c Context) Update() error {
 		return errors.Wrapf(err, "failed to git commit")
 	}
 
-	if !c.DryRun {
+	if !o.DryRun {
 		pushOpts := &git.PushOptions{RemoteName: "origin"}
 		gitToken := os.Getenv("GITHUB_TOKEN")
 		if gitToken != "" {
@@ -142,28 +164,25 @@ func (c Context) Update() error {
 		}
 
 		// create a pull request
+		return o.createPullRequest(repo, ref)
+
 	}
 
 	return nil
 }
 
-func (c Context) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) error {
-	// let's work on a branch when updating package versions, so we can create a PR from that branch later
-	err := c.switchBranch(repo)
-	if err != nil {
-		return errors.Wrapf(err, "failed to switch to working git branch")
-	}
+func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) error {
 
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {
 
 		// if new versions are available lets bump the packages in the target melange git repo
-		//if c.Batch {
+		//if o.Batch {
 		configFile := filepath.Join(tempDir, packageName+".yaml")
 
-		err = c.bump(configFile, latestVersion)
+		err := o.bump(configFile, latestVersion)
 		if err != nil {
-			c.Logger.Printf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error())
+			o.Logger.Printf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error())
 		}
 		worktree, err := repo.Worktree()
 		if err != nil {
@@ -179,36 +198,78 @@ func (c Context) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 }
 
 // create a unique branch
-func (c Context) switchBranch(repo *git.Repository) error {
+func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
 	name := time.Now().Format("2006102150405")
 
 	worktree, err := repo.Worktree()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get git worktree")
+		return "", errors.Wrapf(err, "failed to get git worktree")
 	}
 	ref := plumbing.ReferenceName("refs/heads/wupdater-" + name)
 	err = worktree.Checkout(&git.CheckoutOptions{
 		Create: true,
 		Branch: ref,
 	})
-	return err
+	return ref, err
 }
 
-func (c Context) getPackageConfigs(tempDir string) error {
+func (o Options) getPackageConfigs(tempDir string) error {
 	var err error
-	if c.PackageName != "" {
+	if o.PackageName != "" {
 		// get a single package
-		filename := filepath.Join(tempDir, c.PackageName+".yaml")
-		err = c.readPackageConfig(filename)
+		filename := filepath.Join(tempDir, o.PackageName+".yaml")
+		err = o.readPackageConfig(filename)
 		if err != nil {
 			return errors.Wrapf(err, "failed to read package config %s", filename)
 		}
 	} else {
 		// get all packages in the provided git repo
-		err = c.readAllPackagesFromRepo(tempDir)
+		err = o.readAllPackagesFromRepo(tempDir)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read package configs from repo %s", c.RepoURI)
+			return errors.Wrapf(err, "failed to read package configs from repo %s", o.RepoURI)
 		}
 	}
 	return nil
+}
+
+func (o Options) createPullRequest(repo *git.Repository, ref plumbing.ReferenceName) error {
+	remote, err := repo.Remote("origin")
+	if err != nil {
+		return errors.Wrapf(err, "failed to find git origin URL")
+	}
+	if len(remote.Config().URLs) == 0 {
+		return fmt.Errorf("no remote config URLs found for remote origin")
+	}
+
+	owner, repoName, err := parseGitURL(remote.Config().URLs[0])
+	if err != nil {
+		return errors.Wrapf(err, "failed to find git origin URL")
+	}
+
+	client := github.NewClient(o.GitHubHTTPClient)
+
+	pr, _, err := client.PullRequests.Create(context.Background(), owner, repoName, &github.NewPullRequest{
+		Title: github.String(o.PullRequestTitle),
+		Head:  github.String(ref.String()),
+		Base:  github.String(o.PullRequestBaseBranch),
+		Body:  github.String(wolfiImage),
+	})
+
+	if err != nil {
+		return errors.Wrapf(err, "failed to create pull request")
+	}
+	o.Logger.Printf("Pull Request Created: https://github.com/%s/%s/pull/%d", owner, repoName, *pr.Number)
+	return nil
+}
+
+func parseGitURL(rawURL string) (string, string, error) {
+	rawURL = strings.TrimSuffix(rawURL, ".git")
+
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", "", errors.Wrapf(err, "failed to parse git url %s", rawURL)
+	}
+
+	parts := strings.Split(parsedURL.Path, "/")
+	return parts[1], parts[2], nil
 }
