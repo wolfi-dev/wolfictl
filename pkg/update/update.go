@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+
 	"github.com/go-git/go-git/v5/plumbing"
 
 	"github.com/hashicorp/go-version"
@@ -35,7 +37,7 @@ func New() (Context, error) {
 			client: http.DefaultClient,
 
 			// 1 request every (n) second(s) to avoid DOS'ing server
-			Ratelimiter: rate.NewLimiter(rate.Every(2*time.Second), 5),
+			Ratelimiter: rate.NewLimiter(rate.Every(2*time.Second), 1),
 		},
 		Logger: log.New(log.Writer(), "wupdater: ", log.LstdFlags|log.Lmsgprefix),
 	}
@@ -52,9 +54,8 @@ func (c Context) Update() error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to create temporary folder to clone package configs into")
 	}
-
 	if c.DryRun {
-		c.Logger.Printf("using temp dir %s", tempDir)
+		c.Logger.Printf("using working directory %s", tempDir)
 	} else {
 		defer os.Remove(tempDir)
 	}
@@ -126,10 +127,21 @@ func (c Context) Update() error {
 	}
 
 	if !c.DryRun {
-		err = repo.Push(&git.PushOptions{RemoteName: "origin"})
+		pushOpts := &git.PushOptions{RemoteName: "origin"}
+		gitToken := os.Getenv("GITHUB_TOKEN")
+		if gitToken != "" {
+			pushOpts.Auth = &gitHttp.BasicAuth{
+				Username: "abc123",
+				Password: gitToken,
+			}
+		}
+
+		err = repo.Push(pushOpts)
 		if err != nil {
 			return errors.Wrapf(err, "failed to git push")
 		}
+
+		// create a pull request
 	}
 
 	return nil
