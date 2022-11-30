@@ -173,3 +173,13 @@ help: ## Display help
 		'/^[^\t].+?:.*?##/ {\
 			printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
 		}' $(MAKEFILE_LIST) | sort
+
+bin/docs:
+	go build -v -o bin/docs cmd/docs/*.go
+
+.PHONY: docs
+docs: bin/docs ## update docs
+	@echo "Generating docs"
+	@./bin/docs --target=./docs/cmd
+	@./bin/docs --target=./docs/man/man1 --kind=man
+	@rm -f ./bin/docs

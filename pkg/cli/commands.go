@@ -6,10 +6,10 @@ import (
 
 func New() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:               "update",
+		Use:               "wupdater",
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
-		Short:             "Attempts to converts files into melange configuration files",
+		Short:             "A simple CLI for working with Wolfi GitHub repositories",
 	}
 
 	cmd.AddCommand(Update())
