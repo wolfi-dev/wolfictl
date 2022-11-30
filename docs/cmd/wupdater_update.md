@@ -10,11 +10,7 @@ wupdater update
 
 ### Synopsis
 
-"Proposes melange package update(s) via a pull request".
-
-### Examples
-
-  wupdater update https://github.com/wolfi-dev/os
+Proposes melange package update(s) via a pull request
 
 ### Options
 
@@ -29,5 +25,5 @@ wupdater update
 
 ### SEE ALSO
 
-* [wupdater](wupdater.md)	 - Attempts to converts files into melange configuration files
+* [wupdater](wupdater.md)	 - A simple CLI for working with Wolfi GitHub repositories
 

@@ -1,10 +1,10 @@
 ## wupdater
 
-Attempts to converts files into melange configuration files
+A simple CLI for working with Wolfi GitHub repositories
 
 ### Synopsis
 
-Attempts to converts files into melange configuration files
+A simple CLI for working with Wolfi GitHub repositories
 
 ### Options
 
