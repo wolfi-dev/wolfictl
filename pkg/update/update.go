@@ -1,6 +1,7 @@
 package update
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
@@ -137,7 +138,6 @@ func (o Options) Update() error {
 		return errors.Wrapf(err, "failed to make updates on %s", o.RepoURI)
 	}
 
-	// diff any changes
 	worktree, err := repo.Worktree()
 	if err != nil {
 		return errors.Wrapf(err, "failed to get git worktree")
@@ -183,6 +183,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		err := o.bump(configFile, latestVersion)
 		if err != nil {
 			o.Logger.Printf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error())
+			continue
 		}
 		worktree, err := repo.Worktree()
 		if err != nil {
@@ -190,10 +191,54 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		}
 		_, err = worktree.Add(packageName + ".yaml")
 		if err != nil {
-			return errors.Wrapf(err, "failed to get add %s", configFile)
+			return errors.Wrapf(err, "failed to git add %s", configFile)
 		}
+
+		// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
+		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
+		if err != nil {
+			return errors.Wrap(err, "failed to update Makefile")
+		}
+
 	}
 
+	return nil
+}
+
+// this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
+// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
+func (o Options) updateMakefile(tempDir string, packageName string, latestVersion string, worktree *git.Worktree) error {
+	file, err := os.Open(filepath.Join(tempDir, "Makefile"))
+	if err != nil {
+		// if the Makefile doesn't exist anymore let's just return
+		return nil
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var newFile []byte
+	// optionally, resize scanner's capacity for lines over 64K, see next example
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, packageName) {
+			line = fmt.Sprintf("$(eval $(call build-package,%s,%s-r%s))", packageName, latestVersion, "0")
+		}
+		newFile = append(newFile, []byte(line+"\n")...)
+	}
+
+	info, err := os.Stat(filepath.Join(tempDir, "Makefile"))
+	if err != nil {
+		return errors.Wrap(err, "failed to check file permissions of the Makefile")
+	}
+
+	err = os.WriteFile(filepath.Join(tempDir, "Makefile"), newFile, info.Mode())
+	if err != nil {
+		return errors.Wrap(err, "failed to write Makefile")
+	}
+	_, err = worktree.Add("Makefile")
+	if err != nil {
+		return errors.Wrap(err, "failed to git add Makefile")
+	}
 	return nil
 }
 

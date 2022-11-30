@@ -106,3 +106,34 @@ func setupTestWolfiRepo(t *testing.T, dir string, testURL string) *git.Repositor
 
 	return r
 }
+
+// a bit more than a typical unit test but is useful to test a git branch with melange bump
+func TestUpdate_updateMakefile(t *testing.T) {
+	tempDir := t.TempDir()
+	data, err := os.ReadFile(filepath.Join("testdata", "Makefile"))
+	assert.NoError(t, err)
+
+	// make the temp test dir a git repo
+	fs := osfs.New(tempDir)
+	storage := filesystem.NewStorage(fs, cache.NewObjectLRUDefault())
+	wt, _ := fs.Chroot("melange")
+	r, err := git.Init(storage, wt)
+	assert.NoError(t, err)
+	w, _ := r.Worktree()
+
+	// copy test file into temp git repo
+	err = util.WriteFile(w.Filesystem, "Makefile", data, 0644)
+	assert.NoError(t, err)
+
+	o := Options{
+		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+	}
+	err = o.updateMakefile(filepath.Join(tempDir, "melange"), "zlib", "1.3.0", w)
+	assert.NoError(t, err)
+
+	// assert the Makefile contains the correct changes
+	resultData, err := os.ReadFile(filepath.Join(tempDir, "melange", "Makefile"))
+	assert.NoError(t, err)
+	assert.Contains(t, string(resultData), "build-package,zlib,1.3.0-r0)")
+
+}
