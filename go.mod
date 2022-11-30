@@ -1,4 +1,4 @@
-module github.com/wolfi-dev/wupdater
+module github.com/wolfi-dev/wolfictl
 
 go 1.19
 

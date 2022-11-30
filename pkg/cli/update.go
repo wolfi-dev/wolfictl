@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wupdater/pkg/update"
+	"github.com/wolfi-dev/wolfictl/pkg/update"
 )
 
 type options struct {
@@ -24,7 +24,7 @@ func Update() *cobra.Command {
 		Use:     "update",
 		Short:   "Proposes melange package update(s) via a pull request",
 		Long:    `"Proposes melange package update(s) via a pull request".`,
-		Example: `  wupdater update https://github.com/wolfi-dev/os`,
+		Example: `  wolfictl update https://github.com/wolfi-dev/os`,
 		Args:    cobra.RangeArgs(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 

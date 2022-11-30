@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/wolfi-dev/wupdater/pkg/cli"
+	"github.com/wolfi-dev/wolfictl/pkg/cli"
 	"log"
 )
 

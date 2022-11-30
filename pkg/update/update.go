@@ -55,7 +55,7 @@ func New() (Options, error) {
 			Ratelimiter: rate.NewLimiter(rate.Every(2*time.Second), 1),
 		},
 		GitHubHTTPClient: oauth2.NewClient(context.Background(), ts),
-		Logger:           log.New(log.Writer(), "wupdater: ", log.LstdFlags|log.Lmsgprefix),
+		Logger:           log.New(log.Writer(), "wolfictl: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
 	options.Packages = make(map[string]MelageConfig)
@@ -66,7 +66,7 @@ func New() (Options, error) {
 func (o Options) Update() error {
 
 	// clone the melange config git repo into a temp folder so we can work with it
-	tempDir, err := os.MkdirTemp("", "wupdater")
+	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
 		return errors.Wrapf(err, "failed to create temporary folder to clone package configs into")
 	}
@@ -205,7 +205,7 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to get git worktree")
 	}
-	ref := plumbing.ReferenceName("refs/heads/wupdater-" + name)
+	ref := plumbing.ReferenceName("refs/heads/wolfictl-" + name)
 	err = worktree.Checkout(&git.CheckoutOptions{
 		Create: true,
 		Branch: ref,

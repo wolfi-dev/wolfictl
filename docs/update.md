@@ -1,6 +1,6 @@
 ## Commands
 
-See the [wupdater update_command reference](https://github.com/wolfi-dev/wupdater/blob/main/docs/cmd/wupdater_update.md)
+See the [wolfictl update_command reference](https://github.com/wolfi-dev/wolfictl/blob/main/docs/cmd/wolfictl_update.md)
 
 ## Diagram
 

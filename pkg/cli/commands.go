@@ -6,7 +6,7 @@ import (
 
 func New() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:               "wupdater",
+		Use:               "wolfictl",
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		Short:             "A simple CLI for working with Wolfi GitHub repositories",

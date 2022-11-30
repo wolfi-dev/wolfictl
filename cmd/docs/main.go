@@ -23,7 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/wolfi-dev/wupdater/pkg/cli"
+	"github.com/wolfi-dev/wolfictl/pkg/cli"
 )
 
 const descriptionSourcePath = "docs/reference/cmd/"

@@ -37,7 +37,7 @@ LDFLAGS=-buildid= -X $(PKG).gitVersion=$(GIT_VERSION) \
         -X $(PKG).gitTreeState=$(GIT_TREESTATE) \
         -X $(PKG).buildDate=$(BUILD_DATE)
 
-KO_DOCKER_REPO ?= ghcr.io/wolfi-dev/wupdater
+KO_DOCKER_REPO ?= ghcr.io/wolfi-dev/wolfictl
 DIGEST ?=
 
 
@@ -63,7 +63,7 @@ ko: ## Build images using ko
 	$(eval DIGEST := $(shell LDFLAGS="$(LDFLAGS)" GIT_HASH=$(GIT_HASH) GIT_VERSION=$(GIT_VERSION) \
 	KOCACHE=$(KOCACHE_PATH) ko build --bare \
 		--platform=all --tags $(GIT_VERSION) --tags $(GIT_HASH) \
-		chainguard.dev/wupdater))
+		chainguard.dev/wolfictl))
 	@echo Image Digest $(DIGEST)
 
 .PHONY: ko-local
@@ -72,7 +72,7 @@ ko-local:  ## Build images locally using ko
 	LDFLAGS="$(LDFLAGS)" GIT_HASH=$(GIT_HASH) GIT_VERSION=$(GIT_VERSION) \
 	KOCACHE=$(KOCACHE_PATH) ko build --bare \
 		--tags $(GIT_VERSION) --tags $(GIT_HASH) --local \
-		chainguard.dev/wupdater
+		chainguard.dev/wolfictl
 
 .PHONY: ko-apply
 ko-apply:  ## Build the image and apply the manifests
@@ -85,15 +85,15 @@ ko-apply:  ## Build the image and apply the manifests
 # Build
 ##########
 
-.PHONY: wupdater
-wupdater: $(SRCS) ## Builds wupdater
+.PHONY: wolfictl
+wolfictl: $(SRCS) ## Builds wolfictl
 	CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o $@ ./
 
 .PHONY: install
-install: $(SRCS) ## Installs wupdater into BINDIR (default /usr/bin)
-	install -Dm755 wupdater ${DESTDIR}${BINDIR}/wupdater
-	install -dm755 ${DESTDIR}/usr/share/wupdater/pipelines
-	tar c -C pipelines . | tar x -C "${DESTDIR}/usr/share/wupdater/pipelines"
+install: $(SRCS) ## Installs wolfictl into BINDIR (default /usr/bin)
+	install -Dm755 wolfictl ${DESTDIR}${BINDIR}/wolfictl
+	install -dm755 ${DESTDIR}/usr/share/wolfictl/pipelines
+	tar c -C pipelines . | tar x -C "${DESTDIR}/usr/share/wolfictl/pipelines"
 
 #####################
 # lint / test section
@@ -140,7 +140,7 @@ test: ## Run go test
 
 .PHONY: clean
 clean: ## Clean the workspace
-	rm -rf wupdater
+	rm -rf wolfictl
 	rm -rf bin/
 	rm -rf dist/
 
