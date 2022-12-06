@@ -27,7 +27,10 @@ type ReleaseMonitorVersions struct {
 }
 type MonitorServiceName int
 
-const dataURL = "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/Test.md"
+//const dataURL = "https://raw.githubusercontent.com/rawlingsj/wup-mapper/ba48e10f1bcfb2a42bef689944dac1f5b739fc00/Test.md"
+
+const dataURL = "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/README.md"
+
 const releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%s"
 
 func (m MonitorService) getMonitorServiceData() (map[string]Row, error) {

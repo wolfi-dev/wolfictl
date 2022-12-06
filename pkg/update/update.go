@@ -220,7 +220,7 @@ func (o Options) updateMakefile(tempDir string, packageName string, latestVersio
 	// optionally, resize scanner's capacity for lines over 64K, see next example
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.Contains(line, packageName) {
+		if strings.Contains(line, fmt.Sprintf("$(eval $(call build-package,%s,", packageName)) {
 			line = fmt.Sprintf("$(eval $(call build-package,%s,%s-r%s))", packageName, latestVersion, "0")
 		}
 		newFile = append(newFile, []byte(line+"\n")...)
