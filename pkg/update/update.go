@@ -13,6 +13,7 @@ import (
 	"time"
 
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+
 	"github.com/google/uuid"
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 
@@ -203,7 +204,9 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 			if err != nil {
 				return errors.Wrap(err, "failed to commit changes")
 			}
-			pullRequests = append(pullRequests, pr)
+			if pr != "" {
+				pullRequests = append(pullRequests, pr)
+			}
 		}
 	}
 
@@ -319,26 +322,7 @@ func (o Options) readPackageConfigs(tempDir string) error {
 }
 
 // commits package update changes and creates a pull request
-func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, latestVersion string) (string, error) {
-
-	err := o.commitChanges(repo, packageName, latestVersion)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to commit changes")
-	}
-
-	pushOpts := &git.PushOptions{RemoteName: "origin"}
-	gitToken := os.Getenv("GITHUB_TOKEN")
-	if gitToken != "" {
-		pushOpts.Auth = &gitHttp.BasicAuth{
-			Username: "abc123",
-			Password: gitToken,
-		}
-	}
-
-	err = repo.Push(pushOpts)
-	if err != nil {
-		return "", errors.Wrapf(err, "failed to git push")
-	}
+func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, newVersion string) (string, error) {
 
 	remote, err := repo.Remote("origin")
 	if err != nil {
@@ -354,19 +338,15 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 		return "", errors.Wrapf(err, "failed to find git origin URL")
 	}
 
-	client := github.NewClient(o.GitHubHTTPClient.client)
-
-	// Create an PullRequest struct which is used to create the real pull request from
-	pr := gh.PullRequest{
+	basePullRequest := gh.BasePullRequest{
 		RepoName:              repoName,
 		Owner:                 owner,
 		Branch:                ref.String(),
-		Title:                 fmt.Sprintf(o.PullRequestTitle, packageName),
 		PullRequestBaseBranch: o.PullRequestBaseBranch,
 		Retries:               0,
-		Body:                  wolfiImage,
 	}
 
+	client := github.NewClient(o.GitHubHTTPClient.client)
 	gitOpts := gh.GitOptions{
 		GithubClient:                  client,
 		MaxPullRequestRetries:         maxPullRequestRetries,
@@ -374,7 +354,64 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 		Logger:                        o.Logger,
 	}
 
-	prLink, err := gitOpts.OpenPullRequest(pr)
+	getPr := gh.GetPullRequest{
+		BasePullRequest: basePullRequest,
+		PackageName:     packageName,
+		Version:         newVersion,
+	}
+
+	// if an existing PR is open with the same version skip, if it's an older version close the PR and we'll create a new one
+	exitingPR, err := gitOpts.CheckExistingPullRequests(getPr)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to check for existing pull requests")
+	}
+
+	if exitingPR != "" {
+		o.Logger.Printf("found matching open pull request for %s/%s %s", packageName, newVersion, exitingPR)
+		return "", nil
+	}
+
+	// commit the changes
+	err = o.commitChanges(repo, packageName, newVersion)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to commit changes")
+	}
+
+	// setup github auth using standard environment variables
+	pushOpts := &git.PushOptions{RemoteName: "origin"}
+	gitToken := os.Getenv("GITHUB_TOKEN")
+	if gitToken != "" {
+		pushOpts.Auth = &gitHttp.BasicAuth{
+			Username: "abc123",
+			Password: gitToken,
+		}
+	}
+
+	// push the version update changes to our working branch
+	err = repo.Push(pushOpts)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to git push")
+	}
+
+	// now let's create a pull request
+
+	// if we have a single version use it in the PR title, this might be a batch with multiple versions so default to a simple title
+	var title string
+	if newVersion != "" {
+		title = fmt.Sprintf(o.PullRequestTitle, packageName, newVersion)
+	} else {
+		title = fmt.Sprintf(o.PullRequestTitle, packageName, "new versions")
+	}
+
+	// Create an NewPullRequest struct which is used to create the real pull request from
+	newPR := gh.NewPullRequest{
+		BasePullRequest: basePullRequest,
+		Title:           title,
+		Body:            wolfiImage,
+	}
+
+	// create the pull request
+	prLink, err := gitOpts.OpenPullRequest(newPR)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to create pull request")
 	}
@@ -391,7 +428,7 @@ func (o Options) commitChanges(repo *git.Repository, packageName, latestVersion 
 
 	commitMessage := ""
 	if latestVersion != "" {
-		commitMessage = fmt.Sprintf("Updating %s to %s", packageName, latestVersion)
+		commitMessage = fmt.Sprintf("%s/%s package update", packageName, latestVersion)
 	} else {
 		commitMessage = "Updating wolfi packages"
 	}
