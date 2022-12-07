@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/wolfi-dev/wolfictl/pkg/cli"
 	"log"
+
+	"github.com/wolfi-dev/wolfictl/pkg/cli"
 )
 
 func main() {
