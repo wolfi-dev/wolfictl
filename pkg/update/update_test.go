@@ -42,6 +42,8 @@ func Test_parseGitURL(t *testing.T) {
 // a bit more than a typical unit test but is useful to test a git branch with melange bump
 func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	dir := t.TempDir()
+	t.Setenv("GIT_AUTHOR_NAME", "wolfibot")
+	t.Setenv("GIT_AUTHOR_EMAIL", "wolfibot@nowhere.io")
 
 	data, err := os.ReadFile(filepath.Join("testdata", "cheese-1.5.10.tar.gz"))
 	assert.NoError(t, err)
