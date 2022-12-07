@@ -24,11 +24,12 @@ import (
 )
 
 type Options struct {
-	PackageName           string
+	PackageNames          []string
 	PullRequestBaseBranch string
 	PullRequestTitle      string
 	RepoURI               string
 	DataMapperURL         string
+	DefaultBranch         string
 	Batch                 bool
 	DryRun                bool
 	Packages              map[string]MelageConfig
@@ -67,7 +68,7 @@ func New() (Options, error) {
 	}
 
 	options.Packages = make(map[string]MelageConfig)
-
+	options.DefaultBranch = "main"
 	return options, nil
 }
 
@@ -193,7 +194,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		}
 
 		// if we're not running in batch mode, lets commit and PR each change
-		if !o.Batch {
+		if !o.Batch && !o.DryRun {
 			pr, err := o.proposeChanges(repo, ref, packageName)
 			if err != nil {
 				return errors.Wrap(err, "failed to commit changes")
@@ -203,7 +204,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 	}
 
 	// create the single pull request at the end if running in batch mode
-	if o.Batch {
+	if o.Batch && !o.DryRun {
 		pr, err := o.proposeChanges(repo, ref, "Batch")
 		if err != nil {
 			return errors.Wrap(err, "failed to commit changes")
@@ -265,7 +266,7 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 	}
 
 	// make sure we are on the main branch to start with
-	ref := plumbing.ReferenceName(fmt.Sprintf("refs/heads/main"))
+	ref := plumbing.ReferenceName(fmt.Sprintf("refs/heads/" + o.DefaultBranch))
 	err = worktree.Checkout(&git.CheckoutOptions{
 		Create: false,
 		Branch: ref,
@@ -291,13 +292,17 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 // read the melange package config(s) from the target git repository so we can check if new versions exist
 func (o Options) readPackageConfigs(tempDir string) error {
 	var err error
-	if o.PackageName != "" {
-		// get a single package
-		filename := filepath.Join(tempDir, o.PackageName+".yaml")
-		err = o.readPackageConfig(filename)
-		if err != nil {
-			return errors.Wrapf(err, "failed to read package config %s", filename)
+
+	if len(o.PackageNames) > 0 {
+		// get package by name
+		for _, packageName := range o.PackageNames {
+			filename := filepath.Join(tempDir, packageName+".yaml")
+			err = o.readPackageConfig(filename)
+			if err != nil {
+				return errors.Wrapf(err, "failed to read package config %s", filename)
+			}
 		}
+
 	} else {
 		// get all packages in the provided git repo
 		err = o.readAllPackagesFromRepo(tempDir)

@@ -60,7 +60,9 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	r := setupTestWolfiRepo(t, dir, server.URL)
 
 	o := Options{
-		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		DryRun:        true,
+		Logger:        log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		DefaultBranch: "master",
 	}
 
 	// fake a new version available
@@ -89,12 +91,15 @@ func setupTestWolfiRepo(t *testing.T, dir string, testURL string) *git.Repositor
 	melangConfig := strings.Replace(string(data), "REPLACE_ME", testURL, 1)
 
 	storage := filesystem.NewStorage(fs, cache.NewObjectLRUDefault())
-	wt, _ := fs.Chroot("melange")
+	wt, err := fs.Chroot("melange")
+	assert.NoError(t, err)
 
 	r, err := git.Init(storage, wt)
 	assert.NoError(t, err)
 
-	w, _ := r.Worktree()
+	w, err := r.Worktree()
+	assert.NoError(t, err)
+
 	err = util.WriteFile(w.Filesystem, "cheese.yaml", []byte(melangConfig), 0644)
 	assert.NoError(t, err)
 
