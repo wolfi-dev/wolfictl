@@ -20,8 +20,13 @@ Proposes melange package update(s) via a pull request
 
 .SH OPTIONS
 .PP
-\fB\-\-batch\fP[=true]
+\fB\-\-batch\fP[=false]
     creates a single pull request with package updates rather than individual pull request per package update
+
+.PP
+\fB\-\-data\-mapper\-url\fP="
+\[la]https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/README.md"\[ra]
+    URL to use for mapping packages to source update service
 
 .PP
 \fB\-\-dry\-run\fP[=false]
@@ -40,7 +45,7 @@ Proposes melange package update(s) via a pull request
     base branch to create a pull request against
 
 .PP
-\fB\-\-pull\-request\-title\fP="wolfi update packages"
+\fB\-\-pull\-request\-title\fP="%s package update"
     the title to use when creating a pull request
 
 
