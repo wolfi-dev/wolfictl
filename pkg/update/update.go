@@ -4,9 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
-	"github.com/google/uuid"
-	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,6 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/google/uuid"
+	"github.com/wolfi-dev/wolfictl/pkg/gh"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"

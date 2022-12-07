@@ -3,10 +3,11 @@ package gh
 import (
 	"context"
 	"fmt"
-	"github.com/google/go-github/v48/github"
-	"github.com/pkg/errors"
 	"log"
 	"time"
+
+	"github.com/google/go-github/v48/github"
+	"github.com/pkg/errors"
 )
 
 /*
