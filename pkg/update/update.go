@@ -61,7 +61,7 @@ func New() (Options, error) {
 			client: oauth2.NewClient(context.Background(), ts),
 
 			// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
-			Ratelimiter: rate.NewLimiter(rate.Every(1*time.Second), 1),
+			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
 		Logger: log.New(log.Writer(), "wolfictl: ", log.LstdFlags|log.Lmsgprefix),
 	}
