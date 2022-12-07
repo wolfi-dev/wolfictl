@@ -45,7 +45,7 @@ const (
 	maxPullRequestRetries         = 10
 	wolfiImage                    = `
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wolfi-dev/.gh/main/profile/wolfi-logo-light-mode.svg" />
+  <img src="https://raw.githubusercontent.com/wolfi-dev/.github/main/profile/wolfi-logo-light-mode.svg" />
 </p>
 `
 )
@@ -199,7 +199,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 
 		// if we're not running in batch mode, lets commit and PR each change
 		if !o.Batch && !o.DryRun {
-			pr, err := o.proposeChanges(repo, ref, packageName)
+			pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
 			if err != nil {
 				return errors.Wrap(err, "failed to commit changes")
 			}
@@ -209,7 +209,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 
 	// create the single pull request at the end if running in batch mode
 	if o.Batch && !o.DryRun {
-		pr, err := o.proposeChanges(repo, ref, "Batch")
+		pr, err := o.proposeChanges(repo, ref, "Batch", "")
 		if err != nil {
 			return errors.Wrap(err, "failed to commit changes")
 		}
@@ -319,9 +319,9 @@ func (o Options) readPackageConfigs(tempDir string) error {
 }
 
 // commits package update changes and creates a pull request
-func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName string) (string, error) {
+func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, latestVersion string) (string, error) {
 
-	err := o.commitChanges(repo)
+	err := o.commitChanges(repo, packageName, latestVersion)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to commit changes")
 	}
@@ -356,7 +356,7 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 
 	client := github.NewClient(o.GitHubHTTPClient.client)
 
-	// Create an PullRequest that can be sent into a buffered delay channel to manage calls made to GitHub
+	// Create an PullRequest struct which is used to create the real pull request from
 	pr := gh.PullRequest{
 		RepoName:              repoName,
 		Owner:                 owner,
@@ -383,13 +383,19 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 }
 
 // commit changes to git
-func (o Options) commitChanges(repo *git.Repository) error {
+func (o Options) commitChanges(repo *git.Repository, packageName, latestVersion string) error {
 	worktree, err := repo.Worktree()
 	if err != nil {
 		return errors.Wrapf(err, "failed to get git worktree")
 	}
 
-	_, err = worktree.Commit("Wolfi update packages", &git.CommitOptions{})
+	commitMessage := ""
+	if latestVersion != "" {
+		commitMessage = fmt.Sprintf("Updating %s to %s", packageName, latestVersion)
+	} else {
+		commitMessage = "Updating wolfi packages"
+	}
+	_, err = worktree.Commit(commitMessage, &git.CommitOptions{})
 	if err != nil {
 		return errors.Wrapf(err, "failed to git commit")
 	}
