@@ -152,6 +152,10 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 		}
 	}
 
+	if err != nil {
+		return "", errors.Wrapf(err, "failed listing pull requests")
+	}
+
 	for _, openPr := range openPullRequests {
 		// if we already have a PR for the same version return
 		if strings.HasPrefix(*openPr.Title, fmt.Sprintf("%s/%s", pr.PackageName, pr.Version)) {
@@ -159,7 +163,7 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 		}
 		prTitle := *openPr.Title
 
-		// if we have a PR for the package but a newer version return
+		// if we have a pull request for the package but a newer version return
 		if strings.HasPrefix(prTitle, fmt.Sprintf("%s/", pr.PackageName)) {
 			parts := strings.SplitAfter(prTitle, fmt.Sprintf("%s/", pr.PackageName))
 			if len(parts) > 1 {
@@ -188,9 +192,6 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 		}
 	}
 
-	if err != nil {
-		return "", errors.Wrapf(err, "failed listing pull requests")
-	}
 	return "", nil
 }
 
