@@ -6,6 +6,7 @@ import (
 	"fmt"
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/uuid"
+	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	"log"
 	"net/http"
 	"net/url"
@@ -16,7 +17,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v48/github"
 	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -38,11 +39,15 @@ type Options struct {
 	GitHubHTTPClient      *RLHTTPClient
 }
 
-const wolfiImage = `
+const (
+	secondsToSleepWhenRateLimited = 30
+	maxPullRequestRetries         = 10
+	wolfiImage                    = `
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wolfi-dev/.github/main/profile/wolfi-logo-light-mode.svg" />
+  <img src="https://raw.githubusercontent.com/wolfi-dev/.gh/main/profile/wolfi-logo-light-mode.svg" />
 </p>
 `
+)
 
 // New initialise including a map of existing wolfios packages
 func New() (Options, error) {
@@ -107,11 +112,14 @@ func (o Options) Update() error {
 	}
 
 	packagesToUpdate := make(map[string]string)
+
+	// iterate packages in the target git repo and check if a new version is available
 	for _, config := range o.Packages {
 		item := mapperData[config.Package.Name]
 		if item.Identifier == "" {
 			continue
 		}
+
 		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
 		if err != nil {
 			return errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
@@ -122,6 +130,7 @@ func (o Options) Update() error {
 			o.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err)
 			continue
 		}
+
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
 			o.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err)
@@ -132,15 +141,10 @@ func (o Options) Update() error {
 			o.Logger.Printf("there is a new stable version available %s %s, current wolfi version %s", config.Package.Name, latestVersion, config.Package.Version)
 			packagesToUpdate[config.Package.Name] = latestVersion
 		}
-
 	}
 
-	err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
-	if err != nil {
-		return errors.Wrapf(err, "failed to make updates on %s", o.RepoURI)
-	}
+	return o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
 
-	return nil
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
@@ -169,10 +173,9 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 			}
 		}
 
-		// if new versions are available lets bump the packages in the target melange git repo
-		//if o.Batch {
 		configFile := filepath.Join(tempDir, packageName+".yaml")
 
+		// if new versions are available lets bump the packages in the target melange git repo
 		err := o.bump(configFile, latestVersion)
 		if err != nil {
 			o.Logger.Printf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error())
@@ -231,7 +234,7 @@ func (o Options) updateMakefile(tempDir string, packageName string, latestVersio
 
 	scanner := bufio.NewScanner(file)
 	var newFile []byte
-	// optionally, resize scanner's capacity for lines over 64K, see next example
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.Contains(line, fmt.Sprintf("$(eval $(call build-package,%s,", packageName)) {
@@ -267,6 +270,7 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 
 	// make sure we are on the main branch to start with
 	ref := plumbing.ReferenceName(fmt.Sprintf("refs/heads/" + o.DefaultBranch))
+
 	err = worktree.Checkout(&git.CheckoutOptions{
 		Create: false,
 		Branch: ref,
@@ -339,6 +343,7 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to find git origin URL")
 	}
+
 	if len(remote.Config().URLs) == 0 {
 		return "", fmt.Errorf("no remote config URLs found for remote origin")
 	}
@@ -350,19 +355,30 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 
 	client := github.NewClient(o.GitHubHTTPClient.client)
 
-	pr, _, err := client.PullRequests.Create(context.Background(), owner, repoName, &github.NewPullRequest{
-		Title: github.String(fmt.Sprintf(o.PullRequestTitle, packageName)),
-		Head:  github.String(ref.String()),
-		Base:  github.String(o.PullRequestBaseBranch),
-		Body:  github.String(wolfiImage),
-	})
+	// Create an PullRequest that can be sent into a buffered delay channel to manage calls made to GitHub
+	pr := gh.PullRequest{
+		RepoName:              repoName,
+		Owner:                 owner,
+		Branch:                ref.String(),
+		Title:                 fmt.Sprintf(o.PullRequestTitle, packageName),
+		PullRequestBaseBranch: o.PullRequestBaseBranch,
+		Retries:               0,
+		Body:                  wolfiImage,
+	}
 
+	gitOpts := gh.GitOptions{
+		GithubClient:                  client,
+		MaxPullRequestRetries:         maxPullRequestRetries,
+		SecondsToSleepWhenRateLimited: secondsToSleepWhenRateLimited,
+		Logger:                        o.Logger,
+	}
+
+	prLink, err := gitOpts.OpenPullRequest(pr)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to create pull request")
 	}
 
-	return fmt.Sprintf("Pull Request Created: https://github.com/%s/%s/pull/%d", owner, repoName, *pr.Number), nil
-
+	return prLink, nil
 }
 
 // commit changes to git
