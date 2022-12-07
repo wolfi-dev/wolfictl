@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-billy/v5/util"
@@ -42,8 +45,6 @@ func Test_parseGitURL(t *testing.T) {
 // a bit more than a typical unit test but is useful to test a git branch with melange bump
 func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	dir := t.TempDir()
-	t.Setenv("GIT_AUTHOR_NAME", "wolfibot")
-	t.Setenv("GIT_AUTHOR_EMAIL", "wolfibot@nowhere.io")
 
 	data, err := os.ReadFile(filepath.Join("testdata", "cheese-1.5.10.tar.gz"))
 	assert.NoError(t, err)
@@ -108,7 +109,13 @@ func setupTestWolfiRepo(t *testing.T, dir string, testURL string) *git.Repositor
 	_, err = w.Add("cheese.yaml")
 	assert.NoError(t, err)
 
-	_, err = w.Commit("initial test checkin", &git.CommitOptions{})
+	_, err = w.Commit("initial test checkin", &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "John Doe",
+			Email: "john@doe.org",
+			When:  time.Now(),
+		},
+	})
 	assert.NoError(t, err)
 
 	return r
