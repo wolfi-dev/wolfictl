@@ -12,8 +12,9 @@ import (
 )
 
 type MonitorService struct {
-	Client *RLHTTPClient
-	Logger *log.Logger
+	Client        *RLHTTPClient
+	Logger        *log.Logger
+	DataMapperURL string
 }
 
 type Row struct {
@@ -27,24 +28,20 @@ type ReleaseMonitorVersions struct {
 }
 type MonitorServiceName int
 
-//const dataURL = "https://raw.githubusercontent.com/rawlingsj/wup-mapper/ba48e10f1bcfb2a42bef689944dac1f5b739fc00/Test.md"
-
-const dataURL = "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/README.md"
-
 const releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%s"
 
 func (m MonitorService) getMonitorServiceData() (map[string]Row, error) {
 
-	req, _ := http.NewRequest("GET", dataURL, nil)
+	req, _ := http.NewRequest("GET", m.DataMapperURL, nil)
 	resp, err := m.Client.Do(req)
 
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed getting URI %s", dataURL)
+		return nil, errors.Wrapf(err, "failed getting URI %s", m.DataMapperURL)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("non ok http response for URI %s code: %v", dataURL, resp.StatusCode)
+		return nil, fmt.Errorf("non ok http response for URI %s code: %v", m.DataMapperURL, resp.StatusCode)
 	}
 
 	b, err := io.ReadAll(resp.Body)

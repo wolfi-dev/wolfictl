@@ -14,6 +14,7 @@ type options struct {
 	packageName           string
 	pullRequestBaseBranch string
 	pullRequestTitle      string
+	dataMapperURL         string
 	batch                 bool
 	dryRun                bool
 }
@@ -33,10 +34,11 @@ func Update() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&o.dryRun, "dry-run", false, "prints proposed package updates rather than creating a pull request")
-	cmd.Flags().BoolVar(&o.batch, "batch", true, "creates a single pull request with package updates rather than individual pull request per package update")
+	cmd.Flags().BoolVar(&o.batch, "batch", false, "creates a single pull request with package updates rather than individual pull request per package update")
 	cmd.Flags().StringVar(&o.packageName, "package-name", "", "Optional: provide a specific package name to check for updates rather than searching all packages in a repo URI")
 	cmd.Flags().StringVar(&o.pullRequestBaseBranch, "pull-request-base-branch", "main", "base branch to create a pull request against")
-	cmd.Flags().StringVar(&o.pullRequestTitle, "pull-request-title", "wolfi update packages", "the title to use when creating a pull request")
+	cmd.Flags().StringVar(&o.pullRequestTitle, "pull-request-title", "%s package update", "the title to use when creating a pull request")
+	cmd.Flags().StringVar(&o.dataMapperURL, "data-mapper-url", "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/README.md", "URL to use for mapping packages to source update service")
 
 	return cmd
 }
@@ -57,6 +59,7 @@ func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
 	}
 	context.PackageName = o.packageName
 	context.RepoURI = repoURI
+	context.DataMapperURL = o.dataMapperURL
 	context.DryRun = o.dryRun
 	context.Batch = o.batch
 	context.PullRequestBaseBranch = o.pullRequestBaseBranch
