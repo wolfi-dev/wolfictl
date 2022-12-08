@@ -123,7 +123,7 @@ func (o Options) Update() error {
 			continue
 		}
 
-		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
+		latestVersion, err := m.getLatestReleaseVersion(item.Identifier, item.ServiceName)
 		if err != nil {
 			return errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
 		}

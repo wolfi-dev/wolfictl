@@ -81,11 +81,14 @@ func (m MonitorService) parseData(rawdata string) (map[string]Row, error) {
 
 }
 
-func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {
+func (m MonitorService) getLatestReleaseVersion(identifier string, name string) (string, error) {
 	targetURL := fmt.Sprintf(releaseMonitorURL, identifier)
-	req, _ := http.NewRequest("GET", targetURL, nil)
-	resp, err := m.Client.Do(req)
+	req, err := http.NewRequest("GET", targetURL, nil)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed creating GET request %s", targetURL)
+	}
 
+	resp, err := m.Client.Do(req)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed getting URI %s", targetURL)
 	}
