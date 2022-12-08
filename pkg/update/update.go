@@ -36,6 +36,7 @@ type Options struct {
 	Batch                 bool
 	DryRun                bool
 	Packages              map[string]MelageConfig
+	ErrorMessages         []string
 	Client                *RLHTTPClient
 	Logger                *log.Logger
 	GitHubHTTPClient      *RLHTTPClient
@@ -129,13 +130,14 @@ func (o Options) Update() error {
 
 		currentVersionSemver, err := version.NewVersion(config.Package.Version)
 		if err != nil {
-			o.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err)
+			o.ErrorMessages = append(o.ErrorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err))
+
 			continue
 		}
 
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
-			o.Logger.Printf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err)
+			o.ErrorMessages = append(o.ErrorMessages, fmt.Sprintf("failed to create a latestVersion from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err))
 			continue
 		}
 
@@ -145,21 +147,32 @@ func (o Options) Update() error {
 		}
 	}
 
-	return o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
+	errorMessages, err := o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
+	if err != nil {
+		return errors.Wrap(err, "failed to update packages in git repository")
+	}
 
+	o.ErrorMessages = append(o.ErrorMessages, errorMessages...)
+
+	// certain errors should not halt the updates, print them at the end
+	for _, message := range o.ErrorMessages {
+		o.Logger.Printf(message)
+	}
+	return nil
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) error {
+func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) ([]string, error) {
 	var ref plumbing.ReferenceName
 	var err error
 	var pullRequests []string
+	var errorMessages []string
 
 	if o.Batch {
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
 		ref, err = o.switchBranch(repo)
 		if err != nil {
-			return errors.Wrapf(err, "failed to switch to working git branch")
+			return errorMessages, errors.Wrapf(err, "failed to switch to working git branch")
 		}
 	}
 
@@ -171,7 +184,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 			// let's work on a branch when updating package versions, so we can create a PR from that branch later
 			ref, err = o.switchBranch(repo)
 			if err != nil {
-				return errors.Wrapf(err, "failed to switch to working git branch")
+				return errorMessages, errors.Wrapf(err, "failed to switch to working git branch")
 			}
 		}
 
@@ -180,29 +193,30 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		// if new versions are available lets bump the packages in the target melange git repo
 		err := o.bump(configFile, latestVersion)
 		if err != nil {
-			o.Logger.Printf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error())
+			// add this to the list of messages to print at the end of the update
+			errorMessages = append(errorMessages, fmt.Sprintf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error()))
 			continue
 		}
 		worktree, err := repo.Worktree()
 		if err != nil {
-			return errors.Wrapf(err, "failed to get git worktree")
+			return errorMessages, errors.Wrapf(err, "failed to get git worktree")
 		}
 		_, err = worktree.Add(packageName + ".yaml")
 		if err != nil {
-			return errors.Wrapf(err, "failed to git add %s", configFile)
+			return errorMessages, errors.Wrapf(err, "failed to git add %s", configFile)
 		}
 
 		// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
 		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
 		if err != nil {
-			return errors.Wrap(err, "failed to update Makefile")
+			return errorMessages, errors.Wrap(err, "failed to update Makefile")
 		}
 
 		// if we're not running in batch mode, lets commit and PR each change
 		if !o.Batch && !o.DryRun {
 			pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
 			if err != nil {
-				return errors.Wrap(err, "failed to commit changes")
+				return errorMessages, errors.Wrap(err, "failed to propose changes")
 			}
 			if pr != "" {
 				pullRequests = append(pullRequests, pr)
@@ -214,7 +228,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 	if o.Batch && !o.DryRun {
 		pr, err := o.proposeChanges(repo, ref, "Batch", "")
 		if err != nil {
-			return errors.Wrap(err, "failed to commit changes")
+			return errorMessages, errors.Wrap(err, "failed to propose changes")
 		}
 		pullRequests = append(pullRequests, pr)
 	}
@@ -223,7 +237,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 	for _, pr := range pullRequests {
 		o.Logger.Printf(pr)
 	}
-	return nil
+	return errorMessages, nil
 }
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
