@@ -64,11 +64,6 @@ func (o GitOptions) OpenPullRequest(pr NewPullRequest) (string, error) {
 	// make a pull request
 	githubPR, resp, err := o.GithubClient.PullRequests.Create(context.Background(), pr.Owner, pr.RepoName, newPR)
 
-	// The go-gh library's CheckResponse method can return two different types of rate limiting error:
-	// 1. AbuseRateLimitError which may contain a Retry-After header whose value we can use to slow down, or
-	// 2. RateLimitError which may contain information about when the rate limit will be removed, that we can also use to slow down
-	// Therefore, we need to use type assertions to test for each type of error response, and accordingly fetch the data it may contain
-	// about how long we should wait before its next attempt to open a pull request
 	githubErr := github.CheckResponse(resp.Response)
 
 	if githubErr != nil {
@@ -77,15 +72,8 @@ func (o GitOptions) OpenPullRequest(pr NewPullRequest) (string, error) {
 
 		if isRateLimited {
 
-			// If this request has been seen before, increment its retries count, taking into account previous iterations
 			pr.Retries++
-
-			// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
-			if delay == 0 {
-				delay = time.Duration(o.SecondsToSleepWhenRateLimited)
-			}
-			o.Logger.Printf("retrying PR for repo: %s again later with %d second delay due to secondary rate limiting.", pr.RepoName, delay)
-			time.Sleep(delay * time.Second)
+			o.wait(delay)
 
 			// retry opening a pull request
 			return o.OpenPullRequest(pr)
@@ -99,6 +87,7 @@ func (o GitOptions) OpenPullRequest(pr NewPullRequest) (string, error) {
 	return githubPR.GetHTMLURL(), nil
 }
 
+// checks if error codes returned from GitHub tell us we are being rate limited
 func (o GitOptions) checkRateLimiting(githubErr error) (bool, time.Duration) {
 	var isRateLimited = false
 
@@ -137,15 +126,8 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 
 		if isRateLimited {
 
-			// If this request has been seen before, increment its retries count, taking into account previous iterations
 			pr.Retries++
-
-			// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
-			if delay == 0 {
-				delay = time.Duration(o.SecondsToSleepWhenRateLimited)
-			}
-			o.Logger.Printf("retrying PR for repo: %s again later with %d second delay due to secondary rate limiting.", pr.RepoName, delay)
-			time.Sleep(delay * time.Second)
+			o.wait(delay)
 
 			// retry opening a pull request
 			return o.CheckExistingPullRequests(pr)
@@ -161,33 +143,16 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 		if strings.HasPrefix(*openPr.Title, fmt.Sprintf("%s/%s", pr.PackageName, pr.Version)) {
 			return openPr.GetHTMLURL(), nil
 		}
+
 		prTitle := *openPr.Title
+		// if we have a pull request for the package but it's for an old version close it
+		isOld := o.isPullRequestOldVersion(pr.PackageName, pr.Version, prTitle)
 
-		// if we have a pull request for the package but a newer version return
-		if strings.HasPrefix(prTitle, fmt.Sprintf("%s/", pr.PackageName)) {
-			parts := strings.SplitAfter(prTitle, fmt.Sprintf("%s/", pr.PackageName))
-			if len(parts) > 1 {
-				continue
-			}
-			versionParts := strings.SplitAfter(parts[0], " ")
-			if len(versionParts) == 0 {
-				continue
-			}
-
-			currentVersionSemver, err := version.NewVersion(versionParts[0])
+		if isOld {
+			o.Logger.Printf("closing old pull request %s as we have a newer version %s", openPr.GetHTMLURL(), pr.Version)
+			err = o.closePullRequest(pr, openPr)
 			if err != nil {
-				continue
-			}
-
-			latestVersionSemver, err := version.NewVersion(pr.Version)
-			if err != nil {
-				o.Logger.Printf("failed to create a version from %s.  Error: %s", pr.Version, err)
-				continue
-			}
-
-			if currentVersionSemver.LessThan(latestVersionSemver) {
-				o.Logger.Printf("closing old pull request %s as we have a newer version %s", openPr.GetHTMLURL(), pr.Version)
-				return "", o.closePullRequest(pr, openPr)
+				o.Logger.Printf("failed closing old pull request %s.  Error: %s", openPr.GetHTMLURL(), err.Error())
 			}
 		}
 	}
@@ -195,9 +160,20 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 	return "", nil
 }
 
+func (o GitOptions) wait(delay time.Duration) {
+
+	// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
+	if delay == 0 {
+		delay = time.Duration(o.SecondsToSleepWhenRateLimited)
+	}
+	o.Logger.Printf("retrying PR again later with %d second delay due to secondary rate limiting.", delay)
+	time.Sleep(delay * time.Second)
+}
+
 func (o GitOptions) closePullRequest(pr GetPullRequest, openPr *github.PullRequest) error {
 	closed := "closed"
 	openPr.State = &closed
+
 	_, resp, err := o.GithubClient.PullRequests.Edit(context.Background(), pr.Owner, pr.RepoName, *openPr.Number, openPr)
 	githubErr := github.CheckResponse(resp.Response)
 
@@ -210,16 +186,51 @@ func (o GitOptions) closePullRequest(pr GetPullRequest, openPr *github.PullReque
 			// If this request has been seen before, increment its retries count, taking into account previous iterations
 			pr.Retries++
 
-			// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
-			if delay == 0 {
-				delay = time.Duration(o.SecondsToSleepWhenRateLimited)
-			}
-			o.Logger.Printf("retrying PR for repo: %s again later with %d second delay due to secondary rate limiting.", pr.RepoName, delay)
-			time.Sleep(delay * time.Second)
+			o.wait(delay)
 
 			// retry opening a pull request
 			return o.closePullRequest(pr, openPr)
 		}
 	}
 	return err
+}
+
+// a matching pull request will have a title in the form of "package_name/v1.2.3 package update"
+func (o GitOptions) isPullRequestOldVersion(packageName, packageVersion, prTitle string) bool {
+
+	if strings.HasPrefix(prTitle, fmt.Sprintf("%s/", packageName)) {
+
+		parts := strings.SplitAfter(prTitle, fmt.Sprintf("%s/", packageName))
+		if len(parts) != 2 {
+			return false
+		}
+
+		// try and get a version after the package name.
+		versionParts := strings.SplitAfter(parts[1], " ")
+		if len(versionParts) == 0 {
+			return false
+		}
+
+		currentVersion := strings.TrimSpace(versionParts[0])
+
+		// get the version from the existing pull request title
+		currentVersionSemver, err := version.NewVersion(currentVersion)
+		if err != nil {
+			o.Logger.Printf("cannot get new version from current version %s. Error %s", currentVersion, err.Error())
+			return false
+		}
+
+		// get a comparable version format for our new package version
+		latestVersionSemver, err := version.NewVersion(packageVersion)
+		if err != nil {
+			o.Logger.Printf("cannot get new version from package version %s. Error %s", packageVersion, err.Error())
+			return false
+		}
+
+		// compare if the existing open pull request has an older version, if so close it and continue to create a new onw
+		if currentVersionSemver.LessThan(latestVersionSemver) {
+			return true
+		}
+	}
+	return false
 }
