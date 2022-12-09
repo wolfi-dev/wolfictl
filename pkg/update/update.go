@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shurcooL/githubv4"
+
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 
 	"github.com/google/uuid"
@@ -40,6 +42,7 @@ type Options struct {
 	Client                *RLHTTPClient
 	Logger                *log.Logger
 	GitHubHTTPClient      *RLHTTPClient
+	GitGraphQLClient      *githubv4.Client
 }
 
 const (
@@ -47,13 +50,13 @@ const (
 	maxPullRequestRetries         = 10
 	wolfiImage                    = `
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wolfi-dev/.github/main/profile/wolfi-logo-light-mode.svg" />
+  <img src="https://raw.githubusercontent.com/wolfi-dev/.githubReleases/main/profile/wolfi-logo-light-mode.svg" />
 </p>
 `
 )
 
 // New initialise including a map of existing wolfios packages
-func New() (Options, error) {
+func New() Options {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
@@ -72,12 +75,14 @@ func New() (Options, error) {
 			// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
+		GitGraphQLClient: githubv4.NewClient(oauth2.NewClient(context.Background(), ts)),
+
 		Logger: log.New(log.Writer(), "wolfictl: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
 	options.Packages = make(map[string]MelageConfig)
 	options.DefaultBranch = "main"
-	return options, nil
+	return options
 }
 
 func (o Options) Update() error {
@@ -108,13 +113,29 @@ func (o Options) Update() error {
 	}
 
 	// second, check service for new package versions
-	m := MonitorService{Client: o.Client, Logger: o.Logger, DataMapperURL: o.DataMapperURL}
+	m := MonitorService{
+		Client:           o.Client,
+		GitHubHTTPClient: o.GitHubHTTPClient,
+		Logger:           o.Logger,
+		DataMapperURL:    o.DataMapperURL,
+	}
+
 	mapperData, err := m.getMonitorServiceData()
 	if err != nil {
 		return errors.Wrapf(err, "failed getting release monitor service mapping data")
 	}
 
-	packagesToUpdate := make(map[string]string)
+	g := GitHubReleaseOptions{
+		GitGraphQLClient: o.GitGraphQLClient,
+		Logger:           o.Logger,
+	}
+	// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
+	packagesToUpdate, errorMessages, err := g.getLatestGitHubVersions(mapperData)
+	if err != nil {
+		return errors.Wrapf(err, "failed getting github releases")
+	}
+
+	o.ErrorMessages = append(o.ErrorMessages, errorMessages...)
 
 	// iterate packages in the target git repo and check if a new version is available
 	for _, config := range o.Packages {
@@ -122,8 +143,11 @@ func (o Options) Update() error {
 		if item.Identifier == "" {
 			continue
 		}
+		if item.ServiceName != releaseMonitor {
+			continue
+		}
 
-		latestVersion, err := m.getLatestReleaseVersion(item.Identifier, item.ServiceName)
+		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
 		if err != nil {
 			return errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
 		}
@@ -147,7 +171,7 @@ func (o Options) Update() error {
 		}
 	}
 
-	errorMessages, err := o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
+	errorMessages, err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
 	if err != nil {
 		return errors.Wrap(err, "failed to update packages in git repository")
 	}
@@ -391,7 +415,7 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 		return "", errors.Wrap(err, "failed to commit changes")
 	}
 
-	// setup github auth using standard environment variables
+	// setup githubReleases auth using standard environment variables
 	pushOpts := &git.PushOptions{RemoteName: "origin"}
 	gitToken := os.Getenv("GITHUB_TOKEN")
 	if gitToken != "" {

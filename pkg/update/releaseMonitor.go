@@ -12,9 +12,10 @@ import (
 )
 
 type MonitorService struct {
-	Client        *RLHTTPClient
-	Logger        *log.Logger
-	DataMapperURL string
+	Client           *RLHTTPClient
+	GitHubHTTPClient *RLHTTPClient
+	Logger           *log.Logger
+	DataMapperURL    string
 }
 
 type Row struct {
@@ -28,7 +29,10 @@ type ReleaseMonitorVersions struct {
 }
 type MonitorServiceName int
 
-const releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%s"
+const (
+	releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%s"
+	releaseMonitor    = "RELEASE_MONITOR"
+)
 
 func (m MonitorService) getMonitorServiceData() (map[string]Row, error) {
 
@@ -81,7 +85,8 @@ func (m MonitorService) parseData(rawdata string) (map[string]Row, error) {
 
 }
 
-func (m MonitorService) getLatestReleaseVersion(identifier string, name string) (string, error) {
+func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {
+
 	targetURL := fmt.Sprintf(releaseMonitorURL, identifier)
 	req, err := http.NewRequest("GET", targetURL, nil)
 	if err != nil {

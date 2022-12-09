@@ -7,11 +7,11 @@ require (
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v48 v48.1.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/pkg/errors v0.9.1
+	github.com/shurcooL/githubv4 v0.0.0-20221203213311-70889c5dac07
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
@@ -73,6 +73,7 @@ require (
 	github.com/psanford/memfs v0.0.0-20210214183328-a001468d78ef // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/shurcooL/graphql v0.0.0-20220606043923-3cf50f8a0a29 // indirect
 	github.com/sigstore/cosign v1.13.1 // indirect
 	github.com/sigstore/rekor v0.12.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
@@ -86,10 +87,10 @@ require (
 	golang.org/x/build v0.0.0-20220928220451-9294235e16f5 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.2.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

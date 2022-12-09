@@ -44,16 +44,13 @@ func Update() *cobra.Command {
 }
 
 func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
-	context, err := update.New()
-	if err != nil {
-		return errors.Wrap(err, "initialising update command")
-	}
+	context := update.New()
 
 	if !o.dryRun && os.Getenv("GITHUB_TOKEN") == "" {
 		return errors.New("no GITHUB_TOKEN token found")
 	}
 
-	_, err = url.ParseRequestURI(repoURI)
+	_, err := url.ParseRequestURI(repoURI)
 	if err != nil {
 		return errors.Wrapf(err, "failed to parse URI %s", repoURI)
 	}
