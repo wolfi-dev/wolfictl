@@ -6,7 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
+
+	"github.com/hashicorp/go-version"
 
 	"github.com/pkg/errors"
 )
@@ -16,11 +17,6 @@ type MonitorService struct {
 	GitHubHTTPClient *RLHTTPClient
 	Logger           *log.Logger
 	DataMapperURL    string
-}
-
-type Row struct {
-	Identifier  string
-	ServiceName string
 }
 
 type ReleaseMonitorVersions struct {
@@ -34,55 +30,44 @@ const (
 	releaseMonitor    = "RELEASE_MONITOR"
 )
 
-func (m MonitorService) getMonitorServiceData() (map[string]Row, error) {
+func (m MonitorService) getLatestReleaseMonitorVersions(mapperData map[string]Row, melangePackages map[string]MelageConfig) (map[string]string, []string, error) {
+	var errorMessages []string
+	packagesToUpdate := make(map[string]string)
+	// iterate packages from the target git repo and check if a new version is available
+	for _, config := range melangePackages {
 
-	req, _ := http.NewRequest("GET", m.DataMapperURL, nil)
-	resp, err := m.Client.Do(req)
-
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed getting URI %s", m.DataMapperURL)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("non ok http response for URI %s code: %v", m.DataMapperURL, resp.StatusCode)
-	}
-
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "reading monitor service mapper data file")
-	}
-	return m.parseData(string(b))
-}
-
-func (m MonitorService) parseData(rawdata string) (map[string]Row, error) {
-
-	data := make(map[string]Row)
-
-	lines := strings.Split(rawdata, "\n")
-	// start from index 2 as we want to skip the first two lines
-	for i := 2; i < len(lines); i++ {
-		line := lines[i]
-		parts := strings.Split(line, "|")
-		if len(parts) != 6 {
-			m.Logger.Printf("found %d parts, expected 6 in line %s", len(parts), line)
+		item := mapperData[config.Package.Name]
+		if item.Identifier == "" {
+			continue
+		}
+		if item.ServiceName != releaseMonitor {
 			continue
 		}
 
-		// if notes say to skip then lets not include this row in the update checks
-		notes := strings.TrimSpace(parts[4])
-		if strings.HasPrefix(notes, "SKIP") {
+		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
+		if err != nil {
+			return nil, errorMessages, errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
+		}
+
+		currentVersionSemver, err := version.NewVersion(config.Package.Version)
+		if err != nil {
+			errorMessages = append(errorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err))
+
 			continue
 		}
 
-		data[parts[1]] = Row{
-			Identifier:  parts[2],
-			ServiceName: parts[3],
+		latestVersionSemver, err := version.NewVersion(latestVersion)
+		if err != nil {
+			errorMessages = append(errorMessages, fmt.Sprintf("failed to create a latestVersion from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err))
+			continue
+		}
+
+		if currentVersionSemver.LessThan(latestVersionSemver) {
+			m.Logger.Printf("there is a new stable version available %s, current wolfi version %s, new %s", config.Package.Name, config.Package.Version, latestVersion)
+			packagesToUpdate[config.Package.Name] = latestVersion
 		}
 	}
-
-	return data, nil
-
+	return packagesToUpdate, errorMessages, nil
 }
 
 func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {

@@ -22,8 +22,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v48/github"
-	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/maps"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 )
@@ -37,8 +37,6 @@ type Options struct {
 	DefaultBranch         string
 	Batch                 bool
 	DryRun                bool
-	Packages              map[string]MelageConfig
-	ErrorMessages         []string
 	Client                *RLHTTPClient
 	Logger                *log.Logger
 	GitHubHTTPClient      *RLHTTPClient
@@ -62,7 +60,6 @@ func New() Options {
 	)
 
 	options := Options{
-
 		Client: &RLHTTPClient{
 			client: http.DefaultClient,
 
@@ -76,16 +73,16 @@ func New() Options {
 			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
 		GitGraphQLClient: githubv4.NewClient(oauth2.NewClient(context.Background(), ts)),
-
-		Logger: log.New(log.Writer(), "wolfictl: ", log.LstdFlags|log.Lmsgprefix),
+		Logger:           log.New(log.Writer(), "wolfictl: ", log.LstdFlags|log.Lmsgprefix),
+		DefaultBranch:    "main",
 	}
 
-	options.Packages = make(map[string]MelageConfig)
-	options.DefaultBranch = "main"
 	return options
 }
 
 func (o Options) Update() error {
+	// keep a slice of messages to print at the end of the update to help users diagnose non-fatal problems
+	var printMessages []string
 
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wolfictl")
@@ -106,82 +103,56 @@ func (o Options) Update() error {
 		return errors.Wrapf(err, "failed to clone repository %s into %s", o.RepoURI, tempDir)
 	}
 
-	// first, let's get the package(s) we want to check for updates
-	err = o.readPackageConfigs(tempDir)
+	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
+	packageConfigs, err := o.readPackageConfigs(tempDir)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get package configs")
 	}
 
-	// second, check service for new package versions
-	m := MonitorService{
-		Client:           o.Client,
-		GitHubHTTPClient: o.GitHubHTTPClient,
-		Logger:           o.Logger,
-		DataMapperURL:    o.DataMapperURL,
-	}
-
-	mapperData, err := m.getMonitorServiceData()
+	// second, get package mapping data that we use to lookup if new versions exist
+	mapperData, err := o.getMonitorServiceData()
 	if err != nil {
 		return errors.Wrapf(err, "failed getting release monitor service mapping data")
 	}
 
+	// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
 	g := GitHubReleaseOptions{
 		GitGraphQLClient: o.GitGraphQLClient,
 		Logger:           o.Logger,
 	}
-	// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
 	packagesToUpdate, errorMessages, err := g.getLatestGitHubVersions(mapperData)
 	if err != nil {
-		return errors.Wrapf(err, "failed getting github releases")
+		return errors.Wrap(err, "failed getting github releases")
 	}
+	printMessages = append(printMessages, errorMessages...)
 
-	o.ErrorMessages = append(o.ErrorMessages, errorMessages...)
-
-	// iterate packages in the target git repo and check if a new version is available
-	for _, config := range o.Packages {
-		item := mapperData[config.Package.Name]
-		if item.Identifier == "" {
-			continue
-		}
-		if item.ServiceName != releaseMonitor {
-			continue
-		}
-
-		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
-		if err != nil {
-			return errors.Wrapf(err, "failed getting latest release version for package %s, identifier %s", config.Package.Name, item.Identifier)
-		}
-
-		currentVersionSemver, err := version.NewVersion(config.Package.Version)
-		if err != nil {
-			o.ErrorMessages = append(o.ErrorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", config.Package.Name, config.Package.Version, err))
-
-			continue
-		}
-
-		latestVersionSemver, err := version.NewVersion(latestVersion)
-		if err != nil {
-			o.ErrorMessages = append(o.ErrorMessages, fmt.Sprintf("failed to create a latestVersion from package %s: %s.  Error: %s", config.Package.Name, latestVersion, err))
-			continue
-		}
-
-		if currentVersionSemver.LessThan(latestVersionSemver) {
-			o.Logger.Printf("there is a new stable version available %s %s, current wolfi version %s", config.Package.Name, latestVersion, config.Package.Version)
-			packagesToUpdate[config.Package.Name] = latestVersion
-		}
+	// get latest versions from https://release-monitoring.org/
+	m := MonitorService{
+		Client:           o.Client,
+		GitHubHTTPClient: o.GitHubHTTPClient,
+		Logger:           o.Logger,
 	}
+	newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, packageConfigs)
+	if err != nil {
+		return errors.Wrap(err, "failed release monitor versions")
+	}
+	printMessages = append(printMessages, errorMessages...)
 
+	maps.Copy(packagesToUpdate, newReleaseMonitorVersions)
+
+	// update melange configs in our cloned git repository with any new package versions
 	errorMessages, err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
 	if err != nil {
 		return errors.Wrap(err, "failed to update packages in git repository")
 	}
 
-	o.ErrorMessages = append(o.ErrorMessages, errorMessages...)
+	printMessages = append(printMessages, errorMessages...)
 
 	// certain errors should not halt the updates, print them at the end
-	for _, message := range o.ErrorMessages {
+	for _, message := range printMessages {
 		o.Logger.Printf(message)
 	}
+
 	return nil
 }
 
@@ -202,7 +173,6 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {
-
 		// if not batch mode create a branch for each package change
 		if !o.Batch {
 			// let's work on a branch when updating package versions, so we can create a PR from that branch later
@@ -221,10 +191,12 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 			errorMessages = append(errorMessages, fmt.Sprintf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error()))
 			continue
 		}
+
 		worktree, err := repo.Worktree()
 		if err != nil {
 			return errorMessages, errors.Wrapf(err, "failed to get git worktree")
 		}
+
 		_, err = worktree.Add(packageName + ".yaml")
 		if err != nil {
 			return errorMessages, errors.Wrapf(err, "failed to git add %s", configFile)
@@ -294,6 +266,7 @@ func (o Options) updateMakefile(tempDir string, packageName string, latestVersio
 	if err != nil {
 		return errors.Wrap(err, "failed to write Makefile")
 	}
+
 	_, err = worktree.Add("Makefile")
 	if err != nil {
 		return errors.Wrap(err, "failed to git add Makefile")
@@ -336,27 +309,33 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 }
 
 // read the melange package config(s) from the target git repository so we can check if new versions exist
-func (o Options) readPackageConfigs(tempDir string) error {
+func (o Options) readPackageConfigs(tempDir string) (map[string]MelageConfig, error) {
 	var err error
+	packageConfigs := make(map[string]MelageConfig)
 
+	// if package names were passed as CLI parameters load those packages
 	if len(o.PackageNames) > 0 {
 		// get package by name
 		for _, packageName := range o.PackageNames {
 			filename := filepath.Join(tempDir, packageName+".yaml")
-			err = o.readPackageConfig(filename)
+
+			config, err := o.readPackageConfig(filename)
 			if err != nil {
-				return errors.Wrapf(err, "failed to read package config %s", filename)
+				return packageConfigs, errors.Wrapf(err, "failed to read package config %s", filename)
 			}
+
+			packageConfigs[filename] = config
 		}
 
 	} else {
 		// get all packages in the provided git repo
-		err = o.readAllPackagesFromRepo(tempDir)
+		packageConfigs, err = o.readAllPackagesFromRepo(tempDir)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read package configs from repo %s", o.RepoURI)
+			return packageConfigs, errors.Wrapf(err, "failed to read package configs from repo %s", o.RepoURI)
 		}
 	}
-	return nil
+
+	return packageConfigs, nil
 }
 
 // commits package update changes and creates a pull request
@@ -477,6 +456,7 @@ func (o Options) commitChanges(repo *git.Repository, packageName, latestVersion 
 	return nil
 }
 
+// returns owner, repo name, errors
 func parseGitURL(rawURL string) (string, string, error) {
 	rawURL = strings.TrimSuffix(rawURL, ".git")
 

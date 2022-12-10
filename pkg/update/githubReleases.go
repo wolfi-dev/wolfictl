@@ -2,9 +2,15 @@ package update
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"math"
+	"os"
 	"sort"
+	"strings"
+
+	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
@@ -14,11 +20,6 @@ import (
 const (
 	githubReleases = "GITHUB"
 )
-
-// Query details about a GitHub repository releases
-var releasesQuery struct {
-	Search `graphql:"search(first: $count, query: $searchQuery, type: REPOSITORY)"`
-}
 
 type Search struct {
 	RepositoryCount githubv4.Int
@@ -36,6 +37,7 @@ type Search struct {
 						} `graphql:"node"`
 					} `graphql:"edges"`
 				} `graphql:"releases(first: $first)"`
+				Name          githubv4.String
 				NameWithOwner githubv4.String
 			} `graphql:"... on Repository"`
 		}
@@ -45,34 +47,46 @@ type Search struct {
 type GitHubReleaseOptions struct {
 	GitGraphQLClient *githubv4.Client
 	Logger           *log.Logger
-	DataMapperURL    string
 }
 
 func (o GitHubReleaseOptions) getLatestGitHubVersions(mapperData map[string]Row) (map[string]string, []string, error) {
-	packagesToUpdate := make(map[string]string)
-	var repoQuery []string
 
-	for _, row := range mapperData {
-		if row.ServiceName == githubReleases {
-			repoQuery = append(repoQuery, fmt.Sprintf("repo: %s ", row.Identifier))
+	results := make(map[string]string)
+	var errorMessages []string
+
+	if len(mapperData) == 0 {
+		return results, errorMessages, nil
+	}
+
+	repoList := o.getRepoList(mapperData)
+	var q struct {
+		Search `graphql:"search(first: $count, query: $searchQuery, type: REPOSITORY)"`
+	}
+	for _, batch := range repoList {
+		variables := map[string]interface{}{
+			"searchQuery": githubv4.String(strings.Join(batch[:], " ")),
+			"count":       githubv4.Int(100),
+			"first":       githubv4.Int(5),
 		}
-	}
 
-	// graphql api has a limit of 100 repos per request, lets split this out
-	variables := map[string]interface{}{
-		"searchQuery": githubv4.String(fmt.Sprintf("%s", repoQuery)),
-		"count":       githubv4.Int(100),
-		"first":       githubv4.Int(20),
-	}
-
-	err := o.GitGraphQLClient.Query(context.Background(), &releasesQuery, variables)
-	if err != nil {
+		err := o.GitGraphQLClient.Query(context.Background(), &q, variables)
 		if err != nil {
-			return packagesToUpdate, []string{}, errors.Wrapf(err, "failed to query github graphql, query %v with variables %s", releasesQuery, variables)
+			return nil, nil, err
 		}
+		//printJSON(q)
+
+		r, e, err := o.parseGitHubReleases(q.Search)
+		if err != nil {
+			printJSON(q)
+			return nil, nil, errors.Wrap(err, "failed to parse github releases")
+		}
+
+		maps.Copy(results, r)
+
+		errorMessages = append(errorMessages, e...)
 	}
 
-	return o.parseGitHubReleases(releasesQuery.Search)
+	return results, errorMessages, nil
 
 }
 
@@ -108,11 +122,64 @@ func (m GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 		if len(versions) > 0 {
 			sort.Sort(VersionsByLatest(versions))
 			latestVersion := originalVersions[versions[len(versions)-1]]
-			results[string(edge.Node.Repository.NameWithOwner)] = latestVersion
+			results[string(edge.Node.Repository.Name)] = latestVersion
 		}
 
 	}
 	return results, errorMessages, nil
+}
+
+// function returns batches of git repositories used to query githubs graphql api.  GitHub has a limit of 100 repos per request.
+func (o GitHubReleaseOptions) getRepoList(mapperData map[string]Row) [][]string {
+
+	var repoQuery []string
+
+	for _, row := range mapperData {
+
+		if row.ServiceName == githubReleases {
+
+			repoQuery = append(repoQuery, fmt.Sprintf("repo:%s", row.Identifier))
+		}
+	}
+
+	numberOfRepos := len(repoQuery)
+
+	// divide the number of repos by 100 and round up to the next whole number
+	numberOfBatches := int(math.Ceil(float64(numberOfRepos) / 100))
+
+	batches := make([][]string, numberOfBatches)
+
+	counter := 0
+	for i := 0; i < numberOfBatches; i++ {
+		// looping through the slice to declare
+		// batches of length 100
+
+		if i == numberOfBatches-1 {
+			// if this is the last batch, only make the slice the size of remaining repos
+			batches[i] = make([]string, len(repoQuery)-counter)
+		} else {
+			// create batches of 100
+			batches[i] = make([]string, 100)
+		}
+
+		// fill up each batch with a slice of repos
+		for j := 0; j < 100 && counter < len(repoQuery); j++ {
+			batches[i][j] = repoQuery[counter]
+			counter++
+		}
+	}
+
+	return batches
+}
+
+// printJSON prints v as JSON encoded with indent to stdout. It panics on any error.
+func printJSON(v interface{}) {
+	w := json.NewEncoder(os.Stdout)
+	w.SetIndent("", "\t")
+	err := w.Encode(v)
+	if err != nil {
+		panic(err)
+	}
 }
 
 type Interface interface {

@@ -13,3 +13,4 @@
 |brotli|15235|||
 |bubblewrap|10937|||
 |busybox|230|||
+|cosign                   |sigstore/cosign                 |GITHUB           ||

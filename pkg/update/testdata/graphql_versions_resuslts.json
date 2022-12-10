@@ -14,18 +14,10 @@
               "ReleaseEdge": [
                 {
                   "Release": {
-                    "Name": "2.381",
-                    "IsPrerelease": false,
-                    "IsDraft": false,
-                    "IsLatest": true
-                  }
-                },
-                {
-                  "Release": {
                     "Name": "2.375.1",
                     "IsPrerelease": false,
                     "IsDraft": false,
-                    "IsLatest": false
+                    "IsLatest": true
                   }
                 },
                 {

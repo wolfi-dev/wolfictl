@@ -18,9 +18,9 @@ type MelageConfig struct {
 	Pipeline []build.Pipeline `yaml:"pipeline,omitempty"`
 }
 
-func (o Options) readAllPackagesFromRepo(tempDir string) error {
+func (o Options) readAllPackagesFromRepo(tempDir string) (map[string]MelageConfig, error) {
 	var fileList []string
-
+	packageConfigs := make(map[string]MelageConfig)
 	err := filepath.Walk(tempDir, func(path string, fi os.FileInfo, err error) error {
 		// skip if the path is not the root folder of the melange config repo
 		if fi.IsDir() && path != tempDir {
@@ -33,35 +33,37 @@ func (o Options) readAllPackagesFromRepo(tempDir string) error {
 	})
 
 	if err != nil {
-		return errors.Wrapf(err, "failed walking files in cloned directory %s", tempDir)
+		return packageConfigs, errors.Wrapf(err, "failed walking files in cloned directory %s", tempDir)
 	}
 
 	fmt.Printf("found %[1]d packages\n", len(fileList))
 
 	for _, fi := range fileList {
-		err = o.readPackageConfig(fi)
+		packageConfig, err := o.readPackageConfig(fi)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read package config %s", fi)
+			return packageConfigs, errors.Wrapf(err, "failed to read package config %s", fi)
 		}
+
+		packageConfigs[packageConfig.Package.Name] = packageConfig
 	}
-	return nil
+	return packageConfigs, nil
 }
 
 // read a single melange config using the package name to match the filename
-func (o Options) readPackageConfig(filename string) error {
+func (o Options) readPackageConfig(filename string) (MelageConfig, error) {
+	packageConfig := MelageConfig{}
+
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return errors.Wrapf(err, "failed to read package config %s", filename)
+		return packageConfig, errors.Wrapf(err, "failed to read package config %s", filename)
 	}
-
-	packageConfig := MelageConfig{}
 
 	err = yaml.Unmarshal(data, &packageConfig)
 	if err != nil {
-		return errors.Wrapf(err, "failed to unmarshal package data from filename %s", filename)
+		return packageConfig, errors.Wrapf(err, "failed to unmarshal package data from filename %s", filename)
 	}
-	o.Packages[packageConfig.Package.Name] = packageConfig
-	return nil
+
+	return packageConfig, nil
 }
 
 func (o Options) bump(configFile, version string) error {
