@@ -48,7 +48,7 @@ const (
 	maxPullRequestRetries         = 10
 	wolfiImage                    = `
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wolfi-dev/.githubReleases/main/profile/wolfi-logo-light-mode.svg" />
+  <img src="https://raw.githubusercontent.com/wolfi-dev/.github/b535a42419ce0edb3c144c0edcff55a62b8ec1f8/profile/wolfi-logo-light-mode.svg" />
 </p>
 `
 )
@@ -73,7 +73,7 @@ func New() Options {
 			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
 		GitGraphQLClient: githubv4.NewClient(oauth2.NewClient(context.Background(), ts)),
-		Logger:           log.New(log.Writer(), "wolfictl: ", log.LstdFlags|log.Lmsgprefix),
+		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
 		DefaultBranch:    "main",
 	}
 
@@ -116,11 +116,8 @@ func (o Options) Update() error {
 	}
 
 	// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-	g := GitHubReleaseOptions{
-		GitGraphQLClient: o.GitGraphQLClient,
-		Logger:           o.Logger,
-	}
-	packagesToUpdate, errorMessages, err := g.getLatestGitHubVersions(mapperData)
+	g := NewGitHubReleaseOptions(mapperData, o.GitGraphQLClient)
+	packagesToUpdate, errorMessages, err := g.getLatestGitHubVersions()
 	if err != nil {
 		return errors.Wrap(err, "failed getting github releases")
 	}
@@ -170,6 +167,8 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 			return errorMessages, errors.Wrapf(err, "failed to switch to working git branch")
 		}
 	}
+
+	//todo switch to idendifier as the key
 
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {

@@ -44,21 +44,39 @@ type Search struct {
 	} `json:"Edges"`
 }
 
+func NewGitHubReleaseOptions(mapperData map[string]Row, client *githubv4.Client) GitHubReleaseOptions {
+
+	options := GitHubReleaseOptions{
+		MapperData:       mapperData,
+		GitGraphQLClient: client,
+		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
+		StripPrefix:      make(map[string]string),
+	}
+
+	for _, row := range mapperData {
+		options.StripPrefix[row.Identifier] = row.StripPrefixChar
+	}
+	return options
+
+}
+
 type GitHubReleaseOptions struct {
 	GitGraphQLClient *githubv4.Client
 	Logger           *log.Logger
+	MapperData       map[string]Row
+	StripPrefix      map[string]string
 }
 
-func (o GitHubReleaseOptions) getLatestGitHubVersions(mapperData map[string]Row) (map[string]string, []string, error) {
+func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []string, error) {
 
 	results := make(map[string]string)
 	var errorMessages []string
 
-	if len(mapperData) == 0 {
+	if len(o.MapperData) == 0 {
 		return results, errorMessages, nil
 	}
 
-	repoList := o.getRepoList(mapperData)
+	repoList := o.getRepoList(o.MapperData)
 	var q struct {
 		Search `graphql:"search(first: $count, query: $searchQuery, type: REPOSITORY)"`
 	}
@@ -73,7 +91,7 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions(mapperData map[string]Row)
 		if err != nil {
 			return nil, nil, err
 		}
-		//printJSON(q)
+		printJSON(q)
 
 		r, e, err := o.parseGitHubReleases(q.Search)
 		if err != nil {
@@ -90,14 +108,14 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions(mapperData map[string]Row)
 
 }
 
-func (m GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]string, []string, error) {
+func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]string, []string, error) {
 	results := make(map[string]string)
 	var errorMessages []string
 	for _, edge := range search.Edges {
 		releases := edge.Node.Repository.Releases
 		var versions []*version.Version
 
-		// keep a map of original versions retrived from github with a semver as the key so we can easily look it up after sorting
+		// keep a map of original versions retrieved from github with a semver as the key so we can easily look it up after sorting
 		originalVersions := make(map[*version.Version]string)
 		for _, release := range releases.ReleaseEdge {
 			if release.Release.IsDraft {
@@ -107,6 +125,16 @@ func (m GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 				continue
 			}
 			releaseVersion := string(release.Release.Name)
+
+			// strip any prefix chars using mapper data
+			// the fastest way to check is to lookup git repo name in the map data, but there's no guarantee the repo name and map data key are the same
+			// if the identifiers don't match fall back to iterating through all map data to match using identifier
+
+			stripPrefix := o.StripPrefix[string(edge.Node.Repository.NameWithOwner)]
+			if stripPrefix != "" {
+				releaseVersion = strings.TrimPrefix(releaseVersion, stripPrefix)
+			}
+
 			releaseVersionSemver, err := version.NewVersion(releaseVersion)
 			if err != nil {
 				errorMessages = append(errorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", edge.Node.Repository.NameWithOwner, releaseVersion, err))
@@ -114,6 +142,7 @@ func (m GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 			}
 
 			versions = append(versions, releaseVersionSemver)
+
 			originalVersions[releaseVersionSemver] = releaseVersion
 		}
 
@@ -122,6 +151,7 @@ func (m GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 		if len(versions) > 0 {
 			sort.Sort(VersionsByLatest(versions))
 			latestVersion := originalVersions[versions[len(versions)-1]]
+
 			results[string(edge.Node.Repository.Name)] = latestVersion
 		}
 

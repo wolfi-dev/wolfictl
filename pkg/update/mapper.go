@@ -10,8 +10,9 @@ import (
 )
 
 type Row struct {
-	Identifier  string
-	ServiceName string
+	Identifier      string
+	ServiceName     string
+	StripPrefixChar string
 }
 
 func (o Options) getMonitorServiceData() (map[string]Row, error) {
@@ -44,20 +45,21 @@ func (o Options) parseData(rawdata string) (map[string]Row, error) {
 	for i := 2; i < len(lines); i++ {
 		line := lines[i]
 		parts := strings.Split(line, "|")
-		if len(parts) != 6 {
+		if len(parts) != 7 {
 			o.Logger.Printf("found %d parts, expected 6 in line %s", len(parts), line)
 			continue
 		}
 
 		// if notes say to skip then lets not include this row in the update checks
-		notes := strings.TrimSpace(parts[4])
+		notes := strings.TrimSpace(parts[5])
 		if strings.HasPrefix(notes, "SKIP") {
 			continue
 		}
 
 		data[strings.TrimSpace(parts[1])] = Row{
-			Identifier:  strings.TrimSpace(parts[2]),
-			ServiceName: strings.TrimSpace(parts[3]),
+			Identifier:      strings.TrimSpace(parts[2]),
+			ServiceName:     strings.TrimSpace(parts[3]),
+			StripPrefixChar: strings.TrimSpace(parts[4]),
 		}
 
 	}

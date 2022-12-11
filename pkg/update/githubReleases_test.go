@@ -15,7 +15,14 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	data, err := os.ReadFile(filepath.Join("testdata", "graphql_versions_resuslts.json"))
 	assert.NoError(t, err)
 	assert.NotEmpty(t, data)
-	m := GitHubReleaseOptions{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
+
+	mapperData, err := os.ReadFile(filepath.Join("testdata", "release_mapper_data.txt"))
+	assert.NoError(t, err)
+
+	o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
+	parsedMapperData, err := o.parseData(string(mapperData))
+	assert.NoError(t, err)
+	m := NewGitHubReleaseOptions(parsedMapperData, nil)
 
 	rel := &ReleasesSearchResponse{}
 	err = json.Unmarshal(data, rel)
@@ -25,7 +32,7 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	latestVersions, _, err := m.parseGitHubReleases(rel.Search)
 	assert.NoError(t, err)
 	assert.Equal(t, "2.380", latestVersions["jenkins"])
-	assert.Equal(t, "v1.13.1", latestVersions["cosign"])
+	assert.Equal(t, "1.13.1", latestVersions["cosign"])
 }
 
 type ReleasesSearchResponse struct {
