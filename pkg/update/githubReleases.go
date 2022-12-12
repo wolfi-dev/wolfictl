@@ -19,6 +19,11 @@ import (
 
 const (
 	githubReleases = "GITHUB"
+	// some git repos do not use the "latest" github release well
+	// i.e. they perform a maintenance release of an old version but it can be marked as latest,
+	// 1.2.3.4 gets released but marked as latest while 1.3.0 exists which is the version we want to check against
+	// so we need to check previous number of versions to ensure we can locate the real latest release version
+	numberOfReleasesToReturn = 10
 )
 
 type Search struct {
@@ -44,15 +49,17 @@ type Search struct {
 	} `json:"Edges"`
 }
 
-func NewGitHubReleaseOptions(mapperData map[string]Row, client *githubv4.Client) GitHubReleaseOptions {
+func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]MelageConfig, client *githubv4.Client) GitHubReleaseOptions {
 
 	options := GitHubReleaseOptions{
 		MapperData:       mapperData,
 		GitGraphQLClient: client,
 		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
 		StripPrefix:      make(map[string]string),
+		PackageConfigs:   configs,
 	}
 
+	// maintain a different map, key'd by mapper data identifier for easy lookup
 	for _, row := range mapperData {
 		options.StripPrefix[row.Identifier] = row.StripPrefixChar
 	}
@@ -65,6 +72,7 @@ type GitHubReleaseOptions struct {
 	Logger           *log.Logger
 	MapperData       map[string]Row
 	StripPrefix      map[string]string
+	PackageConfigs   map[string]MelageConfig
 }
 
 func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []string, error) {
@@ -83,8 +91,8 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 	for _, batch := range repoList {
 		variables := map[string]interface{}{
 			"searchQuery": githubv4.String(strings.Join(batch[:], " ")),
-			"count":       githubv4.Int(100),
-			"first":       githubv4.Int(5),
+			"count":       githubv4.Int(100), // github say max 100 repos per request
+			"first":       githubv4.Int(numberOfReleasesToReturn),
 		}
 
 		err := o.GitGraphQLClient.Query(context.Background(), &q, variables)
@@ -150,9 +158,29 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 		// not all projects use the github latest release tag properly so could end up with older versions
 		if len(versions) > 0 {
 			sort.Sort(VersionsByLatest(versions))
-			latestVersion := originalVersions[versions[len(versions)-1]]
 
-			results[string(edge.Node.Repository.Name)] = latestVersion
+			latestVersionSemver := versions[len(versions)-1]
+			latestVersion := originalVersions[latestVersionSemver]
+
+			// compare if this version is newer than the version we have in our related melange package config
+			packageName := string(edge.Node.Repository.Name)
+			melangePackageConfig := o.PackageConfigs[packageName]
+			if melangePackageConfig.Package.Version != "" {
+
+				currentVersionSemver, err := version.NewVersion(melangePackageConfig.Package.Version)
+				if err != nil {
+					errorMessages = append(errorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", melangePackageConfig.Package.Name, melangePackageConfig.Package.Version, err))
+
+					continue
+				}
+
+				if currentVersionSemver.LessThan(latestVersionSemver) {
+					o.Logger.Printf("there is a new stable version available %s, current wolfi version %s, new %s", packageName, melangePackageConfig.Package.Version, latestVersion)
+					results[string(edge.Node.Repository.Name)] = latestVersion
+				}
+
+			}
+
 		}
 
 	}

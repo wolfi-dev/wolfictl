@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"chainguard.dev/melange/pkg/build"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +24,23 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
 	parsedMapperData, err := o.parseData(string(mapperData))
 	assert.NoError(t, err)
-	m := NewGitHubReleaseOptions(parsedMapperData, nil)
+
+	packageConfigs := make(map[string]MelageConfig)
+	packageConfigs["jenkins"] = MelageConfig{
+		Package: build.Package{
+			Name:    "jenkins",
+			Version: "2.370",
+		},
+	}
+
+	packageConfigs["cosign"] = MelageConfig{
+		Package: build.Package{
+			Name:    "cosign",
+			Version: "1.10.1",
+		},
+	}
+
+	m := NewGitHubReleaseOptions(parsedMapperData, packageConfigs, nil)
 
 	rel := &ReleasesSearchResponse{}
 	err = json.Unmarshal(data, rel)

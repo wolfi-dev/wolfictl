@@ -116,7 +116,7 @@ func (o Options) Update() error {
 	}
 
 	// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-	g := NewGitHubReleaseOptions(mapperData, o.GitGraphQLClient)
+	g := NewGitHubReleaseOptions(mapperData, packageConfigs, o.GitGraphQLClient)
 	packagesToUpdate, errorMessages, err := g.getLatestGitHubVersions()
 	if err != nil {
 		return errors.Wrap(err, "failed getting github releases")
