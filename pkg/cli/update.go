@@ -38,7 +38,7 @@ func Update() *cobra.Command {
 	cmd.Flags().StringArrayVar(&o.packageNames, "package-name", []string{}, "Optional: provide a specific package name to check for updates rather than searching all packages in a repo URI")
 	cmd.Flags().StringVar(&o.pullRequestBaseBranch, "pull-request-base-branch", "main", "base branch to create a pull request against")
 	cmd.Flags().StringVar(&o.pullRequestTitle, "pull-request-title", "%s/%s package update", "the title to use when creating a pull request")
-	cmd.Flags().StringVar(&o.dataMapperURL, "data-mapper-url", "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/README.md", "URL to use for mapping packages to source update service")
+	cmd.Flags().StringVar(&o.dataMapperURL, "data-mapper-url", "https://raw.githubusercontent.com/rawlingsj/wup-mapper/main/DATA.md", "URL to use for mapping packages to source update service")
 
 	return cmd
 }
