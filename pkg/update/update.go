@@ -64,7 +64,7 @@ func New() Options {
 			client: http.DefaultClient,
 
 			// 1 request every (n) second(s) to avoid DOS'ing server
-			Ratelimiter: rate.NewLimiter(rate.Every(2*time.Second), 1),
+			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
 		GitHubHTTPClient: &RLHTTPClient{
 			client: oauth2.NewClient(context.Background(), ts),

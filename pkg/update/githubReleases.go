@@ -99,7 +99,7 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 		if err != nil {
 			return nil, nil, err
 		}
-		printJSON(q)
+		//printJSON(q)
 
 		r, e, err := o.parseGitHubReleases(q.Search)
 		if err != nil {
