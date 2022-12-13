@@ -323,7 +323,7 @@ func (o Options) readPackageConfigs(tempDir string) (map[string]MelageConfig, er
 				return packageConfigs, errors.Wrapf(err, "failed to read package config %s", filename)
 			}
 
-			packageConfigs[filename] = config
+			packageConfigs[config.Package.Name] = config
 		}
 
 	} else {
