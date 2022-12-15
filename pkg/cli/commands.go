@@ -12,6 +12,10 @@ func New() *cobra.Command {
 		Short:             "A simple CLI for working with Wolfi GitHub repositories",
 	}
 
-	cmd.AddCommand(Update())
+	cmd.AddCommand(
+		Update(),
+		Lint(),
+	)
+
 	return cmd
 }

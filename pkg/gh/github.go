@@ -45,7 +45,6 @@ type GitOptions struct {
 
 // OpenPullRequest opens a pull request on GitHub
 func (o GitOptions) OpenPullRequest(pr NewPullRequest) (string, error) {
-
 	// if our new version is more recent that the existing PR close it and create a new one, otherwise skip
 
 	// If the current request has already exhausted the configured number of PR retries, short-circuit
@@ -89,7 +88,7 @@ func (o GitOptions) OpenPullRequest(pr NewPullRequest) (string, error) {
 
 // checks if error codes returned from GitHub tell us we are being rate limited
 func (o GitOptions) checkRateLimiting(githubErr error) (bool, time.Duration) {
-	var isRateLimited = false
+	isRateLimited := false
 
 	var delay time.Duration
 	// If GitHub returned an error of type RateLimitError, we can attempt to compute the next time to try the request again
@@ -161,7 +160,6 @@ func (o GitOptions) CheckExistingPullRequests(pr GetPullRequest) (string, error)
 }
 
 func (o GitOptions) wait(delay time.Duration) {
-
 	// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
 	if delay == 0 {
 		delay = time.Duration(o.SecondsToSleepWhenRateLimited)
@@ -197,7 +195,6 @@ func (o GitOptions) closePullRequest(pr GetPullRequest, openPr *github.PullReque
 
 // a matching pull request will have a title in the form of "package_name/v1.2.3 package update"
 func (o GitOptions) isPullRequestOldVersion(packageName, packageVersion, prTitle string) bool {
-
 	if strings.HasPrefix(prTitle, fmt.Sprintf("%s/", packageName)) {
 
 		parts := strings.SplitAfter(prTitle, fmt.Sprintf("%s/", packageName))

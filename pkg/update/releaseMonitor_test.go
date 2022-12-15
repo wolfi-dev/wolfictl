@@ -10,7 +10,6 @@ import (
 )
 
 func TestReleaseMonitor_parseVersions(t *testing.T) {
-
 	m := MonitorService{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
 
 	tests := []struct {

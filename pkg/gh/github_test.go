@@ -6,7 +6,6 @@ import (
 )
 
 func TestGitOptions_isPullRequestOldVersion(t *testing.T) {
-
 	o := GitOptions{
 		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
@@ -34,7 +33,6 @@ func TestGitOptions_isPullRequestOldVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-
 			if got := o.isPullRequestOldVersion(tt.packageName, tt.packageVersion, tt.prTitle); got != tt.want {
 				t.Errorf("isPullRequestOldVersion() = %v, want %v", got, tt.want)
 			}

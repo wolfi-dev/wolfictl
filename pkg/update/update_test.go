@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"chainguard.dev/melange/pkg/build"
+
 	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/go-git/go-billy/v5/osfs"
@@ -23,7 +25,6 @@ import (
 )
 
 func Test_parseGitURL(t *testing.T) {
-
 	tests := []struct {
 		rawURL string
 		owner  string
@@ -57,7 +58,6 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 		// Send response to be tested
 		_, err = rw.Write(data)
 		assert.NoError(t, err)
-
 	}))
 
 	r := setupTestWolfiRepo(t, dir, server.URL)
@@ -77,7 +77,7 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	rsData, err := os.ReadFile(filepath.Join(dir, "melange", "cheese.yaml"))
 	assert.NoError(t, err)
 
-	rsMelangeConfig := &MelageConfig{}
+	rsMelangeConfig := &build.Configuration{}
 	err = yaml.Unmarshal(rsData, rsMelangeConfig)
 	assert.NoError(t, err)
 
@@ -85,7 +85,7 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	assert.Equal(t, "cc2c52929ace57623ff517408a577e783e10042655963b2c8f0633e109337d7a", rsMelangeConfig.Pipeline[0].With["expected-sha256"])
 }
 
-func setupTestWolfiRepo(t *testing.T, dir string, testURL string) *git.Repository {
+func setupTestWolfiRepo(t *testing.T, dir, testURL string) *git.Repository {
 	fs := osfs.New(dir)
 	data, err := os.ReadFile(filepath.Join("testdata", "cheese.yaml"))
 	assert.NoError(t, err)
@@ -103,7 +103,7 @@ func setupTestWolfiRepo(t *testing.T, dir string, testURL string) *git.Repositor
 	w, err := r.Worktree()
 	assert.NoError(t, err)
 
-	err = util.WriteFile(w.Filesystem, "cheese.yaml", []byte(melangConfig), 0644)
+	err = util.WriteFile(w.Filesystem, "cheese.yaml", []byte(melangConfig), 0o644)
 	assert.NoError(t, err)
 
 	_, err = w.Add("cheese.yaml")
@@ -136,7 +136,7 @@ func TestUpdate_updateMakefile(t *testing.T) {
 	w, _ := r.Worktree()
 
 	// copy test file into temp git repo
-	err = util.WriteFile(w.Filesystem, "Makefile", data, 0644)
+	err = util.WriteFile(w.Filesystem, "Makefile", data, 0o644)
 	assert.NoError(t, err)
 
 	o := Options{
@@ -149,5 +149,4 @@ func TestUpdate_updateMakefile(t *testing.T) {
 	resultData, err := os.ReadFile(filepath.Join(tempDir, "melange", "Makefile"))
 	assert.NoError(t, err)
 	assert.Contains(t, string(resultData), "build-package,zlib,1.3.0-r0)")
-
 }

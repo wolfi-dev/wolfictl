@@ -25,15 +25,15 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	parsedMapperData, err := o.parseData(string(mapperData))
 	assert.NoError(t, err)
 
-	packageConfigs := make(map[string]MelageConfig)
-	packageConfigs["jenkins"] = MelageConfig{
+	packageConfigs := make(map[string]build.Configuration)
+	packageConfigs["jenkins"] = build.Configuration{
 		Package: build.Package{
 			Name:    "jenkins",
 			Version: "2.370",
 		},
 	}
 
-	packageConfigs["cosign"] = MelageConfig{
+	packageConfigs["cosign"] = build.Configuration{
 		Package: build.Package{
 			Name:    "cosign",
 			Version: "1.10.1",

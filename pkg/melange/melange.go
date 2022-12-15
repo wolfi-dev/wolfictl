@@ -1,4 +1,4 @@
-package update
+package melange
 
 import (
 	"fmt"
@@ -13,14 +13,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type MelageConfig struct {
-	Package  build.Package    `yaml:"package"`
-	Pipeline []build.Pipeline `yaml:"pipeline,omitempty"`
-}
-
-func (o Options) readAllPackagesFromRepo(tempDir string) (map[string]MelageConfig, error) {
+func ReadAllPackagesFromRepo(tempDir string) (map[string]build.Configuration, error) {
 	var fileList []string
-	packageConfigs := make(map[string]MelageConfig)
+	packageConfigs := make(map[string]build.Configuration)
 	err := filepath.Walk(tempDir, func(path string, fi os.FileInfo, err error) error {
 		// skip if the path is not the root folder of the melange config repo
 		if fi.IsDir() && path != tempDir {
@@ -31,7 +26,6 @@ func (o Options) readAllPackagesFromRepo(tempDir string) (map[string]MelageConfi
 		}
 		return nil
 	})
-
 	if err != nil {
 		return packageConfigs, errors.Wrapf(err, "failed walking files in cloned directory %s", tempDir)
 	}
@@ -39,7 +33,7 @@ func (o Options) readAllPackagesFromRepo(tempDir string) (map[string]MelageConfi
 	fmt.Printf("found %[1]d packages\n", len(fileList))
 
 	for _, fi := range fileList {
-		packageConfig, err := o.readPackageConfig(fi)
+		packageConfig, err := ReadMelangeConfig(fi)
 		if err != nil {
 			return packageConfigs, errors.Wrapf(err, "failed to read package config %s", fi)
 		}
@@ -49,9 +43,9 @@ func (o Options) readAllPackagesFromRepo(tempDir string) (map[string]MelageConfi
 	return packageConfigs, nil
 }
 
-// read a single melange config using the package name to match the filename
-func (o Options) readPackageConfig(filename string) (MelageConfig, error) {
-	packageConfig := MelageConfig{}
+// ReadMelangeConfig reads a single melange config from the provided filename.
+func ReadMelangeConfig(filename string) (build.Configuration, error) {
+	packageConfig := build.Configuration{}
 
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -66,7 +60,7 @@ func (o Options) readPackageConfig(filename string) (MelageConfig, error) {
 	return packageConfig, nil
 }
 
-func (o Options) bump(configFile, version string) error {
+func Bump(configFile, version string) error {
 	ctx, err := renovate.New(renovate.WithConfig(configFile))
 	if err != nil {
 		return err

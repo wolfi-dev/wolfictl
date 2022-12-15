@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 
+	"chainguard.dev/melange/pkg/build"
+
 	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/go-version"
@@ -49,8 +51,7 @@ type Search struct {
 	} `json:"Edges"`
 }
 
-func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]MelageConfig, client *githubv4.Client) GitHubReleaseOptions {
-
+func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]build.Configuration, client *githubv4.Client) GitHubReleaseOptions {
 	options := GitHubReleaseOptions{
 		MapperData:       mapperData,
 		GitGraphQLClient: client,
@@ -64,7 +65,6 @@ func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]Melag
 		options.StripPrefix[row.Identifier] = row.StripPrefixChar
 	}
 	return options
-
 }
 
 type GitHubReleaseOptions struct {
@@ -72,11 +72,10 @@ type GitHubReleaseOptions struct {
 	Logger           *log.Logger
 	MapperData       map[string]Row
 	StripPrefix      map[string]string
-	PackageConfigs   map[string]MelageConfig
+	PackageConfigs   map[string]build.Configuration
 }
 
 func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []string, error) {
-
 	results := make(map[string]string)
 	var errorMessages []string
 
@@ -99,7 +98,7 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 		if err != nil {
 			return nil, nil, err
 		}
-		//printJSON(q)
+		// printJSON(q)
 
 		r, e, err := o.parseGitHubReleases(q.Search)
 		if err != nil {
@@ -113,7 +112,6 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 	}
 
 	return results, errorMessages, nil
-
 }
 
 func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]string, []string, error) {
@@ -189,13 +187,10 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 
 // function returns batches of git repositories used to query githubs graphql api.  GitHub has a limit of 100 repos per request.
 func (o GitHubReleaseOptions) getRepoList(mapperData map[string]Row) [][]string {
-
 	var repoQuery []string
 
 	for _, row := range mapperData {
-
 		if row.ServiceName == githubReleases {
-
 			repoQuery = append(repoQuery, fmt.Sprintf("repo:%s", row.Identifier))
 		}
 	}
@@ -255,9 +250,11 @@ type Interface interface {
 func (u VersionsByLatest) Len() int {
 	return len(u)
 }
+
 func (u VersionsByLatest) Swap(i, j int) {
 	u[i], u[j] = u[j], u[i]
 }
+
 func (u VersionsByLatest) Less(i, j int) bool {
 	return u[i].LessThan(u[j])
 }
