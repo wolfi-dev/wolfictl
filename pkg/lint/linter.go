@@ -12,7 +12,6 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
@@ -30,7 +29,7 @@ type Linter struct {
 }
 
 // New initializes a new instance of Linter.
-func New(opts []Option) *Linter {
+func New(opts ...Option) *Linter {
 	o := Options{}
 	for _, opt := range opts {
 		opt(&o)
@@ -41,16 +40,9 @@ func New(opts []Option) *Linter {
 	}
 }
 
+// Lint evaluates all rules and returns the result.
 func (l *Linter) Lint() (Result, error) {
 	rules := AllRules(l)
-
-	if l.options.List {
-		fmt.Println("Available rules:")
-		for _, rule := range rules {
-			fmt.Printf("%s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
-		}
-		return nil, nil
-	}
 
 	filesToLint, err := melange.ReadAllPackagesFromRepo(l.options.Path)
 	if err != nil {
@@ -59,7 +51,8 @@ func (l *Linter) Lint() (Result, error) {
 
 	results := make(Result, 0)
 	for name, config := range filesToLint {
-		var failedRules *multierror.Error
+		// var failedRules *multierror.Error
+		failedRules := make(EvalRuleErrors, 0)
 		for _, rule := range rules {
 			// Check if we should skip this rule.
 			shouldEvaluate := true
@@ -86,14 +79,18 @@ func (l *Linter) Lint() (Result, error) {
 				if l.options.Verbose {
 					msg += fmt.Sprintf(" - (%s)", rule.Description)
 				}
-				failedRules = multierror.Append(failedRules, fmt.Errorf(msg))
+
+				failedRules = append(failedRules, EvalRuleError{
+					Rule:  rule,
+					Error: fmt.Errorf(msg),
+				})
 			}
 		}
 		// If we have errors we append them to the result.
-		if failedRules.ErrorOrNil() != nil {
+		if failedRules.WrapErrors() != nil {
 			results = append(results, EvalResult{
 				File:   name,
-				Errors: *failedRules,
+				Errors: failedRules,
 			})
 		}
 	}
@@ -105,13 +102,21 @@ func (l *Linter) Lint() (Result, error) {
 func (l *Linter) Print(result Result) {
 	foundAny := false
 	for _, res := range result {
-		if res.Errors.ErrorOrNil() != nil {
+		if res.Errors.WrapErrors() != nil {
 			foundAny = true
-			l.logger.Printf("Package: %s: %s\n", res.File, res.Errors.Error())
+			l.logger.Printf("Package: %s: %s\n", res.File, res.Errors.WrapErrors())
 		}
 	}
 	if !foundAny {
 		l.logger.Println("No linting issues found!")
+	}
+}
+
+// PrintRules prints the rules to stdout.
+func (l *Linter) PrintRules() {
+	l.logger.Println("Available rules:")
+	for _, rule := range AllRules(l) {
+		l.logger.Printf("* %s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
 	}
 }
 

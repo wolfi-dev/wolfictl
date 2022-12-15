@@ -41,14 +41,45 @@ type Rule struct {
 // Rules is a list of Rule.
 type Rules []Rule
 
+// EvalRuleError represents an error that occurred during single rule evaluation.
+type EvalRuleError struct {
+	// Rule is the rule that caused the error.
+	Rule Rule
+
+	// Error is the error that occurred.
+	Error error
+}
+
+// EvalRuleErrors returns a list of EvalError.
+type EvalRuleErrors []EvalRuleError
+
 // EvalResult represents the result of an evaluation for a single configuration.
 type EvalResult struct {
 	// File is the name of the file that was evaluated against.
 	File string
 
-	// Errors is a list of validation errors.
-	Errors multierror.Error
+	// Errors is a list of validation errors for each rule.
+	Errors EvalRuleErrors
 }
 
 // Result is a list of RuleResult.
 type Result []EvalResult
+
+// HasErrors returns true if any of the EvalResult has an error.
+func (r Result) HasErrors() bool {
+	for _, res := range r {
+		if res.Errors.WrapErrors() != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// WrapErrors wraps multiple errors into a single error.
+func (e EvalRuleErrors) WrapErrors() error {
+	var err *multierror.Error
+	for _, e := range e {
+		err = multierror.Append(err, e.Error)
+	}
+	return err.ErrorOrNil()
+}

@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 )
@@ -27,38 +29,39 @@ func Lint() *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbose output")
-	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "enable printing all of the lint rules")
+	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "prints the all of available rules and exits")
 	return cmd
 }
 
 func (o lintOptions) LintCmd() error {
-	linter := lint.New(o.makeLintOptions())
+	linter := lint.New(o.makeLintOptions()...)
+
+	// If the list flag is set, print the list of available rules and exit.
+	if o.list {
+		linter.PrintRules()
+		return nil
+	}
+
+	// Run the linter.
 	result, err := linter.Lint()
 	if err != nil {
 		return err
 	}
-	if !o.list {
+	if result.HasErrors() {
 		linter.Print(result)
+		return fmt.Errorf("linting failed!")
 	}
 	return nil
 }
 
 func (o lintOptions) makeLintOptions() []lint.Option {
-	var lo []lint.Option
-
 	if len(o.args) == 0 {
 		// Lint the current directory by default.
 		o.args = []string{"."}
 	}
 
-	lo = append(lo, lint.WithPath(o.args[0]))
-
-	if o.verbose {
-		lo = append(lo, lint.WithVerbose(o.verbose))
+	return []lint.Option{
+		lint.WithPath(o.args[0]),
+		lint.WithVerbose(o.verbose),
 	}
-
-	if o.list {
-		lo = append(lo, lint.WithList(o.list))
-	}
-	return lo
 }

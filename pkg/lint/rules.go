@@ -53,7 +53,7 @@ var AllRules = func(l *Linter) Rules {
 		{
 			Name:        "valid-pipeline-fetch-uri",
 			Description: "every fetch pipeline should have a valid uri",
-			Severity:    SeverityWarning,
+			Severity:    SeverityError,
 			LintFunc: func(config build.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == "fetch" {
@@ -61,10 +61,21 @@ var AllRules = func(l *Linter) Rules {
 						if !ok {
 							return fmt.Errorf("uri is missing in fetch pipeline")
 						}
-						if _, err := url.Parse(uri); err != nil {
-							return fmt.Errorf("uri is invalid in %s pipeline", p.Name)
+						if _, err := url.ParseRequestURI(uri); err != nil {
+							return fmt.Errorf("uri is invalid URL structure")
 						}
-
+					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "valid-pipeline-fetch-digest",
+			Description: "every fetch pipeline should have a valid digest",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				for _, p := range config.Pipeline {
+					if p.Uses == "fetch" {
 						hashGiven := false
 						if sha256, ok := p.With["expected-sha256"]; ok {
 							if !reValidSHA256.MatchString(sha256) {
@@ -78,7 +89,6 @@ var AllRules = func(l *Linter) Rules {
 							}
 							hashGiven = true
 						}
-
 						if !hashGiven {
 							return fmt.Errorf("expected-sha256 or expected-sha512 is missing")
 						}

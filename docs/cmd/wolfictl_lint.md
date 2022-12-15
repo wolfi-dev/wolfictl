@@ -16,7 +16,7 @@ Lint the code
 
 ```
   -h, --help      help for lint
-  -l, --list      enable printing all of the lint rules
+  -l, --list      prints the all of available rules and exits
   -v, --verbose   verbose output
 ```
 
