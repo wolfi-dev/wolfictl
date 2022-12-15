@@ -9,6 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/hashicorp/go-multierror"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
@@ -27,7 +30,7 @@ type Linter struct {
 }
 
 // New initializes a new instance of Linter.
-func New(opts ...Option) *Linter {
+func New(opts []Option) *Linter {
 	o := Options{}
 	for _, opt := range opts {
 		opt(&o)
@@ -39,12 +42,20 @@ func New(opts ...Option) *Linter {
 }
 
 func (l *Linter) Lint() (Result, error) {
+	rules := AllRules(l)
+
+	if l.options.List {
+		fmt.Println("Available rules:")
+		for _, rule := range rules {
+			fmt.Printf("%s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
+		}
+		return nil, nil
+	}
+
 	filesToLint, err := melange.ReadAllPackagesFromRepo(l.options.Path)
 	if err != nil {
 		return Result{}, err
 	}
-
-	rules := AllRules(l)
 
 	results := make(Result, 0)
 	for name, config := range filesToLint {

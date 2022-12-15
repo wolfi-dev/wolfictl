@@ -7,6 +7,9 @@ type Options struct {
 
 	// Verbose prints the details of the linting errors.
 	Verbose bool
+
+	// List prints the available linting rules.
+	List bool
 }
 
 // Option represents a linter option.
@@ -23,5 +26,12 @@ func WithPath(path string) Option {
 func WithVerbose(verbose bool) Option {
 	return func(o *Options) {
 		o.Verbose = verbose
+	}
+}
+
+// WithList sets the list option.
+func WithList(list bool) Option {
+	return func(o *Options) {
+		o.List = list
 	}
 }
