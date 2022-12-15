@@ -28,7 +28,6 @@ func Update() *cobra.Command {
 		Example: `  wolfictl update https://github.com/wolfi-dev/os`,
 		Args:    cobra.RangeArgs(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			return o.UpdateCmd(cmd.Context(), args[0])
 		},
 	}

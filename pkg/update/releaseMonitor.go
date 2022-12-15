@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"chainguard.dev/melange/pkg/build"
+
 	"github.com/hashicorp/go-version"
 
 	"github.com/pkg/errors"
@@ -30,7 +32,7 @@ const (
 	releaseMonitor    = "RELEASE_MONITOR"
 )
 
-func (m MonitorService) getLatestReleaseMonitorVersions(mapperData map[string]Row, melangePackages map[string]MelageConfig) (map[string]string, []string, error) {
+func (m MonitorService) getLatestReleaseMonitorVersions(mapperData map[string]Row, melangePackages map[string]build.Configuration) (map[string]string, []string, error) {
 	var errorMessages []string
 	packagesToUpdate := make(map[string]string)
 	// iterate packages from the target git repo and check if a new version is available
@@ -71,7 +73,6 @@ func (m MonitorService) getLatestReleaseMonitorVersions(mapperData map[string]Ro
 }
 
 func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {
-
 	targetURL := fmt.Sprintf(releaseMonitorURL, identifier)
 	req, err := http.NewRequest("GET", targetURL, nil)
 	if err != nil {
@@ -96,7 +97,6 @@ func (m MonitorService) getLatestReleaseVersion(identifier string) (string, erro
 }
 
 func (m MonitorService) parseVersions(rawdata []byte) (string, error) {
-
 	versions := ReleaseMonitorVersions{}
 	err := json.Unmarshal(rawdata, &versions)
 	if err != nil {

@@ -12,6 +12,10 @@ import (
 	"strings"
 	"time"
 
+	"chainguard.dev/melange/pkg/build"
+
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
+
 	"github.com/shurcooL/githubv4"
 
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -168,7 +172,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		}
 	}
 
-	//todo switch to idendifier as the key
+	// todo switch to idendifier as the key
 
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {
@@ -184,7 +188,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		configFile := filepath.Join(tempDir, packageName+".yaml")
 
 		// if new versions are available lets bump the packages in the target melange git repo
-		err := o.bump(configFile, latestVersion)
+		err := melange.Bump(configFile, latestVersion)
 		if err != nil {
 			// add this to the list of messages to print at the end of the update
 			errorMessages = append(errorMessages, fmt.Sprintf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error()))
@@ -237,7 +241,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
 // for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-func (o Options) updateMakefile(tempDir string, packageName string, latestVersion string, worktree *git.Worktree) error {
+func (o Options) updateMakefile(tempDir, packageName, latestVersion string, worktree *git.Worktree) error {
 	file, err := os.Open(filepath.Join(tempDir, "Makefile"))
 	if err != nil {
 		// if the Makefile doesn't exist anymore let's just return
@@ -308,9 +312,9 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 }
 
 // read the melange package config(s) from the target git repository so we can check if new versions exist
-func (o Options) readPackageConfigs(tempDir string) (map[string]MelageConfig, error) {
+func (o Options) readPackageConfigs(tempDir string) (map[string]build.Configuration, error) {
 	var err error
-	packageConfigs := make(map[string]MelageConfig)
+	packageConfigs := make(map[string]build.Configuration)
 
 	// if package names were passed as CLI parameters load those packages
 	if len(o.PackageNames) > 0 {
@@ -318,17 +322,16 @@ func (o Options) readPackageConfigs(tempDir string) (map[string]MelageConfig, er
 		for _, packageName := range o.PackageNames {
 			filename := filepath.Join(tempDir, packageName+".yaml")
 
-			config, err := o.readPackageConfig(filename)
+			config, err := melange.ReadMelangeConfig(filename)
 			if err != nil {
 				return packageConfigs, errors.Wrapf(err, "failed to read package config %s", filename)
 			}
 
 			packageConfigs[config.Package.Name] = config
 		}
-
 	} else {
 		// get all packages in the provided git repo
-		packageConfigs, err = o.readAllPackagesFromRepo(tempDir)
+		packageConfigs, err = melange.ReadAllPackagesFromRepo(tempDir)
 		if err != nil {
 			return packageConfigs, errors.Wrapf(err, "failed to read package configs from repo %s", o.RepoURI)
 		}
@@ -339,7 +342,6 @@ func (o Options) readPackageConfigs(tempDir string) (map[string]MelageConfig, er
 
 // commits package update changes and creates a pull request
 func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, newVersion string) (string, error) {
-
 	remote, err := repo.Remote("origin")
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to find git origin URL")

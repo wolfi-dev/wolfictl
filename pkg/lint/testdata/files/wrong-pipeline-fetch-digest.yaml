@@ -1,0 +1,16 @@
+package:
+  name: wrong-pipeline-fetch-digest
+  version: 1.0.0
+  epoch: 0
+  description: "a package with a wrong pipeline fetch digest"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://test.com/missing-copyright/${{package.version}}.tar.gz
+      expected-sha256: ab5a03176ee106d3f0fa9...

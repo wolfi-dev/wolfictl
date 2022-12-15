@@ -16,10 +16,8 @@ type Row struct {
 }
 
 func (o Options) getMonitorServiceData() (map[string]Row, error) {
-
 	req, _ := http.NewRequest("GET", o.DataMapperURL, nil)
 	resp, err := o.Client.Do(req)
-
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed getting URI %s", o.DataMapperURL)
 	}
@@ -37,7 +35,6 @@ func (o Options) getMonitorServiceData() (map[string]Row, error) {
 }
 
 func (o Options) parseData(rawdata string) (map[string]Row, error) {
-
 	data := make(map[string]Row)
 
 	lines := strings.Split(rawdata, "\n")
@@ -65,5 +62,4 @@ func (o Options) parseData(rawdata string) (map[string]Row, error) {
 	}
 
 	return data, nil
-
 }
