@@ -31,6 +31,38 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			file: "forbidden-repository.yaml",
+			want: EvalResult{
+				File: "forbidden-repository",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "forbidden-repository-used",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[forbidden-repository-used]: forbidden repository https://packages.wolfi.dev/os is used (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "forbidden-keyring.yaml",
+			want: EvalResult{
+				File: "forbidden-keyring",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "forbidden-keyring-used",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[forbidden-keyring-used]: forbidden keyring https://packages.wolfi.dev/os/wolfi-signing.rsa.pub is used (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			file: "wrong-pipeline-fetch-uri.yaml",
 			want: EvalResult{
 				File: "wrong-pipeline-fetch-uri",
