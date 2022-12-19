@@ -5,12 +5,22 @@ import (
 	"net/url"
 	"regexp"
 
+	"golang.org/x/exp/slices"
+
 	"chainguard.dev/melange/pkg/build"
 )
 
 var (
 	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
+
+	forbiddenRepositories = []string{
+		"https://packages.wolfi.dev/os",
+	}
+
+	forbiddenKeyrings = []string{
+		"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
+	}
 )
 
 // AllRules is a list of all available rules to evaluate.
@@ -32,6 +42,32 @@ var AllRules = func(l *Linter) Rules {
 			},
 			ConditionFuncs: []ConditionFunc{
 				l.checkIfMakefileExists(),
+			},
+		},
+		{
+			Name:        "forbidden-repository-used",
+			Description: "do not specify a forbidden repository",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				for _, repo := range config.Environment.Contents.Repositories {
+					if slices.Contains(forbiddenRepositories, repo) {
+						return fmt.Errorf("forbidden repository %s is used", repo)
+					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "forbidden-keyring-used",
+			Description: "do not specify a forbidden keyring",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				for _, keyring := range config.Environment.Contents.Keyring {
+					if slices.Contains(forbiddenKeyrings, keyring) {
+						return fmt.Errorf("forbidden keyring %s is used", keyring)
+					}
+				}
+				return nil
 			},
 		},
 		{
