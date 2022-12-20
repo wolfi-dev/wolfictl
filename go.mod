@@ -3,7 +3,7 @@ module github.com/wolfi-dev/wolfictl
 go 1.19
 
 require (
-	chainguard.dev/melange v0.1.1-0.20221214233653-f55793e6cc79
+	chainguard.dev/melange v0.1.1-0.20221220045121-c639687f71a8
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
@@ -18,8 +18,8 @@ require (
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
 	golang.org/x/oauth2 v0.1.0
+	golang.org/x/text v0.5.0
 	golang.org/x/time v0.2.0
-	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -143,7 +143,6 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.99.0 // indirect

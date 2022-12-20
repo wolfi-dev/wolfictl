@@ -10,7 +10,6 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 )
 
 func ReadAllPackagesFromRepo(tempDir string) (map[string]build.Configuration, error) {
@@ -45,19 +44,10 @@ func ReadAllPackagesFromRepo(tempDir string) (map[string]build.Configuration, er
 
 // ReadMelangeConfig reads a single melange config from the provided filename.
 func ReadMelangeConfig(filename string) (build.Configuration, error) {
+	ctx := build.Context{ConfigFile: filename}
 	packageConfig := build.Configuration{}
-
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return packageConfig, errors.Wrapf(err, "failed to read package config %s", filename)
-	}
-
-	err = yaml.Unmarshal(data, &packageConfig)
-	if err != nil {
-		return packageConfig, errors.Wrapf(err, "failed to unmarshal package data from filename %s", filename)
-	}
-
-	return packageConfig, nil
+	err := packageConfig.Load(ctx)
+	return packageConfig, err
 }
 
 func Bump(configFile, version string) error {
