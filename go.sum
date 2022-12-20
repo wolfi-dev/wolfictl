@@ -1,7 +1,7 @@
 chainguard.dev/apko v0.6.0 h1:k3/NcmxtyA4t3azacnvBPi7jpBrSZiU3wdDJC46AODk=
 chainguard.dev/apko v0.6.0/go.mod h1:7Dt5FEtvxKnhKTPqEbaNWtcc3cULGJiwEwhY42bweHE=
-chainguard.dev/melange v0.1.1-0.20221214233653-f55793e6cc79 h1:oBF5gHwSWB33LlNNKYfW+QMLGnptzcB+KbI2rNt9ay4=
-chainguard.dev/melange v0.1.1-0.20221214233653-f55793e6cc79/go.mod h1:mfdPaPWGYf5GU6f86dO3GhasNMC2Cv2PGTnT2CQaeWE=
+chainguard.dev/melange v0.1.1-0.20221220045121-c639687f71a8 h1:khgj7zcTKG1pQGwtdPP0xffGHDn1oc9Kn0U7Q/RCamM=
+chainguard.dev/melange v0.1.1-0.20221220045121-c639687f71a8/go.mod h1:mfdPaPWGYf5GU6f86dO3GhasNMC2Cv2PGTnT2CQaeWE=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=

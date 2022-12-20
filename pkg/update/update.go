@@ -33,18 +33,20 @@ import (
 )
 
 type Options struct {
-	PackageNames          []string
-	PullRequestBaseBranch string
-	PullRequestTitle      string
-	RepoURI               string
-	DataMapperURL         string
-	DefaultBranch         string
-	Batch                 bool
-	DryRun                bool
-	Client                *RLHTTPClient
-	Logger                *log.Logger
-	GitHubHTTPClient      *RLHTTPClient
-	GitGraphQLClient      *githubv4.Client
+	PackageNames           []string
+	PullRequestBaseBranch  string
+	PullRequestTitle       string
+	RepoURI                string
+	DataMapperURL          string
+	DefaultBranch          string
+	Batch                  bool
+	DryRun                 bool
+	ReleaseMonitoringQuery bool
+	GithubReleaseQuery     bool
+	Client                 *RLHTTPClient
+	Logger                 *log.Logger
+	GitHubHTTPClient       *RLHTTPClient
+	GitGraphQLClient       *githubv4.Client
 }
 
 const (
@@ -87,6 +89,8 @@ func New() Options {
 func (o Options) Update() error {
 	// keep a slice of messages to print at the end of the update to help users diagnose non-fatal problems
 	var printMessages []string
+	var packagesToUpdate map[string]string
+	var errorMessages []string
 
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wolfictl")
@@ -119,27 +123,31 @@ func (o Options) Update() error {
 		return errors.Wrapf(err, "failed getting release monitor service mapping data")
 	}
 
-	// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-	g := NewGitHubReleaseOptions(mapperData, packageConfigs, o.GitGraphQLClient)
-	packagesToUpdate, errorMessages, err := g.getLatestGitHubVersions()
-	if err != nil {
-		return errors.Wrap(err, "failed getting github releases")
+	if o.GithubReleaseQuery {
+		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
+		g := NewGitHubReleaseOptions(mapperData, packageConfigs, o.GitGraphQLClient)
+		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
+		if err != nil {
+			return errors.Wrap(err, "failed getting github releases")
+		}
+		printMessages = append(printMessages, errorMessages...)
 	}
-	printMessages = append(printMessages, errorMessages...)
 
-	// get latest versions from https://release-monitoring.org/
-	m := MonitorService{
-		Client:           o.Client,
-		GitHubHTTPClient: o.GitHubHTTPClient,
-		Logger:           o.Logger,
-	}
-	newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, packageConfigs)
-	if err != nil {
-		return errors.Wrap(err, "failed release monitor versions")
-	}
-	printMessages = append(printMessages, errorMessages...)
+	if o.ReleaseMonitoringQuery {
+		// get latest versions from https://release-monitoring.org/
+		m := MonitorService{
+			Client:           o.Client,
+			GitHubHTTPClient: o.GitHubHTTPClient,
+			Logger:           o.Logger,
+		}
+		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, packageConfigs)
+		if err != nil {
+			return errors.Wrap(err, "failed release monitor versions")
+		}
+		printMessages = append(printMessages, errorMessages...)
 
-	maps.Copy(packagesToUpdate, newReleaseMonitorVersions)
+		maps.Copy(packagesToUpdate, newReleaseMonitorVersions)
+	}
 
 	// update melange configs in our cloned git repository with any new package versions
 	errorMessages, err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
