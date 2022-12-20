@@ -89,7 +89,7 @@ func New() Options {
 func (o Options) Update() error {
 	// keep a slice of messages to print at the end of the update to help users diagnose non-fatal problems
 	var printMessages []string
-	var packagesToUpdate map[string]string
+	packagesToUpdate := make(map[string]string)
 	var errorMessages []string
 
 	// clone the melange config git repo into a temp folder so we can work with it
