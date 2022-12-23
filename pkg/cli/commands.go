@@ -15,6 +15,7 @@ func New() *cobra.Command {
 	cmd.AddCommand(
 		Update(),
 		Lint(),
+		VEX(),
 	)
 
 	return cmd
