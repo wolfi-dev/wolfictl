@@ -7,6 +7,7 @@ import (
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/vex/pkg/vex"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -22,7 +23,13 @@ func FromPackageConfiguration(buildCfg build.Configuration, vexCfg Config) (vex.
 	doc.AuthorRole = vexCfg.AuthorRole
 
 	purls := buildCfg.PackageURLs(vexCfg.Distro)
-	doc.Statements = statementsFromConfiguration(buildCfg, doc.Timestamp, purls)
+
+	if doc.Timestamp == nil {
+		// We don't expect this case, since `vex.New()` sets a document timestamp.
+		return vex.VEX{}, errors.New("document timestamp must be set")
+	}
+
+	doc.Statements = statementsFromConfiguration(buildCfg, *doc.Timestamp, purls)
 
 	return doc, nil
 }

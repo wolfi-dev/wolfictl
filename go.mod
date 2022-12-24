@@ -3,8 +3,8 @@ module github.com/wolfi-dev/wolfictl
 go 1.19
 
 require (
-	chainguard.dev/melange v0.2.1-0.20221223231749-de64c979d823
-	chainguard.dev/vex v0.0.3-0.20221223202448-629f72ee3225
+	chainguard.dev/melange v0.2.1-0.20221224013000-48eb9de39a0d
+	chainguard.dev/vex v0.0.3-0.20221224011205-1d4b8701e0dd
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.5.1
