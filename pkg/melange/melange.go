@@ -44,10 +44,11 @@ func ReadAllPackagesFromRepo(tempDir string) (map[string]build.Configuration, er
 
 // ReadMelangeConfig reads a single melange config from the provided filename.
 func ReadMelangeConfig(filename string) (build.Configuration, error) {
-	ctx := build.Context{ConfigFile: filename}
-	packageConfig := build.Configuration{}
-	err := packageConfig.Load(ctx)
-	return packageConfig, err
+	packageConfig, err := build.ParseConfiguration(filename)
+	if err != nil {
+		return build.Configuration{}, err
+	}
+	return *packageConfig, err
 }
 
 func Bump(configFile, version string) error {
