@@ -28,7 +28,7 @@ func VEX() *cobra.Command {
 				AuthorRole: role,
 			}
 
-			doc, err := vex.FromPackageConfiguration(*buildCfg, vexCfg)
+			doc, err := vex.FromPackageConfiguration(buildCfg, vexCfg)
 			if err != nil {
 				return err
 			}

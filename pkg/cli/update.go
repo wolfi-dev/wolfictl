@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 
@@ -47,29 +48,27 @@ func Update() *cobra.Command {
 }
 
 func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
-	context := update.New()
+	updateContext := update.New()
 
 	if !o.dryRun && os.Getenv("GITHUB_TOKEN") == "" {
 		return errors.New("no GITHUB_TOKEN token found")
 	}
 
-	_, err := url.ParseRequestURI(repoURI)
-	if err != nil {
-		return errors.Wrapf(err, "failed to parse URI %s", repoURI)
+	if _, err := url.ParseRequestURI(repoURI); err != nil {
+		return fmt.Errorf("failed to parse URI %s: %w", repoURI, err)
 	}
-	context.PackageNames = o.packageNames
-	context.RepoURI = repoURI
-	context.DataMapperURL = o.dataMapperURL
-	context.DryRun = o.dryRun
-	context.Batch = o.batch
-	context.PullRequestBaseBranch = o.pullRequestBaseBranch
-	context.PullRequestTitle = o.pullRequestTitle
-	context.ReleaseMonitoringQuery = o.releaseMonitoringQuery
-	context.GithubReleaseQuery = o.githubReleaseQuery
+	updateContext.PackageNames = o.packageNames
+	updateContext.RepoURI = repoURI
+	updateContext.DataMapperURL = o.dataMapperURL
+	updateContext.DryRun = o.dryRun
+	updateContext.Batch = o.batch
+	updateContext.PullRequestBaseBranch = o.pullRequestBaseBranch
+	updateContext.PullRequestTitle = o.pullRequestTitle
+	updateContext.ReleaseMonitoringQuery = o.releaseMonitoringQuery
+	updateContext.GithubReleaseQuery = o.githubReleaseQuery
 
-	err = context.Update()
-	if err != nil {
-		return errors.Wrapf(err, "creating updates")
+	if err := updateContext.Update(); err != nil {
+		return fmt.Errorf("creating updates: %w", err)
 	}
 
 	return nil
