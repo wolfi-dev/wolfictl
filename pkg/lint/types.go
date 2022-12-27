@@ -31,7 +31,7 @@ type Rule struct {
 	// Severity is the severity of the rule.
 	Severity Severity
 
-	// Function is the function that lints a single configuration.
+	// LintFunc is the function that lints a single configuration.
 	LintFunc Function
 
 	// ConditionFuncs is a list of and-conditioned functions that check if the rule should be executed.
