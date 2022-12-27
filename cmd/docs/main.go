@@ -101,17 +101,21 @@ type options struct {
 
 func parseArgs() (*options, error) {
 	opts := &options{}
-	cwd, _ := os.Getwd()
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("getting cwd: %w", err)
+	}
 	flags := pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
 	flags.StringVar(&opts.source, "root", cwd, "Path to project root")
 	flags.StringVar(&opts.target, "target", "/tmp", "Target path for generated yaml files")
 	flags.StringVar(&opts.kind, "kind", "markdown", "Kind of docs to generate (supported: man, markdown)")
-	err := flags.Parse(os.Args[1:])
-	return opts, err
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		return nil, fmt.Errorf("parsing arguments: %w", err)
+	}
+	return opts, nil
 }
 
-func parseMDContent(mdString string) (string, string) {
-	var description, examples string
+func parseMDContent(mdString string) (description, examples string) {
 	parsedContent := strings.Split(mdString, "\n## ")
 	for _, s := range parsedContent {
 		if strings.Index(s, "Description") == 0 {
