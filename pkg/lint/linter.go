@@ -50,8 +50,7 @@ func (l *Linter) Lint() (Result, error) {
 	}
 
 	results := make(Result, 0)
-	for name, config := range filesToLint {
-		// var failedRules *multierror.Error
+	for name := range filesToLint {
 		failedRules := make(EvalRuleErrors, 0)
 		for _, rule := range rules {
 			// Check if we should skip this rule.
@@ -74,7 +73,7 @@ func (l *Linter) Lint() (Result, error) {
 			}
 
 			// Evaluate the rule.
-			if err := rule.LintFunc(config); err != nil {
+			if err := rule.LintFunc(filesToLint[name]); err != nil {
 				msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity)
 				if l.options.Verbose {
 					msg += fmt.Sprintf(" - (%s)", rule.Description)
@@ -132,14 +131,14 @@ func (l *Linter) checkIfMakefileExists() ConditionFunc {
 
 // readMakefile reads the Makefile from the file.
 func (l *Linter) readMakefile() error {
-	bytes, err := os.ReadFile(filepath.Join(l.options.Path, "Makefile"))
+	b, err := os.ReadFile(filepath.Join(l.options.Path, "Makefile"))
 	if err != nil {
 		return fmt.Errorf("failed to open Makefile: %w", err)
 	}
-	if len(bytes) == 0 {
+	if len(b) == 0 {
 		return fmt.Errorf("makefile is empty")
 	}
-	l.makefileBytes = bytes
+	l.makefileBytes = b
 	return nil
 }
 

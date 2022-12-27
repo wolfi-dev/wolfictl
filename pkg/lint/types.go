@@ -5,8 +5,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
-// LintFunc is a function that lints a single configuration.
-type LintFunc func(build.Configuration) error
+// Function is a function that lints a single configuration.
+type Function func(build.Configuration) error
 
 // ConditionFunc is a function that checks if a rule should be executed.
 type ConditionFunc func() bool
@@ -31,8 +31,8 @@ type Rule struct {
 	// Severity is the severity of the rule.
 	Severity Severity
 
-	// LintFunc is the function that lints a single configuration.
-	LintFunc LintFunc
+	// Function is the function that lints a single configuration.
+	LintFunc Function
 
 	// ConditionFuncs is a list of and-conditioned functions that check if the rule should be executed.
 	ConditionFuncs []ConditionFunc
