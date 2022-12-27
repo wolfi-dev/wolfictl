@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"chainguard.dev/melange/pkg/build"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/vex"
 )
@@ -16,6 +17,10 @@ func VEX() *cobra.Command {
 		Short:         "Generate a VEX document from a package configuration file",
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				cmd.Help()
+				return errors.New("too few arguments")
+			}
 			configPath := args[0]
 			buildCfg, err := build.ParseConfiguration(configPath)
 			if err != nil {
