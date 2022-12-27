@@ -22,6 +22,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_parseGitURL(t *testing.T) {
@@ -130,10 +131,12 @@ func TestUpdate_updateMakefile(t *testing.T) {
 	// make the temp test dir a git repo
 	fs := osfs.New(tempDir)
 	storage := filesystem.NewStorage(fs, cache.NewObjectLRUDefault())
-	wt, _ := fs.Chroot("melange")
+	wt, err := fs.Chroot("melange")
+	require.NoError(t, err)
 	r, err := git.Init(storage, wt)
 	assert.NoError(t, err)
-	w, _ := r.Worktree()
+	w, err := r.Worktree()
+	require.NoError(t, err)
 
 	// copy test file into temp git repo
 	err = util.WriteFile(w.Filesystem, "Makefile", data, 0o644)
