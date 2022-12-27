@@ -157,10 +157,10 @@ func (o *GitOptions) CheckExistingPullRequests(pr *GetPullRequest) (string, erro
 func (o *GitOptions) wait(delay time.Duration) {
 	// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
 	if delay == 0 {
-		delay = time.Duration(o.SecondsToSleepWhenRateLimited)
+		delay = time.Duration(o.SecondsToSleepWhenRateLimited * int(time.Second))
 	}
 	o.Logger.Printf("retrying PR again later with %d second delay due to secondary rate limiting.", delay)
-	time.Sleep(delay * time.Second)
+	time.Sleep(delay)
 }
 
 func (o *GitOptions) closePullRequest(pr *GetPullRequest, openPr *github.PullRequest) error {
