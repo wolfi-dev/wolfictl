@@ -19,7 +19,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 		Distro: "wolfi",
 	}
 
-	doc, err := FromPackageConfiguration(*buildCfg, vexCfg)
+	doc, err := FromPackageConfiguration(buildCfg, vexCfg)
 	require.NoError(t, err)
 
 	// zero out non-deterministic fields

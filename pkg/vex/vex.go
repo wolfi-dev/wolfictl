@@ -15,7 +15,7 @@ type Config struct {
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
-func FromPackageConfiguration(buildCfg build.Configuration, vexCfg Config) (vex.VEX, error) {
+func FromPackageConfiguration(buildCfg *build.Configuration, vexCfg Config) (vex.VEX, error) {
 	doc := vex.New()
 
 	doc.ID = generateDocumentID(buildCfg.Package.Name)
@@ -34,29 +34,28 @@ func FromPackageConfiguration(buildCfg build.Configuration, vexCfg Config) (vex.
 	return doc, nil
 }
 
-func statementsFromConfiguration(cfg build.Configuration, documentTimestamp time.Time, purls []string) []vex.Statement {
+func statementsFromConfiguration(cfg *build.Configuration, documentTimestamp time.Time, purls []string) []vex.Statement {
 	// We should also add a lint rule for when advisories obviate particular secfixes items.
 	secfixesStatements := statementsFromSecfixes(cfg.Secfixes, purls)
 	advisoriesStatements := statementsFromAdvisories(cfg.Advisories, purls)
 
 	// don't include "not_affected" statements from secfixes that are obviated by statements from advisories
 	notAffectedVulns := make(map[string]struct{})
-	for _, stmt := range advisoriesStatements {
-		if stmt.Status == vex.StatusNotAffected {
-			notAffectedVulns[stmt.Vulnerability] = struct{}{}
+	for i := range advisoriesStatements {
+		if advisoriesStatements[i].Status == vex.StatusNotAffected {
+			notAffectedVulns[advisoriesStatements[i].Vulnerability] = struct{}{}
 		}
 	}
 	var statements []vex.Statement
-	for _, sfStmt := range secfixesStatements {
-		if _, seen := notAffectedVulns[sfStmt.Vulnerability]; !seen {
-			statements = append(statements, sfStmt)
+	for i := range secfixesStatements {
+		if _, seen := notAffectedVulns[secfixesStatements[i].Vulnerability]; !seen {
+			statements = append(statements, secfixesStatements[i])
 		}
 	}
 
 	statements = append(statements, advisoriesStatements...)
 
 	// TODO: also find and weed out duplicate "fixed" statements
-
 	vex.SortStatements(statements, documentTimestamp)
 	return statements
 }
@@ -65,15 +64,17 @@ func statementsFromAdvisories(advisories build.Advisories, purls []string) []vex
 	var stmts []vex.Statement
 
 	for v, entries := range advisories {
-		for _, entry := range entries {
-			stmts = append(stmts, statementFromAdvisoryContent(entry, v, purls))
+		for i := range entries {
+			stmts = append(stmts, statementFromAdvisoryContent(&entries[i], v, purls))
 		}
 	}
 
 	return stmts
 }
 
-func statementFromAdvisoryContent(content build.AdvisoryContent, vulnerability string, purls []string) vex.Statement {
+func statementFromAdvisoryContent(
+	content *build.AdvisoryContent, vulnerability string, purls []string,
+) vex.Statement {
 	return vex.Statement{
 		Vulnerability:   vulnerability,
 		Status:          content.Status,
@@ -115,6 +116,5 @@ func determineStatus(packageVersion string) vex.Status {
 }
 
 func generateDocumentID(packageName string) string {
-	uuid := uuid.New()
-	return fmt.Sprintf("vex-%s-%s", packageName, uuid)
+	return fmt.Sprintf("vex-%s-%s", packageName, uuid.New())
 }
