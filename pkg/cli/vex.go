@@ -66,7 +66,7 @@ func addPackages(parent *cobra.Command) {
 				AuthorRole: role,
 			}
 
-			doc, err := vex.FromPackageConfiguration(buildCfg, vexCfg)
+			doc, err := vex.FromPackageConfiguration(vexCfg, buildCfg)
 			if err != nil {
 				return fmt.Errorf("creating VEX document: %w", err)
 			}

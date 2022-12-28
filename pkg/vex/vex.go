@@ -15,21 +15,22 @@ type Config struct {
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
-func FromPackageConfiguration(buildCfg *build.Configuration, vexCfg Config) (vex.VEX, error) {
+func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (vex.VEX, error) {
 	doc := vex.New()
 
 	doc.ID = generateDocumentID(buildCfg.Package.Name)
 	doc.Author = vexCfg.Author
 	doc.AuthorRole = vexCfg.AuthorRole
 
-	purls := buildCfg.PackageURLs(vexCfg.Distro)
-
 	if doc.Timestamp == nil {
 		// We don't expect this case, since `vex.New()` sets a document timestamp.
 		return vex.VEX{}, errors.New("document timestamp must be set")
 	}
 
-	doc.Statements = statementsFromConfiguration(buildCfg, *doc.Timestamp, purls)
+	for _, conf := range buildCfg {
+		purls := conf.PackageURLs(vexCfg.Distro)
+		doc.Statements = statementsFromConfiguration(conf, *doc.Timestamp, purls)
+	}
 
 	return doc, nil
 }
