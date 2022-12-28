@@ -1,33 +1,27 @@
 package vex
 
 import (
-	"fmt"
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/vex/pkg/vex"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 type Config struct {
-	Distro, Author, AuthorRole string
+	DocumentID, Distro, Author, AuthorRole string
+	DocumentTimestamp                      time.Time
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
 func FromPackageConfiguration(buildCfg build.Configuration, vexCfg Config) (vex.VEX, error) {
 	doc := vex.New()
 
-	doc.ID = generateDocumentID(buildCfg.Package.Name)
+	doc.ID = vexCfg.DocumentID
+	doc.Timestamp = &vexCfg.DocumentTimestamp
 	doc.Author = vexCfg.Author
 	doc.AuthorRole = vexCfg.AuthorRole
 
 	purls := buildCfg.PackageURLs(vexCfg.Distro)
-
-	if doc.Timestamp == nil {
-		// We don't expect this case, since `vex.New()` sets a document timestamp.
-		return vex.VEX{}, errors.New("document timestamp must be set")
-	}
 
 	doc.Statements = statementsFromConfiguration(buildCfg, *doc.Timestamp, purls)
 
@@ -112,9 +106,4 @@ func determineStatus(packageVersion string) vex.Status {
 	}
 
 	return vex.StatusFixed
-}
-
-func generateDocumentID(packageName string) string {
-	uuid := uuid.New()
-	return fmt.Sprintf("vex-%s-%s", packageName, uuid)
 }

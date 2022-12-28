@@ -1,9 +1,12 @@
 package cli
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 
 	"chainguard.dev/melange/pkg/build"
+	"github.com/go-git/go-git/v5"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/vex"
 )
@@ -22,10 +25,29 @@ func VEX() *cobra.Command {
 				return err
 			}
 
+			wolfiDir := filepath.Dir(configPath)
+			repo, err := git.PlainOpen(wolfiDir)
+			if err != nil {
+				return err
+			}
+
+			fileRef := filepath.Base(configPath)
+			log, err := repo.Log(&git.LogOptions{FileName: &fileRef})
+			if err != nil {
+				return err
+			}
+
+			commit, err := log.Next()
+			if err != nil {
+				return err
+			}
+
 			vexCfg := vex.Config{
-				Distro:     "wolfi",
-				Author:     author,
-				AuthorRole: role,
+				Distro:            "wolfi",
+				Author:            author,
+				AuthorRole:        role,
+				DocumentID:        fmt.Sprintf("vex-%s-%s", buildCfg.Package.Name, commit.ID()),
+				DocumentTimestamp: commit.Author.When,
 			}
 
 			doc, err := vex.FromPackageConfiguration(*buildCfg, vexCfg)

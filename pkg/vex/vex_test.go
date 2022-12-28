@@ -3,6 +3,7 @@ package vex
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/vex/pkg/vex"
@@ -15,20 +16,24 @@ func TestFromPackageConfiguration(t *testing.T) {
 	if err != nil {
 		return
 	}
+
+	const documentID = "vex-git-abcdef0"
+	var documentTimestamp = time.Time{}
+
 	vexCfg := Config{
-		Distro: "wolfi",
+		Distro:            "wolfi",
+		DocumentID:        documentID,
+		DocumentTimestamp: documentTimestamp,
 	}
 
 	doc, err := FromPackageConfiguration(*buildCfg, vexCfg)
 	require.NoError(t, err)
 
-	// zero out non-deterministic fields
-	doc.ID = ""
-	doc.Timestamp = nil
-
 	expected := vex.VEX{
 		Metadata: vex.Metadata{
-			Format: "text/vex+json",
+			Format:    "text/vex+json",
+			ID:        documentID,
+			Timestamp: &documentTimestamp,
 		},
 		Statements: []vex.Statement{
 			{
