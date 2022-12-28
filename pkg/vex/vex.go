@@ -1,13 +1,17 @@
 package vex
 
 import (
+	"crypto/sha256"
+	"errors"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/vex/pkg/vex"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -18,7 +22,12 @@ type Config struct {
 func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (vex.VEX, error) {
 	doc := vex.New()
 
-	doc.ID = generateDocumentID(buildCfg.Package.Name)
+	id, err := generateDocumentID(buildCfg)
+	if err != nil {
+		return doc, fmt.Errorf("generating doc ID: %w", err)
+	}
+	doc.ID = id
+
 	doc.Author = vexCfg.Author
 	doc.AuthorRole = vexCfg.AuthorRole
 
@@ -116,6 +125,28 @@ func determineStatus(packageVersion string) vex.Status {
 	return vex.StatusFixed
 }
 
-func generateDocumentID(packageName string) string {
-	return fmt.Sprintf("vex-%s-%s", packageName, uuid.New())
+// generateDocumentID generate a deterministic document ID based
+// on the configuration data contents
+func generateDocumentID(configs []*build.Configuration) (string, error) {
+	hashes := []string{}
+	for _, c := range configs {
+		data, err := yaml.Marshal(c)
+		if err != nil {
+			return "", fmt.Errorf("marshaling melange configuration")
+		}
+		h := sha256.New()
+		if _, err := h.Write([]byte(data)); err != nil {
+			return "", fmt.Errorf("hashing melange configuration")
+		}
+		hashes = append(hashes, fmt.Sprintf("%x", h.Sum(nil)))
+	}
+
+	sort.Strings(hashes)
+	h := sha256.New()
+	if _, err := h.Write([]byte(strings.Join(hashes, ":"))); err != nil {
+		return "", fmt.Errorf("hashing config files")
+	}
+
+	// One hash to rule them all
+	return fmt.Sprintf("vex-%s", fmt.Sprintf("%x", h.Sum(nil))), nil
 }
