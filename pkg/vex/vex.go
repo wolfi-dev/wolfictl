@@ -53,7 +53,8 @@ func statementsFromConfiguration(cfg *build.Configuration, documentTimestamp tim
 	secfixesStatements := statementsFromSecfixes(cfg.Secfixes, purls)
 	advisoriesStatements := statementsFromAdvisories(cfg.Advisories, purls)
 
-	// don't include "not_affected" statements from secfixes that are obviated by statements from advisories
+	// don't include "not_affected" statements from secfixes that are obviated
+	// by statements from advisories
 	notAffectedVulns := make(map[string]struct{})
 	for i := range advisoriesStatements {
 		if advisoriesStatements[i].Status == vex.StatusNotAffected {
