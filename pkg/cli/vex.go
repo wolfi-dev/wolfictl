@@ -38,12 +38,17 @@ more about the VEX tooling powering wolfictk see: https://github.com/chainguard-
 	}
 
 	addPackages(cmd)
-
+	addSBOM(cmd)
 	return cmd
 }
 
+var vexCfg = vex.Config{
+	Distro:     "wolfi",
+	Author:     "",
+	AuthorRole: "",
+}
+
 func addPackages(parent *cobra.Command) {
-	var author, role string
 	cmd := &cobra.Command{
 		Use:           "packages [flags] CONFIG [CONFIG]...",
 		Example:       "wolfictl vex packages --author=joe@doe.com config1.yaml config2.yaml",
@@ -64,12 +69,6 @@ func addPackages(parent *cobra.Command) {
 				confs = append(confs, buildCfg)
 			}
 
-			vexCfg := vex.Config{
-				Distro:     "wolfi",
-				Author:     author,
-				AuthorRole: role,
-			}
-
 			doc, err := vex.FromPackageConfiguration(vexCfg, confs...)
 			if err != nil {
 				return fmt.Errorf("creating VEX document: %w", err)
@@ -82,28 +81,37 @@ func addPackages(parent *cobra.Command) {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&author, "author", "", "author of the VEX document")
-	cmd.Flags().StringVar(&role, "role", "", "role of the author of the VEX document")
+	addCommonVexFlags(cmd)
 	parent.AddCommand(cmd)
 }
 
 func addSBOM(parent *cobra.Command) {
-	var author, role string
 	cmd := &cobra.Command{
-		Use:           "sbom [flags] sbom.spdx.json",
-		Example:       "wolfictl vex sbom --author=joe@doe.com sbom.spdx.json",
-		Short:         "Generate a VEX document from wolfi packages listed in an SBOM",
+		Use:     "sbom [flags] sbom.spdx.json",
+		Example: "wolfictl vex sbom --author=joe@doe.com sbom.spdx.json",
+		Short:   "Generate a VEX document from wolfi packages listed in an SBOM",
+		Long: `wolfictl vex sbom: Generate a VEX document from wolfi packages listed in an SBOM
+		
+The vex sbom subcommand generates VEX documents describing how vulnerabilies
+impact Wolfi packages listed in an SBOM. This subcommand reads SPDX SBOMs and
+will recognize and capture all packages identified as Wolfi OS components 
+by its purl. For example, if an SBOM contains a package with the following
+purl:
+
+	pkg:apk/wolfi/curl@7.87.0-r0
+	
+wolfictl will read the melange configuration file that created the package and
+create a VEX document containing impact assessments in its advisories and
+secfixes.
+
+wolfictl will read the melange config files from an existing wolfi-dev/os clone
+or, if not specified, it will clone the repo for you.
+`,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
 				cmd.Help() //nolint:errcheck
 				return errors.New("required paramter missing: path to SBOM")
-			}
-
-			vexCfg := vex.Config{
-				Distro:     "wolfi",
-				Author:     author,
-				AuthorRole: role,
 			}
 
 			doc, err := vex.FromSBOM(vexCfg, args[0])
@@ -118,7 +126,11 @@ func addSBOM(parent *cobra.Command) {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&author, "author", "", "author of the VEX document")
-	cmd.Flags().StringVar(&role, "role", "", "role of the author of the VEX document")
+	addCommonVexFlags(cmd)
 	parent.AddCommand(cmd)
+}
+
+func addCommonVexFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVar(&vexCfg.Author, "author", "", "author of the VEX document")
+	cmd.Flags().StringVar(&vexCfg.AuthorRole, "role", "", "role of the author of the VEX document")
 }
