@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	purl "github.com/package-url/packageurl-go"
 	"gopkg.in/yaml.v3"
 
 	"chainguard.dev/apko/pkg/sbom/generator/spdx"
@@ -50,6 +51,29 @@ func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (
 		return nil, fmt.Errorf("merging vex documents: %w", err)
 	}
 	return doc, nil
+}
+
+// extractSBOMPurls reads an SBOM and returns the purls identifying
+// packages from the distribution.
+func extractSBOMPurls(vexCfg Config, sbom *spdx.Document) ([]purl.PackageURL, error) {
+	purls := []purl.PackageURL{}
+	for i := range sbom.Packages {
+		for _, ref := range sbom.Packages[i].ExternalRefs {
+			if ref.Type != "purl" {
+				continue
+			}
+
+			p, err := purl.FromString(ref.Locator)
+			if err != nil {
+				return nil, fmt.Errorf("parsing purl: %s: %w", ref.Locator, err)
+			}
+
+			if p.Namespace == vexCfg.Distro {
+				purls = append(purls, p)
+			}
+		}
+	}
+	return purls, nil
 }
 
 // parseSBOM gets an SPDX-json file and returns a parsed SBOM
