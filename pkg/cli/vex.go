@@ -44,6 +44,7 @@ more about the VEX tooling powering wolfictk see: https://github.com/chainguard-
 
 var vexCfg = vex.Config{
 	Distro:     "wolfi",
+	DistroRepo: "",
 	Author:     "",
 	AuthorRole: "",
 }
@@ -127,6 +128,7 @@ or, if not specified, it will clone the repo for you.
 		},
 	}
 	addCommonVexFlags(cmd)
+	cmd.Flags().StringVar(&vexCfg.DistroRepo, "repo", "", "path to a local clone of the wolfi-dev/os repo")
 	parent.AddCommand(cmd)
 }
 

@@ -23,7 +23,7 @@ import (
 )
 
 type Config struct {
-	Distro, Author, AuthorRole string
+	Distro, Author, AuthorRole, DistroRepo string
 }
 
 // FromSBOM parses an SPDX SBOM and returns a VEX document describing
@@ -73,6 +73,11 @@ func getPackageConfigurations(vexCfg Config, purls []purl.PackageURL) ([]*build.
 	repo, err := git.CloneOrOpenRepo("", repoURL, !strings.HasPrefix(repoURL, "https://"))
 	if err != nil {
 		return nil, fmt.Errorf("cloning %s distro: %w", vexCfg.Distro, err)
+	}
+
+	// If we're cloning to a temp dir, remove it after use
+	if vexCfg.DistroRepo == "" {
+		defer os.RemoveAll(repo.Dir())
 	}
 
 	// Parse all package configurations
