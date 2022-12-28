@@ -50,7 +50,7 @@ func VEX() *cobra.Command {
 				DocumentTimestamp: commit.Author.When,
 			}
 
-			doc, err := vex.FromPackageConfiguration(*buildCfg, vexCfg)
+			doc, err := vex.FromPackageConfiguration(buildCfg, vexCfg)
 			if err != nil {
 				return err
 			}

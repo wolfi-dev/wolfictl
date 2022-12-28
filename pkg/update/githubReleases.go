@@ -15,7 +15,6 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/go-version"
-	"github.com/pkg/errors"
 	"github.com/shurcooL/githubv4"
 )
 
@@ -75,9 +74,8 @@ type GitHubReleaseOptions struct {
 	PackageConfigs   map[string]build.Configuration
 }
 
-func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []string, error) {
-	results := make(map[string]string)
-	var errorMessages []string
+func (o GitHubReleaseOptions) getLatestGitHubVersions() (results map[string]string, errorMessages []string, err error) {
+	results = make(map[string]string)
 
 	if len(o.MapperData) == 0 {
 		return results, errorMessages, nil
@@ -89,7 +87,7 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 	}
 	for _, batch := range repoList {
 		variables := map[string]interface{}{
-			"searchQuery": githubv4.String(strings.Join(batch[:], " ")),
+			"searchQuery": githubv4.String(strings.Join(batch, " ")),
 			"count":       githubv4.Int(100), // github say max 100 repos per request
 			"first":       githubv4.Int(numberOfReleasesToReturn),
 		}
@@ -98,12 +96,11 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 		if err != nil {
 			return nil, nil, err
 		}
-		// printJSON(q)
 
 		r, e, err := o.parseGitHubReleases(q.Search)
 		if err != nil {
 			printJSON(q)
-			return nil, nil, errors.Wrap(err, "failed to parse github releases")
+			return nil, nil, fmt.Errorf("failed to parse github releases: %w", err)
 		}
 
 		maps.Copy(results, r)
@@ -114,9 +111,9 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []st
 	return results, errorMessages, nil
 }
 
-func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]string, []string, error) {
-	results := make(map[string]string)
-	var errorMessages []string
+//nolint:unparam // Is this waiting for better error handling?
+func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[string]string, errorMessages []string, err error) {
+	results = make(map[string]string)
 	for _, edge := range search.Edges {
 		releases := edge.Node.Repository.Releases
 		var versions []*version.Version
@@ -133,8 +130,10 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 			releaseVersion := string(release.Release.Name)
 
 			// strip any prefix chars using mapper data
-			// the fastest way to check is to lookup git repo name in the map data, but there's no guarantee the repo name and map data key are the same
-			// if the identifiers don't match fall back to iterating through all map data to match using identifier
+			// the fastest way to check is to lookup git repo name in the map
+			// data, but there's no guarantee the repo name and map data key are
+			// the same if the identifiers don't match fall back to iterating
+			// through all map data to match using identifier
 
 			stripPrefix := o.StripPrefix[string(edge.Node.Repository.NameWithOwner)]
 			if stripPrefix != "" {
@@ -143,7 +142,10 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 
 			releaseVersionSemver, err := version.NewVersion(releaseVersion)
 			if err != nil {
-				errorMessages = append(errorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", edge.Node.Repository.NameWithOwner, releaseVersion, err))
+				errorMessages = append(errorMessages, fmt.Sprintf(
+					"failed to create a version from package %s: %s.  Error: %s",
+					edge.Node.Repository.NameWithOwner, releaseVersion, err,
+				))
 				continue
 			}
 
@@ -153,34 +155,37 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (map[string]str
 		}
 
 		// sort the versions to make sure we really do have the latest.
-		// not all projects use the github latest release tag properly so could end up with older versions
+		// not all projects use the github latest release tag properly so could
+		// end up with older versions
 		if len(versions) > 0 {
 			sort.Sort(VersionsByLatest(versions))
 
 			latestVersionSemver := versions[len(versions)-1]
 			latestVersion := originalVersions[latestVersionSemver]
 
-			// compare if this version is newer than the version we have in our related melange package config
+			// compare if this version is newer than the version we have in our
+			// related melange package config
 			packageName := string(edge.Node.Repository.Name)
 			melangePackageConfig := o.PackageConfigs[packageName]
 			if melangePackageConfig.Package.Version != "" {
-
 				currentVersionSemver, err := version.NewVersion(melangePackageConfig.Package.Version)
 				if err != nil {
-					errorMessages = append(errorMessages, fmt.Sprintf("failed to create a version from package %s: %s.  Error: %s", melangePackageConfig.Package.Name, melangePackageConfig.Package.Version, err))
-
+					errorMessages = append(errorMessages, fmt.Sprintf(
+						"failed to create a version from package %s: %s.  Error: %s",
+						melangePackageConfig.Package.Name, melangePackageConfig.Package.Version, err,
+					))
 					continue
 				}
 
 				if currentVersionSemver.LessThan(latestVersionSemver) {
-					o.Logger.Printf("there is a new stable version available %s, current wolfi version %s, new %s", packageName, melangePackageConfig.Package.Version, latestVersion)
+					o.Logger.Printf(
+						"there is a new stable version available %s, current wolfi version %s, new %s",
+						packageName, melangePackageConfig.Package.Version, latestVersion,
+					)
 					results[string(edge.Node.Repository.Name)] = latestVersion
 				}
-
 			}
-
 		}
-
 	}
 	return results, errorMessages, nil
 }

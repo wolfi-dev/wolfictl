@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
@@ -49,7 +49,7 @@ func (o lintOptions) LintCmd() error {
 	}
 	if result.HasErrors() {
 		linter.Print(result)
-		return fmt.Errorf("linting failed!")
+		return errors.New("linting failed")
 	}
 	return nil
 }

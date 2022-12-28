@@ -13,23 +13,18 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
-
-	"github.com/wolfi-dev/wolfictl/pkg/melange"
-
-	"github.com/shurcooL/githubv4"
-
-	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
-
-	"github.com/google/uuid"
-	"github.com/wolfi-dev/wolfictl/pkg/gh"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/go-github/v48/github"
-	"github.com/pkg/errors"
+	"github.com/google/uuid"
+	"github.com/shurcooL/githubv4"
 	"golang.org/x/exp/maps"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
+
+	"github.com/wolfi-dev/wolfictl/pkg/gh"
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
 type Options struct {
@@ -86,7 +81,7 @@ func New() Options {
 	return options
 }
 
-func (o Options) Update() error {
+func (o *Options) Update() error {
 	// keep a slice of messages to print at the end of the update to help users diagnose non-fatal problems
 	var printMessages []string
 	packagesToUpdate := make(map[string]string)
@@ -95,7 +90,7 @@ func (o Options) Update() error {
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
-		return errors.Wrapf(err, "failed to create temporary folder to clone package configs into")
+		return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
 	}
 	if o.DryRun {
 		o.Logger.Printf("using working directory %s", tempDir)
@@ -108,19 +103,19 @@ func (o Options) Update() error {
 		Progress: os.Stdout,
 	})
 	if err != nil {
-		return errors.Wrapf(err, "failed to clone repository %s into %s", o.RepoURI, tempDir)
+		return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
 	}
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
 	packageConfigs, err := o.readPackageConfigs(tempDir)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get package configs")
+		return fmt.Errorf("failed to get package configs: %w", err)
 	}
 
 	// second, get package mapping data that we use to lookup if new versions exist
 	mapperData, err := o.getMonitorServiceData()
 	if err != nil {
-		return errors.Wrapf(err, "failed getting release monitor service mapping data")
+		return fmt.Errorf("failed getting release monitor service mapping data: %w", err)
 	}
 
 	if o.GithubReleaseQuery {
@@ -128,7 +123,7 @@ func (o Options) Update() error {
 		g := NewGitHubReleaseOptions(mapperData, packageConfigs, o.GitGraphQLClient)
 		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
 		if err != nil {
-			return errors.Wrap(err, "failed getting github releases")
+			return fmt.Errorf("failed getting github releases: %w", err)
 		}
 		printMessages = append(printMessages, errorMessages...)
 	}
@@ -142,7 +137,7 @@ func (o Options) Update() error {
 		}
 		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, packageConfigs)
 		if err != nil {
-			return errors.Wrap(err, "failed release monitor versions")
+			return fmt.Errorf("failed release monitor versions: %w", err)
 		}
 		printMessages = append(printMessages, errorMessages...)
 
@@ -152,7 +147,7 @@ func (o Options) Update() error {
 	// update melange configs in our cloned git repository with any new package versions
 	errorMessages, err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
 	if err != nil {
-		return errors.Wrap(err, "failed to update packages in git repository")
+		return fmt.Errorf("failed to update packages in git repository: %w", err)
 	}
 
 	printMessages = append(printMessages, errorMessages...)
@@ -166,7 +161,7 @@ func (o Options) Update() error {
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) ([]string, error) {
+func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) ([]string, error) {
 	var ref plumbing.ReferenceName
 	var err error
 	var pullRequests []string
@@ -176,7 +171,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
 		ref, err = o.switchBranch(repo)
 		if err != nil {
-			return errorMessages, errors.Wrapf(err, "failed to switch to working git branch")
+			return errorMessages, fmt.Errorf("failed to switch to working git branch: %w", err)
 		}
 	}
 
@@ -189,7 +184,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 			// let's work on a branch when updating package versions, so we can create a PR from that branch later
 			ref, err = o.switchBranch(repo)
 			if err != nil {
-				return errorMessages, errors.Wrapf(err, "failed to switch to working git branch")
+				return errorMessages, fmt.Errorf("failed to switch to working git branch: %w", err)
 			}
 		}
 
@@ -199,31 +194,34 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 		err := melange.Bump(configFile, latestVersion)
 		if err != nil {
 			// add this to the list of messages to print at the end of the update
-			errorMessages = append(errorMessages, fmt.Sprintf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error()))
+			errorMessages = append(errorMessages, fmt.Sprintf(
+				"failed to bump config file %s to version %s: %s",
+				configFile, latestVersion, err.Error(),
+			))
 			continue
 		}
 
 		worktree, err := repo.Worktree()
 		if err != nil {
-			return errorMessages, errors.Wrapf(err, "failed to get git worktree")
+			return errorMessages, fmt.Errorf("failed to get git worktree: %w", err)
 		}
 
 		_, err = worktree.Add(packageName + ".yaml")
 		if err != nil {
-			return errorMessages, errors.Wrapf(err, "failed to git add %s", configFile)
+			return errorMessages, fmt.Errorf("failed to git add %s: %w", configFile, err)
 		}
 
 		// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
 		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
 		if err != nil {
-			return errorMessages, errors.Wrap(err, "failed to update Makefile")
+			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
 		}
 
 		// if we're not running in batch mode, lets commit and PR each change
 		if !o.Batch && !o.DryRun {
 			pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
 			if err != nil {
-				return errorMessages, errors.Wrap(err, "failed to propose changes")
+				return errorMessages, fmt.Errorf("failed to propose changes: %w", err)
 			}
 			if pr != "" {
 				pullRequests = append(pullRequests, pr)
@@ -235,7 +233,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 	if o.Batch && !o.DryRun {
 		pr, err := o.proposeChanges(repo, ref, "Batch", "")
 		if err != nil {
-			return errorMessages, errors.Wrap(err, "failed to propose changes")
+			return errorMessages, fmt.Errorf("failed to propose changes: %w", err)
 		}
 		pullRequests = append(pullRequests, pr)
 	}
@@ -249,7 +247,7 @@ func (o Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpd
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
 // for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-func (o Options) updateMakefile(tempDir, packageName, latestVersion string, worktree *git.Worktree) error {
+func (o *Options) updateMakefile(tempDir, packageName, latestVersion string, worktree *git.Worktree) error {
 	file, err := os.Open(filepath.Join(tempDir, "Makefile"))
 	if err != nil {
 		// if the Makefile doesn't exist anymore let's just return
@@ -270,28 +268,26 @@ func (o Options) updateMakefile(tempDir, packageName, latestVersion string, work
 
 	info, err := os.Stat(filepath.Join(tempDir, "Makefile"))
 	if err != nil {
-		return errors.Wrap(err, "failed to check file permissions of the Makefile")
+		return fmt.Errorf("failed to check file permissions of the Makefile: %w", err)
 	}
 
-	err = os.WriteFile(filepath.Join(tempDir, "Makefile"), newFile, info.Mode())
-	if err != nil {
-		return errors.Wrap(err, "failed to write Makefile")
+	if err := os.WriteFile(filepath.Join(tempDir, "Makefile"), newFile, info.Mode()); err != nil {
+		return fmt.Errorf("failed to write Makefile: %w", err)
 	}
 
-	_, err = worktree.Add("Makefile")
-	if err != nil {
-		return errors.Wrap(err, "failed to git add Makefile")
+	if _, err = worktree.Add("Makefile"); err != nil {
+		return fmt.Errorf("failed to git add Makefile: %w", err)
 	}
 	return nil
 }
 
 // create a unique branch
-func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
+func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
 	name := uuid.New().String()
 
 	worktree, err := repo.Worktree()
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to get git worktree")
+		return "", fmt.Errorf("failed to get git worktree: %w", err)
 	}
 
 	// make sure we are on the main branch to start with
@@ -302,7 +298,7 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 		Branch: ref,
 	})
 	if err != nil {
-		return "", errors.Wrap(err, "failed to checkout main")
+		return "", fmt.Errorf("failed to checkout main: %w", err)
 	}
 
 	// create a unique branch to work from
@@ -313,14 +309,14 @@ func (o Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, err
 	})
 
 	if err != nil {
-		return "", errors.Wrap(err, "failed to checkout to temporary branch")
+		return "", fmt.Errorf("failed to checkout to temporary branch: %w", err)
 	}
 
 	return ref, err
 }
 
 // read the melange package config(s) from the target git repository so we can check if new versions exist
-func (o Options) readPackageConfigs(tempDir string) (map[string]build.Configuration, error) {
+func (o *Options) readPackageConfigs(tempDir string) (map[string]build.Configuration, error) {
 	var err error
 	packageConfigs := make(map[string]build.Configuration)
 
@@ -332,7 +328,7 @@ func (o Options) readPackageConfigs(tempDir string) (map[string]build.Configurat
 
 			config, err := melange.ReadMelangeConfig(filename)
 			if err != nil {
-				return packageConfigs, errors.Wrapf(err, "failed to read package config %s", filename)
+				return packageConfigs, fmt.Errorf("failed to read package config %s: %w", filename, err)
 			}
 
 			packageConfigs[config.Package.Name] = config
@@ -341,7 +337,7 @@ func (o Options) readPackageConfigs(tempDir string) (map[string]build.Configurat
 		// get all packages in the provided git repo
 		packageConfigs, err = melange.ReadAllPackagesFromRepo(tempDir)
 		if err != nil {
-			return packageConfigs, errors.Wrapf(err, "failed to read package configs from repo %s", o.RepoURI)
+			return packageConfigs, fmt.Errorf("failed to read package configs from repo %s: %w", o.RepoURI, err)
 		}
 	}
 
@@ -349,10 +345,10 @@ func (o Options) readPackageConfigs(tempDir string) (map[string]build.Configurat
 }
 
 // commits package update changes and creates a pull request
-func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, newVersion string) (string, error) {
+func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, newVersion string) (string, error) {
 	remote, err := repo.Remote("origin")
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to find git origin URL")
+		return "", fmt.Errorf("failed to find git origin URL: %w", err)
 	}
 
 	if len(remote.Config().URLs) == 0 {
@@ -361,7 +357,7 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 
 	owner, repoName, err := parseGitURL(remote.Config().URLs[0])
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to find git origin URL")
+		return "", fmt.Errorf("failed to find git origin URL: %w", err)
 	}
 
 	basePullRequest := gh.BasePullRequest{
@@ -380,7 +376,7 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 		Logger:                        o.Logger,
 	}
 
-	getPr := gh.GetPullRequest{
+	getPr := &gh.GetPullRequest{
 		BasePullRequest: basePullRequest,
 		PackageName:     packageName,
 		Version:         newVersion,
@@ -389,18 +385,20 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 	// if an existing PR is open with the same version skip, if it's an older version close the PR and we'll create a new one
 	exitingPR, err := gitOpts.CheckExistingPullRequests(getPr)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to check for existing pull requests")
+		return "", fmt.Errorf("failed to check for existing pull requests: %w", err)
 	}
 
 	if exitingPR != "" {
-		o.Logger.Printf("found matching open pull request for %s/%s %s", packageName, newVersion, exitingPR)
+		o.Logger.Printf(
+			"found matching open pull request for %s/%s %s",
+			packageName, newVersion, exitingPR,
+		)
 		return "", nil
 	}
 
 	// commit the changes
-	err = o.commitChanges(repo, packageName, newVersion)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to commit changes")
+	if err = o.commitChanges(repo, packageName, newVersion); err != nil {
+		return "", fmt.Errorf("failed to commit changes: %w", err)
 	}
 
 	// setup githubReleases auth using standard environment variables
@@ -414,9 +412,8 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 	}
 
 	// push the version update changes to our working branch
-	err = repo.Push(pushOpts)
-	if err != nil {
-		return "", errors.Wrapf(err, "failed to git push")
+	if err := repo.Push(pushOpts); err != nil {
+		return "", fmt.Errorf("failed to git push: %w", err)
 	}
 
 	// now let's create a pull request
@@ -430,7 +427,7 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 	}
 
 	// Create an NewPullRequest struct which is used to create the real pull request from
-	newPR := gh.NewPullRequest{
+	newPR := &gh.NewPullRequest{
 		BasePullRequest: basePullRequest,
 		Title:           title,
 		Body:            wolfiImage,
@@ -439,17 +436,17 @@ func (o Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName
 	// create the pull request
 	prLink, err := gitOpts.OpenPullRequest(newPR)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to create pull request")
+		return "", fmt.Errorf("failed to create pull request: %w", err)
 	}
 
 	return prLink, nil
 }
 
 // commit changes to git
-func (o Options) commitChanges(repo *git.Repository, packageName, latestVersion string) error {
+func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion string) error {
 	worktree, err := repo.Worktree()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get git worktree")
+		return fmt.Errorf("failed to get git worktree: %w", err)
 	}
 
 	commitMessage := ""
@@ -458,20 +455,19 @@ func (o Options) commitChanges(repo *git.Repository, packageName, latestVersion 
 	} else {
 		commitMessage = "Updating wolfi packages"
 	}
-	_, err = worktree.Commit(commitMessage, &git.CommitOptions{})
-	if err != nil {
-		return errors.Wrapf(err, "failed to git commit")
+	if _, err = worktree.Commit(commitMessage, &git.CommitOptions{}); err != nil {
+		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil
 }
 
-// returns owner, repo name, errors
-func parseGitURL(rawURL string) (string, string, error) {
+// parseGitURL returns owner, repo name, errors
+func parseGitURL(rawURL string) (owner, repo string, err error) {
 	rawURL = strings.TrimSuffix(rawURL, ".git")
 
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
-		return "", "", errors.Wrapf(err, "failed to parse git url %s", rawURL)
+		return "", "", fmt.Errorf("failed to parse git url %s: %w", rawURL, err)
 	}
 
 	parts := strings.Split(parsedURL.Path, "/")

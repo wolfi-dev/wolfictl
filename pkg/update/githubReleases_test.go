@@ -58,6 +58,7 @@ type ReleasesSearchResponse struct {
 }
 
 // todo convert to test http server
+//nolint:gocritic
 //func TestMonitorService_API(t *testing.T) {
 //	ts := oauth2.StaticTokenSource(
 //		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},

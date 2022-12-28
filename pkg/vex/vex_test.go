@@ -26,7 +26,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 		DocumentTimestamp: documentTimestamp,
 	}
 
-	doc, err := FromPackageConfiguration(*buildCfg, vexCfg)
+	doc, err := FromPackageConfiguration(buildCfg, vexCfg)
 	require.NoError(t, err)
 
 	expected := vex.VEX{
