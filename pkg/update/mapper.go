@@ -15,8 +15,11 @@ type Row struct {
 	StripPrefixChar string
 }
 
-func (o Options) getMonitorServiceData() (map[string]Row, error) {
-	req, _ := http.NewRequest("GET", o.DataMapperURL, nil)
+func (o *Options) getMonitorServiceData() (map[string]Row, error) {
+	req, err := http.NewRequest("GET", o.DataMapperURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating HTTP request: %w", err)
+	}
 	resp, err := o.Client.Do(req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed getting URI %s", o.DataMapperURL)
@@ -34,7 +37,7 @@ func (o Options) getMonitorServiceData() (map[string]Row, error) {
 	return o.parseData(string(b))
 }
 
-func (o Options) parseData(rawdata string) (map[string]Row, error) {
+func (o *Options) parseData(rawdata string) (map[string]Row, error) {
 	data := make(map[string]Row)
 
 	lines := strings.Split(rawdata, "\n")
@@ -58,7 +61,6 @@ func (o Options) parseData(rawdata string) (map[string]Row, error) {
 			ServiceName:     strings.TrimSpace(parts[3]),
 			StripPrefixChar: strings.TrimSpace(parts[4]),
 		}
-
 	}
 
 	return data, nil
