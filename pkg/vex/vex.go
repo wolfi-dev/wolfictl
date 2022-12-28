@@ -26,6 +26,36 @@ type Config struct {
 	Distro, Author, AuthorRole string
 }
 
+// FromSBOM parses an SPDX SBOM and returns a VEX document describing
+// vulnerability impact to any wolfi packages lsited in it.
+func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
+	// Parse the SBOM file
+	sbom, err := parseSBOM(sbomPath)
+	if err != nil {
+		return nil, fmt.Errorf("parsing SBOM: %w", err)
+	}
+
+	// Search for all packages in the SBOM describing the distro
+	// apks we care about
+	purls, err := extractSBOMPurls(vexCfg, sbom)
+	if err != nil {
+		return nil, fmt.Errorf("extracting SBOM purls: %w", err)
+	}
+
+	// get the melange package configurations for all listed APKs
+	configs, err := getPackageConfigurations(vexCfg, purls)
+	if err != nil {
+		return nil, fmt.Errorf("reading package configurations: %w", err)
+	}
+
+	doc, err := FromPackageConfiguration(vexCfg, configs...)
+	if err != nil {
+		return nil, fmt.Errorf("generating VEX document from package configurations: %w", err)
+	}
+
+	return doc, nil
+}
+
 // getPackageConfigurations gets a list of purls and returns the melange build
 // configuration used to build them
 func getPackageConfigurations(vexCfg Config, purls []purl.PackageURL) ([]*build.Configuration, error) {
