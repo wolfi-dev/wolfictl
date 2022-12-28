@@ -10,19 +10,6 @@ import (
 	"chainguard.dev/melange/pkg/build"
 )
 
-var (
-	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
-	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
-
-	forbiddenRepositories = []string{
-		"https://packages.wolfi.dev/os",
-	}
-
-	forbiddenKeyrings = []string{
-		"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
-	}
-)
-
 // AllRules is a list of all available rules to evaluate.
 var AllRules = func(l *Linter) Rules {
 	return Rules{
@@ -36,7 +23,7 @@ var AllRules = func(l *Linter) Rules {
 					return err
 				}
 				if !exist {
-					return fmt.Errorf("package %s is not exist in the Makefile", config.Package.Name)
+					return fmt.Errorf("package %s does not exist in the Makefile", config.Package.Name)
 				}
 				return nil
 			},
@@ -49,6 +36,10 @@ var AllRules = func(l *Linter) Rules {
 			Description: "do not specify a forbidden repository",
 			Severity:    SeverityError,
 			LintFunc: func(config build.Configuration) error {
+				forbiddenRepositories := []string{
+					"https://packages.wolfi.dev/os",
+				}
+
 				for _, repo := range config.Environment.Contents.Repositories {
 					if slices.Contains(forbiddenRepositories, repo) {
 						return fmt.Errorf("forbidden repository %s is used", repo)
@@ -62,6 +53,10 @@ var AllRules = func(l *Linter) Rules {
 			Description: "do not specify a forbidden keyring",
 			Severity:    SeverityError,
 			LintFunc: func(config build.Configuration) error {
+				forbiddenKeyrings := []string{
+					"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
+				}
+
 				for _, keyring := range config.Environment.Contents.Keyring {
 					if slices.Contains(forbiddenKeyrings, keyring) {
 						return fmt.Errorf("forbidden keyring %s is used", keyring)
@@ -110,6 +105,11 @@ var AllRules = func(l *Linter) Rules {
 			Description: "every fetch pipeline should have a valid digest",
 			Severity:    SeverityError,
 			LintFunc: func(config build.Configuration) error {
+				var (
+					reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
+					reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
+				)
+
 				for _, p := range config.Pipeline {
 					if p.Uses == "fetch" {
 						hashGiven := false
@@ -130,6 +130,7 @@ var AllRules = func(l *Linter) Rules {
 						}
 					}
 				}
+
 				return nil
 			},
 		},

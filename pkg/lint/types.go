@@ -50,7 +50,7 @@ type EvalRuleError struct {
 	Error error
 }
 
-// EvalRuleErrors returns a list of EvalError.
+// EvalRuleErrors returns a list of EvalRuleError.
 type EvalRuleErrors []EvalRuleError
 
 // EvalResult represents the result of an evaluation for a single configuration.

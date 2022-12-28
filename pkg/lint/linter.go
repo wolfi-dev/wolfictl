@@ -51,7 +51,6 @@ func (l *Linter) Lint() (Result, error) {
 
 	results := make(Result, 0)
 	for name, config := range filesToLint {
-		// var failedRules *multierror.Error
 		failedRules := make(EvalRuleErrors, 0)
 		for _, rule := range rules {
 			// Check if we should skip this rule.
