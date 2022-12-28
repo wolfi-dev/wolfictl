@@ -54,10 +54,14 @@ func addPackages(parent *cobra.Command) {
 				cmd.Help() //nolint:errcheck
 				return errors.New("too few arguments")
 			}
-			configPath := args[0]
-			buildCfg, err := build.ParseConfiguration(configPath)
-			if err != nil {
-				return err
+
+			confs := []*build.Configuration{}
+			for _, configPath := range args {
+				buildCfg, err := build.ParseConfiguration(configPath)
+				if err != nil {
+					return err
+				}
+				confs = append(confs, buildCfg)
 			}
 
 			vexCfg := vex.Config{
@@ -66,7 +70,7 @@ func addPackages(parent *cobra.Command) {
 				AuthorRole: role,
 			}
 
-			doc, err := vex.FromPackageConfiguration(vexCfg, buildCfg)
+			doc, err := vex.FromPackageConfiguration(vexCfg, confs...)
 			if err != nil {
 				return fmt.Errorf("creating VEX document: %w", err)
 			}

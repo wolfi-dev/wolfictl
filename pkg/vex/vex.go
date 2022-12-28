@@ -1,8 +1,8 @@
 package vex
 
 import (
+	"context"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/vex/pkg/ctl"
 	"chainguard.dev/vex/pkg/vex"
 )
 
@@ -19,28 +20,31 @@ type Config struct {
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
-func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (vex.VEX, error) {
-	doc := vex.New()
-
+func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (*vex.VEX, error) {
 	id, err := generateDocumentID(buildCfg)
 	if err != nil {
-		return doc, fmt.Errorf("generating doc ID: %w", err)
-	}
-	doc.ID = id
-
-	doc.Author = vexCfg.Author
-	doc.AuthorRole = vexCfg.AuthorRole
-
-	if doc.Timestamp == nil {
-		// We don't expect this case, since `vex.New()` sets a document timestamp.
-		return vex.VEX{}, errors.New("document timestamp must be set")
+		return nil, fmt.Errorf("generating doc ID: %w", err)
 	}
 
+	docs := []*vex.VEX{}
 	for _, conf := range buildCfg {
+		subdoc := vex.New()
 		purls := conf.PackageURLs(vexCfg.Distro)
-		doc.Statements = statementsFromConfiguration(conf, *doc.Timestamp, purls)
+		subdoc.Statements = statementsFromConfiguration(conf, *subdoc.Timestamp, purls)
+		docs = append(docs, &subdoc)
 	}
 
+	mergeOpts := &ctl.MergeOptions{
+		DocumentID: id,
+		Author:     vexCfg.Author,
+		AuthorRole: vexCfg.AuthorRole,
+	}
+
+	vexctl := ctl.New()
+	doc, err := vexctl.Merge(context.Background(), mergeOpts, docs)
+	if err != nil {
+		return nil, fmt.Errorf("merging vex documents: %w", err)
+	}
 	return doc, nil
 }
 
@@ -92,6 +96,7 @@ func statementFromAdvisoryContent(
 		ActionStatement: content.ActionStatement,
 		ImpactStatement: content.ImpactStatement,
 		Products:        purls,
+		Timestamp:       &content.Timestamp,
 	}
 }
 
@@ -135,7 +140,7 @@ func generateDocumentID(configs []*build.Configuration) (string, error) {
 			return "", fmt.Errorf("marshaling melange configuration")
 		}
 		h := sha256.New()
-		if _, err := h.Write([]byte(data)); err != nil {
+		if _, err := h.Write(data); err != nil {
 			return "", fmt.Errorf("hashing melange configuration")
 		}
 		hashes = append(hashes, fmt.Sprintf("%x", h.Sum(nil)))
