@@ -1,6 +1,7 @@
 package vex
 
 import (
+	"errors"
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
@@ -13,7 +14,13 @@ type Config struct {
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
+//
+//nolint:gocritic // hugeParam on vexCfg
 func FromPackageConfiguration(buildCfg *build.Configuration, vexCfg Config) (vex.VEX, error) {
+	if buildCfg == nil {
+		return vex.VEX{}, errors.New("cannot create VEX document from nil buildCfg")
+	}
+
 	doc := vex.New()
 
 	doc.ID = vexCfg.DocumentID

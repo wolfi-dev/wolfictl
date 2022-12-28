@@ -18,7 +18,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 	}
 
 	const documentID = "vex-git-abcdef0"
-	var documentTimestamp = time.Time{}
+	documentTimestamp := time.Time{}
 
 	vexCfg := Config{
 		Distro:            "wolfi",
