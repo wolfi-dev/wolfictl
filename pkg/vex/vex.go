@@ -6,12 +6,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
 	purl "github.com/package-url/packageurl-go"
 	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/release-sdk/git"
 
 	"chainguard.dev/apko/pkg/sbom/generator/spdx"
 	"chainguard.dev/melange/pkg/build"
@@ -22,6 +24,40 @@ import (
 
 type Config struct {
 	Distro, Author, AuthorRole string
+}
+
+// getPackageConfigurations gets a list of purls and returns the melange build
+// configuration used to build them
+func getPackageConfigurations(vexCfg Config, purls []purl.PackageURL) ([]*build.Configuration, error) {
+	if len(purls) == 0 {
+		return []*build.Configuration{}, nil
+	}
+
+	repoURL := ""
+	// In case we expand this to read configs from elsewhere
+	if vexCfg.Distro == "wolfi" {
+		repoURL = "https://github.com/wolfi-dev/os.git"
+	}
+
+	// Clone the wolfi distro
+	repo, err := git.CloneOrOpenRepo("", repoURL, !strings.HasPrefix(repoURL, "https://"))
+	if err != nil {
+		return nil, fmt.Errorf("cloning %s distro: %w", vexCfg.Distro, err)
+	}
+
+	// Parse all package configurations
+	configs := []*build.Configuration{}
+	for _, p := range purls {
+		buildCfg, err := build.ParseConfiguration(
+			filepath.Join(repo.Dir(), fmt.Sprintf("%s.yaml", p.Name)),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("parsing %s melange config: %w", p.Name, err)
+		}
+		configs = append(configs, buildCfg)
+	}
+
+	return configs, nil
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
