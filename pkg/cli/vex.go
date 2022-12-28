@@ -86,3 +86,39 @@ func addPackages(parent *cobra.Command) {
 	cmd.Flags().StringVar(&role, "role", "", "role of the author of the VEX document")
 	parent.AddCommand(cmd)
 }
+
+func addSBOM(parent *cobra.Command) {
+	var author, role string
+	cmd := &cobra.Command{
+		Use:           "sbom [flags] sbom.spdx.json",
+		Example:       "wolfictl vex sbom --author=joe@doe.com sbom.spdx.json",
+		Short:         "Generate a VEX document from wolfi packages listed in an SBOM",
+		SilenceErrors: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				cmd.Help() //nolint:errcheck
+				return errors.New("required paramter missing: path to SBOM")
+			}
+
+			vexCfg := vex.Config{
+				Distro:     "wolfi",
+				Author:     author,
+				AuthorRole: role,
+			}
+
+			doc, err := vex.FromSBOM(vexCfg, args[0])
+			if err != nil {
+				return fmt.Errorf("creating VEX document from SBOM: %w", err)
+			}
+
+			if err := doc.ToJSON(os.Stdout); err != nil {
+				return fmt.Errorf("marshaling VEX document")
+			}
+
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&author, "author", "", "author of the VEX document")
+	cmd.Flags().StringVar(&role, "role", "", "role of the author of the VEX document")
+	parent.AddCommand(cmd)
+}
