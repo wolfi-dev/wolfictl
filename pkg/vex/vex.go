@@ -3,14 +3,18 @@ package vex
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
 
 	"gopkg.in/yaml.v3"
 
+	"chainguard.dev/apko/pkg/sbom/generator/spdx"
 	"chainguard.dev/melange/pkg/build"
+
 	"chainguard.dev/vex/pkg/ctl"
 	"chainguard.dev/vex/pkg/vex"
 )
@@ -46,6 +50,21 @@ func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (
 		return nil, fmt.Errorf("merging vex documents: %w", err)
 	}
 	return doc, nil
+}
+
+// parseSBOM gets an SPDX-json file and returns a parsed SBOM
+func parseSBOM(sbomPath string) (*spdx.Document, error) {
+	sbom := &spdx.Document{}
+	data, err := os.ReadFile(sbomPath)
+	if err != nil {
+		return nil, fmt.Errorf("opening SBOM file: %w", err)
+	}
+
+	if err := json.Unmarshal(data, sbom); err != nil {
+		return nil, fmt.Errorf("unmarshaling SBOM data: %w", err)
+	}
+
+	return sbom, nil
 }
 
 func statementsFromConfiguration(cfg *build.Configuration, documentTimestamp time.Time, purls []string) []vex.Statement {
