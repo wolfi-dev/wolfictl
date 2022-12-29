@@ -37,10 +37,7 @@ func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
 
 	// Search for all packages in the SBOM describing the distro
 	// apks we care about
-	purls, err := extractSBOMPurls(vexCfg, sbom)
-	if err != nil {
-		return nil, fmt.Errorf("extracting SBOM purls: %w", err)
-	}
+	purls := extractSBOMPurls(vexCfg, sbom)
 
 	// get the melange package configurations for all listed APKs
 	configs, err := getPackageConfigurations(vexCfg, purls)
@@ -48,9 +45,42 @@ func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
 		return nil, fmt.Errorf("reading package configurations: %w", err)
 	}
 
-	doc, err := FromPackageConfiguration(vexCfg, configs...)
+	// This slice will contain one vex for each product in the SBOM
+	// that contains wolfi packages
+	allVexDocs := []*vex.VEX{}
+
+	// Lets create documents for each product
+	for product, prodPurls := range purls {
+		// Build the config list for this product
+		confs := []*build.Configuration{}
+		for _, p := range prodPurls {
+			for loopPurl, conf := range configs {
+				if loopPurl == p.ToString() {
+					confs = append(confs, conf)
+				}
+			}
+		}
+
+		doc, err := FromPackageConfiguration(vexCfg, confs...)
+		if err != nil {
+			return nil, fmt.Errorf("generating VEX document from package configurations: %w", err)
+		}
+
+		// Doc generated. But now, we need to change the statements so that
+		// they talk about the product in the SBOM, not the Wolfi apk
+		for i := range doc.Statements {
+			doc.Statements[i].Subcomponents = doc.Statements[i].Products
+			doc.Statements[i].Products = []string{product}
+		}
+		allVexDocs = append(allVexDocs, doc)
+	}
+	mergeOpts := ctl.MergeOptions{
+		Author:     vexCfg.Author,
+		AuthorRole: vexCfg.Author,
+	}
+	doc, err := ctl.New().Merge(context.Background(), &mergeOpts, allVexDocs)
 	if err != nil {
-		return nil, fmt.Errorf("generating VEX document from package configurations: %w", err)
+		return nil, fmt.Errorf("merging product VEXes: %w", err)
 	}
 
 	return doc, nil
@@ -58,9 +88,9 @@ func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
 
 // getPackageConfigurations gets a list of purls and returns the melange build
 // configuration used to build them
-func getPackageConfigurations(vexCfg Config, purls []purl.PackageURL) ([]*build.Configuration, error) {
+func getPackageConfigurations(vexCfg Config, purls map[string][]purl.PackageURL) (map[string]*build.Configuration, error) {
 	if len(purls) == 0 {
-		return []*build.Configuration{}, nil
+		return map[string]*build.Configuration{}, nil
 	}
 
 	repoURL := ""
@@ -80,16 +110,24 @@ func getPackageConfigurations(vexCfg Config, purls []purl.PackageURL) ([]*build.
 		defer os.RemoveAll(repo.Dir())
 	}
 
+	// Flatten the purl list
+	flatPurls := map[string]purl.PackageURL{}
+	for _, prodPurls := range purls {
+		for _, p := range prodPurls {
+			flatPurls[p.ToString()] = p
+		}
+	}
+
 	// Parse all package configurations
-	configs := []*build.Configuration{}
-	for _, p := range purls {
+	configs := map[string]*build.Configuration{}
+	for _, p := range flatPurls {
 		buildCfg, err := build.ParseConfiguration(
 			filepath.Join(repo.Dir(), fmt.Sprintf("%s.yaml", p.Name)),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s melange config: %w", p.Name, err)
 		}
-		configs = append(configs, buildCfg)
+		configs[p.ToString()] = buildCfg
 	}
 
 	return configs, nil
@@ -124,27 +162,72 @@ func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (
 	return doc, nil
 }
 
-// extractSBOMPurls reads an SBOM and returns the purls identifying
-// packages from the distribution.
-func extractSBOMPurls(vexCfg Config, sbom *spdx.Document) ([]purl.PackageURL, error) {
+// extractPackagePurls returns all purls describing distro apks found
+// in elements related to a SPDX package
+//
+//nolint:gocritic
+func extractPackagePurls(vexCfg Config, sbom *spdx.Document, spdxID string, seen *map[string]struct{}) []purl.PackageURL {
 	purls := []purl.PackageURL{}
-	for i := range sbom.Packages {
-		for _, ref := range sbom.Packages[i].ExternalRefs {
-			if ref.Type != "purl" {
+	for _, r := range sbom.Relationships {
+		if r.Element != spdxID {
+			continue
+		}
+		if _, ok := (*seen)[r.Related]; ok {
+			continue
+		}
+		(*seen)[r.Related] = struct{}{}
+		subpurls := extractPackagePurls(vexCfg, sbom, r.Related, seen)
+		purls = append(purls, subpurls...)
+		for _, subpackage := range sbom.Packages {
+			if subpackage.ID != r.Related {
 				continue
 			}
+			for _, ref := range subpackage.ExternalRefs {
+				if ref.Type != "purl" {
+					continue
+				}
+				// If malformed, just skip it
+				p, err := purl.FromString(ref.Locator)
+				if err != nil {
+					continue
+				}
 
-			p, err := purl.FromString(ref.Locator)
-			if err != nil {
-				return nil, fmt.Errorf("parsing purl: %s: %w", ref.Locator, err)
-			}
-
-			if p.Namespace == vexCfg.Distro {
-				purls = append(purls, p)
+				if p.Namespace == vexCfg.Distro {
+					purls = append(purls, p)
+				}
 			}
 		}
 	}
-	return purls, nil
+	return purls
+}
+
+// extractSBOMPurls reads an SBOM and returns the purls identifying
+// packages from the distribution.
+func extractSBOMPurls(vexCfg Config, sbom *spdx.Document) map[string][]purl.PackageURL {
+	purls := map[string][]purl.PackageURL{}
+	for _, elementID := range sbom.DocumentDescribes {
+		packagePurls := extractPackagePurls(vexCfg, sbom, elementID, &map[string]struct{}{})
+		if len(packagePurls) == 0 {
+			continue
+		}
+
+		descPurl := ""
+		for i := range sbom.Packages {
+			if sbom.Packages[i].ID != elementID {
+				continue
+			}
+			for _, ref := range sbom.Packages[i].ExternalRefs {
+				if ref.Type == "purl" {
+					descPurl = ref.Locator
+				}
+			}
+		}
+
+		if descPurl != "" {
+			purls[descPurl] = packagePurls
+		}
+	}
+	return purls
 }
 
 // parseSBOM gets an SPDX-json file and returns a parsed SBOM
