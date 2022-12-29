@@ -11,6 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestSBOM(t *testing.T) {
+	sbom, err := parseSBOM("testdata/git.spdx.json")
+	require.NoError(t, err)
+
+	purls := extractSBOMPurls(Config{Distro: "wolfi"}, sbom)
+
+	// Check the list is right:
+	require.Len(t, purls, 1)
+	purlList, ok := purls["pkg:oci/git@sha256:54a88f29b889d82e57712206973db99089caf4074232bb16df8c72605aaaa410?arch=amd64\u0026mediaType=application%2Fvnd.oci.image.manifest.v1%2Bjson\u0026os=linux"]
+	require.True(t, ok)
+	require.Len(t, purlList, 13)
+}
+
 func TestFromPackageConfiguration(t *testing.T) {
 	buildCfg, err := build.ParseConfiguration(filepath.Join("testdata", "git.yaml"))
 	if err != nil {
