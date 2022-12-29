@@ -1,13 +1,14 @@
 package vex
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/vex/pkg/vex"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,6 +39,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 		Distro: "wolfi",
 	}
 
+	os.Setenv("SOURCE_DATE_EPOCH", "2022-12-01T13:10:00+07:00")
 	doc, err := FromPackageConfiguration(vexCfg, buildCfg)
 	require.NoError(t, err)
 
@@ -47,6 +49,15 @@ func TestFromPackageConfiguration(t *testing.T) {
 
 	// TODO: re-introduce timestamp comparisons once latest version of VEX module is imported
 
+	timePointer := func(t time.Time) *time.Time { return &t }
+	tz := time.FixedZone("-0500", -5*3600)
+
+	expectedGitProducts := []string{
+		"pkg:apk/wolfi/git@2.39.0-r0",
+		"pkg:apk/wolfi/git-daemon@2.39.0-r0",
+		"pkg:apk/wolfi/git-email@2.39.0-r0",
+	}
+
 	expected := &vex.VEX{
 		Metadata: vex.Metadata{
 			Format: "text/vex",
@@ -54,87 +65,55 @@ func TestFromPackageConfiguration(t *testing.T) {
 		Statements: []vex.Statement{
 			{
 				Vulnerability: "CVE-1234-5678",
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
-				Status: "not_affected",
+				Products:      expectedGitProducts,
+				Status:        "not_affected",
 			},
 			{
 				Vulnerability: "CVE-2022-1111",
-				// Timestamp:     timePointer(time.Date(2022, 12, 23, 1, 28, 16, 0, tz)),
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
-				Status: "under_investigation",
+				Timestamp:     timePointer(time.Date(2022, 12, 23, 1, 28, 16, 0, tz)),
+				Products:      expectedGitProducts,
+				Status:        "under_investigation",
 			},
 			{
 				Vulnerability: "CVE-2022-1111",
 				// Timestamp:     timePointer(time.Date(2022, 12, 23, 2, 11, 57, 0, tz)),
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
+				Products:      expectedGitProducts,
 				Status:        "not_affected",
 				Justification: "component_not_present",
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
 				// Timestamp:     timePointer(time.Date(2022, 12, 24, 1, 28, 16, 0, tz)),
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
-				Status: "under_investigation",
+				Products: expectedGitProducts,
+				Status:   "under_investigation",
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
 				// Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 12, 49, 0, tz)),
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
+				Products:        expectedGitProducts,
 				Status:          "affected",
 				ActionStatement: "action statement",
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
 				// Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 50, 18, 0, tz)),
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
-				Status: "fixed",
+				Products: expectedGitProducts,
+				Status:   "fixed",
 			},
 			{
 				Vulnerability: "CVE-2022-39253",
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
-				Status: "fixed",
+				Products:      expectedGitProducts,
+				Status:        "fixed",
 			},
 			{
 				Vulnerability: "CVE-2022-39260",
-				Products: []string{
-					"pkg:apk/wolfi/git@2.39.0-r0",
-					"pkg:apk/wolfi/git-daemon@2.39.0-r0",
-					"pkg:apk/wolfi/git-email@2.39.0-r0",
-				},
-				Status: "fixed",
+				Products:      expectedGitProducts,
+				Status:        "fixed",
 			},
 		},
 	}
 
-	if diff := cmp.Diff(expected, doc, cmpopts.IgnoreFields(vex.Statement{}, "Timestamp")); diff != "" {
+	if diff := cmp.Diff(expected, doc); diff != "" {
 		t.Errorf("Unexpected result from FromPackageConfiguration (-want, +got):\n%s", diff)
 	}
 }
