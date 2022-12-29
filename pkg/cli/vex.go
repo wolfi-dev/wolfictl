@@ -13,8 +13,8 @@ import (
 func VEX() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "vex",
-		Short: "Tools to generate VEX statments for Wolfi packages and images",
-		Long: `wolfictl vex: Tools to generate VEX statments for Wolfi packages and images
+		Short: "Tools to generate VEX statements for Wolfi packages and images",
+		Long: `wolfictl vex: Tools to generate VEX statements for Wolfi packages and images
 		
 The vex family of subcommands interacts with Wolfi data and configuration
 files to generate Vulnerability Exploitability eXchange (VEX) documents to
@@ -76,7 +76,7 @@ func addPackages(parent *cobra.Command) {
 			}
 
 			if err := doc.ToJSON(os.Stdout); err != nil {
-				return fmt.Errorf("marshaling VEX document")
+				return fmt.Errorf("marshaling VEX document: %w", err)
 			}
 
 			return nil

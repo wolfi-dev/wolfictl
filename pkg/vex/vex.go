@@ -138,11 +138,11 @@ func generateDocumentID(configs []*build.Configuration) (string, error) {
 	for _, c := range configs {
 		data, err := yaml.Marshal(c)
 		if err != nil {
-			return "", fmt.Errorf("marshaling melange configuration")
+			return "", fmt.Errorf("marshaling melange configuration: %w", err)
 		}
 		h := sha256.New()
 		if _, err := h.Write(data); err != nil {
-			return "", fmt.Errorf("hashing melange configuration")
+			return "", fmt.Errorf("hashing melange configuration: %w", err)
 		}
 		hashes = append(hashes, fmt.Sprintf("%x", h.Sum(nil)))
 	}
@@ -150,7 +150,7 @@ func generateDocumentID(configs []*build.Configuration) (string, error) {
 	sort.Strings(hashes)
 	h := sha256.New()
 	if _, err := h.Write([]byte(strings.Join(hashes, ":"))); err != nil {
-		return "", fmt.Errorf("hashing config files")
+		return "", fmt.Errorf("hashing config files: %w", err)
 	}
 
 	// One hash to rule them all
