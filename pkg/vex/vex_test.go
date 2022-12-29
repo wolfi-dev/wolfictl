@@ -3,6 +3,7 @@ package vex
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/vex/pkg/vex"
@@ -19,16 +20,17 @@ func TestFromPackageConfiguration(t *testing.T) {
 		Distro: "wolfi",
 	}
 
-	doc, err := FromPackageConfiguration(buildCfg, vexCfg)
+	doc, err := FromPackageConfiguration(vexCfg, buildCfg)
 	require.NoError(t, err)
 
 	// zero out non-deterministic fields
-	doc.ID = ""
 	doc.Timestamp = nil
-
-	expected := vex.VEX{
+	timePointer := func(t time.Time) *time.Time { return &t }
+	tz := time.FixedZone("-0500", -5*3600)
+	expected := &vex.VEX{
 		Metadata: vex.Metadata{
-			Format: "text/vex+json",
+			ID:     "vex-60d2bb8952362a0a7bf52b2ac2619a7846cd2394a5cdb3dfe83a66f5f9838e7d",
+			Format: "text/vex",
 		},
 		Statements: []vex.Statement{
 			{
@@ -42,6 +44,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 			},
 			{
 				Vulnerability: "CVE-2022-1111",
+				Timestamp:     timePointer(time.Date(2022, 12, 23, 1, 28, 16, 0, tz)),
 				Products: []string{
 					"pkg:apk/wolfi/git@2.39.0-r0?distro=wolfi",
 					"pkg:apk/wolfi/git-daemon@2.39.0-r0?distro=wolfi",
@@ -51,6 +54,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 			},
 			{
 				Vulnerability: "CVE-2022-1111",
+				Timestamp:     timePointer(time.Date(2022, 12, 23, 2, 11, 57, 0, tz)),
 				Products: []string{
 					"pkg:apk/wolfi/git@2.39.0-r0?distro=wolfi",
 					"pkg:apk/wolfi/git-daemon@2.39.0-r0?distro=wolfi",
@@ -61,6 +65,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
+				Timestamp:     timePointer(time.Date(2022, 12, 24, 1, 28, 16, 0, tz)),
 				Products: []string{
 					"pkg:apk/wolfi/git@2.39.0-r0?distro=wolfi",
 					"pkg:apk/wolfi/git-daemon@2.39.0-r0?distro=wolfi",
@@ -70,6 +75,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
+				Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 12, 49, 0, tz)),
 				Products: []string{
 					"pkg:apk/wolfi/git@2.39.0-r0?distro=wolfi",
 					"pkg:apk/wolfi/git-daemon@2.39.0-r0?distro=wolfi",
@@ -80,6 +86,7 @@ func TestFromPackageConfiguration(t *testing.T) {
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
+				Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 50, 18, 0, tz)),
 				Products: []string{
 					"pkg:apk/wolfi/git@2.39.0-r0?distro=wolfi",
 					"pkg:apk/wolfi/git-daemon@2.39.0-r0?distro=wolfi",

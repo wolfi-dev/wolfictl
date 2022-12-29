@@ -1,13 +1,18 @@
 package vex
 
 import (
+	"context"
+	"crypto/sha256"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
+	"gopkg.in/yaml.v3"
+
 	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/vex/pkg/ctl"
 	"chainguard.dev/vex/pkg/vex"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -15,22 +20,31 @@ type Config struct {
 }
 
 // FromPackageConfiguration generates a new VEX document for the Wolfi package described by the build.Configuration.
-func FromPackageConfiguration(buildCfg *build.Configuration, vexCfg Config) (vex.VEX, error) {
-	doc := vex.New()
-
-	doc.ID = generateDocumentID(buildCfg.Package.Name)
-	doc.Author = vexCfg.Author
-	doc.AuthorRole = vexCfg.AuthorRole
-
-	purls := buildCfg.PackageURLs(vexCfg.Distro)
-
-	if doc.Timestamp == nil {
-		// We don't expect this case, since `vex.New()` sets a document timestamp.
-		return vex.VEX{}, errors.New("document timestamp must be set")
+func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (*vex.VEX, error) {
+	id, err := generateDocumentID(buildCfg)
+	if err != nil {
+		return nil, fmt.Errorf("generating doc ID: %w", err)
 	}
 
-	doc.Statements = statementsFromConfiguration(buildCfg, *doc.Timestamp, purls)
+	docs := []*vex.VEX{}
+	for _, conf := range buildCfg {
+		subdoc := vex.New()
+		purls := conf.PackageURLs(vexCfg.Distro)
+		subdoc.Statements = statementsFromConfiguration(conf, *subdoc.Timestamp, purls)
+		docs = append(docs, &subdoc)
+	}
 
+	mergeOpts := &ctl.MergeOptions{
+		DocumentID: id,
+		Author:     vexCfg.Author,
+		AuthorRole: vexCfg.AuthorRole,
+	}
+
+	vexctl := ctl.New()
+	doc, err := vexctl.Merge(context.Background(), mergeOpts, docs)
+	if err != nil {
+		return nil, fmt.Errorf("merging vex documents: %w", err)
+	}
 	return doc, nil
 }
 
@@ -39,7 +53,8 @@ func statementsFromConfiguration(cfg *build.Configuration, documentTimestamp tim
 	secfixesStatements := statementsFromSecfixes(cfg.Secfixes, purls)
 	advisoriesStatements := statementsFromAdvisories(cfg.Advisories, purls)
 
-	// don't include "not_affected" statements from secfixes that are obviated by statements from advisories
+	// don't include "not_affected" statements from secfixes that are obviated
+	// by statements from advisories
 	notAffectedVulns := make(map[string]struct{})
 	for i := range advisoriesStatements {
 		if advisoriesStatements[i].Status == vex.StatusNotAffected {
@@ -82,6 +97,7 @@ func statementFromAdvisoryContent(
 		ActionStatement: content.ActionStatement,
 		ImpactStatement: content.ImpactStatement,
 		Products:        purls,
+		Timestamp:       &content.Timestamp,
 	}
 }
 
@@ -115,6 +131,28 @@ func determineStatus(packageVersion string) vex.Status {
 	return vex.StatusFixed
 }
 
-func generateDocumentID(packageName string) string {
-	return fmt.Sprintf("vex-%s-%s", packageName, uuid.New())
+// generateDocumentID generate a deterministic document ID based
+// on the configuration data contents
+func generateDocumentID(configs []*build.Configuration) (string, error) {
+	hashes := []string{}
+	for _, c := range configs {
+		data, err := yaml.Marshal(c)
+		if err != nil {
+			return "", fmt.Errorf("marshaling melange configuration: %w", err)
+		}
+		h := sha256.New()
+		if _, err := h.Write(data); err != nil {
+			return "", fmt.Errorf("hashing melange configuration: %w", err)
+		}
+		hashes = append(hashes, fmt.Sprintf("%x", h.Sum(nil)))
+	}
+
+	sort.Strings(hashes)
+	h := sha256.New()
+	if _, err := h.Write([]byte(strings.Join(hashes, ":"))); err != nil {
+		return "", fmt.Errorf("hashing config files: %w", err)
+	}
+
+	// One hash to rule them all
+	return fmt.Sprintf("vex-%s", fmt.Sprintf("%x", h.Sum(nil))), nil
 }
