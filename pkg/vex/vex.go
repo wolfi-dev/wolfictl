@@ -119,12 +119,20 @@ func getPackageConfigurations(vexCfg Config, purls map[string][]purl.PackageURL)
 		}
 	}
 
+	// Index the configuration files
+	configIndex, err := indexMelangeConfigsDir(repo.Dir())
+	if err != nil {
+		return nil, fmt.Errorf("indexing configuration directory: %w", err)
+	}
+
 	// Parse all package configurations
 	configs := map[string]*build.Configuration{}
 	for _, p := range flatPurls {
-		buildCfg, err := build.ParseConfiguration(
-			filepath.Join(repo.Dir(), fmt.Sprintf("%s.yaml", p.Name)),
-		)
+		if _, ok := configIndex[p.Name]; !ok {
+			// Probably should warn here about missing config
+			continue
+		}
+		buildCfg, err := build.ParseConfiguration(configIndex[p.Name])
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s melange config: %w", p.Name, err)
 		}
@@ -163,6 +171,9 @@ func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (
 	return doc, nil
 }
 
+// indexMelangeConfigsDir reads the distro config directory and
+// returns an indexed map where keys are packages and values are
+// its connfiguration file.
 func indexMelangeConfigsDir(dirPath string) (map[string]string, error) {
 	finfo, err := os.Stat(dirPath)
 	if err != nil {
@@ -172,7 +183,7 @@ func indexMelangeConfigsDir(dirPath string) (map[string]string, error) {
 		return nil, errors.New("distro config path is not a directory")
 	}
 
-	files, err := filepath.Glob(fmt.Sprintf("%s/*yaml", dirPath))
+	files, err := filepath.Glob(fmt.Sprintf("%s/*.yaml", dirPath))
 	if err != nil {
 		return nil, fmt.Errorf("listing configuration files")
 	}
@@ -185,8 +196,8 @@ func indexMelangeConfigsDir(dirPath string) (map[string]string, error) {
 		}
 		confMap[buildCfg.Package.Name] = f
 
-		for _, sp := range buildCfg.Subpackages {
-			confMap[sp.Name] = f
+		for i := range buildCfg.Subpackages {
+			confMap[buildCfg.Subpackages[i].Name] = f
 		}
 	}
 	return confMap, nil
