@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -160,6 +161,35 @@ func FromPackageConfiguration(vexCfg Config, buildCfg ...*build.Configuration) (
 		return nil, fmt.Errorf("merging vex documents: %w", err)
 	}
 	return doc, nil
+}
+
+func indexMelangeConfigsDir(dirPath string) (map[string]string, error) {
+	finfo, err := os.Stat(dirPath)
+	if err != nil {
+		return nil, fmt.Errorf("checking the config directory")
+	}
+	if !finfo.IsDir() {
+		return nil, errors.New("distro config path is not a directory")
+	}
+
+	files, err := filepath.Glob(fmt.Sprintf("%s/*yaml", dirPath))
+	if err != nil {
+		return nil, fmt.Errorf("listing configuration files")
+	}
+
+	confMap := map[string]string{}
+	for _, f := range files {
+		buildCfg, err := build.ParseConfiguration(f)
+		if err != nil {
+			return nil, fmt.Errorf("parsing %s config: %w", f, err)
+		}
+		confMap[buildCfg.Package.Name] = f
+
+		for _, sp := range buildCfg.Subpackages {
+			confMap[sp.Name] = f
+		}
+	}
+	return confMap, nil
 }
 
 // extractPackagePurls returns all purls describing distro apks found
