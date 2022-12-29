@@ -49,12 +49,14 @@ func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
 	// This slice will contain one vex for each product in the SBOM
 	// that contains wolfi packages
 	allVexDocs := []*vex.VEX{}
+	purlDict := map[string]purl.PackageURL{}
 
 	// Lets create documents for each product
 	for product, prodPurls := range purls {
 		// Build the config list for this product
 		confs := []*build.Configuration{}
 		for _, p := range prodPurls {
+			purlDict[p.Name] = p
 			for loopPurl, conf := range configs {
 				if loopPurl == p.ToString() {
 					confs = append(confs, conf)
@@ -70,7 +72,16 @@ func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
 		// Doc generated. But now, we need to change the statements so that
 		// they talk about the product in the SBOM, not the Wolfi apk
 		for i := range doc.Statements {
-			doc.Statements[i].Subcomponents = doc.Statements[i].Products
+			for _, p := range doc.Statements[i].Products {
+				productPurl, err := purl.FromString(p)
+				if err != nil {
+					continue
+				}
+
+				if _, ok := purlDict[productPurl.Name]; ok {
+					doc.Statements[i].Subcomponents = append(doc.Statements[i].Subcomponents, p)
+				}
+			}
 			doc.Statements[i].Products = []string{product}
 		}
 		allVexDocs = append(allVexDocs, doc)
