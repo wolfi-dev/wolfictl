@@ -24,6 +24,12 @@ func TestSBOM(t *testing.T) {
 	require.Len(t, purlList, 13)
 }
 
+func TestIndexMelangeConfigsDir(t *testing.T) {
+	files, err := indexMelangeConfigsDir("testdata/configs/")
+	require.NoError(t, err)
+	require.Len(t, files, 218)
+}
+
 func TestFromPackageConfiguration(t *testing.T) {
 	buildCfg, err := build.ParseConfiguration(filepath.Join("testdata", "git.yaml"))
 	if err != nil {

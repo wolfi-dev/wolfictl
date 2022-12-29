@@ -1,0 +1,447 @@
+package:
+  name: glibc
+  version: 2.36
+  epoch: 3
+  description: "the GNU C library"
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+      - "*"
+      attestation: TODO
+      license: GPL-3.0-or-later
+  dependencies:
+    runtime:
+      - wolfi-baselayout
+      - '!musl'
+  scriptlets:
+    trigger:
+      paths:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+      script: |
+        #!/bin/busybox sh
+        /sbin/ldconfig
+
+secfixes:
+  2.36-r1:
+    - CVE-2022-39046
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+    packages:
+      - wolfi-baselayout
+      - busybox
+      - build-base
+      - ca-certificates-bundle
+      - texinfo
+      - zlib
+      - gawk
+      - bison
+      - flex
+      - grep
+      - python3
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: http://ftp.gnu.org/gnu/libc/glibc-${{package.version}}.tar.xz
+      expected-sha256: 1c959fea240906226062cb4b1e7ebce71a9f0e3c0836c09e7e3423d434fcfe75
+  - uses: patch
+    with:
+      patches: CVE-2022-39046.patch
+  - uses: patch
+    with:
+      patches: CVE-2022-39046-fix.patch
+  - name: 'Fix compatibility with GNU make 4.4'
+    runs: |
+      sed '/MAKEFLAGS :=/s/)r/) -r/' -i Makerules
+  - name: 'Set up build directory'
+    runs: |
+      mkdir build
+  - name: 'Configure glibc'
+    runs: |
+      cd build
+      export CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=3/}
+      export CPPFLAGS=${CPPFLAGS/-Wp,-D_FORTIFY_SOURCE=3/}
+      ../configure \
+        --prefix=/usr \
+        --libdir=/usr/lib \
+        --datadir=/usr/share \
+        --includedir=/usr/include \
+        --host=${{host.triplet.gnu}} \
+        --build=$(../config.guess) \
+        --disable-werror \
+        --enable-kernel=4.9
+  - runs: |
+      export CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=3/}
+      export CPPFLAGS=${CPPFLAGS/-Wp,-D_FORTIFY_SOURCE=3/}
+      make -C build -j$(nproc)
+  - runs: |
+      export CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=3/}
+      export CPPFLAGS=${CPPFLAGS/-Wp,-D_FORTIFY_SOURCE=3/}
+      make -C build -j$(nproc) install DESTDIR="${{targets.destdir}}"
+  - name: "Set up ldconfig"
+    runs: |
+      cp vendor/ld.so.conf "${{targets.destdir}}"/etc/ld.so.conf
+  - name: 'Clean up documentation'
+    runs: |
+      rm -rf ${{targets.destdir}}/usr/share/info
+  - name: 'Generate and install locale data'
+    runs: |
+      make -C build -j$(nproc) localedata/install-locale-files DESTDIR="${{targets.destdir}}"
+  - uses: strip
+
+data:
+  - name: locales
+    items:
+      aa: Afar
+      af: Afrikaans
+      agr: Aguaruna
+      ak: Akan
+      am: Amharic
+      anp: Angika
+      an: Aragonese
+      ar: Arabic
+      as: Assamese
+      ast: Asturian
+      ayc: Southern Aymara
+      az: Azerbaijani
+      be: Belarusian
+      bem: Bemba
+      ber: Berber
+      bg: Bulgarian
+      bhb: Bhili
+      bho: Bhojpuri
+      bi: Bislama
+      bn: Bangla
+      bo: Tibetan
+      br: Breton
+      brx: Bodo
+      bs: Bosnian
+      byn: Blin
+      ca: Catalan
+      ce: Chechen
+      chr: Cherokee
+      ckb: Central Kurdish
+      cmn: Mandarin Chinese
+      crh: Crimean Turkish
+      csb: Kashubian
+      cs: Czech
+      cv: Chuvash
+      cy: Welsh
+      da: Danish
+      de: German
+      doi: Dogri
+      dsb: Lower Sorbian
+      dv: Divehi
+      dz: Dzongkha
+      el: Greek
+      en: English
+      eo: Esperanto
+      es: Spanish
+      et: Estonian
+      eu: Basque
+      fa: Persian
+      ff: Fulah
+      fi: Finnish
+      fil: Filipino
+      fo: Faroese
+      fr: French
+      fur: Friulian
+      fy: Western Frisian
+      ga: Irish
+      gd: Scottish Gaelic
+      gez: Geez
+      gl: Galician
+      gu: Gujarati
+      gv: Manx
+      hak: Hakka Chinese
+      ha: Hausa
+      he: Hebrew
+      hif: Fiji Hindi
+      hi: Hindi
+      hne: Chhattisgarhi
+      hr: Croatian
+      hsb: Upper Sorbian
+      ht: Haitian Creole
+      hu: Hungarian
+      hy: Armenian
+      ia: Interlingua
+      id: Indonesian
+      ig: Igbo
+      ik: Inupiaq
+      is: Icelandic
+      it: Italian
+      iu: Inuktitut
+      ja: Japanese
+      kab: Kabyle
+      ka: Georgian
+      kk: Kazakh
+      kl: Kalaallisut
+      km: Khmer
+      kn: Kannada
+      kok: Konkani
+      ko: Korean
+      ks: Kashmiri
+      ku: Kurdish
+      kw: Cornish
+      ky: Kyrgyz
+      lb: Luxembourgish
+      lg: Ganda
+      lij: Ligurian
+      li: Limburgish
+      ln: Lingala
+      lo: Lao
+      lt: Lithuanian
+      lv: Latvian
+      lzh: Literary Chinese
+      mag: Magahi
+      mai: Maithili
+      mfe: Morisyen
+      mg: Malagasy
+      mhr: Meadow Mari
+      miq: Miskito
+      mi: Maori
+      mjw: Karbi
+      mk: Macedonian
+      ml: Malayalam
+      mni: Manipuri
+      mnw: Mon
+      mn: Mongolian
+      mr: Marathi
+      ms: Malay
+      mt: Maltese
+      my: Burmese
+      nan: Min Nan Chinese
+      nb: Norwegian BokmÃ¥l
+      nds: Low German
+      ne: Nepali
+      nhn: Tlaxcala-Puebla Nahuatl
+      niu: Niuean
+      nl: Dutch
+      nn: Norwegian Nynorsk
+      nr: South Ndebele
+      nso: Northern Sotho
+      oc: Occitan
+      om: Oromo
+      or: Odia
+      os: Ossetic
+      pap: Papiamento
+      pa: Punjabi
+      pl: Polish
+      ps: Pashto
+      pt: Portuguese
+      quz: Cusco Quechua
+      raj: Rajasthani
+      rif: Tarifit
+      ro: Romanian
+      ru: Russian
+      rw: Kinyarwanda
+      sah: Sakha
+      sat: Santali
+      sa: Sanskrit
+      sc: Sardinian
+      sd: Sindhi
+      se: Northern Sami
+      sgs: Samogitian
+      shn: Shan
+      shs: Shuswap
+      sid: Sidamo
+      si: Sinhala
+      sk: Slovak
+      sl: Slovenian
+      sm: Samoan
+      so: Somali
+      sq: Albanian
+      sr: Serbian
+      ss: Swati
+      st: Southern Sotho
+      sv: Swedish
+      sw: Swahili
+      syr: Syriac
+      szl: Silesian
+      ta: Tamil
+      tcy: Tulu
+      te: Telugu
+      tg: Tajik
+      the: Chitwania Tharu
+      th: Thai
+      tig: Tigre
+      ti: Tigrinya
+      tk: Turkmen
+      tl: Tagalog
+      tn: Tswana
+      to: Tongan
+      tpi: Tok Pisin
+      tr: Turkish
+      ts: Tsonga
+      tt: Tatar
+      ug: Uyghur
+      uk: Ukrainian
+      unm: Unami language
+      ur: Urdu
+      uz: Uzbek
+      ve: Venda
+      vi: Vietnamese
+      wae: Walser
+      wal: Wolaytta
+      wa: Walloon
+      wo: Wolof
+      xh: Xhosa
+      yi: Yiddish
+      yo: Yoruba
+      yue: Cantonese
+      yuw: Yau
+      zh: Mandarin Chinese
+      zu: Zulu
+
+subpackages:
+  - name: "glibc-dev"
+    description: "GLIBC development headers"
+    pipeline:
+      - uses: split/dev
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/lib
+          [ -f "${{targets.destdir}}"/usr/lib/libc.so ] && mv "${{targets.destdir}}"/usr/lib/libc.so "${{targets.subpkgdir}}"/usr/lib/
+          [ -f "${{targets.destdir}}"/usr/lib/libm.so ] && mv "${{targets.destdir}}"/usr/lib/libm.so "${{targets.subpkgdir}}"/usr/lib/
+
+    dependencies:
+      runtime:
+        - linux-headers
+
+  - name: "glibc-iconv"
+    description: "GLIBC iconv tables"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/lib
+          mv "${{targets.destdir}}"/usr/lib/gconv "${{targets.subpkgdir}}"/usr/lib/
+
+          mkdir -p "${{targets.subpkgdir}}"/usr/sbin
+          mv "${{targets.destdir}}"/usr/sbin/iconvconfig "${{targets.subpkgdir}}"/usr/sbin
+
+  - name: "glibc-locales"
+    description: "GLIBC locale data"
+    pipeline:
+      - uses: split/locales
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/share
+          mv "${{targets.destdir}}"/usr/share/i18n "${{targets.subpkgdir}}"/usr/share/i18n
+
+  - name: "tzutils"
+    description: "Timezone utilities"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/bin
+          mkdir -p "${{targets.subpkgdir}}"/usr/sbin
+
+          mv "${{targets.destdir}}"/usr/bin/tzselect "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/zdump "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/sbin/zic "${{targets.subpkgdir}}"/usr/sbin
+
+  - name: "posix-libc-utils"
+    description: "POSIX XCU utilities included with the C library"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/gencat "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/getconf "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/getent "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/iconv "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/ldd "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/locale "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/pldd "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/libexec "${{targets.subpkgdir}}"/usr
+
+  - name: "localedef"
+    description: "Tool for defining GLIBC locales"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/localedef "${{targets.subpkgdir}}"/usr/bin
+
+  - name: "sotruss"
+    description: "Shared object tracing tool"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/lib/audit
+          mkdir -p "${{targets.subpkgdir}}"/usr/bin
+
+          mv "${{targets.destdir}}"/usr/bin/sotruss "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/lib/audit/* "${{targets.subpkgdir}}"/usr/lib/audit/
+
+  - name: "nscd"
+    description: "NSS caching daemon"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/sbin
+          mv "${{targets.destdir}}"/usr/sbin/nscd "${{targets.subpkgdir}}"/usr/sbin/
+
+  - name: "nss-db"
+    description: "NSS module for database lookups"
+    pipeline:
+       - runs: |
+           mkdir -p "${{targets.subpkgdir}}"/usr/bin
+           mkdir -p "${{targets.subpkgdir}}"/lib64
+           mkdir -p "${{targets.subpkgdir}}"/var
+
+           mv "${{targets.destdir}}"/usr/bin/makedb "${{targets.subpkgdir}}"/usr/bin
+           mv "${{targets.destdir}}"/lib64/libnss_db.so.2 "${{targets.subpkgdir}}"/lib64
+           mv "${{targets.destdir}}"/var/db "${{targets.subpkgdir}}"/var
+
+  - name: "nss-hesiod"
+    description: "NSS module for hesiod lookups"
+    pipeline:
+      - runs: |
+           mkdir -p "${{targets.subpkgdir}}"/lib64
+           mv "${{targets.destdir}}"/lib64/libnss_hesiod.so.2 "${{targets.subpkgdir}}"/lib64
+
+  - name: "pcprofiledump"
+    description: "PC profiling tool"
+    pipeline:
+      - runs: |
+           mkdir -p "${{targets.subpkgdir}}"/lib64
+           mv "${{targets.destdir}}"/lib64/libpcprofile.so "${{targets.subpkgdir}}"/lib64
+
+           mkdir -p "${{targets.subpkgdir}}"/usr/bin
+           mv "${{targets.destdir}}"/usr/bin/pcprofiledump "${{targets.subpkgdir}}"/usr/bin
+
+  - name: "glibc-tracing"
+    description: "GLIBC tracing and profiling utilities"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/mtrace "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/xtrace "${{targets.subpkgdir}}"/usr/bin
+          mv "${{targets.destdir}}"/usr/bin/sprof "${{targets.subpkgdir}}"/usr/bin
+
+  - name: "sln"
+    description: "Staticly-linked symbolic link tool"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/sbin
+          mv "${{targets.destdir}}"/sbin/sln "${{targets.subpkgdir}}"/sbin
+
+  - name: "glibc-locale-posix"
+    description: "POSIX locale data for glibc"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/lib/locale
+          mv "${{targets.destdir}}"/usr/lib/locale/C.utf8 "${{targets.subpkgdir}}"/usr/lib/locale/
+
+  - range: locales
+    name: "glibc-locale-${{range.key}}"
+    description: "${{range.value}} locale data for glibc"
+    pipeline:
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/usr/lib/locale
+          [ -d "${{targets.destdir}}"/usr/lib/locale/${{range.key}} ] \
+            || mv "${{targets.destdir}}"/usr/lib/locale/${{range.key}}_* "${{targets.subpkgdir}}"/usr/lib/locale/
+          [ -d "${{targets.destdir}}"/usr/lib/locale/${{range.key}} ] \
+            && mv "${{targets.destdir}}"/usr/lib/locale/${{range.key}} "${{targets.subpkgdir}}"/usr/lib/locale/
