@@ -94,6 +94,22 @@ func TestLinter_Rules(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			file: "duplicated-package.yaml",
+			want: EvalResult{
+				File: "duplicated-package",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "no-repeated-deps",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[no-repeated-deps]: package foo is duplicated in environment (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
