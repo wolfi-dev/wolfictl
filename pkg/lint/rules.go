@@ -133,5 +133,20 @@ var AllRules = func(l *Linter) Rules {
 				return nil
 			},
 		},
+		{
+			Name:        "no-repeated-deps",
+			Description: "no repeated dependencies",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				seen := map[string]struct{}{}
+				for _, p := range config.Environment.Contents.Packages {
+					if _, ok := seen[p]; ok {
+						return fmt.Errorf("package %s is duplicated in environment", p)
+					}
+					seen[p] = struct{}{}
+				}
+				return nil
+			},
+		},
 	}
 }
