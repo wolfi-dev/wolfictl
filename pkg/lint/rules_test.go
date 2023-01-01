@@ -110,6 +110,22 @@ func TestLinter_Rules(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			file: "bad-template-var.yaml",
+			want: EvalResult{
+				File: "bad-template-var",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "bad-template-var",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[bad-template-var]: package contains likely incorrect template var $pkgdir (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
