@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strings"
 
 	"golang.org/x/exp/slices"
 
@@ -144,6 +145,43 @@ var AllRules = func(l *Linter) Rules {
 						return fmt.Errorf("package %s is duplicated in environment", p)
 					}
 					seen[p] = struct{}{}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "bad-template-var",
+			Description: "bad template variable",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				badTemplateVars := []string{
+					"$pkgdir",
+					"$pkgver",
+					"$pkgname",
+					"$srcdir",
+				}
+
+				hasBadVar := func(runs string) error {
+					for _, badVar := range badTemplateVars {
+						if strings.Contains(runs, badVar) {
+							return fmt.Errorf("package contains likely incorrect template var %s", badVar)
+						}
+					}
+					return nil
+				}
+
+				for _, s := range config.Pipeline {
+					if err := hasBadVar(s.Runs); err != nil {
+						return err
+					}
+				}
+
+				for _, subPkg := range config.Subpackages {
+					for _, subPipeline := range subPkg.Pipeline {
+						if err := hasBadVar(subPipeline.Runs); err != nil {
+							return err
+						}
+					}
 				}
 				return nil
 			},
