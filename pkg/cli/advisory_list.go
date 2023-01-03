@@ -25,6 +25,7 @@ func AdvisoryList() *cobra.Command {
 			cfgs := index.Configurations()
 			var output string
 
+			//nolint:gocritic // rangeValCopy for cfg
 			for _, cfg := range cfgs {
 				for vuln, entries := range cfg.Advisories {
 					if len(entries) == 0 {
@@ -84,6 +85,7 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, fmt.Sprintf("only show advisories whose latest status is %s or %s", vex.StatusAffected, vex.StatusUnderInvestigation))
 }
 
+//nolint:gocritic // hugeParam for entry
 func renderListItem(entry build.AdvisoryContent) string {
 	switch entry.Status {
 	case vex.StatusUnderInvestigation:

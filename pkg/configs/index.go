@@ -60,7 +60,6 @@ func NewIndex(fsys fs.FS) (*Index, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +94,7 @@ func newIndex() Index {
 	return index
 }
 
-var EntryNotFound = errors.New("index entry not found")
+var ErrEntryNotFound = errors.New("index entry not found")
 
 type GetByFunc func(i *Index) (Entry, error)
 
@@ -103,7 +102,7 @@ func ByID(id string) GetByFunc {
 	return func(i *Index) (Entry, error) {
 		entryIdx, ok := i.byID[id]
 		if !ok {
-			return nil, EntryNotFound
+			return nil, ErrEntryNotFound
 		}
 		return i.entry(entryIdx), nil
 	}
@@ -113,7 +112,7 @@ func ByPackageName(name string) GetByFunc {
 	return func(i *Index) (Entry, error) {
 		entryIdx, ok := i.byPackageName[name]
 		if !ok {
-			return nil, EntryNotFound
+			return nil, ErrEntryNotFound
 		}
 		return i.entry(entryIdx), nil
 	}
@@ -123,7 +122,7 @@ func ByPath(path string) GetByFunc {
 	return func(i *Index) (Entry, error) {
 		entryIdx, ok := i.byPath[path]
 		if !ok {
-			return nil, EntryNotFound
+			return nil, ErrEntryNotFound
 		}
 		return i.entry(entryIdx), nil
 	}
@@ -192,7 +191,7 @@ func (i *Index) openWriteableFile(entryID string) (io.ReadWriteCloser, error) {
 	// TODO: fix leaky abstraction!
 
 	path := i.getEntry(entryID).Path()
-	return os.OpenFile(path, os.O_RDWR, 06755)
+	return os.OpenFile(path, os.O_RDWR, 0o6755)
 }
 
 type UpdateFunc func(Entry) error

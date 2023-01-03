@@ -12,6 +12,8 @@ import (
 
 // Create creates a new advisory in the `advisories` section of the configuration
 // at the provided path.
+//
+//nolint:gocritic // hugeParam for initialAdvisoryEntry
 func Create(configPath string, vuln string, initialAdvisoryEntry build.AdvisoryContent) error {
 	index, err := configs.NewIndexFromPaths(configPath)
 	if err != nil {
@@ -44,6 +46,8 @@ func Create(configPath string, vuln string, initialAdvisoryEntry build.AdvisoryC
 
 // Update adds a new entry to an existing advisory (named by the vuln parameter)
 // in the configuration at the provided path.
+//
+//nolint:gocritic // hugeParam for newAdvisoryEntry
 func Update(configPath string, vuln string, newAdvisoryEntry build.AdvisoryContent) error {
 	index, err := configs.NewIndexFromPaths(configPath)
 	if err != nil {

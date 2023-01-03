@@ -66,7 +66,7 @@ func (p *createParams) advisoryContent() (*build.AdvisoryContent, error) {
 
 func (p *createParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.vuln, "vuln", "", "vulnerability ID for advisory")
-	cmd.MarkFlagRequired("vuln")
+	cmd.MarkFlagRequired("vuln") //nolint:errcheck
 	cmd.Flags().StringVar(&p.status, "status", "under_investigation", "status for VEX statement")
 	cmd.Flags().StringVar(&p.action, "action", "", "action statement for VEX statement (used only for affected status)")
 	cmd.Flags().StringVar(&p.impact, "impact", "", "impact statement for VEX statement (used only for not_affected status)")
