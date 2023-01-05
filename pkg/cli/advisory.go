@@ -2,10 +2,12 @@ package cli
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 )
 
@@ -37,7 +39,7 @@ func resolveTimestamp(ts string) (time.Time, error) {
 	return t, nil
 }
 
-func argsToConfigs(args []string) (*configs.Index, error) {
+func newConfigIndexFromArgs(args ...string) (*configs.Index, error) {
 	if len(args) == 0 {
 		// parse all configurations in the current directory
 		i, err := configs.NewIndex(os.DirFS("."))
@@ -52,4 +54,27 @@ func argsToConfigs(args []string) (*configs.Index, error) {
 		return nil, fmt.Errorf("unable to index Wolfi package configurations: %w", err)
 	}
 	return i, nil
+}
+
+func doFollowupSync(index *configs.Index) error {
+	needs, err := sync.NeedsFromIndex(index)
+	if err != nil {
+		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
+	}
+
+	unmetNeeds := sync.Unmet(needs)
+
+	if len(unmetNeeds) == 0 {
+		log.Printf("INFO: No secfixes data needed to be added from this advisory. Secfixes data is in sync. 👍")
+		return nil
+	}
+
+	for _, n := range unmetNeeds {
+		err := n.Resolve()
+		if err != nil {
+			return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
+		}
+	}
+
+	return nil
 }
