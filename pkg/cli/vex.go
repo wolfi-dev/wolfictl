@@ -25,19 +25,19 @@ wolfictl can generate VEX data by reading the melange configuration files
 of each package and additional information coming from external documents.
 There are currently two VEX subcommands:
 
- wolfictl vex packages: Generates VEX documents from a list of melange configs
+ wolfictl vex package: Generates VEX documents from a list of melange configs
 
  wolfictl vex sbom: Generates a VEX document by reading an image SBOM
 
 For more information please see the help sections if these subcommands. To know
-more about the VEX tooling powering wolfictk see: https://github.com/chainguard-dev/vex
+more about the VEX tooling powering wolfictl see: https://github.com/chainguard-dev/vex
 
 
 `,
 		SilenceErrors: true,
 	}
 
-	addPackages(cmd)
+	addPackage(cmd)
 	addSBOM(cmd)
 	return cmd
 }
@@ -49,10 +49,10 @@ var vexCfg = vex.Config{
 	AuthorRole: "",
 }
 
-func addPackages(parent *cobra.Command) {
+func addPackage(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:           "packages [flags] CONFIG [CONFIG]...",
-		Example:       "wolfictl vex packages --author=joe@doe.com config1.yaml config2.yaml",
+		Use:           "package [flags] CONFIG [CONFIG]...",
+		Example:       "wolfictl vex package --author=joe@doe.com config1.yaml config2.yaml",
 		Short:         "Generate a VEX document from package configuration files",
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -93,7 +93,7 @@ func addSBOM(parent *cobra.Command) {
 		Short:   "Generate a VEX document from wolfi packages listed in an SBOM",
 		Long: `wolfictl vex sbom: Generate a VEX document from wolfi packages listed in an SBOM
 		
-The vex sbom subcommand generates VEX documents describing how vulnerabilies
+The vex sbom subcommand generates VEX documents describing how vulnerabilities
 impact Wolfi packages listed in an SBOM. This subcommand reads SPDX SBOMs and
 will recognize and capture all packages identified as Wolfi OS components 
 by its purl. For example, if an SBOM contains a package with the following
@@ -112,7 +112,7 @@ or, if not specified, it will clone the repo for you.
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
 				cmd.Help() //nolint:errcheck
-				return errors.New("required paramter missing: path to SBOM")
+				return errors.New("required parameter missing: path to SBOM")
 			}
 
 			doc, err := vex.FromSBOM(vexCfg, args[0])
