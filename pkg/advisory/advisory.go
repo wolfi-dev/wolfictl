@@ -28,8 +28,6 @@ type CreateOptions struct {
 
 // Create creates a new advisory in the `advisories` section of the configuration
 // at the provided path.
-//
-
 func Create(options CreateOptions) error {
 	index := options.Index
 	path := options.Pathname
@@ -85,8 +83,6 @@ type UpdateOptions struct {
 
 // Update adds a new entry to an existing advisory (named by the vuln parameter)
 // in the configuration at the provided path.
-//
-
 func Update(options UpdateOptions) error {
 	index := options.Index
 	path := options.Pathname
