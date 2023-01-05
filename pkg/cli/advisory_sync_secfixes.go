@@ -15,7 +15,7 @@ func AdvisorySyncSecfixes() *cobra.Command {
 		Short:         "synchronize secfixes and advisories for specific packages or across all of Wolfi",
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			index, err := argsToConfigs(args)
+			index, err := newConfigIndexFromArgs(args...)
 			if err != nil {
 				return err
 			}

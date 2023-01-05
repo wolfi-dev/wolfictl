@@ -139,6 +139,11 @@ func (i *Index) Configurations() []build.Configuration {
 	return i.cfgs
 }
 
+// Len returns the number of configurations stored in the Index.
+func (i *Index) Len() int {
+	return len(i.cfgs)
+}
+
 type IndexEntryFunc func(entry Entry) error
 
 // ForEach applies the given IndexEntryFunc to every item in the Index. If the

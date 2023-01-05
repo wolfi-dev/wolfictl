@@ -18,15 +18,31 @@ func AdvisoryUpdate() *cobra.Command {
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			configPath := args[0]
+			index, err := newConfigIndexFromArgs(configPath)
+			if err != nil {
+				return err
+			}
 
 			newEntry, err := p.advisoryContent()
 			if err != nil {
 				return err
 			}
 
-			err = advisory.Update(configPath, p.vuln, *newEntry)
+			err = advisory.Update(advisory.UpdateOptions{
+				Index:            index,
+				Pathname:         configPath,
+				Vuln:             p.vuln,
+				NewAdvisoryEntry: newEntry,
+			})
 			if err != nil {
 				return err
+			}
+
+			if p.sync {
+				err := doFollowupSync(index)
+				if err != nil {
+					return err
+				}
 			}
 
 			return nil
@@ -39,6 +55,7 @@ func AdvisoryUpdate() *cobra.Command {
 
 type updateParams struct {
 	vuln, status, action, impact, justification, timestamp, fixedVersion string
+	sync                                                                 bool
 }
 
 func (p *updateParams) addFlagsTo(cmd *cobra.Command) {
@@ -50,6 +67,7 @@ func (p *updateParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.justification, "justification", "", "justification for VEX statement (used only for not_affected status)")
 	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp for VEX statement")
 	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for fixed status)")
+	cmd.Flags().BoolVar(&p.sync, "sync", false, "synchronize secfixes data immediately after updating advisory")
 }
 
 func (p *updateParams) advisoryContent() (*build.AdvisoryContent, error) {

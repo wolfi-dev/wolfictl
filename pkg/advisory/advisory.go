@@ -6,24 +6,48 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/dprotaso/go-yit"
+	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"gopkg.in/yaml.v3"
 )
 
+type CreateOptions struct {
+	// The Index of package configs on which to operate.
+	Index *configs.Index
+
+	// Pathname is the filepath for the configuration to which Create will add the
+	// new advisory.
+	Pathname string
+
+	// Vuln is the vulnerability ID used to name the new advisory.
+	Vuln string
+
+	// InitialAdvisoryEntry is the entry that will be added to the new advisory.
+	InitialAdvisoryEntry *build.AdvisoryContent
+}
+
 // Create creates a new advisory in the `advisories` section of the configuration
 // at the provided path.
 //
-//nolint:gocritic // hugeParam for initialAdvisoryEntry
-func Create(configPath string, vuln string, initialAdvisoryEntry build.AdvisoryContent) error {
-	index, err := configs.NewIndexFromPaths(configPath)
-	if err != nil {
-		return err
+
+func Create(options CreateOptions) error {
+	index := options.Index
+	path := options.Pathname
+
+	if count := index.Len(); count != 1 {
+		return fmt.Errorf("can only operate on 1 config, but was given %d configs", count)
 	}
 
-	config, err := index.Get(configs.ByPath(configPath))
+	config, err := index.Get(configs.ByPath(path))
 	if err != nil {
 		// this would be unexpected, since we just created the index for this path, and it succeeded
-		return fmt.Errorf("unable to find config for %q: %w", configPath, err)
+		return fmt.Errorf("unable to find config for %q: %w", path, err)
+	}
+
+	vuln := options.Vuln
+	advisoryEntry := options.InitialAdvisoryEntry
+	if advisoryEntry == nil {
+		return errors.New("cannot use nil advisory entry")
 	}
 
 	updaterFunc := NewConfigUpdaterForAdvisories(index, func(advisories build.Advisories) (build.Advisories, error) {
@@ -31,33 +55,56 @@ func Create(configPath string, vuln string, initialAdvisoryEntry build.AdvisoryC
 			return build.Advisories{}, fmt.Errorf("advisory already exists for %s", vuln)
 		}
 
-		advisories[vuln] = append(advisories[vuln], initialAdvisoryEntry)
+		advisories[vuln] = append(advisories[vuln], *advisoryEntry)
 
 		return advisories, nil
 	})
 
 	err = index.Update(config, updaterFunc)
 	if err != nil {
-		return fmt.Errorf("unable to create advisories entry in %q: %w", configPath, err)
+		return fmt.Errorf("unable to create advisories entry in %q: %w", path, err)
 	}
 
 	return nil
 }
 
+type UpdateOptions struct {
+	// The Index of package configs on which to operate.
+	Index *configs.Index
+
+	// Pathname is the filepath for the configuration in which Update will append the
+	// new advisory entry.
+	Pathname string
+
+	// Vuln is the vulnerability ID for the advisory to update.
+	Vuln string
+
+	// NewAdvisoryEntry is the entry that will be added to the advisory.
+	NewAdvisoryEntry *build.AdvisoryContent
+}
+
 // Update adds a new entry to an existing advisory (named by the vuln parameter)
 // in the configuration at the provided path.
 //
-//nolint:gocritic // hugeParam for newAdvisoryEntry
-func Update(configPath string, vuln string, newAdvisoryEntry build.AdvisoryContent) error {
-	index, err := configs.NewIndexFromPaths(configPath)
-	if err != nil {
-		return err
+
+func Update(options UpdateOptions) error {
+	index := options.Index
+	path := options.Pathname
+
+	if count := index.Len(); count != 1 {
+		return fmt.Errorf("can only update 1 config, but have %d configs", count)
 	}
 
-	config, err := index.Get(configs.ByPath(configPath))
+	config, err := index.Get(configs.ByPath(path))
 	if err != nil {
 		// this would be unexpected, since we just created the index for this path, and it succeeded
-		return fmt.Errorf("unable to find config for %q: %w", configPath, err)
+		return fmt.Errorf("unable to find config for %q: %w", path, err)
+	}
+
+	vuln := options.Vuln
+	advisoryEntry := options.NewAdvisoryEntry
+	if advisoryEntry == nil {
+		return errors.New("cannot use nil advisory entry")
 	}
 
 	updaterFunc := NewConfigUpdaterForAdvisories(index, func(advisories build.Advisories) (build.Advisories, error) {
@@ -65,14 +112,14 @@ func Update(configPath string, vuln string, newAdvisoryEntry build.AdvisoryConte
 			return build.Advisories{}, fmt.Errorf("no advisory exists for %s", vuln)
 		}
 
-		advisories[vuln] = append(advisories[vuln], newAdvisoryEntry)
+		advisories[vuln] = append(advisories[vuln], *advisoryEntry)
 
 		return advisories, nil
 	})
 
 	err = index.Update(config, updaterFunc)
 	if err != nil {
-		return fmt.Errorf("unable to create advisories entry in %q: %w", configPath, err)
+		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vuln, path, err)
 	}
 
 	return nil

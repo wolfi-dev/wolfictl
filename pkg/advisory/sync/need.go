@@ -224,3 +224,17 @@ func GetAdvisoriesNeeds(configEntry configs.Entry, index *configs.Index) []Need 
 
 	return needs
 }
+
+// Unmet filters the given set of Needs down to just the set of needs that are
+// not met.
+func Unmet(needs []Need) []Need {
+	var result []Need
+
+	for _, need := range needs {
+		if !need.Met() {
+			result = append(result, need)
+		}
+	}
+
+	return result
+}
