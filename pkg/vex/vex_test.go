@@ -39,18 +39,17 @@ func TestFromPackageConfiguration(t *testing.T) {
 		Distro: "wolfi",
 	}
 
-	os.Setenv("SOURCE_DATE_EPOCH", "2022-12-01T13:10:00+07:00")
+	const defaultTimestampRFC3339 = "2022-12-01T13:10:00+07:00"
+	os.Setenv("SOURCE_DATE_EPOCH", defaultTimestampRFC3339)
+
 	doc, err := FromPackageConfiguration(vexCfg, buildCfg)
 	require.NoError(t, err)
 
-	// zero out non-deterministic fields
-	doc.Timestamp = nil
-	doc.ID = ""
-
-	// TODO: re-introduce timestamp comparisons once latest version of VEX module is imported
-
 	timePointer := func(t time.Time) *time.Time { return &t }
 	tz := time.FixedZone("-0500", -5*3600)
+
+	defaultTimestamp, err := time.Parse(time.RFC3339, defaultTimestampRFC3339)
+	require.NoError(t, err)
 
 	expectedGitProducts := []string{
 		"pkg:apk/wolfi/git@2.39.0-r0",
@@ -60,13 +59,15 @@ func TestFromPackageConfiguration(t *testing.T) {
 
 	expected := &vex.VEX{
 		Metadata: vex.Metadata{
-			Format: "text/vex",
+			ID:        "vex-3702f2c3962eb7e8f8dedda72621ebf9116087a824a5aad31507d95e2cb54a88",
+			Timestamp: timePointer(defaultTimestamp),
 		},
 		Statements: []vex.Statement{
 			{
 				Vulnerability: "CVE-1234-5678",
 				Products:      expectedGitProducts,
 				Status:        "not_affected",
+				Timestamp:     timePointer(defaultTimestamp),
 			},
 			{
 				Vulnerability: "CVE-2022-1111",
@@ -76,39 +77,41 @@ func TestFromPackageConfiguration(t *testing.T) {
 			},
 			{
 				Vulnerability: "CVE-2022-1111",
-				// Timestamp:     timePointer(time.Date(2022, 12, 23, 2, 11, 57, 0, tz)),
+				Timestamp:     timePointer(time.Date(2022, 12, 23, 2, 11, 57, 0, tz)),
 				Products:      expectedGitProducts,
 				Status:        "not_affected",
 				Justification: "component_not_present",
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
-				// Timestamp:     timePointer(time.Date(2022, 12, 24, 1, 28, 16, 0, tz)),
-				Products: expectedGitProducts,
-				Status:   "under_investigation",
+				Timestamp:     timePointer(time.Date(2022, 12, 24, 1, 28, 16, 0, tz)),
+				Products:      expectedGitProducts,
+				Status:        "under_investigation",
 			},
 			{
-				Vulnerability: "CVE-2022-2222",
-				// Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 12, 49, 0, tz)),
+				Vulnerability:   "CVE-2022-2222",
+				Timestamp:       timePointer(time.Date(2022, 12, 24, 2, 12, 49, 0, tz)),
 				Products:        expectedGitProducts,
 				Status:          "affected",
 				ActionStatement: "action statement",
 			},
 			{
 				Vulnerability: "CVE-2022-2222",
-				// Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 50, 18, 0, tz)),
-				Products: expectedGitProducts,
-				Status:   "fixed",
+				Timestamp:     timePointer(time.Date(2022, 12, 24, 2, 50, 18, 0, tz)),
+				Products:      expectedGitProducts,
+				Status:        "fixed",
 			},
 			{
 				Vulnerability: "CVE-2022-39253",
 				Products:      expectedGitProducts,
 				Status:        "fixed",
+				Timestamp:     timePointer(defaultTimestamp),
 			},
 			{
 				Vulnerability: "CVE-2022-39260",
 				Products:      expectedGitProducts,
 				Status:        "fixed",
+				Timestamp:     timePointer(defaultTimestamp),
 			},
 		},
 	}
