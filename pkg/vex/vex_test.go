@@ -32,9 +32,8 @@ func TestIndexMelangeConfigsDir(t *testing.T) {
 
 func TestFromPackageConfiguration(t *testing.T) {
 	buildCfg, err := build.ParseConfiguration(filepath.Join("testdata", "git.yaml"))
-	if err != nil {
-		return
-	}
+	require.NoError(t, err)
+
 	vexCfg := Config{
 		Distro: "wolfi",
 	}
