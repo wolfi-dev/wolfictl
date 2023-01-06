@@ -33,6 +33,7 @@ advisories:
       action: 'action statement'
     - timestamp: 2022-12-24T02:50:18-05:00
       status: fixed
+      fixed-version: 1.2.3-r4
 
 environment:
   contents:
