@@ -17,6 +17,7 @@ func New() *cobra.Command {
 		Lint(),
 		VEX(),
 		Advisory(),
+		Bump(),
 	)
 
 	return cmd
