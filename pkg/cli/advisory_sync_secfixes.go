@@ -44,7 +44,7 @@ func AdvisorySyncSecfixes() *cobra.Command {
 			}
 
 			if p.warn && syncNeeded {
-				return errors.New("secfixes and advisories are not in sync")
+				return errors.New("secfixes and advisories are not in sync (to fix this, run `wolfictl advisory sync-secfixes`)")
 			}
 
 			return nil
