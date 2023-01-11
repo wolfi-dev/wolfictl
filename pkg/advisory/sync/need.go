@@ -53,15 +53,16 @@ func (n secfixesNeed) Met() bool {
 
 func (n secfixesNeed) Resolve() error {
 	if n.Met() {
+		// nothing to do!
 		return nil
 	}
 
-	updater := advisory.NewConfigUpdaterForSecfixes(n.index, func(secfixes build.Secfixes) (build.Secfixes, error) {
+	err := n.index.Select().UpdateSecfixes(func(cfg build.Configuration) (build.Secfixes, error) {
+		secfixes := cfg.Secfixes
+
 		secfixes[n.version] = append(secfixes[n.version], n.vuln)
 		return secfixes, nil
 	})
-
-	err := n.index.Update(n.configEntry, updater)
 	if err != nil {
 		return fmt.Errorf("unable to resolve need: %w", err)
 	}
@@ -99,6 +100,7 @@ func (n advisoriesNeed) Met() bool {
 
 func (n advisoriesNeed) Resolve() error {
 	if n.Met() {
+		// nothing to do!
 		return nil
 	}
 
@@ -109,18 +111,19 @@ func (n advisoriesNeed) Resolve() error {
 		justification = vex.VulnerableCodeNotInExecutePath
 	}
 
-	updater := advisory.NewConfigUpdaterForAdvisories(n.index, func(advisories build.Advisories) (build.Advisories, error) {
+	err := n.index.Select().UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
 		newAdvisoryEntry := build.AdvisoryContent{
 			Timestamp:     timestamp,
 			Status:        n.status,
 			Justification: justification,
 			FixedVersion:  n.fixedVersion,
 		}
+
+		advisories := cfg.Advisories
+
 		advisories[n.vuln] = append(advisories[n.vuln], newAdvisoryEntry)
 		return advisories, nil
 	})
-
-	err := n.index.Update(n.configEntry, updater)
 	if err != nil {
 		return fmt.Errorf("unable to resolve need: %w", err)
 	}
@@ -139,19 +142,17 @@ func (n advisoriesNeed) String() string {
 }
 
 func NeedsFromIndex(index *configs.Index) ([]Need, error) {
-	var needs []Need
+	needs, err := configs.FlatMap(index.Select(), func(e configs.Entry) ([]Need, error) {
+		var needs []Need
 
-	calculateNeedsForConfig := func(e configs.Entry) error {
 		secfixesNeeds := GetSecfixesNeeds(e, index)
 		needs = append(needs, secfixesNeeds...)
 
 		advisoriesNeeds := GetAdvisoriesNeeds(e, index)
 		needs = append(needs, advisoriesNeeds...)
 
-		return nil
-	}
-
-	err := index.ForEach(calculateNeedsForConfig)
+		return needs, nil
+	})
 	if err != nil {
 		return nil, fmt.Errorf("unable to calculate needs for index: %w", err)
 	}

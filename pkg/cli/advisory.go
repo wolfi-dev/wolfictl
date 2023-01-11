@@ -3,12 +3,12 @@ package cli
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
 func Advisory() *cobra.Command {
@@ -22,6 +22,7 @@ func Advisory() *cobra.Command {
 	cmd.AddCommand(AdvisoryCreate())
 	cmd.AddCommand(AdvisoryUpdate())
 	cmd.AddCommand(AdvisorySyncSecfixes())
+	cmd.AddCommand(AdvisoryDiscover())
 
 	return cmd
 }
@@ -42,7 +43,7 @@ func resolveTimestamp(ts string) (time.Time, error) {
 func newConfigIndexFromArgs(args ...string) (*configs.Index, error) {
 	if len(args) == 0 {
 		// parse all configurations in the current directory
-		i, err := configs.NewIndex(os.DirFS("."))
+		i, err := configs.NewIndex(rwfsOS.DirFS("."))
 		if err != nil {
 			return nil, fmt.Errorf("unable to index Wolfi package configurations: %w", err)
 		}

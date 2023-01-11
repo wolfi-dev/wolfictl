@@ -50,7 +50,7 @@ linters:
     - predeclared
     - promlinter
     - revive
-    #  - rowserrcheck is disabled because of generics. You can track the evolution of the generics support by following the https://github.com/golangci/golangci-lint/issues/2649
+    # - rowserrcheck is disabled because of generics. You can track the evolution of the generics support by following the https://github.com/golangci/golangci-lint/issues/2649
     # - sqlclosecheck is disabled because of generics. You can track the evolution of the generics support by following the https://github.com/golangci/golangci-lint/issues/2649
     - staticcheck
     - stylecheck
