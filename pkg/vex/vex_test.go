@@ -1,6 +1,7 @@
 package vex
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestSBOM(t *testing.T) {
-	sbom, err := parseSBOM("testdata/git.spdx.json")
+	sbom, err := parseSBOM(context.Background(), "testdata/git.spdx.json")
 	require.NoError(t, err)
 
 	purls := extractSBOMPurls(Config{Distro: "wolfi"}, sbom)

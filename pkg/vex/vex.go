@@ -16,6 +16,13 @@ import (
 	"gopkg.in/yaml.v3"
 	"sigs.k8s.io/release-sdk/git"
 
+	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/name"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/sigstore/cosign/v2/pkg/oci"
+	ociremote "github.com/sigstore/cosign/v2/pkg/oci/remote"
+
 	"chainguard.dev/apko/pkg/sbom/generator/spdx"
 	"chainguard.dev/melange/pkg/build"
 
@@ -31,7 +38,7 @@ type Config struct {
 // vulnerability impact to any wolfi packages lsited in it.
 func FromSBOM(vexCfg Config, sbomPath string) (*vex.VEX, error) {
 	// Parse the SBOM file
-	sbom, err := parseSBOM(sbomPath)
+	sbom, err := parseSBOM(context.Background(), sbomPath)
 	if err != nil {
 		return nil, fmt.Errorf("parsing SBOM: %w", err)
 	}
@@ -110,6 +117,8 @@ func getPackageConfigurations(vexCfg Config, purls map[string][]purl.PackageURL)
 	if vexCfg.Distro == "wolfi" {
 		repoURL = "https://github.com/wolfi-dev/os.git"
 	}
+
+	fmt.Fprintf(os.Stderr, "Cloning repository %s", repoURL)
 
 	// Clone the wolfi distro
 	repo, err := git.CloneOrOpenRepo("", repoURL, !strings.HasPrefix(repoURL, "https://"))
@@ -283,18 +292,39 @@ func extractSBOMPurls(vexCfg Config, sbom *spdx.Document) map[string][]purl.Pack
 }
 
 // parseSBOM gets an SPDX-json file and returns a parsed SBOM
-func parseSBOM(sbomPath string) (*spdx.Document, error) {
-	sbom := &spdx.Document{}
-	data, err := os.ReadFile(sbomPath)
+func parseSBOM(ctx context.Context, sbomPath string) (*spdx.Document, error) {
+	data, err := openSBOM(ctx, sbomPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening SBOM file: %w", err)
 	}
 
+	sbom := &spdx.Document{}
 	if err := json.Unmarshal(data, sbom); err != nil {
 		return nil, fmt.Errorf("unmarshaling SBOM data: %w", err)
 	}
 
 	return sbom, nil
+}
+
+func openSBOM(ctx context.Context, sbomPath string) ([]byte, error) {
+	_, err := os.Stat(sbomPath)
+	if err == nil {
+		return os.ReadFile(sbomPath)
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return nil, err
+	}
+
+	// if it parses as an image ref
+	ref, err := name.ParseReference(sbomPath)
+	if err != nil {
+		return nil, err
+	}
+
+	sbomData, err := downloadSBOM(ctx, ref, "")
+	if err != nil {
+		return nil, fmt.Errorf("downloading sbom from OCI reference: %w", err)
+	}
+	return sbomData, nil
 }
 
 func statementsFromConfiguration(cfg *build.Configuration, documentTimestamp time.Time, purls []string) []vex.Statement {
@@ -404,4 +434,149 @@ func generateDocumentID(configs []*build.Configuration) (string, error) {
 
 	// One hash to rule them all
 	return fmt.Sprintf("vex-%s", fmt.Sprintf("%x", h.Sum(nil))), nil
+}
+
+func downloadSBOM(_ context.Context, ref name.Reference, platformString string) ([]byte, error) {
+	fmt.Fprintf(os.Stderr, "downloading SBOM from OCI reference %s\n", ref.Context().String())
+	se, err := ociremote.SignedEntity(
+		ref, ociremote.WithRemoteOptions(remote.WithAuthFromKeychain(authn.DefaultKeychain)),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	idx, isIndex := se.(oci.SignedImageIndex)
+
+	// We only allow --platform on multiarch indexes
+	if platformString != "" && !isIndex {
+		return nil, fmt.Errorf("specified reference is not a multiarch image")
+	}
+
+	if platformString != "" && isIndex {
+		targetPlatform, err := v1.ParsePlatform(platformString)
+		if err != nil {
+			return nil, fmt.Errorf("parsing platform: %w", err)
+		}
+		platforms, err := getIndexPlatforms(idx)
+		if err != nil {
+			return nil, fmt.Errorf("getting available platforms: %w", err)
+		}
+
+		platforms = matchPlatform(targetPlatform, platforms)
+		if len(platforms) == 0 {
+			return nil, fmt.Errorf("unable to find an SBOM for %s", targetPlatform.String())
+		}
+		if len(platforms) > 1 {
+			return nil, fmt.Errorf(
+				"platform spec matches more than one image architecture: %s",
+				platforms.String(),
+			)
+		}
+
+		nse, err := idx.SignedImage(platforms[0].hash)
+		if err != nil {
+			return nil, fmt.Errorf("searching for %s image: %w", platforms[0].hash.String(), err)
+		}
+		if nse == nil {
+			return nil, fmt.Errorf("unable to find image %s", platforms[0].hash.String())
+		}
+		se = nse
+	}
+
+	file, err := se.Attachment("sbom")
+	if errors.Is(err, ociremote.ErrImageNotFound) {
+		if !isIndex {
+			return nil, errors.New("no sbom attached to reference")
+		}
+		// Help the user with the available architectures
+		pl, err := getIndexPlatforms(idx)
+		if len(pl) > 0 && err == nil {
+			fmt.Fprintf(
+				os.Stderr,
+				"\nThis multiarch image does not have an SBOM attached at the index level.\n"+
+					"Try using --platform with one of the following architectures:\n%s\n\n",
+				pl.String(),
+			)
+		}
+		return nil, fmt.Errorf("no SBOM found attached to image index")
+	} else if err != nil {
+		return nil, fmt.Errorf("getting sbom attachment: %w", err)
+	}
+
+	mt, err := file.FileMediaType()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Fprintf(os.Stderr, "Found SBOM of media type: %s\n", mt)
+	sbom, err := file.Payload()
+	if err != nil {
+		return nil, err
+	}
+
+	return sbom, nil
+}
+
+type platformList []struct {
+	hash     v1.Hash
+	platform *v1.Platform
+}
+
+func (pl *platformList) String() string {
+	r := []string{}
+	for _, p := range *pl {
+		r = append(r, p.platform.String())
+	}
+	return strings.Join(r, ", ")
+}
+
+func getIndexPlatforms(idx oci.SignedImageIndex) (platformList, error) {
+	im, err := idx.IndexManifest()
+	if err != nil {
+		return nil, fmt.Errorf("fetching index manifest: %w", err)
+	}
+
+	platforms := platformList{}
+	for _, m := range im.Manifests {
+		if m.Platform == nil {
+			continue
+		}
+		platforms = append(platforms, struct {
+			hash     v1.Hash
+			platform *v1.Platform
+		}{m.Digest, m.Platform})
+	}
+	return platforms, nil
+}
+
+func matchPlatform(base *v1.Platform, list platformList) platformList {
+	ret := platformList{}
+	for _, p := range list {
+		if base.OS != "" && base.OS != p.platform.OS {
+			continue
+		}
+		if base.Architecture != "" && base.Architecture != p.platform.Architecture {
+			continue
+		}
+		if base.Variant != "" && base.Variant != p.platform.Variant {
+			continue
+		}
+
+		if base.OSVersion != "" && p.platform.OSVersion != base.OSVersion {
+			if base.OS != "windows" {
+				continue
+			} else {
+				if pcount, bcount := strings.Count(base.OSVersion, "."), strings.Count(p.platform.OSVersion, "."); pcount == 2 && bcount == 3 {
+					if base.OSVersion != p.platform.OSVersion[:strings.LastIndex(p.platform.OSVersion, ".")] {
+						continue
+					}
+				} else {
+					continue
+				}
+			}
+		}
+		ret = append(ret, p)
+	}
+
+	return ret
 }
