@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
-	"chainguard.dev/vex/pkg/vex"
 	"github.com/google/go-cmp/cmp"
+	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/stretchr/testify/require"
 )
 

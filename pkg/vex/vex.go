@@ -26,8 +26,8 @@ import (
 	"chainguard.dev/apko/pkg/sbom/generator/spdx"
 	"chainguard.dev/melange/pkg/build"
 
-	"chainguard.dev/vex/pkg/ctl"
-	"chainguard.dev/vex/pkg/vex"
+	"github.com/openvex/go-vex/pkg/vex"
+	"github.com/openvex/vexctl/pkg/ctl"
 )
 
 type Config struct {
