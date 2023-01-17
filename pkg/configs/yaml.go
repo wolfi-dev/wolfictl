@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"chainguard.dev/melange/pkg/build"
+	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/dprotaso/go-yit"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
@@ -40,8 +41,12 @@ func (i *Index) newYAMLUpdateFunc(updateYAML yamlUpdater) updateFunc {
 			return fmt.Errorf("unable to update %q: %w", e.Path(), err)
 		}
 
-		encoder := yaml.NewEncoder(file)
+		encoder := formatted.NewEncoder(file)
 		encoder.SetIndent(yamlIndent)
+		err = encoder.SetGapExpressions(".")
+		if err != nil {
+			return fmt.Errorf("unable to set gap expressions when updating YAML: %w", err)
+		}
 		err = encoder.Encode(root)
 		if err != nil {
 			return fmt.Errorf("unable to encode updated YAML: %w", err)
