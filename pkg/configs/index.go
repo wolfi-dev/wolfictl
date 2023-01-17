@@ -2,26 +2,20 @@ package configs
 
 import (
 	"fmt"
-	"io"
 	"io/fs"
-	"os"
 	"strings"
 
 	"chainguard.dev/melange/pkg/build"
-	"github.com/pkg/errors"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
+	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"gopkg.in/yaml.v3"
 )
-
-// TODO: there are leaks in the entry abstraction for fs.FS. It'd be great to
-// break out this FS abstraction and have this package be able to depend on that.
-
-const yamlIndent = 2
 
 // An Index is a queryable store of Melange configurations, where each
 // configuration has already been decoded both into the build.Configuration Go
 // type and into a YAML AST.
 type Index struct {
-	fsys          fs.FS
+	fsys          rwfs.FS
 	paths         []string
 	yamlRoots     []*yaml.Node
 	cfgs          []build.Configuration
@@ -32,7 +26,7 @@ type Index struct {
 
 // NewIndex returns a new Index of all build configurations found within the
 // given filesystem.
-func NewIndex(fsys fs.FS) (*Index, error) {
+func NewIndex(fsys rwfs.FS) (*Index, error) {
 	index := newIndex()
 	index.fsys = fsys
 
@@ -71,6 +65,7 @@ func NewIndex(fsys fs.FS) (*Index, error) {
 // given paths.
 func NewIndexFromPaths(paths ...string) (*Index, error) {
 	index := newIndex()
+	index.fsys = rwfsOS.DirFS(".")
 
 	for _, path := range paths {
 		err := index.processAndAdd(path)
@@ -94,44 +89,19 @@ func newIndex() Index {
 	return index
 }
 
-var ErrEntryNotFound = errors.New("index entry not found")
+// Select returns a Selection for the Index, which allows the caller to begin chaining selection clauses.
+func (i *Index) Select() Selection {
+	cfgs := i.Configurations()
 
-type GetByFunc func(i *Index) (Entry, error)
-
-func ByID(id string) GetByFunc {
-	return func(i *Index) (Entry, error) {
-		entryIdx, ok := i.byID[id]
-		if !ok {
-			return nil, ErrEntryNotFound
-		}
-		return i.entry(entryIdx), nil
+	entries := make([]Entry, 0, len(cfgs))
+	for idx := range cfgs {
+		entries = append(entries, i.entry(idx))
 	}
-}
 
-func ByPackageName(name string) GetByFunc {
-	return func(i *Index) (Entry, error) {
-		entryIdx, ok := i.byPackageName[name]
-		if !ok {
-			return nil, ErrEntryNotFound
-		}
-		return i.entry(entryIdx), nil
+	return Selection{
+		entries: entries,
+		index:   i,
 	}
-}
-
-func ByPath(path string) GetByFunc {
-	return func(i *Index) (Entry, error) {
-		entryIdx, ok := i.byPath[path]
-		if !ok {
-			return nil, ErrEntryNotFound
-		}
-		return i.entry(entryIdx), nil
-	}
-}
-
-// Get finds an Entry in the index using the provided GetByFunc, such as ByID,
-// ByPackageName, or ByPath.
-func (i *Index) Get(by GetByFunc) (Entry, error) {
-	return by(i)
 }
 
 // Configurations returns all parsed build configurations stored in the Index.
@@ -139,35 +109,46 @@ func (i *Index) Configurations() []build.Configuration {
 	return i.cfgs
 }
 
-// Len returns the number of configurations stored in the Index.
-func (i *Index) Len() int {
-	return len(i.cfgs)
-}
+// Map applies the given predicate function to each entry in the given selection.
+// It returns a slice of all predicate function outputs. If the predicate
+// function returns an error, Map stops processing and returns that error to its
+// caller.
+func Map[T any](selection Selection, predicate func(Entry) (T, error)) ([]T, error) {
+	result := make([]T, 0, len(selection.entries))
 
-type IndexEntryFunc func(entry Entry) error
-
-// ForEach applies the given IndexEntryFunc to every item in the Index. If the
-// given func returns an error, ForEach stops iterating and returns that error to
-// the caller.
-func (i *Index) ForEach(f IndexEntryFunc) error {
-	for entryIdx := range i.cfgs {
-		e := entry{
-			path:     i.paths[entryIdx],
-			yamlRoot: i.yamlRoots[entryIdx],
-			cfg:      &i.cfgs[entryIdx],
-		}
-
-		err := f(e)
+	for _, e := range selection.entries {
+		t, err := predicate(e)
 		if err != nil {
-			return err
+			return nil, err
 		}
+
+		result = append(result, t)
 	}
 
-	return nil
+	return result, nil
 }
 
-// Update updates the given entry in the index using the provided UpdateFunc.
-func (i *Index) Update(entry Entry, updateFunc UpdateFunc) error {
+// FlatMap applies the given predicate function to each entry in the given
+// selection. It returns all predicate function outputs, each of which is a
+// slice, flattened into a single slice. If the predicate function returns an
+// error, Map stops processing and returns that error to its caller.
+func FlatMap[T any](selection Selection, predicate func(Entry) ([]T, error)) ([]T, error) {
+	var result []T
+
+	for _, e := range selection.entries {
+		ts, err := predicate(e)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, ts...)
+	}
+
+	return result, nil
+}
+
+// update updates the given entry in the index using the provided updateFunc.
+func (i *Index) update(entry Entry, updateFunc updateFunc) error {
 	err := updateFunc(entry)
 	if err != nil {
 		return err
@@ -182,64 +163,8 @@ func (i *Index) Update(entry Entry, updateFunc UpdateFunc) error {
 	return nil
 }
 
-func (i *Index) openFile(entryID string) (fs.File, error) {
-	path := i.getEntry(entryID).Path()
-
-	if i.fsys != nil {
-		return i.fsys.Open(path)
-	}
-
-	return os.Open(path)
-}
-
-func (i *Index) openWriteableFile(entryID string) (io.ReadWriteCloser, error) {
-	// TODO: fix leaky abstraction!
-
-	path := i.getEntry(entryID).Path()
-	return os.OpenFile(path, os.O_RDWR, 0o6755)
-}
-
-type UpdateFunc func(Entry) error
-
-type YAMLUpdater func(node *yaml.Node) error
-
-func (i *Index) NewUpdater(updateYAML YAMLUpdater) UpdateFunc {
-	return func(e Entry) error {
-		cfgFile, err := i.openFile(e.id())
-		if err != nil {
-			return err
-		}
-		defer cfgFile.Close()
-
-		root := e.YAMLRoot()
-
-		err = updateYAML(root)
-		if err != nil {
-			return err
-		}
-
-		writableCfgFile, err := i.openWriteableFile(e.id())
-		if err != nil {
-			return err
-		}
-		defer writableCfgFile.Close()
-
-		encoder := yaml.NewEncoder(writableCfgFile)
-		encoder.SetIndent(yamlIndent)
-		err = encoder.Encode(root)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
 // processAndAdd parses the configuration file at the given path into both a YAML
 // AST and a build.Configuration, and it then adds a new entry to the Index.
-//
-// processAndAdd uses the fsys parameter to open the given path, if fsys is not
-// nil; otherwise, it uses os.Open.
 func (i *Index) processAndAdd(path string) error {
 	entry, err := i.process(path)
 	if err != nil {
@@ -258,7 +183,7 @@ func (i *Index) processAndUpdate(path string, entryIndex int) error {
 	if err != nil {
 		return err
 	}
-	i.update(entry, entryIndex)
+	i.updateAtIndex(entry, entryIndex)
 
 	return nil
 }
@@ -266,18 +191,9 @@ func (i *Index) processAndUpdate(path string, entryIndex int) error {
 func (i *Index) process(path string) (*entry, error) {
 	// TODO: for the follow operations, consider noting the error and moving on, rather than stopping the indexing.
 
-	var f fs.File
-	var err error
-	if i.fsys != nil {
-		f, err = i.fsys.Open(path)
-		if err != nil {
-			return nil, fmt.Errorf("unable to open configuration at %q: %w", path, err)
-		}
-	} else {
-		f, err = os.Open(path)
-		if err != nil {
-			return nil, fmt.Errorf("unable to open configuration at %q: %w", path, err)
-		}
+	f, err := i.fsys.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open configuration at %q: %w", path, err)
 	}
 
 	yamlRoot := &yaml.Node{}
@@ -316,18 +232,13 @@ func (i *Index) add(e *entry) error {
 	return nil
 }
 
-func (i *Index) update(e *entry, entryIndex int) {
+func (i *Index) updateAtIndex(e *entry, entryIndex int) {
 	i.paths[entryIndex] = e.path
 	i.yamlRoots[entryIndex] = e.yamlRoot
 	i.cfgs[entryIndex] = *e.cfg
 	i.byID[e.id()] = entryIndex
 	i.byPackageName[e.Configuration().Package.Name] = entryIndex
 	i.byPath[e.Path()] = entryIndex
-}
-
-func (i *Index) getEntry(id string) Entry {
-	entryIndex := i.byID[id]
-	return i.entry(entryIndex)
 }
 
 func (i *Index) entry(idx int) Entry {

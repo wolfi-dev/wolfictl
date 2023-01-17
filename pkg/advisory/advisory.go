@@ -2,13 +2,15 @@ package advisory
 
 import (
 	"fmt"
+	"log"
 	"sort"
+	"time"
 
 	"chainguard.dev/melange/pkg/build"
-	"github.com/dprotaso/go-yit"
+	"chainguard.dev/vex/pkg/vex"
 	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	"gopkg.in/yaml.v3"
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 type CreateOptions struct {
@@ -29,36 +31,29 @@ type CreateOptions struct {
 // Create creates a new advisory in the `advisories` section of the configuration
 // at the provided path.
 func Create(options CreateOptions) error {
-	index := options.Index
 	path := options.Pathname
 
-	if count := index.Len(); count != 1 {
-		return fmt.Errorf("can only operate on 1 config, but was given %d configs", count)
+	selection := options.Index.Select().WhereFilePath(path)
+	if count := selection.Len(); count != 1 {
+		return fmt.Errorf("can only operate on 1 config, but found %d configs at file path %q", count, path)
 	}
 
-	config, err := index.Get(configs.ByPath(path))
-	if err != nil {
-		// this would be unexpected, since we just created the index for this path, and it succeeded
-		return fmt.Errorf("unable to find config for %q: %w", path, err)
-	}
-
-	vuln := options.Vuln
+	vulnID := options.Vuln
 	advisoryEntry := options.InitialAdvisoryEntry
 	if advisoryEntry == nil {
 		return errors.New("cannot use nil advisory entry")
 	}
 
-	updaterFunc := NewConfigUpdaterForAdvisories(index, func(advisories build.Advisories) (build.Advisories, error) {
-		if _, existsAlready := advisories[vuln]; existsAlready {
-			return build.Advisories{}, fmt.Errorf("advisory already exists for %s", vuln)
+	err := selection.UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+		advisories := cfg.Advisories
+		if _, existsAlready := advisories[vulnID]; existsAlready {
+			return build.Advisories{}, fmt.Errorf("advisory already exists for %s", vulnID)
 		}
 
-		advisories[vuln] = append(advisories[vuln], *advisoryEntry)
+		advisories[vulnID] = append(advisories[vulnID], *advisoryEntry)
 
 		return advisories, nil
 	})
-
-	err = index.Update(config, updaterFunc)
 	if err != nil {
 		return fmt.Errorf("unable to create advisories entry in %q: %w", path, err)
 	}
@@ -84,38 +79,31 @@ type UpdateOptions struct {
 // Update adds a new entry to an existing advisory (named by the vuln parameter)
 // in the configuration at the provided path.
 func Update(options UpdateOptions) error {
-	index := options.Index
 	path := options.Pathname
 
-	if count := index.Len(); count != 1 {
-		return fmt.Errorf("can only update 1 config, but have %d configs", count)
+	selection := options.Index.Select().WhereFilePath(path)
+	if count := selection.Len(); count != 1 {
+		return fmt.Errorf("can only update 1 config, but found %d configs at file path %q", count, path)
 	}
 
-	config, err := index.Get(configs.ByPath(path))
-	if err != nil {
-		// this would be unexpected, since we just created the index for this path, and it succeeded
-		return fmt.Errorf("unable to find config for %q: %w", path, err)
-	}
-
-	vuln := options.Vuln
+	vulnID := options.Vuln
 	advisoryEntry := options.NewAdvisoryEntry
 	if advisoryEntry == nil {
 		return errors.New("cannot use nil advisory entry")
 	}
 
-	updaterFunc := NewConfigUpdaterForAdvisories(index, func(advisories build.Advisories) (build.Advisories, error) {
-		if _, existsAlready := advisories[vuln]; !existsAlready {
-			return build.Advisories{}, fmt.Errorf("no advisory exists for %s", vuln)
+	err := selection.UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+		advisories := cfg.Advisories
+		if _, existsAlready := advisories[vulnID]; !existsAlready {
+			return build.Advisories{}, fmt.Errorf("no advisory exists for %s", vulnID)
 		}
 
-		advisories[vuln] = append(advisories[vuln], *advisoryEntry)
+		advisories[vulnID] = append(advisories[vulnID], *advisoryEntry)
 
 		return advisories, nil
 	})
-
-	err = index.Update(config, updaterFunc)
 	if err != nil {
-		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vuln, path, err)
+		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vulnID, path, err)
 	}
 
 	return nil
@@ -140,89 +128,63 @@ func Latest(entries []build.AdvisoryContent) *build.AdvisoryContent {
 	return &latestEntry
 }
 
-func NewConfigUpdaterForAdvisories(i *configs.Index, transform func(build.Advisories) (build.Advisories, error)) configs.UpdateFunc {
-	return i.NewUpdater(func(node *yaml.Node) error {
-		advNode, err := yamlNodeForAdvisories(node)
-		if err != nil {
-			return err
-		}
+type DiscoverOptions struct {
+	// The Index of package configs on which to operate.
+	Index *configs.Index
 
-		advisories := build.Advisories{}
-		err = advNode.Decode(&advisories)
-		if err != nil {
-			return err
-		}
-
-		updatedAdvisories, err := transform(advisories)
-		if err != nil {
-			return err
-		}
-
-		err = advNode.Encode(updatedAdvisories)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
+	// VulnerabilitySearcher is how Discover searches for vulnerabilities to match to
+	// packages.
+	VulnerabilitySearcher vuln.Searcher
 }
 
-func NewConfigUpdaterForSecfixes(i *configs.Index, transform func(secfixes build.Secfixes) (build.Secfixes, error)) configs.UpdateFunc {
-	return i.NewUpdater(func(node *yaml.Node) error {
-		sfNode, err := yamlNodeForSecfixes(node)
-		if err != nil {
-			return err
-		}
-
-		secfixes := build.Secfixes{}
-		err = sfNode.Decode(&secfixes)
-		if err != nil {
-			return err
-		}
-
-		updatedSecfixes, err := transform(secfixes)
-		if err != nil {
-			return err
-		}
-
-		err = sfNode.Encode(updatedSecfixes)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-}
-
-// yamlNodeForAdvisories locates and returns the yaml.Node within the provided
-// AST for the `advisories` section, if one exists; otherwise, it creates the
-// section, and returns a usable reference to the newly created section.
-func yamlNodeForAdvisories(root *yaml.Node) (*yaml.Node, error) {
-	const key = "advisories"
-	return yamlNodeForKey(root, key)
-}
-
-// yamlNodeForSecfixes locates and returns the yaml.Node within the provided
-// AST for the `secfixes` section, if one exists; otherwise, it creates the
-// section, and returns a usable reference to the newly created section.
-func yamlNodeForSecfixes(root *yaml.Node) (*yaml.Node, error) {
-	const key = "secfixes"
-	return yamlNodeForKey(root, key)
-}
-
-func yamlNodeForKey(root *yaml.Node, key string) (*yaml.Node, error) {
-	rootMap := root.Content[0]
-
-	iter := yit.FromNode(rootMap).ValuesForMap(yit.WithValue(key), yit.All)
-	advNode, ok := iter()
-	if ok {
-		return advNode, nil
+// Discover searches for new vulnerabilities that match packages in a config
+// index, and adds new advisories to configs for vulnerabilities that haven't
+// been noted yet.
+func Discover(options DiscoverOptions) error {
+	matches, err := options.VulnerabilitySearcher.AllVulnerabilities()
+	if err != nil {
+		return fmt.Errorf("unable to discover advisories: %w", err)
 	}
 
-	mapKey := &yaml.Node{Value: key, Tag: "!!str", Kind: yaml.ScalarNode}
-	rootMap.Content = append(rootMap.Content, mapKey)
-	mapValue := &yaml.Node{Tag: "!!map", Kind: yaml.MappingNode}
-	rootMap.Content = append(rootMap.Content, mapValue)
+	err = options.Index.Select().UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+		matchesForPackage := matches[cfg.Package.Name]
+		if len(matchesForPackage) == 0 {
+			// nothing to update for this package
+			return build.Advisories{}, configs.ErrSkip
+		}
 
-	return mapValue, nil
+		//nolint:gocritic // rangeValCopy rule not worth it here
+		for _, m := range matchesForPackage {
+			if !m.CPE.VersionRange.Includes(cfg.Package.Version) {
+				continue
+			}
+
+			vulnID := m.Vulnerability.ID
+			_, exists := cfg.Advisories[vulnID]
+
+			if exists {
+				// TODO: Should we allow for updating existing advisories if previously read vuln
+				// data has been updated?
+				log.Printf("skipping advisory creation for %s in %q: advisory already exists", vulnID, cfg.Package.Name)
+				continue
+			}
+
+			log.Printf("found new potential vulnerability for package %q: %s", cfg.Package.Name, vulnID)
+
+			ts := time.Now()
+			ac := build.AdvisoryContent{
+				Timestamp: ts,
+				Status:    vex.StatusUnderInvestigation,
+				// TODO: Note the reported affected version range.
+			}
+			cfg.Advisories[vulnID] = append(cfg.Advisories[vulnID], ac)
+		}
+
+		return cfg.Advisories, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
