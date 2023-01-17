@@ -8,7 +8,10 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/vuln/sftracker"
 )
 
+const defaultSecfixesTrackerHostname = "secfixes-tracker-nd2dq3gc7a-uk.a.run.app"
+
 func AdvisoryDiscover() *cobra.Command {
+	p := &discoverParams{}
 	cmd := &cobra.Command{
 		Use:           "discover",
 		Short:         "search for new potential vulnerabilities and create advisories for them",
@@ -20,7 +23,7 @@ func AdvisoryDiscover() *cobra.Command {
 			}
 
 			secfixesTracker := sftracker.New(
-				"secfixes-tracker-nd2dq3gc7a-uk.a.run.app",
+				p.secfixesTrackerHostname,
 				http.DefaultClient,
 			)
 
@@ -36,5 +39,14 @@ func AdvisoryDiscover() *cobra.Command {
 		},
 	}
 
+	p.addFlagsTo(cmd)
 	return cmd
+}
+
+type discoverParams struct {
+	secfixesTrackerHostname string
+}
+
+func (p *discoverParams) addFlagsTo(cmd *cobra.Command) {
+	cmd.Flags().StringVar(&p.secfixesTrackerHostname, "host", defaultSecfixesTrackerHostname, "hostname for secfixes-tracker")
 }
