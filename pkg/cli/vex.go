@@ -30,7 +30,7 @@ There are currently two VEX subcommands:
  wolfictl vex sbom: Generates a VEX document by reading an image SBOM
 
 For more information please see the help sections if these subcommands. To know
-more about the VEX tooling powering wolfictl see: https://github.com/chainguard-dev/vex
+more about the VEX tooling powering wolfictl see: https://openvex.dev/
 
 
 `,

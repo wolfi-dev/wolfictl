@@ -3,19 +3,22 @@ module github.com/wolfi-dev/wolfictl
 go 1.19
 
 require (
-	chainguard.dev/apko v0.6.0
-	chainguard.dev/melange v0.2.1-0.20221231013029-bd4e1298b6f4
-	chainguard.dev/vex v0.0.3-0.20230106020947-653216b81784
+	chainguard.dev/apko v0.6.1-0.20230112190132-a65677fe7e84
+	chainguard.dev/melange v0.2.1-0.20230117233119-f388539c0c1f
+	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/go-git/go-billy/v5 v5.4.0
-	github.com/go-git/go-git/v5 v5.5.1
+	github.com/go-git/go-git/v5 v5.5.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-containerregistry v0.12.1
 	github.com/google/go-github/v48 v48.1.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
+	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
+	github.com/openvex/go-vex v0.1.1-0.20230117203711-211394f7f8dd
+	github.com/openvex/vexctl v0.1.1-0.20230118001924-769ba3f0c638
 	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a
 	github.com/pkg/errors v0.9.1
 	github.com/shurcooL/githubv4 v0.0.0-20221203213311-70889c5dac07
@@ -84,7 +87,6 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
-	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467 // indirect
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20221129204813-6a4d6ed5d396 // indirect
 	github.com/clbanning/mxj/v2 v2.5.7 // indirect
 	github.com/cloudflare/circl v1.3.1 // indirect
@@ -153,7 +155,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.14 // indirect
-	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f // indirect
 	github.com/korovkin/limiter v0.0.0-20221015170604-22eb1ceceddc // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/letsencrypt/boulder v0.0.0-20230105221423-8d43397d1a9d // indirect
@@ -172,6 +173,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/openvex/vex v0.1.1-0.20230117021350-78649647b8fb // indirect
 	github.com/owenrumney/go-sarif v1.1.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect

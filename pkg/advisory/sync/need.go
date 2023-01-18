@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
-	"chainguard.dev/vex/pkg/vex"
+	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"golang.org/x/exp/slices"
