@@ -60,8 +60,12 @@ func TestFromPackageConfiguration(t *testing.T) {
 
 	expected := &vex.VEX{
 		Metadata: vex.Metadata{
-			ID:        "vex-3702f2c3962eb7e8f8dedda72621ebf9116087a824a5aad31507d95e2cb54a88",
-			Timestamp: timePointer(defaultTimestamp),
+			Context:    vex.Context,
+			ID:         "vex-3702f2c3962eb7e8f8dedda72621ebf9116087a824a5aad31507d95e2cb54a88",
+			Author:     vex.DefaultAuthor,
+			AuthorRole: vex.DefaultRole,
+			Version:    "1",
+			Timestamp:  timePointer(defaultTimestamp),
 		},
 		Statements: []vex.Statement{
 			{
