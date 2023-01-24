@@ -75,3 +75,9 @@ func equal(a, b []int) bool {
 	}
 	return true
 }
+
+// NewVersion some older versions in wolfi contain an underscore to separate pre-release
+func NewVersion(v string) (*version.Version, error) {
+	v = strings.ReplaceAll(v, "_", "")
+	return version.NewVersion(v)
+}
