@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"chainguard.dev/melange/pkg/build"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -29,6 +28,7 @@ import (
 
 type Options struct {
 	PackageNames           []string
+	PackageConfigs         map[string]melange.Packages
 	PullRequestBaseBranch  string
 	PullRequestTitle       string
 	RepoURI                string
@@ -107,7 +107,7 @@ func (o *Options) Update() error {
 	}
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
-	packageConfigs, err := o.readPackageConfigs(tempDir)
+	o.PackageConfigs, err = melange.ReadPackageConfigs(o.PackageNames, tempDir)
 	if err != nil {
 		return fmt.Errorf("failed to get package configs: %w", err)
 	}
@@ -120,7 +120,7 @@ func (o *Options) Update() error {
 
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-		g := NewGitHubReleaseOptions(mapperData, packageConfigs, o.GitGraphQLClient)
+		g := NewGitHubReleaseOptions(mapperData, o.PackageConfigs, o.GitGraphQLClient)
 		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
 		if err != nil {
 			return fmt.Errorf("failed getting github releases: %w", err)
@@ -135,7 +135,7 @@ func (o *Options) Update() error {
 			GitHubHTTPClient: o.GitHubHTTPClient,
 			Logger:           o.Logger,
 		}
-		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, packageConfigs)
+		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, o.PackageConfigs)
 		if err != nil {
 			return fmt.Errorf("failed release monitor versions: %w", err)
 		}
@@ -188,10 +188,19 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			}
 		}
 
-		configFile := filepath.Join(tempDir, packageName+".yaml")
+		// get the filename from the map of melange configs we loaded at the start
+		config, ok := o.PackageConfigs[packageName]
+		if !ok {
+			return errorMessages, fmt.Errorf("no melange config found for package %s", packageName)
+		}
+
+		configFile := filepath.Join(tempDir, config.Filename)
+		if configFile == "" {
+			return errorMessages, fmt.Errorf("no config filename found for package %s", packageName)
+		}
 
 		// if new versions are available lets bump the packages in the target melange git repo
-		err := melange.Bump(configFile, latestVersion)
+		err = melange.Bump(configFile, latestVersion)
 		if err != nil {
 			// add this to the list of messages to print at the end of the update
 			errorMessages = append(errorMessages, fmt.Sprintf(
@@ -206,7 +215,8 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return errorMessages, fmt.Errorf("failed to get git worktree: %w", err)
 		}
 
-		_, err = worktree.Add(packageName + ".yaml")
+		// this needs to be the relative path set when reading the files initially
+		_, err = worktree.Add(config.Filename)
 		if err != nil {
 			return errorMessages, fmt.Errorf("failed to git add %s: %w", configFile, err)
 		}
@@ -313,35 +323,6 @@ func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, er
 	}
 
 	return ref, err
-}
-
-// read the melange package config(s) from the target git repository so we can check if new versions exist
-func (o *Options) readPackageConfigs(tempDir string) (map[string]build.Configuration, error) {
-	var err error
-	packageConfigs := make(map[string]build.Configuration)
-
-	// if package names were passed as CLI parameters load those packages
-	if len(o.PackageNames) > 0 {
-		// get package by name
-		for _, packageName := range o.PackageNames {
-			filename := filepath.Join(tempDir, packageName+".yaml")
-
-			config, err := melange.ReadMelangeConfig(filename)
-			if err != nil {
-				return packageConfigs, fmt.Errorf("failed to read package config %s: %w", filename, err)
-			}
-
-			packageConfigs[config.Package.Name] = config
-		}
-	} else {
-		// get all packages in the provided git repo
-		packageConfigs, err = melange.ReadAllPackagesFromRepo(tempDir)
-		if err != nil {
-			return packageConfigs, fmt.Errorf("failed to read package configs from repo %s: %w", o.RepoURI, err)
-		}
-	}
-
-	return packageConfigs, nil
 }
 
 // commits package update changes and creates a pull request

@@ -73,7 +73,7 @@ func (l *Linter) Lint() (Result, error) {
 			}
 
 			// Evaluate the rule.
-			if err := rule.LintFunc(filesToLint[name]); err != nil {
+			if err := rule.LintFunc(filesToLint[name].Config); err != nil {
 				msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity)
 				if l.options.Verbose {
 					msg += fmt.Sprintf(" - (%s)", rule.Description)

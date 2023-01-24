@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
+
 	"chainguard.dev/melange/pkg/build"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -68,6 +70,9 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 		Logger:        log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 		DefaultBranch: "master",
 	}
+
+	o.PackageConfigs, err = melange.ReadAllPackagesFromRepo(filepath.Join(dir, "melange"))
+	assert.NoError(t, err)
 
 	// fake a new version available
 	newVersion := map[string]string{"cheese": "1.5.10"}

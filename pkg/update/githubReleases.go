@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"chainguard.dev/melange/pkg/build"
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
 
 	"golang.org/x/exp/maps"
 
@@ -50,7 +50,7 @@ type Search struct {
 	} `json:"Edges"`
 }
 
-func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]build.Configuration, client *githubv4.Client) GitHubReleaseOptions {
+func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melange.Packages, client *githubv4.Client) GitHubReleaseOptions {
 	options := GitHubReleaseOptions{
 		MapperData:       mapperData,
 		GitGraphQLClient: client,
@@ -71,7 +71,7 @@ type GitHubReleaseOptions struct {
 	Logger           *log.Logger
 	MapperData       map[string]Row
 	StripPrefix      map[string]string
-	PackageConfigs   map[string]build.Configuration
+	PackageConfigs   map[string]melange.Packages
 }
 
 func (o GitHubReleaseOptions) getLatestGitHubVersions() (results map[string]string, errorMessages []string, err error) {
@@ -167,12 +167,12 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[st
 			// related melange package config
 			packageName := string(edge.Node.Repository.Name)
 			melangePackageConfig := o.PackageConfigs[packageName]
-			if melangePackageConfig.Package.Version != "" {
-				currentVersionSemver, err := version.NewVersion(melangePackageConfig.Package.Version)
+			if melangePackageConfig.Config.Package.Version != "" {
+				currentVersionSemver, err := version.NewVersion(melangePackageConfig.Config.Package.Version)
 				if err != nil {
 					errorMessages = append(errorMessages, fmt.Sprintf(
 						"failed to create a version from package %s: %s.  Error: %s",
-						melangePackageConfig.Package.Name, melangePackageConfig.Package.Version, err,
+						melangePackageConfig.Config.Package.Name, melangePackageConfig.Config.Package.Version, err,
 					))
 					continue
 				}
@@ -180,7 +180,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[st
 				if currentVersionSemver.LessThan(latestVersionSemver) {
 					o.Logger.Printf(
 						"there is a new stable version available %s, current wolfi version %s, new %s",
-						packageName, melangePackageConfig.Package.Version, latestVersion,
+						packageName, melangePackageConfig.Config.Package.Version, latestVersion,
 					)
 					results[string(edge.Node.Repository.Name)] = latestVersion
 				}

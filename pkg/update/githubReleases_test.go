@@ -10,6 +10,8 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,18 +27,16 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	parsedMapperData, err := o.parseData(string(mapperData))
 	assert.NoError(t, err)
 
-	packageConfigs := make(map[string]build.Configuration)
-	packageConfigs["jenkins"] = build.Configuration{
-		Package: build.Package{
-			Name:    "jenkins",
-			Version: "2.370",
+	packageConfigs := make(map[string]melange.Packages)
+	packageConfigs["jenkins"] = melange.Packages{
+		Config: build.Configuration{
+			Package: build.Package{Name: "jenkins", Version: "2.370"},
 		},
 	}
 
-	packageConfigs["cosign"] = build.Configuration{
-		Package: build.Package{
-			Name:    "cosign",
-			Version: "1.10.1",
+	packageConfigs["cosign"] = melange.Packages{
+		Config: build.Configuration{
+			Package: build.Package{Name: "cosign", Version: "1.10.1"},
 		},
 	}
 
