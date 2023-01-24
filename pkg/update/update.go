@@ -3,6 +3,9 @@ package update
 import (
 	"bufio"
 	"context"
+
+	"github.com/pkg/errors"
+
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -29,6 +34,7 @@ import (
 type Options struct {
 	PackageNames           []string
 	PackageConfigs         map[string]melange.Packages
+	MapperData             map[string]Row
 	PullRequestBaseBranch  string
 	PullRequestTitle       string
 	RepoURI                string
@@ -113,14 +119,14 @@ func (o *Options) Update() error {
 	}
 
 	// second, get package mapping data that we use to lookup if new versions exist
-	mapperData, err := o.getMonitorServiceData()
+	o.MapperData, err = o.getMonitorServiceData()
 	if err != nil {
 		return fmt.Errorf("failed getting release monitor service mapping data: %w", err)
 	}
 
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-		g := NewGitHubReleaseOptions(mapperData, o.PackageConfigs, o.GitGraphQLClient)
+		g := NewGitHubReleaseOptions(o.MapperData, o.PackageConfigs, o.GitGraphQLClient)
 		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
 		if err != nil {
 			return fmt.Errorf("failed getting github releases: %w", err)
@@ -135,7 +141,7 @@ func (o *Options) Update() error {
 			GitHubHTTPClient: o.GitHubHTTPClient,
 			Logger:           o.Logger,
 		}
-		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, o.PackageConfigs)
+		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(o.MapperData, o.PackageConfigs)
 		if err != nil {
 			return fmt.Errorf("failed release monitor versions: %w", err)
 		}
@@ -227,6 +233,18 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
 		}
 
+		// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
+		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
+		if err != nil {
+			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
+		}
+
+		// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
+		err = o.updateGitModules(tempDir, packageName, latestVersion, worktree)
+		if err != nil {
+			return errorMessages, fmt.Errorf("failed to update git modules: %w", err)
+		}
+
 		// if we're not running in batch mode, lets commit and PR each change
 		if !o.Batch && !o.DryRun {
 			pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
@@ -287,6 +305,48 @@ func (o *Options) updateMakefile(tempDir, packageName, latestVersion string, wor
 
 	if _, err = worktree.Add("Makefile"); err != nil {
 		return fmt.Errorf("failed to git add Makefile: %w", err)
+	}
+	return nil
+}
+
+// some melange config repos use submodules to pull in git repositories into the source dir before the melange pipelines run
+// this function is a noop if no git submodules exist
+func (o *Options) updateGitModules(dir string, packageName string, version string, wt *git.Worktree) error {
+
+	// if no gitmodules file exist this in a noop
+	if _, err := os.Stat(".gitmodules"); errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+
+	mapingData, ok := o.MapperData[packageName]
+	if !ok {
+		o.Logger.Printf("no mapping data found for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	if mapingData.Identifier == "" {
+		o.Logger.Printf("no identifier found in mapping data for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	if mapingData.ServiceName != "GITHUB" {
+		o.Logger.Printf("package %s  is not a github repo in mapping data, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	parts := strings.Split(mapingData.Identifier, "/")
+	if len(parts) != 0 {
+		o.Logger.Printf("identifier doesn't look like a github owner/repo in mapping data for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	err := submodules.Update(dir, parts[0], parts[1], version, wt)
+	if err != nil {
+		return errors.Wrapf(err, "failed to update gitmodules file")
+	}
+
+	if _, err = wt.Add(".gitmodules"); err != nil {
+		return fmt.Errorf("failed to git add .gitmodules: %w", err)
 	}
 	return nil
 }
