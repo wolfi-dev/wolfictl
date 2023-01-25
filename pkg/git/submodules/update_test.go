@@ -10,17 +10,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSubmodules_update(t *testing.T) {
+func TestSubmodules_updateConfigFile(t *testing.T) {
 
 	dir := t.TempDir()
 
-	data, err := os.ReadFile(filepath.Join("testdata", ".gitmodules"))
+	data, err := os.ReadFile(filepath.Join("testdata", "multiple_submodules", ".gitmodules"))
 	assert.NoError(t, err)
 
 	err = os.WriteFile(filepath.Join(dir, ".gitmodules"), data, 0666)
 	assert.NoError(t, err)
 
-	_, err = updateConfigfile(dir, "foo", "bar", "v1.2.4")
+	_, err = updateConfigFile(dir, "foo", "bar", "v1.2.4")
 	assert.NoError(t, err)
 
 	data, err = os.ReadFile(filepath.Join(dir, ".gitmodules"))

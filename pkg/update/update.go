@@ -104,10 +104,19 @@ func (o *Options) Update() error {
 		defer os.Remove(tempDir)
 	}
 
-	repo, err := git.PlainClone(tempDir, false, &git.CloneOptions{
+	cloneOpts := &git.CloneOptions{
 		URL:      o.RepoURI,
 		Progress: os.Stdout,
-	})
+	}
+	gitToken := os.Getenv("GITHUB_TOKEN")
+	if gitToken != "" {
+		cloneOpts.Auth = &gitHttp.BasicAuth{
+			Username: "abc123",
+			Password: gitToken,
+		}
+	}
+
+	repo, err := git.PlainClone(tempDir, false, cloneOpts)
 	if err != nil {
 		return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
 	}

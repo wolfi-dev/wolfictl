@@ -15,7 +15,7 @@ import (
 func Update(dir, owner, repo, version string, wt *git.Worktree) error {
 
 	// update the .gitmodule config file
-	submodules, err := updateConfigfile(dir, owner, repo, version)
+	submodules, err := updateConfigFile(dir, owner, repo, version)
 	if err != nil {
 		return errors.Wrap(err, "failed to update gitmodules file")
 	}
@@ -30,7 +30,7 @@ func Update(dir, owner, repo, version string, wt *git.Worktree) error {
 	return nil
 }
 
-func updateConfigfile(dir, owner, repo, version string) ([]string, error) {
+func updateConfigFile(dir, owner, repo, version string) ([]string, error) {
 	var submodules []string
 	filename := filepath.Join(dir, ".gitmodules")
 	data, err := os.ReadFile(filename)
