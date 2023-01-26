@@ -10,12 +10,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/wolfi-dev/wolfictl/pkg/melange"
-
-	"golang.org/x/exp/maps"
-
 	"github.com/hashicorp/go-version"
+
 	"github.com/shurcooL/githubv4"
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
+	"golang.org/x/exp/maps"
 )
 
 const (
@@ -27,27 +26,77 @@ const (
 	numberOfReleasesToReturn = 10
 )
 
+/*
+
+The graphql query used is the equivalent contained in this comment, which can be tested using GitHub's graphql explorer
+https://docs.github.com/en/graphql/overview/explorer
+
+__NOTE__ if using the explorer to generate responses to extend unit tests, you will need to strip off
+
+searxh
+{
+  "data": {
+    "search": {
+      "repositoryCount": #,
+      "nodes": [
+
+
+Query https://docs.github.com/en/graphql/overview/explorer
+
+{
+  search(type: REPOSITORY, query: "repo:jenkinsci/jenkins repo:sigstore/cosign", first: 100) {
+    repositoryCount
+    nodes
+
+      ... on Repository  {
+        owner {
+          login
+        }
+        name
+        nameWithOwner
+        releases(first: 40) {
+          totalCount
+          nodes {
+            tag {
+              name
+            }
+            name
+            isPrerelease
+            isDraft
+            isLatest
+          }
+        }
+      }
+    }
+  }
+}
+*/
+
 type Search struct {
-	RepositoryCount githubv4.Int
-	Edges           []struct {
-		Node struct {
-			Repository struct {
-				Releases struct {
-					TotalCount  githubv4.Int
-					ReleaseEdge []struct {
-						Release struct {
-							Name         githubv4.String
-							IsPrerelease githubv4.Boolean
-							IsDraft      githubv4.Boolean
-							IsLatest     githubv4.Boolean
-						} `graphql:"node"`
-					} `graphql:"edges"`
-				} `graphql:"releases(first: $first)"`
-				Name          githubv4.String
-				NameWithOwner githubv4.String
-			} `graphql:"... on Repository"`
-		}
-	} `json:"Edges"`
+	RepositoryCount githubv4.Int `graphql:"repositoryCount"`
+	Nodes           []struct {
+		Repository Repository `graphql:"... on Repository"`
+	}
+}
+
+type Repository struct {
+	Owner struct {
+		Login githubv4.String `graphql:"login"`
+	} `json:"Owner"`
+	Name          githubv4.String `graphql:"name"`
+	NameWithOwner githubv4.String `graphql:"nameWithOwner"`
+	Releases      struct {
+		TotalCount githubv4.Int `graphql:"totalCount"`
+		Nodes      []struct {
+			Tag struct {
+				Name githubv4.String `graphql:"name"`
+			} `json:"Tag"`
+			Name         githubv4.String  `graphql:"name"`
+			IsPrerelease githubv4.Boolean `graphql:"isPrerelease"`
+			IsDraft      githubv4.Boolean `graphql:"isDraft"`
+			IsLatest     githubv4.Boolean `graphql:"isLatest"`
+		} `graphql:"nodes"`
+	} `graphql:"releases(first: $first)"`
 }
 
 func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melange.Packages, client *githubv4.Client) GitHubReleaseOptions {
@@ -55,13 +104,13 @@ func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melan
 		MapperData:       mapperData,
 		GitGraphQLClient: client,
 		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
-		StripPrefix:      make(map[string]string),
+		PackageConfigIDs: make(map[string]string),
 		PackageConfigs:   configs,
 	}
 
 	// maintain a different map, key'd by mapper data identifier for easy lookup
 	for _, row := range mapperData {
-		options.StripPrefix[row.Identifier] = row.StripPrefixChar
+		options.PackageConfigIDs[row.Identifier] = row.StripPrefixChar
 	}
 	return options
 }
@@ -70,7 +119,7 @@ type GitHubReleaseOptions struct {
 	GitGraphQLClient *githubv4.Client
 	Logger           *log.Logger
 	MapperData       map[string]Row
-	StripPrefix      map[string]string
+	PackageConfigIDs map[string]string
 	PackageConfigs   map[string]melange.Packages
 }
 
@@ -97,7 +146,13 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (results map[string]stri
 			return nil, nil, err
 		}
 
-		r, e, err := o.parseGitHubReleases(q.Search)
+		repos := make([]Repository, len(q.Search.Nodes))
+
+		for i, v := range q.Search.Nodes {
+			repos[i] = v.Repository
+		}
+
+		r, e, err := o.parseGitHubReleases(repos)
 		if err != nil {
 			printJSON(q)
 			return nil, nil, fmt.Errorf("failed to parse github releases: %w", err)
@@ -112,22 +167,35 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (results map[string]stri
 }
 
 //nolint:unparam // Is this waiting for better error handling?
-func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[string]string, errorMessages []string, err error) {
+func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results map[string]string, errorMessages []string, err error) {
 	results = make(map[string]string)
-	for _, edge := range search.Edges {
-		releases := edge.Node.Repository.Releases
+	for _, node := range repos {
+		releases := node.Releases
 		var versions []*version.Version
 
 		// keep a map of original versions retrieved from github with a semver as the key so we can easily look it up after sorting
 		originalVersions := make(map[*version.Version]string)
-		for _, release := range releases.ReleaseEdge {
-			if release.Release.IsDraft {
+		for _, release := range releases.Nodes {
+			if release.IsDraft {
 				continue
 			}
-			if release.Release.IsPrerelease {
+			if release.IsPrerelease {
 				continue
 			}
-			releaseVersion := string(release.Release.Name)
+
+			// first get teh version from the release name but fall back to using the tag
+			releaseVersion := string(release.Name)
+			if releaseVersion == "" {
+				o.Logger.Printf("GitHub %s no release name found, falling back to release tag", node.Name)
+				releaseVersion = string(release.Tag.Name)
+				if releaseVersion == "" {
+					errorMessages = append(errorMessages, fmt.Sprintf(
+						"no release name or tag found for release %s",
+						node.Name,
+					))
+					continue
+				}
+			}
 
 			// strip any prefix chars using mapper data
 			// the fastest way to check is to lookup git repo name in the map
@@ -135,7 +203,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[st
 			// the same if the identifiers don't match fall back to iterating
 			// through all map data to match using identifier
 
-			stripPrefix := o.StripPrefix[string(edge.Node.Repository.NameWithOwner)]
+			stripPrefix := o.PackageConfigIDs[string(node.NameWithOwner)]
 			if stripPrefix != "" {
 				releaseVersion = strings.TrimPrefix(releaseVersion, stripPrefix)
 			}
@@ -144,7 +212,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[st
 			if err != nil {
 				errorMessages = append(errorMessages, fmt.Sprintf(
 					"failed to create a version from package %s: %s.  Error: %s",
-					edge.Node.Repository.NameWithOwner, releaseVersion, err,
+					node.NameWithOwner, releaseVersion, err,
 				))
 				continue
 			}
@@ -165,8 +233,15 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[st
 
 			// compare if this version is newer than the version we have in our
 			// related melange package config
-			packageName := string(edge.Node.Repository.Name)
-			melangePackageConfig := o.PackageConfigs[packageName]
+			packageName := string(node.Name)
+			melangePackageConfig, ok := o.PackageConfigs[packageName]
+			if !ok {
+				errorMessages = append(errorMessages, fmt.Sprintf(
+					"failed to find %s in package configs",
+					packageName,
+				))
+				continue
+			}
 			if melangePackageConfig.Config.Package.Version != "" {
 				currentVersionSemver, err := version.NewVersion(melangePackageConfig.Config.Package.Version)
 				if err != nil {
@@ -176,13 +251,13 @@ func (o GitHubReleaseOptions) parseGitHubReleases(search Search) (results map[st
 					))
 					continue
 				}
-
+				o.Logger.Printf("is %s less than %s", currentVersionSemver.String(), latestVersionSemver.String())
 				if currentVersionSemver.LessThan(latestVersionSemver) {
 					o.Logger.Printf(
 						"there is a new stable version available %s, current wolfi version %s, new %s",
 						packageName, melangePackageConfig.Config.Package.Version, latestVersion,
 					)
-					results[string(edge.Node.Repository.Name)] = latestVersion
+					results[string(node.Name)] = latestVersion
 				}
 			}
 		}

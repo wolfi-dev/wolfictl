@@ -10,7 +10,7 @@ import (
 )
 
 func TestMapper_parseData(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("testdata", "release_mapper_data.txt"))
+	data, err := os.ReadFile(filepath.Join("testdata", "mapper", "release_mapper_data.txt"))
 	assert.NoError(t, err)
 
 	o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
