@@ -19,6 +19,39 @@ type bumpOptions struct {
 	dryRun  bool
 }
 
+// this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
+// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
+func updateMakefile(repoDir, packageName, latestVersion string, epoch uint64) error {
+	file, err := os.Open(filepath.Join(repoDir, "Makefile"))
+	if err != nil {
+		// if the Makefile doesn't exist anymore let's just return
+		return nil
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var newFile []byte
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, fmt.Sprintf("$(eval $(call build-package,%s,", packageName)) {
+			line = fmt.Sprintf("$(eval $(call build-package,%s,%s-r%d))", packageName, latestVersion, epoch)
+		}
+		newFile = append(newFile, []byte(line+"\n")...)
+	}
+
+	info, err := os.Stat(filepath.Join(repoDir, "Makefile"))
+	if err != nil {
+		return fmt.Errorf("failed to check file permissions of the Makefile: %w", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(repoDir, "Makefile"), newFile, info.Mode()); err != nil {
+		return fmt.Errorf("failed to write Makefile: %w", err)
+	}
+
+	return nil
+}
+
 func Bump() *cobra.Command {
 	opts := bumpOptions{}
 	cmd := &cobra.Command{
@@ -137,5 +170,10 @@ func bumpEpoch(opts bumpOptions, path string) error {
 	); err != nil {
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
+
+	if err := updateMakefile(opts.repoDir, cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch+1); err != nil {
+		return fmt.Errorf("updating makefile: %w", err)
+	}
+
 	return nil
 }
