@@ -6,7 +6,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
+
+	"github.com/hashicorp/go-version"
 
 	"chainguard.dev/melange/pkg/build"
 
@@ -96,4 +99,51 @@ func TestGitHubReleases_GetRepoList(t *testing.T) {
 	assert.Equal(t, 4, len(rs))
 	assert.Equal(t, len(rs[0]), 100)
 	assert.Equal(t, len(rs[3]), 50)
+}
+
+func TestGitHubReleases_SortVersions(t *testing.T) {
+	baseVersions := []string{"1.2.3", "1.1.1", "2.3.4", "0.1.3"}
+
+	tests := []struct {
+		name                  string
+		baseVersions          []string
+		testVersions          []string
+		expectedLatestVersion string
+	}{
+		{
+			name:                  "simple",
+			baseVersions:          baseVersions,
+			testVersions:          []string{"4.0.1"},
+			expectedLatestVersion: "4.0.1",
+		},
+		{
+			name:                  "fork",
+			baseVersions:          baseVersions,
+			testVersions:          []string{"4.0.1ab2", "4.0.1ab3", "4.0.1ab1"},
+			expectedLatestVersion: "4.0.1ab3",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var versions []*version.Version
+
+			// add test versions to the list first
+			for _, v := range test.testVersions {
+				semver, err := version.NewVersion(v)
+				assert.NoError(t, err)
+				versions = append(versions, semver)
+			}
+
+			// next add base versions
+			for _, v := range test.baseVersions {
+				semver, err := version.NewVersion(v)
+				assert.NoError(t, err)
+				versions = append(versions, semver)
+			}
+
+			sort.Sort(VersionsByLatest(versions))
+
+			assert.Equal(t, test.expectedLatestVersion, versions[len(versions)-1].Original())
+		})
+	}
 }

@@ -33,13 +33,18 @@ https://docs.github.com/en/graphql/overview/explorer
 
 __NOTE__ if using the explorer to generate responses to extend unit tests, you will need to strip off
 
-searxh
+search
 {
   "data": {
     "search": {
       "repositoryCount": #,
-      "nodes": [
+      "nodes":
 
+		...
+
+       }
+    }
+}
 
 Query https://docs.github.com/en/graphql/overview/explorer
 
@@ -174,7 +179,6 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 		var versions []*version.Version
 
 		// keep a map of original versions retrieved from github with a semver as the key so we can easily look it up after sorting
-		originalVersions := make(map[*version.Version]string)
 		for _, release := range releases.Nodes {
 			if release.IsDraft {
 				continue
@@ -183,7 +187,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 				continue
 			}
 
-			// first get teh version from the release name but fall back to using the tag
+			// first get the version from the release name but fall back to using the tag
 			releaseVersion := string(release.Name)
 			if releaseVersion == "" {
 				o.Logger.Printf("GitHub %s no release name found, falling back to release tag", node.Name)
@@ -202,7 +206,6 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 			// data, but there's no guarantee the repo name and map data key are
 			// the same if the identifiers don't match fall back to iterating
 			// through all map data to match using identifier
-
 			stripPrefix := o.PackageConfigIDs[string(node.NameWithOwner)]
 			if stripPrefix != "" {
 				releaseVersion = strings.TrimPrefix(releaseVersion, stripPrefix)
@@ -218,8 +221,6 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 			}
 
 			versions = append(versions, releaseVersionSemver)
-
-			originalVersions[releaseVersionSemver] = releaseVersion
 		}
 
 		// sort the versions to make sure we really do have the latest.
@@ -229,7 +230,6 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 			sort.Sort(VersionsByLatest(versions))
 
 			latestVersionSemver := versions[len(versions)-1]
-			latestVersion := originalVersions[latestVersionSemver]
 
 			// compare if this version is newer than the version we have in our
 			// related melange package config
@@ -255,9 +255,9 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 				if currentVersionSemver.LessThan(latestVersionSemver) {
 					o.Logger.Printf(
 						"there is a new stable version available %s, current wolfi version %s, new %s",
-						packageName, melangePackageConfig.Config.Package.Version, latestVersion,
+						packageName, melangePackageConfig.Config.Package.Version, latestVersionSemver.Original(),
 					)
-					results[string(node.Name)] = latestVersion
+					results[string(node.Name)] = latestVersionSemver.Original()
 				}
 			}
 		}
