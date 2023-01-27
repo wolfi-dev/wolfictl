@@ -3,11 +3,6 @@ package update
 import (
 	"bufio"
 	"context"
-
-	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
-
-	"github.com/pkg/errors"
-
 	"fmt"
 	"log"
 	"net/http"
@@ -16,6 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
+
+	"github.com/pkg/errors"
 
 	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 
@@ -318,8 +317,7 @@ func (o *Options) updateMakefile(tempDir, packageName, latestVersion string, wor
 
 // some melange config repos use submodules to pull in git repositories into the source dir before the melange pipelines run
 // this function is a noop if no git submodules exist
-func (o *Options) updateGitModules(dir string, packageName string, version string, wt *git.Worktree) error {
-
+func (o *Options) updateGitModules(dir, packageName, version string, wt *git.Worktree) error {
 	// if no gitmodules file exist this in a noop
 	if _, err := os.Stat(".gitmodules"); errors.Is(err, os.ErrNotExist) {
 		return nil
@@ -348,7 +346,6 @@ func (o *Options) updateGitModules(dir string, packageName string, version strin
 	}
 
 	return submodules.Update(dir, parts[0], parts[1], version, wt)
-
 }
 
 // create a unique branch

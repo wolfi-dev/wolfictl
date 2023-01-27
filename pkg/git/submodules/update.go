@@ -17,7 +17,6 @@ import (
 
 // Update will modify a .gitmodules file and perform a `git submodule update --remote`
 func Update(dir, owner, repo, version string, wt *git.Worktree) error {
-
 	// update the .gitmodule config file
 	submodules, err := updateConfigFile(dir, owner, repo, version)
 	if err != nil {
@@ -30,12 +29,14 @@ func Update(dir, owner, repo, version string, wt *git.Worktree) error {
 
 	// git submodule update --remote
 	for _, submodule := range submodules {
-		err := updateSubmodules(submodule.Name, version, wt)
+		err := updateSubmodules(submodule.Name, wt)
 		if err != nil {
 			return errors.Wrapf(err, "failed to update gitmodules")
 		}
 
-		// need to fall back to using git CLI as go-git hasn't implemented adding submodules, errors with empty dir that are references to git shas
+		// need to fall back to using git CLI as go-git hasn't implemented adding submodules
+		// there are errors with empty dir that are references to git module shas when adding via go-git
+		//nolint:gosec
 		cmd := exec.Command("git", "add", submodule.Path)
 		cmd.Dir = dir
 		err = cmd.Run()
@@ -82,12 +83,11 @@ func updateConfigFile(dir, owner, repo, version string) (map[string]*config.Subm
 			return updatedSubmodules, err
 		}
 		return updatedSubmodules, os.WriteFile(filename, output, info.Mode())
-
 	}
 	return updatedSubmodules, err
 }
 
-func updateSubmodules(submodule, version string, wt *git.Worktree) error {
+func updateSubmodules(submodule string, wt *git.Worktree) error {
 	sub, err := wt.Submodule(submodule)
 	if err != nil {
 		return err

@@ -38,7 +38,6 @@ func (c ConfigCheck) isMelangeConfig() bool {
 
 // ReadPackageConfigs read the melange package config(s) from the target git repository so we can check if new versions exist
 func ReadPackageConfigs(packageNames []string, dir string) (map[string]Packages, error) {
-
 	p := make(map[string]Packages)
 
 	// if package names were passed as CLI parameters load those packages
@@ -55,13 +54,11 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]Packages,
 				Config:   config,
 				Filename: filename,
 			}
-			return p, nil
-
 		}
+		return p, nil
 	}
 	// get all packages in the provided git repo
 	return ReadAllPackagesFromRepo(dir)
-
 }
 
 func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
@@ -69,7 +66,6 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
-
 		if filepath.Ext(path) == ".yaml" {
 			fileList = append(fileList, path)
 		}

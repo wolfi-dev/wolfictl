@@ -11,13 +11,12 @@ import (
 )
 
 func TestSubmodules_updateConfigFile(t *testing.T) {
-
 	dir := t.TempDir()
 
 	data, err := os.ReadFile(filepath.Join("testdata", "multiple_submodules", ".gitmodules"))
 	assert.NoError(t, err)
 
-	err = os.WriteFile(filepath.Join(dir, ".gitmodules"), data, 0666)
+	err = os.WriteFile(filepath.Join(dir, ".gitmodules"), data, 0o600)
 	assert.NoError(t, err)
 
 	_, err = updateConfigFile(dir, "foo", "bar", "v1.2.4")
@@ -28,6 +27,7 @@ func TestSubmodules_updateConfigFile(t *testing.T) {
 
 	cfg := config.NewModules()
 	err = cfg.Unmarshal(data)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "v1.2.4", cfg.Submodules["images/cheese/mount/bar"].Branch)
 	assert.Equal(t, "v1.2.4", cfg.Submodules["images/wine/mount/bar"].Branch)

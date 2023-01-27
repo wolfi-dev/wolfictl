@@ -72,7 +72,6 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 			latestVersions, _, err := m.parseGitHubReleases(rel)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
-
 		})
 	}
 }
