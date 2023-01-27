@@ -15,4 +15,5 @@ runs:
         cd wolfictl-setup-gha
         make wolfictl
         mv wolfictl /home/runner/go/bin/
+        cd ..
         rm -rf wolfictl-setup-gha
