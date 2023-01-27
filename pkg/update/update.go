@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"context"
 
+	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
+
 	"github.com/pkg/errors"
 
 	"fmt"
@@ -19,7 +21,6 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/go-github/v48/github"
 	"github.com/google/uuid"
 	"github.com/shurcooL/githubv4"
@@ -105,15 +106,10 @@ func (o *Options) Update() error {
 	}
 
 	cloneOpts := &git.CloneOptions{
-		URL:      o.RepoURI,
-		Progress: os.Stdout,
-	}
-	gitToken := os.Getenv("GITHUB_TOKEN")
-	if gitToken != "" {
-		cloneOpts.Auth = &gitHttp.BasicAuth{
-			Username: "abc123",
-			Password: gitToken,
-		}
+		URL:               o.RepoURI,
+		Progress:          os.Stdout,
+		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		Auth:              wgit.GetGitAuth(),
 	}
 
 	repo, err := git.PlainClone(tempDir, false, cloneOpts)
@@ -242,14 +238,16 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
 		}
 
-		// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
-		if err != nil {
-			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
+		// if mapping data has a strip prefix, add it back in to the version for when updating git modules
+		latestVersionWithPrefix := latestVersion
+		mapping, ok := o.MapperData[packageName]
+		if ok {
+			if mapping.StripPrefixChar != "" {
+				latestVersionWithPrefix = mapping.StripPrefixChar + latestVersionWithPrefix
+			}
 		}
-
 		// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
-		err = o.updateGitModules(tempDir, packageName, latestVersion, worktree)
+		err = o.updateGitModules(tempDir, packageName, latestVersionWithPrefix, worktree)
 		if err != nil {
 			return errorMessages, fmt.Errorf("failed to update git modules: %w", err)
 		}
@@ -344,20 +342,13 @@ func (o *Options) updateGitModules(dir string, packageName string, version strin
 	}
 
 	parts := strings.Split(mapingData.Identifier, "/")
-	if len(parts) != 0 {
+	if len(parts) != 2 {
 		o.Logger.Printf("identifier doesn't look like a github owner/repo in mapping data for package %s, not attempting to bump gitmodules", packageName)
 		return nil
 	}
 
-	err := submodules.Update(dir, parts[0], parts[1], version, wt)
-	if err != nil {
-		return errors.Wrapf(err, "failed to update gitmodules file")
-	}
+	return submodules.Update(dir, parts[0], parts[1], version, wt)
 
-	if _, err = wt.Add(".gitmodules"); err != nil {
-		return fmt.Errorf("failed to git add .gitmodules: %w", err)
-	}
-	return nil
 }
 
 // create a unique branch
@@ -452,13 +443,9 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	// setup githubReleases auth using standard environment variables
-	pushOpts := &git.PushOptions{RemoteName: "origin"}
-	gitToken := os.Getenv("GITHUB_TOKEN")
-	if gitToken != "" {
-		pushOpts.Auth = &gitHttp.BasicAuth{
-			Username: "abc123",
-			Password: gitToken,
-		}
+	pushOpts := &git.PushOptions{
+		RemoteName: "origin",
+		Auth:       wgit.GetGitAuth(),
 	}
 
 	// push the version update changes to our working branch

@@ -103,7 +103,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 		if err != nil {
 			return p, errors.Wrapf(err, "failed to get relative path from dir %s and file %s package config %s", dir, fi, packageConfig.Package.Name)
 		}
-		//relativeFilename := filepath.Base(fi)
+
 		p[packageConfig.Package.Name] = Packages{
 			Config:   packageConfig,
 			Filename: relativeFilename,

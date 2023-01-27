@@ -251,7 +251,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 					))
 					continue
 				}
-				o.Logger.Printf("is %s less than %s", currentVersionSemver.String(), latestVersionSemver.String())
+
 				if currentVersionSemver.LessThan(latestVersionSemver) {
 					o.Logger.Printf(
 						"there is a new stable version available %s, current wolfi version %s, new %s",
