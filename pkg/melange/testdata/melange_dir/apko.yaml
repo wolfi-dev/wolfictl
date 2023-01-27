@@ -1,0 +1,29 @@
+contents:
+  keyring:
+    - https://foo.pub
+  repositories:
+    - https://foo/os
+  packages:
+    - busybox
+    - ca-certificates-bundle
+
+paths:
+  - path: /app
+    type: directory
+    permissions: 0o777
+    uid: 65532
+    gid: 65532
+
+work-dir: /app
+
+environment:
+  PORT: 3000
+  PATH: /usr/sbin:/sbin:/usr/bin:/bin
+
+entrypoint:
+  command: /usr/bin/foo
+cmd: --help
+
+archs:
+  - x86_64
+  - aarch64

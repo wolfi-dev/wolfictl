@@ -10,87 +10,71 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 
+	"github.com/wolfi-dev/wolfictl/pkg/melange"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMonitorService_parseGitHubReleases(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("testdata", "graphql_versions_resuslts.json"))
-	assert.NoError(t, err)
-	assert.NotEmpty(t, data)
-
-	mapperData, err := os.ReadFile(filepath.Join("testdata", "release_mapper_data.txt"))
-	assert.NoError(t, err)
-
-	o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
-	parsedMapperData, err := o.parseData(string(mapperData))
-	assert.NoError(t, err)
-
-	packageConfigs := make(map[string]build.Configuration)
-	packageConfigs["jenkins"] = build.Configuration{
-		Package: build.Package{
-			Name:    "jenkins",
-			Version: "2.370",
+	tests := []struct {
+		name            string
+		packageName     string
+		initialVersion  string
+		expectedVersion string
+	}{
+		{
+			name:            "multiple_repos",
+			packageName:     "cosign",
+			initialVersion:  "1.10.1",
+			expectedVersion: "1.13.1",
+		},
+		{
+			name:            "multiple_repos",
+			packageName:     "jenkins",
+			initialVersion:  "2.370",
+			expectedVersion: "2.388",
+		},
+		{
+			name:            "complex_versions",
+			packageName:     "cheese",
+			initialVersion:  "1.2.3",
+			expectedVersion: "1.2.4-cg2",
 		},
 	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			data, err := os.ReadFile(filepath.Join("testdata", test.name, "graphql_versions_results.json"))
+			assert.NoError(t, err)
+			assert.NotEmpty(t, data)
 
-	packageConfigs["cosign"] = build.Configuration{
-		Package: build.Package{
-			Name:    "cosign",
-			Version: "1.10.1",
-		},
+			mapperData, err := os.ReadFile(filepath.Join("testdata", test.name, "release_mapper_data.txt"))
+			assert.NoError(t, err)
+
+			o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
+			parsedMapperData, err := o.parseData(string(mapperData))
+			assert.NoError(t, err)
+
+			packageConfigs := make(map[string]melange.Packages)
+
+			packageConfigs[test.packageName] = melange.Packages{
+				Config: build.Configuration{
+					Package: build.Package{Name: test.packageName, Version: test.initialVersion},
+				},
+			}
+
+			m := NewGitHubReleaseOptions(parsedMapperData, packageConfigs, nil)
+
+			var rel []Repository
+			err = json.Unmarshal(data, &rel)
+			assert.NoError(t, err)
+			assert.NotEmpty(t, rel)
+
+			latestVersions, _, err := m.parseGitHubReleases(rel)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
+		})
 	}
-
-	m := NewGitHubReleaseOptions(parsedMapperData, packageConfigs, nil)
-
-	rel := &ReleasesSearchResponse{}
-	err = json.Unmarshal(data, rel)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, rel)
-
-	latestVersions, _, err := m.parseGitHubReleases(rel.Search)
-	assert.NoError(t, err)
-	assert.Equal(t, "2.380", latestVersions["jenkins"])
-	assert.Equal(t, "1.13.1", latestVersions["cosign"])
 }
-
-type ReleasesSearchResponse struct {
-	Search `json:"Search"`
-}
-
-// todo convert to test http server
-//nolint:gocritic
-//func TestMonitorService_API(t *testing.T) {
-//	ts := oauth2.StaticTokenSource(
-//		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-//	)
-//
-//	o := GitHubReleaseOptions{
-//		Logger:           log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
-//		GitGraphQLClient: githubv4.NewClient(oauth2.NewClient(context.Background(), ts)),
-//	}
-//	testData := make(map[string]Row)
-//	testData["cosign"] = Row{
-//		Identifier:  "sigstore/cosign",
-//		ServiceName: "GITHUB",
-//	}
-//	testData["jenkins"] = Row{
-//		Identifier:  "jenkinsci/jenkins",
-//		ServiceName: "GITHUB",
-//	}
-//	//
-//	//_, _, err := o.getLatestGitHubVersions(testData)
-//	//assert.NoError(t, err)
-//	//DoIt()
-//	//DoItAgain()
-//	rs, errorMessages, err := o.DoItAgain2(testData)
-//	assert.NoError(t, err)
-//	assert.Empty(t, errorMessages)
-//	assert.NotEmpty(t, rs)
-//	assert.Equal(t, rs["jenkinsci/jenkins"], "2.381")
-//	assert.Equal(t, rs["sigstore/cosign"], "v1.13.1")
-//
-//	//DoIt(testData)
-//}
 
 func TestGitHubReleases_GetRepoList(t *testing.T) {
 	testData := make(map[string]Row)

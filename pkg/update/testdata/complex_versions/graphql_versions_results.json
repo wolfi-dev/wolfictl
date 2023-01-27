@@ -1,0 +1,32 @@
+[
+  {
+    "owner":{
+      "login":"rawlingsj"
+    },
+    "name":"cheese",
+    "nameWithOwner":"foo/cheese",
+    "releases":{
+      "totalCount":2,
+      "nodes":[
+        {
+          "tag":{
+            "name":"v1.2.4-cg2"
+          },
+          "name":"",
+          "isPrerelease":false,
+          "isDraft":false,
+          "isLatest":true
+        },
+        {
+          "tag":{
+            "name":"v1.2.3"
+          },
+          "name":"v1.2.3",
+          "isPrerelease":false,
+          "isDraft":false,
+          "isLatest":false
+        }
+      ]
+    }
+  }
+]

@@ -12,10 +12,14 @@ import (
 	"strings"
 	"time"
 
-	"chainguard.dev/melange/pkg/build"
+	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
+
+	"github.com/pkg/errors"
+
+	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/go-github/v48/github"
 	"github.com/google/uuid"
 	"github.com/shurcooL/githubv4"
@@ -29,6 +33,8 @@ import (
 
 type Options struct {
 	PackageNames           []string
+	PackageConfigs         map[string]melange.Packages
+	MapperData             map[string]Row
 	PullRequestBaseBranch  string
 	PullRequestTitle       string
 	RepoURI                string
@@ -98,29 +104,33 @@ func (o *Options) Update() error {
 		defer os.Remove(tempDir)
 	}
 
-	repo, err := git.PlainClone(tempDir, false, &git.CloneOptions{
-		URL:      o.RepoURI,
-		Progress: os.Stdout,
-	})
+	cloneOpts := &git.CloneOptions{
+		URL:               o.RepoURI,
+		Progress:          os.Stdout,
+		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		Auth:              wgit.GetGitAuth(),
+	}
+
+	repo, err := git.PlainClone(tempDir, false, cloneOpts)
 	if err != nil {
 		return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
 	}
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
-	packageConfigs, err := o.readPackageConfigs(tempDir)
+	o.PackageConfigs, err = melange.ReadPackageConfigs(o.PackageNames, tempDir)
 	if err != nil {
 		return fmt.Errorf("failed to get package configs: %w", err)
 	}
 
 	// second, get package mapping data that we use to lookup if new versions exist
-	mapperData, err := o.getMonitorServiceData()
+	o.MapperData, err = o.getMonitorServiceData()
 	if err != nil {
 		return fmt.Errorf("failed getting release monitor service mapping data: %w", err)
 	}
 
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-		g := NewGitHubReleaseOptions(mapperData, packageConfigs, o.GitGraphQLClient)
+		g := NewGitHubReleaseOptions(o.MapperData, o.PackageConfigs, o.GitGraphQLClient)
 		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
 		if err != nil {
 			return fmt.Errorf("failed getting github releases: %w", err)
@@ -135,7 +145,7 @@ func (o *Options) Update() error {
 			GitHubHTTPClient: o.GitHubHTTPClient,
 			Logger:           o.Logger,
 		}
-		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(mapperData, packageConfigs)
+		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(o.MapperData, o.PackageConfigs)
 		if err != nil {
 			return fmt.Errorf("failed release monitor versions: %w", err)
 		}
@@ -188,10 +198,19 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			}
 		}
 
-		configFile := filepath.Join(tempDir, packageName+".yaml")
+		// get the filename from the map of melange configs we loaded at the start
+		config, ok := o.PackageConfigs[packageName]
+		if !ok {
+			return errorMessages, fmt.Errorf("no melange config found for package %s", packageName)
+		}
+
+		configFile := filepath.Join(tempDir, config.Filename)
+		if configFile == "" {
+			return errorMessages, fmt.Errorf("no config filename found for package %s", packageName)
+		}
 
 		// if new versions are available lets bump the packages in the target melange git repo
-		err := melange.Bump(configFile, latestVersion)
+		err = melange.Bump(configFile, latestVersion)
 		if err != nil {
 			// add this to the list of messages to print at the end of the update
 			errorMessages = append(errorMessages, fmt.Sprintf(
@@ -206,7 +225,8 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return errorMessages, fmt.Errorf("failed to get git worktree: %w", err)
 		}
 
-		_, err = worktree.Add(packageName + ".yaml")
+		// this needs to be the relative path set when reading the files initially
+		_, err = worktree.Add(config.Filename)
 		if err != nil {
 			return errorMessages, fmt.Errorf("failed to git add %s: %w", configFile, err)
 		}
@@ -215,6 +235,20 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
 		if err != nil {
 			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
+		}
+
+		// if mapping data has a strip prefix, add it back in to the version for when updating git modules
+		latestVersionWithPrefix := latestVersion
+		mapping, ok := o.MapperData[packageName]
+		if ok {
+			if mapping.StripPrefixChar != "" {
+				latestVersionWithPrefix = mapping.StripPrefixChar + latestVersionWithPrefix
+			}
+		}
+		// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
+		err = o.updateGitModules(tempDir, packageName, latestVersionWithPrefix, worktree)
+		if err != nil {
+			return errorMessages, fmt.Errorf("failed to update git modules: %w", err)
 		}
 
 		// if we're not running in batch mode, lets commit and PR each change
@@ -281,6 +315,39 @@ func (o *Options) updateMakefile(tempDir, packageName, latestVersion string, wor
 	return nil
 }
 
+// some melange config repos use submodules to pull in git repositories into the source dir before the melange pipelines run
+// this function is a noop if no git submodules exist
+func (o *Options) updateGitModules(dir, packageName, version string, wt *git.Worktree) error {
+	// if no gitmodules file exist this in a noop
+	if _, err := os.Stat(".gitmodules"); errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+
+	mapingData, ok := o.MapperData[packageName]
+	if !ok {
+		o.Logger.Printf("no mapping data found for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	if mapingData.Identifier == "" {
+		o.Logger.Printf("no identifier found in mapping data for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	if mapingData.ServiceName != "GITHUB" {
+		o.Logger.Printf("package %s  is not a github repo in mapping data, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	parts := strings.Split(mapingData.Identifier, "/")
+	if len(parts) != 2 {
+		o.Logger.Printf("identifier doesn't look like a github owner/repo in mapping data for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	return submodules.Update(dir, parts[0], parts[1], version, wt)
+}
+
 // create a unique branch
 func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
 	name := uuid.New().String()
@@ -313,35 +380,6 @@ func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, er
 	}
 
 	return ref, err
-}
-
-// read the melange package config(s) from the target git repository so we can check if new versions exist
-func (o *Options) readPackageConfigs(tempDir string) (map[string]build.Configuration, error) {
-	var err error
-	packageConfigs := make(map[string]build.Configuration)
-
-	// if package names were passed as CLI parameters load those packages
-	if len(o.PackageNames) > 0 {
-		// get package by name
-		for _, packageName := range o.PackageNames {
-			filename := filepath.Join(tempDir, packageName+".yaml")
-
-			config, err := melange.ReadMelangeConfig(filename)
-			if err != nil {
-				return packageConfigs, fmt.Errorf("failed to read package config %s: %w", filename, err)
-			}
-
-			packageConfigs[config.Package.Name] = config
-		}
-	} else {
-		// get all packages in the provided git repo
-		packageConfigs, err = melange.ReadAllPackagesFromRepo(tempDir)
-		if err != nil {
-			return packageConfigs, fmt.Errorf("failed to read package configs from repo %s: %w", o.RepoURI, err)
-		}
-	}
-
-	return packageConfigs, nil
 }
 
 // commits package update changes and creates a pull request
@@ -402,13 +440,9 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	// setup githubReleases auth using standard environment variables
-	pushOpts := &git.PushOptions{RemoteName: "origin"}
-	gitToken := os.Getenv("GITHUB_TOKEN")
-	if gitToken != "" {
-		pushOpts.Auth = &gitHttp.BasicAuth{
-			Username: "abc123",
-			Password: gitToken,
-		}
+	pushOpts := &git.PushOptions{
+		RemoteName: "origin",
+		Auth:       wgit.GetGitAuth(),
 	}
 
 	// push the version update changes to our working branch
