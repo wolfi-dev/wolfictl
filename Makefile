@@ -39,7 +39,11 @@ LDFLAGS=-buildid= -X $(PKG).gitVersion=$(GIT_VERSION) \
 
 KO_DOCKER_REPO ?= ghcr.io/wolfi-dev/wolfictl
 DIGEST ?=
+BUILDFLAGS ?=
 
+ifdef DEBUG
+BUILDFLAGS := -gcflags "all=-N -l" $(BUILDFLAGS)
+endif
 
 KOCACHE_PATH=/tmp/ko
 
@@ -87,7 +91,7 @@ ko-apply:  ## Build the image and apply the manifests
 
 .PHONY: wolfictl
 wolfictl: $(SRCS) ## Builds wolfictl
-	CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o $@ ./
+	CGO_ENABLED=0 go build -trimpath $(BUILDFLAGS) -ldflags "$(LDFLAGS)" -o $@ ./
 
 .PHONY: install
 install: $(SRCS) ## Installs wolfictl into BINDIR (default /usr/bin)
