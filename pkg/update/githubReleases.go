@@ -14,6 +14,7 @@ import (
 
 	"github.com/shurcooL/githubv4"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
+	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
 	"golang.org/x/exp/maps"
 )
 
@@ -227,7 +228,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 		// not all projects use the github latest release tag properly so could
 		// end up with older versions
 		if len(versions) > 0 {
-			sort.Sort(VersionsByLatest(versions))
+			sort.Sort(wolfiversions.ByLatest(versions))
 
 			latestVersionSemver := versions[len(versions)-1]
 
@@ -314,29 +315,3 @@ func printJSON(v interface{}) {
 		panic(err)
 	}
 }
-
-type Interface interface {
-	// Len is the number of elements in the collection.
-	Len() int
-
-	// Less reports whether the element with index i must sort before the element with index j.
-	// If both Less(i, j) and Less(j, i) are false, then the elements at index i and j are considered equal.
-	Less(i, j int) bool
-
-	// Swap swaps the elements with indexes i and j.
-	Swap(i, j int)
-}
-
-func (u VersionsByLatest) Len() int {
-	return len(u)
-}
-
-func (u VersionsByLatest) Swap(i, j int) {
-	u[i], u[j] = u[j], u[i]
-}
-
-func (u VersionsByLatest) Less(i, j int) bool {
-	return u[i].LessThan(u[j])
-}
-
-type VersionsByLatest []*version.Version

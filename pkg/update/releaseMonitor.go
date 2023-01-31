@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
+
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 
 	"github.com/hashicorp/go-version"
@@ -15,8 +17,8 @@ import (
 )
 
 type MonitorService struct {
-	Client           *RLHTTPClient
-	GitHubHTTPClient *RLHTTPClient
+	Client           *http2.RLHTTPClient
+	GitHubHTTPClient *http2.RLHTTPClient
 	Logger           *log.Logger
 	DataMapperURL    string
 }

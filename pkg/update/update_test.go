@@ -27,25 +27,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_parseGitURL(t *testing.T) {
-	tests := []struct {
-		rawURL string
-		owner  string
-		repo   string
-	}{
-		{rawURL: "https://github.com/cheese/wine", owner: "cheese", repo: "wine"},
-		{rawURL: "https://github.com/cheese/wine.git", owner: "cheese", repo: "wine"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.rawURL, func(t *testing.T) {
-			owner, repo, err := parseGitURL(tt.rawURL)
-			assert.NoError(t, err)
-			assert.Equalf(t, tt.owner, owner, "parseGitURL(%v)", tt.rawURL)
-			assert.Equalf(t, tt.repo, repo, "parseGitURL(%v)", tt.rawURL)
-		})
-	}
-}
-
 // a bit more than a typical unit test but is useful to test a git branch with melange bump
 func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	dir := t.TempDir()

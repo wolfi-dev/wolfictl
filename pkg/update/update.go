@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 
@@ -44,9 +45,9 @@ type Options struct {
 	DryRun                 bool
 	ReleaseMonitoringQuery bool
 	GithubReleaseQuery     bool
-	Client                 *RLHTTPClient
+	Client                 *http2.RLHTTPClient
 	Logger                 *log.Logger
-	GitHubHTTPClient       *RLHTTPClient
+	GitHubHTTPClient       *http2.RLHTTPClient
 	GitGraphQLClient       *githubv4.Client
 }
 
@@ -67,14 +68,14 @@ func New() Options {
 	)
 
 	options := Options{
-		Client: &RLHTTPClient{
-			client: http.DefaultClient,
+		Client: &http2.RLHTTPClient{
+			Client: http.DefaultClient,
 
 			// 1 request every (n) second(s) to avoid DOS'ing server
 			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
-		GitHubHTTPClient: &RLHTTPClient{
-			client: oauth2.NewClient(context.Background(), ts),
+		GitHubHTTPClient: &http2.RLHTTPClient{
+			Client: oauth2.NewClient(context.Background(), ts),
 
 			// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
@@ -384,29 +385,20 @@ func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, er
 
 // commits package update changes and creates a pull request
 func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, newVersion string) (string, error) {
-	remote, err := repo.Remote("origin")
-	if err != nil {
-		return "", fmt.Errorf("failed to find git origin URL: %w", err)
-	}
-
-	if len(remote.Config().URLs) == 0 {
-		return "", fmt.Errorf("no remote config URLs found for remote origin")
-	}
-
-	owner, repoName, err := parseGitURL(remote.Config().URLs[0])
+	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return "", fmt.Errorf("failed to find git origin URL: %w", err)
 	}
 
 	basePullRequest := gh.BasePullRequest{
-		RepoName:              repoName,
-		Owner:                 owner,
+		RepoName:              gitURL.Name,
+		Owner:                 gitURL.Organisation,
 		Branch:                ref.String(),
 		PullRequestBaseBranch: o.PullRequestBaseBranch,
 		Retries:               0,
 	}
 
-	client := github.NewClient(o.GitHubHTTPClient.client)
+	client := github.NewClient(o.GitHubHTTPClient.Client)
 	gitOpts := gh.GitOptions{
 		GithubClient:                  client,
 		MaxPullRequestRetries:         maxPullRequestRetries,
@@ -493,17 +485,4 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil
-}
-
-// parseGitURL returns owner, repo name, errors
-func parseGitURL(rawURL string) (owner, repo string, err error) {
-	rawURL = strings.TrimSuffix(rawURL, ".git")
-
-	parsedURL, err := url.Parse(rawURL)
-	if err != nil {
-		return "", "", fmt.Errorf("failed to parse git url %s: %w", rawURL, err)
-	}
-
-	parts := strings.Split(parsedURL.Path, "/")
-	return parts[1], parts[2], nil
 }
