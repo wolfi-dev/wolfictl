@@ -10,6 +10,7 @@ import (
 )
 
 type Row struct {
+	PackageName     string
 	Identifier      string
 	ServiceName     string
 	StripPrefixChar string
@@ -57,6 +58,7 @@ func (o *Options) parseData(rawdata string) (map[string]Row, error) {
 		}
 
 		data[strings.TrimSpace(parts[1])] = Row{
+			PackageName:     strings.TrimSpace(parts[1]),
 			Identifier:      strings.TrimSpace(parts[2]),
 			ServiceName:     strings.TrimSpace(parts[3]),
 			StripPrefixChar: strings.TrimSpace(parts[4]),
