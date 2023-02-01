@@ -63,9 +63,9 @@ func NewIndex(fsys rwfs.FS) (*Index, error) {
 
 // NewIndexFromPaths returns a new Index of build configurations for each of the
 // given paths.
-func NewIndexFromPaths(paths ...string) (*Index, error) {
+func NewIndexFromPaths(baseDir string, paths ...string) (*Index, error) {
 	index := newIndex()
-	index.fsys = rwfsOS.DirFS(".")
+	index.fsys = rwfsOS.DirFS(baseDir)
 
 	for _, path := range paths {
 		err := index.processAndAdd(path)
