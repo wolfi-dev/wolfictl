@@ -20,17 +20,17 @@ Proposes melange package update(s) via a pull request
 
 .SH OPTIONS
 .PP
-\fB\-\-batch\fP[=false]
-    creates a single pull request with package updates rather than individual pull request per package update
-
-.PP
 \fB\-\-data\-mapper\-url\fP="
-\[la]https://raw.githubusercontent.com/rawlingsj/wup-mapper/5e57013abb47ae345c1d1ca9aa6e902740b36f40/DATA.md"\[ra]
+\[la]https://raw.githubusercontent.com/wolfi-dev/wolfi-update-mapper/main/DATA.md"\[ra]
     URL to use for mapping packages to source update service
 
 .PP
 \fB\-\-dry\-run\fP[=false]
     prints proposed package updates rather than creating a pull request
+
+.PP
+\fB\-\-github\-release\-query\fP[=true]
+    query the GitHub graphql API for latest releases
 
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
@@ -48,7 +48,12 @@ Proposes melange package update(s) via a pull request
 \fB\-\-pull\-request\-title\fP="%s/%s package update"
     the title to use when creating a pull request
 
+.PP
+\fB\-\-release\-monitoring\-query\fP[=true]
+    query 
+\[la]https://release-monitoring.org/\[ra] API for latest releases
+
 
 .SH SEE ALSO
 .PP
-\fBwolfictl(1)\fP
+\fBwolfictl(1)\fP, \fBwolfictl\-update\-package(1)\fP
