@@ -16,7 +16,6 @@ import (
 )
 
 func TestPackageUpdate_getFixesCVEList(t *testing.T) {
-
 	dir := t.TempDir()
 	r := setupTestRepo(t, dir)
 
@@ -42,11 +41,11 @@ func TestPackageUpdate_getFixesCVEList(t *testing.T) {
 	assert.NoError(t, err)
 
 	cves, err := o.getFixesCVEList(dir, previousVersion)
+	assert.NoError(t, err)
 
 	assert.Equal(t, 2, len(cves))
 	assert.Equal(t, "CVE78910QWERTY", cves[0])
 	assert.Equal(t, "CVE456ABC", cves[1])
-
 }
 
 func setupTestRepo(t *testing.T, dir string) *git.Repository {
@@ -115,4 +114,5 @@ func createTestCommit(t *testing.T, r *git.Repository, testData, commitMessage s
 			When:  time.Now(),
 		},
 	})
+	assert.NoError(t, err)
 }

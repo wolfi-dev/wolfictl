@@ -9,12 +9,11 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 
 	"github.com/google/go-github/v48/github"
-
-	"github.com/wolfi-dev/wolfictl/pkg/gh"
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
@@ -26,8 +25,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/hashicorp/go-version"
-
-	"time"
 
 	wolfigit "github.com/wolfi-dev/wolfictl/pkg/git"
 
@@ -73,8 +70,7 @@ func NewPackageOptions() PackageOptions {
 	return options
 }
 
-func (o PackageOptions) UpdatePackageCmd() error {
-
+func (o *PackageOptions) UpdatePackageCmd() error {
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
@@ -136,8 +132,7 @@ func (o PackageOptions) UpdatePackageCmd() error {
 }
 
 // if we are executing the update command in a git repository then check for CVE fixes
-func (o PackageOptions) updateSecfixes(repo *git.Repository) error {
-
+func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -149,10 +144,9 @@ func (o PackageOptions) updateSecfixes(repo *git.Repository) error {
 	}
 
 	// ignore errors getting previous tags as most likely there's no existing release so should check all commits
-	previous, _ := wolfigit.GetVersionFromTag(currentDir, 2)
+	previous, err := wolfigit.GetVersionFromTag(currentDir, 2)
 	if err != nil {
 		o.Logger.Println("no previous tag found so checking all commits for sec fixes")
-		return nil
 	}
 
 	// get list of commits between the previous tag and current tag
@@ -175,15 +169,17 @@ func (o PackageOptions) updateSecfixes(repo *git.Repository) error {
 	}
 
 	return o.addCommit(repo, cveFixes)
-
 }
 
 // getFixesCVEList returns a list of CVEs fixed in the latest release based on commit messages i.e. fixes: CVE###
-func (o PackageOptions) getFixesCVEList(dir string, previous *version.Version) ([]string, error) {
+func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) ([]string, error) {
 	var fixedCVEs []string
 
-	tagRamge := fmt.Sprintf("%s...%s", previous.Original(), o.Version)
-	//nolint:gosec
+	tagRamge := ""
+	if previous != nil {
+		tagRamge = fmt.Sprintf("%s...%s", previous.Original(), o.Version)
+	}
+
 	cmd := exec.Command("git", "log", tagRamge)
 	cmd.Dir = dir
 	rs, err := cmd.Output()
@@ -192,10 +188,12 @@ func (o PackageOptions) getFixesCVEList(dir string, previous *version.Version) (
 	}
 
 	// convert to string as dealing with bytes results in a 3 dimensional array, hard to debug
+	//nolint:gocritic
 	gitLog := string(rs[:])
 
 	// parse commit comments for `fixes: CVE###`, (?i) to ignore case
-	r, _ := regexp.Compile("(?i)fixes: CVE\\w+")
+	//nolint:gosimple
+	r := regexp.MustCompile("(?i)fixes: CVE\\w+")
 
 	cves := r.FindAllStringSubmatch(gitLog, -1)
 	for _, commitCVEs := range cves {
@@ -213,8 +211,7 @@ func (o PackageOptions) getFixesCVEList(dir string, previous *version.Version) (
 	return fixedCVEs, nil
 }
 
-func (o PackageOptions) createAdvisories(vuln string) error {
-
+func (o *PackageOptions) createAdvisories(vuln string) error {
 	p := o.PackageConfig[o.PackageName]
 	fullFilePath := filepath.Join(p.Dir, p.Filename)
 
@@ -240,23 +237,21 @@ func (o PackageOptions) createAdvisories(vuln string) error {
 	return o.doFollowupSync(index)
 }
 
-func (o PackageOptions) advisoryContent() (*build.AdvisoryContent, error) {
-
+func (o *PackageOptions) advisoryContent() (*build.AdvisoryContent, error) {
 	// todo cannot add action statement when status is fixed, maybe we can add some metadata as this would be nice to link to from other tooling
-	//releaseURL, err := o.getFixedReleaseURL()
-	//if err != nil {
+	// releaseURL, err := o.getFixedReleaseURL()
+	// if err != nil {
 	//	return nil, err
-	//}
+	// }
 
-	fixVersion := strings.TrimPrefix(o.Version, "v")
-	fixVersion = fmt.Sprintf("%s-r%s", fixVersion, o.Epoch)
+	fixVersion := fmt.Sprintf("%s-r%s", strings.TrimPrefix(o.Version, "v"), o.Epoch)
 
 	ts := time.Now()
 	ac := &build.AdvisoryContent{
 		Timestamp: ts,
 		Status:    vex.StatusFixed,
-		//ActionStatement: fmt.Sprintf("CVE fixed in release %s", releaseURL),
-		FixedVersion: o.Version,
+		// ActionStatement: fmt.Sprintf("CVE fixed in release %s", releaseURL),
+		FixedVersion: fixVersion,
 	}
 
 	err := ac.Validate()
@@ -267,33 +262,33 @@ func (o PackageOptions) advisoryContent() (*build.AdvisoryContent, error) {
 	return ac, err
 }
 
-func (o PackageOptions) getFixedReleaseURL() (string, error) {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
+// func (o *PackageOptions) getFixedReleaseURL() (string, error) {
+//	currentDir, err := os.Getwd()
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	r, err := git.PlainOpen(currentDir)
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	remoteURL, err := wolfigit.GetRemoteURL(r)
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	releaseOpts := gh.ReleaseOptions{
+//		GithubClient: o.GithubClient,
+//	}
+//	releaseURL, err := releaseOpts.GetReleaseURL(remoteURL.Organisation, remoteURL.Name, o.Version)
+//	if err != nil {
+//		return "", err
+//	}
+//	return releaseURL, nil
+//}
 
-	r, err := git.PlainOpen(currentDir)
-	if err != nil {
-		return "", err
-	}
-
-	remoteURL, err := wolfigit.GetRemoteURL(r)
-	if err != nil {
-		return "", err
-	}
-
-	releaseOpts := gh.ReleaseOptions{
-		GithubClient: o.GithubClient,
-	}
-	releaseURL, err := releaseOpts.GetReleaseURL(remoteURL.Organisation, remoteURL.Name, o.Version)
-	if err != nil {
-		return "", err
-	}
-	return releaseURL, nil
-}
-
-func (o PackageOptions) doFollowupSync(index *configs.Index) error {
+func (o *PackageOptions) doFollowupSync(index *configs.Index) error {
 	needs, err := sync.NeedsFromIndex(index)
 	if err != nil {
 		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
@@ -316,8 +311,7 @@ func (o PackageOptions) doFollowupSync(index *configs.Index) error {
 	return nil
 }
 
-func (o PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
-
+func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 	wt, err := repo.Worktree()
 	if err != nil {
 		return err
@@ -339,5 +333,4 @@ func (o PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil
-
 }

@@ -109,9 +109,7 @@ func GetVersionFromTag(dir string, index int) (*version.Version, error) {
 
 	// get the latest tag, maybe need to sort?
 	sort.Sort(wolfiversions.ByLatest(versions))
-
 	switch size := len(versions); {
-
 	case size == 0:
 		return nil, fmt.Errorf("no tags found in dir %s", dir)
 	case index > size:

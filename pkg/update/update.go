@@ -173,11 +173,9 @@ func (o *Options) Update() error {
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
 func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string) ([]string, error) {
-
 	var errorMessages []string
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {
-
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
 		ref, err := o.switchBranch(repo)
 		if err != nil {
@@ -193,8 +191,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 	return errorMessages, nil
 }
 
-func (o *Options) updateGitPackage(repo *git.Repository, packageName string, latestVersion string, ref plumbing.ReferenceName) error {
-
+func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVersion string, ref plumbing.ReferenceName) error {
 	// get the filename from the map of melange configs we loaded at the start
 	config, ok := o.PackageConfigs[packageName]
 	if !ok {

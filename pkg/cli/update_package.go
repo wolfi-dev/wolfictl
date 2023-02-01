@@ -18,7 +18,6 @@ func Package() *cobra.Command {
 		Example: `wolfictl update package cheese --version v1.2.3 --target-repo https://github.com/wolfi-dev/os`,
 		Args:    cobra.RangeArgs(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			if !o.DryRun && os.Getenv("GITHUB_TOKEN") == "" {
 				return errors.New("no GITHUB_TOKEN token found")
 			}
