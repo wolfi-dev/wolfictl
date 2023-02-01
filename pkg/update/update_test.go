@@ -57,7 +57,7 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 
 	// fake a new version available
 	newVersion := map[string]string{"cheese": "1.5.10"}
-	_, err = o.updatePackagesGitRepository(r, newVersion, filepath.Join(dir, "melange"))
+	_, err = o.updatePackagesGitRepository(r, newVersion)
 	assert.NoError(t, err)
 
 	// assert the results

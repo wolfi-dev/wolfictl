@@ -110,13 +110,15 @@ func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melan
 		MapperData:       mapperData,
 		GitGraphQLClient: client,
 		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
-		PackageConfigIDs: make(map[string]string),
+		PackageConfigIDs: make(map[string]Row),
 		PackageConfigs:   configs,
 	}
 
 	// maintain a different map, key'd by mapper data identifier for easy lookup
 	for _, row := range mapperData {
-		options.PackageConfigIDs[row.Identifier] = row.StripPrefixChar
+		if row.ServiceName == "GITHUB" {
+			options.PackageConfigIDs[row.Identifier] = row
+		}
 	}
 	return options
 }
@@ -125,7 +127,7 @@ type GitHubReleaseOptions struct {
 	GitGraphQLClient *githubv4.Client
 	Logger           *log.Logger
 	MapperData       map[string]Row
-	PackageConfigIDs map[string]string
+	PackageConfigIDs map[string]Row
 	PackageConfigs   map[string]melange.Packages
 }
 
@@ -207,9 +209,9 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 			// data, but there's no guarantee the repo name and map data key are
 			// the same if the identifiers don't match fall back to iterating
 			// through all map data to match using identifier
-			stripPrefix := o.PackageConfigIDs[string(node.NameWithOwner)]
-			if stripPrefix != "" {
-				releaseVersion = strings.TrimPrefix(releaseVersion, stripPrefix)
+			p := o.PackageConfigIDs[string(node.NameWithOwner)]
+			if p.StripPrefixChar != "" {
+				releaseVersion = strings.TrimPrefix(releaseVersion, p.StripPrefixChar)
 			}
 
 			releaseVersionSemver, err := version.NewVersion(releaseVersion)
@@ -234,12 +236,14 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 
 			// compare if this version is newer than the version we have in our
 			// related melange package config
-			packageName := string(node.Name)
-			melangePackageConfig, ok := o.PackageConfigs[packageName]
+			packageName := string(node.NameWithOwner)
+
+			melangePackageName := o.PackageConfigIDs[packageName].PackageName
+			melangePackageConfig, ok := o.PackageConfigs[melangePackageName]
 			if !ok {
 				errorMessages = append(errorMessages, fmt.Sprintf(
 					"failed to find %s in package configs",
-					packageName,
+					melangePackageName,
 				))
 				continue
 			}
@@ -258,7 +262,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 						"there is a new stable version available %s, current wolfi version %s, new %s",
 						packageName, melangePackageConfig.Config.Package.Version, latestVersionSemver.Original(),
 					)
-					results[string(node.Name)] = latestVersionSemver.Original()
+					results[melangePackageName] = latestVersionSemver.Original()
 				}
 			}
 		}

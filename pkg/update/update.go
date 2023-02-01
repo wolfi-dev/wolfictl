@@ -156,7 +156,7 @@ func (o *Options) Update() error {
 	}
 
 	// update melange configs in our cloned git repository with any new package versions
-	errorMessages, err = o.updatePackagesGitRepository(repo, packagesToUpdate, tempDir)
+	errorMessages, err = o.updatePackagesGitRepository(repo, packagesToUpdate)
 	if err != nil {
 		return fmt.Errorf("failed to update packages in git repository: %w", err)
 	}
@@ -172,112 +172,84 @@ func (o *Options) Update() error {
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, tempDir string) ([]string, error) {
-	var ref plumbing.ReferenceName
-	var err error
-	var pullRequests []string
+func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string) ([]string, error) {
 	var errorMessages []string
-
-	if o.Batch {
-		// let's work on a branch when updating package versions, so we can create a PR from that branch later
-		ref, err = o.switchBranch(repo)
-		if err != nil {
-			return errorMessages, fmt.Errorf("failed to switch to working git branch: %w", err)
-		}
-	}
-
-	// todo switch to idendifier as the key
-
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {
-		// if not batch mode create a branch for each package change
-		if !o.Batch {
-			// let's work on a branch when updating package versions, so we can create a PR from that branch later
-			ref, err = o.switchBranch(repo)
-			if err != nil {
-				return errorMessages, fmt.Errorf("failed to switch to working git branch: %w", err)
-			}
-		}
-
-		// get the filename from the map of melange configs we loaded at the start
-		config, ok := o.PackageConfigs[packageName]
-		if !ok {
-			return errorMessages, fmt.Errorf("no melange config found for package %s", packageName)
-		}
-
-		configFile := filepath.Join(tempDir, config.Filename)
-		if configFile == "" {
-			return errorMessages, fmt.Errorf("no config filename found for package %s", packageName)
-		}
-
-		// if new versions are available lets bump the packages in the target melange git repo
-		err = melange.Bump(configFile, latestVersion)
+		// let's work on a branch when updating package versions, so we can create a PR from that branch later
+		ref, err := o.switchBranch(repo)
 		if err != nil {
-			// add this to the list of messages to print at the end of the update
-			errorMessages = append(errorMessages, fmt.Sprintf(
-				"failed to bump config file %s to version %s: %s",
-				configFile, latestVersion, err.Error(),
-			))
-			continue
+			return nil, fmt.Errorf("failed to switch to working git branch: %w", err)
 		}
 
-		worktree, err := repo.Worktree()
+		err = o.updateGitPackage(repo, packageName, latestVersion, ref)
 		if err != nil {
-			return errorMessages, fmt.Errorf("failed to get git worktree: %w", err)
-		}
-
-		// this needs to be the relative path set when reading the files initially
-		_, err = worktree.Add(config.Filename)
-		if err != nil {
-			return errorMessages, fmt.Errorf("failed to git add %s: %w", configFile, err)
-		}
-
-		// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-		err = o.updateMakefile(tempDir, packageName, latestVersion, worktree)
-		if err != nil {
-			return errorMessages, fmt.Errorf("failed to update Makefile: %w", err)
-		}
-
-		// if mapping data has a strip prefix, add it back in to the version for when updating git modules
-		latestVersionWithPrefix := latestVersion
-		mapping, ok := o.MapperData[packageName]
-		if ok {
-			if mapping.StripPrefixChar != "" {
-				latestVersionWithPrefix = mapping.StripPrefixChar + latestVersionWithPrefix
-			}
-		}
-		// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
-		err = o.updateGitModules(tempDir, packageName, latestVersionWithPrefix, worktree)
-		if err != nil {
-			return errorMessages, fmt.Errorf("failed to update git modules: %w", err)
-		}
-
-		// if we're not running in batch mode, lets commit and PR each change
-		if !o.Batch && !o.DryRun {
-			pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
-			if err != nil {
-				return errorMessages, fmt.Errorf("failed to propose changes: %w", err)
-			}
-			if pr != "" {
-				pullRequests = append(pullRequests, pr)
-			}
+			errorMessages = append(errorMessages, err.Error())
 		}
 	}
 
-	// create the single pull request at the end if running in batch mode
-	if o.Batch && !o.DryRun {
-		pr, err := o.proposeChanges(repo, ref, "Batch", "")
-		if err != nil {
-			return errorMessages, fmt.Errorf("failed to propose changes: %w", err)
-		}
-		pullRequests = append(pullRequests, pr)
+	return errorMessages, nil
+}
+
+func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVersion string, ref plumbing.ReferenceName) error {
+	// get the filename from the map of melange configs we loaded at the start
+	config, ok := o.PackageConfigs[packageName]
+	if !ok {
+		return fmt.Errorf("no melange config found for package %s", packageName)
 	}
 
-	// print out pull request links
-	for _, pr := range pullRequests {
+	configFile := filepath.Join(config.Dir, config.Filename)
+	if configFile == "" {
+		return fmt.Errorf("no config filename found for package %s", packageName)
+	}
+
+	// if new versions are available lets bump the packages in the target melange git repo
+	err := melange.Bump(configFile, latestVersion)
+	if err != nil {
+		// add this to the list of messages to print at the end of the update
+		return errors.Wrapf(err, "failed to bump config file %s to version %s", configFile, latestVersion)
+	}
+
+	worktree, err := repo.Worktree()
+	if err != nil {
+		return fmt.Errorf("failed to get git worktree: %w", err)
+	}
+
+	// this needs to be the relative path set when reading the files initially
+	_, err = worktree.Add(config.Filename)
+	if err != nil {
+		return fmt.Errorf("failed to git add %s: %w", configFile, err)
+	}
+
+	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
+	err = o.updateMakefile(config.Dir, packageName, latestVersion, worktree)
+	if err != nil {
+		return fmt.Errorf("failed to update Makefile: %w", err)
+	}
+
+	// if mapping data has a strip prefix, add it back in to the version for when updating git modules
+	latestVersionWithPrefix := latestVersion
+	mapping, ok := o.MapperData[packageName]
+	if ok {
+		if mapping.StripPrefixChar != "" {
+			latestVersionWithPrefix = mapping.StripPrefixChar + latestVersionWithPrefix
+		}
+	}
+	// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
+	err = o.updateGitModules(config.Dir, packageName, latestVersionWithPrefix, worktree)
+	if err != nil {
+		return fmt.Errorf("failed to update git modules: %w", err)
+	}
+
+	// if we're not running in batch mode, lets commit and PR each change
+	if !o.DryRun {
+		pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
+		if err != nil {
+			return fmt.Errorf("failed to propose changes: %w", err)
+		}
 		o.Logger.Printf(pr)
 	}
-	return errorMessages, nil
+	return nil
 }
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
@@ -366,7 +338,7 @@ func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, er
 		Branch: ref,
 	})
 	if err != nil {
-		return "", fmt.Errorf("failed to checkout main: %w", err)
+		return "", fmt.Errorf("failed to checkout ref %s: %w", ref, err)
 	}
 
 	// create a unique branch to work from

@@ -17,6 +17,7 @@ import (
 type Packages struct {
 	Config   build.Configuration
 	Filename string
+	Dir      string
 }
 
 type ConfigCheck struct {
@@ -44,15 +45,16 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]Packages,
 	if len(packageNames) > 0 {
 		// get package by name
 		for _, packageName := range packageNames {
-			filename := filepath.Join(dir, packageName+".yaml")
-
-			config, err := ReadMelangeConfig(filename)
+			filename := packageName + ".yaml"
+			fullPath := filepath.Join(dir, filename)
+			config, err := ReadMelangeConfig(fullPath)
 			if err != nil {
-				return p, fmt.Errorf("failed to read package config %s: %w", filename, err)
+				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
 			p[config.Package.Name] = Packages{
 				Config:   config,
 				Filename: filename,
+				Dir:      dir,
 			}
 		}
 		return p, nil
@@ -103,6 +105,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 		p[packageConfig.Package.Name] = Packages{
 			Config:   packageConfig,
 			Filename: relativeFilename,
+			Dir:      dir,
 		}
 	}
 	fmt.Printf("found %[1]d packages\n", len(p))

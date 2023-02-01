@@ -50,7 +50,7 @@ func newConfigIndexFromArgs(args ...string) (*configs.Index, error) {
 		return i, nil
 	}
 
-	i, err := configs.NewIndexFromPaths(args...)
+	i, err := configs.NewIndexFromPaths(".", args...)
 	if err != nil {
 		return nil, fmt.Errorf("unable to index Wolfi package configurations: %w", err)
 	}
