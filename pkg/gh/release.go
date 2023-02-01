@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/go-git/go-git/v5/plumbing/object"
 
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"golang.org/x/oauth2"
@@ -18,19 +15,12 @@ import (
 
 	"github.com/google/go-github/v48/github"
 
+	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 	wolfigit "github.com/wolfi-dev/wolfictl/pkg/git"
-	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
-
-	"github.com/hashicorp/go-version"
-
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing"
 
 	"github.com/go-git/go-git/v5"
 )
-
-const defaultStartVersion = "v0.0.0"
 
 type ReleaseOptions struct {
 	GithubClient             *github.Client
@@ -60,12 +50,17 @@ func NewReleaseOptions() ReleaseOptions {
 	}
 }
 
+const defaultStartVersion = "v0.0.0"
+
 // Release will create a new GitHub release
 func (o ReleaseOptions) Release() error {
 	// get the latest git tag
-	current, err := o.getCurrentVersionFromTag()
-	if err != nil {
-		return errors.Wrapf(err, "failed to get current version from tag in dir %s", o.Dir)
+	current, err := wolfigit.GetVersionFromTag(o.Dir, 1)
+	if current == nil || err != nil {
+		current, err = version.NewVersion(defaultStartVersion)
+		if err != nil {
+			return err
+		}
 	}
 
 	o.Logger.Printf("current latest version tag is %s", current.Original())
@@ -77,59 +72,18 @@ func (o ReleaseOptions) Release() error {
 	}
 
 	// create new tag + GitHub release
-	err = o.createTag(next.Original(), "", "")
+	err = wolfigit.CreateTag(o.Dir, next.Original(), "", "")
 	if err != nil {
 		return errors.Wrapf(err, "failed to create tag %s", next.Original())
 	}
 
 	// push new tag
-	err = o.pushTag(next.Original())
+	err = wolfigit.PushTag(o.Dir, next.Original())
 	if err != nil {
 		return err
 	}
 
 	return o.createGitHubRelease(next.Original())
-}
-
-func (o ReleaseOptions) getCurrentVersionFromTag() (*version.Version, error) {
-	r, err := git.PlainOpen(o.Dir)
-	if err != nil {
-		return nil, err
-	}
-
-	tagRefs, err := r.Tags()
-	if err != nil {
-		return nil, err
-	}
-
-	// collect all tags
-	var versions []*version.Version
-
-	err = tagRefs.ForEach(func(t *plumbing.Reference) error {
-		releaseVersionSemver, err := version.NewVersion(t.Name().Short())
-		if err != nil {
-			return errors.Wrapf(err, "failed to create new version from tag %s", t.Name().Short())
-		}
-		versions = append(versions, releaseVersionSemver)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// get the latest tag, maybe need to sort?
-	sort.Sort(wolfiversions.ByLatest(versions))
-	var latest *version.Version
-	if len(versions) == 0 {
-		latest, err = version.NewVersion(defaultStartVersion)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create new version from tag %s", defaultStartVersion)
-		}
-	} else {
-		// get the last tag
-		latest = versions[len(versions)-1]
-	}
-	return latest, nil
 }
 
 // bumpReleaseVersion will increment parts of a new release version based on flags supplied when running the CLI command
@@ -184,36 +138,6 @@ func (o ReleaseOptions) bumpReleaseVersion(current *version.Version) (*version.V
 	return version.NewVersion(newVersion)
 }
 
-func (o ReleaseOptions) createTag(tag, overrideGitName, overrideGitEmail string) error {
-	r, err := git.PlainOpen(o.Dir)
-	if err != nil {
-		return err
-	}
-
-	o.Logger.Printf("creating tag %s", tag)
-	h, err := r.Head()
-	if err != nil {
-		return err
-	}
-
-	tagOptions := &git.CreateTagOptions{
-		Message: tag,
-	}
-	// override default git config tagger info
-	if overrideGitName != "" && overrideGitEmail != "" {
-		o.Logger.Printf("overriding default git tagger config with name %s: email: %s", overrideGitName, overrideGitEmail)
-		tagOptions.Tagger = &object.Signature{
-			Name:  overrideGitName,
-			Email: overrideGitEmail,
-			When:  time.Now(),
-		}
-	}
-
-	_, err = r.CreateTag(tag, h.Hash(), tagOptions)
-
-	return err
-}
-
 // createGitHubRelease creates a new release on GitHub
 func (o ReleaseOptions) createGitHubRelease(v string) error {
 	repo, err := git.PlainOpen(o.Dir)
@@ -241,39 +165,11 @@ func (o ReleaseOptions) createGitHubRelease(v string) error {
 	return nil
 }
 
-func (o ReleaseOptions) pushTag(tagName string) error {
-	r, err := git.PlainOpen(o.Dir)
+func (o ReleaseOptions) GetReleaseURL(owner, repoName, v string) (string, error) {
+	ctx := context.Background()
+	release, _, err := o.GithubClient.Repositories.GetReleaseByTag(ctx, owner, repoName, v)
 	if err != nil {
-		return err
+		return "", errors.Wrapf(err, "failed to get github release for %s/%s tag %s", owner, repoName, v)
 	}
-
-	// force remote URL to be https, using git@ requires ssh keys and we default to using basic auth
-	remote, err := r.Remote("origin")
-	if err != nil {
-		return err
-	}
-	gitURL, err := wolfigit.ParseGitURL(remote.Config().URLs[0])
-	if err != nil {
-		return err
-	}
-	remoteURL := fmt.Sprintf("https://github.com/%s/%s.git", gitURL.Organisation, gitURL.Name)
-
-	po := &git.PushOptions{
-		RemoteName: "origin",
-		RemoteURL:  remoteURL,
-		RefSpecs:   []config.RefSpec{config.RefSpec(fmt.Sprintf("refs/tags/%s:refs/tags/%s", tagName, tagName))},
-		Auth:       wolfigit.GetGitAuth(),
-	}
-
-	err = r.Push(po)
-
-	if err != nil {
-		if err == git.NoErrAlreadyUpToDate {
-			o.Logger.Println("origin remote was up to date, no push done")
-			return nil
-		}
-		return errors.Wrapf(err, "failed to push tag")
-	}
-
-	return nil
+	return *release.HTMLURL, nil
 }
