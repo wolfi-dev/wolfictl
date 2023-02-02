@@ -19,6 +19,8 @@ func New() *cobra.Command {
 		Advisory(),
 		Bump(),
 		Gh(),
+		Apk(),
+		Index(),
 	)
 
 	return cmd
