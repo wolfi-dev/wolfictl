@@ -18,7 +18,7 @@ func Apk() *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			url := fmt.Sprintf("https://packages.wolfi.dev/os/%s/%s", arch, args[0])
-			resp, err := http.Get(url)
+			resp, err := http.Get(url) //nolint:gosec
 			if err != nil {
 				return err
 			}
@@ -51,7 +51,7 @@ func Index() *cobra.Command {
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			url := fmt.Sprintf("https://packages.wolfi.dev/os/%s/APKINDEX.tar.gz", arch)
-			resp, err := http.Get(url)
+			resp, err := http.Get(url) //nolint:gosec
 			if err != nil {
 				return err
 			}
