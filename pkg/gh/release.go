@@ -83,7 +83,13 @@ func (o ReleaseOptions) Release() error {
 		return err
 	}
 
-	return o.createGitHubRelease(next.Original())
+	// create the GitHub release
+	err = o.createGitHubRelease(next.Original())
+	if err != nil {
+		return err
+	}
+	o.Logger.Printf("NEW_VERSION=%s", next.Original())
+	return nil
 }
 
 // bumpReleaseVersion will increment parts of a new release version based on flags supplied when running the CLI command
