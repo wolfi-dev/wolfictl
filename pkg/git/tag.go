@@ -3,20 +3,17 @@ package git
 import (
 	"fmt"
 	"sort"
-	"time"
 
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/hashicorp/go-version"
 	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
-
-	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/pkg/errors"
 )
 
-func CreateTag(dir, tag, overrideGitName, overrideGitEmail string) error {
+func CreateTag(dir, tag string) error {
 	r, err := git.PlainOpen(dir)
 	if err != nil {
 		return err
@@ -30,14 +27,8 @@ func CreateTag(dir, tag, overrideGitName, overrideGitEmail string) error {
 	tagOptions := &git.CreateTagOptions{
 		Message: tag,
 	}
-	// override default git config tagger info
-	if overrideGitName != "" && overrideGitEmail != "" {
-		tagOptions.Tagger = &object.Signature{
-			Name:  overrideGitName,
-			Email: overrideGitEmail,
-			When:  time.Now(),
-		}
-	}
+
+	tagOptions.Tagger = GetGitAuthorSignature()
 
 	_, err = r.CreateTag(tag, h.Hash(), tagOptions)
 
