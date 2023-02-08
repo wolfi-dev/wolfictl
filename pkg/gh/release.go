@@ -88,7 +88,8 @@ func (o ReleaseOptions) Release() error {
 	if err != nil {
 		return err
 	}
-	o.Logger.Printf("NEW_VERSION=%s", next.Original())
+
+	fmt.Printf("::set-output name=new_version::%s\n", next.Original())
 	return nil
 }
 

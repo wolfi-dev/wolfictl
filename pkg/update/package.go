@@ -137,20 +137,41 @@ func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
 	if err != nil {
 		return err
 	}
+	gitURL, err := wolfigit.GetRemoteURLFromDir(currentDir)
+	if err != nil {
+		return err
+	}
+	// checkout repo into tmp dir so we know we are working on a clean HEAD
+	cloneOpts := &git.CloneOptions{
+		URL:               gitURL.RawURL,
+		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		Auth:              wolfigit.GetGitAuth(),
+		Tags:              git.AllTags,
+	}
 
-	if _, err := os.Stat(filepath.Join(currentDir, ".git")); os.IsNotExist(err) {
+	tempDir, err := os.MkdirTemp("", "wolfictl")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
+	}
+
+	_, err = git.PlainClone(tempDir, false, cloneOpts)
+	if err != nil {
+		return fmt.Errorf("failed to clone repository %s into %s: %w", o.TargetRepo, tempDir, err)
+	}
+
+	if _, err := os.Stat(filepath.Join(tempDir, ".git")); os.IsNotExist(err) {
 		o.Logger.Println("skip sec fixes as we are not running update from a git repo")
 		return nil
 	}
 
 	// ignore errors getting previous tags as most likely there's no existing release so should check all commits
-	previous, err := wolfigit.GetVersionFromTag(currentDir, 2)
+	previous, err := wolfigit.GetVersionFromTag(tempDir, 2)
 	if err != nil {
 		o.Logger.Println("no previous tag found so checking all commits for sec fixes")
 	}
 
 	// get list of commits between the previous tag and current tag
-	cveFixes, err := o.getFixesCVEList(currentDir, previous)
+	cveFixes, err := o.getFixesCVEList(tempDir, previous)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get CVE list from commits between tags %s and %s", previous, o.Version)
 	}
@@ -180,11 +201,11 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 		tagRamge = fmt.Sprintf("%s...%s", previous.Original(), o.Version)
 	}
 
-	cmd := exec.Command("git", "log", tagRamge)
+	cmd := exec.Command("git", "log", "--no-merges", tagRamge)
 	cmd.Dir = dir
 	rs, err := cmd.Output()
 	if err != nil {
-		return fixedCVEs, errors.Wrapf(err, "failed to get outut from git log %s", tagRamge)
+		return fixedCVEs, errors.Wrapf(err, "failed to get output from git log %s", tagRamge)
 	}
 
 	// convert to string as dealing with bytes results in a 3 dimensional array, hard to debug
