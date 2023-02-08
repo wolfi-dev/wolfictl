@@ -329,7 +329,10 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 
 	commitMessage := fmt.Sprintf("add advisory and secfixes %s", strings.Join(fixes, " "))
 
-	if _, err = worktree.Commit(commitMessage, &git.CommitOptions{}); err != nil {
+	commitOpts := &git.CommitOptions{}
+	commitOpts.Author = wolfigit.GetGitAuthorSignature()
+
+	if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
 		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil

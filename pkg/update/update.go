@@ -453,7 +453,9 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 	} else {
 		commitMessage = "Updating wolfi packages"
 	}
-	if _, err = worktree.Commit(commitMessage, &git.CommitOptions{}); err != nil {
+	commitOpts := &git.CommitOptions{}
+	commitOpts.Author = wgit.GetGitAuthorSignature()
+	if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
 		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil

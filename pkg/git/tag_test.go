@@ -14,6 +14,8 @@ import (
 )
 
 func TestGetCurrentVersionFromTag(t *testing.T) {
+	t.Setenv("GIT_AUTHOR_NAME", "test")
+	t.Setenv("GIT_AUTHOR_EMAIL", "test@tester.com")
 	tests := []struct {
 		existing []string
 		expected string
@@ -31,7 +33,7 @@ func TestGetCurrentVersionFromTag(t *testing.T) {
 			setupTestRepo(t, dir)
 
 			for _, tag := range test.existing {
-				err := CreateTag(dir, tag, "test", "test@tester.com")
+				err := CreateTag(dir, tag)
 				assert.NoError(t, err)
 			}
 

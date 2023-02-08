@@ -5,6 +5,9 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/wolfi-dev/wolfictl/pkg/stringhelpers"
@@ -75,4 +78,18 @@ func ParseGitURL(rawURL string) (*URL, error) {
 	gitURL.Name = parts[2]
 
 	return gitURL, nil
+}
+
+func GetGitAuthorSignature() *object.Signature {
+	gitAuthorName := os.Getenv("GIT_AUTHOR_NAME")
+	gitAuthorEmail := os.Getenv("GIT_AUTHOR_EMAIL")
+	// override default git config tagger info
+	if gitAuthorName != "" && gitAuthorEmail != "" {
+		return &object.Signature{
+			Name:  gitAuthorName,
+			Email: gitAuthorEmail,
+			When:  time.Now(),
+		}
+	}
+	return nil
 }

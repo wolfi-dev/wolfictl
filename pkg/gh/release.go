@@ -72,7 +72,7 @@ func (o ReleaseOptions) Release() error {
 	}
 
 	// create new tag + GitHub release
-	err = wolfigit.CreateTag(o.Dir, next.Original(), "", "")
+	err = wolfigit.CreateTag(o.Dir, next.Original())
 	if err != nil {
 		return errors.Wrapf(err, "failed to create tag %s", next.Original())
 	}
