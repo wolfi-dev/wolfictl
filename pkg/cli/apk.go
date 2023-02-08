@@ -133,6 +133,7 @@ func index(arch, repo string) (*repository.ApkIndex, error) {
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
 			b, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -146,9 +147,9 @@ func index(arch, repo string) (*repository.ApkIndex, error) {
 		if err != nil {
 			return nil, fmt.Errorf("opening %q: %w", repo, err)
 		}
+		defer f.Close()
 		rc = f
 	}
-	defer rc.Close()
 
 	return repository.IndexFromArchive(rc)
 }
