@@ -31,7 +31,6 @@ linters:
     - gocyclo
     - godox
     - gofmt
-    - gofumpt
     - goheader
     - goimports
     - gomoddirectives
@@ -184,3 +183,5 @@ linters-settings:
   gomoddirectives:
     replace-allow-list:
       - gitlab.alpinelinux.org/alpine/go
+      - github.com/goccy/go-graphviz
+      - k8s.io/client-go

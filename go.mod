@@ -4,6 +4,11 @@ go 1.19
 
 replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230208145941-f16d44faeed4
 
+// Forked to only support SVG, remove deps that had liceses issues.
+replace github.com/goccy/go-graphviz => github.com/n3wscott/go-graphviz v0.0.10-0.20211216184452-fd4faf331d28
+
+replace k8s.io/client-go => k8s.io/client-go v0.25.3
+
 require (
 	chainguard.dev/apko v0.6.1-0.20230112190132-a65677fe7e84
 	chainguard.dev/melange v0.2.1-0.20230117233119-f388539c0c1f
@@ -13,10 +18,12 @@ require (
 	github.com/charmbracelet/bubbletea v0.23.2
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/cpuguy83/go-md2man v1.0.10
+	github.com/dominikbraun/graph v0.15.1
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/go-git/go-billy/v5 v5.4.1
 	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.5.2
+	github.com/goccy/go-graphviz v0.0.9
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-containerregistry v0.13.0
 	github.com/google/go-github/v50 v50.0.0
@@ -24,6 +31,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
+	github.com/mattmoor/mink v1.3.1
 	github.com/openvex/go-vex v0.2.0
 	github.com/openvex/vexctl v0.2.1-0.20230123203902-a37dcd068257
 	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a
@@ -41,14 +49,18 @@ require (
 	golang.org/x/time v0.3.0
 	google.golang.org/api v0.110.0
 	gopkg.in/yaml.v3 v3.0.1
+	k8s.io/api v0.25.3
+	k8s.io/apimachinery v0.26.0
+	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
+	k8s.io/utils v0.0.0-20230115233650-391b47cb4029
 	sigs.k8s.io/release-sdk v0.9.7
 )
 
 require (
-	cloud.google.com/go v0.107.0 // indirect
+	cloud.google.com/go v0.108.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v0.9.0 // indirect
+	cloud.google.com/go/iam v0.10.0 // indirect
 	github.com/AliyunContainerService/ack-ram-tool/pkg/credentials/alibabacloudsdkgo/helper v0.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -167,7 +179,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
-	github.com/korovkin/limiter v0.0.0-20221015170604-22eb1ceceddc // indirect
+	github.com/korovkin/limiter v0.0.0-20230101005513-bfac7ca56b5a // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/letsencrypt/boulder v0.0.0-20230123193802-cee636b47dd4 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -244,6 +256,7 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/build v0.0.0-20221229213058-1f2478aa0ea8 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
@@ -260,12 +273,9 @@ require (
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/api v0.26.1 // indirect
-	k8s.io/apimachinery v0.26.1 // indirect
-	k8s.io/client-go v0.26.1 // indirect
 	k8s.io/klog/v2 v2.90.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20230123170611-3dfa6bdaa2d5 // indirect
-	k8s.io/utils v0.0.0-20230115233650-391b47cb4029 // indirect
+	knative.dev/pkg v0.0.0-20220316002959-3a4cc56708b9 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/release-utils v0.7.3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
