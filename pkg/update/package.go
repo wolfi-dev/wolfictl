@@ -85,8 +85,9 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	cloneOpts := &git.CloneOptions{
 		URL:               o.TargetRepo,
 		Progress:          os.Stdout,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		RecurseSubmodules: git.NoRecurseSubmodules,
 		Auth:              wolfigit.GetGitAuth(),
+		Depth:             1,
 	}
 
 	repo, err := git.PlainClone(tempDir, false, cloneOpts)
@@ -105,6 +106,27 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	uo.DryRun = o.DryRun
 	uo.PullRequestBaseBranch = o.PullRequestBaseBranch
 	uo.PullRequestTitle = "%s/%s package update"
+
+	// build a mapping data
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	currentRepo, err := git.PlainOpen(currentDir)
+	if err != nil {
+		return fmt.Errorf("failed to clone repository %s into %s: %w", o.TargetRepo, tempDir, err)
+	}
+	gitURL, err := wolfigit.GetRemoteURL(currentRepo)
+	if err != nil {
+		return err
+	}
+
+	uo.MapperData = map[string]Row{o.PackageName: {
+		PackageName:     o.PackageName,
+		Identifier:      fmt.Sprintf("%s/%s", gitURL.Organisation, gitURL.Name),
+		ServiceName:     "GITHUB",
+		StripPrefixChar: "v",
+	}}
 
 	// let's work on a branch when updating package versions, so we can create a PR from that branch later
 	ref, err := uo.switchBranch(repo)
@@ -144,9 +166,10 @@ func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
 	// checkout repo into tmp dir so we know we are working on a clean HEAD
 	cloneOpts := &git.CloneOptions{
 		URL:               gitURL.RawURL,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		RecurseSubmodules: git.NoRecurseSubmodules,
 		Auth:              wolfigit.GetGitAuth(),
 		Tags:              git.AllTags,
+		Depth:             1,
 	}
 
 	tempDir, err := os.MkdirTemp("", "wolfictl")

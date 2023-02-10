@@ -93,6 +93,11 @@ func updateSubmodules(submodule string, wt *git.Worktree) error {
 		return err
 	}
 
+	err = sub.Init()
+	if err != nil {
+		return err
+	}
+
 	sr, err := sub.Repository()
 	if err != nil {
 		return err
@@ -106,6 +111,7 @@ func updateSubmodules(submodule string, wt *git.Worktree) error {
 	err = sw.Pull(&git.PullOptions{
 		RemoteName: "origin",
 		Auth:       wgit.GetGitAuth(),
+		Depth:      1,
 	})
 
 	return err
