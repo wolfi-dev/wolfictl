@@ -21,6 +21,7 @@ func New() *cobra.Command {
 		Gh(),
 		Apk(),
 		Index(),
+		GenerateIndex(),
 	)
 
 	return cmd

@@ -2,12 +2,16 @@ module github.com/wolfi-dev/wolfictl
 
 go 1.19
 
+replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230208145941-f16d44faeed4
+
 require (
 	chainguard.dev/apko v0.6.1-0.20230112190132-a65677fe7e84
 	chainguard.dev/melange v0.2.1-0.20230117233119-f388539c0c1f
+	cloud.google.com/go/storage v1.28.1
 	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
 	github.com/charmbracelet/bubbles v0.15.0
-	github.com/charmbracelet/bubbletea v0.23.1
+	github.com/charmbracelet/bubbletea v0.23.2
+	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/go-git/go-billy/v5 v5.4.0
@@ -32,8 +36,10 @@ require (
 	gitlab.alpinelinux.org/alpine/go v0.6.0
 	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157
 	golang.org/x/oauth2 v0.4.0
+	golang.org/x/sync v0.1.0
 	golang.org/x/text v0.6.0
 	golang.org/x/time v0.3.0
+	google.golang.org/api v0.108.0
 	gopkg.in/yaml.v3 v3.0.1
 	sigs.k8s.io/release-sdk v0.9.6
 )
@@ -43,7 +49,6 @@ require (
 	cloud.google.com/go/compute v1.15.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.9.0 // indirect
-	cloud.google.com/go/storage v1.28.1 // indirect
 	github.com/AliyunContainerService/ack-ram-tool/pkg/credentials/alibabacloudsdkgo/helper v0.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -93,7 +98,6 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
-	github.com/charmbracelet/lipgloss v0.6.0 // indirect
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20221129204813-6a4d6ed5d396 // indirect
 	github.com/clbanning/mxj/v2 v2.5.7 // indirect
 	github.com/cloudflare/circl v1.3.1 // indirect
@@ -182,7 +186,7 @@ require (
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
-	github.com/muesli/termenv v0.13.0 // indirect
+	github.com/muesli/termenv v0.14.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oec/goparsify v0.2.1 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
@@ -243,12 +247,10 @@ require (
 	golang.org/x/crypto v0.5.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/term v0.4.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/api v0.108.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230123190316-2c411cf9d197 // indirect
 	google.golang.org/grpc v1.52.0 // indirect
