@@ -1,0 +1,18 @@
+---
+version: 2
+updates:
+  # workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  # actions
+  - package-ecosystem: "github-actions"
+    directory: "/actions"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: "daily"
