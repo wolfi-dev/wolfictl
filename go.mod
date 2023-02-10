@@ -14,7 +14,7 @@ require (
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
-	github.com/go-git/go-billy/v5 v5.4.0
+	github.com/go-git/go-billy/v5 v5.4.1
 	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.5.2
 	github.com/google/go-cmp v0.5.9
