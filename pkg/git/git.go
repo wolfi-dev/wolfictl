@@ -72,6 +72,7 @@ func ParseGitURL(rawURL string) (*URL, error) {
 			gitURL.Host = arr[0]
 			gitURL.Organisation = arr[1]
 			gitURL.Name = arr[len(arr)-1]
+			gitURL.RawURL = fmt.Sprintf("https://%s/%s/%s.git", gitURL.Host, gitURL.Organisation, gitURL.Name)
 			return gitURL, nil
 		}
 	}
