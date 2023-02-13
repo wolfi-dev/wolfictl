@@ -13,7 +13,7 @@ import (
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v50/github"
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"

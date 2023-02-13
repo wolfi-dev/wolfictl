@@ -13,7 +13,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v50/github"
 
 	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"

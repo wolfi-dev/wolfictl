@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/go-version"
 
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v50/github"
 
 	"github.com/pkg/errors"
 )
