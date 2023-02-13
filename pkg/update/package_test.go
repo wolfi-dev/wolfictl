@@ -28,6 +28,18 @@ func TestPackageUpdate_getFixesCVEList(t *testing.T) {
 	createTestTag(t, r, "1.2.4")
 	createTestCommit(t, r, "a2", "fixes: CVE456abc and some other text")
 	createTestCommit(t, r, "a3", "FIXES: cve78910qwerty and some other text")
+	createTestCommit(t, r, "a4", "FIXES: cve257 fixes: cve579")
+	createTestCommit(t, r, "a5", `
+fixes: CVE961
+fixes: CVE852
+`)
+	createTestCommit(t, r, "a6", `
+
+    patch foo go modules
+
+    fixes: CVE-2000-1234
+
+`)
 
 	// create a new release tag 1.2.5
 	createTestTag(t, r, "1.2.5")
@@ -43,9 +55,14 @@ func TestPackageUpdate_getFixesCVEList(t *testing.T) {
 	cves, err := o.getFixesCVEList(dir, previousVersion)
 	assert.NoError(t, err)
 
-	assert.Equal(t, 2, len(cves))
-	assert.Equal(t, "CVE78910QWERTY", cves[0])
-	assert.Equal(t, "CVE456ABC", cves[1])
+	assert.Equal(t, 7, len(cves))
+	assert.Contains(t, cves, "CVE78910")
+	assert.Contains(t, cves, "CVE456")
+	assert.Contains(t, cves, "CVE257")
+	assert.Contains(t, cves, "CVE579")
+	assert.Contains(t, cves, "CVE961")
+	assert.Contains(t, cves, "CVE852")
+	assert.Contains(t, cves, "CVE-2000-1234")
 }
 
 func setupTestRepo(t *testing.T, dir string) *git.Repository {
