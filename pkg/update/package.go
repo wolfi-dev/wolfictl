@@ -200,7 +200,7 @@ func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
 	}
 
 	if len(cveFixes) == 0 {
-		o.Logger.Printf("no fixes: CVE### comments found from commits between tags %s and %s, skip creating sec fix advisories\n", previous, o.Version)
+		o.Logger.Printf("no fixes: CVE### comments found from commits between tags %s and %s, skip creating sec fix advisories\n", previous.Original(), o.Version)
 		return nil
 	}
 	// run the equivalent of `wolfictl advisory create ./foo.melange.yaml --vuln 'CVE-2022-31130' --status 'fixed' --fixed-version '7.5.17-r1'`
@@ -237,7 +237,7 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 
 	// parse commit comments for `fixes: CVE###`, (?i) to ignore case
 	//nolint:gosimple
-	r := regexp.MustCompile("(?i)fixes: CVE\\w+")
+	r := regexp.MustCompile("(?i)fixes: CVE-*[0-9]\\d+-*[0-9]?\\d+")
 
 	cves := r.FindAllStringSubmatch(gitLog, -1)
 	for _, commitCVEs := range cves {
