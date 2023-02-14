@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v50/github"
 	"github.com/google/uuid"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/exp/maps"
@@ -110,6 +110,7 @@ func (o *Options) Update() error {
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 		Auth:              wgit.GetGitAuth(),
+		Depth:             1,
 	}
 
 	repo, err := git.PlainClone(tempDir, false, cloneOpts)
@@ -292,7 +293,7 @@ func (o *Options) updateMakefile(tempDir, packageName, latestVersion string, wor
 // this function is a noop if no git submodules exist
 func (o *Options) updateGitModules(dir, packageName, version string, wt *git.Worktree) error {
 	// if no gitmodules file exist this in a noop
-	if _, err := os.Stat(".gitmodules"); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(filepath.Join(dir, ".gitmodules")); errors.Is(err, os.ErrNotExist) {
 		return nil
 	}
 
@@ -453,7 +454,9 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 	} else {
 		commitMessage = "Updating wolfi packages"
 	}
-	if _, err = worktree.Commit(commitMessage, &git.CommitOptions{}); err != nil {
+	commitOpts := &git.CommitOptions{}
+	commitOpts.Author = wgit.GetGitAuthorSignature()
+	if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
 		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil

@@ -8,9 +8,10 @@ import (
 )
 
 type lintOptions struct {
-	args    []string
-	verbose bool
-	list    bool
+	args      []string
+	verbose   bool
+	list      bool
+	skipRules []string
 }
 
 func Lint() *cobra.Command {
@@ -30,6 +31,7 @@ func Lint() *cobra.Command {
 	}
 	cmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbose output")
 	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "prints the all of available rules and exits")
+	cmd.Flags().StringArrayVarP(&o.skipRules, "skip-rule", "", []string{}, "list of rules to skip")
 	return cmd
 }
 
@@ -63,5 +65,6 @@ func (o lintOptions) makeLintOptions() []lint.Option {
 	return []lint.Option{
 		lint.WithPath(o.args[0]),
 		lint.WithVerbose(o.verbose),
+		lint.WithSkipRules(o.skipRules),
 	}
 }

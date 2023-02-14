@@ -13,7 +13,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v50/github"
 
 	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
@@ -72,7 +72,7 @@ func (o ReleaseOptions) Release() error {
 	}
 
 	// create new tag + GitHub release
-	err = wolfigit.CreateTag(o.Dir, next.Original(), "", "")
+	err = wolfigit.CreateTag(o.Dir, next.Original())
 	if err != nil {
 		return errors.Wrapf(err, "failed to create tag %s", next.Original())
 	}
@@ -83,7 +83,14 @@ func (o ReleaseOptions) Release() error {
 		return err
 	}
 
-	return o.createGitHubRelease(next.Original())
+	// create the GitHub release
+	err = o.createGitHubRelease(next.Original())
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("::set-output name=new_version::%s\n", next.Original())
+	return nil
 }
 
 // bumpReleaseVersion will increment parts of a new release version based on flags supplied when running the CLI command

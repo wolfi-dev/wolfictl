@@ -13,7 +13,7 @@ import (
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v50/github"
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
@@ -85,8 +85,9 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	cloneOpts := &git.CloneOptions{
 		URL:               o.TargetRepo,
 		Progress:          os.Stdout,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		RecurseSubmodules: git.NoRecurseSubmodules,
 		Auth:              wolfigit.GetGitAuth(),
+		Depth:             1,
 	}
 
 	repo, err := git.PlainClone(tempDir, false, cloneOpts)
@@ -105,6 +106,27 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	uo.DryRun = o.DryRun
 	uo.PullRequestBaseBranch = o.PullRequestBaseBranch
 	uo.PullRequestTitle = "%s/%s package update"
+
+	// build a mapping data
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	currentRepo, err := git.PlainOpen(currentDir)
+	if err != nil {
+		return fmt.Errorf("failed to clone repository %s into %s: %w", o.TargetRepo, tempDir, err)
+	}
+	gitURL, err := wolfigit.GetRemoteURL(currentRepo)
+	if err != nil {
+		return err
+	}
+
+	uo.MapperData = map[string]Row{o.PackageName: {
+		PackageName:     o.PackageName,
+		Identifier:      fmt.Sprintf("%s/%s", gitURL.Organisation, gitURL.Name),
+		ServiceName:     "GITHUB",
+		StripPrefixChar: "v",
+	}}
 
 	// let's work on a branch when updating package versions, so we can create a PR from that branch later
 	ref, err := uo.switchBranch(repo)
@@ -137,26 +159,48 @@ func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
 	if err != nil {
 		return err
 	}
+	gitURL, err := wolfigit.GetRemoteURLFromDir(currentDir)
+	if err != nil {
+		return err
+	}
+	// checkout repo into tmp dir so we know we are working on a clean HEAD
+	cloneOpts := &git.CloneOptions{
+		URL:               gitURL.RawURL,
+		RecurseSubmodules: git.NoRecurseSubmodules,
+		Auth:              wolfigit.GetGitAuth(),
+		Tags:              git.AllTags,
+		Depth:             1,
+	}
 
-	if _, err := os.Stat(filepath.Join(currentDir, ".git")); os.IsNotExist(err) {
+	tempDir, err := os.MkdirTemp("", "wolfictl")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
+	}
+
+	_, err = git.PlainClone(tempDir, false, cloneOpts)
+	if err != nil {
+		return fmt.Errorf("failed to clone repository %s into %s: %w", o.TargetRepo, tempDir, err)
+	}
+
+	if _, err := os.Stat(filepath.Join(tempDir, ".git")); os.IsNotExist(err) {
 		o.Logger.Println("skip sec fixes as we are not running update from a git repo")
 		return nil
 	}
 
 	// ignore errors getting previous tags as most likely there's no existing release so should check all commits
-	previous, err := wolfigit.GetVersionFromTag(currentDir, 2)
+	previous, err := wolfigit.GetVersionFromTag(tempDir, 2)
 	if err != nil {
 		o.Logger.Println("no previous tag found so checking all commits for sec fixes")
 	}
 
 	// get list of commits between the previous tag and current tag
-	cveFixes, err := o.getFixesCVEList(currentDir, previous)
+	cveFixes, err := o.getFixesCVEList(tempDir, previous)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get CVE list from commits between tags %s and %s", previous, o.Version)
 	}
 
 	if len(cveFixes) == 0 {
-		o.Logger.Printf("no fixes: CVE### comments found from commits between tags %s and %s, skip creating sec fix advisories\n", previous, o.Version)
+		o.Logger.Printf("no fixes: CVE### comments found from commits between tags %s and %s, skip creating sec fix advisories\n", previous.Original(), o.Version)
 		return nil
 	}
 	// run the equivalent of `wolfictl advisory create ./foo.melange.yaml --vuln 'CVE-2022-31130' --status 'fixed' --fixed-version '7.5.17-r1'`
@@ -180,11 +224,11 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 		tagRamge = fmt.Sprintf("%s...%s", previous.Original(), o.Version)
 	}
 
-	cmd := exec.Command("git", "log", tagRamge)
+	cmd := exec.Command("git", "log", "--no-merges", tagRamge)
 	cmd.Dir = dir
 	rs, err := cmd.Output()
 	if err != nil {
-		return fixedCVEs, errors.Wrapf(err, "failed to get outut from git log %s", tagRamge)
+		return fixedCVEs, errors.Wrapf(err, "failed to get output from git log %s", tagRamge)
 	}
 
 	// convert to string as dealing with bytes results in a 3 dimensional array, hard to debug
@@ -193,7 +237,7 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 
 	// parse commit comments for `fixes: CVE###`, (?i) to ignore case
 	//nolint:gosimple
-	r := regexp.MustCompile("(?i)fixes: CVE\\w+")
+	r := regexp.MustCompile("(?i)fixes: CVE-*[0-9]\\d+-*[0-9]?\\d+")
 
 	cves := r.FindAllStringSubmatch(gitLog, -1)
 	for _, commitCVEs := range cves {
@@ -329,7 +373,10 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 
 	commitMessage := fmt.Sprintf("add advisory and secfixes %s", strings.Join(fixes, " "))
 
-	if _, err = worktree.Commit(commitMessage, &git.CommitOptions{}); err != nil {
+	commitOpts := &git.CommitOptions{}
+	commitOpts.Author = wolfigit.GetGitAuthorSignature()
+
+	if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
 		return fmt.Errorf("failed to git commit: %w", err)
 	}
 	return nil
