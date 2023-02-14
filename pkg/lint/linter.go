@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/exp/slices"
+
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
@@ -68,6 +70,14 @@ func (l *Linter) Lint() (Result, error) {
 			if !shouldEvaluate {
 				if l.options.Verbose {
 					l.logger.Printf("%s: skipping rule %s because condition is not met\n", name, rule.Name)
+				}
+				continue
+			}
+
+			// Allow users to override rules when running lint command
+			if slices.Contains(l.options.SkipRules, rule.Name) {
+				if l.options.Verbose {
+					l.logger.Printf("%s: skipping rule %s because --skip-rule flag set\n", name, rule.Name)
 				}
 				continue
 			}

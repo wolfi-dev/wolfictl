@@ -7,6 +7,9 @@ type Options struct {
 
 	// Verbose prints the details of the linting errors.
 	Verbose bool
+
+	// Skip rules removes the given slice of rules to be checked
+	SkipRules []string
 }
 
 // Option represents a linter option.
@@ -23,5 +26,12 @@ func WithPath(path string) Option {
 func WithVerbose(verbose bool) Option {
 	return func(o *Options) {
 		o.Verbose = verbose
+	}
+}
+
+// WithSkipRules sets the skip rules option.
+func WithSkipRules(skipRules []string) Option {
+	return func(o *Options) {
+		o.SkipRules = skipRules
 	}
 }
