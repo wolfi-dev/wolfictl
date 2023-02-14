@@ -85,7 +85,8 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 		check := &ConfigCheck{}
 		err = yaml.Unmarshal(data, check)
 		if err != nil {
-			return p, errors.Wrapf(err, "failed to unmarshal file when checking if a melange config %s", fi)
+			// we need certain keys to unmarshal so we can identify this as a melange config, if there's no package name and version assume it is not a melange config
+			continue
 		}
 
 		// skip if this file is not a melange config
