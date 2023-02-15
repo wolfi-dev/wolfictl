@@ -9,7 +9,7 @@ func New() *cobra.Command {
 		Use:               "wolfictl",
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
-		Short:             "A simple CLI for working with Wolfi GitHub repositories",
+		Short:             "A CLI helper for developing Wolfi",
 	}
 
 	cmd.AddCommand(
@@ -22,6 +22,9 @@ func New() *cobra.Command {
 		Apk(),
 		Index(),
 		GenerateIndex(),
+		cmdPod(),
+		cmdSVG(),
+		cmdText(),
 	)
 
 	return cmd

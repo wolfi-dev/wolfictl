@@ -11,7 +11,6 @@ endif
 
 GOFILES ?= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
-RUNTIME_IMAGE ?= gcr.io/distroless/static
 # Set version variables for LDFLAGS
 GIT_TAG ?= dirty-tag
 GIT_VERSION ?= $(shell git describe --tags --always --dirty)
@@ -45,12 +44,6 @@ ifdef DEBUG
 BUILDFLAGS := -gcflags "all=-N -l" $(BUILDFLAGS)
 endif
 
-KOCACHE_PATH=/tmp/ko
-
-define create_kocache_path
-  mkdir -p $(KOCACHE_PATH)
-endef
-
 ##########
 # default
 ##########
@@ -58,40 +51,12 @@ endef
 default: help
 
 ##########
-# ko build
-##########
-
-.PHONY: ko
-ko: ## Build images using ko
-	$(create_kocache_path)
-	$(eval DIGEST := $(shell LDFLAGS="$(LDFLAGS)" GIT_HASH=$(GIT_HASH) GIT_VERSION=$(GIT_VERSION) \
-	KOCACHE=$(KOCACHE_PATH) ko build --bare \
-		--platform=all --tags $(GIT_VERSION) --tags $(GIT_HASH) \
-		chainguard.dev/wolfictl))
-	@echo Image Digest $(DIGEST)
-
-.PHONY: ko-local
-ko-local:  ## Build images locally using ko
-	$(create_kocache_path)
-	LDFLAGS="$(LDFLAGS)" GIT_HASH=$(GIT_HASH) GIT_VERSION=$(GIT_VERSION) \
-	KOCACHE=$(KOCACHE_PATH) ko build --bare \
-		--tags $(GIT_VERSION) --tags $(GIT_HASH) --local \
-		chainguard.dev/wolfictl
-
-.PHONY: ko-apply
-ko-apply:  ## Build the image and apply the manifests
-	$(create_kocache_path)
-	LDFLAGS="$(LDFLAGS)" \
-	KOCACHE=$(KOCACHE_PATH) ko apply --base-import-paths \
-		--recursive --filename config/
-
-##########
 # Build
 ##########
 
 .PHONY: wolfictl
 wolfictl: $(SRCS) ## Builds wolfictl
-	CGO_ENABLED=0 go build -trimpath $(BUILDFLAGS) -ldflags "$(LDFLAGS)" -o $@ ./
+	go build -trimpath $(BUILDFLAGS) -ldflags "$(LDFLAGS)" -o $@ ./
 
 .PHONY: install
 install: $(SRCS) ## Installs wolfictl into BINDIR (default /usr/bin)
@@ -147,26 +112,6 @@ clean: ## Clean the workspace
 	rm -rf wolfictl
 	rm -rf bin/
 	rm -rf dist/
-
-#######################
-# Release / goreleaser
-#######################
-
-.PHONY: snapshot
-snapshot: ## Run Goreleaser in snapshot mode
-	LDFLAGS="$(LDFLAGS)" goreleaser release --rm-dist --snapshot --skip-sign --skip-publish
-
-.PHONY: release
-release: ## Run Goreleaser in release mode
-	LDFLAGS="$(LDFLAGS)" goreleaser release --rm-dist
-
-
-#######################
-# Sign images
-#######################
-.PHONY: sign-image
-sign-image: ko ## Sign images built using ko
-	cosign sign $(DIGEST)
 
 ##################
 # help
