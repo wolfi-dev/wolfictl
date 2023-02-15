@@ -45,6 +45,7 @@ type PackageOptions struct {
 	Epoch                 string
 	Secfixes              bool
 	DryRun                bool
+	UseGitSign            bool
 	Logger                *log.Logger
 	GithubClient          *github.Client
 }
@@ -106,6 +107,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	uo.DryRun = o.DryRun
 	uo.PullRequestBaseBranch = o.PullRequestBaseBranch
 	uo.PullRequestTitle = "%s/%s package update"
+	uo.UseGitSign = o.UseGitSign
 
 	// build a mapping data
 	currentDir, err := os.Getwd()
@@ -376,8 +378,23 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 	commitOpts := &git.CommitOptions{}
 	commitOpts.Author = wolfigit.GetGitAuthorSignature()
 
-	if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
-		return fmt.Errorf("failed to git commit: %w", err)
+	if o.UseGitSign {
+		err := wolfigit.SetGitSignOptions(wt.Filesystem.Root())
+		if err != nil {
+			return fmt.Errorf("failed to set git config: %w", err)
+		}
+
+		// maybe we change this when https://github.com/go-git/go-git/issues/400 is implemented
+		cmd := exec.Command("git", "commit", "-sm", commitMessage)
+		rs, err := cmd.Output()
+		if err != nil {
+			return errors.Wrapf(err, "failed to git sign commit %s", rs)
+		}
+	} else {
+		if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
+			return fmt.Errorf("failed to git commit: %w", err)
+		}
 	}
+
 	return nil
 }

@@ -33,6 +33,7 @@ func Package() *cobra.Command {
 	cmd.Flags().StringVar(&o.TargetRepo, "target-repo", "https://github.com/wolfi-dev/os", "target git repository containing melange configuration to update")
 	cmd.Flags().StringVar(&o.Version, "version", "", "version to bump melange package to")
 	cmd.Flags().StringVar(&o.Epoch, "epoch", "0", "the epoch used to identify fix, defaults to 0 as this command is expected to run in a release pipeline that's creating a new version so epoch will be 0")
+	cmd.Flags().BoolVar(&o.UseGitSign, "use-gitsign", false, "enable gitsign to sign the git commits")
 
 	return cmd
 }
