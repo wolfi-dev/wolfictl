@@ -19,6 +19,7 @@ type options struct {
 	dryRun                 bool
 	githubReleaseQuery     bool
 	releaseMonitoringQuery bool
+	useGitSign             bool
 }
 
 func Update() *cobra.Command {
@@ -41,6 +42,7 @@ func Update() *cobra.Command {
 	cmd.Flags().StringVar(&o.pullRequestBaseBranch, "pull-request-base-branch", "main", "base branch to create a pull request against")
 	cmd.Flags().StringVar(&o.pullRequestTitle, "pull-request-title", "%s/%s package update", "the title to use when creating a pull request")
 	cmd.Flags().StringVar(&o.dataMapperURL, "data-mapper-url", "https://raw.githubusercontent.com/wolfi-dev/wolfi-update-mapper/main/DATA.md", "URL to use for mapping packages to source update service")
+	cmd.Flags().BoolVar(&o.useGitSign, "use-gitsign", false, "enable gitsign to sign the git commits")
 
 	cmd.AddCommand(
 		Package(),
@@ -67,6 +69,7 @@ func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
 	updateContext.PullRequestTitle = o.pullRequestTitle
 	updateContext.ReleaseMonitoringQuery = o.releaseMonitoringQuery
 	updateContext.GithubReleaseQuery = o.githubReleaseQuery
+	updateContext.UseGitSign = o.useGitSign
 
 	if err := updateContext.Update(); err != nil {
 		return fmt.Errorf("creating updates: %w", err)

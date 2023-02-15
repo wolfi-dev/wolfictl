@@ -7,28 +7,25 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
-
-	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
-
-	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
-
-	"github.com/pkg/errors"
-
-	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v50/github"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/exp/maps"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
+	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
+	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
+	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
@@ -45,6 +42,7 @@ type Options struct {
 	DryRun                 bool
 	ReleaseMonitoringQuery bool
 	GithubReleaseQuery     bool
+	UseGitSign             bool
 	Client                 *http2.RLHTTPClient
 	Logger                 *log.Logger
 	GitHubHTTPClient       *http2.RLHTTPClient
@@ -456,8 +454,25 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 	}
 	commitOpts := &git.CommitOptions{}
 	commitOpts.Author = wgit.GetGitAuthorSignature()
-	if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
-		return fmt.Errorf("failed to git commit: %w", err)
+
+	if o.UseGitSign {
+		err := wgit.SetGitSignOptions(worktree.Filesystem.Root())
+		if err != nil {
+			return fmt.Errorf("failed to set git config: %w", err)
+		}
+
+		// maybe we change this when https://github.com/go-git/go-git/issues/400 is implemented
+		cmd := exec.Command("git", "commit", "-sm", commitMessage)
+		cmd.Dir = worktree.Filesystem.Root()
+		rs, err := cmd.Output()
+		if err != nil {
+			return errors.Wrapf(err, "failed to git sign commit %s", rs)
+		}
+	} else {
+		if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
+			return fmt.Errorf("failed to git commit: %w", err)
+		}
 	}
+
 	return nil
 }

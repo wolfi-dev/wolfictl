@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/pkg/errors"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/wolfi-dev/wolfictl/pkg/stringhelpers"
@@ -102,5 +104,50 @@ func GetGitAuthorSignature() *object.Signature {
 			When:  time.Now(),
 		}
 	}
+	return nil
+}
+
+func SetGitSignOptions(repoPath string) error {
+	cmd := exec.Command("git", "config", "--local", "commit.gpgsign", "true")
+	cmd.Dir = repoPath
+	rs, err := cmd.Output()
+	if err != nil {
+		return errors.Wrapf(err, "failed to set git config gpgsign: %s", rs)
+	}
+
+	cmd = exec.Command("git", "config", "--local", "gpg.x509.program", "gitsign")
+	cmd.Dir = repoPath
+	rs, err = cmd.Output()
+	if err != nil {
+		return errors.Wrapf(err, "failed to set git config gpg.x509.program: %s", rs)
+	}
+
+	cmd = exec.Command("git", "config", "--local", "gpg.format", "x509")
+	cmd.Dir = repoPath
+	rs, err = cmd.Output()
+	if err != nil {
+		return errors.Wrapf(err, "failed to set git config gpg.format: %s", rs)
+	}
+
+	gitAuthorName := os.Getenv("GIT_AUTHOR_NAME")
+	gitAuthorEmail := os.Getenv("GIT_AUTHOR_EMAIL")
+	if gitAuthorName != "" || gitAuthorEmail != "" {
+		return fmt.Errorf("missing GIT_AUTHOR_NAME and/or GIT_AUTHOR_EMAIL environment variable, please set")
+	}
+
+	cmd = exec.Command("git", "config", "--local", "user.name", gitAuthorName)
+	cmd.Dir = repoPath
+	rs, err = cmd.Output()
+	if err != nil {
+		return errors.Wrapf(err, "failed to set git config user.name: %s", rs)
+	}
+
+	cmd = exec.Command("git", "config", "--local", "user.email", gitAuthorEmail)
+	cmd.Dir = repoPath
+	rs, err = cmd.Output()
+	if err != nil {
+		return errors.Wrapf(err, "failed to set git config user.email: %s", rs)
+	}
+
 	return nil
 }
