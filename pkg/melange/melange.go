@@ -68,6 +68,9 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+		if fi.IsDir() && path != dir {
+			return filepath.SkipDir
+		}
 		if filepath.Ext(path) == ".yaml" {
 			fileList = append(fileList, path)
 		}
