@@ -131,7 +131,7 @@ func SetGitSignOptions(repoPath string) error {
 
 	gitAuthorName := os.Getenv("GIT_AUTHOR_NAME")
 	gitAuthorEmail := os.Getenv("GIT_AUTHOR_EMAIL")
-	if gitAuthorName != "" || gitAuthorEmail != "" {
+	if gitAuthorName == "" || gitAuthorEmail == "" {
 		return fmt.Errorf("missing GIT_AUTHOR_NAME and/or GIT_AUTHOR_EMAIL environment variable, please set")
 	}
 
