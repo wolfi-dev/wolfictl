@@ -332,7 +332,7 @@ Otherwise it's written to APKINDEX.tar.gz.
 				defer func() {
 					// Closing the GCS object also flushes remaining data, and so it can fail.
 					if err := w.Close(); err != nil {
-						log.Fatalf("error closing object")
+						log.Fatalf("error closing object: %v", err)
 					}
 				}()
 				if _, err := io.Copy(w, f); err != nil {
