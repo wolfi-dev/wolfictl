@@ -328,7 +328,8 @@ Otherwise it's written to APKINDEX.tar.gz.
 
 			if publish {
 				log.Println("publishing APKINDEX to repo")
-				w := client.Bucket(bucket).Object(path.Join(prefix, "APKINDEX.tar.gz")).NewWriter(ctx)
+				w := client.Bucket(bkt).Object(path.Join(prefix, arch, "APKINDEX.tar.gz")).NewWriter(ctx)
+				w.CacheControl = "no-cache"
 				defer func() {
 					// Closing the GCS object also flushes remaining data, and so it can fail.
 					if err := w.Close(); err != nil {
