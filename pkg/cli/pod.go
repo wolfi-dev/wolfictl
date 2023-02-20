@@ -193,7 +193,6 @@ if [[ ! -f /var/secrets/melange.rsa ]]; then
 else
   echo "Using secret key..."
   cp /var/secrets/melange.rsa {{.signingKeyName}}.rsa
-  cp ./packages/*.rsa.pub
   KEY={{.signingKeyName}}.rsa
   ls {{.signingKeyName}}.rsa
 fi
