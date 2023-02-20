@@ -45,9 +45,10 @@ func gcloudProjectID(ctx context.Context) (string, error) {
 }
 
 func cmdPod() *cobra.Command {
-	var dir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, cachedig, bucket, srcBucket, signingKeyName string
+	var dir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, cachedig, bucket, srcBucket, publicKeyBucket, signingKeyName string
 	var create, watch, secretKey bool
 	var pendingTimeout time.Duration
+
 	pod := &cobra.Command{
 		Use:   "pod",
 		Short: "Generate a kubernetes pod to run the build",
@@ -104,6 +105,10 @@ func cmdPod() *cobra.Command {
 			}
 			log.Println("bundled source context to", dig)
 
+			// default publicKeyBucket to source bucket if not set
+			if publicKeyBucket == "" {
+				publicKeyBucket = srcBucket
+			}
 			p := &corev1.Pod{
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Pod",
@@ -145,11 +150,12 @@ set -euo pipefail
 # Download all packages so we can avoid rebuilding them.
 mkdir -p ./packages/{{.arch}}
 gsutil -m rsync -r {{.bucket}}{{.arch}} ./packages/{{.arch}} || true
-gsutil cp {{.bucket}}{{.signingKeyName}}.rsa.pub .
+gsutil cp {{.publicKeyBucket}}{{.signingKeyName}}.rsa.pub .
 `, map[string]string{
-							"arch":           arch,
-							"bucket":         srcBucket,
-							"signingKeyName": signingKeyName,
+							"arch":            arch,
+							"bucket":          srcBucket,
+							"publicKeyBucket": publicKeyBucket,
+							"signingKeyName":  signingKeyName,
 						})},
 						Resources: corev1.ResourceRequirements{
 							Requests: corev1.ResourceList{
@@ -330,6 +336,7 @@ gsutil -m cp -r "./packages/*" gs://{{.bucket}}`, map[string]string{"bucket": bu
 	pod.Flags().BoolVar(&secretKey, "secret-key", false, "if true, bind a GCP secret named `melange-signing-key` into /var/secrets/melange.rsa (requires GKE and Workload Identity)")
 	pod.Flags().StringVar(&bucket, "bucket", "", "if set, upload contents of packages/* to a location in GCS")
 	pod.Flags().StringVar(&srcBucket, "src-bucket", "gs://wolfi-production-registry-destination/os/", "if set, download contents of packages/* from a location in GCS")
+	pod.Flags().StringVar(&publicKeyBucket, "public-key-bucket", "", "if set, uses this bucket combined with --signing-key-name to fetch the public key used to verify packages from --src-bucket.  If not set defaults to --src-bucket value")
 	pod.Flags().StringVar(&signingKeyName, "signing-key-name", "wolfi-signing", "the signing key name to use, the name is important when when signing e.g. keyName=wolfi-signing")
 	_ = pod.MarkFlagRequired("repo") //nolint:errcheck
 	return pod
