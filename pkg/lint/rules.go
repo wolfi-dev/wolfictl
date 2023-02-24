@@ -22,10 +22,16 @@ var (
 	forbiddenKeyrings = []string{
 		"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
 	}
+
+	// versionRegex how to parse versions.
+	// see https://github.com/alpinelinux/apk-tools/blob/50ab589e9a5a84592ee4c0ac5a49506bb6c552fc/src/version.c#
+	versionRegex = regexp.MustCompile(`^([0-9]+)((\.[0-9]+)*)([a-z]?)((_alpha|_beta|_pre|_rc)([0-9]*))?((_cvs|_svn|_git|_hg|_p)([0-9]*))?((-r)([0-9]+))?$`)
 )
 
+func init() { versionRegex.Longest() }
+
 // AllRules is a list of all available rules to evaluate.
-var AllRules = func(l *Linter) Rules {
+var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 	return Rules{
 		{
 			Name:        "no-makefile-entry-for-package",
@@ -182,6 +188,18 @@ var AllRules = func(l *Linter) Rules {
 							return err
 						}
 					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "bad-version",
+			Description: "version is malformed",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				version := config.Package.Version
+				if len(versionRegex.FindAllStringSubmatch(version, -1)) == 0 {
+					return fmt.Errorf("invalid version %s, could not parse", version)
 				}
 				return nil
 			},
