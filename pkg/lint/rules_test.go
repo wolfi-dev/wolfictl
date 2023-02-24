@@ -126,6 +126,22 @@ func TestLinter_Rules(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			file: "bad-version.yaml",
+			want: EvalResult{
+				File: "bad-version",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "bad-version",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[bad-version]: invalid version 1.0.0rc1, could not parse (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

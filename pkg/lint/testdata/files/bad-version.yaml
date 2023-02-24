@@ -1,0 +1,15 @@
+package:
+  name: bad-version
+  version: 1.0.0rc1
+  epoch: 0
+  description: "a package with a wrong pipeline fetch uri"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+environment:
+  contents:
+    packages:
+      - foo
+      - bar
