@@ -31,7 +31,7 @@ var (
 func init() { versionRegex.Longest() }
 
 // AllRules is a list of all available rules to evaluate.
-var AllRules = func(l *Linter) Rules {
+var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 	return Rules{
 		{
 			Name:        "no-makefile-entry-for-package",
