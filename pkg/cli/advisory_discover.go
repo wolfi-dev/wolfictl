@@ -8,7 +8,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/vuln/sftracker"
 )
 
-const defaultSecfixesTrackerHostname = "secfixes-tracker-nd2dq3gc7a-uk.a.run.app"
+const defaultSecfixesTrackerHostname = "secfixes-tracker-q67u43ydxq-uc.a.run.app"
 
 func AdvisoryDiscover() *cobra.Command {
 	p := &discoverParams{}
