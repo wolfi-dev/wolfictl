@@ -141,6 +141,53 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			file: "wrong-pipeline-git-checkout-commit.yaml",
+			want: EvalResult{
+				File: "wrong-pipeline-git-checkout-commit",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-git-checkout-commit",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-commit]: expected-commit is not valid SHA1 (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "missing-pipeline-git-checkout-commit.yaml",
+			want: EvalResult{
+				File: "missing-pipeline-git-checkout-commit",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-git-checkout-commit",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-commit]: expected-commit is missing (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "wrong-pipeline-git-checkout-tag.yaml",
+			want: EvalResult{
+				File: "wrong-pipeline-git-checkout-tag",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-git-checkout-tag",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-tag]: tag is missing (ERROR)"),
+					},
+				},
+			},
 			wantErr: false,
 		},
 		{

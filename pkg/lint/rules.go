@@ -14,6 +14,7 @@ import (
 var (
 	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
+	reValidSHA1   = regexp.MustCompile(`^[a-fA-F0-9]{40}$`)
 
 	forbiddenRepositories = []string{
 		"https://packages.wolfi.dev/os",
@@ -200,6 +201,40 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				version := config.Package.Version
 				if len(versionRegex.FindAllStringSubmatch(version, -1)) == 0 {
 					return fmt.Errorf("invalid version %s, could not parse", version)
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "valid-pipeline-git-checkout-commit",
+			Description: "every git-checkout pipeline should have a valid expected-commit",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				for _, p := range config.Pipeline {
+					if p.Uses == "git-checkout" {
+						if commit, ok := p.With["expected-commit"]; ok {
+							if !reValidSHA1.MatchString(commit) {
+								return fmt.Errorf("expected-commit is not valid SHA1")
+							}
+						} else {
+							return fmt.Errorf("expected-commit is missing")
+						}
+					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "valid-pipeline-git-checkout-tag",
+			Description: "every git-checkout pipeline should have a tag",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				for _, p := range config.Pipeline {
+					if p.Uses == "git-checkout" {
+						if _, ok := p.With["tag"]; !ok {
+							return fmt.Errorf("tag is missing")
+						}
+					}
 				}
 				return nil
 			},
