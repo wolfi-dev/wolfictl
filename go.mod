@@ -20,6 +20,7 @@ require (
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dominikbraun/graph v0.15.1
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
+	github.com/facebookincubator/nvdtools v0.1.5
 	github.com/fatih/color v1.15.0
 	github.com/go-git/go-billy/v5 v5.4.1
 	github.com/go-git/go-git v4.7.0+incompatible
@@ -37,6 +38,7 @@ require (
 	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.38.1
+	github.com/savioxavier/termlink v1.2.1
 	github.com/sigstore/cosign/v2 v2.0.3-0.20230425232139-17cc13812d8a
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -183,6 +185,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/jwalton/go-supportscolor v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/korovkin/limiter v0.0.0-20230101005513-bfac7ca56b5a // indirect
