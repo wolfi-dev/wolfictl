@@ -40,7 +40,7 @@ require (
 	github.com/sigstore/cosign/v2 v2.0.0-rc.2
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	gitlab.alpinelinux.org/alpine/go v0.6.0
 	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157
 	golang.org/x/oauth2 v0.5.0
