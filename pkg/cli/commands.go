@@ -25,6 +25,7 @@ func New() *cobra.Command {
 		cmdPod(),
 		cmdSVG(),
 		cmdText(),
+		cmdMake(),
 	)
 
 	return cmd

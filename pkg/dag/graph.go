@@ -69,15 +69,11 @@ func NewGraph(dirFS fs.FS, dirPath string) (*Graph, error) { //nolint:gocyclo
 			packages = append(packages, name)
 
 			for _, prov := range c.Package.Dependencies.Provides {
-				p, v, ok := strings.Cut(prov, "=")
-				if !ok {
-					log.Fatalf("don't know how to interpret %q in %s", prov, path)
-				}
 				if _, exists := configs[p]; !exists {
 					configs[p] = build.Configuration{
 						Package: build.Package{
-							Name:        p,
-							Version:     v,
+							Name:        packageNameFromProvides(prov),
+							Version:     "PROVIDED",
 							Description: fmt.Sprintf("PROVIDED BY %s", c.Package.Name),
 						},
 					}
@@ -113,6 +109,19 @@ func NewGraph(dirFS fs.FS, dirPath string) (*Graph, error) { //nolint:gocyclo
 			}
 			if err := g.AddEdge(subpkg.Name, c.Package.Name); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
 				return nil, fmt.Errorf("unable to add edge for %q subpackage %q: %w", name, subpkg.Name, err)
+			}
+
+			for _, prov := range subpkg.Dependencies.Provides {
+				p := packageNameFromProvides(prov)
+				if _, exists := configs[p]; !exists {
+					configs[p] = build.Configuration{
+						Package: build.Package{
+							Name:        p,
+							Version:     "PROVIDED",
+							Description: fmt.Sprintf("PROVIDED BY %s", c.Package.Name),
+						},
+					}
+				}
 			}
 
 			// TODO: resolve deps via `uses` for subpackage pipelines.
@@ -156,6 +165,17 @@ func NewGraph(dirFS fs.FS, dirPath string) (*Graph, error) { //nolint:gocyclo
 		configs:  configs,
 		packages: packages,
 	}, nil
+}
+
+func packageNameFromProvides(prov string) string {
+	if p, _, ok := strings.Cut(prov, "~="); ok {
+		return p
+	}
+	if p, _, ok := strings.Cut(prov, "="); ok {
+		return p
+	}
+	log.Printf("could not parse package name from %q", prov)
+	return ""
 }
 
 // Config returns the Melange configuration for the package with the given name,
@@ -298,7 +318,8 @@ func (g Graph) SubgraphWithLeaves(leaves []string) (*Graph, error) { //nolint:du
 func (g Graph) MakeTarget(pkgName, arch string) (string, error) {
 	config := g.Config(pkgName)
 	if config == nil {
-		return "", fmt.Errorf("unable to generate target: no config for package %q", pkgName)
+		log.Println("no config for package:", pkgName)
+		return "", nil
 	}
 	if pkgName != config.Package.Name {
 		return "", nil
@@ -313,7 +334,8 @@ func (g Graph) MakeTarget(pkgName, arch string) (string, error) {
 func (g Graph) MakefileEntry(pkgName string) (string, error) {
 	config := g.Config(pkgName)
 	if config == nil {
-		return "", fmt.Errorf("unable to generate target: no config for package %q", pkgName)
+		log.Println("no config for package:", pkgName)
+		return "", nil
 	}
 	if pkgName != config.Package.Name {
 		return "", nil
