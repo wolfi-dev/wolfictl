@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 
@@ -18,6 +19,7 @@ type Packages struct {
 	Config   build.Configuration
 	Filename string
 	Dir      string
+	NoLint   []string
 }
 
 type ConfigCheck struct {
@@ -51,16 +53,37 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]Packages,
 			if err != nil {
 				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
+
+			nolint, err := findNoLint(fullPath)
+			if err != nil {
+				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
+			}
+
 			p[config.Package.Name] = Packages{
 				Config:   config,
 				Filename: filename,
 				Dir:      dir,
+				NoLint:   nolint,
 			}
 		}
 		return p, nil
 	}
 	// get all packages in the provided git repo
 	return ReadAllPackagesFromRepo(dir)
+}
+
+func findNoLint(filename string) ([]string, error) {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(string(b), "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "#nolint:") {
+			return strings.Split(strings.TrimPrefix(line, "#nolint:"), ","), nil
+		}
+	}
+	return nil, nil
 }
 
 func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
@@ -106,10 +129,16 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 			return p, errors.Wrapf(err, "failed to get relative path from dir %s and file %s package config %s", dir, fi, packageConfig.Package.Name)
 		}
 
+		nolint, err := findNoLint(fi)
+		if err != nil {
+			return p, fmt.Errorf("failed to read package config %s: %w", fi, err)
+		}
+
 		p[packageConfig.Package.Name] = Packages{
 			Config:   packageConfig,
 			Filename: relativeFilename,
 			Dir:      dir,
+			NoLint:   nolint,
 		}
 	}
 	fmt.Printf("found %[1]d packages\n", len(p))

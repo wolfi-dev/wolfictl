@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLinter_Rules(t *testing.T) {
@@ -142,6 +143,22 @@ func TestLinter_Rules(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			file: "nolint.yaml",
+			want: EvalResult{
+				File: "nolint",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-copyright-header",
+							Severity: SeverityInfo,
+						},
+						Error: fmt.Errorf("[valid-copyright-header]: copyright header is missing (INFO)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -154,14 +171,14 @@ func TestLinter_Rules(t *testing.T) {
 			}
 
 			// Always should be a single element array.
-			assert.Len(t, got, 1)
+			require.Len(t, got, 1)
 
 			g := got[0]
 
 			// Ensure we're testing the right file.
 			assert.Equal(t, tt.want.File, g.File)
 			// Fast-fail if lengths don't match.
-			assert.Len(t, g.Errors, len(tt.want.Errors))
+			require.Len(t, g.Errors, len(tt.want.Errors))
 
 			for i, e := range g.Errors {
 				assert.Equal(t, e.Error, tt.want.Errors[i].Error, "Lint(): Error: got = %v, want %v", e.Error, tt.want.Errors[i].Error)
