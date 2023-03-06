@@ -23,10 +23,11 @@ Proposes melange package update(s) via a pull request
       --pull-request-base-branch string   base branch to create a pull request against (default "main")
       --pull-request-title string         the title to use when creating a pull request (default "%s/%s package update")
       --release-monitoring-query          query https://release-monitoring.org/ API for latest releases (default true)
+      --use-gitsign                       enable gitsign to sign the git commits
 ```
 
 ### SEE ALSO
 
-* [wolfictl](wolfictl.md)	 - A simple CLI for working with Wolfi GitHub repositories
+* [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi
 * [wolfictl update package](wolfictl_update_package.md)	 - Proposes a single melange package update via a pull request
 
