@@ -15,12 +15,13 @@ Lint the code
 ### Options
 
 ```
-  -h, --help      help for lint
-  -l, --list      prints the all of available rules and exits
-  -v, --verbose   verbose output
+  -h, --help                    help for lint
+  -l, --list                    prints the all of available rules and exits
+      --skip-rule stringArray   list of rules to skip
+  -v, --verbose                 verbose output
 ```
 
 ### SEE ALSO
 
-* [wolfictl](wolfictl.md)	 - A simple CLI for working with Wolfi GitHub repositories
+* [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi
 
