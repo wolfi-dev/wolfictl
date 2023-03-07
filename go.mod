@@ -22,7 +22,7 @@ require (
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/go-git/go-billy/v5 v5.4.1
 	github.com/go-git/go-git v4.7.0+incompatible
-	github.com/go-git/go-git/v5 v5.5.2
+	github.com/go-git/go-git/v5 v5.6.0
 	github.com/goccy/go-graphviz v0.0.9
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-containerregistry v0.13.0
@@ -45,9 +45,9 @@ require (
 	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157
 	golang.org/x/oauth2 v0.5.0
 	golang.org/x/sync v0.1.0
-	golang.org/x/text v0.7.0
+	golang.org/x/text v0.8.0
 	golang.org/x/time v0.3.0
-	google.golang.org/api v0.110.0
+	google.golang.org/api v0.111.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.26.1
 	k8s.io/apimachinery v0.26.1
@@ -60,7 +60,7 @@ require (
 	cloud.google.com/go v0.108.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v0.10.0 // indirect
+	cloud.google.com/go/iam v0.11.0 // indirect
 	github.com/AliyunContainerService/ack-ram-tool/pkg/credentials/alibabacloudsdkgo/helper v0.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -206,7 +206,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/owenrumney/go-sarif v1.1.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
-	github.com/pjbgf/sha1cd v0.2.3 // indirect
+	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/psanford/memfs v0.0.0-20210214183328-a001468d78ef // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
@@ -257,14 +257,14 @@ require (
 	golang.org/x/build v0.0.0-20221229213058-1f2478aa0ea8 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
-	golang.org/x/mod v0.7.0 // indirect
+	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
-	golang.org/x/tools v0.5.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230209215440-0dfe4f8abfcc // indirect
+	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
