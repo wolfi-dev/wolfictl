@@ -2,6 +2,7 @@ package checks
 
 import (
 	"bufio"
+	"debug/elf"
 	"fmt"
 	"io"
 	"log"
@@ -233,9 +234,29 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		s := reg.FindString(filepath.Base(path))
 		if s != "" {
 			fileList = append(fileList, path)
+		}
+
+		// also check for DT_SONAME
+		ef, err := elf.Open(filepath.Join(dir, path))
+		if err != nil {
+			return nil
+		}
+		defer ef.Close()
+
+		sonames, err := ef.DynString(elf.DT_SONAME)
+		// most likely SONAME is not set on this object
+		if err != nil {
+			return nil
+		}
+
+		if len(sonames) > 0 {
+			fileList = append(fileList, sonames...)
 		}
 		return nil
 	})
@@ -244,7 +265,6 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 }
 
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
-
 	// first turn the existing soname files into a map so it is easier to match with
 	existingSonameMap := make(map[string]string)
 	for _, soname := range existingSonameFiles {
@@ -254,7 +274,6 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 
 	// now iterate over new soname files and compare with existing files
 	for _, soname := range newSonameFiles {
-
 		sonameParts := strings.Split(soname, ".so.")
 		name := sonameParts[0]
 		versionStr := sonameParts[1]
@@ -282,7 +301,6 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		if newVersionMajor > existingVersionMajor {
 			return fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version)
 		}
-
 	}
 	return nil
 }

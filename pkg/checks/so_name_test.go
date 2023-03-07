@@ -53,12 +53,19 @@ func TestChecks_getSonameFiles(t *testing.T) {
 	assert.NoError(t, err)
 	err = os.WriteFile(filepath.Join(dir, "foo"), []byte("test"), os.ModePerm)
 	assert.NoError(t, err)
+
+	// simulate DT_SONAME
+	err = os.WriteFile(filepath.Join(dir, "cheese.so.1.1"), []byte("test"), os.ModePerm)
+	assert.NoError(t, err)
+	err = os.Link(filepath.Join(dir, "cheese.so.1.1"), filepath.Join(dir, "cheese.so.1"))
+	assert.NoError(t, err)
+
 	o := SoNameOptions{}
 
 	files, err := o.getSonameFiles(dir)
 	assert.NoError(t, err)
 
-	assert.Equal(t, 3, len(files))
+	assert.Equal(t, 5, len(files))
 }
 
 func TestChecks_downloadCurrentAPK(t *testing.T) {
