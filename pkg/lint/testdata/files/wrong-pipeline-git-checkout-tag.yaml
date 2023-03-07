@@ -1,0 +1,17 @@
+package:
+  name: wrong-pipeline-git-checkout-tag
+  version: 1.0.0
+  epoch: 0
+  description: "a package with missing pipeline git-checkout tag"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+
+pipeline:
+  - uses: git-checkout
+    with:
+      uri: https://test.com/missing-copyright/${{package.version}}.tar.gz
+      branch: main
+      expected-commit: 9c5cfe0525dc7415cec482342ca674875c1e9115
