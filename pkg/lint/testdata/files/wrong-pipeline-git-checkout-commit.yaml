@@ -1,0 +1,17 @@
+package:
+  name: wrong-pipeline-git-checkout-commit
+  version: 1.0.0
+  epoch: 0
+  description: "a package with a wrong pipeline git-checkout commit"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+
+pipeline:
+  - uses: git-checkout
+    with:
+      uri: https://test.com/missing-copyright/${{package.version}}.tar.gz
+      tag: v1.2.3
+      expected-commit: inv@l1d!~

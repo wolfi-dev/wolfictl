@@ -82,6 +82,13 @@ func (l *Linter) Lint() (Result, error) {
 				continue
 			}
 
+			if slices.Contains(filesToLint[name].NoLint, rule.Name) {
+				if l.options.Verbose {
+					l.logger.Printf("%s: skipping rule %s because file contains #nolint:%s\n", name, rule.Name, rule.Name)
+				}
+				continue
+			}
+
 			// Evaluate the rule.
 			if err := rule.LintFunc(filesToLint[name].Config); err != nil {
 				msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity)

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLinter_Rules(t *testing.T) {
@@ -140,6 +141,69 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			file: "wrong-pipeline-git-checkout-commit.yaml",
+			want: EvalResult{
+				File: "wrong-pipeline-git-checkout-commit",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-git-checkout-commit",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-commit]: expected-commit is not valid SHA1 (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "missing-pipeline-git-checkout-commit.yaml",
+			want: EvalResult{
+				File: "missing-pipeline-git-checkout-commit",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-git-checkout-commit",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-commit]: expected-commit is missing (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "wrong-pipeline-git-checkout-tag.yaml",
+			want: EvalResult{
+				File: "wrong-pipeline-git-checkout-tag",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-git-checkout-tag",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-tag]: tag is missing (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "nolint.yaml",
+			want: EvalResult{
+				File: "nolint",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-copyright-header",
+							Severity: SeverityInfo,
+						},
+						Error: fmt.Errorf("[valid-copyright-header]: copyright header is missing (INFO)"),
+					},
+				},
+			},
 			wantErr: false,
 		},
 	}
@@ -154,14 +218,14 @@ func TestLinter_Rules(t *testing.T) {
 			}
 
 			// Always should be a single element array.
-			assert.Len(t, got, 1)
+			require.Len(t, got, 1)
 
 			g := got[0]
 
 			// Ensure we're testing the right file.
 			assert.Equal(t, tt.want.File, g.File)
 			// Fast-fail if lengths don't match.
-			assert.Len(t, g.Errors, len(tt.want.Errors))
+			require.Len(t, g.Errors, len(tt.want.Errors))
 
 			for i, e := range g.Errors {
 				assert.Equal(t, e.Error, tt.want.Errors[i].Error, "Lint(): Error: got = %v, want %v", e.Error, tt.want.Errors[i].Error)
