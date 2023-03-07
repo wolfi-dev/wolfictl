@@ -123,6 +123,10 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
+			name: "abi_compatible", existingSonameFiles: []string{"foo.so.1.2"}, newSonameFiles: []string{"foo.so.1.3"},
+			wantErr: assert.NoError,
+		},
+		{
 			name: "no_existing", existingSonameFiles: []string{}, newSonameFiles: []string{"cheese.so.1"},
 			wantErr: assert.NoError,
 		},

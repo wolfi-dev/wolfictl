@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
+
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
@@ -242,31 +244,45 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 }
 
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
-	reg := regexp.MustCompile(`.so.*\d`)
 
 	// first turn the existing soname files into a map so it is easier to match with
 	existingSonameMap := make(map[string]string)
-	for _, filename := range existingSonameFiles {
-		name := reg.Split(filename, -1)[0]
-		version := reg.FindAllString(filename, -1)[0]
-
-		existingSonameMap[name] = version
+	for _, soname := range existingSonameFiles {
+		sonameParts := strings.Split(soname, ".so.")
+		existingSonameMap[sonameParts[0]] = sonameParts[1]
 	}
 
 	// now iterate over new soname files and compare with existing files
-	for _, filename := range newSonameFiles {
-		name := reg.Split(filename, -1)[0]
-		version := reg.FindAllString(filename, -1)[0]
+	for _, soname := range newSonameFiles {
 
-		existingVersion := existingSonameMap[name]
+		sonameParts := strings.Split(soname, ".so.")
+		name := sonameParts[0]
+		versionStr := sonameParts[1]
+		existingVersionStr := existingSonameMap[name]
+
 		// skip if no matching file
-		if existingVersion == "" {
+		if existingVersionStr == "" {
 			continue
 		}
 
-		if existingVersion != version {
+		// turning the string version into proper version will give us major.minor.patch segments
+		existingVersion, err := versions.NewVersion(existingVersionStr)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse existing version %s", existingVersionStr)
+		}
+
+		version, err := versions.NewVersion(versionStr)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse new version %s", existingVersionStr)
+		}
+
+		// let's now compare the major segments as only major version increments indicate a break ABI compatability
+		newVersionMajor := version.Segments()[0]
+		existingVersionMajor := existingVersion.Segments()[0]
+		if newVersionMajor > existingVersionMajor {
 			return fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version)
 		}
+
 	}
 	return nil
 }
