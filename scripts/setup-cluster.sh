@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SECRET_NAME="${SIGNING_SECRET_NAME:-melange-signing-key}"
+
 if [ $# -lt 1 ]; then
   echo "Must specify service account name"
 fi
@@ -46,7 +48,7 @@ spec:
   provider: gcp
   parameters:
     secrets: |
-      - resourceName: "projects/${PROJECT}/secrets/melange-signing-key/versions/latest"
+      - resourceName: "projects/${PROJECT}/secrets/${SECRET_NAME}/versions/latest"
         path: "melange.rsa"
 EOF
 
