@@ -16,7 +16,7 @@ require (
 	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
 	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
-	github.com/charmbracelet/lipgloss v0.6.0
+	github.com/charmbracelet/lipgloss v0.7.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dominikbraun/graph v0.15.1
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
@@ -106,7 +106,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.1 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/awslabs/amazon-ecr-credential-helper/ecr-login v0.0.0-20230110223219-40efa3093a22 // indirect
-	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
+	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
@@ -197,7 +197,7 @@ require (
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
-	github.com/muesli/termenv v0.14.0 // indirect
+	github.com/muesli/termenv v0.15.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oec/goparsify v0.2.1 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
