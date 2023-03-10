@@ -165,7 +165,7 @@ func Discover(options DiscoverOptions) error {
 			if exists {
 				// TODO: Should we allow for updating existing advisories if previously read vuln
 				// data has been updated?
-				log.Printf("skipping advisory creation for %s in %q: advisory already exists", vulnID, cfg.Package.Name)
+
 				continue
 			}
 
