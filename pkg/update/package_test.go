@@ -1,6 +1,7 @@
 package update
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -40,6 +41,13 @@ fixes: CVE852
     fixes: CVE-2000-1234
 
 `)
+	createTestCommit(t, r, "a7", `
+fix CVEs
+
+    fixes: CVE-2022-12345
+    fixes: CVE-2022-23456
+    fixes: CVE-2022-34567
+`)
 
 	// create a new release tag 1.2.5
 	createTestTag(t, r, "1.2.5")
@@ -47,6 +55,7 @@ fixes: CVE852
 	// run secfixes, current version 1.2.5, previous 1.2.4 and assert only two CVEs returned in list
 	o := PackageOptions{
 		Secfixes: true,
+		Logger:   log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
 	previousVersion, err := version.NewVersion("1.2.4")
@@ -55,7 +64,7 @@ fixes: CVE852
 	cves, err := o.getFixesCVEList(dir, previousVersion)
 	assert.NoError(t, err)
 
-	assert.Equal(t, 7, len(cves))
+	assert.Equal(t, 10, len(cves))
 	assert.Contains(t, cves, "CVE78910")
 	assert.Contains(t, cves, "CVE456")
 	assert.Contains(t, cves, "CVE257")
@@ -63,6 +72,9 @@ fixes: CVE852
 	assert.Contains(t, cves, "CVE961")
 	assert.Contains(t, cves, "CVE852")
 	assert.Contains(t, cves, "CVE-2000-1234")
+	assert.Contains(t, cves, "CVE-2022-12345")
+	assert.Contains(t, cves, "CVE-2022-23456")
+	assert.Contains(t, cves, "CVE-2022-34567")
 }
 
 func setupTestRepo(t *testing.T, dir string) *git.Repository {
