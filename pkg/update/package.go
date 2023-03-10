@@ -171,7 +171,7 @@ func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		Auth:              wolfigit.GetGitAuth(),
 		Tags:              git.AllTags,
-		Depth:             1,
+		Depth:             20,
 	}
 
 	tempDir, err := os.MkdirTemp("", "wolfictl")
@@ -226,6 +226,8 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 		tagRamge = fmt.Sprintf("%s...%s", previous.Original(), o.Version)
 	}
 
+	o.Logger.Printf("git log --no-merges %s", tagRamge)
+
 	cmd := exec.Command("git", "log", "--no-merges", tagRamge)
 	cmd.Dir = dir
 	rs, err := cmd.Output()
@@ -237,9 +239,10 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 	//nolint:gocritic
 	gitLog := string(rs[:])
 
+	o.Logger.Printf("result: %s", gitLog)
+
 	// parse commit comments for `fixes: CVE###`, (?i) to ignore case
-	//nolint:gosimple
-	r := regexp.MustCompile("(?i)fixes: CVE-*[0-9]\\d+-*[0-9]?\\d+")
+	r := regexp.MustCompile(`(?i)fixes: CVE-*[0-9]\d+-*[0-9]?\d+`)
 
 	cves := r.FindAllStringSubmatch(gitLog, -1)
 	for _, commitCVEs := range cves {
