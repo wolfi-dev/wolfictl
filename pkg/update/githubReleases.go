@@ -1,16 +1,23 @@
 package update
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"math"
+	"net/http"
 	"os"
 	"sort"
 	"strings"
+	gotemplate "text/template"
+
+	"github.com/pkg/errors"
 
 	"github.com/hashicorp/go-version"
+	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
 	"github.com/shurcooL/githubv4"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
@@ -26,6 +33,30 @@ const (
 	// so we need to check previous number of versions to ensure we can locate the real latest release version
 	numberOfReleasesToReturn = 10
 )
+
+/*
+The graphql query used is the equivalent contained in this comment, which can be tested using GitHub's graphql explorer
+https://docs.github.com/en/graphql/overview/explorer
+
+Using a go template we can build a single query in batches of 100 that request the tags of many GitHub repos.
+
+Querying Tags and Releases differ because with tags we need to pass an extra Query to filter on names that we are interested in
+*/
+var queryTags = `
+query {
+{{ range  $index, $r := .RepoList }}
+  repo_{{$index}}: repository(owner: "{{$r.Owner}}", name: "{{$r.Name}}") {
+    nameWithOwner
+    refs(refPrefix: "refs/tags/", query: "{{.Filter}}", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
+      totalCount
+      nodes {
+        name
+      }
+    }
+  }{{ if not $index }}, {{end}}
+{{ end }}
+}
+`
 
 /*
 
@@ -52,7 +83,7 @@ Query https://docs.github.com/en/graphql/overview/explorer
 {
   search(type: REPOSITORY, query: "repo:jenkinsci/jenkins repo:sigstore/cosign", first: 100) {
     repositoryCount
-    nodes
+    nodes {
 
       ... on Repository  {
         owner {
@@ -105,13 +136,14 @@ type Repository struct {
 	} `graphql:"releases(first: $first)"`
 }
 
-func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melange.Packages, client *githubv4.Client) GitHubReleaseOptions {
+func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melange.Packages, gqlClient *githubv4.Client, ghClient *http2.RLHTTPClient) GitHubReleaseOptions {
 	options := GitHubReleaseOptions{
 		MapperData:       mapperData,
-		GitGraphQLClient: client,
+		GitGraphQLClient: gqlClient,
 		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
 		PackageConfigIDs: make(map[string]Row),
 		PackageConfigs:   configs,
+		GitHubHTTPClient: ghClient,
 	}
 
 	// maintain a different map, key'd by mapper data identifier for easy lookup
@@ -125,27 +157,53 @@ func NewGitHubReleaseOptions(mapperData map[string]Row, configs map[string]melan
 
 type GitHubReleaseOptions struct {
 	GitGraphQLClient *githubv4.Client
+	GitHubHTTPClient *http2.RLHTTPClient
 	Logger           *log.Logger
 	MapperData       map[string]Row
 	PackageConfigIDs map[string]Row
 	PackageConfigs   map[string]melange.Packages
 }
 
-func (o GitHubReleaseOptions) getLatestGitHubVersions() (results map[string]string, errorMessages []string, err error) {
-	results = make(map[string]string)
+func (o GitHubReleaseOptions) getLatestGitHubVersions() (map[string]string, []string, error) {
+	var results map[string]string
+	var errorMessages []string
 
 	if len(o.MapperData) == 0 {
+		o.Logger.Println("no mapping data, skip checking github versions")
 		return results, errorMessages, nil
 	}
 
-	repoList := o.getRepoList(o.MapperData)
+	releaseRepoList, tagRepolist := o.getRepoLists(o.MapperData)
+
+	results, errorMessages, err := o.getGitHubReleaseVersions(releaseRepoList)
+	if err != nil {
+		return results, errorMessages, errors.Wrapf(err, "failed to get github release  versions")
+	}
+
+	r, e, err := o.getGitHubTagVersions(tagRepolist)
+	if err != nil {
+		return results, errorMessages, errors.Wrapf(err, "failed to get github tag versions")
+	}
+
+	// append any error messages from getting tag versions to the release version error messages
+	errorMessages = append(errorMessages, e...)
+
+	// combine both release and tag versions from retrieved from GitHub
+	maps.Copy(results, r)
+
+	return results, errorMessages, nil
+}
+
+func (o GitHubReleaseOptions) getGitHubReleaseVersions(releaseRepoList [][]string) (map[string]string, []string, error) {
+	results := make(map[string]string)
+	var errorMessages []string
 	var q struct {
 		Search `graphql:"search(first: $count, query: $searchQuery, type: REPOSITORY)"`
 	}
-	for _, batch := range repoList {
+	for _, batch := range releaseRepoList {
 		variables := map[string]interface{}{
 			"searchQuery": githubv4.String(strings.Join(batch, " ")),
-			"count":       githubv4.Int(100), // github say max 100 repos per request
+			"count":       githubv4.Int(100), // github states max 100 repos per request
 			"first":       githubv4.Int(numberOfReleasesToReturn),
 		}
 
@@ -166,11 +224,153 @@ func (o GitHubReleaseOptions) getLatestGitHubVersions() (results map[string]stri
 			return nil, nil, fmt.Errorf("failed to parse github releases: %w", err)
 		}
 
+		// todo why?
 		maps.Copy(results, r)
 
 		errorMessages = append(errorMessages, e...)
 	}
+	return results, errorMessages, nil
+}
 
+func (o GitHubReleaseOptions) getGitHubTagVersions(repoList [][]string) (map[string]string, []string, error) {
+
+	var queries []RepoQuery
+
+	// batches are only needed for request releases from GitHub, no point in looping over all map entries again though so reusing the list structure
+	for _, batches := range repoList {
+		for _, repo := range batches {
+			filter := o.PackageConfigIDs[repo].TagFilter
+			parts := strings.Split(repo, "/")
+
+			queries = append(queries, RepoQuery{
+				Owner:  parts[0],
+				Name:   parts[1],
+				Filter: filter,
+			})
+		}
+	}
+	requestData := QueryTagsData{
+		RepoList: queries,
+	}
+	requestQuery := template(queryTags, requestData)
+
+	// Define the JSON payload as a map[string]string
+	payload := map[string]string{
+		"query": requestQuery,
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return nil, nil, err
+	}
+	o.Logger.Printf("request: %s", requestQuery)
+
+	req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	//req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	token := os.Getenv("GITHUB_TOKEN")
+	req.Header.Add("Authorization", fmt.Sprintf("bearer %s", token))
+	resp, err := o.GitHubHTTPClient.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil, fmt.Errorf("non ok http response for github graphql code: %v %s", resp.StatusCode, resp.Status)
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rs := QueryTagsResponse{}
+	err = json.Unmarshal(b, &rs)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return o.parseGitHubTags(rs)
+}
+
+func (o GitHubReleaseOptions) parseGitHubTags(repos QueryTagsResponse) (map[string]string, []string, error) {
+	results := make(map[string]string)
+	var errorMessages []string
+
+	for _, repo := range repos.Data {
+		var versions []*version.Version
+
+		for _, node := range repo.Refs.Nodes {
+			releaseVersion := node.TagName
+
+			// strip any prefix chars using mapper data
+			// the fastest way to check is to lookup git repo name in the map
+			// data, but there's no guarantee the repo name and map data key are
+			// the same if the identifiers don't match fall back to iterating
+			// through all map data to match using identifier
+			p := o.PackageConfigIDs[repo.NameWithOwner]
+			if p.StripPrefixChar != "" {
+				releaseVersion = strings.TrimPrefix(releaseVersion, p.StripPrefixChar)
+			}
+
+			if p.StripSuffixChar != "" {
+				releaseVersion = strings.TrimPrefix(releaseVersion, p.StripSuffixChar)
+			}
+
+			releaseVersionSemver, err := version.NewVersion(releaseVersion)
+			if err != nil {
+				errorMessages = append(errorMessages, fmt.Sprintf(
+					"failed to create a version from package %s: %s.  Error: %s",
+					repo.NameWithOwner, releaseVersion, err,
+				))
+				continue
+			}
+
+			versions = append(versions, releaseVersionSemver)
+		}
+		// sort the versions to make sure we really do have the latest.
+		// not all projects use the github latest release tag properly so could
+		// end up with older versions
+		if len(versions) > 0 {
+			sort.Sort(wolfiversions.ByLatest(versions))
+
+			latestVersionSemver := versions[len(versions)-1]
+
+			// compare if this version is newer than the version we have in our
+			// related melange package config
+			melangePackageName := o.PackageConfigIDs[repo.NameWithOwner].PackageName
+			melangePackageConfig, ok := o.PackageConfigs[melangePackageName]
+			if !ok {
+				errorMessages = append(errorMessages, fmt.Sprintf(
+					"failed to find %s in package configs",
+					melangePackageName,
+				))
+				continue
+			}
+			if melangePackageConfig.Config.Package.Version != "" {
+				currentVersionSemver, err := version.NewVersion(melangePackageConfig.Config.Package.Version)
+				if err != nil {
+					errorMessages = append(errorMessages, fmt.Sprintf(
+						"failed to create a version from package %s: %s.  Error: %s",
+						melangePackageConfig.Config.Package.Name, melangePackageConfig.Config.Package.Version, err,
+					))
+					continue
+				}
+
+				if currentVersionSemver.LessThan(latestVersionSemver) {
+					o.Logger.Printf(
+						"there is a new stable version available %s, current wolfi version %s, new %s",
+						repo.NameWithOwner, melangePackageConfig.Config.Package.Version, latestVersionSemver.Original(),
+					)
+					results[melangePackageName] = latestVersionSemver.Original()
+				}
+			}
+		}
+	}
 	return results, errorMessages, nil
 }
 
@@ -212,6 +412,9 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 			p := o.PackageConfigIDs[string(node.NameWithOwner)]
 			if p.StripPrefixChar != "" {
 				releaseVersion = strings.TrimPrefix(releaseVersion, p.StripPrefixChar)
+			}
+			if p.StripSuffixChar != "" {
+				releaseVersion = strings.TrimPrefix(releaseVersion, p.StripSuffixChar)
 			}
 
 			releaseVersionSemver, err := version.NewVersion(releaseVersion)
@@ -271,15 +474,26 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository) (results m
 }
 
 // function returns batches of git repositories used to query githubs graphql api.  GitHub has a limit of 100 repos per request.
-func (o GitHubReleaseOptions) getRepoList(mapperData map[string]Row) [][]string {
-	var repoQuery []string
+func (o GitHubReleaseOptions) getRepoLists(mapperData map[string]Row) ([][]string, [][]string) {
+	var releaseRepoQuery []string
+	var tagRepoQuery []string
 
 	for _, row := range mapperData {
 		if row.ServiceName == githubReleases {
-			repoQuery = append(repoQuery, fmt.Sprintf("repo:%s", row.Identifier))
+			if row.UseTags {
+				tagRepoQuery = append(tagRepoQuery, row.Identifier)
+			} else {
+				releaseRepoQuery = append(releaseRepoQuery, fmt.Sprintf("repo:%s", row.Identifier))
+			}
 		}
 	}
 
+	releaseBatch := getBatches(releaseRepoQuery)
+	tagBatch := getBatches(tagRepoQuery)
+	return releaseBatch, tagBatch
+}
+
+func getBatches(repoQuery []string) [][]string {
 	numberOfRepos := len(repoQuery)
 
 	// divide the number of repos by 100 and round up to the next whole number
@@ -318,4 +532,36 @@ func printJSON(v interface{}) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+type QueryTagsData struct {
+	RepoList []RepoQuery
+}
+type RepoQuery struct {
+	Owner  string
+	Name   string
+	Filter string
+}
+type Repo struct {
+	NameWithOwner string `json:"nameWithOwner"`
+	Refs          struct {
+		TotalCount int `json:"totalCount"`
+		Nodes      []struct {
+			TagName string `json:"name"`
+		} `json:"nodes"`
+	} `json:"refs"`
+}
+
+type QueryTagsResponse struct {
+	Data map[string]Repo `json:"data"`
+}
+
+func template(tmpl string, data QueryTagsData) string {
+	var buf bytes.Buffer
+	t := gotemplate.Must(gotemplate.New("").Parse(tmpl))
+	t.Option("missingkey=error")
+	if err := t.Execute(&buf, data); err != nil {
+		log.Fatalf("Executing template: %v", err)
+	}
+	return buf.String()
 }

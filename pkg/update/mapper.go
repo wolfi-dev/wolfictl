@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -13,7 +14,11 @@ type Row struct {
 	PackageName     string
 	Identifier      string
 	ServiceName     string
+	UseTags         bool
+	Shared          bool
+	TagFilter       string
 	StripPrefixChar string
+	StripSuffixChar string
 }
 
 func (o *Options) getMonitorServiceData() (map[string]Row, error) {
@@ -45,23 +50,38 @@ func (o *Options) parseData(rawdata string) (map[string]Row, error) {
 	// start from index 2 as we want to skip the first two lines
 	for i := 2; i < len(lines); i++ {
 		line := lines[i]
-		parts := strings.Split(line, "|")
-		if len(parts) != 7 {
-			o.Logger.Printf("found %d parts, expected 6 in line %s", len(parts), line)
+		if strings.TrimSpace(line) == "" {
 			continue
+		}
+		parts := strings.Split(line, "|")
+		if len(parts) != 11 {
+			return data, fmt.Errorf("found %d parts, expected 10 in line %s", len(parts), line)
 		}
 
 		// if notes say to skip then lets not include this row in the update checks
-		notes := strings.TrimSpace(parts[5])
+		notes := strings.TrimSpace(parts[8])
 		if strings.HasPrefix(notes, "SKIP") {
 			continue
+		}
+
+		useTags, err := strconv.ParseBool(strings.TrimSpace(parts[4]))
+		if err != nil {
+			useTags = false
+		}
+		shared, err := strconv.ParseBool(strings.TrimSpace(parts[5]))
+		if err != nil {
+			shared = false
 		}
 
 		data[strings.TrimSpace(parts[1])] = Row{
 			PackageName:     strings.TrimSpace(parts[1]),
 			Identifier:      strings.TrimSpace(parts[2]),
 			ServiceName:     strings.TrimSpace(parts[3]),
-			StripPrefixChar: strings.TrimSpace(parts[4]),
+			UseTags:         useTags,
+			Shared:          shared,
+			TagFilter:       strings.TrimSpace(parts[6]),
+			StripPrefixChar: strings.TrimSpace(parts[7]),
+			StripSuffixChar: strings.TrimSpace(parts[8]),
 		}
 	}
 

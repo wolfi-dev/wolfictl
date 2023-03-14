@@ -1,0 +1,4 @@
+| package name            | identifier                     | release service | use tags     | shared | tag filter       | strip prefix | strip prefix | notes                                                                     |
+| ----------------------- | ------------------------------ | --------------- | ------------ | ------ | ---------------- | ------------ | ------------ | ------------------------------------------------------------------------- |
+|openjdk-11               |openjdk/jdk11u                  |GITHUB           |true          |true    |jdk-11            |jdk-          |-ga           |                                                                           |
+|go-1.19                  |golang/go                       |GITHUB           |true          |true    |go1.19            |go            |              |                                                                           |

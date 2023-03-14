@@ -1,0 +1,23 @@
+{
+
+  repo_0: repository(owner: "golang", name: "go") {
+    nameWithOwner
+    refs(refPrefix: "refs/tags/", query: "go1.19", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
+      totalCount
+      nodes {
+        name
+      }
+    }
+  }, 
+
+  repo_1: repository(owner: "openjdk", name: "jdk11u") {
+    nameWithOwner
+    refs(refPrefix: "refs/tags/", query: "jdk-11", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
+      totalCount
+      nodes {
+        name
+      }
+    }
+  }
+
+}

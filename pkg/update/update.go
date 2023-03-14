@@ -130,7 +130,7 @@ func (o *Options) Update() error {
 
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-		g := NewGitHubReleaseOptions(o.MapperData, o.PackageConfigs, o.GitGraphQLClient)
+		g := NewGitHubReleaseOptions(o.MapperData, o.PackageConfigs, o.GitGraphQLClient, o.GitHubHTTPClient)
 		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
 		if err != nil {
 			return fmt.Errorf("failed getting github releases: %w", err)

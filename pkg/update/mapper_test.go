@@ -21,4 +21,10 @@ func TestMapper_parseData(t *testing.T) {
 	assert.Equal(t, "", mapperData["bazel-5"].Identifier)
 	assert.Equal(t, "sigstore/cosign", mapperData["cosign"].Identifier)
 	assert.Equal(t, "GITHUB", mapperData["cosign"].ServiceName)
+	assert.Equal(t, false, mapperData["cosign"].Shared)
+	assert.Equal(t, true, mapperData["go-1.19"].Shared)
+	assert.Equal(t, "go1.19", mapperData["go-1.19"].TagFilter)
+	assert.Equal(t, true, mapperData["go-1.19"].UseTags)
+	assert.Equal(t, "jdk-", mapperData["openjdk-11"].StripPrefixChar)
+	assert.Equal(t, "-ga", mapperData["openjdk-11"].StripSuffixChar)
 }

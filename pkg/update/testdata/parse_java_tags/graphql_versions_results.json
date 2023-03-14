@@ -1,0 +1,77 @@
+{
+  "data": {
+    "repo_0": {
+      "nameWithOwner": "golang/go",
+      "refs": {
+        "totalCount": 11,
+        "nodes": [
+          {
+            "name": "go1.19.7"
+          },
+          {
+            "name": "go1.19.6"
+          },
+          {
+            "name": "go1.19.5"
+          },
+          {
+            "name": "go1.19.4"
+          },
+          {
+            "name": "go1.19.3"
+          },
+          {
+            "name": "go1.19.2"
+          },
+          {
+            "name": "go1.19.1"
+          },
+          {
+            "name": "go1.19"
+          },
+          {
+            "name": "go1.19rc2"
+          },
+          {
+            "name": "go1.19rc1"
+          },
+          {
+            "name": "go1.19beta1"
+          }
+        ]
+      }
+    },
+    "repo_1": {
+      "nameWithOwner": "openjdk/jdk11u",
+      "refs": {
+        "totalCount": 100,
+        "nodes": [
+          {
+            "name": "jdk-11.0.19+5"
+          },
+          {
+            "name": "jdk-11.0.19+4"
+          },
+          {
+            "name": "jdk-11.0.19+3"
+          },
+          {
+            "name": "jdk-11.0.19+2"
+          },
+          {
+            "name": "jdk-11.0.19+1"
+          },
+          {
+            "name": "jdk-11.0.18+10"
+          },
+          {
+            "name": "jdk-11.0.18-ga"
+          },
+          {
+            "name": "jdk-11.0.18+9"
+          }
+        ]
+      }
+    }
+  }
+}

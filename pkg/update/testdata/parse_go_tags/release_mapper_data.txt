@@ -1,0 +1,4 @@
+| package name            | identifier                     | release service | use tags     | shared | tag filter       | strip prefix | strip suffix | notes                                                                     |
+| ----------------------- | ------------------------------ | --------------- | ------------ | ------ | ---------------- | ------------ | ------------ | ------------------------------------------------------------------------- |
+|gmp                      |1186                            |RELEASE_MONITOR  |              |        |                  |              |              |                                                                           |
+|go-1.19                  |golang/go                       |GITHUB           |true          |true    |go1.19            |go            |go            |                                                                           |
