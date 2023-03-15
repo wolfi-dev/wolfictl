@@ -54,12 +54,14 @@ func (o *Options) parseData(rawdata string) (map[string]Row, error) {
 			continue
 		}
 		parts := strings.Split(line, "|")
+
+		// this is a breaking change (parts are now 11 not 7) however the mapping data is being moved directly into melange configs soon.  We are assuming that wolfictl update is only being used on wolfi itself, so we can make the corresponding mapping file change, that includes the extra fields until we move the data
 		if len(parts) != 11 {
 			return data, fmt.Errorf("found %d parts, expected 10 in line %s", len(parts), line)
 		}
 
 		// if notes say to skip then lets not include this row in the update checks
-		notes := strings.TrimSpace(parts[8])
+		notes := strings.TrimSpace(parts[9])
 		if strings.HasPrefix(notes, "SKIP") {
 			continue
 		}

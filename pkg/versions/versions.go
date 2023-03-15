@@ -36,14 +36,6 @@ func (u ByLatest) Less(i, j int) bool {
 		re := regexp.MustCompile("\\d+|\\D+")
 
 		if u[j].Metadata() != "" {
-
-			//a := u[j].Metadata()
-			//b := u[i].Metadata()
-			//
-			//if a > b {
-			//	return true
-			//}
-
 			if u[j].Metadata() > u[i].Metadata() {
 				return true
 			}

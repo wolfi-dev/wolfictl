@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hashicorp/go-version"
+
 	"chainguard.dev/melange/pkg/build"
 
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
@@ -187,4 +189,29 @@ func Test_queryTagsResult(t *testing.T) {
 	assert.Contains(t, "golang/go", response.Data["repo_0"].NameWithOwner)
 	assert.Contains(t, "openjdk/jdk11u", response.Data["repo_1"].NameWithOwner)
 
+}
+
+func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
+
+	tests := []struct {
+		version string
+		skip    bool
+	}{
+		{version: "1.2.3-alpha", skip: true},
+		{version: "1.2.3-beta", skip: true},
+		{version: "1.2.3-rc", skip: true},
+		{version: "1.2.3", skip: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.version, func(t *testing.T) {
+			o := GitHubReleaseOptions{
+				Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+			}
+
+			v, err := version.NewVersion(tt.version)
+			assert.NoError(t, err)
+
+			assert.Equalf(t, tt.skip, o.isVersionPreRelease(v, "cheese/crackers"), "isVersionPreRelease(%v)", v)
+		})
+	}
 }

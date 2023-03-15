@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v50/github"
@@ -164,7 +166,7 @@ func (o *Options) Update() error {
 
 	// certain errors should not halt the updates, print them at the end
 	for _, message := range printMessages {
-		o.Logger.Printf(message)
+		o.Logger.Println(color.YellowString(message))
 	}
 
 	return nil
@@ -246,7 +248,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVers
 		if err != nil {
 			return fmt.Errorf("failed to propose changes: %w", err)
 		}
-		o.Logger.Printf(pr)
+		o.Logger.Println(color.GreenString(pr))
 	}
 	return nil
 }

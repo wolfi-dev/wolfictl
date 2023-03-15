@@ -1,4 +1,4 @@
-{
+query {
 
   repo_0: repository(owner: "golang", name: "go") {
     nameWithOwner
