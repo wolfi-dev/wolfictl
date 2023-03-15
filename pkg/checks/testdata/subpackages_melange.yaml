@@ -1,0 +1,22 @@
+package:
+  name: bind
+  version: 1.2.3
+  epoch: 0
+  target-architecture:
+    - all
+subpackages:
+  - name: "bind-doc"
+    description: "bind documentation"
+    pipeline:
+      - uses: split/manpages
+  - name: "bind-dev"
+    description: "bind development headers"
+    pipeline:
+      - uses: split/dev
+  - name: "grape-utils"
+    description: "grape utility headers"
+    pipeline:
+      - runs:  |
+          mkdir -p "${{targets.destdir}}"/foo
+          echo cheese > "${{targets.subpkgdir}}"/foo/cheese
+

@@ -24,6 +24,12 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 			expectedLatestVersion: "4.0.1",
 		},
 		{
+			name:                  "underscore",
+			baseVersions:          baseVersions,
+			testVersions:          []string{"5.2_rc4"},
+			expectedLatestVersion: "5.2rc4",
+		},
+		{
 			name:                  "fork",
 			baseVersions:          baseVersions,
 			testVersions:          []string{"4.0.1ab2", "4.0.1ab3", "4.0.1ab1"},
@@ -41,14 +47,14 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 
 			// add test versions to the list first
 			for _, v := range test.testVersions {
-				semver, err := version.NewVersion(v)
+				semver, err := NewVersion(v)
 				assert.NoError(t, err)
 				versions = append(versions, semver)
 			}
 
 			// next add base versions
 			for _, v := range test.baseVersions {
-				semver, err := version.NewVersion(v)
+				semver, err := NewVersion(v)
 				assert.NoError(t, err)
 				versions = append(versions, semver)
 			}

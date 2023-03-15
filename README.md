@@ -12,4 +12,5 @@ See the [wolfictl command reference](https://github.com/wolfi-dev/wolfictl/blob/
 
 ## Docs
 
+[Check so_name docs](./docs/check_so_name.md) - CI check for detecting ABI breaking changes in package version updates
 [Update docs](./docs/update.md) - for detecting new upstream wolfi package versions and creating a pull request to update Wolfi
