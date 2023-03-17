@@ -12,7 +12,7 @@ replace k8s.io/client-go => k8s.io/client-go v0.25.3
 require (
 	chainguard.dev/apko v0.6.1-0.20230112190132-a65677fe7e84
 	chainguard.dev/melange v0.2.1-0.20230221180358-72f9bc23c4d4
-	cloud.google.com/go/storage v1.29.0
+	cloud.google.com/go/storage v1.30.0
 	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
 	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
