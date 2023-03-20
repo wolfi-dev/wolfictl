@@ -268,19 +268,20 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 	// first turn the existing soname files into a map so it is easier to match with
 	existingSonameMap := make(map[string]string)
 	for _, soname := range existingSonameFiles {
-		sonameParts := strings.Split(soname, ".so.")
-		existingSonameMap[sonameParts[0]] = sonameParts[1]
+		sonameParts := strings.Split(soname, ".so")
+		existingSonameMap[sonameParts[0]] = strings.TrimPrefix(sonameParts[1], ".")
 	}
 
 	// now iterate over new soname files and compare with existing files
 	for _, soname := range newSonameFiles {
-		sonameParts := strings.Split(soname, ".so.")
+		sonameParts := strings.Split(soname, ".so")
 		name := sonameParts[0]
-		versionStr := sonameParts[1]
+		versionStr := strings.TrimPrefix(sonameParts[1], ".")
 		existingVersionStr := existingSonameMap[name]
 
 		// skip if no matching file
 		if existingVersionStr == "" {
+			o.Logger.Printf("no existing soname version found for %s, skipping", name)
 			continue
 		}
 
