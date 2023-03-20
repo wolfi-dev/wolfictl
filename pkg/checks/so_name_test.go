@@ -2,6 +2,7 @@ package checks
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -106,6 +107,18 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 		wantErr             assert.ErrorAssertionFunc
 	}{
 		{
+			name: "deleted", existingSonameFiles: []string{"foo.so", "bar.so"}, newSonameFiles: []string{"foo.so"},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "match", existingSonameFiles: []string{"foo.so", "bar.so"}, newSonameFiles: []string{"foo.so", "bar.so"},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "ignore", existingSonameFiles: []string{"foo.so"}, newSonameFiles: []string{"foo.so.1"},
+			wantErr: assert.NoError,
+		},
+		{
 			name: "match", existingSonameFiles: []string{"foo.so.1"}, newSonameFiles: []string{"foo.so.1"},
 			wantErr: assert.NoError,
 		},
@@ -140,7 +153,9 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			o := SoNameOptions{}
+			o := SoNameOptions{
+				Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+			}
 			tt.wantErr(t, o.checkSonamesMatch(tt.existingSonameFiles, tt.newSonameFiles), fmt.Sprintf("checkSonamesMatch(%v, %v)", tt.existingSonameFiles, tt.newSonameFiles))
 		})
 	}
