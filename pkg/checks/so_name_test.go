@@ -67,6 +67,16 @@ func TestChecks_getSonameFiles(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 5, len(files))
+
+	// don't match
+	dir = t.TempDir()
+	err = os.WriteFile(filepath.Join(dir, "XIDefineCursor.3"), []byte("test"), os.ModePerm)
+	assert.NoError(t, err)
+
+	files, err = o.getSonameFiles(dir)
+	assert.NoError(t, err)
+
+	assert.Equal(t, 0, len(files))
 }
 
 func TestChecks_downloadCurrentAPK(t *testing.T) {
@@ -148,6 +158,10 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 		},
 		{
 			name: "no_existing", existingSonameFiles: []string{}, newSonameFiles: []string{"cheese.so.1"},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "none_at_all", existingSonameFiles: []string{}, newSonameFiles: []string{},
 			wantErr: assert.NoError,
 		},
 	}

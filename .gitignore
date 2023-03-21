@@ -2,3 +2,5 @@
 wolfictl
 .bin/
 .vscode
+
+dist/

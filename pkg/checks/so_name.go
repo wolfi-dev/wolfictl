@@ -230,7 +230,7 @@ func (o *SoNameOptions) downloadCurrentAPK(newPackageName, dirCurrentApk string)
 }
 
 func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
-	reg := regexp.MustCompile(`.so.*\d`)
+	reg := regexp.MustCompile(`\.so.*\d`)
 
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
@@ -265,9 +265,14 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 }
 
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
+	if len(existingSonameFiles) == 0 {
+		o.Logger.Printf("no existing soname files, skipping")
+		return nil
+	}
 	// first turn the existing soname files into a map so it is easier to match with
 	existingSonameMap := make(map[string]string)
 	for _, soname := range existingSonameFiles {
+		o.Logger.Printf("checking soname file %s", soname)
 		sonameParts := strings.Split(soname, ".so")
 		existingSonameMap[sonameParts[0]] = strings.TrimPrefix(sonameParts[1], ".")
 	}
