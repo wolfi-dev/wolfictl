@@ -42,31 +42,62 @@ func TestChecks_sonameParsePackages(t *testing.T) {
 }
 
 func TestChecks_getSonameFiles(t *testing.T) {
-	dir := t.TempDir()
+	tests := []struct {
+		name        string
+		sonameFiles []string
+		dtSoname    []string
+		match       bool
+		wantErr     assert.ErrorAssertionFunc
+	}{
+		{
+			name: "match", sonameFiles: []string{
+				"foo.so",
+				"foo.so.1",
+				"foo.so.11",
+				"foo.so.1.1",
+				"libstdc++.so.6.0.30-gdb.py",
+			}, dtSoname: []string{"cheese.so.1.1"}, match: true,
+			wantErr: assert.NoError,
+		},
+		{
+			name: "dont_match", sonameFiles: []string{
+				"foo",
+				"XIDefineCursor.3",
+				"README.solaris2",
+			}, match: false,
+			wantErr: assert.NoError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := SoNameOptions{}
 
-	err := os.WriteFile(filepath.Join(dir, "foo.so"), []byte("test"), os.ModePerm)
-	assert.NoError(t, err)
-	err = os.WriteFile(filepath.Join(dir, "foo.so.1"), []byte("test"), os.ModePerm)
-	assert.NoError(t, err)
-	err = os.WriteFile(filepath.Join(dir, "foo.so.11"), []byte("test"), os.ModePerm)
-	assert.NoError(t, err)
-	err = os.WriteFile(filepath.Join(dir, "foo.so.1.1"), []byte("test"), os.ModePerm)
-	assert.NoError(t, err)
-	err = os.WriteFile(filepath.Join(dir, "foo"), []byte("test"), os.ModePerm)
-	assert.NoError(t, err)
+			dir := t.TempDir()
 
-	// simulate DT_SONAME
-	err = os.WriteFile(filepath.Join(dir, "cheese.so.1.1"), []byte("test"), os.ModePerm)
-	assert.NoError(t, err)
-	err = os.Link(filepath.Join(dir, "cheese.so.1.1"), filepath.Join(dir, "cheese.so.1"))
-	assert.NoError(t, err)
+			for _, f := range tt.sonameFiles {
+				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm)
+				assert.NoError(t, err)
+			}
 
-	o := SoNameOptions{}
+			// simulate DT_SONAME
+			for _, f := range tt.dtSoname {
+				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm)
+				assert.NoError(t, err)
+				err = os.Link(filepath.Join(dir, f), filepath.Join(dir, "cheese.so.1"))
+				assert.NoError(t, err)
+			}
 
-	files, err := o.getSonameFiles(dir)
-	assert.NoError(t, err)
+			got, err := o.getSonameFiles(dir)
+			assert.NoError(t, err)
 
-	assert.Equal(t, 5, len(files))
+			expectedCount := 0
+			if tt.match {
+				expectedCount = len(tt.sonameFiles) + len(tt.dtSoname)
+			}
+
+			assert.Equal(t, expectedCount, len(got))
+		})
+	}
 }
 
 func TestChecks_downloadCurrentAPK(t *testing.T) {
@@ -148,6 +179,14 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 		},
 		{
 			name: "no_existing", existingSonameFiles: []string{}, newSonameFiles: []string{"cheese.so.1"},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "none_at_all", existingSonameFiles: []string{}, newSonameFiles: []string{},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "complex", existingSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"}, newSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"},
 			wantErr: assert.NoError,
 		},
 	}
