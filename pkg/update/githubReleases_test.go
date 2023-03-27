@@ -19,29 +19,43 @@ import (
 )
 
 func TestMonitorService_parseGitHubReleases(t *testing.T) {
+	packageConfigs := make(map[string]melange.Packages)
+
+	packageConfigs["cosign"] = melange.Packages{
+		Config: build.Configuration{
+			Package: build.Package{Name: "cosign", Version: "1.10.1"},
+			Update: build.Update{GitHubMonitor: &build.GitHubMonitor{
+				Identifier:  "sigstore/cosign",
+				StripPrefix: "v",
+			}},
+		},
+	}
+
+	packageConfigs["jenkins"] = melange.Packages{
+		Config: build.Configuration{
+			Package: build.Package{Name: "jenkins", Version: "2.370"},
+			Update: build.Update{GitHubMonitor: &build.GitHubMonitor{
+				Identifier:  "jenkinsci/jenkins",
+				StripPrefix: "jenkins-",
+			}},
+		},
+	}
 	tests := []struct {
 		name            string
 		packageName     string
 		initialVersion  string
 		expectedVersion string
+		githubMonitor   build.GitHubMonitor
 	}{
 		{
 			name:            "multiple_repos",
 			packageName:     "cosign",
-			initialVersion:  "1.10.1",
 			expectedVersion: "1.13.1",
 		},
 		{
 			name:            "multiple_repos",
 			packageName:     "jenkins",
-			initialVersion:  "2.370",
 			expectedVersion: "2.388",
-		},
-		{
-			name:            "complex_versions",
-			packageName:     "cheese",
-			initialVersion:  "1.2.3",
-			expectedVersion: "1.2.4-cg2",
 		},
 	}
 	for _, test := range tests {
@@ -50,30 +64,16 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotEmpty(t, data)
 
-			mapperData, err := os.ReadFile(filepath.Join("testdata", test.name, "release_mapper_data.txt"))
-			assert.NoError(t, err)
-
-			o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
-			parsedMapperData, err := o.parseData(string(mapperData))
-			assert.NoError(t, err)
-
-			packageConfigs := make(map[string]melange.Packages)
-
-			packageConfigs[test.packageName] = melange.Packages{
-				Config: build.Configuration{
-					Package: build.Package{Name: test.packageName, Version: test.initialVersion},
-				},
-			}
-
-			m := NewGitHubReleaseOptions(parsedMapperData, packageConfigs, nil, nil)
+			m := NewGitHubReleaseOptions(packageConfigs, nil, nil)
 
 			var rel []Repository
 			err = json.Unmarshal(data, &rel)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, rel)
 
-			latestVersions, _, err := m.parseGitHubReleases(rel)
+			latestVersions, errormessages, err := m.parseGitHubReleases(rel)
 			assert.NoError(t, err)
+			assert.Empty(t, errormessages)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
 		})
 	}
@@ -83,20 +83,40 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 	tests := []struct {
 		name            string
 		packageName     string
-		initialVersion  string
 		expectedVersion string
+		updateConfig    build.Configuration
 	}{
 		{
 			name:            "parse_go_tags",
 			packageName:     "go-1.19",
-			initialVersion:  "1.19.1",
 			expectedVersion: "1.19.7",
+			updateConfig: build.Configuration{
+				Package: build.Package{Name: "go-1.19", Version: "1.19.1"},
+				Update: build.Update{
+					Enabled: true,
+					GitHubMonitor: &build.GitHubMonitor{
+						Identifier:  "golang/go",
+						TagFilter:   "go1.19",
+						StripPrefix: "go",
+					},
+				},
+			},
 		},
 		{
 			name:            "parse_java_tags",
 			packageName:     "openjdk-11",
-			initialVersion:  "11.0.16",
 			expectedVersion: "11.0.19+5",
+			updateConfig: build.Configuration{
+				Package: build.Package{Name: "openjdk-11", Version: "11.0.16"},
+				Update: build.Update{
+					Enabled: true,
+					GitHubMonitor: &build.GitHubMonitor{
+						Identifier:  "openjdk/jdk11u",
+						TagFilter:   "jdk-17",
+						StripPrefix: "jdk-",
+					},
+				},
+			},
 		},
 	}
 	for _, test := range tests {
@@ -105,43 +125,36 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotEmpty(t, data)
 
-			mapperData, err := os.ReadFile(filepath.Join("testdata", test.name, "release_mapper_data.txt"))
-			assert.NoError(t, err)
-
-			o := Options{Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)}
-			parsedMapperData, err := o.parseData(string(mapperData))
-			assert.NoError(t, err)
-
 			packageConfigs := make(map[string]melange.Packages)
 
 			packageConfigs[test.packageName] = melange.Packages{
-				Config: build.Configuration{
-					Package: build.Package{Name: test.packageName, Version: test.initialVersion},
-				},
+				Config: test.updateConfig,
 			}
 
-			m := NewGitHubReleaseOptions(parsedMapperData, packageConfigs, nil, nil)
+			m := NewGitHubReleaseOptions(packageConfigs, nil, nil)
 
 			var rel QueryTagsResponse
 			err = json.Unmarshal(data, &rel)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, rel)
 
-			latestVersions, _, err := m.parseGitHubTags(rel)
-			assert.NoError(t, err)
+			latestVersions, _ := m.parseGitHubTags(rel)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
 		})
 	}
 }
 
 func TestGitHubReleases_GetRepoLists(t *testing.T) {
-	testData := make(map[string]Row)
+	testData := make(map[string]build.Configuration)
 
 	for i := 0; i < 350; i++ {
 		item := fmt.Sprintf("cheese%d", i)
-		testData[item] = Row{
-			Identifier:  "wine/" + item,
-			ServiceName: "GITHUB",
+		testData[item] = build.Configuration{
+			Update: build.Update{
+				GitHubMonitor: &build.GitHubMonitor{
+					Identifier: "wine/" + item,
+				},
+			},
 		}
 	}
 
@@ -173,7 +186,6 @@ func Test_queryTemplate(t *testing.T) {
 	assert.NotEmpty(t, data)
 
 	assert.Equal(t, strings.TrimSpace(string(expected)), strings.TrimSpace(got))
-
 }
 
 func Test_queryTagsResult(t *testing.T) {
@@ -188,11 +200,9 @@ func Test_queryTagsResult(t *testing.T) {
 	assert.Equal(t, 2, len(response.Data))
 	assert.Contains(t, "golang/go", response.Data["repo_0"].NameWithOwner)
 	assert.Contains(t, "openjdk/jdk11u", response.Data["repo_1"].NameWithOwner)
-
 }
 
 func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
-
 	tests := []struct {
 		version string
 		skip    bool

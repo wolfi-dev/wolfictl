@@ -109,27 +109,6 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	uo.PullRequestTitle = "%s/%s package update"
 	uo.UseGitSign = o.UseGitSign
 
-	// build a mapping data
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	currentRepo, err := git.PlainOpen(currentDir)
-	if err != nil {
-		return fmt.Errorf("failed to clone repository %s into %s: %w", o.TargetRepo, tempDir, err)
-	}
-	gitURL, err := wolfigit.GetRemoteURL(currentRepo)
-	if err != nil {
-		return err
-	}
-
-	uo.MapperData = map[string]Row{o.PackageName: {
-		PackageName:     o.PackageName,
-		Identifier:      fmt.Sprintf("%s/%s", gitURL.Organisation, gitURL.Name),
-		ServiceName:     "GITHUB",
-		StripPrefixChar: "v",
-	}}
-
 	// let's work on a branch when updating package versions, so we can create a PR from that branch later
 	ref, err := uo.switchBranch(repo)
 	if err != nil {

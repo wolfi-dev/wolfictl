@@ -537,7 +537,8 @@ func getIndexPlatforms(idx oci.SignedImageIndex) (platformList, error) {
 	}
 
 	platforms := platformList{}
-	for _, m := range im.Manifests {
+	for i := range im.Manifests {
+		m := im.Manifests[i]
 		if m.Platform == nil {
 			continue
 		}

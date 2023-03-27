@@ -34,11 +34,9 @@ import (
 type Options struct {
 	PackageNames           []string
 	PackageConfigs         map[string]melange.Packages
-	MapperData             map[string]Row
 	PullRequestBaseBranch  string
 	PullRequestTitle       string
 	RepoURI                string
-	DataMapperURL          string
 	DefaultBranch          string
 	Batch                  bool
 	DryRun                 bool
@@ -124,16 +122,18 @@ func (o *Options) Update() error {
 		return fmt.Errorf("failed to get package configs: %w", err)
 	}
 
-	// second, get package mapping data that we use to lookup if new versions exist
-	o.MapperData, err = o.getMonitorServiceData()
-	if err != nil {
-		return fmt.Errorf("failed getting release monitor service mapping data: %w", err)
+	// remove any updates that have been disabled
+	for i := range o.PackageConfigs {
+		c := o.PackageConfigs[i]
+		if !c.Config.Update.Enabled {
+			delete(o.PackageConfigs, i)
+		}
 	}
 
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-		g := NewGitHubReleaseOptions(o.MapperData, o.PackageConfigs, o.GitGraphQLClient, o.GitHubHTTPClient)
-		packagesToUpdate, errorMessages, err = g.getLatestGitHubVersions()
+		g := NewGitHubReleaseOptions(o.PackageConfigs, o.GitGraphQLClient, o.GitHubHTTPClient)
+		packagesToUpdate, errorMessages = g.getLatestGitHubVersions()
 		if err != nil {
 			return fmt.Errorf("failed getting github releases: %w", err)
 		}
@@ -147,7 +147,7 @@ func (o *Options) Update() error {
 			GitHubHTTPClient: o.GitHubHTTPClient,
 			Logger:           o.Logger,
 		}
-		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(o.MapperData, o.PackageConfigs)
+		newReleaseMonitorVersions, errorMessages, err := m.getLatestReleaseMonitorVersions(o.PackageConfigs)
 		if err != nil {
 			return fmt.Errorf("failed release monitor versions: %w", err)
 		}
@@ -230,10 +230,10 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVers
 
 	// if mapping data has a strip prefix, add it back in to the version for when updating git modules
 	latestVersionWithPrefix := latestVersion
-	mapping, ok := o.MapperData[packageName]
-	if ok {
-		if mapping.StripPrefixChar != "" {
-			latestVersionWithPrefix = mapping.StripPrefixChar + latestVersionWithPrefix
+	ghm := o.PackageConfigs[packageName].Config.Update.GitHubMonitor
+	if ghm != nil {
+		if ghm.StripPrefix != "" {
+			latestVersionWithPrefix = ghm.StripPrefix + latestVersionWithPrefix
 		}
 	}
 	// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
@@ -297,23 +297,19 @@ func (o *Options) updateGitModules(dir, packageName, version string, wt *git.Wor
 		return nil
 	}
 
-	mapingData, ok := o.MapperData[packageName]
-	if !ok {
-		o.Logger.Printf("no mapping data found for package %s, not attempting to bump gitmodules", packageName)
-		return nil
-	}
+	ghm := o.PackageConfigs[packageName].Config.Update.GitHubMonitor
 
-	if mapingData.Identifier == "" {
-		o.Logger.Printf("no identifier found in mapping data for package %s, not attempting to bump gitmodules", packageName)
-		return nil
-	}
-
-	if mapingData.ServiceName != "GITHUB" {
+	if ghm == nil {
 		o.Logger.Printf("package %s  is not a github repo in mapping data, not attempting to bump gitmodules", packageName)
 		return nil
 	}
 
-	parts := strings.Split(mapingData.Identifier, "/")
+	if ghm.Identifier == "" {
+		o.Logger.Printf("no identifier found in mapping data for package %s, not attempting to bump gitmodules", packageName)
+		return nil
+	}
+
+	parts := strings.Split(ghm.Identifier, "/")
 	if len(parts) != 2 {
 		o.Logger.Printf("identifier doesn't look like a github owner/repo in mapping data for package %s, not attempting to bump gitmodules", packageName)
 		return nil
