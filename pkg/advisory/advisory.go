@@ -153,6 +153,10 @@ func Discover(options DiscoverOptions) error {
 			return build.Advisories{}, configs.ErrSkip
 		}
 
+		// Keep track of whether we'll need to add advisories for new matches. If not,
+		// we won't touch the file.
+		anyNewMatches := false
+
 		//nolint:gocritic // rangeValCopy rule not worth it here
 		for _, m := range matchesForPackage {
 			if !m.CPE.VersionRange.Includes(cfg.Package.Version) {
@@ -169,6 +173,7 @@ func Discover(options DiscoverOptions) error {
 				continue
 			}
 
+			anyNewMatches = true
 			log.Printf("found new potential vulnerability for package %q: %s", cfg.Package.Name, vulnID)
 
 			ts := time.Now()
@@ -178,6 +183,10 @@ func Discover(options DiscoverOptions) error {
 				// TODO: Note the reported affected version range.
 			}
 			cfg.Advisories[vulnID] = append(cfg.Advisories[vulnID], ac)
+		}
+
+		if !anyNewMatches {
+			return build.Advisories{}, configs.ErrSkip
 		}
 
 		return cfg.Advisories, nil
