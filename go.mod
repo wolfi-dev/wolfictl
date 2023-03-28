@@ -30,7 +30,7 @@ require (
 	github.com/goccy/go-graphviz v0.0.9
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-containerregistry v0.14.0
-	github.com/google/go-github/v50 v50.1.0
+	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
@@ -260,7 +260,7 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/build v0.0.0-20221229213058-1f2478aa0ea8 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
