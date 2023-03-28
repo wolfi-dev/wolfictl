@@ -164,8 +164,5 @@ func Bump(configFile, version string) error {
 		bump.WithTargetVersion(version),
 	)
 
-	if err := ctx.Renovate(bumpRenovator); err != nil {
-		return err
-	}
-	return nil
+	return ctx.Renovate(bumpRenovator)
 }
