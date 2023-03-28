@@ -34,6 +34,13 @@ func (u ByLatest) Less(i, j int) bool {
 	if equal(u[i].Segments(), u[j].Segments()) {
 		//nolint:gosimple // incorrect behaviour if using ``
 		re := regexp.MustCompile("\\d+|\\D+")
+
+		if u[j].Metadata() != "" {
+			if u[j].Metadata() > u[i].Metadata() {
+				return true
+			}
+		}
+
 		iparts := re.FindAllString(u[i].Prerelease(), -1)
 		if len(iparts) != 2 {
 			return false

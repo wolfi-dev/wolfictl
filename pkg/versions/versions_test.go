@@ -40,6 +40,17 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 			testVersions:          []string{"v1.2.3", "v1.2.3ab1", "v1.2.3ab2", "v1.2.4ab1", "v1.2.4ab10", "v1.2.4ab2", "v1.2.4ab3", "v1.2.4ab4", "v1.2.4ab5", "v1.2.4ab6", "v1.2.4ab7", "v1.2.4ab8", "v1.2.4ab9"},
 			expectedLatestVersion: "v1.2.4ab10",
 		},
+		{
+			name:                  "prerelease",
+			baseVersions:          baseVersions,
+			testVersions:          []string{"4.0.1-ab2", "4.0.1-ab3", "4.0.1-ab1"},
+			expectedLatestVersion: "4.0.1-ab3",
+		},
+		{
+			name:                  "metadata",
+			testVersions:          []string{"1.2.3+1", "1.2.3+2", "1.2.3+3", "1.2.3+4", "1.2.3+5", "1.2.3"},
+			expectedLatestVersion: "1.2.3+5",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

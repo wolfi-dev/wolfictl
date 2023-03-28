@@ -185,3 +185,4 @@ linters-settings:
       - gitlab.alpinelinux.org/alpine/go
       - github.com/goccy/go-graphviz
       - k8s.io/client-go
+      - knative.dev/pkg

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
@@ -30,38 +31,41 @@ type ReleaseMonitorVersions struct {
 type MonitorServiceName int
 
 const (
-	releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%s"
+	releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%d"
 	releaseMonitor    = "RELEASE_MONITOR"
 )
 
 func (m MonitorService) getLatestReleaseMonitorVersions(
-	mapperData map[string]Row, melangePackages map[string]melange.Packages,
+	melangePackages map[string]melange.Packages,
 ) (packagesToUpdate map[string]string, errorMessages []string, err error) {
 	packagesToUpdate = make(map[string]string)
 
 	// iterate packages from the target git repo and check if a new version is available
 	for i := range melangePackages {
-		item := mapperData[melangePackages[i].Config.Package.Name]
-		if item.Identifier == "" {
-			continue
-		}
-		if item.ServiceName != releaseMonitor {
+		p := melangePackages[i]
+		rm := p.Config.Update.ReleaseMonitor
+		if rm == nil {
 			continue
 		}
 
-		latestVersion, err := m.getLatestReleaseVersion(item.Identifier)
+		latestVersion, err := m.getLatestReleaseVersion(rm.Identifier)
 		if err != nil {
 			return nil, errorMessages, fmt.Errorf(
-				"failed getting latest release version for package %s, identifier %s: %w",
-				melangePackages[i].Config.Package.Name, item.Identifier, err,
+				"failed getting latest release version for package %s, identifier %d: %w",
+				p.Config.Package.Name, rm.Identifier, err,
 			)
 		}
 
-		currentVersionSemver, err := version.NewVersion(melangePackages[i].Config.Package.Version)
+		// replace any nonstandard version separators
+		if p.Config.Update.VersionSeparator != "" {
+			latestVersion = strings.ReplaceAll(latestVersion, p.Config.Update.VersionSeparator, ".")
+		}
+
+		currentVersionSemver, err := version.NewVersion(p.Config.Package.Version)
 		if err != nil {
 			errorMessages = append(errorMessages, fmt.Sprintf(
 				"failed to create a version from package %s: %s.  Error: %s",
-				melangePackages[i].Config.Package.Name, melangePackages[i].Config.Package.Version, err,
+				p.Config.Package.Name, p.Config.Package.Version, err,
 			))
 			continue
 		}
@@ -70,7 +74,7 @@ func (m MonitorService) getLatestReleaseMonitorVersions(
 		if err != nil {
 			errorMessages = append(errorMessages, fmt.Sprintf(
 				"failed to create a latestVersion from package %s: %s.  Error: %s",
-				melangePackages[i].Config.Package.Name, latestVersion, err,
+				p.Config.Package.Name, latestVersion, err,
 			))
 			continue
 		}
@@ -78,15 +82,15 @@ func (m MonitorService) getLatestReleaseMonitorVersions(
 		if currentVersionSemver.LessThan(latestVersionSemver) {
 			m.Logger.Printf(
 				"there is a new stable version available %s, current wolfi version %s, new %s",
-				melangePackages[i].Config.Package.Name, melangePackages[i].Config.Package.Version, latestVersion,
+				p.Config.Package.Name, p.Config.Package.Version, latestVersion,
 			)
-			packagesToUpdate[melangePackages[i].Config.Package.Name] = latestVersion
+			packagesToUpdate[p.Config.Package.Name] = latestVersion
 		}
 	}
 	return packagesToUpdate, errorMessages, nil
 }
 
-func (m MonitorService) getLatestReleaseVersion(identifier string) (string, error) {
+func (m MonitorService) getLatestReleaseVersion(identifier int) (string, error) {
 	targetURL := fmt.Sprintf(releaseMonitorURL, identifier)
 	req, err := http.NewRequest("GET", targetURL, nil)
 	if err != nil {
