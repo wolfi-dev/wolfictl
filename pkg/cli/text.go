@@ -63,16 +63,27 @@ func cmdText() *cobra.Command {
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
 	text.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
 	text.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
-	text.Flags().StringVarP(&t, "type", "t", string(typeTarget), "What type of text to emit")
+	text.Flags().StringVarP(&t, "type", "t", string(typeTarget), fmt.Sprintf("What type of text to emit; values can be one of: %v", textTypes))
 	return text
 }
 
 type textType string
 
 const (
-	typeTarget       textType = "target"
-	typeMakefileLine textType = "makefile"
+	typeTarget                textType = "target"
+	typeMakefileLine          textType = "makefile"
+	typePackageName           textType = "name"
+	typePackageVersion        textType = "version"
+	typePackageNameAndVersion textType = "name-version"
 )
+
+var textTypes = []textType{
+	typeTarget,
+	typeMakefileLine,
+	typePackageName,
+	typePackageVersion,
+	typePackageNameAndVersion,
+}
 
 func reverse(ss []string) {
 	last := len(ss) - 1
@@ -105,6 +116,30 @@ func text(g dag.Graph, arch string, t textType, w io.Writer) error {
 			}
 			if entry != "" {
 				fmt.Fprintf(w, "%s\n", entry)
+			}
+		case typePackageName:
+			pkg, err := g.PkgInfo(node, arch)
+			if err != nil {
+				return err
+			}
+			if pkg != nil && pkg.Name != "" {
+				fmt.Fprintf(w, "%s\n", pkg.Name)
+			}
+		case typePackageVersion:
+			pkg, err := g.PkgInfo(node, arch)
+			if err != nil {
+				return err
+			}
+			if pkg != nil && pkg.Version != "" {
+				fmt.Fprintf(w, "%s\n", pkg.Version)
+			}
+		case typePackageNameAndVersion:
+			pkg, err := g.PkgInfo(node, arch)
+			if err != nil {
+				return err
+			}
+			if pkg != nil && pkg.Name != "" && pkg.Version != "" {
+				fmt.Fprintf(w, "%s-%s\n", pkg.Name, pkg.Version)
 			}
 		default:
 			return fmt.Errorf("invalid type: %s", t)

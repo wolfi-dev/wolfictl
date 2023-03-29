@@ -343,6 +343,19 @@ func (g Graph) MakefileEntry(pkgName string) (string, error) {
 	return fmt.Sprintf("$(eval $(call build-package,%s,%s-%d))", pkgName, config.Package.Version, config.Package.Epoch), nil
 }
 
+// PkgInfo returns the buildp.Package struct
+func (g Graph) PkgInfo(pkgName, arch string) (*build.Package, error) {
+	config := g.Config(pkgName)
+	if config == nil {
+		log.Println("no config for package:", pkgName)
+		return nil, nil
+	}
+	if pkgName != config.Package.Name {
+		return nil, nil
+	}
+	return &config.Package, nil
+}
+
 // Nodes returns a slice of the names of all nodes in the Graph, sorted alphabetically.
 func (g Graph) Nodes() []string {
 	allPackages := g.packages
