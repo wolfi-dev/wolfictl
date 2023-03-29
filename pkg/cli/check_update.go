@@ -14,7 +14,6 @@ import (
 )
 
 func CheckUpdate() *cobra.Command {
-
 	var dir string
 	cmd := &cobra.Command{
 		Use:               "update",
@@ -41,21 +40,21 @@ func checkUpdates(dir string, files []string) error {
 	o := update.New()
 	o.GithubReleaseQuery = true
 	o.ReleaseMonitoringQuery = true
-	errorMessages := make(map[string]string)
+	o.ErrorMessages = make(map[string]string)
 	checkErrors := make(lint.EvalRuleErrors, 0)
 
-	var packagesToUpdate []string
+	packagesToUpdate := []string{}
 	for _, f := range files {
 		packagesToUpdate = append(packagesToUpdate, strings.TrimSuffix(f, ".yaml"))
 	}
-	newVersions, err := o.GetNewVersions(dir, packagesToUpdate, errorMessages)
+	newVersions, err := o.GetNewVersions(dir, packagesToUpdate)
 	if err != nil {
 		checkErrors = append(checkErrors, lint.EvalRuleError{
 			Error: fmt.Errorf(err.Error()),
 		})
 	}
 
-	for _, message := range errorMessages {
+	for _, message := range o.ErrorMessages {
 		checkErrors = append(checkErrors, lint.EvalRuleError{
 			Error: errors.New(message),
 		})
@@ -68,5 +67,4 @@ func checkUpdates(dir string, files []string) error {
 	}
 
 	return checkErrors.WrapErrors()
-
 }

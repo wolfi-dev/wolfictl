@@ -51,6 +51,11 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 			testVersions:          []string{"1.2.3+1", "1.2.3+2", "1.2.3+3", "1.2.3+4", "1.2.3+5", "1.2.3"},
 			expectedLatestVersion: "1.2.3+5",
 		},
+		{
+			name:                  "jdk",
+			testVersions:          []string{"17+32", "17+33", "17.0.7+5"},
+			expectedLatestVersion: "17.0.7+5",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

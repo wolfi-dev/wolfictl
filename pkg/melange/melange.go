@@ -20,6 +20,7 @@ type Packages struct {
 	Filename string
 	Dir      string
 	NoLint   []string
+	Hash     string
 }
 
 type ConfigCheck struct {
@@ -40,8 +41,8 @@ func (c ConfigCheck) isMelangeConfig() bool {
 }
 
 // ReadPackageConfigs read the melange package config(s) from the target git repository so we can check if new versions exist
-func ReadPackageConfigs(packageNames []string, dir string) (map[string]Packages, error) {
-	p := make(map[string]Packages)
+func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages, error) {
+	p := make(map[string]*Packages)
 
 	// if package names were passed as CLI parameters load those packages
 	if len(packageNames) > 0 {
@@ -59,7 +60,7 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]Packages,
 				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
 
-			p[config.Package.Name] = Packages{
+			p[config.Package.Name] = &Packages{
 				Config:   config,
 				Filename: filename,
 				Dir:      dir,
@@ -86,8 +87,8 @@ func findNoLint(filename string) ([]string, error) {
 	return nil, nil
 }
 
-func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
-	p := make(map[string]Packages)
+func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
+	p := make(map[string]*Packages)
 
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
@@ -134,7 +135,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]Packages, error) {
 			return p, fmt.Errorf("failed to read package config %s: %w", fi, err)
 		}
 
-		p[packageConfig.Package.Name] = Packages{
+		p[packageConfig.Package.Name] = &Packages{
 			Config:   packageConfig,
 			Filename: relativeFilename,
 			Dir:      dir,

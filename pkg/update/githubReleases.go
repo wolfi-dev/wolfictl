@@ -2,7 +2,7 @@ package update
 
 import (
 	"bytes"
-	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,27 +13,18 @@ import (
 	"strings"
 	gotemplate "text/template"
 
-	"github.com/fatih/color"
-
 	"chainguard.dev/melange/pkg/build"
+
+	"github.com/fatih/color"
 
 	"github.com/pkg/errors"
 
 	"github.com/hashicorp/go-version"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
-	"github.com/shurcooL/githubv4"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
 	"golang.org/x/exp/maps"
-)
-
-const (
-	// some git repos do not use the "latest" github release well
-	// i.e. they perform a maintenance release of an old version but it can be marked as latest,
-	// 1.2.3.4 gets released but marked as latest while 1.3.0 exists which is the version we want to check against
-	// so we need to check previous number of versions to ensure we can locate the real latest release version
-	numberOfReleasesToReturn = 10
 )
 
 /*
@@ -47,7 +38,7 @@ Querying Tags and Releases differ because with tags we need to pass an extra Que
 var queryTags = `
 query {
 {{ range  $index, $r := .RepoList }}
-  repo_{{$index}}: repository(owner: "{{$r.Owner}}", name: "{{$r.Name}}") {
+  r{{$r.PackageName}}: repository(owner: "{{$r.Owner}}", name: "{{$r.Name}}") {
     nameWithOwner
     refs(refPrefix: "refs/tags/", query: "{{.Filter}}", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
       totalCount
@@ -60,92 +51,65 @@ query {
 }
 `
 
-/*
-
-The graphql query used is the equivalent contained in this comment, which can be tested using GitHub's graphql explorer
-https://docs.github.com/en/graphql/overview/explorer
-
-__NOTE__ if using the explorer to generate responses to extend unit tests, you will need to strip off
-
-search
-{
-  "data": {
-    "search": {
-      "repositoryCount": #,
-      "nodes":
-
-		...
-
-       }
+// some git repos do not use the "latest" github release well
+// i.e. they perform a maintenance release of an old version but it can be marked as latest,
+// 1.2.3.4 gets released but marked as latest while 1.3.0 exists which is the version we want to check against
+// so we need to check previous number of versions to ensure we can locate the real latest release version
+// for this reason we get the first 40 results in the query below
+var queryReleases = `
+query {
+{{ range $index, $r := .RepoList }}
+  r{{$r.PackageName}}: repository(owner: "{{$r.Owner}}", name: "{{$r.Name}}") {
+    owner {
+      login
     }
-}
-
-Query https://docs.github.com/en/graphql/overview/explorer
-
-{
-  search(type: REPOSITORY, query: "repo:jenkinsci/jenkins repo:sigstore/cosign", first: 100) {
-    repositoryCount
-    nodes {
-
-      ... on Repository  {
-        owner {
-          login
+    name
+    nameWithOwner
+    releases(first: 40) {
+      totalCount
+      nodes {
+        tag {
+          name
         }
         name
-        nameWithOwner
-        releases(first: 40) {
-          totalCount
-          nodes {
-            tag {
-              name
-            }
-            name
-            isPrerelease
-            isDraft
-            isLatest
-          }
-        }
+        isPrerelease
+        isDraft
+        isLatest
       }
     }
-  }
+  }{{ if not $index }}, {{end}}
+{{ end }}
 }
-*/
-
-type Search struct {
-	RepositoryCount githubv4.Int `graphql:"repositoryCount"`
-	Nodes           []struct {
-		Repository Repository `graphql:"... on Repository"`
-	}
-}
-
-type Repository struct {
-	Owner struct {
-		Login githubv4.String `graphql:"login"`
-	} `json:"Owner"`
-	Name          githubv4.String `graphql:"name"`
-	NameWithOwner githubv4.String `graphql:"nameWithOwner"`
-	Releases      struct {
-		TotalCount githubv4.Int `graphql:"totalCount"`
-		Nodes      []struct {
-			Tag struct {
-				Name githubv4.String `graphql:"name"`
-			} `json:"Tag"`
-			Name         githubv4.String  `graphql:"name"`
-			IsPrerelease githubv4.Boolean `graphql:"isPrerelease"`
-			IsDraft      githubv4.Boolean `graphql:"isDraft"`
-			IsLatest     githubv4.Boolean `graphql:"isLatest"`
-		} `graphql:"nodes"`
-	} `graphql:"releases(first: $first)"`
-}
+`
 
 type QueryTagsData struct {
 	RepoList []RepoQuery
 }
-type RepoQuery struct {
-	Owner  string
-	Name   string
-	Filter string
+type QueryReleaseData struct {
+	RepoList []RepoQuery
 }
+type RepoQuery struct {
+	Owner       string
+	Name        string
+	Filter      string
+	PackageName string
+}
+
+type ResponseError struct {
+	Errors []struct {
+		Type       string   `json:"type"`
+		Path       []string `json:"path"`
+		Extensions struct {
+			SamlFailure bool `json:"saml_failure"`
+		} `json:"extensions"`
+		Locations []struct {
+			Line   int `json:"line"`
+			Column int `json:"column"`
+		} `json:"locations"`
+		Message string `json:"message"`
+	} `json:"errors"`
+}
+
 type Repo struct {
 	NameWithOwner string `json:"nameWithOwner"`
 	Refs          struct {
@@ -156,116 +120,188 @@ type Repo struct {
 	} `json:"refs"`
 }
 
+type Releases struct {
+	RepositoryCount int `json:"repositoryCount"`
+	Owner           struct {
+		Login string `json:"login"`
+	} `json:"owner"`
+	Name          string `json:"name"`
+	NameWithOwner string `json:"nameWithOwner"`
+	Releases      struct {
+		TotalCount int `json:"totalCount"`
+		Nodes      []struct {
+			Tag struct {
+				Name string `json:"name"`
+			} `json:"tag"`
+			Name         string `json:"name"`
+			IsPrerelease bool   `json:"isPrerelease"`
+			IsDraft      bool   `json:"isDraft"`
+			IsLatest     bool   `json:"isLatest"`
+		} `json:"nodes"`
+	} `json:"releases"`
+}
+
 type QueryTagsResponse struct {
 	Data map[string]Repo `json:"data"`
 }
 
-func NewGitHubReleaseOptions(configs map[string]melange.Packages, gqlClient *githubv4.Client, ghClient *http2.RLHTTPClient) GitHubReleaseOptions {
-	options := GitHubReleaseOptions{
-		GitGraphQLClient: gqlClient,
-		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
-		PackageConfigs:   configs,
-		GitHubHTTPClient: ghClient,
+type QueryReleasesResponse struct {
+	Data map[string]Releases `json:"data"`
+}
+
+func NewGitHubReleaseOptions(packageConfigs map[string]*melange.Packages, ghClient *http2.RLHTTPClient) GitHubReleaseOptions {
+	configsByHash := make(map[string]build.Configuration)
+
+	// maintain a map of melange build configs for easy lookup when we get a response back from GitHub
+	for _, pc := range packageConfigs {
+		h256 := sha256.New()
+		h256.Write([]byte(pc.Config.Package.Name))
+		hash := fmt.Sprintf("%x", h256.Sum(nil))
+		pc.Hash = hash
+		configsByHash[pc.Hash] = pc.Config
 	}
 
-	return options
+	o := GitHubReleaseOptions{
+		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
+		PackageConfigs:   packageConfigs,
+		ConfigsByHash:    configsByHash,
+		GitHubHTTPClient: ghClient,
+		ErrorMessages:    make(map[string]string),
+	}
+
+	return o
 }
 
 type GitHubReleaseOptions struct {
-	GitGraphQLClient *githubv4.Client
 	GitHubHTTPClient *http2.RLHTTPClient
 	Logger           *log.Logger
-	PackageConfigs   map[string]melange.Packages
+	PackageConfigs   map[string]*melange.Packages
+
+	// hash is used to create graphql queries, maintain a map of associated configs
+	ConfigsByHash map[string]build.Configuration
+	ErrorMessages map[string]string
 }
 
-func (o GitHubReleaseOptions) getLatestGitHubVersions(errorMessages map[string]string) (results map[string]string, err error) {
+func (o GitHubReleaseOptions) getLatestGitHubVersions() (results, errorMessages map[string]string, err error) {
+	results = make(map[string]string)
+
 	if len(o.PackageConfigs) == 0 {
-		return results, errors.New("no melange configs found")
+		return results, o.ErrorMessages, errors.New("no melange configs found")
 	}
 
 	releaseRepoList, tagRepolist := o.getRepoLists()
 
-	results, err = o.getGitHubReleaseVersions(releaseRepoList, errorMessages)
-	if err != nil {
-		return results, err
-	}
-
-	r, err := o.getGitHubTagVersions(tagRepolist, errorMessages)
-	if err != nil {
-		return results, err
-	}
-
-	// combine both release and tag versions from retrieved from GitHub
-	maps.Copy(results, r)
-
-	return results, err
-}
-
-func (o GitHubReleaseOptions) getGitHubReleaseVersions(releaseRepoList []map[string]string, errorMessages map[string]string) (results map[string]string, err error) {
-	results = make(map[string]string)
-	var q struct {
-		Search `graphql:"search(first: $count, query: $searchQuery, type: REPOSITORY)"`
-	}
-	for _, batch := range releaseRepoList {
-		var query []string
-		for _, identifier := range batch {
-			query = append(query, identifier)
-		}
-		variables := map[string]interface{}{
-			"searchQuery": githubv4.String(strings.Join(query, " ")),
-			"count":       githubv4.Int(100), // github states max 100 repos per request
-			"first":       githubv4.Int(numberOfReleasesToReturn),
-		}
-
-		err := o.GitGraphQLClient.Query(context.Background(), &q, variables)
+	if len(releaseRepoList) > 0 {
+		results, err = o.getGitHubReleaseVersions(releaseRepoList)
 		if err != nil {
-			return nil, err
+			return results, o.ErrorMessages, err
 		}
+	}
 
-		repos := make([]Repository, len(q.Search.Nodes))
-
-		for i, v := range q.Search.Nodes {
-			repos[i] = v.Repository
-		}
-
-		r, err := o.parseGitHubReleases(repos, errorMessages)
+	if len(tagRepolist) > 0 {
+		r, err := o.getGitHubTagVersions(tagRepolist)
 		if err != nil {
-			printJSON(q)
-			return nil, fmt.Errorf("failed to parse github releases: %w", err)
+			return results, o.ErrorMessages, err
 		}
 
+		// combine both release and tag versions from retrieved from GitHub
 		maps.Copy(results, r)
 	}
+
+	return results, o.ErrorMessages, err
+}
+
+func (o GitHubReleaseOptions) getGitHubReleaseVersions(repoList map[string]string) (results map[string]string, err error) {
+	results = make(map[string]string)
+	queries := []RepoQuery{}
+
+	for packageName, ownerName := range repoList {
+		pc, ok := o.PackageConfigs[packageName]
+		if !ok {
+			return nil, fmt.Errorf("no package config found for %s", packageName)
+		}
+
+		parts := strings.Split(ownerName, "/")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("malformed repo identifier should be in the form owner/repo, got %s", ownerName)
+		}
+
+		queries = append(queries, RepoQuery{
+			Owner:       parts[0],
+			Name:        parts[1],
+			Filter:      pc.Config.Update.GitHubMonitor.TagFilter,
+			PackageName: pc.Hash,
+		})
+	}
+
+	requestData := QueryReleaseData{
+		RepoList: queries,
+	}
+	requestQuery := template(queryReleases, requestData)
+
+	b, err := o.get(requestQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	rs := QueryReleasesResponse{}
+	err = json.Unmarshal(b, &rs)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := o.parseGitHubReleases(rs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse github releases: %w", err)
+	}
+
+	maps.Copy(results, r)
+
 	return results, nil
 }
 
-func (o GitHubReleaseOptions) getGitHubTagVersions(repoList []map[string]string, errorMessages map[string]string) (results map[string]string, err error) {
-	var queries []RepoQuery
+func (o GitHubReleaseOptions) getGitHubTagVersions(repoList map[string]string) (results map[string]string, err error) {
+	queries := []RepoQuery{}
 
-	// batches are only needed for request releases from GitHub, no point in looping over all map entries again though so reusing the list structure
-	for _, batches := range repoList {
-		for _, repo := range batches {
-			c, err := o.getMelangeConfig(repo)
-			if err != nil {
-				return nil, err
-			}
-			parts := strings.Split(repo, "/")
-
-			if len(parts) != 2 {
-				return nil, fmt.Errorf("malformed repo identifier should be in the form owner/repo, got %s", repo)
-			}
-			queries = append(queries, RepoQuery{
-				Owner:  parts[0],
-				Name:   parts[1],
-				Filter: c.Update.GitHubMonitor.TagFilter,
-			})
+	for packageName, ownerName := range repoList {
+		pc, ok := o.PackageConfigs[packageName]
+		if !ok {
+			return nil, fmt.Errorf("no package config found for %s", packageName)
 		}
+
+		parts := strings.Split(ownerName, "/")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("malformed repo identifier should be in the form owner/repo, got %s", ownerName)
+		}
+
+		queries = append(queries, RepoQuery{
+			Owner:       parts[0],
+			Name:        parts[1],
+			Filter:      pc.Config.Update.GitHubMonitor.TagFilter,
+			PackageName: pc.Hash,
+		})
 	}
+
 	requestData := QueryTagsData{
 		RepoList: queries,
 	}
 	requestQuery := template(queryTags, requestData)
 
+	b, err := o.get(requestQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	rs := QueryTagsResponse{}
+	err = json.Unmarshal(b, &rs)
+	if err != nil {
+		return nil, err
+	}
+
+	return o.parseGitHubTags(rs)
+}
+
+func (o GitHubReleaseOptions) get(requestQuery string) ([]byte, error) {
 	// Define the JSON payload as a map[string]string
 	payload := map[string]string{
 		"query": requestQuery,
@@ -303,31 +339,37 @@ func (o GitHubReleaseOptions) getGitHubTagVersions(repoList []map[string]string,
 		return nil, err
 	}
 
-	rs := QueryTagsResponse{}
-	err = json.Unmarshal(b, &rs)
+	e := ResponseError{}
+	err = json.Unmarshal(b, &e)
 	if err != nil {
 		return nil, err
 	}
 
-	return o.parseGitHubTags(rs, errorMessages)
+	// github graphql API returns 200 status + errors when cannot query repos
+	if len(e.Errors) > 0 {
+		return b, fmt.Errorf("error reponse from github %s", e.Errors[0].Message)
+	}
+	return b, nil
 }
 
 // using the response from the GitHub GraphQL API, parse it and return a slice of latest package versions
-func (o GitHubReleaseOptions) parseGitHubTags(repos QueryTagsResponse, errorMessages map[string]string) (results map[string]string, err error) {
+func (o GitHubReleaseOptions) parseGitHubTags(repos QueryTagsResponse) (results map[string]string, err error) {
 	results = make(map[string]string)
 
 	// for each repo queried, check for the latest version
-	for _, repo := range repos.Data {
+	for packageNameHash, repo := range repos.Data {
+		// strip prefix that avoids github thinking hash is not a float
+		packageNameHash = strings.TrimPrefix(packageNameHash, "r")
 		var versions []*version.Version
-		melangeConfig, err := o.getMelangeConfig(repo.NameWithOwner)
-		if err != nil {
+		c, ok := o.ConfigsByHash[packageNameHash]
+		if !ok {
 			return results, fmt.Errorf("no package config found for identifier %s", repo.NameWithOwner)
 		}
 
 		for _, node := range repo.Refs.Nodes {
-			v, err := o.getVersion(node.TagName, repo.NameWithOwner)
+			v, err := o.getVersion(packageNameHash, node.TagName, repo.NameWithOwner)
 			if err != nil {
-				errorMessages[melangeConfig.Package.Name] = err.Error()
+				o.ErrorMessages[c.Package.Name] = err.Error()
 				continue
 			}
 			if v == nil {
@@ -335,30 +377,32 @@ func (o GitHubReleaseOptions) parseGitHubTags(repos QueryTagsResponse, errorMess
 			}
 			versions = append(versions, v)
 		}
-		err = o.addIfNewVersion(versions, repo.NameWithOwner, results)
+		err = o.addIfNewVersion(packageNameHash, versions, repo.NameWithOwner, results)
 		if err != nil {
-			errorMessages[melangeConfig.Package.Name] = err.Error()
+			o.ErrorMessages[c.Package.Name] = err.Error()
 		}
 	}
+
 	return results, nil
 }
 
-func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository, errorMessages map[string]string) (results map[string]string, err error) {
+func (o GitHubReleaseOptions) parseGitHubReleases(repos QueryReleasesResponse) (results map[string]string, err error) {
 	results = make(map[string]string)
 
-	for _, node := range repos {
-		releases := node.Releases
+	for packageNameHash, node := range repos.Data {
+		// strip prefix that avoids github thinking hash is not a float
+		packageNameHash = strings.TrimPrefix(packageNameHash, "r")
 		var versions []*version.Version
 
 		// compare if this version is newer than the version we have in our
 		// related melange package config
-		melangePackageConfig, err := o.getMelangeConfig(string(node.NameWithOwner))
-		if err != nil {
-			return results, fmt.Errorf("failed to find %s in package configs", string(node.NameWithOwner))
+		c, ok := o.ConfigsByHash[packageNameHash]
+		if !ok {
+			return results, fmt.Errorf("failed to find %s in package configs", node.NameWithOwner)
 		}
 
 		// keep a map of original versions retrieved from github with a semver as the key so we can easily look it up after sorting
-		for _, release := range releases.Nodes {
+		for _, release := range node.Releases.Nodes {
 			if release.IsDraft {
 				continue
 			}
@@ -367,20 +411,20 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository, errorMessa
 			}
 
 			// first get the version from the release name but fall back to using the tag
-			releaseVersion := string(release.Tag.Name)
+			releaseVersion := release.Tag.Name
 			if releaseVersion == "" {
-				errorMessages[melangePackageConfig.Package.Name] = fmt.Sprintf("no tag found for release %s", node.Name)
+				o.ErrorMessages[c.Package.Name] = fmt.Sprintf("no tag found for release %s", node.Name)
 				continue
 			}
 
 			// if tag filter matched the prefix then skip
-			if !strings.HasPrefix(releaseVersion, melangePackageConfig.Update.GitHubMonitor.TagFilter) {
+			if !strings.HasPrefix(releaseVersion, c.Update.GitHubMonitor.TagFilter) {
 				continue
 			}
 
-			v, err := o.getVersion(releaseVersion, string(node.NameWithOwner))
+			v, err := o.getVersion(packageNameHash, releaseVersion, node.NameWithOwner)
 			if err != nil {
-				errorMessages[melangePackageConfig.Package.Name] = err.Error()
+				o.ErrorMessages[c.Package.Name] = err.Error()
 				continue
 			}
 			if v == nil {
@@ -389,15 +433,16 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos []Repository, errorMessa
 			versions = append(versions, v)
 		}
 
-		err = o.addIfNewVersion(versions, string(node.NameWithOwner), results)
+		err = o.addIfNewVersion(packageNameHash, versions, node.NameWithOwner, results)
 		if err != nil {
-			errorMessages[melangePackageConfig.Package.Name] = err.Error()
+			o.ErrorMessages[c.Package.Name] = err.Error()
 		}
 	}
+
 	return results, nil
 }
 
-func (o GitHubReleaseOptions) addIfNewVersion(versions []*version.Version, ownerName string, results map[string]string) error {
+func (o GitHubReleaseOptions) addIfNewVersion(packageNameHash string, versions []*version.Version, ownerName string, results map[string]string) error {
 	// sort the versions to make sure we really do have the latest.
 	// not all projects use the github latest release tag properly so could
 	// end up with older versions
@@ -408,52 +453,48 @@ func (o GitHubReleaseOptions) addIfNewVersion(versions []*version.Version, owner
 
 		// compare if this version is newer than the version we have in our
 		// related melange package config
-		melangePackageConfig, err := o.getMelangeConfig(ownerName)
-		if err != nil {
+		c, ok := o.ConfigsByHash[packageNameHash]
+		if !ok {
 			return fmt.Errorf("failed to find %s in package configs", ownerName)
 		}
 
-		if melangePackageConfig.Package.Version != "" {
-			currentVersionSemver, err := version.NewVersion(melangePackageConfig.Package.Version)
+		if c.Package.Version != "" {
+			currentVersionSemver, err := version.NewVersion(c.Package.Version)
 			if err != nil {
-				return errors.Wrapf(err, "failed to create a version from package %s: %s", melangePackageConfig.Package.Name, melangePackageConfig.Package.Version)
+				return errors.Wrapf(err, "failed to create a version from package %s: %s", c.Package.Name, c.Package.Version)
 			}
 
 			if currentVersionSemver.Equal(latestVersionSemver) {
 				o.Logger.Printf(
 					"%s is on the latest version %s",
-					melangePackageConfig.Package.Name, latestVersionSemver.Original(),
+					c.Package.Name, latestVersionSemver.Original(),
 				)
 			}
 			if currentVersionSemver.LessThan(latestVersionSemver) {
 				o.Logger.Println(
 					color.GreenString(
 						fmt.Sprintf("there is a new stable version available %s, current wolfi version %s, new %s",
-							melangePackageConfig.Package.Name, melangePackageConfig.Package.Version, latestVersionSemver.Original())))
+							c.Package.Name, c.Package.Version, latestVersionSemver.Original())))
 
-				results[melangePackageConfig.Package.Name] = latestVersionSemver.Original()
+				results[c.Package.Name] = latestVersionSemver.Original()
 			}
 		}
 	}
 	return nil
 }
 
-func (o GitHubReleaseOptions) isVersionPreRelease(v *version.Version, id string) bool {
+func (o GitHubReleaseOptions) shouldSkipVersion(v string) bool {
 	invalid := []string{"alpha", "beta", "rc"}
 	for _, i := range invalid {
-		if strings.Contains(v.Prerelease(), i) {
+		if strings.Contains(strings.ToLower(v), i) {
 			return true
 		}
-		// todo JR add back
-		//if strings.Contains(strings.ToLower(v.Prerelease()), i) {
-		//	return true
-		//}
 	}
 	return false
 }
 
-// function returns batches of git repositories used to query githubs graphql api.  GitHub has a limit of 100 repos per request.
-func (o GitHubReleaseOptions) getRepoLists() (releaseBatch, tagBatch []map[string]string) {
+// function returns two slices, one for configs that use github releases and second that use tags
+func (o GitHubReleaseOptions) getRepoLists() (releaseBatch, tagBatch map[string]string) {
 	releaseRepoQuery := make(map[string]string)
 	tagRepoQuery := make(map[string]string)
 
@@ -463,32 +504,38 @@ func (o GitHubReleaseOptions) getRepoLists() (releaseBatch, tagBatch []map[strin
 			if c.Update.GitHubMonitor.UseTags {
 				tagRepoQuery[c.Package.Name] = c.Update.GitHubMonitor.Identifier
 			} else {
-				releaseRepoQuery[c.Package.Name] = fmt.Sprintf("repo:%s", c.Update.GitHubMonitor.Identifier)
+				releaseRepoQuery[c.Package.Name] = c.Update.GitHubMonitor.Identifier
 			}
 		}
 	}
 
-	releaseBatch = getBatches(releaseRepoQuery)
-	tagBatch = getBatches(tagRepoQuery)
-	return releaseBatch, tagBatch
+	return releaseRepoQuery, tagRepoQuery
 }
 
-func (o GitHubReleaseOptions) getVersion(v, id string) (*version.Version, error) {
+func (o GitHubReleaseOptions) getVersion(nameHash, v, id string) (*version.Version, error) {
 	// strip any prefix chars using mapper data
 	// the fastest way to check is to lookup git repo name in the map
 	// data, but there's no guarantee the repo name and map data key are
 	// the same if the identifiers don't match fall back to iterating
 	// through all map data to match using identifier
-	p, err := o.getMelangeConfig(id)
-	if p.Update.GitHubMonitor == nil {
+	c, ok := o.ConfigsByHash[nameHash]
+	if !ok {
+		return nil, fmt.Errorf("no melange package found for github response key / idendifier name %s", id)
+	}
+	ghm := c.Update.GitHubMonitor
+	if ghm == nil {
 		return nil, fmt.Errorf("no github update config found for package %s", id)
 	}
-	if p.Update.GitHubMonitor.StripPrefix != "" {
-		v = strings.TrimPrefix(v, p.Update.GitHubMonitor.StripPrefix)
+	if ghm.StripPrefix != "" {
+		v = strings.TrimPrefix(v, ghm.StripPrefix)
 	}
 
-	if p.Update.VersionSeparator != "" {
-		v = strings.ReplaceAll(v, p.Update.VersionSeparator, ".")
+	if c.Update.VersionSeparator != "" {
+		v = strings.ReplaceAll(v, c.Update.VersionSeparator, ".")
+	}
+
+	if o.shouldSkipVersion(v) {
+		return nil, nil
 	}
 
 	releaseVersionSemver, err := version.NewVersion(v)
@@ -496,96 +543,10 @@ func (o GitHubReleaseOptions) getVersion(v, id string) (*version.Version, error)
 		return nil, errors.Wrapf(err, "failed to create a version from %s: %s", id, v)
 	}
 
-	if o.isVersionPreRelease(releaseVersionSemver, id) {
-		return nil, nil
-	}
 	return releaseVersionSemver, nil
 }
 
-// loop through slice of package configs and find teh matching identifier
-// originally we turned the slice into a map key'd by identifier however,
-// this caused an issue if we have more that one package that has update
-// config for the same repo and hence same backend identifier.  Not able
-// add the package name to the key as we don't know the package name when
-// parsing graphql responses
-func (o GitHubReleaseOptions) getMelangeConfig(identifier string) (build.Configuration, error) {
-	for i := range o.PackageConfigs {
-		ghm := o.PackageConfigs[i].Config.Update.GitHubMonitor
-		if ghm == nil {
-			continue
-		}
-		if ghm.Identifier == identifier {
-			return o.PackageConfigs[i].Config, nil
-		}
-	}
-	return build.Configuration{}, fmt.Errorf("no package config found with update identifier %s", identifier)
-}
-
-//	func getBatches(repoQuery map[string]string) []map[string]string {
-//		numberOfRepos := len(repoQuery)
-//
-//		// divide the number of repos by 100 and round up to the next whole number
-//		numberOfBatches := int(math.Ceil(float64(numberOfRepos) / 100))
-//
-//		batches := make([]map[string]string, numberOfBatches)
-//
-//		counter := 0
-//		for i := 0; i < numberOfBatches; i++ {
-//			// looping through the maps to declare
-//			// batches of length 100
-//
-//			if i == numberOfBatches-1 {
-//				// if this is the last batch, only make the map the size of remaining repos
-//				batches[i] = make(map[string]string, len(repoQuery)-counter)
-//			} else {
-//				// create batches of 100
-//				batches[i] = make(map[string]string, 100)
-//			}
-//
-//			// fill up each batch with a map of repos
-//			for j := 0; j < 100 && counter < len(repoQuery); j++ {
-//				repoQuery
-//				batches[i][j] = repoQuery[counter]
-//				counter++
-//			}
-//		}
-//
-//		return batches
-//	}
-func getBatches(repoQuery map[string]string) []map[string]string {
-	var sliceOfMaps []map[string]string
-	if len(repoQuery) == 0 {
-		return sliceOfMaps
-	}
-	sliceOfMaps = append(sliceOfMaps, make(map[string]string))
-
-	count := 0
-	// loop over all entries to add to slice
-	for key, value := range repoQuery {
-		// check if current map has reached max entries
-		if count == 100 {
-			// create new map and append to slice
-			sliceOfMaps = append(sliceOfMaps, make(map[string]string))
-			count = 0
-		}
-		// add entry to current map
-		sliceOfMaps[len(sliceOfMaps)-1][key] = value
-		count++
-	}
-	return sliceOfMaps
-}
-
-// printJSON prints v as JSON encoded with indent to stdout. It panics on any error.
-func printJSON(v interface{}) {
-	w := json.NewEncoder(os.Stdout)
-	w.SetIndent("", "\t")
-	err := w.Encode(v)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func template(tmpl string, data QueryTagsData) string {
+func template(tmpl string, data interface{}) string {
 	var buf bytes.Buffer
 	t := gotemplate.Must(gotemplate.New("").Parse(tmpl))
 	t.Option("missingkey=error")

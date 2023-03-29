@@ -19,7 +19,6 @@ import (
 	"github.com/google/go-github/v50/github"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/shurcooL/githubv4"
 	"golang.org/x/exp/maps"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
@@ -33,7 +32,7 @@ import (
 
 type Options struct {
 	PackageNames           []string
-	PackageConfigs         map[string]melange.Packages
+	PackageConfigs         map[string]*melange.Packages
 	PullRequestBaseBranch  string
 	PullRequestTitle       string
 	RepoURI                string
@@ -46,7 +45,7 @@ type Options struct {
 	Client                 *http2.RLHTTPClient
 	Logger                 *log.Logger
 	GitHubHTTPClient       *http2.RLHTTPClient
-	GitGraphQLClient       *githubv4.Client
+	ErrorMessages          map[string]string
 }
 
 const (
@@ -78,19 +77,15 @@ func New() Options {
 			// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
 		},
-		GitGraphQLClient: githubv4.NewClient(oauth2.NewClient(context.Background(), ts)),
-		Logger:           log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
-		DefaultBranch:    "main",
+		Logger:        log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
+		DefaultBranch: "main",
+		ErrorMessages: make(map[string]string),
 	}
 
 	return options
 }
 
 func (o *Options) Update() error {
-	// keep a slice of messages to print at the end of the update to help users diagnose non-fatal problems
-	errorMessages := make(map[string]string)
-	packagesToUpdate := make(map[string]string)
-
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
@@ -115,26 +110,26 @@ func (o *Options) Update() error {
 		return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
 	}
 
-	packagesToUpdate, err = o.GetNewVersions(tempDir, o.PackageNames, errorMessages)
+	packagesToUpdate, err := o.GetNewVersions(tempDir, o.PackageNames)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get package updates")
 	}
 
 	// update melange configs in our cloned git repository with any new package versions
-	err = o.updatePackagesGitRepository(repo, packagesToUpdate, errorMessages)
+	err = o.updatePackagesGitRepository(repo, packagesToUpdate)
 	if err != nil {
 		return fmt.Errorf("failed to update packages in git repository: %w", err)
 	}
 
 	// certain errors should not halt the updates, print them at the end
-	for k, message := range errorMessages {
+	for k, message := range o.ErrorMessages {
 		o.Logger.Printf("%s: %s\n", k, color.YellowString(message))
 	}
 
 	return nil
 }
 
-func (o *Options) GetNewVersions(dir string, packageNames []string, errorMessages map[string]string) (map[string]string, error) {
+func (o *Options) GetNewVersions(dir string, packageNames []string) (map[string]string, error) {
 	var err error
 	latestVersions := make(map[string]string)
 
@@ -154,12 +149,12 @@ func (o *Options) GetNewVersions(dir string, packageNames []string, errorMessage
 
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
-		g := NewGitHubReleaseOptions(o.PackageConfigs, o.GitGraphQLClient, o.GitHubHTTPClient)
-		v, err := g.getLatestGitHubVersions(errorMessages)
+		g := NewGitHubReleaseOptions(o.PackageConfigs, o.GitHubHTTPClient)
+		v, errorMessages, err := g.getLatestGitHubVersions()
 		if err != nil {
 			return latestVersions, fmt.Errorf("failed getting github releases: %w", err)
 		}
-
+		maps.Copy(o.ErrorMessages, errorMessages)
 		maps.Copy(latestVersions, v)
 	}
 
@@ -170,17 +165,18 @@ func (o *Options) GetNewVersions(dir string, packageNames []string, errorMessage
 			GitHubHTTPClient: o.GitHubHTTPClient,
 			Logger:           o.Logger,
 		}
-		v, err := m.getLatestReleaseMonitorVersions(o.PackageConfigs, errorMessages)
+		v, errorMessages := m.getLatestReleaseMonitorVersions(o.PackageConfigs)
 		if err != nil {
 			return nil, fmt.Errorf("failed release monitor versions: %w", err)
 		}
+		maps.Copy(o.ErrorMessages, errorMessages)
 		maps.Copy(latestVersions, v)
 	}
 	return latestVersions, nil
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string, errorMessages map[string]string) error {
+func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string) error {
 	// bump packages that need updating
 	for packageName, latestVersion := range packagesToUpdate {
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
@@ -194,7 +190,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return err
 		}
 		if errorMessage != "" {
-			errorMessages[packageName] = errorMessage
+			o.ErrorMessages[packageName] = errorMessage
 		}
 	}
 

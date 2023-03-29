@@ -2,14 +2,11 @@ package update
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/hashicorp/go-version"
 
 	"chainguard.dev/melange/pkg/build"
 
@@ -19,9 +16,9 @@ import (
 )
 
 func TestMonitorService_parseGitHubReleases(t *testing.T) {
-	packageConfigs := make(map[string]melange.Packages)
+	packageConfigs := make(map[string]*melange.Packages)
 
-	packageConfigs["cosign"] = melange.Packages{
+	packageConfigs["cosign"] = &melange.Packages{
 		Config: build.Configuration{
 			Package: build.Package{Name: "cosign", Version: "1.10.1"},
 			Update: build.Update{GitHubMonitor: &build.GitHubMonitor{
@@ -31,7 +28,7 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 		},
 	}
 
-	packageConfigs["jenkins"] = melange.Packages{
+	packageConfigs["jenkins"] = &melange.Packages{
 		Config: build.Configuration{
 			Package: build.Package{Name: "jenkins", Version: "2.370"},
 			Update: build.Update{GitHubMonitor: &build.GitHubMonitor{
@@ -50,12 +47,12 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 		{
 			name:            "multiple_repos",
 			packageName:     "cosign",
-			expectedVersion: "1.13.1",
+			expectedVersion: "2.0.0",
 		},
 		{
 			name:            "multiple_repos",
 			packageName:     "jenkins",
-			expectedVersion: "2.388",
+			expectedVersion: "2.397",
 		},
 	}
 	for _, test := range tests {
@@ -64,21 +61,54 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotEmpty(t, data)
 
-			m := NewGitHubReleaseOptions(packageConfigs, nil, nil)
+			m := NewGitHubReleaseOptions(packageConfigs, nil)
 
-			var rel []Repository
+			rel := QueryReleasesResponse{}
 			err = json.Unmarshal(data, &rel)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, rel)
 
+			rel.Data = getReleaseResultsMapWithHashKeys(rel, m)
+
 			errorMessages := make(map[string]string)
 
-			latestVersions, err := m.parseGitHubReleases(rel, errorMessages)
+			latestVersions, err := m.parseGitHubReleases(rel)
 			assert.NoError(t, err)
 			assert.Empty(t, errorMessages)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
 		})
 	}
+}
+
+func getReleaseResultsMapWithHashKeys(rel QueryReleasesResponse, m GitHubReleaseOptions) map[string]Releases {
+	// modify the fake github response with the hash keys generated from NewGitHubReleaseOptions
+	// this is so we can match the response back with the melange package
+	copyMap := make(map[string]Releases)
+	for old, config := range rel.Data {
+		for s, packages := range m.PackageConfigs {
+			if packages.Config.Update.GitHubMonitor.Identifier == config.NameWithOwner {
+				copyMap[m.PackageConfigs[s].Hash] = config
+				delete(rel.Data, old)
+				continue
+			}
+		}
+	}
+	return copyMap
+}
+func getTagResultsMapWithHashKeys(rel QueryTagsResponse, m GitHubReleaseOptions) map[string]Repo {
+	// modify the fake github response with the hash keys generated from NewGitHubReleaseOptions
+	// this is so we can match the response back with the melange package
+	copyMap := make(map[string]Repo)
+	for old, config := range rel.Data {
+		for s, packages := range m.PackageConfigs {
+			if packages.Config.Update.GitHubMonitor.Identifier == config.NameWithOwner {
+				copyMap[m.PackageConfigs[s].Hash] = config
+				delete(rel.Data, old)
+				continue
+			}
+		}
+	}
+	return copyMap
 }
 
 func TestMonitorService_parseGitHubTags(t *testing.T) {
@@ -127,88 +157,28 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotEmpty(t, data)
 
-			packageConfigs := make(map[string]melange.Packages)
+			packageConfigs := make(map[string]*melange.Packages)
 
-			packageConfigs[test.packageName] = melange.Packages{
+			packageConfigs[test.packageName] = &melange.Packages{
 				Config: test.updateConfig,
 			}
 
-			m := NewGitHubReleaseOptions(packageConfigs, nil, nil)
+			m := NewGitHubReleaseOptions(packageConfigs, nil)
 
 			var rel QueryTagsResponse
 			err = json.Unmarshal(data, &rel)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, rel)
 
+			rel.Data = getTagResultsMapWithHashKeys(rel, m)
+
 			errorMessages := make(map[string]string)
-			latestVersions, _ := m.parseGitHubTags(rel, errorMessages)
+			latestVersions, err := m.parseGitHubTags(rel)
+			assert.NoError(t, err)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
 			assert.Empty(t, errorMessages)
 		})
 	}
-}
-
-func TestGitHubReleases_GetRepoListsTags(t *testing.T) {
-	testData := make(map[string]melange.Packages)
-
-	for i := 0; i < 350; i++ {
-		item := fmt.Sprintf("cheese%d", i)
-
-		testData[item] = melange.Packages{Config: build.Configuration{
-			Package: build.Package{
-				Name: item,
-			},
-			Update: build.Update{
-				GitHubMonitor: &build.GitHubMonitor{
-					Identifier: "wine/" + item,
-					UseTags:    true,
-				},
-			},
-		}}
-	}
-
-	o := GitHubReleaseOptions{
-		Logger:         log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
-		PackageConfigs: testData,
-	}
-
-	rs1, rs2 := o.getRepoLists()
-
-	assert.Equal(t, 4, len(rs2))
-	assert.Equal(t, 0, len(rs1))
-	assert.Equal(t, len(rs2[0]), 100)
-	assert.Equal(t, len(rs2[3]), 50)
-}
-
-func TestGitHubReleases_GetRepoListsReleases(t *testing.T) {
-	testData := make(map[string]melange.Packages)
-
-	for i := 0; i < 350; i++ {
-		item := fmt.Sprintf("cheese%d", i)
-
-		testData[item] = melange.Packages{Config: build.Configuration{
-			Package: build.Package{
-				Name: item,
-			},
-			Update: build.Update{
-				GitHubMonitor: &build.GitHubMonitor{
-					Identifier: "wine/" + item,
-				},
-			},
-		}}
-	}
-
-	o := GitHubReleaseOptions{
-		Logger:         log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
-		PackageConfigs: testData,
-	}
-
-	rs1, rs2 := o.getRepoLists()
-
-	assert.Equal(t, 4, len(rs1))
-	assert.Equal(t, 0, len(rs2))
-	assert.Equal(t, len(rs1[0]), 100)
-	assert.Equal(t, len(rs1[3]), 50)
 }
 
 func Test_queryTemplate(t *testing.T) {
@@ -259,34 +229,7 @@ func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
 				Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 			}
 
-			v, err := version.NewVersion(tt.version)
-			assert.NoError(t, err)
-
-			assert.Equalf(t, tt.skip, o.isVersionPreRelease(v, "cheese/crackers"), "isVersionPreRelease(%v)", v)
-		})
-	}
-}
-
-func TestGitHubRelease_getBatches(t *testing.T) {
-	tests := []struct {
-		packageName    string
-		identifier     string
-		numberToCreate int
-		batchCount     int
-	}{
-		{packageName: "foo", identifier: "cheese/wine", numberToCreate: 250, batchCount: 3},
-		{packageName: "foo", identifier: "cheese/wine", numberToCreate: 5, batchCount: 1},
-	}
-	for _, tt := range tests {
-		t.Run(tt.packageName, func(t *testing.T) {
-
-			repos := make(map[string]string)
-			for i := 0; i < tt.numberToCreate; i++ {
-				repos[fmt.Sprintf("%s-%d", tt.packageName, i)] = tt.identifier
-			}
-
-			got := getBatches(repos)
-			assert.Len(t, got, tt.batchCount)
+			assert.Equalf(t, tt.skip, o.shouldSkipVersion(tt.version), "isVersionPreRelease(%v)", tt.version)
 		})
 	}
 }

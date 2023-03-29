@@ -38,7 +38,7 @@ import (
 
 type PackageOptions struct {
 	PackageName           string
-	PackageConfig         map[string]melange.Packages
+	PackageConfig         map[string]*melange.Packages
 	PullRequestBaseBranch string
 	TargetRepo            string
 	Version               string
