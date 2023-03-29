@@ -3,6 +3,7 @@ package gh
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/hashicorp/go-version"
@@ -68,6 +69,10 @@ func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (string, error) {
 func (o GitOptions) CheckExistingPullRequests(pr *GetPullRequest) (string, error) {
 	// check if there's an existing PR open for the same package
 	openPullRequests, resp, err := o.GithubClient.PullRequests.List(context.Background(), pr.Owner, pr.RepoName, &github.PullRequestListOptions{State: "open"})
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return "", errors.Wrapf(err, "failed to auth with github, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo")
+	}
 
 	githubErr := github.CheckResponse(resp.Response)
 

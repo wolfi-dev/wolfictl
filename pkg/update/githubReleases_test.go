@@ -71,9 +71,11 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotEmpty(t, rel)
 
-			latestVersions, errormessages, err := m.parseGitHubReleases(rel)
+			errorMessages := make(map[string]string)
+
+			latestVersions, err := m.parseGitHubReleases(rel, errorMessages)
 			assert.NoError(t, err)
-			assert.Empty(t, errormessages)
+			assert.Empty(t, errorMessages)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
 		})
 	}
@@ -138,31 +140,70 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotEmpty(t, rel)
 
-			latestVersions, _ := m.parseGitHubTags(rel)
+			errorMessages := make(map[string]string)
+			latestVersions, _ := m.parseGitHubTags(rel, errorMessages)
 			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
+			assert.Empty(t, errorMessages)
 		})
 	}
 }
 
-func TestGitHubReleases_GetRepoLists(t *testing.T) {
-	testData := make(map[string]build.Configuration)
+func TestGitHubReleases_GetRepoListsTags(t *testing.T) {
+	testData := make(map[string]melange.Packages)
 
 	for i := 0; i < 350; i++ {
 		item := fmt.Sprintf("cheese%d", i)
-		testData[item] = build.Configuration{
+
+		testData[item] = melange.Packages{Config: build.Configuration{
+			Package: build.Package{
+				Name: item,
+			},
+			Update: build.Update{
+				GitHubMonitor: &build.GitHubMonitor{
+					Identifier: "wine/" + item,
+					UseTags:    true,
+				},
+			},
+		}}
+	}
+
+	o := GitHubReleaseOptions{
+		Logger:         log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		PackageConfigs: testData,
+	}
+
+	rs1, rs2 := o.getRepoLists()
+
+	assert.Equal(t, 4, len(rs2))
+	assert.Equal(t, 0, len(rs1))
+	assert.Equal(t, len(rs2[0]), 100)
+	assert.Equal(t, len(rs2[3]), 50)
+}
+
+func TestGitHubReleases_GetRepoListsReleases(t *testing.T) {
+	testData := make(map[string]melange.Packages)
+
+	for i := 0; i < 350; i++ {
+		item := fmt.Sprintf("cheese%d", i)
+
+		testData[item] = melange.Packages{Config: build.Configuration{
+			Package: build.Package{
+				Name: item,
+			},
 			Update: build.Update{
 				GitHubMonitor: &build.GitHubMonitor{
 					Identifier: "wine/" + item,
 				},
 			},
-		}
+		}}
 	}
 
 	o := GitHubReleaseOptions{
-		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		Logger:         log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		PackageConfigs: testData,
 	}
 
-	rs1, rs2 := o.getRepoLists(testData)
+	rs1, rs2 := o.getRepoLists()
 
 	assert.Equal(t, 4, len(rs1))
 	assert.Equal(t, 0, len(rs2))
@@ -222,6 +263,30 @@ func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equalf(t, tt.skip, o.isVersionPreRelease(v, "cheese/crackers"), "isVersionPreRelease(%v)", v)
+		})
+	}
+}
+
+func TestGitHubRelease_getBatches(t *testing.T) {
+	tests := []struct {
+		packageName    string
+		identifier     string
+		numberToCreate int
+		batchCount     int
+	}{
+		{packageName: "foo", identifier: "cheese/wine", numberToCreate: 250, batchCount: 3},
+		{packageName: "foo", identifier: "cheese/wine", numberToCreate: 5, batchCount: 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.packageName, func(t *testing.T) {
+
+			repos := make(map[string]string)
+			for i := 0; i < tt.numberToCreate; i++ {
+				repos[fmt.Sprintf("%s-%d", tt.packageName, i)] = tt.identifier
+			}
+
+			got := getBatches(repos)
+			assert.Len(t, got, tt.batchCount)
 		})
 	}
 }

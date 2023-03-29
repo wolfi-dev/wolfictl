@@ -14,6 +14,7 @@ func Check() *cobra.Command {
 	}
 	cmd.AddCommand(
 		SoName(),
+		CheckUpdate(),
 	)
 	return cmd
 }

@@ -126,11 +126,13 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	// update melange configs in our cloned git repository with any new package versions
 	v := strings.TrimPrefix(o.Version, "v")
 
-	err = uo.updateGitPackage(repo, o.PackageName, v, ref)
+	errorMessage, err := uo.updateGitPackage(repo, o.PackageName, v, ref)
 	if err != nil {
 		return fmt.Errorf("failed to update package in git repository: %w", err)
 	}
-
+	if errorMessage != "" {
+		return errors.New(errorMessage)
+	}
 	return nil
 }
 
