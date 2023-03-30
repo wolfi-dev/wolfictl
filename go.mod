@@ -13,7 +13,7 @@ replace k8s.io/client-go => k8s.io/client-go v0.25.3
 replace knative.dev/pkg => knative.dev/pkg v0.0.0-20220407210145-4d62e1dbb943
 
 require (
-	chainguard.dev/apko v0.7.3-0.20230317132250-f7175ff7300a
+	chainguard.dev/apko v0.7.3
 	chainguard.dev/melange v0.2.1-0.20230324185817-f21e1da68255
 	cloud.google.com/go/storage v1.30.0
 	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
