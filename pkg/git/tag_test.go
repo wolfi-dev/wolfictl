@@ -22,10 +22,9 @@ func TestGetCurrentVersionFromTag(t *testing.T) {
 		err      bool
 	}{
 		{existing: nil, expected: "", err: true},
-		{existing: []string{"v1.2.3ab1", "v1.2.3ab2"}, expected: "v1.2.3ab2"},
-		{existing: []string{"v1.2.3ab2", "v1.2.3ab1"}, expected: "v1.2.3ab2"},
-		{existing: []string{"v1.2.4cg9", "v1.2.4cg10"}, expected: "v1.2.4cg10"},
-		{existing: []string{"v1.2.4cg10", "v1.2.4cg9"}, expected: "v1.2.4cg10"},
+		{existing: []string{"v1.2.3", "v1.2.3.1"}, expected: "v1.2.3.1"},
+		{existing: []string{"v1.2", "v1.2+1"}, expected: "v1.2+1"},
+		{existing: []string{"v1.2.4", "v1.2.4-1"}, expected: "v1.2.4"},
 	}
 	for _, test := range tests {
 		t.Run(test.expected, func(t *testing.T) {

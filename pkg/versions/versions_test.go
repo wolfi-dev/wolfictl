@@ -36,11 +36,6 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 			expectedLatestVersion: "4.0.1ab3",
 		},
 		{
-			name:                  "large",
-			testVersions:          []string{"v1.2.3", "v1.2.3ab1", "v1.2.3ab2", "v1.2.4ab1", "v1.2.4ab10", "v1.2.4ab2", "v1.2.4ab3", "v1.2.4ab4", "v1.2.4ab5", "v1.2.4ab6", "v1.2.4ab7", "v1.2.4ab8", "v1.2.4ab9"},
-			expectedLatestVersion: "v1.2.4ab10",
-		},
-		{
 			name:                  "prerelease",
 			baseVersions:          baseVersions,
 			testVersions:          []string{"4.0.1-ab2", "4.0.1-ab3", "4.0.1-ab1"},
@@ -55,6 +50,11 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 			name:                  "jdk",
 			testVersions:          []string{"17+32", "17+33", "17.0.7+5"},
 			expectedLatestVersion: "17.0.7+5",
+		},
+		{
+			name:                  "zookeeper",
+			testVersions:          []string{"3.8.1", "3.8.1-1"},
+			expectedLatestVersion: "3.8.1",
 		},
 	}
 	for _, test := range tests {
