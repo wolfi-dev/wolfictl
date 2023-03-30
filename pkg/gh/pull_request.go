@@ -3,7 +3,6 @@ package gh
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/hashicorp/go-version"
@@ -27,11 +26,9 @@ type GetPullRequest struct {
 
 // OpenPullRequest opens a pull request on GitHub
 func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (string, error) {
-	// if our new version is more recent that the existing PR close it and create a new one, otherwise skip
-
 	// If the current request has already exhausted the configured number of PR retries, short-circuit
-	if pr.Retries > o.MaxPullRequestRetries {
-		return "", fmt.Errorf("failed max number of retries, tried %d max %d", pr.Retries, o.MaxPullRequestRetries)
+	if pr.Retries > o.MaxRetries {
+		return "", fmt.Errorf("failed max number of retries, tried %d max %d", pr.Retries, o.MaxRetries)
 	}
 
 	// Configure pull request options that the GitHub client accepts when making calls to open new pull requests
@@ -42,21 +39,12 @@ func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (string, error) {
 		Body:  github.String(pr.Body),
 	}
 
-	// make a pull request
-	githubPR, resp, err := o.GithubClient.PullRequests.Create(context.Background(), pr.Owner, pr.RepoName, newPR)
-
-	githubErr := github.CheckResponse(resp.Response)
-
-	if githubErr != nil {
-		isRateLimited, delay := o.checkRateLimiting(githubErr)
-		if isRateLimited {
-			pr.Retries++
-			o.wait(delay)
-
-			// retry opening a pull request
-			return o.OpenPullRequest(pr)
-		}
-	}
+	var githubPR *github.PullRequest
+	err := o.handleRateLimit(func() (*github.Response, error) {
+		createdPR, resp, err := o.GithubClient.PullRequests.Create(context.Background(), pr.Owner, pr.RepoName, newPR)
+		githubPR = createdPR
+		return resp, err
+	})
 
 	if err != nil {
 		return "", errors.Wrapf(err, "failed opening pull request")
@@ -67,26 +55,14 @@ func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (string, error) {
 
 // CheckExistingPullRequests if an existing PR is open with the same version skip, if it's an older version close the PR and we'll create a new one
 func (o GitOptions) CheckExistingPullRequests(pr *GetPullRequest) (string, error) {
+	openPullRequests := []*github.PullRequest{}
+
 	// check if there's an existing PR open for the same package
-	openPullRequests, resp, err := o.GithubClient.PullRequests.List(context.Background(), pr.Owner, pr.RepoName, &github.PullRequestListOptions{State: "open"})
-
-	if resp.StatusCode == http.StatusUnauthorized {
-		return "", errors.Wrapf(err, "failed to auth with github, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo")
-	}
-
-	githubErr := github.CheckResponse(resp.Response)
-
-	if githubErr != nil {
-		isRateLimited, delay := o.checkRateLimiting(githubErr)
-
-		if isRateLimited {
-			pr.Retries++
-			o.wait(delay)
-
-			// retry opening a pull request
-			return o.CheckExistingPullRequests(pr)
-		}
-	}
+	err := o.handleRateLimit(func() (*github.Response, error) {
+		prs, resp, err := o.GithubClient.PullRequests.List(context.Background(), pr.Owner, pr.RepoName, &github.PullRequestListOptions{State: "open"})
+		openPullRequests = prs
+		return resp, err
+	})
 
 	if err != nil {
 		return "", errors.Wrapf(err, "failed listing pull requests")
@@ -118,21 +94,11 @@ func (o GitOptions) closePullRequest(pr *GetPullRequest, openPr *github.PullRequ
 	closed := "closed"
 	openPr.State = &closed
 
-	_, resp, err := o.GithubClient.PullRequests.Edit(context.Background(), pr.Owner, pr.RepoName, *openPr.Number, openPr)
-	githubErr := github.CheckResponse(resp.Response)
+	err := o.handleRateLimit(func() (*github.Response, error) {
+		_, resp, err := o.GithubClient.PullRequests.Edit(context.Background(), pr.Owner, pr.RepoName, *openPr.Number, openPr)
+		return resp, err
+	})
 
-	if githubErr != nil {
-		isRateLimited, delay := o.checkRateLimiting(githubErr)
-
-		if isRateLimited {
-			// If this request has been seen before, increment its retries count, taking into account previous iterations
-			pr.Retries++
-			o.wait(delay)
-
-			// retry opening a pull request
-			return o.closePullRequest(pr, openPr)
-		}
-	}
 	return err
 }
 
