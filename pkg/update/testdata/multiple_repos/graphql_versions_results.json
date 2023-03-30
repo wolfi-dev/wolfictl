@@ -1,206 +1,748 @@
-[
-  {
-    "owner":{
-      "login":"jenkinsci"
+{
+  "data": {
+    "rjenkins": {
+      "owner": {
+        "login": "jenkinsci"
+      },
+      "name": "jenkins",
+      "nameWithOwner": "jenkinsci/jenkins",
+      "releases": {
+        "totalCount": 249,
+        "nodes": [
+          {
+            "tag": {
+              "name": "jenkins-2.397"
+            },
+            "name": "2.397",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": true
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.396"
+            },
+            "name": "2.396",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.387.2-rc"
+            },
+            "name": "2.387.2 RC",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.395"
+            },
+            "name": "2.395",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.394"
+            },
+            "name": "2.394",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.387.1"
+            },
+            "name": "2.387.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.4"
+            },
+            "name": "2.375.4",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.393"
+            },
+            "name": "2.393",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.392"
+            },
+            "name": "2.392",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.387.1-rc"
+            },
+            "name": "2.387.1 RC",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.391"
+            },
+            "name": "2.391",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.3"
+            },
+            "name": "2.375.3",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.390"
+            },
+            "name": "2.390",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.389"
+            },
+            "name": "2.389",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.388"
+            },
+            "name": "2.388",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.3-rc"
+            },
+            "name": "2.375.3 RC",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.387"
+            },
+            "name": "2.387",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.2"
+            },
+            "name": "2.375.2",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.386"
+            },
+            "name": "2.386",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.385"
+            },
+            "name": "2.385",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.384"
+            },
+            "name": "2.384",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.383"
+            },
+            "name": "2.383",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.2-rc"
+            },
+            "name": "2.375.2 RC",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.382"
+            },
+            "name": "2.382",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.381"
+            },
+            "name": "2.381",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.1"
+            },
+            "name": "2.375.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.380"
+            },
+            "name": "2.380",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.379"
+            },
+            "name": "2.379",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.378"
+            },
+            "name": "2.378",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.361.4"
+            },
+            "name": "2.361.4",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375.1-rc"
+            },
+            "name": "2.375.1 RC",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.377"
+            },
+            "name": "2.377",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.361.3"
+            },
+            "name": "2.361.3",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.376"
+            },
+            "name": "2.376",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.375"
+            },
+            "name": "2.375",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.374"
+            },
+            "name": "2.374",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.361.3-rc"
+            },
+            "name": "2.361.3 RC",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.373"
+            },
+            "name": "2.373",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.361.2"
+            },
+            "name": "2.361.2",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "jenkins-2.372"
+            },
+            "name": "2.372",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          }
+        ]
+      }
     },
-    "name":"jenkins",
-    "nameWithOwner":"jenkinsci/jenkins",
-    "releases":{
-      "totalCount":235,
-      "nodes":[
-        {
-          "tag":{
-            "name":"jenkins-2.388"
+    "rcosign": {
+      "owner": {
+        "login": "sigstore"
+      },
+      "name": "cosign",
+      "nameWithOwner": "sigstore/cosign",
+      "releases": {
+        "totalCount": 40,
+        "nodes": [
+          {
+            "tag": {
+              "name": "v2.0.0"
+            },
+            "name": "v2.0.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": true
           },
-          "name":"2.388",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":true
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.375.3-rc"
+          {
+            "tag": {
+              "name": "v2.0.0-rc.3"
+            },
+            "name": "v2.0.0-rc.3",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.375.3 RC",
-          "isPrerelease":true,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.387"
+          {
+            "tag": {
+              "name": "v2.0.0-rc.2"
+            },
+            "name": "v2.0.0-rc.2",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.387",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.375.2"
+          {
+            "tag": {
+              "name": "v2.0.0-rc.1"
+            },
+            "name": "v2.0.0-rc.1",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.375.2",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.386"
+          {
+            "tag": {
+              "name": "v2.0.0-rc.0"
+            },
+            "name": "v2.0.0-rc.0",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.386",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.385"
+          {
+            "tag": {
+              "name": "v1.13.1"
+            },
+            "name": "v1.13.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.385",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.384"
+          {
+            "tag": {
+              "name": "v1.13.0"
+            },
+            "name": "v1.13.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.384",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.383"
+          {
+            "tag": {
+              "name": "v1.12.1"
+            },
+            "name": "v1.12.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.383",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.375.2-rc"
+          {
+            "tag": {
+              "name": "v1.12.0"
+            },
+            "name": "v1.12.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.375.2 RC",
-          "isPrerelease":true,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.382"
+          {
+            "tag": {
+              "name": "v1.11.1"
+            },
+            "name": "v1.11.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.382",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.381"
+          {
+            "tag": {
+              "name": "v1.11.0"
+            },
+            "name": "v1.11.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.381",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.375.1"
+          {
+            "tag": {
+              "name": "v1.10.1"
+            },
+            "name": "v1.10.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.375.1",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.380"
+          {
+            "tag": {
+              "name": "v1.10.0"
+            },
+            "name": "v1.10.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.380",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"jenkins-2.379"
+          {
+            "tag": {
+              "name": "v1.10.0-rc.1"
+            },
+            "name": "v1.10.0-rc.1",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"2.379",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        }
-      ]
-    }
-  },
-  {
-    "owner":{
-      "login":"sigstore"
-    },
-    "name":"cosign",
-    "nameWithOwner":"sigstore/cosign",
-    "releases":{
-      "totalCount":36,
-      "nodes":[
-        {
-          "tag":{
-            "name":"v2.0.0-rc.0"
+          {
+            "tag": {
+              "name": "v1.9.0"
+            },
+            "name": "v1.9.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"v2.0.0-rc.0",
-          "isPrerelease":true,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"v1.13.1"
+          {
+            "tag": {
+              "name": "v1.8.0"
+            },
+            "name": "v1.8.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"v1.13.1",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":true
-        },
-        {
-          "tag":{
-            "name":"v1.13.0"
+          {
+            "tag": {
+              "name": "v1.7.2"
+            },
+            "name": "v1.7.2",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"v1.13.0",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"v1.12.1"
+          {
+            "tag": {
+              "name": "v1.7.1"
+            },
+            "name": "v1.7.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"v1.12.1",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"v1.12.0"
+          {
+            "tag": {
+              "name": "v1.6.0"
+            },
+            "name": "v1.6.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"v1.12.0",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        },
-        {
-          "tag":{
-            "name":"v1.11.1"
+          {
+            "tag": {
+              "name": "v1.5.2"
+            },
+            "name": "v1.5.2 - CVE-2022-23649",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
           },
-          "name":"v1.11.1",
-          "isPrerelease":false,
-          "isDraft":false,
-          "isLatest":false
-        }
-      ]
+          {
+            "tag": {
+              "name": "v1.5.1"
+            },
+            "name": "v1.5.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.5.0"
+            },
+            "name": "v1.5.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.4.1"
+            },
+            "name": "v1.4.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.4.0"
+            },
+            "name": "v1.4.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.3.1"
+            },
+            "name": "v1.3.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.3.0"
+            },
+            "name": "v1.3.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.2.1"
+            },
+            "name": "v1.2.1",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.2.0"
+            },
+            "name": "v1.2.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "cosigned-v0.0.3-dev"
+            },
+            "name": "cosigned-v0.0.3-dev",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "cosigned-v0.0.2-dev"
+            },
+            "name": "cosigned-v0.0.2-dev",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "cosigned-v0.0.1-dev"
+            },
+            "name": "cosigned-v0.0.1-dev",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.1.0"
+            },
+            "name": "v1.1.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v1.0.0"
+            },
+            "name": "v1.0.0",
+            "isPrerelease": false,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.6.0"
+            },
+            "name": "v0.6.0",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.5.0"
+            },
+            "name": "v0.5.0",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.4.0"
+            },
+            "name": "v0.4.0",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.3.1"
+            },
+            "name": "v0.3.1",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.3.0"
+            },
+            "name": "v0.3.0",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.2.0"
+            },
+            "name": "v0.2.0 Release",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          },
+          {
+            "tag": {
+              "name": "v0.1.0"
+            },
+            "name": "v0.1.0",
+            "isPrerelease": true,
+            "isDraft": false,
+            "isLatest": false
+          }
+        ]
+      }
     }
   }
-]
+}

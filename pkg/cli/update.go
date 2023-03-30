@@ -49,7 +49,7 @@ func Update() *cobra.Command {
 	return cmd
 }
 
-func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
+func (o options) UpdateCmd(_ context.Context, repoURI string) error {
 	updateContext := update.New()
 
 	if !o.dryRun && os.Getenv("GITHUB_TOKEN") == "" {

@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fatih/color"
+
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
@@ -32,13 +34,11 @@ type MonitorServiceName int
 
 const (
 	releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%d"
-	releaseMonitor    = "RELEASE_MONITOR"
 )
 
-func (m MonitorService) getLatestReleaseMonitorVersions(
-	melangePackages map[string]melange.Packages,
-) (packagesToUpdate map[string]string, errorMessages []string, err error) {
+func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[string]*melange.Packages) (packagesToUpdate, errorMessages map[string]string) {
 	packagesToUpdate = make(map[string]string)
+	errorMessages = make(map[string]string)
 
 	// iterate packages from the target git repo and check if a new version is available
 	for i := range melangePackages {
@@ -50,9 +50,9 @@ func (m MonitorService) getLatestReleaseMonitorVersions(
 
 		latestVersion, err := m.getLatestReleaseVersion(rm.Identifier)
 		if err != nil {
-			return nil, errorMessages, fmt.Errorf(
-				"failed getting latest release version for package %s, identifier %d: %w",
-				p.Config.Package.Name, rm.Identifier, err,
+			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
+				"failed getting latest release version for package %s, identifier %d: %s",
+				p.Config.Package.Name, rm.Identifier, err.Error(),
 			)
 		}
 
@@ -63,20 +63,27 @@ func (m MonitorService) getLatestReleaseMonitorVersions(
 
 		currentVersionSemver, err := version.NewVersion(p.Config.Package.Version)
 		if err != nil {
-			errorMessages = append(errorMessages, fmt.Sprintf(
+			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
 				"failed to create a version from package %s: %s.  Error: %s",
 				p.Config.Package.Name, p.Config.Package.Version, err,
-			))
+			)
 			continue
 		}
 
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
-			errorMessages = append(errorMessages, fmt.Sprintf(
+			errorMessages[p.Config.Package.Name] = color.GreenString(fmt.Sprintf(
 				"failed to create a latestVersion from package %s: %s.  Error: %s",
 				p.Config.Package.Name, latestVersion, err,
 			))
 			continue
+		}
+
+		if currentVersionSemver.Equal(latestVersionSemver) {
+			m.Logger.Printf(
+				"%s is on the latest version %s",
+				p.Config.Package.Name, latestVersionSemver.Original(),
+			)
 		}
 
 		if currentVersionSemver.LessThan(latestVersionSemver) {
@@ -87,7 +94,7 @@ func (m MonitorService) getLatestReleaseMonitorVersions(
 			packagesToUpdate[p.Config.Package.Name] = latestVersion
 		}
 	}
-	return packagesToUpdate, errorMessages, nil
+	return packagesToUpdate, errorMessages
 }
 
 func (m MonitorService) getLatestReleaseVersion(identifier int) (string, error) {

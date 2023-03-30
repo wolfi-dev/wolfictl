@@ -1,6 +1,10 @@
 package stringhelpers
 
-import "regexp"
+import (
+	"net/url"
+	"path/filepath"
+	"regexp"
+)
 
 // RegexpSplit splits a string into an array using the regexSep as a separator
 func RegexpSplit(text, regexSeperator string) []string {
@@ -14,4 +18,13 @@ func RegexpSplit(text, regexSeperator string) []string {
 	}
 	result[len(indexes)] = text[lastIdx:]
 	return result
+}
+
+func IsURI(s string) bool {
+	_, err := url.Parse(s)
+	return err == nil
+}
+
+func IsFilePath(s string) bool {
+	return filepath.IsAbs(s)
 }
