@@ -147,6 +147,11 @@ func (o *Options) GetNewVersions(dir string, packageNames []string) (map[string]
 		}
 	}
 
+	if len(o.PackageConfigs) == 0 {
+		o.Logger.Printf("no package updates")
+		return nil, nil
+	}
+
 	if o.GithubReleaseQuery {
 		// let's get any versions that use GITHUB first as we can do that using reduced graphql requests
 		g := NewGitHubReleaseOptions(o.PackageConfigs, o.GitHubHTTPClient)
