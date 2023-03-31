@@ -33,7 +33,7 @@ import (
 	"k8s.io/utils/pointer"
 )
 
-const gsutilImage = "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim" // TODO: make this configurable?
+const gcloudImage = "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim" // TODO: make this configurable?
 
 func gcloudProjectID(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "gcloud", "config", "get-value", "project")
@@ -140,7 +140,7 @@ func cmdPod() *cobra.Command {
 						},
 					}, {
 						Name:       "fetch-packages",
-						Image:      gsutilImage,
+						Image:      gcloudImage,
 						WorkingDir: "/workspace",
 						VolumeMounts: []corev1.VolumeMount{{
 							Name:      "workspace",
@@ -198,12 +198,12 @@ else
   ls {{.signingKeyName}}.rsa
 fi
 
-set +e # Always touch start-gsutil-cp to start uploading buitl packages, even if the build fails.
+set +e # Always touch start-gcloud-cp to start uploading buitl packages, even if the build fails.
 find ./packages -print -exec touch \{} \;
 MELANGE=/usr/bin/melange MELANGE_DIR=/usr/share/melange KEY=${KEY} ARCH={{.arch}} REPO=./packages MELANGE_EXTRA_OPTS="{{.melangeBuildOpts}}" make {{.targets}}
 success=$?
 rm ${KEY}
-touch start-gsutil-cp
+touch start-gcloud-cp
 echo exiting $success...
 exit $success
 `, map[string]string{
@@ -255,18 +255,27 @@ exit $success
 
 			if bucket != "" {
 				p.Spec.Containers = append(p.Spec.Containers, corev1.Container{
-					Name:       "gsutil-cp",
-					Image:      gsutilImage,
+					Name:       "gcloud-cp",
+					Image:      gcloudImage,
 					WorkingDir: "/workspace",
 					Command: []string{"sh", "-c", template(`
 #!/usr/bin/env bash
 interval=10
 while true;
 do
-  [ -f start-gsutil-cp ] && break
+  [ -f start-gcloud-cp ] && break
   sleep $interval
 done
-gsutil -m cp -r "./packages/*" gs://{{.bucket}} || true`, map[string]string{"bucket": bucket}),
+
+# Don't cache the APKINDEX.
+gcloud --quiet storage cp \
+	--cache-control=off \
+	"./packages/**/APKINDEX.tar.gz" gs://{{.bucket}}/os/{{.arch}}/ || true
+
+# apks will be cached in CDN for an hour by default.
+gcloud --quiet storage cp \
+	"./packages/**/*.apk" gs://{{.bucket}}/os/{{.arch}}/ || true
+`, map[string]string{"bucket": bucket, "arch": arch}),
 					},
 					VolumeMounts: []corev1.VolumeMount{{
 						Name:      "workspace",
@@ -456,7 +465,7 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 				}
 				errg.Go(stream("build"))
 				if k.bucket != "" {
-					errg.Go(stream("gsutil-cp"))
+					errg.Go(stream("gcloud-cp"))
 				}
 				if err := errg.Wait(); err != nil {
 					return err
