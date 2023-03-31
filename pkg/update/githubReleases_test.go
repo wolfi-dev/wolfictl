@@ -2,6 +2,7 @@ package update
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -72,10 +73,10 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 
 			errorMessages := make(map[string]string)
 
-			latestVersions, err := m.parseGitHubReleases(rel)
+			latestVersions, err := m.parseGitHubReleases(&rel)
 			assert.NoError(t, err)
 			assert.Empty(t, errorMessages)
-			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
+			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName].Version)
 		})
 	}
 }
@@ -173,9 +174,9 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 			rel.Data = getTagResultsMapWithHashKeys(rel, m)
 
 			errorMessages := make(map[string]string)
-			latestVersions, err := m.parseGitHubTags(rel)
+			latestVersions, err := m.parseGitHubTags(&rel)
 			assert.NoError(t, err)
-			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName])
+			assert.Equal(t, test.expectedVersion, latestVersions[test.packageName].Version)
 			assert.Empty(t, errorMessages)
 		})
 	}
@@ -230,6 +231,27 @@ func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
 			}
 
 			assert.Equalf(t, tt.skip, o.shouldSkipVersion(tt.version), "isVersionPreRelease(%v)", tt.version)
+		})
+	}
+}
+
+func Test_getCommit(t *testing.T) {
+	tests := []struct {
+		name         string
+		commitURLStr string
+		want         string
+		wantErr      assert.ErrorAssertionFunc
+	}{
+		{name: "simple", commitURLStr: "https://github.com/golang/go/commit/7bd22aafe41be40e2174335a3dc55431ca9548ec", want: "7bd22aafe41be40e2174335a3dc55431ca9548ec", wantErr: assert.NoError},
+		{name: "bad_sha", commitURLStr: "https://github.com/golang/go/commit/abc123", want: "", wantErr: assert.Error},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getCommit(tt.commitURLStr)
+			if !tt.wantErr(t, err, fmt.Sprintf("getCommit(%v)", tt.commitURLStr)) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "getCommit(%v)", tt.commitURLStr)
 		})
 	}
 }

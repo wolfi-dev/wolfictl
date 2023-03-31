@@ -49,6 +49,11 @@ type Options struct {
 	ErrorMessages          map[string]string
 }
 
+type NewVersionResults struct {
+	Version string
+	Commit  string
+}
+
 const (
 	maxPullRequestRetries = 10
 	wolfiImage            = `
@@ -137,9 +142,9 @@ func (o *Options) Update() error {
 	return nil
 }
 
-func (o *Options) GetNewVersions(dir string, packageNames []string) (map[string]string, error) {
+func (o *Options) GetNewVersions(dir string, packageNames []string) (map[string]NewVersionResults, error) {
 	var err error
-	latestVersions := make(map[string]string)
+	latestVersions := make(map[string]NewVersionResults)
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
 	o.PackageConfigs, err = melange.ReadPackageConfigs(packageNames, dir)
@@ -189,16 +194,16 @@ func (o *Options) GetNewVersions(dir string, packageNames []string) (map[string]
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]string) error {
+func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
 	// bump packages that need updating
-	for packageName, latestVersion := range packagesToUpdate {
+	for packageName, newVersion := range packagesToUpdate {
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
 		ref, err := o.switchBranch(repo)
 		if err != nil {
 			return fmt.Errorf("failed to switch to working git branch: %w", err)
 		}
 
-		errorMessage, err := o.updateGitPackage(repo, packageName, latestVersion, ref)
+		errorMessage, err := o.updateGitPackage(repo, packageName, newVersion, ref)
 		if err != nil {
 			return err
 		}
@@ -210,7 +215,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 	return nil
 }
 
-func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVersion string, ref plumbing.ReferenceName) (string, error) {
+func (o *Options) updateGitPackage(repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
 	// get the filename from the map of melange configs we loaded at the start
 	config, ok := o.PackageConfigs[packageName]
 	if !ok {
@@ -223,10 +228,10 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVers
 	}
 
 	// if new versions are available lets bump the packages in the target melange git repo
-	err := melange.Bump(configFile, latestVersion)
+	err := melange.Bump(configFile, newVersion.Version, newVersion.Commit)
 	if err != nil {
 		// add this to the list of messages to print at the end of the update
-		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, latestVersion, err.Error()), nil
+		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, newVersion.Version, err.Error()), nil
 	}
 
 	worktree, err := repo.Worktree()
@@ -241,13 +246,13 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVers
 	}
 
 	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-	err = o.updateMakefile(config.Dir, packageName, latestVersion, worktree)
+	err = o.updateMakefile(config.Dir, packageName, newVersion.Version, worktree)
 	if err != nil {
 		return fmt.Sprintf("failed to update Makefile: %s", err.Error()), nil
 	}
 
 	// if mapping data has a strip prefix, add it back in to the version for when updating git modules
-	latestVersionWithPrefix := latestVersion
+	latestVersionWithPrefix := newVersion.Version
 	ghm := o.PackageConfigs[packageName].Config.Update.GitHubMonitor
 	if ghm != nil {
 		if ghm.StripPrefix != "" {
@@ -262,11 +267,13 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVers
 
 	// if we're not running in batch mode, lets commit and PR each change
 	if !o.DryRun {
-		pr, err := o.proposeChanges(repo, ref, packageName, latestVersion)
+		pr, err := o.proposeChanges(repo, ref, packageName, newVersion.Version)
 		if err != nil {
 			return fmt.Sprintf("failed to propose changes: %s", err.Error()), nil
 		}
-		o.Logger.Println(color.GreenString(pr))
+		if pr != "" {
+			o.Logger.Println(color.GreenString(pr))
+		}
 	}
 	return "", nil
 }
@@ -405,9 +412,8 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	if exitingPR != "" {
-		o.Logger.Printf(
-			"found matching open pull request for %s/%s %s",
-			packageName, newVersion, exitingPR,
+		o.Logger.Println(color.GreenString(fmt.Sprintf("found matching open pull request for %s/%s %s",
+			packageName, newVersion, exitingPR)),
 		)
 		return "", nil
 	}
@@ -522,7 +528,7 @@ func (o *Options) createIssue(repo *git.Repository, packageName, message string)
 	if existingIssue > 0 {
 		exists, err := gitOpts.HasExistingComment(context.Background(), i, existingIssue, message)
 		if exists {
-			return "", err
+			return fmt.Sprintf("existing issue %d already exists for error message: %s", existingIssue, message), err
 		}
 		// if this is a new error add a new comment
 		return gitOpts.CommentIssue(context.Background(), i, existingIssue)

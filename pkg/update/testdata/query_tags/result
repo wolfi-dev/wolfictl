@@ -6,6 +6,9 @@ query {
       totalCount
       nodes {
         name
+        target {
+          commitUrl
+        }
       }
     }
   }, 
@@ -16,6 +19,9 @@ query {
       totalCount
       nodes {
         name
+        target {
+          commitUrl
+        }
       }
     }
   }
