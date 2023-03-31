@@ -3,8 +3,11 @@ package gh
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"time"
+
+	"github.com/pkg/errors"
 
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"golang.org/x/time/rate"
@@ -14,9 +17,16 @@ import (
 	"github.com/google/go-github/v50/github"
 )
 
-/*
-Code modified from original.  Credited to https://github.com/gruntwork-io/git-xargs/blob/f68178c5878108f32c63e1cb027eb1b5b93caaac/repository/repo-operations.go#L404
-*/
+const SecondsToSleepWhenRateLimited = 30
+
+type GitHubOperations interface {
+	CheckExistingIssue(ctx context.Context, r *Issues) (string, error)
+	OpenIssue(ctx context.Context, r *Issues) (string, error)
+	OpenPullRequest(pr *NewPullRequest) (string, error)
+	AddReactionIssue(ctx context.Context, i *Issues, number int, reaction string) error
+	HasExistingComment(ctx context.Context, r *Issues, issueNumber int, newComment string) (bool, error)
+	CommentIssue(ctx context.Context, r *Issues, number int) (string, error)
+}
 
 type BasePullRequest struct {
 	Owner                 string
@@ -27,10 +37,9 @@ type BasePullRequest struct {
 }
 
 type GitOptions struct {
-	GithubClient                  *github.Client
-	MaxPullRequestRetries         int
-	SecondsToSleepWhenRateLimited int
-	Logger                        *log.Logger
+	GithubClient *github.Client
+	MaxRetries   int
+	Logger       *log.Logger
 }
 
 func New() GitOptions {
@@ -51,11 +60,36 @@ func New() GitOptions {
 	}
 }
 
-// checks if error codes returned from GitHub tell us we are being rate limited
+/*
+Code modified from original.  Credited to https://github.com/gruntwork-io/git-xargs/blob/f68178c5878108f32c63e1cb027eb1b5b93caaac/repository/repo-operations.go#L404
+*/
+
+func (o GitOptions) handleRateLimit(action func() (*github.Response, error)) error {
+	resp, err := action()
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return errors.Wrap(err, "failed to auth with github, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo")
+	}
+
+	if err != nil {
+		if githubErr := github.CheckResponse(resp.Response); githubErr != nil {
+			isRateLimited, delay := o.checkRateLimiting(githubErr)
+			if isRateLimited {
+				o.Logger.Printf("retrying again later with %d second delay due to secondary rate limiting.", delay)
+				time.Sleep(delay)
+				return o.handleRateLimit(action)
+			}
+			return githubErr
+		}
+		return err
+	}
+	return nil
+}
+
 func (o GitOptions) checkRateLimiting(githubErr error) (bool, time.Duration) {
 	isRateLimited := false
 
-	var delay time.Duration
+	delay := time.Duration(SecondsToSleepWhenRateLimited * int(time.Second))
 	// If GitHub returned an error of type RateLimitError, we can attempt to compute the next time to try the request again
 	// by reading its rate limit information
 	if rateLimitError, ok := githubErr.(*github.RateLimitError); ok {
@@ -75,13 +109,4 @@ func (o GitOptions) checkRateLimiting(githubErr error) (bool, time.Duration) {
 		}
 	}
 	return isRateLimited, delay
-}
-
-func (o GitOptions) wait(delay time.Duration) {
-	// If we couldn't determine a more accurate delay from GitHub API response headers, then fall back to our user-configurable default
-	if delay == 0 {
-		delay = time.Duration(o.SecondsToSleepWhenRateLimited * int(time.Second))
-	}
-	o.Logger.Printf("retrying PR again later with %d second delay due to secondary rate limiting.", delay)
-	time.Sleep(delay)
 }

@@ -42,6 +42,7 @@ type Options struct {
 	ReleaseMonitoringQuery bool
 	GithubReleaseQuery     bool
 	UseGitSign             bool
+	CreateIssues           bool
 	Client                 *http2.RLHTTPClient
 	Logger                 *log.Logger
 	GitHubHTTPClient       *http2.RLHTTPClient
@@ -49,9 +50,8 @@ type Options struct {
 }
 
 const (
-	secondsToSleepWhenRateLimited = 30
-	maxPullRequestRetries         = 10
-	wolfiImage                    = `
+	maxPullRequestRetries = 10
+	wolfiImage            = `
 <p align="center">
   <img src="https://raw.githubusercontent.com/wolfi-dev/.github/b535a42419ce0edb3c144c0edcff55a62b8ec1f8/profile/wolfi-logo-light-mode.svg" />
 </p>
@@ -75,7 +75,7 @@ func New() Options {
 			Client: oauth2.NewClient(context.Background(), ts),
 
 			// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
-			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
+			Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
 		},
 		Logger:        log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
 		DefaultBranch: "main",
@@ -121,9 +121,17 @@ func (o *Options) Update() error {
 		return fmt.Errorf("failed to update packages in git repository: %w", err)
 	}
 
-	// certain errors should not halt the updates, print them at the end
+	// certain errors should not halt the updates, either create a GitHub Issue or print them
 	for k, message := range o.ErrorMessages {
-		o.Logger.Printf("%s: %s\n", k, color.YellowString(message))
+		if o.CreateIssues {
+			issueURL, err := o.createIssue(repo, k, message)
+			if err != nil {
+				return err
+			}
+			o.Logger.Printf("%s: %s\n", k, color.YellowString(issueURL))
+		} else {
+			o.Logger.Printf("%s: %s\n", k, color.YellowString(message))
+		}
 	}
 
 	return nil
@@ -218,7 +226,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName, latestVers
 	err := melange.Bump(configFile, latestVersion)
 	if err != nil {
 		// add this to the list of messages to print at the end of the update
-		return fmt.Sprintf("failed to bump config file %s to version %s: %s", configFile, latestVersion, err.Error()), nil
+		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, latestVersion, err.Error()), nil
 	}
 
 	worktree, err := repo.Worktree()
@@ -379,10 +387,9 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 
 	client := github.NewClient(o.GitHubHTTPClient.Client)
 	gitOpts := gh.GitOptions{
-		GithubClient:                  client,
-		MaxPullRequestRetries:         maxPullRequestRetries,
-		SecondsToSleepWhenRateLimited: secondsToSleepWhenRateLimited,
-		Logger:                        o.Logger,
+		GithubClient: client,
+		MaxRetries:   maxPullRequestRetries,
+		Logger:       o.Logger,
 	}
 
 	getPr := &gh.GetPullRequest{
@@ -484,6 +491,42 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 			return fmt.Errorf("failed to git commit: %w", err)
 		}
 	}
-
 	return nil
+}
+
+func (o *Options) createIssue(repo *git.Repository, packageName, message string) (string, error) {
+	gitURL, err := wgit.GetRemoteURL(repo)
+	if err != nil {
+		return "", fmt.Errorf("failed to find git origin URL: %w", err)
+	}
+
+	client := github.NewClient(o.GitHubHTTPClient.Client)
+	gitOpts := gh.GitOptions{
+		GithubClient: client,
+		MaxRetries:   maxPullRequestRetries,
+		Logger:       o.Logger,
+	}
+
+	i := &gh.Issues{
+		Owner:       gitURL.Organisation,
+		RepoName:    gitURL.Name,
+		PackageName: packageName,
+		Comment:     message,
+		Retries:     0,
+	}
+	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
+	if err != nil {
+		return "", err
+	}
+
+	if existingIssue > 0 {
+		exists, err := gitOpts.HasExistingComment(context.Background(), i, existingIssue, message)
+		if exists {
+			return "", err
+		}
+		// if this is a new error add a new comment
+		return gitOpts.CommentIssue(context.Background(), i, existingIssue)
+	}
+
+	return gitOpts.OpenIssue(context.Background(), i)
 }
