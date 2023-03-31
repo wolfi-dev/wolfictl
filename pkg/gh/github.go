@@ -75,7 +75,7 @@ func (o GitOptions) handleRateLimit(action func() (*github.Response, error)) err
 		if githubErr := github.CheckResponse(resp.Response); githubErr != nil {
 			isRateLimited, delay := o.checkRateLimiting(githubErr)
 			if isRateLimited {
-				o.Logger.Printf("retrying again later with %d second delay due to secondary rate limiting.", delay)
+				o.Logger.Printf("retrying again later with %v second delay due to secondary rate limiting.", delay.Seconds())
 				time.Sleep(delay)
 				return o.handleRateLimit(action)
 			}
