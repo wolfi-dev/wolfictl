@@ -269,7 +269,7 @@ done
 
 # Don't cache the APKINDEX.
 gcloud --quiet storage cp \
-	--cache-control=off \
+	--cache-control=no-store \
 	"./packages/**/APKINDEX.tar.gz" gs://{{.bucket}}/os/{{.arch}}/ || true
 
 # apks will be cached in CDN for an hour by default.
