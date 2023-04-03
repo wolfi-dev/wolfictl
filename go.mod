@@ -9,12 +9,12 @@ replace github.com/goccy/go-graphviz => github.com/n3wscott/go-graphviz v0.0.10-
 
 replace k8s.io/client-go => k8s.io/client-go v0.25.3
 
-//// Required after upgrading to latest melange, matches https://github.com/mattmoor/mink/blob/b9148a39b2d8bbc69ca9aaf5e89a7613c0b179d8/go.mod#LL90C18-L90C52
+// Required after upgrading to latest melange, matches https://github.com/mattmoor/mink/blob/b9148a39b2d8bbc69ca9aaf5e89a7613c0b179d8/go.mod#LL90C18-L90C52
 replace knative.dev/pkg => knative.dev/pkg v0.0.0-20220407210145-4d62e1dbb943
 
 require (
 	chainguard.dev/apko v0.7.4-0.20230402102107-ddb6145f674f
-	chainguard.dev/melange v0.3.1-0.20230403130111-a011419f8d35
+	chainguard.dev/melange v0.3.1-0.20230403153335-bcb8968f8ed3
 	cloud.google.com/go/storage v1.30.1
 	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
 	github.com/charmbracelet/bubbles v0.15.0

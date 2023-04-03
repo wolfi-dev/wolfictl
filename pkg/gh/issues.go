@@ -8,14 +8,13 @@ import (
 	"github.com/google/go-github/v50/github"
 )
 
-const bot = "wolfi-bot"
-
 type Issues struct {
 	Owner       string
 	RepoName    string
 	PackageName string
 	Comment     string
 	Retries     int
+	Title       string
 }
 
 func (o GitOptions) CheckExistingIssue(ctx context.Context, r *Issues) (int, error) {
@@ -32,9 +31,8 @@ func (o GitOptions) CheckExistingIssue(ctx context.Context, r *Issues) (int, err
 		return 0, err
 	}
 
-	lookForTitle := getIssueTitle(r)
 	for _, issue := range openIssues {
-		if strings.EqualFold(*issue.Title, lookForTitle) {
+		if strings.EqualFold(*issue.Title, r.Title) {
 			return *issue.Number, nil
 		}
 	}
@@ -62,13 +60,14 @@ func (o GitOptions) HasExistingComment(ctx context.Context, r *Issues, issueNumb
 	}
 	return false, nil
 }
+
 func (o GitOptions) OpenIssue(ctx context.Context, r *Issues) (string, error) {
 	if r.Retries > o.MaxRetries {
 		return "", fmt.Errorf("failed max number of retries, tried %d max %d", r.Retries, o.MaxRetries)
 	}
 
 	newIssue := &github.IssueRequest{
-		Title: github.String(getIssueTitle(r)),
+		Title: github.String(r.Title),
 		Body:  github.String(r.Comment),
 	}
 
@@ -84,10 +83,6 @@ func (o GitOptions) OpenIssue(ctx context.Context, r *Issues) (string, error) {
 	}
 
 	return issue.GetHTMLURL(), nil
-}
-
-func getIssueTitle(r *Issues) string {
-	return fmt.Sprintf("%s/%s", bot, r.PackageName)
 }
 
 func (o GitOptions) CommentIssue(ctx context.Context, r *Issues, number int) (string, error) {
@@ -110,4 +105,11 @@ func (o GitOptions) AddReactionIssue(ctx context.Context, i *Issues, number int,
 		return resp, err
 	})
 	return err
+}
+
+func GetErrorIssueTitle(bot, packageName string) string {
+	return fmt.Sprintf("%s/%s", bot, packageName)
+}
+func GetUpdateIssueTitle(packageName, version string) string {
+	return fmt.Sprintf("%s/%s new package update", packageName, version)
 }
