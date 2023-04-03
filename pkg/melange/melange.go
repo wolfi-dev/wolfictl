@@ -155,7 +155,7 @@ func ReadMelangeConfig(filename string) (build.Configuration, error) {
 	return *packageConfig, err
 }
 
-func Bump(configFile, version string) error {
+func Bump(configFile, version, expectedCommit string) error {
 	ctx, err := renovate.New(renovate.WithConfig(configFile))
 	if err != nil {
 		return err
@@ -163,6 +163,7 @@ func Bump(configFile, version string) error {
 
 	bumpRenovator := bump.New(
 		bump.WithTargetVersion(version),
+		bump.WithExpectedCommit(expectedCommit),
 	)
 
 	if err := ctx.Renovate(bumpRenovator); err != nil {

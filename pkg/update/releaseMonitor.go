@@ -36,8 +36,8 @@ const (
 	releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%d"
 )
 
-func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[string]*melange.Packages) (packagesToUpdate, errorMessages map[string]string) {
-	packagesToUpdate = make(map[string]string)
+func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[string]*melange.Packages) (packagesToUpdate map[string]NewVersionResults, errorMessages map[string]string) {
+	packagesToUpdate = make(map[string]NewVersionResults)
 	errorMessages = make(map[string]string)
 
 	// iterate packages from the target git repo and check if a new version is available
@@ -91,7 +91,7 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 				"there is a new stable version available %s, current wolfi version %s, new %s",
 				p.Config.Package.Name, p.Config.Package.Version, latestVersion,
 			)
-			packagesToUpdate[p.Config.Package.Name] = latestVersion
+			packagesToUpdate[p.Config.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original()}
 		}
 	}
 	return packagesToUpdate, errorMessages
