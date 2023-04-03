@@ -490,7 +490,7 @@ func getCommit(commitURLStr string) (string, error) {
 func createSemverSlice(versionResults map[string]string) ([]*version.Version, error) {
 	versions := []*version.Version{}
 	for k := range versionResults {
-		releaseVersionSemver, err := version.NewVersion(k)
+		releaseVersionSemver, err := wolfiversions.NewVersion(k)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to create a version from %s", k)
 		}
@@ -523,7 +523,7 @@ func (o GitHubReleaseOptions) addIfNewVersion(packageNameHash string, versionRes
 	}
 
 	if c.Package.Version != "" {
-		currentVersionSemver, err := version.NewVersion(c.Package.Version)
+		currentVersionSemver, err := wolfiversions.NewVersion(c.Package.Version)
 		if err != nil {
 			return errors.Wrapf(err, "failed to create a version from package %s: %s", c.Package.Name, c.Package.Version)
 		}

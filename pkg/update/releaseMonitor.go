@@ -14,7 +14,7 @@ import (
 
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 
-	"github.com/hashicorp/go-version"
+	version "github.com/wolfi-dev/wolfictl/pkg/versions"
 
 	"github.com/pkg/errors"
 )

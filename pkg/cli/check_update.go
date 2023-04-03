@@ -62,7 +62,7 @@ func checkUpdates(dir string, files []string) error {
 
 	for k, v := range newVersions {
 		checkErrors = append(checkErrors, lint.EvalRuleError{
-			Error: fmt.Errorf("package %s: update found newer version %s compared with package.version in melange config", k, v),
+			Error: fmt.Errorf("package %s: update found newer version %s compared with package.version in melange config", k, v.Version),
 		})
 	}
 

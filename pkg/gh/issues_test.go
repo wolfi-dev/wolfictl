@@ -51,6 +51,7 @@ func TestCheckExistingIssue(t *testing.T) {
 		Owner:       "cheese",
 		RepoName:    "crisps",
 		PackageName: "foo-package",
+		Title:       GetErrorIssueTitle("wolfi-bot", "foo-package"),
 	}
 	issueNumber, err := gitOptions.CheckExistingIssue(ctx, issues)
 
@@ -95,6 +96,7 @@ func TestOpenIssue(t *testing.T) {
 		RepoName:    "crisps",
 		PackageName: "foo-package",
 		Comment:     "This is a test issue",
+		Title:       GetErrorIssueTitle("wolfi-bot", "foo-package"),
 	}
 	htmlURL, err := gitOptions.OpenIssue(ctx, issues)
 

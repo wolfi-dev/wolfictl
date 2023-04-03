@@ -56,6 +56,7 @@ type NewVersionResults struct {
 
 const (
 	maxPullRequestRetries = 10
+	bot                   = "wolfi-bot"
 	wolfiImage            = `
 <p align="center">
   <img src="https://raw.githubusercontent.com/wolfi-dev/.github/b535a42419ce0edb3c144c0edcff55a62b8ec1f8/profile/wolfi-logo-light-mode.svg" />
@@ -129,7 +130,7 @@ func (o *Options) Update() error {
 	// certain errors should not halt the updates, either create a GitHub Issue or print them
 	for k, message := range o.ErrorMessages {
 		if o.CreateIssues {
-			issueURL, err := o.createIssue(repo, k, message)
+			issueURL, err := o.createErrorMessageIssue(repo, k, message)
 			if err != nil {
 				return err
 			}
@@ -220,6 +221,11 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	config, ok := o.PackageConfigs[packageName]
 	if !ok {
 		return "", fmt.Errorf("no melange config found for package %s", packageName)
+	}
+
+	// if manual update create an issue rather than a pull request
+	if config.Config.Update.Manual {
+		return o.createNewVersionIssue(repo, packageName, newVersion)
 	}
 
 	configFile := filepath.Join(config.Dir, config.Filename)
@@ -500,7 +506,7 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 	return nil
 }
 
-func (o *Options) createIssue(repo *git.Repository, packageName, message string) (string, error) {
+func (o *Options) createErrorMessageIssue(repo *git.Repository, packageName, message string) (string, error) {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return "", fmt.Errorf("failed to find git origin URL: %w", err)
@@ -518,6 +524,7 @@ func (o *Options) createIssue(repo *git.Repository, packageName, message string)
 		RepoName:    gitURL.Name,
 		PackageName: packageName,
 		Comment:     message,
+		Title:       gh.GetErrorIssueTitle(bot, packageName),
 		Retries:     0,
 	}
 	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
@@ -535,4 +542,41 @@ func (o *Options) createIssue(repo *git.Repository, packageName, message string)
 	}
 
 	return gitOpts.OpenIssue(context.Background(), i)
+}
+
+func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string, version NewVersionResults) (string, error) {
+	gitURL, err := wgit.GetRemoteURL(repo)
+	if err != nil {
+		return "", fmt.Errorf("failed to find git origin URL: %w", err)
+	}
+
+	client := github.NewClient(o.GitHubHTTPClient.Client)
+	gitOpts := gh.GitOptions{
+		GithubClient: client,
+		MaxRetries:   maxPullRequestRetries,
+		Logger:       o.Logger,
+	}
+
+	i := &gh.Issues{
+		Owner:       gitURL.Organisation,
+		RepoName:    gitURL.Name,
+		PackageName: packageName,
+		Title:       gh.GetUpdateIssueTitle(packageName, version.Version),
+		Retries:     0,
+	}
+	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
+	if err != nil {
+		return "", err
+	}
+
+	if existingIssue > 0 {
+		return "", nil
+	}
+
+	issueLink, err := gitOpts.OpenIssue(context.Background(), i)
+	if err != nil {
+		return "", err
+	}
+	o.Logger.Println(color.GreenString(fmt.Sprintf("%s opened issue %s", packageName, issueLink)))
+	return "", nil
 }
