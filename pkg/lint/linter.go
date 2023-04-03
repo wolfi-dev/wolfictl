@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
@@ -148,12 +150,13 @@ func (l *Linter) checkIfMakefileExists() ConditionFunc {
 
 // readMakefile reads the Makefile from the file.
 func (l *Linter) readMakefile() error {
-	b, err := os.ReadFile(filepath.Join(l.options.Path, "Makefile"))
+	cmd := exec.Command("make", "-C", l.options.Path, "list") //nolint: gosec
+	b, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("failed to open Makefile: %w", err)
+		return errors.Wrapf(err, "failed to call 'make list'")
 	}
 	if len(b) == 0 {
-		return fmt.Errorf("makefile is empty")
+		return fmt.Errorf("make list is empty")
 	}
 	l.makefileBytes = b
 	return nil
@@ -169,10 +172,11 @@ func (l *Linter) checkMakefile(packageName string) (bool, error) {
 	}
 
 	scanner := bufio.NewScanner(bytes.NewReader(l.makefileBytes))
+	scanner.Split(bufio.ScanWords)
 
 	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, fmt.Sprintf("$(eval $(call build-package,%s,", packageName)) {
+		word := scanner.Text()
+		if strings.Contains(word, packageName) {
 			// We found the corresponding package in the Makefile.
 			return true, nil
 		}
