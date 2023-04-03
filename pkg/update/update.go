@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
+
 	"github.com/fatih/color"
 
 	"github.com/go-git/go-git/v5"
@@ -116,7 +118,14 @@ func (o *Options) Update() error {
 		return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
 	}
 
-	packagesToUpdate, err := o.GetNewVersions(tempDir, o.PackageNames)
+	// get the latest upstream versions available
+	latestVersions, err := o.GetLatestVersions(tempDir, o.PackageNames)
+	if err != nil {
+		return errors.Wrapf(err, "failed to get package updates")
+	}
+
+	// compare latest upstream versions with melange package versions and return a map of packages to update
+	packagesToUpdate, err := o.getPackagesToUpdate(latestVersions)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get package updates")
 	}
@@ -143,7 +152,7 @@ func (o *Options) Update() error {
 	return nil
 }
 
-func (o *Options) GetNewVersions(dir string, packageNames []string) (map[string]NewVersionResults, error) {
+func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[string]NewVersionResults, error) {
 	var err error
 	latestVersions := make(map[string]NewVersionResults)
 
@@ -579,4 +588,41 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 	}
 	o.Logger.Println(color.GreenString(fmt.Sprintf("%s opened issue %s", packageName, issueLink)))
 	return "", nil
+}
+
+func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResults) (map[string]NewVersionResults, error) {
+	results := make(map[string]NewVersionResults)
+
+	for packageName, v := range latestVersions {
+		pc, ok := o.PackageConfigs[packageName]
+		if !ok {
+			return nil, fmt.Errorf("failed to match latest version package name %s with local melange packages", packageName)
+		}
+		c := pc.Config
+		currentVersionSemver, err := wolfiversions.NewVersion(c.Package.Version)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to create a version from package %s: %s", c.Package.Name, c.Package.Version)
+		}
+
+		latestVersionSemver, err := wolfiversions.NewVersion(v.Version)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to create a latest version from package %s: %s", c.Package.Name, c.Package.Version)
+		}
+
+		if currentVersionSemver.Equal(latestVersionSemver) {
+			o.Logger.Printf(
+				"%s is on the latest version %s",
+				c.Package.Name, latestVersionSemver.Original(),
+			)
+		}
+		if currentVersionSemver.LessThan(latestVersionSemver) {
+			o.Logger.Println(
+				color.GreenString(
+					fmt.Sprintf("there is a new stable version available %s, current wolfi version %s, new %s",
+						c.Package.Name, c.Package.Version, latestVersionSemver.Original())))
+
+			results[c.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original(), Commit: v.Commit}
+		}
+	}
+	return results, nil
 }

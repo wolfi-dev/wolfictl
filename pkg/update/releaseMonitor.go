@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/fatih/color"
-
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
@@ -54,6 +52,14 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 				"failed getting latest release version for package %s, identifier %d: %s",
 				p.Config.Package.Name, rm.Identifier, err.Error(),
 			)
+			continue
+		}
+		if latestVersion == "" {
+			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
+				"no latest version found in release monitor for package %s, identifier %d",
+				p.Config.Package.Name, rm.Identifier,
+			)
+			continue
 		}
 
 		// replace any nonstandard version separators
@@ -72,10 +78,10 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
-			errorMessages[p.Config.Package.Name] = color.GreenString(fmt.Sprintf(
+			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
 				"failed to create a latestVersion from package %s: %s.  Error: %s",
 				p.Config.Package.Name, latestVersion, err,
-			))
+			)
 			continue
 		}
 

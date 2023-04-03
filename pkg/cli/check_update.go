@@ -1,20 +1,19 @@
 package cli
 
 import (
-	"fmt"
+	"log"
 	"os"
-	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/wolfi-dev/wolfictl/pkg/lint"
+	"github.com/wolfi-dev/wolfictl/pkg/checks"
 
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/update"
 )
 
 func CheckUpdate() *cobra.Command {
-	var dir string
+	o := checks.CheckUpdateOptions{
+		Logger: log.New(log.Writer(), "wolfictl check update: ", log.LstdFlags|log.Lmsgprefix),
+	}
+
 	cmd := &cobra.Command{
 		Use:               "update",
 		DisableAutoGenTag: true,
@@ -22,49 +21,21 @@ func CheckUpdate() *cobra.Command {
 		SilenceErrors:     true,
 		Short:             "Check Wolfi update configs",
 		RunE: func(cmd *cobra.Command, files []string) error {
-			return checkUpdates(dir, files)
+			return o.CheckUpdates(files)
 		},
 	}
 
+	checkUpdateFlags(cmd, &o)
+
+	return cmd
+}
+
+func checkUpdateFlags(cmd *cobra.Command, o *checks.CheckUpdateOptions) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		cwd = "."
 	}
 
-	cmd.Flags().StringVarP(&dir, "directory", "d", cwd, "directory containing melange configs")
-
-	return cmd
-}
-
-func checkUpdates(dir string, files []string) error {
-	o := update.New()
-	o.GithubReleaseQuery = true
-	o.ReleaseMonitoringQuery = true
-	o.ErrorMessages = make(map[string]string)
-	checkErrors := make(lint.EvalRuleErrors, 0)
-
-	packagesToUpdate := []string{}
-	for _, f := range files {
-		packagesToUpdate = append(packagesToUpdate, strings.TrimSuffix(f, ".yaml"))
-	}
-	newVersions, err := o.GetNewVersions(dir, packagesToUpdate)
-	if err != nil {
-		checkErrors = append(checkErrors, lint.EvalRuleError{
-			Error: fmt.Errorf(err.Error()),
-		})
-	}
-
-	for _, message := range o.ErrorMessages {
-		checkErrors = append(checkErrors, lint.EvalRuleError{
-			Error: errors.New(message),
-		})
-	}
-
-	for k, v := range newVersions {
-		checkErrors = append(checkErrors, lint.EvalRuleError{
-			Error: fmt.Errorf("package %s: update found newer version %s compared with package.version in melange config", k, v.Version),
-		})
-	}
-
-	return checkErrors.WrapErrors()
+	cmd.Flags().StringVarP(&o.Dir, "directory", "d", cwd, "directory containing melange configs")
+	cmd.Flags().StringVarP(&o.OverrideVersion, "override-version", "", "", "override the local melange config version to test an update works as expected")
 }

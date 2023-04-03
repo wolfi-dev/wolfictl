@@ -20,8 +20,6 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 
-	"github.com/fatih/color"
-
 	"github.com/pkg/errors"
 
 	"github.com/hashicorp/go-version"
@@ -398,7 +396,7 @@ func (o GitHubReleaseOptions) parseGitHubTags(repos *QueryTagsResponse) (results
 			}
 			versions[v] = commitSha
 		}
-		err = o.addIfNewVersion(packageNameHash, versions, repo.NameWithOwner, results)
+		err = o.getLatestVersion(packageNameHash, versions, repo.NameWithOwner, results)
 		if err != nil {
 			o.ErrorMessages[c.Package.Name] = err.Error()
 		}
@@ -461,7 +459,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos *QueryReleasesResponse) 
 			versions[v] = commitSha
 		}
 
-		err = o.addIfNewVersion(packageNameHash, versions, node.NameWithOwner, results)
+		err = o.getLatestVersion(packageNameHash, versions, node.NameWithOwner, results)
 		if err != nil {
 			o.ErrorMessages[c.Package.Name] = err.Error()
 		}
@@ -505,7 +503,7 @@ func findLatestVersion(versions []*version.Version) *version.Version {
 	return versions[len(versions)-1]
 }
 
-func (o GitHubReleaseOptions) addIfNewVersion(packageNameHash string, versionResults map[string]string, ownerName string, results map[string]NewVersionResults) error {
+func (o GitHubReleaseOptions) getLatestVersion(packageNameHash string, versionResults map[string]string, ownerName string, results map[string]NewVersionResults) error {
 	versions, err := createSemverSlice(versionResults)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create a version slice for %s", ownerName)
@@ -521,28 +519,7 @@ func (o GitHubReleaseOptions) addIfNewVersion(packageNameHash string, versionRes
 	if !ok {
 		return fmt.Errorf("failed to find %s in package configs", ownerName)
 	}
-
-	if c.Package.Version != "" {
-		currentVersionSemver, err := wolfiversions.NewVersion(c.Package.Version)
-		if err != nil {
-			return errors.Wrapf(err, "failed to create a version from package %s: %s", c.Package.Name, c.Package.Version)
-		}
-
-		if currentVersionSemver.Equal(latestVersionSemver) {
-			o.Logger.Printf(
-				"%s is on the latest version %s",
-				c.Package.Name, latestVersionSemver.Original(),
-			)
-		}
-		if currentVersionSemver.LessThan(latestVersionSemver) {
-			o.Logger.Println(
-				color.GreenString(
-					fmt.Sprintf("there is a new stable version available %s, current wolfi version %s, new %s",
-						c.Package.Name, c.Package.Version, latestVersionSemver.Original())))
-
-			results[c.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original(), Commit: versionResults[latestVersionSemver.Original()]}
-		}
-	}
+	results[c.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original(), Commit: versionResults[latestVersionSemver.Original()]}
 
 	return nil
 }
