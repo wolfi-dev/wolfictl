@@ -14,8 +14,8 @@ replace knative.dev/pkg => knative.dev/pkg v0.0.0-20220407210145-4d62e1dbb943
 
 require (
 	chainguard.dev/apko v0.7.3
-	chainguard.dev/melange v0.2.1-0.20230324185817-f21e1da68255
-	cloud.google.com/go/storage v1.30.0
+	chainguard.dev/melange v0.3.2
+	cloud.google.com/go/storage v1.30.1
 	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
 	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
@@ -171,6 +171,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/ijt/goparsify v0.0.0-20221203142333-3a5276334b8d // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/in-toto/in-toto-golang v0.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -204,7 +205,6 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/oec/goparsify v0.2.1 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
@@ -246,6 +246,7 @@ require (
 	github.com/vbatts/tar-split v0.11.2 // indirect
 	github.com/xanzy/go-gitlab v0.80.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
+	github.com/yookoala/realpath v1.0.0 // indirect
 	github.com/zclconf/go-cty v1.12.1 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
 	github.com/zeebo/errs v1.3.0 // indirect
@@ -267,7 +268,7 @@ require (
 	golang.org/x/tools v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
+	google.golang.org/genproto v0.0.0-20230320184635-7606e756e683 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.29.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
