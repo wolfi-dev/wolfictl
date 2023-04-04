@@ -77,7 +77,6 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 		}
 
 		packagesToUpdate[p.Config.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original()}
-
 	}
 	return packagesToUpdate, errorMessages
 }

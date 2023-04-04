@@ -140,6 +140,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		err = melange.Bump(tmpConfigFile, newVersion.Version, newVersion.Commit)
 		if err != nil {
 			addCheckError(checkErrors, errors.Wrapf(err, "package %s: failed to validate update config, melange bump", packageName))
+			continue
 		}
 
 		updated, err := build.ParseConfiguration(tmpConfigFile)
