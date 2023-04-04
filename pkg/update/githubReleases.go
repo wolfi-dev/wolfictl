@@ -313,6 +313,9 @@ func (o GitHubReleaseOptions) getResultsFromTemplate(templateType string, repos 
 		return nil, fmt.Errorf("failed to parse results: %w", err)
 	}
 
+	if len(results) == 0 {
+		return nil, fmt.Errorf("no versions returned from github graphql api")
+	}
 	return results, nil
 }
 
