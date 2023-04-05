@@ -543,7 +543,7 @@ func (o GitHubReleaseOptions) getLatestVersion(packageNameHash string, versionRe
 }
 
 func (o GitHubReleaseOptions) shouldSkipVersion(v string) bool {
-	invalid := []string{"alpha", "beta", "rc"}
+	invalid := []string{"alpha", "beta", "rc", "pre"}
 	for _, i := range invalid {
 		if strings.Contains(strings.ToLower(v), i) {
 			return true
