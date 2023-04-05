@@ -67,15 +67,6 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 			latestVersion = strings.ReplaceAll(latestVersion, p.Config.Update.VersionSeparator, ".")
 		}
 
-		currentVersionSemver, err := version.NewVersion(p.Config.Package.Version)
-		if err != nil {
-			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
-				"failed to create a version from package %s: %s.  Error: %s",
-				p.Config.Package.Name, p.Config.Package.Version, err,
-			)
-			continue
-		}
-
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
 			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
@@ -85,20 +76,7 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 			continue
 		}
 
-		if currentVersionSemver.Equal(latestVersionSemver) {
-			m.Logger.Printf(
-				"%s is on the latest version %s",
-				p.Config.Package.Name, latestVersionSemver.Original(),
-			)
-		}
-
-		if currentVersionSemver.LessThan(latestVersionSemver) {
-			m.Logger.Printf(
-				"there is a new stable version available %s, current wolfi version %s, new %s",
-				p.Config.Package.Name, p.Config.Package.Version, latestVersion,
-			)
-			packagesToUpdate[p.Config.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original()}
-		}
+		packagesToUpdate[p.Config.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original()}
 	}
 	return packagesToUpdate, errorMessages
 }

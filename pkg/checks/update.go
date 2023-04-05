@@ -40,6 +40,7 @@ func SetupUpdate() (*update.Options, lint.EvalRuleErrors) {
 	return &o, checkErrors
 }
 
+// CheckUpdates will use the melange update config to get the latest versions and validate fetch and git-checkout pipelines
 func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 	updateOpts, checkErrors := SetupUpdate()
 
@@ -84,6 +85,7 @@ func handleErrorMessages(updateOpts *update.Options, checkErrors *lint.EvalRuleE
 	}
 }
 
+// check if the current package.version is the latest according to the update config
 func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) {
 	for k, v := range latestVersions {
 		c, err := build.ParseConfiguration(filepath.Join(o.Dir, k+".yaml"))
@@ -105,6 +107,7 @@ func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]upd
 	}
 }
 
+// iterate over slice of packages, optionally override the package.version and verify fetch + git-checkout work with latest versions
 func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) error {
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
@@ -133,9 +136,11 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			return err
 		}
 
+		// melange bump will modify the modified copy of the melange config
 		err = melange.Bump(tmpConfigFile, newVersion.Version, newVersion.Commit)
 		if err != nil {
 			addCheckError(checkErrors, errors.Wrapf(err, "package %s: failed to validate update config, melange bump", packageName))
+			continue
 		}
 
 		updated, err := build.ParseConfiguration(tmpConfigFile)
@@ -150,11 +155,13 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			Package: &updated.Package,
 		}
 
+		// get a map of variable mutations we can substitute vars in URLs
 		mutations, err := build.MutateWith(pctx, map[string]string{})
 		if err != nil {
 			return err
 		}
 
+		// download or git clone sources into a temp folder to validate the update config
 		verifyPipelines(o, updated, mutations, checkErrors)
 	}
 	return nil
