@@ -328,7 +328,7 @@ func (o GitHubReleaseOptions) getResultsFromTemplate(templateType string, repos 
 		maps.Copy(results, batchResults)
 	}
 
-	if len(results) == 0 {
+	if len(o.ErrorMessages) == 0 && len(results) == 0 {
 		return nil, fmt.Errorf("no versions returned from github graphql api")
 	}
 	return results, nil
