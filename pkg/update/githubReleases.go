@@ -328,7 +328,7 @@ func (o GitHubReleaseOptions) getResultsFromTemplate(templateType string, repos 
 		maps.Copy(results, batchResults)
 	}
 
-	if len(results) == 0 {
+	if len(o.ErrorMessages) == 0 && len(results) == 0 {
 		return nil, fmt.Errorf("no versions returned from github graphql api")
 	}
 	return results, nil
@@ -543,7 +543,7 @@ func (o GitHubReleaseOptions) getLatestVersion(packageNameHash string, versionRe
 }
 
 func (o GitHubReleaseOptions) shouldSkipVersion(v string) bool {
-	invalid := []string{"alpha", "beta", "rc"}
+	invalid := []string{"alpha", "beta", "rc", "pre"}
 	for _, i := range invalid {
 		if strings.Contains(strings.ToLower(v), i) {
 			return true
