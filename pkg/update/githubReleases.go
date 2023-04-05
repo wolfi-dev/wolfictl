@@ -274,43 +274,58 @@ func (o GitHubReleaseOptions) getGitHubTagVersions(repoList map[string]string) (
 }
 
 func (o GitHubReleaseOptions) getResultsFromTemplate(templateType string, repos []RepoInfo) (map[string]NewVersionResults, error) {
-	requestData := map[string]interface{}{
-		"RepoList": repos,
-	}
-	requestQuery := template(templateType, requestData)
+	// batch the requests sent to graphql API else we can get a bad gateway error returned
+	batchSize := 50
+	results := make(map[string]NewVersionResults)
 
-	b, err := o.get(requestQuery)
-	if err != nil {
-		return nil, err
-	}
+	for i := 0; i < len(repos); i += batchSize {
+		end := i + batchSize
+		if end > len(repos) {
+			end = len(repos)
+		}
+		repoBatch := repos[i:end]
 
-	var resp interface{}
-	switch templateType {
-	case queryReleases:
-		resp = &QueryReleasesResponse{}
-	case queryTags:
-		resp = &QueryTagsResponse{}
-	default:
-		return nil, errors.New("unknown template type")
-	}
+		requestData := map[string]interface{}{
+			"RepoList": repoBatch,
+		}
+		requestQuery := template(templateType, requestData)
 
-	err = json.Unmarshal(b, resp)
-	if err != nil {
-		return nil, err
-	}
+		b, err := o.get(requestQuery)
+		if err != nil {
+			return nil, err
+		}
 
-	var results map[string]NewVersionResults
-	switch templateType {
-	case queryReleases:
-		results, err = o.parseGitHubReleases(resp.(*QueryReleasesResponse))
-	case queryTags:
-		results, err = o.parseGitHubTags(resp.(*QueryTagsResponse))
-	default:
-		return nil, errors.New("unknown template type")
-	}
+		var resp interface{}
+		switch templateType {
+		case queryReleases:
+			resp = &QueryReleasesResponse{}
+		case queryTags:
+			resp = &QueryTagsResponse{}
+		default:
+			return nil, errors.New("unknown template type")
+		}
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse results: %w", err)
+		err = json.Unmarshal(b, resp)
+		if err != nil {
+			return nil, err
+		}
+
+		var batchResults map[string]NewVersionResults
+		switch templateType {
+		case queryReleases:
+			batchResults, err = o.parseGitHubReleases(resp.(*QueryReleasesResponse))
+		case queryTags:
+			batchResults, err = o.parseGitHubTags(resp.(*QueryTagsResponse))
+		default:
+			return nil, errors.New("unknown template type")
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse results: %w", err)
+		}
+
+		// merge batchResults into results
+		maps.Copy(results, batchResults)
 	}
 
 	if len(results) == 0 {
