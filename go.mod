@@ -1,6 +1,6 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.19
+go 1.20
 
 replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230208145941-f16d44faeed4
 

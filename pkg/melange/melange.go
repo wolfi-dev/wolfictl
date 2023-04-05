@@ -166,8 +166,5 @@ func Bump(configFile, version, expectedCommit string) error {
 		bump.WithExpectedCommit(expectedCommit),
 	)
 
-	if err := ctx.Renovate(bumpRenovator); err != nil {
-		return err
-	}
-	return nil
+	return ctx.Renovate(bumpRenovator)
 }
