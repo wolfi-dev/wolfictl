@@ -52,8 +52,10 @@ type Options struct {
 }
 
 type NewVersionResults struct {
-	Version string
-	Commit  string
+	Version                    string
+	Commit                     string
+	ReplaceExistingIssueNumber int
+	ReplaceExistingPRNumber    int
 }
 
 const (
@@ -71,13 +73,12 @@ func New() Options {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
-
 	options := Options{
 		Client: &http2.RLHTTPClient{
 			Client: http.DefaultClient,
 
 			// 1 request every (n) second(s) to avoid DOS'ing server
-			Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
+			Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
 		},
 		GitHubHTTPClient: &http2.RLHTTPClient{
 			Client: oauth2.NewClient(context.Background(), ts),
@@ -89,7 +90,6 @@ func New() Options {
 		DefaultBranch: "main",
 		ErrorMessages: make(map[string]string),
 	}
-
 	return options
 }
 
@@ -126,6 +126,12 @@ func (o *Options) Update() error {
 
 	// compare latest upstream versions with melange package versions and return a map of packages to update
 	packagesToUpdate, err := o.getPackagesToUpdate(latestVersions)
+	if err != nil {
+		return errors.Wrapf(err, "failed to get package updates")
+	}
+
+	// skip packages for which we already have an open issue or pull request
+	packagesToUpdate, err = o.removeExistingUpdates(repo, packagesToUpdate)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get package updates")
 	}
@@ -189,9 +195,8 @@ func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[stri
 	if o.ReleaseMonitoringQuery {
 		// get latest versions from https://release-monitoring.org/
 		m := MonitorService{
-			Client:           o.Client,
-			GitHubHTTPClient: o.GitHubHTTPClient,
-			Logger:           o.Logger,
+			Client: o.Client,
+			Logger: o.Logger,
 		}
 		v, errorMessages := m.getLatestReleaseMonitorVersions(o.PackageConfigs)
 		if err != nil {
@@ -282,7 +287,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 
 	// if we're not running in batch mode, lets commit and PR each change
 	if !o.DryRun {
-		pr, err := o.proposeChanges(repo, ref, packageName, newVersion.Version)
+		pr, err := o.proposeChanges(repo, ref, packageName, newVersion)
 		if err != nil {
 			return fmt.Sprintf("failed to propose changes: %s", err.Error()), nil
 		}
@@ -393,7 +398,7 @@ func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, er
 }
 
 // commits package update changes and creates a pull request
-func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName, newVersion string) (string, error) {
+func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName string, newVersion NewVersionResults) (string, error) {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return "", fmt.Errorf("failed to find git origin URL: %w", err)
@@ -404,37 +409,18 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 		Owner:                 gitURL.Organisation,
 		Branch:                ref.String(),
 		PullRequestBaseBranch: o.PullRequestBaseBranch,
-		Retries:               0,
 	}
 
 	client := github.NewClient(o.GitHubHTTPClient.Client)
+
 	gitOpts := gh.GitOptions{
 		GithubClient: client,
 		MaxRetries:   maxPullRequestRetries,
 		Logger:       o.Logger,
 	}
 
-	getPr := &gh.GetPullRequest{
-		BasePullRequest: basePullRequest,
-		PackageName:     packageName,
-		Version:         newVersion,
-	}
-
-	// if an existing PR is open with the same version skip, if it's an older version close the PR and we'll create a new one
-	exitingPR, err := gitOpts.CheckExistingPullRequests(getPr)
-	if err != nil {
-		return "", fmt.Errorf("failed to check for existing pull requests: %w", err)
-	}
-
-	if exitingPR != "" {
-		o.Logger.Println(color.GreenString(fmt.Sprintf("found matching open pull request for %s/%s %s",
-			packageName, newVersion, exitingPR)),
-		)
-		return "", nil
-	}
-
 	// commit the changes
-	if err = o.commitChanges(repo, packageName, newVersion); err != nil {
+	if err = o.commitChanges(repo, packageName, newVersion.Version); err != nil {
 		return "", fmt.Errorf("failed to commit changes: %w", err)
 	}
 
@@ -456,8 +442,8 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 
 	// if we have a single version use it in the PR title, this might be a batch with multiple versions so default to a simple title
 	var title string
-	if newVersion != "" {
-		title = fmt.Sprintf(o.PullRequestTitle, packageName, newVersion)
+	if newVersion.Version != "" {
+		title = fmt.Sprintf(o.PullRequestTitle, packageName, newVersion.Version)
 	} else {
 		title = fmt.Sprintf(o.PullRequestTitle, packageName, "new versions")
 	}
@@ -475,6 +461,19 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 		return "", fmt.Errorf("failed to create pull request: %w", err)
 	}
 
+	if newVersion.ReplaceExistingPRNumber != 0 {
+		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, prLink, newVersion.ReplaceExistingPRNumber)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed to close pull request: %d", newVersion.ReplaceExistingPRNumber)
+		}
+
+		// comment on the closed PR the new pull request link which supersedes it
+		comment := fmt.Sprintf("superceded by %s", prLink)
+		_, err = gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, comment, newVersion.ReplaceExistingPRNumber)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed to comment pull request: %d", newVersion.ReplaceExistingPRNumber)
+		}
+	}
 	return prLink, nil
 }
 
@@ -534,7 +533,6 @@ func (o *Options) createErrorMessageIssue(repo *git.Repository, packageName, mes
 		PackageName: packageName,
 		Comment:     message,
 		Title:       gh.GetErrorIssueTitle(bot, packageName),
-		Retries:     0,
 	}
 	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
 	if err != nil {
@@ -547,7 +545,7 @@ func (o *Options) createErrorMessageIssue(repo *git.Repository, packageName, mes
 			return fmt.Sprintf("existing issue %d already exists for error message: %s", existingIssue, message), err
 		}
 		// if this is a new error add a new comment
-		return gitOpts.CommentIssue(context.Background(), i, existingIssue)
+		return gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, message, existingIssue)
 	}
 
 	return gitOpts.OpenIssue(context.Background(), i)
@@ -571,7 +569,6 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 		RepoName:    gitURL.Name,
 		PackageName: packageName,
 		Title:       gh.GetUpdateIssueTitle(packageName, version.Version),
-		Retries:     0,
 	}
 	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
 	if err != nil {
@@ -625,4 +622,134 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 		}
 	}
 	return results, nil
+}
+
+// return updated map if an existing issue or pr for an older version should be closed
+// will also remove an update if we already have an open matching pull request or issue
+func (o *Options) removeExistingUpdates(repo *git.Repository, updates map[string]NewVersionResults) (map[string]NewVersionResults, error) {
+	gitURL, err := wgit.GetRemoteURL(repo)
+	if err != nil {
+		return updates, fmt.Errorf("failed to find git origin URL: %w", err)
+	}
+
+	client := github.NewClient(o.GitHubHTTPClient.Client)
+	gitOpts := gh.GitOptions{
+		GithubClient: client,
+		MaxRetries:   maxPullRequestRetries,
+		Logger:       o.Logger,
+	}
+
+	openPRs, err := gitOpts.ListPullRequests(context.Background(), gitURL.Organisation, gitURL.Name, "open")
+	if err != nil {
+		return updates, errors.Wrapf(err, "failed to list open pull requests for %s/%s", gitURL.Organisation, gitURL.Name)
+	}
+
+	o.processPullRequests(updates, openPRs)
+
+	openIssues, err := gitOpts.ListIssues(context.Background(), gitURL.Organisation, gitURL.Name, "open")
+	if err != nil {
+		return updates, errors.Wrapf(err, "failed to list open issues for %s/%s", gitURL.Organisation, gitURL.Name)
+	}
+
+	o.processIssues(updates, openIssues)
+
+	return updates, nil
+}
+
+func (o *Options) processPullRequests(updates map[string]NewVersionResults, prs []*github.PullRequest) {
+	for _, pr := range prs {
+		prTitle := *pr.Title
+
+		packageName, titleVersion, err := extractPackageVersionFromTitle(prTitle)
+		if err != nil {
+			// ignore if we can't extract a package name and version string
+			continue
+		}
+
+		v, ok := updates[packageName]
+		if !ok {
+			continue
+		}
+
+		if o.isSameVersion(packageName, v.Version, prTitle) {
+			delete(updates, packageName)
+			continue
+		}
+
+		if o.containsOldVersion(packageName, v.Version, titleVersion, prTitle) {
+			v.ReplaceExistingPRNumber = *pr.Number
+			updates[packageName] = v
+		}
+	}
+}
+
+func (o *Options) processIssues(updates map[string]NewVersionResults, issues []*github.Issue) {
+	for _, issue := range issues {
+		issueTitle := *issue.Title
+
+		packageName, titleVersion, err := extractPackageVersionFromTitle(issueTitle)
+		if err != nil {
+			// ignore if we can't extract a package name and version string
+			continue
+		}
+
+		v, ok := updates[packageName]
+		if !ok {
+			continue
+		}
+
+		if o.isSameVersion(packageName, v.Version, issueTitle) {
+			delete(updates, packageName)
+			continue
+		}
+
+		if o.containsOldVersion(packageName, v.Version, titleVersion, issueTitle) {
+			v.ReplaceExistingPRNumber = *issue.Number
+			updates[packageName] = v
+		}
+	}
+}
+
+func (o *Options) isSameVersion(packageName, version, title string) bool {
+	return strings.HasPrefix(title, fmt.Sprintf("%s/%s", packageName, version))
+}
+
+// checks if a version in a pull request or issue title is older that the latest available version
+func (o *Options) containsOldVersion(packageName, latestVersionStr, titleVersionStr, title string) bool {
+	prefix := fmt.Sprintf("%s/", packageName)
+
+	if !strings.HasPrefix(title, prefix) {
+		return false
+	}
+
+	currentVersion, err := wolfiversions.NewVersion(titleVersionStr)
+	if err != nil {
+		// ignore if we can't create a real version
+		return false
+	}
+
+	latestVersion, err := wolfiversions.NewVersion(latestVersionStr)
+	if err != nil {
+		o.Logger.Printf("cannot get new version from version %s. Error %s", latestVersionStr, err.Error())
+		return false
+	}
+
+	return currentVersion.LessThan(latestVersion)
+}
+
+// grab the package name and version from a title similar to "package_name/1.2.3 package update"
+func extractPackageVersionFromTitle(title string) (packageName, version string, err error) {
+	parts := strings.SplitAfter(title, "/")
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("cannot split title %s", title)
+	}
+
+	versionParts := strings.SplitAfter(parts[1], " ")
+	if len(versionParts) == 0 {
+		return "", "", fmt.Errorf("cannot split version %s", parts[1])
+	}
+
+	version = strings.TrimSpace(versionParts[0])
+	packageName = strings.TrimSuffix(parts[0], "/")
+	return
 }

@@ -13,17 +13,35 @@ type Issues struct {
 	RepoName    string
 	PackageName string
 	Comment     string
-	Retries     int
 	Title       string
+}
+
+func (o GitOptions) ListIssues(ctx context.Context, owner, repo, state string) ([]*github.Issue, error) {
+	var openIssues []*github.Issue
+
+	err := o.handleRateLimitList(func(opt *github.ListOptions) (*github.Response, error) {
+		ilo := github.IssueListByRepoOptions{
+			State:       state,
+			ListOptions: *opt,
+		}
+		issues, resp, err := o.GithubClient.Issues.ListByRepo(ctx, owner, repo, &ilo)
+		openIssues = append(openIssues, issues...)
+		return resp, err
+	})
+
+	return openIssues, err
 }
 
 func (o GitOptions) CheckExistingIssue(ctx context.Context, r *Issues) (int, error) {
 	var openIssues []*github.Issue
 
-	ilo := github.IssueListByRepoOptions{State: "open"}
-	err := o.handleRateLimit(func() (*github.Response, error) {
+	err := o.handleRateLimitList(func(opt *github.ListOptions) (*github.Response, error) {
+		ilo := github.IssueListByRepoOptions{
+			State:       "open",
+			ListOptions: *opt,
+		}
 		issues, resp, err := o.GithubClient.Issues.ListByRepo(ctx, r.Owner, r.RepoName, &ilo)
-		openIssues = issues
+		openIssues = append(openIssues, issues...)
 		return resp, err
 	})
 
@@ -41,11 +59,12 @@ func (o GitOptions) CheckExistingIssue(ctx context.Context, r *Issues) (int, err
 
 func (o GitOptions) HasExistingComment(ctx context.Context, r *Issues, issueNumber int, newComment string) (bool, error) {
 	var comments []*github.IssueComment
-
-	opt := &github.IssueListCommentsOptions{}
-	err := o.handleRateLimit(func() (*github.Response, error) {
-		rs, resp, err := o.GithubClient.Issues.ListComments(ctx, r.Owner, r.RepoName, issueNumber, opt)
-		comments = rs
+	err := o.handleRateLimitList(func(opt *github.ListOptions) (*github.Response, error) {
+		ilo := &github.IssueListCommentsOptions{
+			ListOptions: *opt,
+		}
+		rs, resp, err := o.GithubClient.Issues.ListComments(ctx, r.Owner, r.RepoName, issueNumber, ilo)
+		comments = append(comments, rs...)
 		return resp, err
 	})
 
@@ -62,10 +81,6 @@ func (o GitOptions) HasExistingComment(ctx context.Context, r *Issues, issueNumb
 }
 
 func (o GitOptions) OpenIssue(ctx context.Context, r *Issues) (string, error) {
-	if r.Retries > o.MaxRetries {
-		return "", fmt.Errorf("failed max number of retries, tried %d max %d", r.Retries, o.MaxRetries)
-	}
-
 	newIssue := &github.IssueRequest{
 		Title: github.String(r.Title),
 		Body:  github.String(r.Comment),
@@ -85,13 +100,13 @@ func (o GitOptions) OpenIssue(ctx context.Context, r *Issues) (string, error) {
 	return issue.GetHTMLURL(), nil
 }
 
-func (o GitOptions) CommentIssue(ctx context.Context, r *Issues, number int) (string, error) {
+func (o GitOptions) CommentIssue(ctx context.Context, owner, repo, comment string, number int) (string, error) {
 	ic := &github.IssueComment{
-		Body: &r.Comment,
+		Body: github.String(comment),
 	}
 	var issue *github.IssueComment
 	err := o.handleRateLimit(func() (*github.Response, error) {
-		updatedIssue, resp, err := o.GithubClient.Issues.CreateComment(ctx, r.Owner, r.RepoName, number, ic)
+		updatedIssue, resp, err := o.GithubClient.Issues.CreateComment(ctx, owner, repo, number, ic)
 		issue = updatedIssue
 		return resp, err
 	})
