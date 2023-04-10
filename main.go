@@ -1,8 +1,7 @@
 package main
 
 import (
-	"log"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/wolfi-dev/wolfictl/pkg/cli"
 )
 

@@ -19,25 +19,34 @@ func cmdMake() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			g, err := dag.NewGraph(os.DirFS(dir), dir)
+			pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+			if err != nil {
+				return err
+			}
+			g, err := dag.NewGraph(pkgs)
 			if err != nil {
 				return err
 			}
 
-			all, err := g.Sorted()
+			filtered, err := g.Filter(dag.FilterLocal())
 			if err != nil {
 				return err
 			}
-			reverse(all)
+			all, err := filtered.ReverseSorted()
+			if err != nil {
+				return err
+			}
 
 			for _, node := range all {
-				target, err := g.MakeTarget(node, arch)
+				name := node.Name()
+				pkg, err := pkgs.PkgInfo(name)
 				if err != nil {
 					return err
 				}
-				if target == "" { // ignore subpackages
+				if pkg == nil {
 					continue
 				}
+				target := makeTarget(name, arch, pkg)
 				if dryrun {
 					fmt.Println(target)
 				} else {

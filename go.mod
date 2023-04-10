@@ -40,11 +40,13 @@ require (
 	github.com/samber/lo v1.38.1
 	github.com/savioxavier/termlink v1.2.1
 	github.com/sigstore/cosign/v2 v2.0.3-0.20230425232139-17cc13812d8a
+	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
 	github.com/tmc/dot v0.0.0-20210901225022-f9bc17da75c0
 	gitlab.alpinelinux.org/alpine/go v0.7.0
+	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
 	golang.org/x/oauth2 v0.7.0
 	golang.org/x/sync v0.1.0
@@ -232,7 +234,6 @@ require (
 	github.com/sigstore/rekor v1.1.0 // indirect
 	github.com/sigstore/sigstore v1.6.3 // indirect
 	github.com/sigstore/timestamp-authority v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
@@ -256,7 +257,6 @@ require (
 	github.com/zclconf/go-cty v1.12.1 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
 	github.com/zeebo/errs v1.3.0 // indirect
-	go.lsp.dev/uri v0.3.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.14.0 // indirect

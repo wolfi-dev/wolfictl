@@ -1,0 +1,24 @@
+package:
+  name: three-other
+  version: "7.8.9"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+        - "*"
+      attestation:
+      license: Apache-2.0
+  dependencies:
+    runtime:
+      - bash
+      - gcc
+environment:
+  contents:
+    packages:
+      - wolfi-baselayout
+      - busybox
+      - ca-certificates-bundle
+      - one
+      - two

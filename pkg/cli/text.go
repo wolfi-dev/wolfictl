@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"chainguard.dev/apko/pkg/build/types"
+	"chainguard.dev/melange/pkg/build"
 	"github.com/dominikbraun/graph"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
@@ -21,7 +22,11 @@ func cmdText() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			g, err := dag.NewGraph(os.DirFS(dir), dir)
+			pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+			if err != nil {
+				return err
+			}
+			g, err := dag.NewGraph(pkgs)
 			if err != nil {
 				return err
 			}
@@ -57,7 +62,7 @@ func cmdText() *cobra.Command {
 				g = subgraph
 			}
 
-			return text(*g, arch, textType(t), os.Stdout)
+			return text(*g, pkgs, arch, textType(t), os.Stdout)
 		},
 	}
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
@@ -85,66 +90,49 @@ var textTypes = []textType{
 	typePackageNameAndVersion,
 }
 
-func reverse(ss []string) {
-	last := len(ss) - 1
-	for i := 0; i < len(ss)/2; i++ {
-		ss[i], ss[last-i] = ss[last-i], ss[i]
-	}
-}
-
-func text(g dag.Graph, arch string, t textType, w io.Writer) error {
-	all, err := g.Sorted()
+func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer) error {
+	filtered, err := g.Filter(dag.FilterLocal())
 	if err != nil {
 		return err
 	}
-	reverse(all)
+	all, err := filtered.ReverseSorted()
+	if err != nil {
+		return err
+	}
 
 	for _, node := range all {
+		name := node.Name()
+		pkg, err := pkgs.PkgInfo(name)
+		if err != nil {
+			return err
+		}
+		if pkg == nil || pkg.Name == "" {
+			continue
+		}
 		switch t {
 		case typeTarget:
-			target, err := g.MakeTarget(node, arch)
-			if err != nil {
-				return err
-			}
-			if target != "" {
-				fmt.Fprintf(w, "%s\n", target)
-			}
+			fmt.Fprintf(w, "%s\n", makeTarget(name, arch, pkg))
 		case typeMakefileLine:
-			entry, err := g.MakefileEntry(node)
-			if err != nil {
-				return err
-			}
-			if entry != "" {
-				fmt.Fprintf(w, "%s\n", entry)
-			}
+			fmt.Fprintf(w, "%s\n", makefileEntry(name, pkg))
 		case typePackageName:
-			pkg, err := g.PkgInfo(node, arch)
-			if err != nil {
-				return err
-			}
-			if pkg != nil && pkg.Name != "" {
-				fmt.Fprintf(w, "%s\n", pkg.Name)
-			}
+			fmt.Fprintf(w, "%s\n", pkg.Name)
 		case typePackageVersion:
-			pkg, err := g.PkgInfo(node, arch)
-			if err != nil {
-				return err
-			}
-			if pkg != nil && pkg.Version != "" {
-				fmt.Fprintf(w, "%s\n", pkg.Version)
-			}
+			fmt.Fprintf(w, "%s\n", pkg.Version)
 		case typePackageNameAndVersion:
-			pkg, err := g.PkgInfo(node, arch)
-			if err != nil {
-				return err
-			}
-			if pkg != nil && pkg.Name != "" && pkg.Version != "" {
-				fmt.Fprintf(w, "%s-%s\n", pkg.Name, pkg.Version)
-			}
+			fmt.Fprintf(w, "%s-%s\n", pkg.Name, pkg.Version)
 		default:
 			return fmt.Errorf("invalid type: %s", t)
 		}
 	}
 
 	return nil
+}
+
+func makefileEntry(pkgName string, p *build.Package) string {
+	return fmt.Sprintf("$(eval $(call build-package,%s,%s-%d))", pkgName, p.Version, p.Epoch)
+}
+
+func makeTarget(pkgName, arch string, p *build.Package) string {
+	// note: using pkgName here because it may be a subpackage, not the main package declared within the config (i.e. `p.Name`)
+	return fmt.Sprintf("make packages/%s/%s-%s-r%d.apk", arch, pkgName, p.Version, p.Epoch)
 }

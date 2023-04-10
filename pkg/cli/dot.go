@@ -27,7 +27,11 @@ Generate .dot output and pipe it to dot to generate a PNG
   wolfictl dot | dot -Tpng > graph.png
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g, err := dag.NewGraph(os.DirFS(dir), dir)
+			pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+			if err != nil {
+				return err
+			}
+			g, err := dag.NewGraph(pkgs)
 			if err != nil {
 				return err
 			}
@@ -92,7 +96,7 @@ func viz(g dag.Graph) error {
 	out := dot.NewGraph("images")
 	out.SetType(dot.DIGRAPH)
 
-	nodes := g.Nodes()
+	nodes := g.Packages()
 
 	for _, node := range nodes {
 		n := dot.NewNode(node)
