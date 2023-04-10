@@ -462,7 +462,7 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	if newVersion.ReplaceExistingPRNumber != 0 {
-		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, prLink, newVersion.ReplaceExistingPRNumber)
+		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
 			return "", errors.Wrapf(err, "failed to close pull request: %d", newVersion.ReplaceExistingPRNumber)
 		}

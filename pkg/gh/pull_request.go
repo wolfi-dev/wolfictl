@@ -61,7 +61,7 @@ func (o GitOptions) ListPullRequests(ctx context.Context, owner, repo, state str
 	return openPullRequests, err
 }
 
-func (o GitOptions) ClosePullRequest(ctx context.Context, owner, repo, newPr string, number int) error {
+func (o GitOptions) ClosePullRequest(ctx context.Context, owner, repo string, number int) error {
 	closed := "closed"
 	pr := &github.PullRequest{
 		State: &closed,

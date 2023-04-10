@@ -344,7 +344,7 @@ func (g Graph) MakefileEntry(pkgName string) (string, error) {
 }
 
 // PkgInfo returns the buildp.Package struct
-func (g Graph) PkgInfo(pkgName, arch string) (*build.Package, error) {
+func (g Graph) PkgInfo(pkgName, _ string) (*build.Package, error) {
 	config := g.Config(pkgName)
 	if config == nil {
 		log.Println("no config for package:", pkgName)
