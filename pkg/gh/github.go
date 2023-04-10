@@ -2,11 +2,10 @@ package gh
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/google/go-github/v50/github"
 )
@@ -43,24 +42,9 @@ Code modified from original.  Credited to https://github.com/gruntwork-io/git-xa
 
 func (o GitOptions) handleRateLimit(action func() (*github.Response, error)) error {
 	resp, err := action()
-
-	if resp.StatusCode == http.StatusUnauthorized {
-		return errors.Wrap(err, "failed to auth with github, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo")
-	}
-
-	if err != nil {
-		if githubErr := github.CheckResponse(resp.Response); githubErr != nil {
-			isRateLimited, delay := o.checkRateLimiting(githubErr)
-			if isRateLimited {
-				o.Logger.Printf("retrying again later with %v second delay due to secondary rate limiting.", delay.Seconds())
-				time.Sleep(delay)
-				return o.handleRateLimit(action)
-			}
-			return githubErr
-		}
-		return err
-	}
-	return nil
+	return o.handleGitHubResponse(resp, err, func() error {
+		return o.handleRateLimit(action)
+	})
 }
 
 func (o GitOptions) handleRateLimitList(action func(opt *github.ListOptions) (*github.Response, error)) error {
@@ -71,20 +55,10 @@ func (o GitOptions) handleRateLimitList(action func(opt *github.ListOptions) (*g
 	for {
 		resp, err := action(opt)
 
-		if resp.StatusCode == http.StatusUnauthorized {
-			return errors.Wrap(err, "failed to auth with GitHub, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo")
-		}
-
+		err = o.handleGitHubResponse(resp, err, func() error {
+			return o.handleRateLimitList(action)
+		})
 		if err != nil {
-			if githubErr := github.CheckResponse(resp.Response); githubErr != nil {
-				isRateLimited, delay := o.checkRateLimiting(githubErr)
-				if isRateLimited {
-					o.Logger.Printf("retrying again later with %v second delay due to secondary rate limiting.", delay.Seconds())
-					time.Sleep(delay)
-					return o.handleRateLimitList(action)
-				}
-				return githubErr
-			}
 			return err
 		}
 
@@ -94,7 +68,25 @@ func (o GitOptions) handleRateLimitList(action func(opt *github.ListOptions) (*g
 
 		opt.Page = resp.NextPage
 	}
+	return nil
+}
 
+func (o GitOptions) handleGitHubResponse(resp *github.Response, err error, action func() error) error {
+	if resp.StatusCode == http.StatusUnauthorized {
+		return fmt.Errorf("failed to auth with GitHub, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo. status code: %d", resp.StatusCode)
+	}
+	if err != nil {
+		if githubErr := github.CheckResponse(resp.Response); githubErr != nil {
+			isRateLimited, delay := o.checkRateLimiting(githubErr)
+			if isRateLimited {
+				o.Logger.Printf("retrying again later with %v second delay due to secondary rate limiting.", delay.Seconds())
+				time.Sleep(delay)
+				return action()
+			}
+			return githubErr
+		}
+		return err
+	}
 	return nil
 }
 
