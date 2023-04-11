@@ -70,7 +70,7 @@ query {
     }
     name
     nameWithOwner
-    releases(first: 40) {
+    releases(first: 20) {
       totalCount
       nodes {
         tag {
@@ -275,7 +275,7 @@ func (o GitHubReleaseOptions) getGitHubTagVersions(repoList map[string]string) (
 
 func (o GitHubReleaseOptions) getResultsFromTemplate(templateType string, repos []RepoInfo) (map[string]NewVersionResults, error) {
 	// batch the requests sent to graphql API else we can get a bad gateway error returned
-	batchSize := 25
+	batchSize := 15
 	results := make(map[string]NewVersionResults)
 
 	for i := 0; i < len(repos); i += batchSize {

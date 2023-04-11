@@ -1,6 +1,7 @@
 package update
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -140,4 +141,28 @@ func TestUpdate_updateMakefile(t *testing.T) {
 	resultData, err := os.ReadFile(filepath.Join(tempDir, "melange", "Makefile"))
 	assert.NoError(t, err)
 	assert.Contains(t, string(resultData), "build-package,zlib,1.3.0-r0)")
+}
+
+func Test_extractVersionFromTitle(t *testing.T) {
+	tests := []struct {
+		title       string
+		wantPackage string
+		wantVersion string
+		wantErr     assert.ErrorAssertionFunc
+	}{
+		{title: "foo/1.11.0 package update", wantPackage: "foo", wantVersion: "1.11.0", wantErr: assert.NoError},
+		{title: "foo/1.11 package update", wantPackage: "foo", wantVersion: "1.11", wantErr: assert.NoError},
+		{title: "foo/1 package update", wantPackage: "foo", wantVersion: "1", wantErr: assert.NoError},
+		{title: "no package update", wantPackage: "", wantVersion: "", wantErr: assert.Error},
+	}
+	for _, tt := range tests {
+		t.Run(tt.title, func(t *testing.T) {
+			got1, got2, err := extractPackageVersionFromTitle(tt.title)
+			if !tt.wantErr(t, err, fmt.Sprintf("extractVersionFromTitle(%v)", tt.title)) {
+				return
+			}
+			assert.Equalf(t, tt.wantPackage, got1, "extractVersionFromTitle(%v)", tt.title)
+			assert.Equalf(t, tt.wantVersion, got2, "extractVersionFromTitle(%v)", tt.title)
+		})
+	}
 }

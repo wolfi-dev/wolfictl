@@ -18,10 +18,9 @@ import (
 )
 
 type MonitorService struct {
-	Client           *http2.RLHTTPClient
-	GitHubHTTPClient *http2.RLHTTPClient
-	Logger           *log.Logger
-	DataMapperURL    string
+	Client        *http2.RLHTTPClient
+	Logger        *log.Logger
+	DataMapperURL string
 }
 
 type ReleaseMonitorVersions struct {
