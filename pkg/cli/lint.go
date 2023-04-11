@@ -32,6 +32,9 @@ func Lint() *cobra.Command {
 	cmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbose output")
 	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "prints the all of available rules and exits")
 	cmd.Flags().StringArrayVarP(&o.skipRules, "skip-rule", "", []string{}, "list of rules to skip")
+
+	cmd.AddCommand(LintYam())
+
 	return cmd
 }
 
