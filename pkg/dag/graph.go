@@ -44,7 +44,7 @@ func NewGraph(dirFS fs.FS, dirPath string) (*Graph, error) { //nolint:gocyclo
 			return fs.SkipDir
 		}
 
-		if d.Type().IsRegular() && strings.HasSuffix(path, ".yaml") {
+		if d.Type().IsRegular() && strings.HasSuffix(path, ".yaml") && !strings.HasPrefix(d.Name(), ".") {
 			f, err := dirFS.Open(path)
 			if err != nil {
 				return err
