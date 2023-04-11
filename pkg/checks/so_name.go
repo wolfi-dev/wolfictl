@@ -18,10 +18,6 @@ import (
 
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 
-	"golang.org/x/exp/maps"
-
-	"github.com/wolfi-dev/wolfictl/pkg/melange"
-
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 
 	"github.com/pkg/errors"
@@ -107,16 +103,16 @@ func (o *SoNameOptions) getNewPackages() (map[string]NewApkPackage, error) {
 		}
 		parts := strings.Split(scanner.Text(), "|")
 
-		if len(parts) != 3 {
+		if len(parts) != 4 {
 			return rs, fmt.Errorf("expected 3 parts but found %d when scanning %s", len(parts), scanner.Text())
 		}
-		versionParts := strings.Split(parts[2], "-")
+		versionParts := strings.Split(parts[3], "-")
 		if len(versionParts) != 2 {
 			return rs, fmt.Errorf("expected 2 version parts but found %d", len(versionParts))
 		}
 
 		arch := parts[0]
-		packageName := parts[1]
+		packageName := parts[2]
 		version := versionParts[0]
 
 		epoch := versionParts[1]
@@ -130,27 +126,7 @@ func (o *SoNameOptions) getNewPackages() (map[string]NewApkPackage, error) {
 		}
 	}
 
-	rs = o.addSubpackages(rs)
 	return rs, nil
-}
-
-func (o *SoNameOptions) addSubpackages(m map[string]NewApkPackage) map[string]NewApkPackage {
-	packagesAndSubpackages := make(map[string]NewApkPackage)
-	maps.Copy(packagesAndSubpackages, m)
-
-	for melangePackageName, apkPackage := range m {
-		filename := filepath.Join(o.Dir, melangePackageName+".yaml")
-		c, err := melange.ReadMelangeConfig(filename)
-		if err != nil {
-			log.Printf("failed to read melange config %s", filename)
-			continue
-		}
-
-		for i := 0; i < len(c.Subpackages); i++ {
-			packagesAndSubpackages[c.Subpackages[i].Name] = apkPackage
-		}
-	}
-	return packagesAndSubpackages
 }
 
 // diff will compare the so name versions between the latest existing apk in a APKINDEX with a newly built local apk

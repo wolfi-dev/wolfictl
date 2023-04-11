@@ -39,6 +39,10 @@ func TestChecks_sonameParsePackages(t *testing.T) {
 	assert.Equal(t, "1.2.3", packages["bind-doc"].Version)
 	assert.Equal(t, "1.2.3", packages["bind-dev"].Version)
 	assert.Equal(t, "1.2.3", packages["grape-utils"].Version)
+
+	// if-conditional subpackages might not be built
+	_, ok := packages["foo-utils"]
+	assert.False(t, ok, "foo-utils should not be present")
 }
 
 func TestChecks_getSonameFiles(t *testing.T) {

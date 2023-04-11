@@ -19,4 +19,9 @@ subpackages:
       - runs:  |
           mkdir -p "${{targets.destdir}}"/foo
           echo cheese > "${{targets.subpkgdir}}"/foo/cheese
-
+  - if: ${{options.foo.enabled}} == 'true'
+    name: "foo-utils"
+    description: "foo utility"
+      - runs: |
+          mkdir -p "${{targets.subpkgdir}}"/foo
+          echo cheese > "${{targets.subpkgdir}}"/foo/cheese
