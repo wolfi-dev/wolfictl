@@ -16,7 +16,7 @@ require (
 	chainguard.dev/apko v0.7.4-0.20230402102107-ddb6145f674f
 	chainguard.dev/melange v0.3.1-0.20230404103643-34643adbdff2
 	cloud.google.com/go/storage v1.30.1
-	github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467
+	github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e
 	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
 	github.com/charmbracelet/lipgloss v0.7.1
@@ -40,6 +40,7 @@ require (
 	github.com/openvex/vexctl v0.2.1-0.20230123203902-a37dcd068257
 	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a
 	github.com/pkg/errors v0.9.1
+	github.com/samber/lo v1.38.1
 	github.com/sigstore/cosign/v2 v2.0.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -57,6 +58,7 @@ require (
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/utils v0.0.0-20230115233650-391b47cb4029
 	sigs.k8s.io/release-sdk v0.10.0
+	sigs.k8s.io/release-utils v0.7.3
 )
 
 require (
@@ -282,7 +284,6 @@ require (
 	knative.dev/pkg v0.0.0-20230125083639-408ad0773f47 // indirect
 	mvdan.cc/sh/v3 v3.5.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
-	sigs.k8s.io/release-utils v0.7.3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )

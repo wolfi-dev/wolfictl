@@ -218,8 +218,8 @@ github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
-github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467 h1:gi3YegWmNaLnyQwQPwPEi5cZEIBw1qCOkCXGGd/+4QA=
-github.com/chainguard-dev/yam v0.0.0-20230116015213-e93efc9df467/go.mod h1:UKmsa6j+6qz6JyYMPkLPtOvBRO1KhHYNYc+z+Onk8pE=
+github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e h1:TlpfdSUjQkrq2yh+bySzoOmPKspeaxmOr1fmsNCfNXM=
+github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e/go.mod h1:sfV9rXdvBVe0PDTLWzPh4IpapowZ9CDROjMUN2etRrk=
 github.com/charmbracelet/bubbles v0.15.0 h1:c5vZ3woHV5W2b8YZI1q7v4ZNQaPetfHuoHzx+56Z6TI=
 github.com/charmbracelet/bubbles v0.15.0/go.mod h1:Y7gSFbBzlMpUDR/XM9MhZI374Q+1p1kluf1uLl8iK74=
 github.com/charmbracelet/bubbletea v0.23.1/go.mod h1:JAfGK/3/pPKHTnAS8JIE2u9f61BjWTQY57RbT25aMXU=
@@ -817,6 +817,8 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/ryanuber/go-glob v1.0.0 h1:iQh3xXAumdQ+4Ufa5b25cRpC5TYKlno6hsv6Cb3pkBk=
 github.com/sahilm/fuzzy v0.1.0 h1:FzWGaw2Opqyu+794ZQ9SYifWv2EIXpwP4q8dY1kDAwI=
 github.com/sahilm/fuzzy v0.1.0/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
+github.com/samber/lo v1.38.1 h1:j2XEAqXKb09Am4ebOg31SpvzUTTs6EN3VfgeLUhPdXM=
+github.com/samber/lo v1.38.1/go.mod h1:+m/ZKRl6ClXCE2Lgf3MsQlWfh4bn1bz6CXEOxnEXnEA=
 github.com/sassoftware/go-rpmutils v0.1.1/go.mod h1:euhXULoBpvAxqrBHEyJS4Tsu3hHxUmQWNymxoJbzgUY=
 github.com/sassoftware/relic v0.0.0-20210427151427-dfb082b79b74 h1:sUNzanSKA9z/h8xXl+ZJoxIYZL0Qx306MmxqRrvUgr0=
 github.com/sassoftware/relic v0.0.0-20210427151427-dfb082b79b74/go.mod h1:YlB8wFIZmFLZ1JllNBfSURzz52fBxbliNgYALk1UDmk=
