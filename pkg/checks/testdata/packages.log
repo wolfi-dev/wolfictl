@@ -1,3 +1,6 @@
-aarch64|bind|1.2.3-r0
-aarch64|gnupg|2.2.41-r0
-aarch64|gnutls-c++|3.7.8-r0
+aarch64|bind|bind|1.2.3-r0
+aarch64|bind|bind-doc|1.2.3-r0
+aarch64|bind|bind-dev|1.2.3-r0
+aarch64|bind|grape-utils|1.2.3-r0
+aarch64|gnupg|gnupg|2.2.41-r0
+aarch64|gnutls-c++|gnutls-c++|3.7.8-r0
