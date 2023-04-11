@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/release-utils/version"
 )
 
 func New() *cobra.Command {
@@ -27,6 +28,7 @@ func New() *cobra.Command {
 		Lint(),
 		Update(),
 		VEX(),
+		version.Version(),
 	)
 
 	return cmd
