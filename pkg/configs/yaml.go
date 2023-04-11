@@ -10,8 +10,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const yamlIndent = 2
-
 // A yamlUpdater is a function that mutates a YAML AST. The function is also
 // given a build.Configuration in case implementations require it for context.
 type yamlUpdater func(build.Configuration, *yaml.Node) error
@@ -41,12 +39,8 @@ func (i *Index) newYAMLUpdateFunc(updateYAML yamlUpdater) updateFunc {
 			return fmt.Errorf("unable to update %q: %w", e.Path(), err)
 		}
 
-		encoder := formatted.NewEncoder(file)
-		encoder.SetIndent(yamlIndent)
-		err = encoder.SetGapExpressions(".")
-		if err != nil {
-			return fmt.Errorf("unable to set gap expressions when updating YAML: %w", err)
-		}
+		encoder := formatted.NewEncoder(file).AutomaticConfig()
+
 		err = encoder.Encode(root)
 		if err != nil {
 			return fmt.Errorf("unable to encode updated YAML: %w", err)
