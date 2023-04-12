@@ -136,3 +136,35 @@ func createTestRepo(t *testing.T, dir, tag string) string {
 
 	return c.String()
 }
+
+func TestUpdateKeyExists(t *testing.T) {
+	dir := t.TempDir()
+	// create a temporary file with an update key
+	yamlData := []byte("name: cheese\nupdate:\n  foo: true\n")
+	fileContainsUpdate := filepath.Join(dir, "contains.yaml")
+	err := os.WriteFile(fileContainsUpdate, yamlData, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkErrors := make(lint.EvalRuleErrors, 0)
+	// check update key exists
+	validateUpdateConfig([]string{fileContainsUpdate}, &checkErrors)
+
+	assert.Empty(t, checkErrors)
+
+	// create a temporary file without an update key
+	yamlData = []byte("name: cheese\n")
+	fileNoContainsUpdate := filepath.Join(dir, "does_not_contain.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = os.WriteFile(fileNoContainsUpdate, yamlData, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// check the update key does not exist
+	validateUpdateConfig([]string{fileNoContainsUpdate}, &checkErrors)
+	assert.NotEmpty(t, checkErrors)
+}
