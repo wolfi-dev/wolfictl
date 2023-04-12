@@ -161,6 +161,12 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			return err
 		}
 
+		// if manual update is expected then let's not try to validate pipelines
+		if updated.Update.Manual {
+			o.Logger.Println("manual update configured, skipping pipeline validation")
+			continue
+		}
+
 		// download or git clone sources into a temp folder to validate the update config
 		verifyPipelines(o, updated, mutations, checkErrors)
 	}
