@@ -131,8 +131,17 @@ func (o *SoNameOptions) getNewPackages() (map[string]NewApkPackage, error) {
 
 // diff will compare the so name versions between the latest existing apk in a APKINDEX with a newly built local apk
 func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error {
-	dirExistingApk := os.TempDir()
-	dirNewApk := os.TempDir()
+	dirExistingApk, err := os.MkdirTemp("", "wolfictl-apk-*")
+	if err != nil {
+		return errors.Wrapf(err, "failed to create temporary dir")
+	}
+	defer os.RemoveAll(dirExistingApk)
+
+	dirNewApk, err := os.MkdirTemp("", "wolfictl-apk-*")
+	if err != nil {
+		return errors.Wrapf(err, "failed to create temporary dir")
+	}
+	defer os.RemoveAll(dirNewApk)
 
 	// read new apk
 	filename := filepath.Join(o.PackagesDir, newAPK.Arch, fmt.Sprintf("%s-%s-r%s.apk", newPackageName, newAPK.Version, newAPK.Epoch))
