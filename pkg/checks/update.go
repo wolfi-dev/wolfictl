@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dprotaso/go-yit"
+
 	version "github.com/wolfi-dev/wolfictl/pkg/versions"
 
 	"github.com/fatih/color"
@@ -44,7 +46,11 @@ func SetupUpdate() (*update.Options, lint.EvalRuleErrors) {
 func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 	updateOpts, checkErrors := SetupUpdate()
 
-	latestVersions, err := updateOpts.GetLatestVersions(o.Dir, GetPackagesToUpdate(files))
+	changedPackages := GetPackagesToUpdate(files)
+
+	validateUpdateConfig(changedPackages, &checkErrors)
+
+	latestVersions, err := updateOpts.GetLatestVersions(o.Dir, changedPackages)
 	if err != nil {
 		addCheckError(&checkErrors, err)
 	}
@@ -64,6 +70,66 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 
 	return checkErrors.WrapErrors()
 }
+
+// validates update configuration
+func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
+	for _, file := range files {
+		// first need to read raw bytes as unmarshalling a struct without a pointer means update will never be nil
+		if !strings.HasSuffix(file, ".yaml") {
+			file += ".yaml"
+		}
+		yamlData, err := os.ReadFile(file)
+		if err != nil {
+			addCheckError(checkErrors, errors.Wrapf(err, "failed to read %s", file))
+			continue
+		}
+
+		var node yaml.Node
+		err = yaml.Unmarshal(yamlData, &node)
+		if err != nil {
+			addCheckError(checkErrors, errors.Wrapf(err, "failed to unmarshal %s", file))
+			continue
+		}
+
+		if node.Content == nil {
+			addCheckError(checkErrors, fmt.Errorf("config %s has no yaml content", file))
+			continue
+		}
+		// loop over content to ensure an update key exists
+		err = containsKey(node.Content[0], "update")
+		if err != nil {
+			addCheckError(checkErrors, fmt.Errorf("config %s does not have update config provided, see examples in this repository.  Or use update.enabled=false, be aware maintainers may require enabled=true so the package does not become stale", file))
+			continue
+		}
+
+		// now make sure update config is configured
+		c, err := build.ParseConfiguration(file)
+		if err != nil {
+			addCheckError(checkErrors, errors.Wrapf(err, "failed to parse %s", file))
+			continue
+		}
+
+		// ensure a backend has been configured
+		if c.Update.Enabled {
+			if c.Update.ReleaseMonitor == nil && c.Update.GitHubMonitor == nil {
+				addCheckError(checkErrors, fmt.Errorf("config %s has update config enabled but no release-monitor or github backend monitor configured, see examples in this repository", file))
+				continue
+			}
+		}
+	}
+}
+
+func containsKey(parentNode *yaml.Node, key string) error {
+	it := yit.FromNode(parentNode).
+		ValuesForMap(yit.WithValue(key), yit.All)
+
+	if _, ok := it(); ok {
+		return nil
+	}
+
+	return fmt.Errorf("key '%s' not found in mapping", key)
+}
+
 func GetPackagesToUpdate(files []string) []string {
 	packagesToUpdate := []string{}
 	for _, f := range files {
@@ -159,6 +225,12 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		mutations, err := build.MutateWith(pctx, map[string]string{})
 		if err != nil {
 			return err
+		}
+
+		// if manual update is expected then let's not try to validate pipelines
+		if updated.Update.Manual {
+			o.Logger.Println("manual update configured, skipping pipeline validation")
+			continue
 		}
 
 		// download or git clone sources into a temp folder to validate the update config

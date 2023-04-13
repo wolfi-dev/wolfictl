@@ -672,6 +672,7 @@ func (o *Options) processPullRequests(updates map[string]NewVersionResults, prs 
 		}
 
 		if o.isSameVersion(packageName, v.Version, prTitle) {
+			o.Logger.Printf("pull request %s already exists for %s\n", *pr.HTMLURL, prTitle)
 			delete(updates, packageName)
 			continue
 		}
