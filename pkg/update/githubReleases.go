@@ -586,6 +586,14 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 	if ghm == nil {
 		return "", fmt.Errorf("no github update config found for package %s", id)
 	}
+
+	// the github graphql query filter matches any occurrence, we want to make that more strict and remove any tags that do not START with the filter
+	if ghm.TagFilter != "" {
+		if !strings.HasPrefix(v, ghm.StripPrefix) {
+			return "", nil
+		}
+	}
+
 	if ghm.StripPrefix != "" {
 		v = strings.TrimPrefix(v, ghm.StripPrefix)
 	}
