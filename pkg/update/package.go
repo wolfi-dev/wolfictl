@@ -110,7 +110,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	uo.UseGitSign = o.UseGitSign
 
 	// let's work on a branch when updating package versions, so we can create a PR from that branch later
-	ref, err := uo.switchBranch(repo)
+	ref, err := uo.createBranch(repo)
 	if err != nil {
 		return fmt.Errorf("failed to switch to working git branch: %w", err)
 	}
