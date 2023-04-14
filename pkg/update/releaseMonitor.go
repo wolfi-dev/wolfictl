@@ -38,13 +38,14 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 	errorMessages = make(map[string]string)
 
 	// iterate packages from the target git repo and check if a new version is available
-	for i := range melangePackages {
-		p := melangePackages[i]
+	for packageName := range melangePackages {
+		p := melangePackages[packageName]
 		rm := p.Config.Update.ReleaseMonitor
 		if rm == nil {
 			continue
 		}
 
+		m.Logger.Printf("%s: checking release monitor using id %d\n", packageName, rm.Identifier)
 		latestVersion, err := m.getLatestReleaseVersion(rm.Identifier)
 		if err != nil {
 			errorMessages[p.Config.Package.Name] = fmt.Sprintf(

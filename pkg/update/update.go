@@ -210,12 +210,30 @@ func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[stri
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
 func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
-	// bump packages that need updating
+	// store the HEAD ref to switch back later
+	headRef, err := repo.Head()
+	if err != nil {
+		return errors.Wrap(err, "failed to get the HEAD ref")
+	}
+
+	// Bump packages that need updating
 	for packageName, newVersion := range packagesToUpdate {
-		// let's work on a branch when updating package versions, so we can create a PR from that branch later
-		ref, err := o.switchBranch(repo)
+		wt, err := repo.Worktree()
 		if err != nil {
-			return fmt.Errorf("failed to switch to working git branch: %w", err)
+			return errors.Wrap(err, "failed to get the worktree")
+		}
+		// make sure we are on HEAD
+		err = wt.Checkout(&git.CheckoutOptions{
+			Branch: headRef.Name(),
+		})
+		if err != nil {
+			return errors.Wrap(err, "failed to check out HEAD")
+		}
+
+		// let's work on a branch when updating package versions, so we can create a PR from that branch later
+		ref, err := o.createBranch(repo)
+		if err != nil {
+			return errors.Wrap(err, "failed to create git branch")
 		}
 
 		errorMessage, err := o.updateGitPackage(repo, packageName, newVersion, ref)
@@ -364,37 +382,39 @@ func (o *Options) updateGitModules(dir, packageName, version string, wt *git.Wor
 }
 
 // create a unique branch
-func (o *Options) switchBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
+func (o *Options) createBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
 	name := uuid.New().String()
 
-	worktree, err := repo.Worktree()
+	headRef, err := repo.Head()
 	if err != nil {
-		return "", fmt.Errorf("failed to get git worktree: %w", err)
+		return "", errors.Wrap(err, "failed to get repository HEAD")
 	}
 
-	// make sure we are on the main branch to start with
-	ref := plumbing.ReferenceName(fmt.Sprintf("refs/heads/" + o.DefaultBranch))
+	// Create a unique branch to work from
+	branchName := plumbing.NewBranchReferenceName(fmt.Sprintf("wolfictl-%s", name))
 
-	err = worktree.Checkout(&git.CheckoutOptions{
-		Create: false,
-		Branch: ref,
+	// Create the branch reference pointing to the HEAD commit
+	newBranchRef := plumbing.NewHashReference(branchName, headRef.Hash())
+
+	// Set the new branch reference in the repository
+	err = repo.Storer.SetReference(newBranchRef)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to create temporary branch %s", branchName)
+	}
+
+	wt, err := repo.Worktree()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get the worktree")
+	}
+	// check out the new branch
+	err = wt.Checkout(&git.CheckoutOptions{
+		Branch: newBranchRef.Name(),
 	})
 	if err != nil {
-		return "", fmt.Errorf("failed to checkout ref %s: %w", ref, err)
+		return "", errors.Wrap(err, "failed to check out the new branch")
 	}
 
-	// create a unique branch to work from
-	ref = plumbing.ReferenceName(fmt.Sprintf("refs/heads/wolfictl-%v", name))
-	err = worktree.Checkout(&git.CheckoutOptions{
-		Create: true,
-		Branch: ref,
-	})
-
-	if err != nil {
-		return "", fmt.Errorf("failed to checkout to temporary branch: %w", err)
-	}
-
-	return ref, err
+	return newBranchRef.Name(), nil
 }
 
 // commits package update changes and creates a pull request
