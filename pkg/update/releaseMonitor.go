@@ -36,16 +36,28 @@ const (
 func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[string]*melange.Packages) (packagesToUpdate map[string]NewVersionResults, errorMessages map[string]string) {
 	packagesToUpdate = make(map[string]NewVersionResults)
 	errorMessages = make(map[string]string)
+	releaseMonitorPackages := make(map[string]*melange.Packages)
 
-	// iterate packages from the target git repo and check if a new version is available
+	// build a separate map of packages that use release monitor
+	// not necessarily needed but helps with logging to know truly how many packages are left
 	for packageName := range melangePackages {
 		p := melangePackages[packageName]
 		rm := p.Config.Update.ReleaseMonitor
-		if rm == nil {
-			continue
+		if rm != nil {
+			releaseMonitorPackages[packageName] = p
 		}
+	}
+	size := len(releaseMonitorPackages)
+	count := 0
 
-		m.Logger.Printf("%s: checking release monitor using id %d\n", packageName, rm.Identifier)
+	// iterate packages from the target git repo and check if a new version is available
+	for packageName := range releaseMonitorPackages {
+		count++
+		p := releaseMonitorPackages[packageName]
+		rm := releaseMonitorPackages[packageName].Config.Update.ReleaseMonitor
+
+		m.Logger.Printf("[%d/%d] %s: checking release monitor using id %d\n", count, size, packageName, rm.Identifier)
+
 		latestVersion, err := m.getLatestReleaseVersion(rm.Identifier)
 		if err != nil {
 			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
