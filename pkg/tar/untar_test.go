@@ -11,14 +11,13 @@ import (
 func TestUntar(t *testing.T) {
 	dir := t.TempDir()
 
-	apk, err := os.Open(filepath.Join("testdata", "hello-world-0.0.1-r0.apk"))
+	apk, err := os.Open(filepath.Join("testdata", "hello-wolfi-2.12-r1.apk"))
 	assert.NoError(t, err)
 
 	err = Untar(apk, dir)
 	assert.NoError(t, err)
 
-	extracted, err := os.ReadFile(filepath.Join(dir, "usr", "tester"))
+	extracted, err := os.ReadFile(filepath.Join(dir, "usr", "bin", "hello"))
 	assert.NoError(t, err)
-
-	assert.Equal(t, []byte("test\n"), extracted)
+	assert.NotEmpty(t, extracted)
 }

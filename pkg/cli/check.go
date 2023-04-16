@@ -13,8 +13,9 @@ func Check() *cobra.Command {
 		Short:         "Subcommands used for CI checks in Wolfi",
 	}
 	cmd.AddCommand(
-		SoName(),
+		Diff(),
 		CheckUpdate(),
+		SoName(),
 	)
 	return cmd
 }

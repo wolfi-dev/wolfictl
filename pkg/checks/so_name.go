@@ -1,10 +1,8 @@
 package checks
 
 import (
-	"bufio"
 	"debug/elf"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -36,6 +34,7 @@ type SoNameOptions struct {
 }
 
 type NewApkPackage struct {
+	Name    string
 	Arch    string
 	Epoch   string
 	Version string
@@ -63,7 +62,7 @@ func (o *SoNameOptions) CheckSoName() error {
 	}
 
 	// get a list of new package names that have recently been built
-	newPackages, err := o.getNewPackages()
+	newPackages, err := getNewPackages(o.PackageListFilename)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get new packages")
 	}
@@ -82,51 +81,6 @@ func (o *SoNameOptions) CheckSoName() error {
 	}
 
 	return soNameErrors.WrapErrors()
-}
-
-// the wolfi package repo CI will write a file entry for every new .apk package that's been built
-// in the form $ARCH|$PACKAGE_NAME|$VERSION_r$EPOCH
-func (o *SoNameOptions) getNewPackages() (map[string]NewApkPackage, error) {
-	rs := make(map[string]NewApkPackage)
-	original, err := os.Open(o.PackageListFilename)
-	if err != nil {
-		return rs, errors.Wrapf(err, "opening file %s", o.PackageListFilename)
-	}
-
-	scanner := bufio.NewScanner(original)
-	defer original.Close()
-	scanner.Split(bufio.ScanLines)
-
-	for scanner.Scan() {
-		if strings.TrimSpace(scanner.Text()) == "" {
-			continue
-		}
-		parts := strings.Split(scanner.Text(), "|")
-
-		if len(parts) != 4 {
-			return rs, fmt.Errorf("expected 3 parts but found %d when scanning %s", len(parts), scanner.Text())
-		}
-		versionParts := strings.Split(parts[3], "-")
-		if len(versionParts) != 2 {
-			return rs, fmt.Errorf("expected 2 version parts but found %d", len(versionParts))
-		}
-
-		arch := parts[0]
-		packageName := parts[2]
-		version := versionParts[0]
-
-		epoch := versionParts[1]
-		epoch = strings.TrimPrefix(epoch, "r")
-		epoch = strings.TrimSuffix(epoch, ".apk")
-
-		rs[packageName] = NewApkPackage{
-			Version: version,
-			Epoch:   epoch,
-			Arch:    arch,
-		}
-	}
-
-	return rs, nil
 }
 
 // diff will compare the so name versions between the latest existing apk in a APKINDEX with a newly built local apk
@@ -172,7 +126,7 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 		return nil
 	}
 	existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
-	err = o.downloadCurrentAPK(existingFilename, dirExistingApk)
+	err = downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, dirExistingApk)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download %s using base URL %s", newPackageName, o.ApkIndexURL)
 	}
@@ -188,29 +142,6 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 		return errors.Wrapf(err, "soname files differ, this can cause an ABI break.  Existing soname files %s, New soname files %s", strings.Join(existingSonameFiles, ","), strings.Join(newSonameFiles, ","))
 	}
 
-	return nil
-}
-
-func (o *SoNameOptions) downloadCurrentAPK(newPackageName, dirCurrentApk string) error {
-	apkURL := strings.ReplaceAll(o.ApkIndexURL, "APKINDEX", newPackageName)
-	resp, err := o.Client.Get(apkURL)
-	if err != nil {
-		return errors.Wrapf(err, "failed to get %s", apkURL)
-	}
-	defer resp.Body.Close()
-
-	// Create the file
-	out, err := os.Create(filepath.Join(dirCurrentApk, newPackageName))
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	// Writer the body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
