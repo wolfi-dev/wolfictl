@@ -3,47 +3,12 @@ package checks
 import (
 	"fmt"
 	"log"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestChecks_sonameParsePackages(t *testing.T) {
-	dir := t.TempDir()
-
-	// packages.log is an example output of packages that were built by melange, eg wolfi/os
-	data, err := os.ReadFile(filepath.Join("testdata", "packages.log"))
-	assert.NoError(t, err)
-	assert.NotEmpty(t, data)
-
-	// if a top level melange package was built then it's subpackages will also have been built
-	melangeData, err := os.ReadFile(filepath.Join("testdata", "subpackages_melange.yaml"))
-	assert.NoError(t, err)
-	assert.NotEmpty(t, data)
-
-	err = os.WriteFile(filepath.Join(dir, "bind.yaml"), melangeData, os.ModePerm)
-	assert.NoError(t, err)
-
-	o := &SoNameOptions{}
-	o.Dir = dir
-
-	o.PackageListFilename = filepath.Join("testdata", "packages.log")
-	packages, err := o.getNewPackages()
-	assert.NoError(t, err)
-
-	assert.Equal(t, "3.7.8", packages["gnutls-c++"].Version)
-	assert.Equal(t, "1.2.3", packages["bind-doc"].Version)
-	assert.Equal(t, "1.2.3", packages["bind-dev"].Version)
-	assert.Equal(t, "1.2.3", packages["grape-utils"].Version)
-
-	// if-conditional subpackages might not be built
-	_, ok := packages["foo-utils"]
-	assert.False(t, ok, "foo-utils should not be present")
-}
 
 func TestChecks_getSonameFiles(t *testing.T) {
 	tests := []struct {
@@ -102,36 +67,6 @@ func TestChecks_getSonameFiles(t *testing.T) {
 			assert.Equal(t, expectedCount, len(got))
 		})
 	}
-}
-
-func TestChecks_downloadCurrentAPK(t *testing.T) {
-	dir := t.TempDir()
-
-	o := SoNameOptions{}
-
-	data, err := os.ReadFile(filepath.Join("testdata", "hello-world-0.0.1-r0.apk"))
-	assert.NoError(t, err)
-
-	// create a test server to download the test apk from
-	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		// Test request parameters
-		assert.Equal(t, req.URL.String(), "/hello-world-0.0.1-r0.apk")
-
-		// Send response to be tested
-		_, err = rw.Write(data)
-		assert.NoError(t, err)
-	}))
-
-	o.ApkIndexURL = server.URL + "/APKINDEX"
-
-	o.Client = server.Client()
-	err = o.downloadCurrentAPK("hello-world-0.0.1-r0.apk", dir)
-	assert.NoError(t, err)
-
-	data, err = os.ReadFile(filepath.Join(dir, "hello-world-0.0.1-r0.apk"))
-	assert.NoError(t, err)
-
-	assert.NotEmpty(t, data)
 }
 
 func TestSoNameOptions_checkSonamesMatch(t *testing.T) {

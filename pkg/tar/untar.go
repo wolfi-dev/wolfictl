@@ -46,6 +46,10 @@ func Untar(src io.Reader, dst string) error {
 			}
 		// Write out files
 		case tar.TypeReg:
+			// Ensure the parent directory exists
+			if err := os.MkdirAll(filepath.Dir(target), os.ModePerm); err != nil {
+				return err
+			}
 			fileToWrite, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				return err
@@ -72,8 +76,13 @@ func Untar(src io.Reader, dst string) error {
 
 // From https://github.com/securego/gosec/issues/324
 func sanitizeArchivePath(d, t string) (v string, err error) {
-	v = filepath.Join(d, t)
-	if strings.HasPrefix(v, filepath.Clean(d)) {
+	// Convert to forward slashes
+	cleanedTarget := filepath.FromSlash(t)
+
+	v = filepath.Join(d, cleanedTarget)
+	cleanedBase := filepath.Clean(d)
+
+	if strings.HasPrefix(v, cleanedBase) {
 		return v, nil
 	}
 

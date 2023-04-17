@@ -1,0 +1,17 @@
+<details>
+  <summary>Package test: Click to expand/collapse</summary>
+
+Package test:
+Added: test/test/wine.txt
+Modified: test/test/tester.txt
+Deleted: test/test/cheese.txt
+
+</details>
+
+<details>
+  <summary>Package test_sub: Click to expand/collapse</summary>
+
+Package test_sub:
+Unchanged
+
+</details>
