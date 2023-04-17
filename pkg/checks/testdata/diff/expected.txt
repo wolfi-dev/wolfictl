@@ -2,9 +2,9 @@
   <summary>Package test: Click to expand/collapse</summary>
 
 Package test:
-Added: test/test/wine.txt
-Modified: test/test/tester.txt
-Deleted: test/test/cheese.txt
+Added: /test/wine.txt
+Modified: /test/tester.txt
+Deleted: /test/cheese.txt
 
 </details>
 

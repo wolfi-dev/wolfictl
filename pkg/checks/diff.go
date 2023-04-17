@@ -79,7 +79,11 @@ func (o *DiffOptions) Diff() error {
 		// fetch current latest apk
 		p, ok := o.ExistingPackages[newPackageName]
 		if !ok {
-			return fmt.Errorf("no package %s in APKINDEX", newPackageName)
+			err = os.Mkdir(filepath.Join(dirExistingApk, newAPK.Name), os.ModePerm)
+			if err != nil {
+				return fmt.Errorf("failed to mkdir %s", filepath.Join(dirExistingApk, newAPK.Name))
+			}
+			continue
 		}
 
 		existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
@@ -89,7 +93,7 @@ func (o *DiffOptions) Diff() error {
 		}
 	}
 
-	rs, err := diffDirectories(dirNewApk, dirExistingApk, newPackages)
+	rs, err := diffDirectories(dirNewApk, dirExistingApk)
 	if err != nil {
 		return err
 	}
@@ -118,7 +122,7 @@ type diffResult struct {
 	deleted  []string
 }
 
-func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (diffResult, error) {
+func diffDirectories(dir1, dir2 string) (diffResult, error) {
 	result := diffResult{}
 
 	err := filepath.Walk(dir1, func(path1 string, info1 os.FileInfo, err error) error {
@@ -134,9 +138,7 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 		if err != nil {
 			return err
 		}
-		packageName := filepath.Base(filepath.Dir(path1))
-		newPackage := newPackages[packageName]
-		relPathWithPackage := filepath.Join(newPackage.Name, relPath)
+
 		path2 := filepath.Join(dir2, relPath)
 
 		if shouldSkipFile(path1) {
@@ -146,7 +148,7 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 		info2, err := os.Stat(path2)
 
 		if os.IsNotExist(err) {
-			result.added = append(result.added, relPathWithPackage)
+			result.added = append(result.added, relPath)
 		} else if !info2.IsDir() {
 			content1, err := readFileContents(path1)
 			if err != nil {
@@ -159,7 +161,7 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 			}
 
 			if content1 != content2 {
-				result.modified = append(result.modified, relPathWithPackage)
+				result.modified = append(result.modified, relPath)
 			}
 		}
 
@@ -182,8 +184,7 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 		if err != nil {
 			return err
 		}
-		packageName := filepath.Base(filepath.Dir(path2))
-		relPathWithPackage := filepath.Join(packageName, relPath)
+
 		path1 := filepath.Join(dir1, relPath)
 
 		if shouldSkipFile(path2) {
@@ -193,7 +194,7 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 		_, err = os.Stat(path1)
 
 		if os.IsNotExist(err) {
-			result.deleted = append(result.deleted, relPathWithPackage)
+			result.deleted = append(result.deleted, relPath)
 		}
 
 		return nil
@@ -226,19 +227,19 @@ func writeDiffLog(diff diffResult, filename string, newPackages map[string]NewAp
 		changes := []string{}
 		for _, added := range diff.added {
 			if strings.HasPrefix(added, packageName+"/") {
-				changes = append(changes, "Added: "+strings.TrimPrefix(added, packageName+"/"))
+				changes = append(changes, "Added: "+strings.TrimPrefix(added, packageName))
 			}
 		}
 
 		for _, modified := range diff.modified {
 			if strings.HasPrefix(modified, packageName+"/") {
-				changes = append(changes, "Modified: "+strings.TrimPrefix(modified, packageName+"/"))
+				changes = append(changes, "Modified: "+strings.TrimPrefix(modified, packageName))
 			}
 		}
 
 		for _, deleted := range diff.deleted {
 			if strings.HasPrefix(deleted, packageName+"/") {
-				changes = append(changes, "Deleted: "+strings.TrimPrefix(deleted, packageName+"/"))
+				changes = append(changes, "Deleted: "+strings.TrimPrefix(deleted, packageName))
 			}
 		}
 
