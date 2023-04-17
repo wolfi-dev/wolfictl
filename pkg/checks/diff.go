@@ -126,38 +126,40 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 			return err
 		}
 
-		if !info1.IsDir() {
-			relPath, err := filepath.Rel(dir1, path1)
+		if info1.IsDir() {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(dir1, path1)
+		if err != nil {
+			return err
+		}
+		packageName := filepath.Base(filepath.Dir(path1))
+		newPackage := newPackages[packageName]
+		relPathWithPackage := filepath.Join(newPackage.Name, relPath)
+		path2 := filepath.Join(dir2, relPath)
+
+		if shouldSkipFile(path1) {
+			return nil
+		}
+
+		info2, err := os.Stat(path2)
+
+		if os.IsNotExist(err) {
+			result.added = append(result.added, relPathWithPackage)
+		} else if !info2.IsDir() {
+			content1, err := readFileContents(path1)
 			if err != nil {
 				return err
 			}
-			packageName := filepath.Base(filepath.Dir(path1))
-			newPackage := newPackages[packageName]
-			relPathWithPackage := filepath.Join(newPackage.Name, relPath)
-			path2 := filepath.Join(dir2, relPath)
 
-			if shouldSkipFile(path1) {
-				return nil
+			content2, err := readFileContents(path2)
+			if err != nil {
+				return err
 			}
 
-			info2, err := os.Stat(path2)
-
-			if os.IsNotExist(err) {
-				result.added = append(result.added, relPathWithPackage)
-			} else if !info2.IsDir() {
-				content1, err := readFileContents(path1)
-				if err != nil {
-					return err
-				}
-
-				content2, err := readFileContents(path2)
-				if err != nil {
-					return err
-				}
-
-				if content1 != content2 {
-					result.modified = append(result.modified, relPathWithPackage)
-				}
+			if content1 != content2 {
+				result.modified = append(result.modified, relPathWithPackage)
 			}
 		}
 
@@ -173,24 +175,25 @@ func diffDirectories(dir1, dir2 string, newPackages map[string]NewApkPackage) (d
 			return err
 		}
 
-		if !info2.IsDir() {
-			relPath, err := filepath.Rel(dir2, path2)
-			if err != nil {
-				return err
-			}
-			packageName := filepath.Base(filepath.Dir(path2))
-			relPathWithPackage := filepath.Join(packageName, relPath)
-			path1 := filepath.Join(dir1, relPath)
+		if info2.IsDir() {
+			return nil
+		}
+		relPath, err := filepath.Rel(dir2, path2)
+		if err != nil {
+			return err
+		}
+		packageName := filepath.Base(filepath.Dir(path2))
+		relPathWithPackage := filepath.Join(packageName, relPath)
+		path1 := filepath.Join(dir1, relPath)
 
-			if shouldSkipFile(path2) {
-				return nil
-			}
+		if shouldSkipFile(path2) {
+			return nil
+		}
 
-			_, err = os.Stat(path1)
+		_, err = os.Stat(path1)
 
-			if os.IsNotExist(err) {
-				result.deleted = append(result.deleted, relPathWithPackage)
-			}
+		if os.IsNotExist(err) {
+			result.deleted = append(result.deleted, relPathWithPackage)
 		}
 
 		return nil

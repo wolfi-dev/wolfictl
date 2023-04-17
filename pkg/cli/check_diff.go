@@ -15,7 +15,7 @@ func Diff() *cobra.Command {
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
-		Short:             "Create a diff comparing proposed apk changes to the latest available in an APKINDEX",
+		Short:             "Create a diff comparing proposed apk changes following a melange build, to the latest available in an APKINDEX",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return o.Diff()
 		},
