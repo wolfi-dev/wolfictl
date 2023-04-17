@@ -54,8 +54,17 @@ func TestDiff(t *testing.T) {
 	actual, err := os.ReadFile(diffLogFile)
 	assert.NoError(t, err)
 
-	expected, err := os.ReadFile(filepath.Join(dir, "expected.txt"))
-	assert.NoError(t, err)
+	expectedPackage := `
+Package test:
+Added: /test/wine.txt
+Modified: /test/tester.txt
+Deleted: /test/cheese.txt
+`
 
-	assert.Contains(t, string(actual), string(expected))
+	expectedSubpackage := `
+Package test_sub:
+Unchanged
+`
+	assert.Contains(t, string(actual), expectedPackage)
+	assert.Contains(t, string(actual), expectedSubpackage)
 }
