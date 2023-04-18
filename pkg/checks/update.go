@@ -157,18 +157,21 @@ func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]upd
 		c, err := build.ParseConfiguration(filepath.Join(o.Dir, k+".yaml"))
 		if err != nil {
 			addCheckError(checkErrors, err)
+			continue
 		}
 		currentVersion, err := version.NewVersion(c.Package.Version)
 		if err != nil {
 			addCheckError(checkErrors, err)
+			continue
 		}
 
 		latestVersion, err := version.NewVersion(v.Version)
 		if err != nil {
 			addCheckError(checkErrors, err)
+			continue
 		}
 		if !currentVersion.Equal(latestVersion) {
-			addCheckError(checkErrors, fmt.Errorf("package %s: update found newer version %s compared with package.version in melange config", k, v.Version))
+			addCheckError(checkErrors, fmt.Errorf("package %s: update found newer version %s compared with package.version %s in melange config", k, v.Version, c.Package.Version))
 		}
 	}
 }
