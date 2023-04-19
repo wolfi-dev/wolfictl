@@ -74,6 +74,11 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 // validates update configuration
 func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 	for _, file := range files {
+		// skip hidden files
+		if strings.HasPrefix(file, ".") {
+			continue
+		}
+
 		// first need to read raw bytes as unmarshalling a struct without a pointer means update will never be nil
 		if !strings.HasSuffix(file, ".yaml") {
 			file += ".yaml"
