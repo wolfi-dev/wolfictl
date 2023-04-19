@@ -202,7 +202,7 @@ func (i *Index) process(path string) (*entry, error) {
 		return nil, fmt.Errorf("unable to decode YAML at %q: %w", path, err)
 	}
 
-	cfg, err := build.ParseConfiguration(path)
+	cfg, err := build.ParseConfiguration(path, build.WithFS(i.fsys))
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse configuration at %q: %w", path, err)
 	}
