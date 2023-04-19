@@ -43,6 +43,10 @@ func NewIndex(fsys rwfs.FS) (*Index, error) {
 			return nil
 		}
 
+		if strings.HasPrefix(d.Name(), ".") {
+			return nil
+		}
+
 		if !strings.HasSuffix(d.Name(), ".yaml") {
 			return nil
 		}
