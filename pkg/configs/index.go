@@ -35,7 +35,7 @@ func NewIndex(fsys rwfs.FS) (*Index, error) {
 			return err
 		}
 
-		if d.Type().IsDir() && path != "." && strings.HasPrefix(d.Name(), ".") {
+		if d.Type().IsDir() && path != "." {
 			return fs.SkipDir
 		}
 

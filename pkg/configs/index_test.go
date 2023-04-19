@@ -9,13 +9,20 @@ import (
 )
 
 func TestNewIndex(t *testing.T) {
-	t.Run("skips configs in subdirectories", func(t *testing.T) {
-		fsys := rwos.DirFS("testdata/index-1")
+	fsys := rwos.DirFS("testdata/index-1")
 
-		index, err := NewIndex(fsys)
-		require.NoError(t, err)
+	index, err := NewIndex(fsys)
+	require.NoError(t, err)
 
+	t.Run("includes real configs", func(t *testing.T) {
 		assert.Contains(t, index.paths, "config-1.yaml")
+	})
+
+	t.Run("skips configs in subdirectories", func(t *testing.T) {
 		assert.NotContains(t, index.paths, "subdir/not-a-config.yaml")
+	})
+
+	t.Run("skips hidden files", func(t *testing.T) {
+		assert.NotContains(t, index.paths, ".not-a-config.yaml")
 	})
 }
