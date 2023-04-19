@@ -15,7 +15,7 @@ Proposes melange package update(s) via a pull request
 ### Options
 
 ```
-      --data-mapper-url string            URL to use for mapping packages to source update service (default "https://raw.githubusercontent.com/wolfi-dev/wolfi-update-mapper/main/DATA.md")
+      --create-issues                     creates GitHub Issues for failed package updates (default true)
       --dry-run                           prints proposed package updates rather than creating a pull request
       --github-release-query              query the GitHub graphql API for latest releases (default true)
   -h, --help                              help for update

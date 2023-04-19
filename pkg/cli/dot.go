@@ -6,17 +6,26 @@ import (
 	"os"
 
 	"github.com/dominikbraun/graph"
-	"github.com/goccy/go-graphviz"
 	"github.com/spf13/cobra"
+	"github.com/tmc/dot"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
 )
 
 func cmdSVG() *cobra.Command {
-	var dir, out string
+	var dir string
 	var showDependents bool
-	svg := &cobra.Command{
-		Use:   "svg",
-		Short: "Generate a graphviz SVG",
+	d := &cobra.Command{
+		Use:   "dot",
+		Short: "Generate graphviz .dot output",
+		Long: `
+Generate .dot output and pipe it to dot to generate an SVG
+
+  wolfictl dot | dot -Tsvg > graph.svg
+
+Generate .dot output and pipe it to dot to generate a PNG
+
+  wolfictl dot | dot -Tpng > graph.png
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g, err := dag.NewGraph(os.DirFS(dir), dir)
 			if err != nil {
@@ -55,13 +64,12 @@ func cmdSVG() *cobra.Command {
 			}
 
 			summarize(*g)
-			return viz(*g, out)
+			return viz(*g)
 		},
 	}
-	svg.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
-	svg.Flags().StringVarP(&out, "out", "o", "dag.svg", "output file")
-	svg.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
-	return svg
+	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
+	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
+	return d
 }
 
 func summarize(g dag.Graph) {
@@ -69,38 +77,23 @@ func summarize(g dag.Graph) {
 	log.Println("edges:", g.Graph.Size())
 }
 
-func viz(g dag.Graph, out string) (err error) {
-	v := graphviz.New()
-	gr, err := v.Graph()
-	if err != nil {
-		log.Fatalf("graphviz: %v", err)
-	}
-	defer func() {
-		if cerr := gr.Close(); err != nil {
-			err = cerr
-		}
-		v.Close()
-	}()
+func viz(g dag.Graph) error {
+	out := dot.NewGraph("images")
+	out.SetType(dot.DIGRAPH)
 
 	nodes := g.Nodes()
 
 	for _, node := range nodes {
-		n, err := gr.CreateNode(node)
-		if err != nil {
-			return fmt.Errorf("graphviz: %w", err)
-		}
+		n := dot.NewNode(node)
+		out.AddNode(n)
 
 		for _, dependency := range g.DependenciesOf(node) {
-			depNode, err := gr.CreateNode(dependency)
-			if err != nil {
-				return fmt.Errorf("graphviz: %w", err)
-			}
-
-			if _, err := gr.CreateEdge("e", n, depNode); err != nil {
-				return fmt.Errorf("graphviz: %w", err)
-			}
+			d := dot.NewNode(dependency)
+			out.AddNode(d)
+			out.AddEdge(dot.NewEdge(n, d))
 		}
 	}
 
-	return v.RenderFilename(gr, graphviz.SVG, out)
+	fmt.Println(out.String())
+	return nil
 }

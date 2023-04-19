@@ -19,7 +19,7 @@ Print a sorted list of downstream dependent packages
   -d, --dir string        directory to search for melange configs (default ".")
   -h, --help              help for text
   -D, --show-dependents   show packages that depend on these packages, instead of these packages' dependencies
-  -t, --type string       What type of text to emit (default "target")
+  -t, --type string       What type of text to emit; values can be one of: [target makefile name version name-version] (default "target")
 ```
 
 ### SEE ALSO

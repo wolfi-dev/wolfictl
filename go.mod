@@ -4,9 +4,6 @@ go 1.20
 
 replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230208145941-f16d44faeed4
 
-// Forked to only support SVG, remove deps that had liceses issues.
-replace github.com/goccy/go-graphviz => github.com/n3wscott/go-graphviz v0.0.10-0.20211216184452-fd4faf331d28
-
 replace k8s.io/client-go => k8s.io/client-go v0.25.3
 
 // Required after upgrading to latest melange, matches https://github.com/mattmoor/mink/blob/b9148a39b2d8bbc69ca9aaf5e89a7613c0b179d8/go.mod#LL90C18-L90C52
@@ -27,7 +24,6 @@ require (
 	github.com/go-git/go-billy/v5 v5.4.1
 	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.6.1
-	github.com/goccy/go-graphviz v0.0.9
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-containerregistry v0.14.0
 	github.com/google/go-github/v50 v50.2.0
@@ -45,6 +41,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
+	github.com/tmc/dot v0.0.0-20210901225022-f9bc17da75c0
 	gitlab.alpinelinux.org/alpine/go v0.6.0
 	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
 	golang.org/x/oauth2 v0.6.0
@@ -265,7 +262,6 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/build v0.0.0-20221229213058-1f2478aa0ea8 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
-	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect

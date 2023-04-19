@@ -24,4 +24,5 @@ Lint the code
 ### SEE ALSO
 
 * [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi
+* [wolfictl lint yam](wolfictl_lint_yam.md)	 - 
 
