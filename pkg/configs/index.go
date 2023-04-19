@@ -35,11 +35,15 @@ func NewIndex(fsys rwfs.FS) (*Index, error) {
 			return err
 		}
 
-		if d.Type().IsDir() && path != "." && strings.HasPrefix(d.Name(), ".") {
+		if d.Type().IsDir() && path != "." {
 			return fs.SkipDir
 		}
 
 		if !d.Type().IsRegular() {
+			return nil
+		}
+
+		if strings.HasPrefix(d.Name(), ".") {
 			return nil
 		}
 
@@ -202,7 +206,7 @@ func (i *Index) process(path string) (*entry, error) {
 		return nil, fmt.Errorf("unable to decode YAML at %q: %w", path, err)
 	}
 
-	cfg, err := build.ParseConfiguration(path)
+	cfg, err := build.ParseConfiguration(path, build.WithFS(i.fsys))
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse configuration at %q: %w", path, err)
 	}
