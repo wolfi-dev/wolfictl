@@ -175,7 +175,7 @@ func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]upd
 			addCheckError(checkErrors, err)
 			continue
 		}
-		if !currentVersion.Equal(latestVersion) {
+		if currentVersion.LessThan(latestVersion) {
 			addCheckError(checkErrors, fmt.Errorf("package %s: update found newer version %s compared with package.version %s in melange config", k, v.Version, c.Package.Version))
 		}
 	}
