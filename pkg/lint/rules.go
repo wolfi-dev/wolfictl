@@ -3,8 +3,14 @@ package lint
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
+
+	"chainguard.dev/melange/pkg/renovate"
+
+	"github.com/dprotaso/go-yit"
+	"gopkg.in/yaml.v3"
 
 	"golang.org/x/exp/slices"
 
@@ -91,6 +97,53 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						return fmt.Errorf("license is missing")
 					}
 				}
+				return nil
+			},
+		},
+		{
+			Name:        "contains-epoch",
+			Description: "every package should have an epoch",
+			Severity:    SeverityError,
+			LintFunc: func(_ build.Configuration) error {
+				var node yaml.Node
+				fileInfo, err := os.Stat(l.options.Path)
+				if err != nil {
+					return err
+				}
+
+				// only lint files
+				if fileInfo.IsDir() {
+					return nil
+				}
+
+				yamlData, err := os.ReadFile(l.options.Path)
+				if err != nil {
+					return err
+				}
+
+				err = yaml.Unmarshal(yamlData, &node)
+				if err != nil {
+					return err
+				}
+
+				if node.Content == nil {
+					return fmt.Errorf("config %s has no yaml content", l.options.Path)
+				}
+
+				pkg, err := renovate.NodeFromMapping(node.Content[0], "package")
+				if err != nil {
+					return err
+				}
+
+				if pkg == nil {
+					return fmt.Errorf("config %s has no package content", l.options.Path)
+				}
+
+				err = containsKey(pkg, "epoch")
+				if err != nil {
+					return fmt.Errorf("config %s has no package.epoch", l.options.Path)
+				}
+
 				return nil
 			},
 		},
@@ -240,4 +293,15 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			},
 		},
 	}
+}
+
+func containsKey(parentNode *yaml.Node, key string) error {
+	it := yit.FromNode(parentNode).
+		ValuesForMap(yit.WithValue(key), yit.All)
+
+	if _, ok := it(); ok {
+		return nil
+	}
+
+	return fmt.Errorf("key '%s' not found in mapping", key)
 }

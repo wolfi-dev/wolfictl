@@ -1,0 +1,9 @@
+package:
+  name: no-epoch
+  version: 1.2.3
+  description: "a package that fails as no epoch"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
