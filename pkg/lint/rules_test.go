@@ -206,6 +206,22 @@ func TestLinter_Rules(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			file: "no-epoch.yaml",
+			want: EvalResult{
+				File: "no-epoch",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "contains-epoch",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[contains-epoch]: config testdata/files/no-epoch.yaml has no package.epoch (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
