@@ -153,13 +153,14 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		s := reg.FindString(filepath.Base(path))
+		basePath := filepath.Base(path)
+		s := reg.FindString(basePath)
 		if s != "" {
-			fileList = append(fileList, path)
+			fileList = append(fileList, basePath)
 		}
 
 		// also check for DT_SONAME
-		ef, err := elf.Open(filepath.Join(dir, path))
+		ef, err := elf.Open(filepath.Join(dir, basePath))
 		if err != nil {
 			return nil
 		}
