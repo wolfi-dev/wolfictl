@@ -138,3 +138,23 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 		})
 	}
 }
+
+func TestSoNameOptions_checkSonamesSubFolders(t *testing.T) {
+	o := SoNameOptions{}
+	dir := t.TempDir()
+	subDir := filepath.Join(dir, "foo")
+	err := os.Mkdir(subDir, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.WriteFile(filepath.Join(subDir, "bar.so.1.2.3"), []byte("test"), os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := o.getSonameFiles(dir)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "bar.so.1.2.3", got[0])
+}
