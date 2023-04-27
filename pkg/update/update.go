@@ -66,6 +66,7 @@ const (
   <img src="https://raw.githubusercontent.com/wolfi-dev/.github/b535a42419ce0edb3c144c0edcff55a62b8ec1f8/profile/wolfi-logo-light-mode.svg" />
 </p>
 `
+	updateLabel = "request-version-update"
 )
 
 // New initialise including a map of existing wolfios packages
@@ -476,10 +477,12 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	// create the pull request
-	prLink, err := gitOpts.OpenPullRequest(newPR)
+	pr, err := gitOpts.OpenPullRequest(newPR)
+	prLink := pr.GetHTMLURL()
 	if err != nil {
 		return "", fmt.Errorf("failed to create pull request: %w", err)
 	}
+	err = gitOpts.LabelIssue(context.Background(), newPR.Owner, newPR.RepoName, *pr.Number, &[]string{updateLabel})
 
 	if newVersion.ReplaceExistingPRNumber != 0 {
 		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)
@@ -589,6 +592,7 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 		RepoName:    gitURL.Name,
 		PackageName: packageName,
 		Title:       gh.GetUpdateIssueTitle(packageName, version.Version),
+		Labels:      []string{updateLabel},
 	}
 	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
 	if err != nil {

@@ -14,6 +14,7 @@ type Issues struct {
 	PackageName string
 	Comment     string
 	Title       string
+	Labels      []string
 }
 
 func (o GitOptions) ListIssues(ctx context.Context, owner, repo, state string) ([]*github.Issue, error) {
@@ -82,8 +83,9 @@ func (o GitOptions) HasExistingComment(ctx context.Context, r *Issues, issueNumb
 
 func (o GitOptions) OpenIssue(ctx context.Context, r *Issues) (string, error) {
 	newIssue := &github.IssueRequest{
-		Title: github.String(r.Title),
-		Body:  github.String(r.Comment),
+		Title:  github.String(r.Title),
+		Body:   github.String(r.Comment),
+		Labels: &r.Labels,
 	}
 
 	var issue *github.Issue
@@ -112,6 +114,17 @@ func (o GitOptions) CommentIssue(ctx context.Context, owner, repo, comment strin
 	})
 
 	return issue.GetHTMLURL(), err
+}
+
+func (o GitOptions) LabelIssue(ctx context.Context, owner string, repo string, number int, labels *[]string) error {
+	ir := &github.IssueRequest{
+		Labels: labels,
+	}
+	err := o.handleRateLimit(func() (*github.Response, error) {
+		_, resp, err := o.GithubClient.Issues.Edit(ctx, owner, repo, number, ir)
+		return resp, err
+	})
+	return err
 }
 
 func (o GitOptions) AddReactionIssue(ctx context.Context, i *Issues, number int, reaction string) error {

@@ -21,7 +21,7 @@ type GetPullRequest struct {
 }
 
 // OpenPullRequest opens a pull request on GitHub
-func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (string, error) {
+func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (*github.PullRequest, error) {
 	// Configure pull request options that the GitHub client accepts when making calls to open new pull requests
 	newPR := &github.NewPullRequest{
 		Title: github.String(pr.Title),
@@ -38,10 +38,10 @@ func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (string, error) {
 	})
 
 	if err != nil {
-		return "", errors.Wrapf(err, "failed opening pull request")
+		return nil, errors.Wrapf(err, "failed opening pull request")
 	}
 
-	return githubPR.GetHTMLURL(), nil
+	return githubPR, nil
 }
 
 // ListPullRequests returns a list of pull requests for a given state using pagination
