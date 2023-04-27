@@ -598,6 +598,10 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		v = strings.TrimPrefix(v, ghm.StripPrefix)
 	}
 
+	if ghm.StripSuffix != "" {
+		v = strings.TrimSuffix(v, ghm.StripSuffix)
+	}
+
 	if c.Update.VersionSeparator != "" {
 		v = strings.ReplaceAll(v, c.Update.VersionSeparator, ".")
 	}
