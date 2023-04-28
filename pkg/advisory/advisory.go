@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sort"
@@ -9,8 +10,12 @@ import (
 	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/pkg/errors"
+	"github.com/samber/lo"
+	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 type CreateOptions struct {
@@ -129,26 +134,44 @@ func Latest(entries []build.AdvisoryContent) *build.AdvisoryContent {
 }
 
 type DiscoverOptions struct {
-	// The Index of package configs on which to operate.
-	Index *configs.Index
+	// The Configs (for packages) on which to operate.
+	Configs *configs.Index
 
-	// VulnerabilitySearcher is how Discover searches for vulnerabilities to match to
-	// packages.
-	VulnerabilitySearcher vuln.Searcher
+	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").
+	PackageRepositoryURL string
+
+	// The Arches to select during discovery (e.g. "x86_64").
+	Arches []string
+
+	// VulnerabilityDetector is how Discover finds for vulnerabilities for packages.
+	VulnerabilityDetector vuln.Detector
 }
 
 // Discover searches for new vulnerabilities that match packages in a config
 // index, and adds new advisories to configs for vulnerabilities that haven't
 // been noted yet.
-func Discover(options DiscoverOptions) error {
-	matches, err := options.VulnerabilitySearcher.AllVulnerabilities()
-	if err != nil {
-		return fmt.Errorf("unable to discover advisories: %w", err)
+func Discover(opts DiscoverOptions) error {
+	ctx := context.Background()
+
+	var apkindexes []*repository.ApkIndex
+	for _, arch := range opts.Arches {
+		apkindex, err := index.Index(arch, opts.PackageRepositoryURL)
+		if err != nil {
+			return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
+		}
+		apkindexes = append(apkindexes, apkindex)
 	}
 
-	err = options.Index.Select().UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
-		matchesForPackage := matches[cfg.Package.Name]
-		if len(matchesForPackage) == 0 {
+	packagesToLookup := determinePackagesToLookup(apkindexes, opts.Configs)
+
+	vulnMatches, err := opts.VulnerabilityDetector.VulnerabilitiesForPackages(ctx, packagesToLookup...)
+	if err != nil {
+		return err
+	}
+
+	err = opts.Configs.Select().UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+		matchesForPackage := vulnMatches[cfg.Package.Name]
+		if len(vulnMatches) == 0 {
 			// nothing to update for this package
 			return build.Advisories{}, configs.ErrSkip
 		}
@@ -168,13 +191,13 @@ func Discover(options DiscoverOptions) error {
 
 			if exists {
 				// TODO: Should we allow for updating existing advisories if previously read vuln
-				// data has been updated?
+				//  data has been updated?
 
 				continue
 			}
 
 			anyNewMatches = true
-			log.Printf("found new potential vulnerability for package %q: %s", cfg.Package.Name, vulnID)
+			log.Printf("🐛 new potential vulnerability for package %q: %s", cfg.Package.Name, hyperlinkCVE(vulnID))
 
 			ts := time.Now()
 			ac := build.AdvisoryContent{
@@ -196,4 +219,53 @@ func Discover(options DiscoverOptions) error {
 	}
 
 	return nil
+}
+
+func determinePackagesToLookup(apkindexes []*repository.ApkIndex, cfgs *configs.Index) []string {
+	packagesFound := make(map[string]struct{})
+
+	for _, apkindex := range apkindexes {
+		if apkindex == nil {
+			continue
+		}
+
+		for _, pkg := range apkindex.Packages {
+			if pkg.Origin == "" {
+				// This case was caused by a bug in Melange early on, that has since been
+				// resolved.
+				continue
+			}
+			name := pkg.Origin
+
+			// skip package if it hasn't been included among the given package configs
+			isInConfigsIndex := cfgs.Select().WherePackageName(name).Len() != 0
+			if !isInConfigsIndex {
+				continue
+			}
+
+			// skip redundant recording of package name
+			if _, ok := packagesFound[name]; ok {
+				continue
+			}
+
+			packagesFound[name] = struct{}{}
+		}
+	}
+
+	log.Printf("🔎 discovered %d package(s) to search for in NVD", len(packagesFound))
+
+	packagesToLookup := lo.Keys(packagesFound)
+	sort.Strings(packagesToLookup)
+
+	return packagesToLookup
+}
+
+var termSupportsHyperlinks = termlink.SupportsHyperlinks()
+
+func hyperlinkCVE(id string) string {
+	if !termSupportsHyperlinks {
+		return id
+	}
+
+	return termlink.Link(id, fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", id))
 }

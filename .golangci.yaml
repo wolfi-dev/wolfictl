@@ -45,7 +45,7 @@ linters:
     #- misspell
     - nakedret
     - nolintlint
-    - prealloc
+    # - prealloc is disabled because it is terrible. Following this rule doesn't necessarily improve the readability or performance of the code, and it can encourage wasteful allocations depending on the circumstance.
     - predeclared
     - promlinter
     - revive
