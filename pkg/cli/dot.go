@@ -73,8 +73,19 @@ Generate .dot output and pipe it to dot to generate a PNG
 }
 
 func summarize(g dag.Graph) {
-	log.Println("nodes:", g.Graph.Order())
-	log.Println("edges:", g.Graph.Size())
+	order, err := g.Graph.Order()
+	if err != nil {
+		log.Printf("unable to get number of nodes in graph: %s", err)
+		return
+	}
+	log.Println("nodes:", order)
+
+	size, err := g.Graph.Size()
+	if err != nil {
+		log.Printf("unable to get number of edges in graph: %s", err)
+		return
+	}
+	log.Println("edges:", size)
 }
 
 func viz(g dag.Graph) error {
