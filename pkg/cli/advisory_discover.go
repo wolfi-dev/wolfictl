@@ -36,7 +36,7 @@ func AdvisoryDiscover() *cobra.Command {
 			err = advisory.Discover(advisory.DiscoverOptions{
 				Configs:               index,
 				PackageRepositoryURL:  p.packageRepositoryURL,
-				Arch:                  "x86_64",
+				Arches:                []string{"x86_64", "aarch64"},
 				VulnerabilityDetector: nvdapi.NewDetector(http.DefaultClient, nvdapi.DefaultHost, apiKey),
 			})
 			if err != nil {

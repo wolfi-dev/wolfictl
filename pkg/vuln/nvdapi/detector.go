@@ -1,4 +1,3 @@
-//nolint:prealloc // This rule is terrible
 package nvdapi
 
 import (
@@ -166,6 +165,10 @@ func determineVulnMatch(cve *Cve, packageName, requestCPE string) (*vuln.Match, 
 			}
 
 			for _, cpeMatch := range node.CpeMatch {
+				if !cpeMatch.Vulnerable {
+					continue
+				}
+
 				doCPEsMatch, err := cpeStringsMatch(requestCPE, cpeMatch.Criteria)
 				if err != nil {
 					return nil, err
@@ -174,14 +177,12 @@ func determineVulnMatch(cve *Cve, packageName, requestCPE string) (*vuln.Match, 
 					continue
 				}
 
-				if !cpeMatch.Vulnerable {
-					continue
-				}
-
-				// TODO: Should we discard CpeMatches with no version data whatsoever?
-
 				vr, err := convertCpeMatchToVersionRange(cpeMatch)
 				if err != nil {
+					if errors.Is(err, errNoVersionData) {
+						// skip — but we can reevaluate this decision in the future
+						continue
+					}
 					return nil, err
 				}
 
@@ -287,6 +288,8 @@ func (s *Detector) doSearch(ctx context.Context, cpe string) ([]Cve, error) {
 	return cves, nil
 }
 
+var errNoVersionData = errors.New("CPE has no version data available")
+
 //nolint:gocritic // hugeParam
 func convertCpeMatchToVersionRange(m CpeMatch) (vuln.VersionRange, error) {
 	rawCPE := m.Criteria
@@ -296,6 +299,8 @@ func convertCpeMatchToVersionRange(m CpeMatch) (vuln.VersionRange, error) {
 	}
 
 	if cpe.Version != wfn.Any {
+		// The CPE URI itself specifies one specific version.
+
 		return vuln.VersionRange{
 			SingleVersion: cpe.Version,
 		}, nil
@@ -314,6 +319,11 @@ func convertCpeMatchToVersionRange(m CpeMatch) (vuln.VersionRange, error) {
 	} else if v := m.VersionEndExcluding; v != "" {
 		vr.VersionRangeUpperInclusive = false
 		vr.VersionRangeUpper = v
+	}
+
+	if vr.VersionRangeLower == "" && vr.VersionRangeUpper == "" {
+		// No version data available! We'll consider this to be junk for now.
+		return vuln.VersionRange{}, errNoVersionData
 	}
 
 	return vr, nil

@@ -140,8 +140,8 @@ type DiscoverOptions struct {
 	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").
 	PackageRepositoryURL string
 
-	// The Arch to select during discovery (e.g. "x86_64").
-	Arch string
+	// The Arches to select during discovery (e.g. "x86_64").
+	Arches []string
 
 	// VulnerabilityDetector is how Discover finds for vulnerabilities for packages.
 	VulnerabilityDetector vuln.Detector
@@ -153,12 +153,16 @@ type DiscoverOptions struct {
 func Discover(opts DiscoverOptions) error {
 	ctx := context.Background()
 
-	apkindex, err := index.Index(opts.Arch, opts.PackageRepositoryURL)
-	if err != nil {
-		return fmt.Errorf("unable to get APKINDEX: %w", err)
+	var apkindexes []*repository.ApkIndex
+	for _, arch := range opts.Arches {
+		apkindex, err := index.Index(arch, opts.PackageRepositoryURL)
+		if err != nil {
+			return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
+		}
+		apkindexes = append(apkindexes, apkindex)
 	}
 
-	packagesToLookup := determinePackagesToLookup(apkindex, opts.Configs)
+	packagesToLookup := determinePackagesToLookup(apkindexes, opts.Configs)
 
 	vulnMatches, err := opts.VulnerabilityDetector.VulnerabilitiesForPackages(ctx, packagesToLookup...)
 	if err != nil {
@@ -217,27 +221,35 @@ func Discover(opts DiscoverOptions) error {
 	return nil
 }
 
-func determinePackagesToLookup(apkindex *repository.ApkIndex, cfgs *configs.Index) []string {
+func determinePackagesToLookup(apkindexes []*repository.ApkIndex, cfgs *configs.Index) []string {
 	packagesFound := make(map[string]struct{})
-	for _, pkg := range apkindex.Packages {
-		if pkg.Origin == "" {
-			// TODO: find out why this case exists in the real APKINDEX
-			continue
-		}
-		name := pkg.Origin
 
-		// skip package if it hasn't been included among the given package configs
-		isInConfigsIndex := cfgs.Select().WherePackageName(name).Len() != 0
-		if !isInConfigsIndex {
+	for _, apkindex := range apkindexes {
+		if apkindex == nil {
 			continue
 		}
 
-		// skip redundant recording of package name
-		if _, ok := packagesFound[name]; ok {
-			continue
-		}
+		for _, pkg := range apkindex.Packages {
+			if pkg.Origin == "" {
+				// This case was caused by a bug in Melange early on, that has since been
+				// resolved.
+				continue
+			}
+			name := pkg.Origin
 
-		packagesFound[name] = struct{}{}
+			// skip package if it hasn't been included among the given package configs
+			isInConfigsIndex := cfgs.Select().WherePackageName(name).Len() != 0
+			if !isInConfigsIndex {
+				continue
+			}
+
+			// skip redundant recording of package name
+			if _, ok := packagesFound[name]; ok {
+				continue
+			}
+
+			packagesFound[name] = struct{}{}
+		}
 	}
 
 	log.Printf("🔎 discovered %d package(s) to search for in NVD", len(packagesFound))
