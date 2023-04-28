@@ -589,7 +589,7 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 
 	// the github graphql query filter matches any occurrence, we want to make that more strict and remove any tags that do not START with the filter
 	if ghm.TagFilter != "" {
-		if !strings.HasPrefix(v, ghm.StripPrefix) {
+		if !strings.HasPrefix(v, ghm.TagFilter) {
 			return "", nil
 		}
 	}
@@ -600,6 +600,20 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 
 	if ghm.StripSuffix != "" {
 		v = strings.TrimSuffix(v, ghm.StripSuffix)
+	}
+
+	// ignore versions that match a regex pattern in the melange update config
+	if len(c.Update.IgnoreRegexPatterns) > 0 {
+		for _, pattern := range c.Update.IgnoreRegexPatterns {
+			regex, err := regexp.Compile(pattern)
+			if err != nil {
+				return "", errors.Wrapf(err, "failed to compile regex %s", pattern)
+			}
+
+			if regex.MatchString(v) {
+				return "", nil
+			}
+		}
 	}
 
 	if c.Update.VersionSeparator != "" {

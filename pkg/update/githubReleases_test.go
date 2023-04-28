@@ -145,7 +145,7 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 					Enabled: true,
 					GitHubMonitor: &build.GitHubMonitor{
 						Identifier:  "openjdk/jdk11u",
-						TagFilter:   "jdk-17",
+						TagFilter:   "jdk-11",
 						StripPrefix: "jdk-",
 					},
 				},
@@ -252,6 +252,79 @@ func Test_getCommit(t *testing.T) {
 				return
 			}
 			assert.Equalf(t, tt.want, got, "getCommit(%v)", tt.commitURLStr)
+		})
+	}
+}
+
+func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
+	tests := []struct {
+		name          string
+		melangeConfig build.Configuration
+		version       string
+		want          string
+		wantErr       assert.ErrorAssertionFunc
+	}{
+		{name: "regex", melangeConfig: build.Configuration{
+			Update: build.Update{
+				IgnoreRegexPatterns: []string{"dec*"},
+				GitHubMonitor:       &build.GitHubMonitor{},
+			},
+		}, version: "1.2.3dec11", want: "", wantErr: assert.NoError},
+		{name: "regex_error", melangeConfig: build.Configuration{
+			Update: build.Update{
+				IgnoreRegexPatterns: []string{"ab(c"},
+				GitHubMonitor:       &build.GitHubMonitor{},
+			},
+		}, version: "1.2.3dec11", want: "", wantErr: assert.Error},
+		{name: "strip_prefix", melangeConfig: build.Configuration{
+			Update: build.Update{
+				GitHubMonitor: &build.GitHubMonitor{
+					StripPrefix: "v",
+				},
+			},
+		}, version: "v1.2.3", want: "1.2.3", wantErr: assert.NoError},
+		{name: "strip_suffix", melangeConfig: build.Configuration{
+			Update: build.Update{
+				GitHubMonitor: &build.GitHubMonitor{
+					StripSuffix: "blah",
+				},
+			},
+		}, version: "1.2.3blah", want: "1.2.3", wantErr: assert.NoError},
+		{name: "tag-filter", melangeConfig: build.Configuration{
+			Update: build.Update{
+				GitHubMonitor: &build.GitHubMonitor{
+					TagFilter: "v",
+				},
+			},
+		}, version: "1.2.3", want: "", wantErr: assert.NoError},
+		{name: "tag-filter", melangeConfig: build.Configuration{
+			Update: build.Update{
+				GitHubMonitor: &build.GitHubMonitor{
+					TagFilter: "v",
+				},
+			},
+		}, version: "v1.2.3", want: "v1.2.3", wantErr: assert.NoError},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := GitHubReleaseOptions{}
+
+			packageConfigs := make(map[string]*melange.Packages)
+			configsByHash := make(map[string]build.Configuration)
+
+			packageConfigs["foo"] = &melange.Packages{Config: tt.melangeConfig}
+			packageConfigs["foo"].Hash = "bar"
+
+			configsByHash["bar"] = tt.melangeConfig
+
+			o.PackageConfigs = packageConfigs
+			o.ConfigsByHash = configsByHash
+
+			got, err := o.prepareVersion("bar", tt.version, "cheese/crisps")
+			if !tt.wantErr(t, err, fmt.Sprintf("prepareVersion %s", tt.version)) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "prepareVersion %s", tt.version)
 		})
 	}
 }

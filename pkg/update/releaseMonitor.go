@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
@@ -72,6 +73,21 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 				p.Config.Package.Name, rm.Identifier,
 			)
 			continue
+		}
+
+		// ignore versions that match a regex pattern in the melange update config
+		if len(p.Config.Update.IgnoreRegexPatterns) > 0 {
+			for _, pattern := range p.Config.Update.IgnoreRegexPatterns {
+				regex, err := regexp.Compile(pattern)
+				if err != nil {
+					errorMessages[p.Config.Package.Name] = fmt.Sprintf("failed to compile regex %s", pattern)
+					continue
+				}
+
+				if regex.MatchString(latestVersion) {
+					continue
+				}
+			}
 		}
 
 		// replace any nonstandard version separators
