@@ -277,10 +277,8 @@ func (s *Detector) doSearch(ctx context.Context, cpe string) ([]Cve, error) {
 
 	defer resp.Body.Close()
 
-	dec := json.NewDecoder(resp.Body)
 	var cvesResponse CVEsResponse
-	err = dec.Decode(&cvesResponse)
-	if err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&cvesResponse); err != nil {
 		return nil, fmt.Errorf("unable to decode JSON response to URL %q: %w", reqURL, err)
 	}
 
