@@ -2,7 +2,7 @@ module github.com/wolfi-dev/wolfictl
 
 go 1.20
 
-replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230208145941-f16d44faeed4
+replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230428222852-3db8d023b49b
 
 replace k8s.io/client-go => k8s.io/client-go v0.25.3
 
