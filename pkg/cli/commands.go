@@ -28,6 +28,7 @@ func New() *cobra.Command {
 		Lint(),
 		Update(),
 		VEX(),
+		Schema(),
 		version.Version(),
 	)
 
