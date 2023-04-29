@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
+	"github.com/facebookincubator/nvdtools/wfn"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
@@ -86,6 +87,24 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 		match := matches[i]
 		if !match.CPE.VersionRange.Includes(buildCfg.Package.Version) {
 			continue
+		}
+
+		// TODO: create a Detection Event
+
+		cpe, err := wfn.Parse(match.CPE.URI)
+		if err != nil {
+			return fmt.Errorf("unable to parse CPE URI %q: %w", match.CPE.URI, err)
+		}
+
+		e := DetectionEvent{
+			Timestamp: time.Now(),
+			Detector:  NVDAPIDetector,
+			Subject: Subject{
+				CPE: *cpe,
+			},
+			VulnerabilityIDs: []string{match.Vulnerability.ID},
+			PackageVersions:  nil,
+			Severity:         SeverityUnknown,
 		}
 
 		advCfgEntries := opts.AdvisoryCfgs.Select().WhereName(pkg)
