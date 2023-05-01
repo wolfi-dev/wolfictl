@@ -1,7 +1,7 @@
 chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e h1:cYFDdpVnm2PcH7sxsHn/l+BRiJj0BK7Nmtj9xz4t5dw=
 chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e/go.mod h1:avKgL6ETv4Gz5HbDSMvShwACob60CSaf82vMsRdOKds=
-chainguard.dev/melange v0.3.1-0.20230428103606-b89afc01abcc h1:4L0/TCI3eB+GIR6+3pzQs2USE3uI3f+EiZyQdSSP+3k=
-chainguard.dev/melange v0.3.1-0.20230428103606-b89afc01abcc/go.mod h1:j9fx45PKXXkKNkdb3O5jUYL0RE9q2WNG7jn7CqMgNzc=
+chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030 h1:IDZKIDHB7oaRpV9giI7ohYI6cwklFVVB/xZo9PuZN5U=
+chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030/go.mod h1:ZCyCY+6roktOmi3RjD7Ub+FpKQbg4s/XPZKxZpMclbI=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=
@@ -253,6 +253,8 @@ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghf
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
+github.com/chainguard-dev/go-apk v0.0.0-20230501082831-d4a4a3b48750 h1:l0s4EA2eGjn1VFK4k7yxZywPCr7yGXkRtxS3jwMWlO4=
+github.com/chainguard-dev/go-apk v0.0.0-20230501082831-d4a4a3b48750/go.mod h1:AAWHP+cZSBRe1AjQbfio64C66XxlOXAS08orCjF0zj8=
 github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e h1:TlpfdSUjQkrq2yh+bySzoOmPKspeaxmOr1fmsNCfNXM=
 github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e/go.mod h1:sfV9rXdvBVe0PDTLWzPh4IpapowZ9CDROjMUN2etRrk=
 github.com/charmbracelet/bubbles v0.15.0 h1:c5vZ3woHV5W2b8YZI1q7v4ZNQaPetfHuoHzx+56Z6TI=
@@ -889,8 +891,8 @@ github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d/go.mod h1:c3At6R
 github.com/prometheus/procfs v0.0.2/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsTZCD3I8kEA=
 github.com/prometheus/procfs v0.0.8/go.mod h1:7Qr8sr6344vo1JqZ6HhLceV9o3AJ1Ff+GxbHq6oeK9A=
 github.com/prometheus/procfs v0.9.0 h1:wzCHvIvM5SxWqYvwgVL7yJY8Lz3PKn49KQtpgMYJfhI=
-github.com/psanford/memfs v0.0.0-20210214183328-a001468d78ef h1:NKxTG6GVGbfMXc2mIk+KphcH6hagbVXhcFkbTgYleTI=
-github.com/psanford/memfs v0.0.0-20210214183328-a001468d78ef/go.mod h1:tcaRap0jS3eifrEEllL6ZMd9dg8IlDpi2S1oARrQ+NI=
+github.com/psanford/memfs v0.0.0-20230130182539-4dbf7e3e865e h1:51xcRlSMBU5rhM9KahnJGfEsBPVPz3182TgFRowA8yY=
+github.com/psanford/memfs v0.0.0-20230130182539-4dbf7e3e865e/go.mod h1:tcaRap0jS3eifrEEllL6ZMd9dg8IlDpi2S1oARrQ+NI=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.3 h1:utMvzDsuh3suAEnhH0RdHmoPbU648o6CvXxTx4SBMOw=

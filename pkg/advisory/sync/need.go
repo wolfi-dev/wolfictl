@@ -8,6 +8,7 @@ import (
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	"golang.org/x/exp/slices"
 )
 
@@ -33,8 +34,8 @@ type Need interface {
 }
 
 type secfixesNeed struct {
-	index         *configs.Index
-	configEntry   configs.Entry
+	index         *configs.Index[build.Configuration]
+	configEntry   configs.Entry[build.Configuration]
 	version, vuln string
 }
 
@@ -57,12 +58,14 @@ func (n secfixesNeed) Resolve() error {
 		return nil
 	}
 
-	err := n.index.Select().UpdateSecfixes(func(cfg build.Configuration) (build.Secfixes, error) {
+	updateSecfixes := buildconfigs.NewSecfixesSectionUpdater(func(cfg build.Configuration) (build.Secfixes, error) {
 		secfixes := cfg.Secfixes
 
 		secfixes[n.version] = append(secfixes[n.version], n.vuln)
 		return secfixes, nil
 	})
+
+	err := n.index.Select().UpdateEntries(updateSecfixes)
 	if err != nil {
 		return fmt.Errorf("unable to resolve need: %w", err)
 	}
@@ -75,8 +78,8 @@ func (n secfixesNeed) String() string {
 }
 
 type advisoriesNeed struct {
-	index        *configs.Index
-	configEntry  configs.Entry
+	index        *configs.Index[build.Configuration]
+	configEntry  configs.Entry[build.Configuration]
 	status       vex.Status
 	vuln         string
 	fixedVersion string
@@ -111,7 +114,7 @@ func (n advisoriesNeed) Resolve() error {
 		justification = vex.VulnerableCodeNotInExecutePath
 	}
 
-	err := n.index.Select().UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+	updateAdvisories := buildconfigs.NewAdvisoriesSectionUpdater(func(cfg build.Configuration) (build.Advisories, error) {
 		newAdvisoryEntry := build.AdvisoryContent{
 			Timestamp:     timestamp,
 			Status:        n.status,
@@ -124,6 +127,8 @@ func (n advisoriesNeed) Resolve() error {
 		advisories[n.vuln] = append(advisories[n.vuln], newAdvisoryEntry)
 		return advisories, nil
 	})
+
+	err := n.index.Select().UpdateEntries(updateAdvisories)
 	if err != nil {
 		return fmt.Errorf("unable to resolve need: %w", err)
 	}
@@ -141,8 +146,8 @@ func (n advisoriesNeed) String() string {
 	return fmt.Sprintf("%s: need an advisories entry for %s: %s%s", cfg.Package.Name, n.vuln, n.status, inFixedVersion)
 }
 
-func NeedsFromIndex(index *configs.Index) ([]Need, error) {
-	needs, err := configs.FlatMap(index.Select(), func(e configs.Entry) ([]Need, error) {
+func NeedsFromIndex(index *configs.Index[build.Configuration]) ([]Need, error) {
+	needs, err := configs.FlatMap(index.Select(), func(e configs.Entry[build.Configuration]) ([]Need, error) {
 		var needs []Need
 
 		secfixesNeeds := GetSecfixesNeeds(e, index)
@@ -162,7 +167,10 @@ func NeedsFromIndex(index *configs.Index) ([]Need, error) {
 
 // GetSecfixesNeeds returns a list of the Needs that must be met in the `secfixes`
 // section, as informed by analyzing the `advisories` section.
-func GetSecfixesNeeds(configEntry configs.Entry, index *configs.Index) []Need {
+func GetSecfixesNeeds(
+	configEntry configs.Entry[build.Configuration],
+	index *configs.Index[build.Configuration],
+) []Need {
 	var needs []Need
 
 	cfg := configEntry.Configuration()
@@ -197,7 +205,10 @@ func GetSecfixesNeeds(configEntry configs.Entry, index *configs.Index) []Need {
 
 // GetAdvisoriesNeeds returns a list of the Needs that must be met in the `advisories`
 // section, as informed by analyzing the `secfixes` section.
-func GetAdvisoriesNeeds(configEntry configs.Entry, index *configs.Index) []Need {
+func GetAdvisoriesNeeds(
+	configEntry configs.Entry[build.Configuration],
+	index *configs.Index[build.Configuration],
+) []Need {
 	var needs []Need
 
 	cfg := configEntry.Configuration()

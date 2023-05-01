@@ -23,13 +23,15 @@ func AdvisoryCreate() *cobra.Command {
 				return err
 			}
 
+			// build.ParseConfiguration(path, build.WithFS(i.fsys))
+
 			entry, err := p.advisoryContent()
 			if err != nil {
 				return err
 			}
 
 			err = advisory.Create(advisory.CreateOptions{
-				Index:                index,
+				BuildCfgs:            index,
 				Pathname:             configPath,
 				Vuln:                 p.vuln,
 				InitialAdvisoryEntry: entry,

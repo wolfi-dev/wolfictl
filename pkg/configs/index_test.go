@@ -3,6 +3,7 @@ package configs
 import (
 	"testing"
 
+	"chainguard.dev/melange/pkg/build"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -11,7 +12,9 @@ import (
 func TestNewIndex(t *testing.T) {
 	fsys := rwos.DirFS("testdata/index-1")
 
-	index, err := NewIndex(fsys)
+	index, err := NewIndex[build.Configuration](fsys, func(path string) (*build.Configuration, error) {
+		return build.ParseConfiguration(path, build.WithFS(fsys))
+	})
 	require.NoError(t, err)
 
 	t.Run("includes real configs", func(t *testing.T) {

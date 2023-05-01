@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
+	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
+	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 
 	"github.com/google/go-github/v50/github"
 
@@ -248,7 +250,8 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	p := o.PackageConfig[o.PackageName]
 	fullFilePath := filepath.Join(p.Dir, p.Filename)
 
-	index, err := configs.NewIndexFromPaths("/", fullFilePath)
+	fsys := rwfsOS.DirFS("/")
+	index, err := buildconfigs.NewIndexFromPaths(fsys, fullFilePath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get new index for package %s config file %s", o.PackageName, p.Filename)
 	}
@@ -259,7 +262,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	}
 
 	err = advisory.Create(advisory.CreateOptions{
-		Index:                index,
+		BuildCfgs:            index,
 		Pathname:             fullFilePath,
 		Vuln:                 vuln,
 		InitialAdvisoryEntry: content,
@@ -319,9 +322,9 @@ func (o *PackageOptions) advisoryContent() (*build.AdvisoryContent, error) {
 //		return "", err
 //	}
 //	return releaseURL, nil
-//}
+// }
 
-func (o *PackageOptions) doFollowupSync(index *configs.Index) error {
+func (o *PackageOptions) doFollowupSync(index *configs.Index[build.Configuration]) error {
 	needs, err := sync.NeedsFromIndex(index)
 	if err != nil {
 		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
