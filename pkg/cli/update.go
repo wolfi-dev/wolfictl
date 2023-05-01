@@ -20,6 +20,7 @@ type options struct {
 	releaseMonitoringQuery bool
 	useGitSign             bool
 	createIssues           bool
+	issueLabels            []string
 }
 
 func Update() *cobra.Command {
@@ -43,6 +44,7 @@ func Update() *cobra.Command {
 	cmd.Flags().StringVar(&o.pullRequestTitle, "pull-request-title", "%s/%s package update", "the title to use when creating a pull request")
 	cmd.Flags().BoolVar(&o.useGitSign, "use-gitsign", false, "enable gitsign to sign the git commits")
 	cmd.Flags().BoolVar(&o.createIssues, "create-issues", true, "creates GitHub Issues for failed package updates")
+	cmd.Flags().StringArrayVar(&o.issueLabels, "github-labels", []string{}, "Optional: provide a list of labels to apply to updater generated issues and pull requests")
 
 	cmd.AddCommand(
 		Package(),
@@ -70,7 +72,7 @@ func (o options) UpdateCmd(_ context.Context, repoURI string) error {
 	updateContext.GithubReleaseQuery = o.githubReleaseQuery
 	updateContext.UseGitSign = o.useGitSign
 	updateContext.CreateIssues = o.createIssues
-
+	updateContext.IssueLabels = o.issueLabels
 	if err := updateContext.Update(); err != nil {
 		return fmt.Errorf("creating updates: %w", err)
 	}

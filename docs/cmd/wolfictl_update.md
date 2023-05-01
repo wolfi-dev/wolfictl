@@ -24,6 +24,7 @@ Proposes melange package update(s) via a pull request
       --pull-request-title string         the title to use when creating a pull request (default "%s/%s package update")
       --release-monitoring-query          query https://release-monitoring.org/ API for latest releases (default true)
       --use-gitsign                       enable gitsign to sign the git commits
+      --github-label                      specify a label to apply to all update related issues and PRs
 ```
 
 ### SEE ALSO
