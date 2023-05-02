@@ -1,11 +1,11 @@
 package configs
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 	"gopkg.in/yaml.v3"
 )

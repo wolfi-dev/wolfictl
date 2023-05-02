@@ -20,7 +20,7 @@ import (
 )
 
 type CreateOptions struct {
-	// BuildCfgs is Index of build configurations on which to operate.
+	// BuildCfgs is the Index of build configurations on which to operate.
 	BuildCfgs *configs.Index[build.Configuration]
 
 	// Pathname is the filepath for the configuration to which Create will add the
@@ -70,7 +70,7 @@ func Create(options CreateOptions) error {
 }
 
 type UpdateOptions struct {
-	// BuildCfgs is Index of build configurations on which to operate.
+	// BuildCfgs is the Index of build configurations on which to operate.
 	BuildCfgs *configs.Index[build.Configuration]
 
 	// Pathname is the filepath for the configuration in which Update will append the
@@ -139,7 +139,7 @@ func Latest(entries []build.AdvisoryContent) *build.AdvisoryContent {
 }
 
 type DiscoverOptions struct {
-	// BuildCfgs is Index of build configurations on which to operate.
+	// BuildCfgs is the Index of build configurations on which to operate.
 	BuildCfgs *configs.Index[build.Configuration]
 
 	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").

@@ -23,8 +23,6 @@ func AdvisoryCreate() *cobra.Command {
 				return err
 			}
 
-			// build.ParseConfiguration(path, build.WithFS(i.fsys))
-
 			entry, err := p.advisoryContent()
 			if err != nil {
 				return err

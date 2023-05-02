@@ -2,6 +2,7 @@ package tester
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -11,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 )
@@ -215,7 +215,7 @@ type testFile struct {
 	originalRead, expectedRead, writtenBack *bytes.Buffer
 }
 
-func (t *testFile) ReadDir(n int) ([]fs.DirEntry, error) {
+func (t *testFile) ReadDir(_ int) ([]fs.DirEntry, error) {
 	if !t.isDir {
 		return nil, fmt.Errorf("not a directory")
 	}
