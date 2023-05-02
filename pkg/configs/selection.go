@@ -71,3 +71,8 @@ func (s Selection[T]) UpdateEntries(entryUpdater EntryUpdater[T]) error {
 
 	return nil
 }
+
+// Entries returns the Entry items included in the current Selection.
+func (s Selection[T]) Entries() []Entry[T] {
+	return s.entries
+}

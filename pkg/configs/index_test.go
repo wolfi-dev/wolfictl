@@ -19,6 +19,7 @@ func TestNewIndex(t *testing.T) {
 
 	t.Run("includes real configs", func(t *testing.T) {
 		assert.Contains(t, index.paths, "config-1.yaml")
+		assert.Contains(t, index.paths, "config-2.yaml")
 	})
 
 	t.Run("skips configs in subdirectories", func(t *testing.T) {
