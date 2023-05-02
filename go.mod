@@ -11,7 +11,7 @@ replace knative.dev/pkg => knative.dev/pkg v0.0.0-20220407210145-4d62e1dbb943
 
 require (
 	chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e
-	chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030
+	chainguard.dev/melange v0.3.2
 	cloud.google.com/go/storage v1.30.1
 	github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e
 	github.com/charmbracelet/bubbles v0.15.0
@@ -115,7 +115,6 @@ require (
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/buildkite/agent/v3 v3.45.0 // indirect
-	github.com/chainguard-dev/go-apk v0.0.0-20230501082831-d4a4a3b48750 // indirect
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20221129204813-6a4d6ed5d396 // indirect
 	github.com/clbanning/mxj/v2 v2.5.7 // indirect
 	github.com/cloudflare/circl v1.3.1 // indirect
