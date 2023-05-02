@@ -4,28 +4,41 @@ import (
 	"fmt"
 	"sort"
 
-	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
 func AdvisoryList() *cobra.Command {
 	p := &listParams{}
 	cmd := &cobra.Command{
-		Use:           "list [configs...]",
+		Use:           "list",
 		Short:         "list advisories for specific packages or across all of Wolfi",
 		SilenceErrors: true,
+		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			index, err := newConfigIndexFromArgs(args...)
+			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
+			if advisoriesRepoDir == "" {
+				advisoriesRepoDir = defaultAdvisoriesRepoDir
+			}
+
+			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
+			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoriesFsys)
 			if err != nil {
 				return err
 			}
 
-			cfgs := index.Configurations()
+			var cfgs []advisoryconfigs.Document
+			if pkg := p.packageName; pkg != "" {
+				cfgs = advisoryCfgs.Select().WhereName(pkg).Configurations()
+			} else {
+				cfgs = advisoryCfgs.Select().Configurations()
+			}
+
 			var output string
 
-			//nolint:gocritic // rangeValCopy for cfg
 			for _, cfg := range cfgs {
 				for vuln, entries := range cfg.Advisories {
 					if len(entries) == 0 {
@@ -74,19 +87,25 @@ func AdvisoryList() *cobra.Command {
 }
 
 type listParams struct {
-	vuln       string
-	history    bool
-	unresolved bool
+	advisoriesRepoDir string
+
+	packageName string
+	vuln        string
+	history     bool
+	unresolved  bool
 }
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&p.vuln, "vuln", "", "vulnerability ID for advisory")
+	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
+
+	addPackageFlag(&p.packageName, cmd)
+	addVulnFlag(&p.vuln, cmd)
+
 	cmd.Flags().BoolVar(&p.history, "history", false, "show full history for advisories")
 	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, fmt.Sprintf("only show advisories whose latest status is %s or %s", vex.StatusAffected, vex.StatusUnderInvestigation))
 }
 
-//nolint:gocritic // hugeParam for entry
-func renderListItem(entry build.AdvisoryContent) string {
+func renderListItem(entry advisoryconfigs.Entry) string {
 	switch entry.Status {
 	case vex.StatusUnderInvestigation:
 		return string(entry.Status)

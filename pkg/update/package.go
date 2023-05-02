@@ -12,12 +12,11 @@ import (
 	"time"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
-	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 
 	"github.com/google/go-github/v50/github"
 
-	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -251,51 +250,35 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	fullFilePath := filepath.Join(p.Dir, p.Filename)
 
 	fsys := rwfsOS.DirFS("/")
-	index, err := buildconfigs.NewIndexFromPaths(fsys, fullFilePath)
+	advisoryCfgs, err := advisoryconfigs.NewIndexFromPaths(fsys, fullFilePath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get new index for package %s config file %s", o.PackageName, p.Filename)
 	}
 
-	content, err := o.advisoryContent()
-	if err != nil {
+	req := o.request(vuln)
+	if err := req.Validate(); err != nil {
 		return err
 	}
 
-	err = advisory.Create(advisory.CreateOptions{
-		BuildCfgs:            index,
-		Pathname:             fullFilePath,
-		Vuln:                 vuln,
-		InitialAdvisoryEntry: content,
+	err = advisory.Create(req, advisory.CreateOptions{
+		AdvisoryCfgs: advisoryCfgs,
 	})
 	if err != nil {
 		return err
 	}
-	return o.doFollowupSync(index)
+	return o.doFollowupSync(advisoryCfgs.Select())
 }
 
-func (o *PackageOptions) advisoryContent() (*build.AdvisoryContent, error) {
-	// todo cannot add action statement when status is fixed, maybe we can add some metadata as this would be nice to link to from other tooling
-	// releaseURL, err := o.getFixedReleaseURL()
-	// if err != nil {
-	//	return nil, err
-	// }
+func (o *PackageOptions) request(vuln string) advisory.Request {
+	fixedVersion := fmt.Sprintf("%s-r%s", strings.TrimPrefix(o.Version, "v"), o.Epoch)
 
-	fixVersion := fmt.Sprintf("%s-r%s", strings.TrimPrefix(o.Version, "v"), o.Epoch)
-
-	ts := time.Now()
-	ac := &build.AdvisoryContent{
-		Timestamp: ts,
-		Status:    vex.StatusFixed,
-		// ActionStatement: fmt.Sprintf("CVE fixed in release %s", releaseURL),
-		FixedVersion: fixVersion,
+	return advisory.Request{
+		Package:       o.PackageName,
+		Vulnerability: vuln,
+		Status:        vex.StatusFixed,
+		Timestamp:     time.Now(),
+		FixedVersion:  fixedVersion,
 	}
-
-	err := ac.Validate()
-	if err != nil {
-		return nil, fmt.Errorf("unable to create advisory content: %w", err)
-	}
-
-	return ac, err
 }
 
 // func (o *PackageOptions) getFixedReleaseURL() (string, error) {
@@ -324,8 +307,8 @@ func (o *PackageOptions) advisoryContent() (*build.AdvisoryContent, error) {
 //	return releaseURL, nil
 // }
 
-func (o *PackageOptions) doFollowupSync(index *configs.Index[build.Configuration]) error {
-	needs, err := sync.NeedsFromIndex(index)
+func (o *PackageOptions) doFollowupSync(selection configs.Selection[advisoryconfigs.Document]) error {
+	needs, err := sync.DetermineNeeds(selection)
 	if err != nil {
 		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
 	}

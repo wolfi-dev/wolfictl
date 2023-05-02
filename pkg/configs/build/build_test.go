@@ -32,7 +32,7 @@ func TestBuildConfigsIndex(t *testing.T) {
 	})
 
 	s := index.Select().WhereName("cheese")
-	err = s.UpdateEntries(packageSectionUpdater)
+	err = s.Update(packageSectionUpdater)
 	require.NoError(t, err)
 
 	if diff := fsys.DiffAll(); diff != "" {

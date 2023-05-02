@@ -1,45 +1,77 @@
+//nolint:dupl // We expect create and update to diverge.
 package cli
 
 import (
 	"fmt"
 
-	"chainguard.dev/melange/pkg/build"
-	"github.com/openvex/go-vex/pkg/vex"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/createprompt"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
 func AdvisoryUpdate() *cobra.Command {
 	p := &updateParams{}
 	cmd := &cobra.Command{
-		Use:           "update <package-name>",
+		Use:           "update",
 		Short:         "append an entry to an existing package advisory",
 		SilenceErrors: true,
-		Args:          cobra.ExactArgs(1),
+		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			configPath := args[0]
-			index, err := newConfigIndexFromArgs(configPath)
+			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
+			if advisoriesRepoDir == "" {
+				advisoriesRepoDir = defaultAdvisoriesRepoDir
+			}
+
+			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
+			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoryFsys)
 			if err != nil {
 				return err
 			}
 
-			newEntry, err := p.advisoryContent()
+			req, err := p.requestParams.advisoryRequest()
 			if err != nil {
 				return err
 			}
 
-			err = advisory.Update(advisory.UpdateOptions{
-				BuildCfgs:        index,
-				Pathname:         configPath,
-				Vuln:             p.vuln,
-				NewAdvisoryEntry: newEntry,
-			})
+			if err := req.Validate(); err != nil {
+				// prompt for missing fields
+
+				m := createprompt.New(req)
+				var returnedModel tea.Model
+				program := tea.NewProgram(m)
+
+				// try to be helpful: if we're prompting, automatically enable secfixes sync
+				p.requestParams.sync = true
+
+				if returnedModel, err = program.Run(); err != nil {
+					return err
+				}
+
+				if m, ok := returnedModel.(createprompt.Model); ok {
+					if m.EarlyExit {
+						return nil
+					}
+
+					req = m.Request
+				} else {
+					return fmt.Errorf("unexpected model type: %T", returnedModel)
+				}
+			}
+
+			opts := advisory.UpdateOptions{
+				AdvisoryCfgs: advisoryCfgs,
+			}
+
+			err = advisory.Update(req, opts)
 			if err != nil {
 				return err
 			}
 
-			if p.sync {
-				err := doFollowupSync(index)
+			if p.requestParams.sync {
+				err := doFollowupSync(advisoryCfgs.Select().WhereName(req.Package))
 				if err != nil {
 					return err
 				}
@@ -54,41 +86,11 @@ func AdvisoryUpdate() *cobra.Command {
 }
 
 type updateParams struct {
-	vuln, status, action, impact, justification, timestamp, fixedVersion string
-	sync                                                                 bool
+	requestParams     advisoryRequestParams
+	advisoriesRepoDir string
 }
 
 func (p *updateParams) addFlagsTo(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&p.vuln, "vuln", "", "vulnerability ID for advisory")
-	cmd.MarkFlagRequired("vuln") //nolint: errcheck
-	cmd.Flags().StringVar(&p.status, "status", "", "status for VEX statement")
-	cmd.Flags().StringVar(&p.action, "action", "", "action statement for VEX statement (used only for affected status)")
-	cmd.Flags().StringVar(&p.impact, "impact", "", "impact statement for VEX statement (used only for not_affected status)")
-	cmd.Flags().StringVar(&p.justification, "justification", "", "justification for VEX statement (used only for not_affected status)")
-	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp for VEX statement")
-	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for fixed status)")
-	cmd.Flags().BoolVar(&p.sync, "sync", false, "synchronize secfixes data immediately after updating advisory")
-}
-
-func (p *updateParams) advisoryContent() (*build.AdvisoryContent, error) {
-	ts, err := resolveTimestamp(p.timestamp)
-	if err != nil {
-		return nil, fmt.Errorf("unable to process timestamp: %w", err)
-	}
-
-	ac := build.AdvisoryContent{
-		Timestamp:       ts,
-		Status:          vex.Status(p.status),
-		Justification:   vex.Justification(p.justification),
-		ImpactStatement: p.impact,
-		ActionStatement: p.action,
-		FixedVersion:    p.fixedVersion,
-	}
-
-	err = ac.Validate()
-	if err != nil {
-		return nil, fmt.Errorf("unable to create advisory content: %w", err)
-	}
-
-	return &ac, nil
+	p.requestParams.addFlags(cmd)
+	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 }

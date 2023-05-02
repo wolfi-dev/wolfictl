@@ -124,7 +124,6 @@ type CpeMatch struct {
 	VersionStartIncluding string `json:"versionStartIncluding,omitempty"`
 }
 
-//nolint:gocritic // hugeParam
 func vulnerabilityToCve(v Vulnerability, _ int) Cve {
 	return v.Cve
 }

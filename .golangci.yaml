@@ -123,7 +123,7 @@ linters-settings:
       # Performance
       - appendCombine
       - equalFold
-      - hugeParam
+      # - hugeParam is disabled because it's not always worthwhile to favor a pointer over a value for "large" data types. Pointers can create footguns and create the need for additional nil checks to keep the code safe..
       - indexAlloc
       - rangeExprCopy
       - rangeValCopy

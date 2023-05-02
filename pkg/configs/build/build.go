@@ -9,14 +9,14 @@ import (
 )
 
 func NewIndex(fsys rwfs.FS) (*configs.Index[build.Configuration], error) {
-	return configs.NewIndex[build.Configuration](fsys, NewConfigurationDecodeFunc(fsys))
+	return configs.NewIndex[build.Configuration](fsys, newConfigurationDecodeFunc(fsys))
 }
 
 func NewIndexFromPaths(fsys rwfs.FS, paths ...string) (*configs.Index[build.Configuration], error) {
-	return configs.NewIndexFromPaths[build.Configuration](fsys, NewConfigurationDecodeFunc(fsys), paths...)
+	return configs.NewIndexFromPaths[build.Configuration](fsys, newConfigurationDecodeFunc(fsys), paths...)
 }
 
-func NewConfigurationDecodeFunc(fsys fs.FS) func(string) (*build.Configuration, error) {
+func newConfigurationDecodeFunc(fsys fs.FS) func(string) (*build.Configuration, error) {
 	return func(path string) (*build.Configuration, error) {
 		return build.ParseConfiguration(path, build.WithFS(fsys))
 	}
