@@ -5,9 +5,11 @@ import (
 	"log"
 	"time"
 
+	"chainguard.dev/melange/pkg/build"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -40,24 +42,26 @@ func resolveTimestamp(ts string) (time.Time, error) {
 	return t, nil
 }
 
-func newConfigIndexFromArgs(args ...string) (*configs.Index, error) {
+func newConfigIndexFromArgs(args ...string) (*configs.Index[build.Configuration], error) {
+	fsys := rwfsOS.DirFS(".")
+
 	if len(args) == 0 {
 		// parse all configurations in the current directory
-		i, err := configs.NewIndex(rwfsOS.DirFS("."))
+		i, err := buildconfigs.NewIndex(fsys)
 		if err != nil {
 			return nil, fmt.Errorf("unable to index Wolfi package configurations: %w", err)
 		}
 		return i, nil
 	}
 
-	i, err := configs.NewIndexFromPaths(".", args...)
+	i, err := buildconfigs.NewIndexFromPaths(fsys, args...)
 	if err != nil {
 		return nil, fmt.Errorf("unable to index Wolfi package configurations: %w", err)
 	}
 	return i, nil
 }
 
-func doFollowupSync(index *configs.Index) error {
+func doFollowupSync(index *configs.Index[build.Configuration]) error {
 	needs, err := sync.NeedsFromIndex(index)
 	if err != nil {
 		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)

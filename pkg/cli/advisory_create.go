@@ -29,7 +29,7 @@ func AdvisoryCreate() *cobra.Command {
 			}
 
 			err = advisory.Create(advisory.CreateOptions{
-				Index:                index,
+				BuildCfgs:            index,
 				Pathname:             configPath,
 				Vuln:                 p.vuln,
 				InitialAdvisoryEntry: entry,

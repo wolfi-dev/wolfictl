@@ -13,14 +13,15 @@ import (
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 type CreateOptions struct {
-	// The Index of package configs on which to operate.
-	Index *configs.Index
+	// BuildCfgs is the Index of build configurations on which to operate.
+	BuildCfgs *configs.Index[build.Configuration]
 
 	// Pathname is the filepath for the configuration to which Create will add the
 	// new advisory.
@@ -38,7 +39,7 @@ type CreateOptions struct {
 func Create(options CreateOptions) error {
 	path := options.Pathname
 
-	selection := options.Index.Select().WhereFilePath(path)
+	selection := options.BuildCfgs.Select().WhereFilePath(path)
 	if count := selection.Len(); count != 1 {
 		return fmt.Errorf("can only operate on 1 config, but found %d configs at file path %q", count, path)
 	}
@@ -49,7 +50,7 @@ func Create(options CreateOptions) error {
 		return errors.New("cannot use nil advisory entry")
 	}
 
-	err := selection.UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+	updateAdvisories := buildconfigs.NewAdvisoriesSectionUpdater(func(cfg build.Configuration) (build.Advisories, error) {
 		advisories := cfg.Advisories
 		if _, existsAlready := advisories[vulnID]; existsAlready {
 			return build.Advisories{}, fmt.Errorf("advisory already exists for %s", vulnID)
@@ -59,6 +60,8 @@ func Create(options CreateOptions) error {
 
 		return advisories, nil
 	})
+
+	err := selection.UpdateEntries(updateAdvisories)
 	if err != nil {
 		return fmt.Errorf("unable to create advisories entry in %q: %w", path, err)
 	}
@@ -67,8 +70,8 @@ func Create(options CreateOptions) error {
 }
 
 type UpdateOptions struct {
-	// The Index of package configs on which to operate.
-	Index *configs.Index
+	// BuildCfgs is the Index of build configurations on which to operate.
+	BuildCfgs *configs.Index[build.Configuration]
 
 	// Pathname is the filepath for the configuration in which Update will append the
 	// new advisory entry.
@@ -86,7 +89,7 @@ type UpdateOptions struct {
 func Update(options UpdateOptions) error {
 	path := options.Pathname
 
-	selection := options.Index.Select().WhereFilePath(path)
+	selection := options.BuildCfgs.Select().WhereFilePath(path)
 	if count := selection.Len(); count != 1 {
 		return fmt.Errorf("can only update 1 config, but found %d configs at file path %q", count, path)
 	}
@@ -97,7 +100,7 @@ func Update(options UpdateOptions) error {
 		return errors.New("cannot use nil advisory entry")
 	}
 
-	err := selection.UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+	updateAdvisories := buildconfigs.NewAdvisoriesSectionUpdater(func(cfg build.Configuration) (build.Advisories, error) {
 		advisories := cfg.Advisories
 		if _, existsAlready := advisories[vulnID]; !existsAlready {
 			return build.Advisories{}, fmt.Errorf("no advisory exists for %s", vulnID)
@@ -107,6 +110,8 @@ func Update(options UpdateOptions) error {
 
 		return advisories, nil
 	})
+
+	err := selection.UpdateEntries(updateAdvisories)
 	if err != nil {
 		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vulnID, path, err)
 	}
@@ -134,8 +139,8 @@ func Latest(entries []build.AdvisoryContent) *build.AdvisoryContent {
 }
 
 type DiscoverOptions struct {
-	// The Configs (for packages) on which to operate.
-	Configs *configs.Index
+	// BuildCfgs is the Index of build configurations on which to operate.
+	BuildCfgs *configs.Index[build.Configuration]
 
 	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").
 	PackageRepositoryURL string
@@ -162,14 +167,14 @@ func Discover(opts DiscoverOptions) error {
 		apkindexes = append(apkindexes, apkindex)
 	}
 
-	packagesToLookup := determinePackagesToLookup(apkindexes, opts.Configs)
+	packagesToLookup := determinePackagesToLookup(apkindexes, opts.BuildCfgs)
 
 	vulnMatches, err := opts.VulnerabilityDetector.VulnerabilitiesForPackages(ctx, packagesToLookup...)
 	if err != nil {
 		return err
 	}
 
-	err = opts.Configs.Select().UpdateAdvisories(func(cfg build.Configuration) (build.Advisories, error) {
+	updateAdvisories := buildconfigs.NewAdvisoriesSectionUpdater(func(cfg build.Configuration) (build.Advisories, error) {
 		matchesForPackage := vulnMatches[cfg.Package.Name]
 		if len(vulnMatches) == 0 {
 			// nothing to update for this package
@@ -214,6 +219,8 @@ func Discover(opts DiscoverOptions) error {
 
 		return cfg.Advisories, nil
 	})
+
+	err = opts.BuildCfgs.Select().UpdateEntries(updateAdvisories)
 	if err != nil {
 		return err
 	}
@@ -221,7 +228,7 @@ func Discover(opts DiscoverOptions) error {
 	return nil
 }
 
-func determinePackagesToLookup(apkindexes []*repository.ApkIndex, cfgs *configs.Index) []string {
+func determinePackagesToLookup(apkindexes []*repository.ApkIndex, buildCfgs *configs.Index[build.Configuration]) []string {
 	packagesFound := make(map[string]struct{})
 
 	for _, apkindex := range apkindexes {
@@ -238,7 +245,7 @@ func determinePackagesToLookup(apkindexes []*repository.ApkIndex, cfgs *configs.
 			name := pkg.Origin
 
 			// skip package if it hasn't been included among the given package configs
-			isInConfigsIndex := cfgs.Select().WherePackageName(name).Len() != 0
+			isInConfigsIndex := buildCfgs.Select().WhereName(name).Len() != 0
 			if !isInConfigsIndex {
 				continue
 			}

@@ -29,7 +29,7 @@ func AdvisoryUpdate() *cobra.Command {
 			}
 
 			err = advisory.Update(advisory.UpdateOptions{
-				Index:            index,
+				BuildCfgs:        index,
 				Pathname:         configPath,
 				Vuln:             p.vuln,
 				NewAdvisoryEntry: newEntry,

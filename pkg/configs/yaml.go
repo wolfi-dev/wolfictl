@@ -3,27 +3,29 @@ package configs
 import (
 	"fmt"
 
-	"chainguard.dev/melange/pkg/build"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/dprotaso/go-yit"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 
-// A yamlUpdater is a function that mutates a YAML AST. The function is also
-// given a build.Configuration in case implementations require it for context.
-type yamlUpdater func(build.Configuration, *yaml.Node) error
+// A YAMLASTMutater is a function that mutates a YAML AST. The function is also
+// given a configuration struct (type T) in case implementations require it for
+// context.
+type YAMLASTMutater[T any] func(T, *yaml.Node) error
 
-func (i *Index) newYAMLUpdateFunc(updateYAML yamlUpdater) updateFunc {
-	return func(e Entry) error {
-		root := e.YAMLRoot()
+// NewYAMLUpdateFunc returns a EntryUpdater function that will use the
+// YAMLASTMutater provided to operate on a given Entry.
+func NewYAMLUpdateFunc[T Configuration](yamlASTMutater YAMLASTMutater[T]) EntryUpdater[T] {
+	return func(i *Index[T], e Entry[T]) error {
+		root := e.yamlASTRoot()
 
 		cfg := e.Configuration()
 		if cfg == nil {
 			return errors.New("nil configuration")
 		}
 
-		err := updateYAML(*cfg, root)
+		err := yamlASTMutater(*cfg, root)
 		if err != nil {
 			return err
 		}
