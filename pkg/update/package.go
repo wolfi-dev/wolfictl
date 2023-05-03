@@ -349,8 +349,13 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 	if err != nil {
 		return err
 	}
-	configFilename := o.PackageConfig[o.PackageName].Filename
-	_, err = wt.Add(configFilename)
+
+	p, ok := o.PackageConfig[o.PackageName]
+	if !ok {
+		return fmt.Errorf("no package config found for package name %s", o.PackageName)
+	}
+
+	_, err = wt.Add(p.Filename)
 	if err != nil {
 		return err
 	}
@@ -373,6 +378,7 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 
 		// maybe we change this when https://github.com/go-git/go-git/issues/400 is implemented
 		cmd := exec.Command("git", "commit", "-sm", commitMessage)
+		cmd.Dir = p.Dir
 		rs, err := cmd.Output()
 		if err != nil {
 			return errors.Wrapf(err, "failed to git sign commit %s", rs)
