@@ -218,6 +218,10 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 
 	// Bump packages that need updating
 	for packageName, newVersion := range packagesToUpdate {
+		// todo jr remove if this doesn't help
+		// add sleep to see if it helps intermittent "object not found" when pushing
+		time.Sleep(1 * time.Second)
+
 		wt, err := repo.Worktree()
 		if err != nil {
 			return errors.Wrap(err, "failed to get the worktree")
@@ -229,6 +233,13 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 		if err != nil {
 			return errors.Wrap(err, "failed to check out HEAD")
 		}
+
+		// todo jr remove if this doesn't help
+		rs, err := debug(wt)
+		if err != nil {
+			return err
+		}
+		o.Logger.Printf("updatePackagesGitRepository: %s git status: %s", packageName, string(rs))
 
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
 		ref, err := o.createBranch(repo)
@@ -246,6 +257,17 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 	}
 
 	return nil
+}
+
+func debug(wt *git.Worktree) ([]byte, error) {
+	// add extra logging to help debug intermittent "object not found" when pushing
+	cmd := exec.Command("git", "status")
+	cmd.Dir = wt.Filesystem.Root()
+	rs, err := cmd.Output()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed run git status %s", rs)
+	}
+	return rs, nil
 }
 
 func (o *Options) updateGitPackage(repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
@@ -444,10 +466,22 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 		return "", fmt.Errorf("failed to commit changes: %w", err)
 	}
 
+	// todo jr remove if this doesn't help
+	wt, err := repo.Worktree()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get the worktree")
+	}
+	rs, err := debug(wt)
+	if err != nil {
+		return "", err
+	}
+	o.Logger.Printf("proposeChanges: %s git status: %s", packageName, string(rs))
+
 	// setup githubReleases auth using standard environment variables
 	pushOpts := &git.PushOptions{
 		RemoteName: "origin",
 		Auth:       wgit.GetGitAuth(),
+		Progress:   os.Stdout, // todo remove if this doesn't help: extra logging to help debug intermittent "object not found" when pushing
 	}
 
 	// push the version update changes to our working branch
