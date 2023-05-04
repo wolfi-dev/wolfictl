@@ -10,7 +10,9 @@ wolfictl text
 
 ### Synopsis
 
-Print a sorted list of downstream dependent packages
+Print a sorted list of downstream dependent packages. This will give a reliable
+build order for packages. If a reliable build order is not possible, an error
+will be returned.
 
 ### Options
 
@@ -25,4 +27,5 @@ Print a sorted list of downstream dependent packages
 ### SEE ALSO
 
 * [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi
+* [graph](../reference/graph.md) - The graph order resolution logic.
 

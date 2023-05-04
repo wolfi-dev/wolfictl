@@ -74,7 +74,11 @@ func cmdPod() *cobra.Command {
 
 			targets := []string{"all"}
 			if len(args) > 0 {
-				g, err := dag.NewGraph(os.DirFS(dir), dir)
+				pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+				if err != nil {
+					return err
+				}
+				g, err := dag.NewGraph(pkgs)
 				if err != nil {
 					return err
 				}
@@ -85,13 +89,15 @@ func cmdPod() *cobra.Command {
 				}
 
 				targets = nil
-				for _, node := range subgraph.Nodes() {
-					t, err := g.MakeTarget(node, arch)
+				for _, node := range subgraph.Packages() {
+					pkg, err := pkgs.PkgInfo(node)
 					if err != nil {
 						return err
 					}
-
-					targets = append(targets, t)
+					if pkg == nil {
+						continue
+					}
+					targets = append(targets, makeTarget(node, arch, pkg))
 				}
 			}
 

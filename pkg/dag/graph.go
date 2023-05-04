@@ -1,205 +1,349 @@
 package dag
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
-	"log"
-	"path/filepath"
+	"net/http"
+	"net/url"
+	"os"
 	"sort"
 	"strings"
 
-	"chainguard.dev/melange/pkg/build"
 	"github.com/dominikbraun/graph"
+	log "github.com/sirupsen/logrus"
+	"go.lsp.dev/uri"
+
+	apko "chainguard.dev/apko/pkg/apk/impl"
 )
 
-// A Graph represents an interdependent set of Wolfi packages defined in one or more Melange configuration files.
+// Graph represents an interdependent set of packages defined in one or more Melange configurations,
+// as defined in Packages, as well as upstream repositories and their package indexes,
+// as declared in those configurations files. The graph is directed and acyclic.
 type Graph struct {
-	Graph    graph.Graph[string, string]
-	configs  map[string]build.Configuration
-	packages []string
+	Graph    graph.Graph[string, Package]
+	packages *Packages
+	opts     *graphOptions
+	byName   map[string][]string // maintains a listing of all known hashes for a given name
 }
 
-func newGraph() graph.Graph[string, string] {
-	return graph.New(graph.StringHash, graph.Directed(), graph.Acyclic(), graph.PreventCycles())
+// packageHash given anything that implements Package, return the hash to be used
+// for the node in the graph.
+func packageHash(p Package) string {
+	return fmt.Sprintf("%s:%s@%s", p.Name(), p.Version(), p.Source())
 }
 
-// NewGraph returns a new Graph using Melange configuration discovered in the given directory.
-//
-// The input is any fs.FS filesystem implementation. Given a directory path, you can call NewGraph like this:
-//
-// pkg.NewGraph(os.DirFS('path/to/directory'))
-func NewGraph(dirFS fs.FS, dirPath string) (*Graph, error) { //nolint:gocyclo
-	g := newGraph()
+func newGraph() graph.Graph[string, Package] {
+	return graph.New(packageHash, graph.Directed(), graph.Acyclic(), graph.PreventCycles())
+}
 
-	var packages []string
-	configs := make(map[string]build.Configuration)
+// cycle represents pairs of edges that create a cycle in the graph
+type cycle struct {
+	src, target string
+}
 
-	err := fs.WalkDir(dirFS, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
+// NewGraph returns a new Graph using the packages, including names and versions, in the Packages struct.
+// It parses the packages to create the dependency graph.
+// If the list of packages creates a cycle, an error is returned.
+// If a package cannot be resolved, an error is returned, unless WithAllowUnresolved is set.
+func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
+	var opts = &graphOptions{}
+	for _, option := range options {
+		if err := option(opts); err != nil {
+			return nil, err
 		}
-
-		if d.IsDir() && path != "." {
-			return fs.SkipDir
-		}
-
-		if d.Type().IsRegular() && strings.HasSuffix(path, ".yaml") && !strings.HasPrefix(d.Name(), ".") {
-			f, err := dirFS.Open(path)
-			if err != nil {
-				return err
-			}
-			defer f.Close()
-
-			p := filepath.Join(dirPath, path)
-			c, err := build.ParseConfiguration(p)
-			if err != nil {
-				return err
-			}
-
-			name := c.Package.Name
-			if name == "" {
-				log.Fatalf("no package name in %q", path)
-			}
-			if p, exists := configs[name]; exists && !strings.HasPrefix(p.Package.Description, "PROVIDED BY") {
-				log.Fatalf("duplicate package config found for %q in %q", c.Package.Name, path)
-			}
-
-			configs[name] = *c
-			packages = append(packages, name)
-
-			for _, prov := range c.Package.Dependencies.Provides {
-				if _, exists := configs[p]; !exists {
-					configs[p] = build.Configuration{
-						Package: build.Package{
-							Name:        packageNameFromProvides(prov),
-							Version:     "PROVIDED",
-							Description: fmt.Sprintf("PROVIDED BY %s", c.Package.Name),
-						},
-					}
-				}
-			}
-
-			if err := g.AddVertex(name); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
-				return err
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
+	}
+	g := &Graph{
+		Graph:    newGraph(),
+		packages: pkgs,
+		opts:     opts,
+		byName:   map[string][]string{},
 	}
 
-	for _, name := range packages {
-		c := configs[name]
+	// indexes is a cache of all repositories. Only some might be used for each package.
+	var (
+		indexes = make(map[string]apko.NamedIndex)
+		errs    []error
+	)
 
+	// 1. go through each known origin package, add it as a vertex
+	// 2. go through each of its subpackages, add them as vertices, with the sub dependent on the origin
+	// 3. go through each of its dependencies, add them as vertices, with the origin dependent on the dependency
+	for _, c := range pkgs.Packages() {
+		version := fullVersion(&c.Package)
+		if err := g.addVertex(c); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+			errs = append(errs, err)
+			continue
+		}
 		for i := range c.Subpackages {
-			subpkg := c.Subpackages[i]
-			if subpkg.Name == "" {
-				log.Fatalf("empty subpackage name for %q", c.Package.Name)
-			}
-
-			if _, exists := configs[subpkg.Name]; exists {
-				log.Fatalf("subpackage name %q (listed in package %q) was used already", subpkg.Name, c.Package.Name)
-			}
-			configs[subpkg.Name] = c
-			if err := g.AddVertex(subpkg.Name); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
-				return nil, fmt.Errorf("unable to add vertex for %q subpackage %q: %w", name, subpkg.Name, err)
-			}
-			if err := g.AddEdge(subpkg.Name, c.Package.Name); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
-				return nil, fmt.Errorf("unable to add edge for %q subpackage %q: %w", name, subpkg.Name, err)
-			}
-
-			for _, prov := range subpkg.Dependencies.Provides {
-				p := packageNameFromProvides(prov)
-				if _, exists := configs[p]; !exists {
-					configs[p] = build.Configuration{
-						Package: build.Package{
-							Name:        p,
-							Version:     "PROVIDED",
-							Description: fmt.Sprintf("PROVIDED BY %s", c.Package.Name),
-						},
-					}
+			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
+			for _, subpkgVersion := range subpkg {
+				if fullVersion(&subpkgVersion.Package) == version {
+					continue
+				}
+				if err := g.addVertex(subpkgVersion); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+					errs = append(errs, fmt.Errorf("unable to add vertex for %q subpackage %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
+					continue
+				}
+				if err := g.Graph.AddEdge(packageHash(subpkgVersion), packageHash(c)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+					// a subpackage always must depend on its origin package. It is not acceptable to have any errors, other than that we already know about that dependency.
+					errs = append(errs, fmt.Errorf("unable to add edge for subpackage %q from %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
+					continue
 				}
 			}
-
-			// TODO: resolve deps via `uses` for subpackage pipelines.
 		}
+		// TODO: should we repeat across multiple arches? Use c.Package.TargetArchitecture []string
+		var arch = "x86_64"
+		// get all of the repositories that are referenced by the package
 
-		// Resolve all `uses` used by the pipeline. This updates the set of
-		// .environment.contents.packages so the next block can include those as build deps.
-		pctx := &build.PipelineContext{
-			Context: &build.Context{
-				Configuration: c,
-			},
-			Package: &c.Package,
-		}
-		for i := range c.Pipeline {
-			s := c.Pipeline[i]
-			if err := s.ApplyNeeds(pctx); err != nil {
-				return nil, fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
+		var (
+			origRepos   = c.Environment.Contents.Repositories
+			origKeys    = c.Environment.Contents.Keyring
+			repos       []string
+			lookupRepos = []apko.NamedIndex{}
+		)
+		for _, repo := range append(origRepos, opts.repos...) {
+			if index, ok := indexes[repo]; !ok {
+				repos = append(repos, repo)
+			} else {
+				lookupRepos = append(lookupRepos, index)
 			}
-			c.Environment.Contents.Packages = pctx.Context.Configuration.Environment.Contents.Packages
 		}
-
+		keyMap := make(map[string][]byte)
+		for _, key := range append(origKeys, opts.keys...) {
+			b, err := getKeyMaterial(key)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get key material for %s: %w", key, err)
+			}
+			// we can have no error, but still no bytes, as we ignore missing files
+			if b != nil {
+				keyMap[key] = b
+			}
+		}
+		if len(repos) > 0 {
+			loadedRepos, err := apko.GetRepositoryIndexes(repos, keyMap, arch)
+			if err != nil {
+				return nil, fmt.Errorf("unable to load repositories for %s: %w", c.String(), err)
+			}
+			for _, repo := range loadedRepos {
+				indexes[repo.Source()] = repo
+				lookupRepos = append(lookupRepos, repo)
+			}
+		}
+		// add our own packages list to the lookupRepos
+		localRepo := pkgs.Repository(arch)
+		lookupRepos = append(lookupRepos, localRepo)
+		resolver := apko.NewPkgResolver(lookupRepos)
+		localRepoSource := localRepo.Source()
 		for _, buildDep := range c.Environment.Contents.Packages {
 			if buildDep == "" {
-				log.Fatalf("empty package name in environment packages for %q", c.Package.Name)
+				errs = append(errs, fmt.Errorf("empty package name in environment packages for %q", c.Package.Name))
+				continue
 			}
-			if err := g.AddVertex(buildDep); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
-				return nil, fmt.Errorf("unable to add vertex for %q dependency %q: %w", name, buildDep, err)
+			// need to resolve the package given the available versions
+			// this could be in the current packages set, or in one to which it refers
+			// 1. look in c.Environments.Contents.Repositories and c.Environments.Contents.Keyring
+			// 2. if there are Repositories, download their index
+			// 3. try to resolve first in Repositories and then in current packages
+
+			cycle, err := g.addAppropriatePackage(resolver, c, buildDep, localRepoSource)
+			if err != nil {
+				errs = append(errs, err)
+				continue
 			}
-			if err := g.AddEdge(c.Package.Name, buildDep); err != nil {
-				if errors.Is(err, graph.ErrEdgeCreatesCycle) {
-					log.Printf("warning: package %q depedendency on %q would introduce a cycle, so %q needs to be provided via bootstrapping", name, buildDep, buildDep)
-				} else {
-					return nil, fmt.Errorf("unable to add edge for %q dependency %q: %w", name, buildDep, err)
+			// resolve any cycle
+			if cycle != nil {
+				if err := g.resolveCycle(cycle, buildDep, resolver, localRepoSource); err != nil {
+					sp, _ := graph.ShortestPath(g.Graph, cycle.target, cycle.src) //nolint:errcheck // we do not need to check for an error, as we have an error
+					log.Errorf("unresolvable cycle: %s -> %s, caused by: %s", cycle.src, cycle.target, strings.Join(sp, " -> "))
+					errs = append(errs, err)
+					continue
 				}
 			}
 		}
 	}
-
-	return &Graph{
-		Graph:    g,
-		configs:  configs,
-		packages: packages,
-	}, nil
+	if errs != nil {
+		return nil, fmt.Errorf("unable to build graph:\n%w", errors.Join(errs...))
+	}
+	return g, nil
 }
 
-func packageNameFromProvides(prov string) string {
-	if p, _, ok := strings.Cut(prov, "~="); ok {
-		return p
+// addAppropriatePackage adds the appropriate package to the graph, and returns any cycle that was created.
+// The c *Configuration is the source package, while the dep represents the dependency.
+func (g *Graph) addAppropriatePackage(resolver *apko.PkgResolver, c Package, dep, localRepo string) (*cycle, error) {
+	var (
+		pkg         Package
+		cycleTarget string
+	)
+	resolved, err := resolver.ResolvePackage(dep)
+	switch {
+	case (err != nil || len(resolved) == 0) && g.opts.allowUnresolved:
+		if err := g.addDanglingPackage(dep, c); err != nil {
+			return nil, fmt.Errorf("%s: unable to add dangling package %s: %w", c, dep, err)
+		}
+	case (err != nil || len(resolved) == 0):
+		return nil, fmt.Errorf("%s: unable to resolve dependency %s: %w", c, dep, err)
+	default:
+		// no error and we had at least one package listed in `resolved`
+		for _, r := range resolved {
+			// wolfi-dev has a policy not to use a package to fulfull a dependency, if that package is myself.
+			// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
+			if r.Version == c.Version() && dep == c.Name() {
+				continue
+			}
+			resolvedSource := r.Repository().IndexUri()
+			if resolvedSource == localRepo {
+				// it's in our own packages list, so find the package that is an actual match
+				configs := g.packages.Config(r.Name, false)
+				if len(configs) == 0 {
+					return nil, fmt.Errorf("unable to find package %s-%s in local repository", r.Name, r.Version)
+				}
+				for _, config := range configs {
+					if fullVersion(&config.Package) == r.Version {
+						pkg = config
+						break
+					}
+				}
+				if pkg == nil {
+					return nil, fmt.Errorf("unable to find package %s-%s in local repository", r.Name, r.Version)
+				}
+			} else {
+				pkg = externalPackage{r.Name, r.Version, r.Repository().Uri}
+			}
+			if err := g.addVertex(pkg); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+				return nil, fmt.Errorf("unable to add vertex for %s dependency %s: %w", c, dep, err)
+			}
+			target := packageHash(pkg)
+			if isCycle, err := graph.CreatesCycle(g.Graph, packageHash(c), target); err != nil || isCycle {
+				pkg = nil
+				// we only take the first cycleTarget we find, as we prefer the highest one
+				if cycleTarget == "" {
+					cycleTarget = target
+				}
+				continue
+			}
+			err := g.Graph.AddEdge(packageHash(c), target, graph.EdgeAttribute("target-origin", dep))
+			switch {
+			case err == nil || errors.Is(err, graph.ErrEdgeAlreadyExists):
+				// no error, so we can keep the vertex and we have our match
+				return nil, nil
+			default:
+				return nil, fmt.Errorf("%s: add edge dependency %s error: %w", c, dep, err)
+			}
+		}
+		// did we find a valid dep?
+		if pkg == nil {
+			if cycleTarget != "" {
+				return &cycle{src: packageHash(c), target: cycleTarget}, nil
+			}
+			if !g.opts.allowUnresolved {
+				return nil, fmt.Errorf("%s: unfulfilled dependency %s", c, dep)
+			}
+			if err := g.addDanglingPackage(dep, c); err != nil {
+				return nil, fmt.Errorf("%s: unable to add dangling package %s: %w", c, dep, err)
+			}
+		}
 	}
-	if p, _, ok := strings.Cut(prov, "="); ok {
-		return p
-	}
-	log.Printf("could not parse package name from %q", prov)
-	return ""
+	return nil, nil
 }
 
-// Config returns the Melange configuration for the package with the given name,
-// if the package is present in the Graph. If it's not present, Config returns
-// nil. Providing the name of a subpackage will return the configuration of the
-// subpackage's origin package.
-func (g Graph) Config(name string) *build.Configuration {
-	if g.configs == nil {
-		// this would be unexpected
-		return nil
+// resolveCycle resolves a cycle by trying to reverse the order.
+// It discovers what the current dependency is that is causing the potential loop,
+// removes the last edge in that cycle, and regenerates that dependency without the previous target.
+func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apko.PkgResolver, localRepoSource string) error {
+	sp, err := graph.ShortestPath(g.Graph, c.target, c.src)
+	if err != nil {
+		return fmt.Errorf("unable to find shortest path: %w", err)
 	}
-
-	if c, ok := g.configs[name]; ok {
-		return &c
+	if len(sp) < 2 {
+		return fmt.Errorf("there is no path from %s to %s", c.target, c.src)
 	}
+	// the last edge in the cycle is the one that caused the cycle
+	removeSrc, removeTarget := sp[len(sp)-2], sp[len(sp)-1]
 
+	edge, err := g.Graph.Edge(removeSrc, removeTarget)
+	if err != nil {
+		return fmt.Errorf("unable to find last edge %s -> %s: %w", removeSrc, removeTarget, err)
+	}
+	if edge.Properties.Attributes == nil {
+		return fmt.Errorf("original edge %s -> %s has no attributes", removeSrc, removeTarget)
+	}
+	origDep := edge.Properties.Attributes["target-origin"]
+	// try to reverse the direction of the edge
+	if err := g.Graph.RemoveEdge(removeSrc, removeTarget); err != nil {
+		return fmt.Errorf("unable to remove original edge %s -> %s: %w", removeSrc, removeTarget, err)
+	}
+	// add in our new edge
+	if err := g.Graph.AddEdge(c.src, c.target, graph.EdgeAttribute("target-origin", dep)); err != nil {
+		return fmt.Errorf("unable to add replacement edge %s -> %s: %w", c.src, c.target, err)
+	}
+	// now we need to re-add the edge that was removed, but with a different target
+	config, err := g.Graph.Vertex(removeSrc)
+	if err != nil {
+		return fmt.Errorf("unable to find original vertex %s: %w", removeSrc, err)
+	}
+	cycle, err := g.addAppropriatePackage(resolver, config, origDep, localRepoSource)
+	if err != nil {
+		return fmt.Errorf("unable to re-add original edge %s -> %s: %w", removeSrc, origDep, err)
+	}
+	if cycle != nil {
+		return fmt.Errorf("unable re-add original edge with new dep still causes cycle %s -> %s: %w", removeSrc, dep, err)
+	}
+	return nil
+}
+
+// addVertex adds a vertex to the internal graph, while also tracking its hash by name
+func (g *Graph) addVertex(pkg Package) error {
+	if err := g.Graph.AddVertex(pkg); err != nil {
+		return err
+	}
+	g.byName[pkg.Name()] = append(g.byName[pkg.Name()], packageHash(pkg))
+	return nil
+}
+
+func (g *Graph) addDanglingPackage(name string, parent Package) error {
+	pkg := danglingPackage{name}
+	if err := g.addVertex(pkg); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+		return err
+	}
+	if err := g.Graph.AddEdge(packageHash(parent), packageHash(pkg)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+		return err
+	}
 	return nil
 }
 
 // Sorted returns a list of all package names in the Graph, sorted in topological
 // order, meaning that packages earlier in the list depend on packages later in
 // the list.
-func (g Graph) Sorted() ([]string, error) {
-	return graph.TopologicalSort(g.Graph)
+func (g Graph) Sorted() ([]Package, error) {
+	nodes, err := graph.TopologicalSort(g.Graph)
+	if err != nil {
+		return nil, err
+	}
+	pkgs := make([]Package, len(nodes))
+	for i, n := range nodes {
+		pkgs[i], err = g.Graph.Vertex(n)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return pkgs, nil
+}
+
+// ReverseSorted returns a list of all package names in the Graph, sorted in reverse
+// topological order, meaning that packages later in the list depend on packages earlier
+// in the list.
+func (g Graph) ReverseSorted() ([]Package, error) {
+	pkgs, err := g.Sorted()
+	if err != nil {
+		return nil, err
+	}
+	for i, j := 0, len(pkgs)-1; i < j; i, j = i+1, j-1 {
+		pkgs[i], pkgs[j] = pkgs[j], pkgs[i]
+	}
+	return pkgs, nil
 }
 
 // SubgraphWithRoots returns a new Graph that's a subgraph of g, where the set of
@@ -208,54 +352,13 @@ func (g Graph) Sorted() ([]string, error) {
 //
 // In other words, the new subgraph will contain all dependencies (transitively)
 // of all packages whose names were given as the `roots` argument.
-func (g Graph) SubgraphWithRoots(roots []string) (*Graph, error) { //nolint:dupl
-	subgraph := newGraph()
-	configs := make(map[string]build.Configuration)
-	var packages []string
-
-	adjacencyMap, err := g.Graph.AdjacencyMap()
+func (g Graph) SubgraphWithRoots(roots []string) (*Graph, error) {
+	// subgraph needs to create a new graph, but it also has a subset of Packages
+	subPkgs, err := g.packages.Sub(roots...)
 	if err != nil {
 		return nil, err
 	}
-
-	var walk func(key string) error // Go can be so awkward sometimes!
-	walk = func(key string) error {
-		if err := subgraph.AddVertex(key); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
-			return err
-		}
-		packages = append(packages, key)
-
-		c := g.Config(key)
-		if c != nil {
-			configs[key] = *c
-		}
-
-		for dependency := range adjacencyMap[key] {
-			if err := subgraph.AddVertex(dependency); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
-				return err
-			}
-			if err := subgraph.AddEdge(key, dependency); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
-				return err
-			}
-
-			if err := walk(dependency); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	for _, root := range roots {
-		if err := walk(root); err != nil {
-			return nil, err
-		}
-	}
-
-	return &Graph{
-		Graph:    subgraph,
-		configs:  configs,
-		packages: packages,
-	}, nil
+	return NewGraph(subPkgs)
 }
 
 // SubgraphWithLeaves returns a new Graph that's a subgraph of g, where the set of
@@ -264,10 +367,13 @@ func (g Graph) SubgraphWithRoots(roots []string) (*Graph, error) { //nolint:dupl
 //
 // In other words, the new subgraph will contain all packages (transitively) that
 // are dependent on the packages whose names were given as the `leaves` argument.
-func (g Graph) SubgraphWithLeaves(leaves []string) (*Graph, error) { //nolint:dupl
-	subgraph := newGraph()
-	configs := make(map[string]build.Configuration)
-	var packages []string
+func (g Graph) SubgraphWithLeaves(leaves []string) (*Graph, error) {
+	subgraph := &Graph{
+		Graph:  newGraph(),
+		opts:   g.opts,
+		byName: map[string][]string{},
+	}
+	var names []string
 
 	predecessorMap, err := g.Graph.PredecessorMap()
 	if err != nil {
@@ -276,21 +382,24 @@ func (g Graph) SubgraphWithLeaves(leaves []string) (*Graph, error) { //nolint:du
 
 	var walk func(key string) error // Go can be so awkward sometimes!
 	walk = func(key string) error {
-		if err := subgraph.AddVertex(key); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+		c := g.packages.ConfigByKey(key)
+		if c == nil {
+			return fmt.Errorf("unable to find package %q", key)
+		}
+		if err := subgraph.addVertex(c); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 			return err
 		}
-		packages = append(packages, key)
-
-		c := g.Config(key)
-		if c != nil {
-			configs[key] = *c
-		}
+		names = append(names, key)
 
 		for dependent := range predecessorMap[key] {
-			if err := subgraph.AddVertex(dependent); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+			c := g.packages.ConfigByKey(dependent)
+			if c == nil {
+				return fmt.Errorf("unable to find package %q", dependent)
+			}
+			if err := subgraph.addVertex(c); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 				return err
 			}
-			if err := subgraph.AddEdge(dependent, key); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+			if err := subgraph.Graph.AddEdge(dependent, key); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
 				return err
 			}
 
@@ -307,62 +416,107 @@ func (g Graph) SubgraphWithLeaves(leaves []string) (*Graph, error) { //nolint:du
 		}
 	}
 
-	return &Graph{
-		Graph:    subgraph,
-		configs:  configs,
-		packages: packages,
-	}, nil
+	subPkgs, err := g.packages.Sub(names...)
+	if err != nil {
+		return nil, err
+	}
+	subgraph.packages = subPkgs
+	return subgraph, nil
 }
 
-// MakeTarget creates the make target for the given package in the Graph.
-func (g Graph) MakeTarget(pkgName, arch string) (string, error) {
-	config := g.Config(pkgName)
-	if config == nil {
-		log.Println("no config for package:", pkgName)
-		return "", nil
-	}
-	if pkgName != config.Package.Name {
-		return "", nil
-	}
+// Filter is a function that takes a Package and returns true if the Package
+// should be included in the filtered Graph, or false if it should be excluded.
+type Filter func(Package) bool
 
-	p := config.Package
-
-	// note: using pkgName here because it may be a subpackage, not the main package declared within the config (i.e. `p.Name`)
-	return fmt.Sprintf("make packages/%s/%s-%s-r%d.apk", arch, pkgName, p.Version, p.Epoch), nil
+// FilterSources returns a Filter that returns true if the Package's source
+// matches one of the provided sources, or false otherwise
+func FilterSources(source ...string) Filter {
+	return func(p Package) bool {
+		src := p.Source()
+		for _, s := range source {
+			if src == s {
+				return true
+			}
+		}
+		return false
+	}
 }
 
-func (g Graph) MakefileEntry(pkgName string) (string, error) {
-	config := g.Config(pkgName)
-	if config == nil {
-		log.Println("no config for package:", pkgName)
-		return "", nil
+// FilterNotSources returns a Filter that returns false if the Package's source
+// matches one of the provided sources, or true otherwise
+func FilterNotSources(source ...string) Filter {
+	return func(p Package) bool {
+		src := p.Source()
+		for _, s := range source {
+			if src == s {
+				return false
+			}
+		}
+		return true
 	}
-	if pkgName != config.Package.Name {
-		return "", nil
-	}
-	return fmt.Sprintf("$(eval $(call build-package,%s,%s-%d))", pkgName, config.Package.Version, config.Package.Epoch), nil
 }
 
-// PkgInfo returns the buildp.Package struct
-func (g Graph) PkgInfo(pkgName, _ string) (*build.Package, error) {
-	config := g.Config(pkgName)
-	if config == nil {
-		log.Println("no config for package:", pkgName)
-		return nil, nil
-	}
-	if pkgName != config.Package.Name {
-		return nil, nil
-	}
-	return &config.Package, nil
+// FilterLocal returns a Filter that returns true if the Package's source
+// matches the local source, or false otherwise.
+func FilterLocal() Filter {
+	return FilterSources(Local)
 }
 
-// Nodes returns a slice of the names of all nodes in the Graph, sorted alphabetically.
-func (g Graph) Nodes() []string {
-	allPackages := g.packages
+// FilterNotLocal returns a Filter that returns true if the Package's source
+// matches the local source, or false otherwise.
+func FilterNotLocal() Filter {
+	return FilterNotSources(Local)
+}
 
-	// sort for deterministic output
-	sort.Strings(allPackages)
-	return allPackages
+// Filter returns a new Graph that's a subgraph of g, where the set of nodes
+// in the new graph are filtered by the provided parameters.
+// Must provide a func to which each Vertex of type Package is processed, and should return
+// true to keep the Vertex and all references to it, or false to remove the Vertex
+// and all references to it.
+// Some convenience functions are provided for common filtering needs.
+func (g Graph) Filter(filter Filter) (*Graph, error) {
+	subgraph := &Graph{
+		Graph:    newGraph(),
+		packages: g.packages,
+		opts:     g.opts,
+		byName:   map[string][]string{},
+	}
+	adjacencyMap, err := g.Graph.AdjacencyMap()
+	if err != nil {
+		return nil, err
+	}
+
+	// do this in 2 passes
+	// first pass, add all vertices that pass the filter
+	// second pass, add all edges whose source and dest are in the new graph
+	for node := range adjacencyMap {
+		vertex, err := g.Graph.Vertex(node)
+		if err != nil {
+			return nil, err
+		}
+		if !filter(vertex) {
+			continue
+		}
+		if err := subgraph.addVertex(vertex); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+			return nil, err
+		}
+	}
+
+	for node, deps := range adjacencyMap {
+		if _, err := subgraph.Graph.Vertex(node); err != nil {
+			continue
+		}
+		for dep, edge := range deps {
+			if _, err := subgraph.Graph.Vertex(dep); err != nil {
+				continue
+			}
+			// both the node and the dependency are in the new graph, so keep the edge
+			if err := subgraph.Graph.AddEdge(edge.Source, edge.Target); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+				return nil, err
+			}
+		}
+	}
+	return subgraph, nil
 }
 
 // DependenciesOf returns a slice of the names of the given package's dependencies, sorted alphabetically.
@@ -385,4 +539,82 @@ func (g Graph) DependenciesOf(node string) []string {
 	}
 
 	return nil
+}
+
+// Packages returns a slice of the names of all origin packages, sorted alphabetically.
+func (g Graph) Packages() []string {
+	return g.packages.PackageNames()
+}
+
+// Nodes returns a slice of all of the nodes in the graph, sorted alphabetically.
+// Unlike Packages, this includes subpackages, provides, etc.
+func (g Graph) Nodes() (nodes []string, err error) {
+	m, err := g.Graph.AdjacencyMap()
+	if err != nil {
+		return nil, err
+	}
+	for node := range m {
+		nodes = append(nodes, node)
+	}
+	sort.Strings(nodes)
+	return
+}
+
+// NodesByName returns a slice of all of the nodes in the graph for which
+// the Vertex's Name() matches the provided name. The sorting order is not guaranteed.
+func (g Graph) NodesByName(name string) (pkgs []Package, err error) {
+	for _, node := range g.byName[name] {
+		pkg, err := g.Graph.Vertex(node)
+		if err != nil {
+			return nil, err
+		}
+		pkgs = append(pkgs, pkg)
+	}
+	return
+}
+
+func getKeyMaterial(key string) ([]byte, error) {
+	var (
+		b     []byte
+		asURI uri.URI
+		err   error
+	)
+	if strings.HasPrefix(key, "https://") {
+		asURI, err = uri.Parse(key)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse key %s as URI: %w", key, err)
+		}
+	} else {
+		asURI = uri.New(key)
+	}
+	asURL, err := url.Parse(string(asURI))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse key %s as URI: %w", key, err)
+	}
+
+	switch asURL.Scheme {
+	case "file":
+		b, err = os.ReadFile(key)
+		if err != nil {
+			if !errors.Is(err, fs.ErrNotExist) {
+				return nil, fmt.Errorf("failed to read repository %s: %w", key, err)
+			}
+			return nil, nil
+		}
+	case "https":
+		client := &http.Client{}
+		res, err := client.Get(asURL.String())
+		if err != nil {
+			return nil, fmt.Errorf("unable to get key at %s: %w", key, err)
+		}
+		defer res.Body.Close()
+		buf := bytes.NewBuffer(nil)
+		if _, err := io.Copy(buf, res.Body); err != nil {
+			return nil, fmt.Errorf("unable to read key at %s: %w", key, err)
+		}
+		b = buf.Bytes()
+	default:
+		return nil, fmt.Errorf("key scheme %s not supported", asURL.Scheme)
+	}
+	return b, nil
 }
