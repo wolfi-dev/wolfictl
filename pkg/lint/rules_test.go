@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -217,6 +218,38 @@ func TestLinter_Rules(t *testing.T) {
 							Severity: SeverityError,
 						},
 						Error: fmt.Errorf("[contains-epoch]: config testdata/files/no-epoch.yaml has no package.epoch (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "check-version-matches.yaml",
+			want: EvalResult{
+				File: "check-version-matches",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "check-when-version-changes",
+							Severity: SeverityError,
+						},
+						Error: errors.New("[check-when-version-changes]: version in comment: 1.0.0 does not match version in package: 1.0.1, check that it can be updated and update the comment (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			file: "check-subpipeline-version-matches.yaml",
+			want: EvalResult{
+				File: "check-version-matches",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "check-when-version-changes",
+							Severity: SeverityError,
+						},
+						Error: errors.New("[check-when-version-changes]: version in comment: 0.8.0 does not match version in package: 0.9.0, check that it can be updated and update the comment (ERROR)"),
 					},
 				},
 			},

@@ -1,0 +1,14 @@
+package:
+  name: check-version-matches
+  version: 1.0.1
+  epoch: 0
+  description: "a package with an out of date comment"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+pipeline:
+  - runs: |
+      # CHECK-WHEN-VERSION-CHANGES: 1.0.0
+      echo "this should be checked each time the version is bumped"
