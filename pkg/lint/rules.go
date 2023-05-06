@@ -292,6 +292,39 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return nil
 			},
 		},
+		{
+			Name:        "check-when-version-changes",
+			Description: "check comments to make sure they are updated when version changes",
+			Severity:    SeverityError,
+			LintFunc: func(config build.Configuration) error {
+				re := regexp.MustCompile(`# CHECK-WHEN-VERSION-CHANGES: (.+)`)
+				var checkString = func(s string) error {
+					match := re.FindStringSubmatch(s)
+					if len(match) == 0 {
+						return nil
+					}
+					for _, m := range match[1:] {
+						if m != config.Package.Version {
+							return fmt.Errorf("version in comment: %s does not match version in package: %s, check that it can be updated and update the comment", m, config.Package.Version)
+						}
+					}
+					return nil
+				}
+				for _, p := range config.Pipeline {
+					if err := checkString(p.Runs); err != nil {
+						return err
+					}
+				}
+				for _, subPkg := range config.Subpackages {
+					for _, subPipeline := range subPkg.Pipeline {
+						if err := checkString(subPipeline.Runs); err != nil {
+							return err
+						}
+					}
+				}
+				return nil
+			},
+		},
 	}
 }
 
