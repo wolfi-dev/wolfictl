@@ -89,7 +89,7 @@ spec:
             privileged: true
       containers:
         - name: pause
-          image: gcr.io/google_containers/pause
+          image: registry.k8s.io/kubernetes/pause:3.9
           resources:
             limits:
               cpu: 50m

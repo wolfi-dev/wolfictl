@@ -33,8 +33,6 @@ import (
 	"k8s.io/utils/pointer"
 )
 
-const gcloudImage = "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim" // TODO: make this configurable?
-
 func gcloudProjectID(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "gcloud", "config", "get-value", "project")
 	b, err := cmd.Output()
@@ -45,7 +43,7 @@ func gcloudProjectID(ctx context.Context) (string, error) {
 }
 
 func cmdPod() *cobra.Command {
-	var dir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, cachedig, bucket, srcBucket, publicKeyBucket, signingKeyName, melangeBuildOpts string
+	var dir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, gcloudImage, cachedig, bucket, srcBucket, publicKeyBucket, signingKeyName, melangeBuildOpts string
 
 	var create, watch, secretKey bool
 	var pendingTimeout time.Duration
@@ -349,6 +347,7 @@ gcloud --quiet storage cp \
 	pod.Flags().StringVar(&publicKeyBucket, "public-key-bucket", "", "if set, uses this bucket combined with --signing-key-name to fetch the public key used to verify packages from --src-bucket.  If not set defaults to --src-bucket value")
 	pod.Flags().StringVar(&signingKeyName, "signing-key-name", "wolfi-signing", "the signing key name to use, the name is important when when signing e.g. keyName=wolfi-signing")
 	pod.Flags().StringVar(&melangeBuildOpts, "melange-build-options", "", "additional options to pass to the melange build")
+	pod.Flags().StringVar(&gcloudImage, "gcloud-image", "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim", "image to use for gcloud stuff")
 
 	_ = pod.MarkFlagRequired("repo") //nolint:errcheck
 	return pod
