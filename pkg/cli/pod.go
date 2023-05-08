@@ -281,6 +281,14 @@ gcloud --quiet storage cp \
 	"./packages/**/*.apk" gs://{{.bucket}}{{.arch}}/ || true
 `, map[string]string{"bucket": bucket, "arch": arch}),
 					},
+					Resources: corev1.ResourceRequirements{
+						// Minimums required by Autopilot.
+						Requests: corev1.ResourceList{
+							corev1.ResourceCPU:              resource.MustParse("1"),
+							corev1.ResourceMemory:           resource.MustParse("2Gi"),
+							corev1.ResourceEphemeralStorage: resource.MustParse("1Gi"),
+						},
+					},
 					VolumeMounts: []corev1.VolumeMount{{
 						Name:      "workspace",
 						MountPath: "/workspace",
