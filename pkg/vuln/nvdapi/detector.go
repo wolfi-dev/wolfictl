@@ -290,7 +290,6 @@ func (s *Detector) doSearch(ctx context.Context, cpe string) ([]Cve, error) {
 
 var errNoVersionData = errors.New("CPE has no version data available")
 
-//nolint:gocritic // hugeParam
 func convertCpeMatchToVersionRange(m CpeMatch) (vuln.VersionRange, error) {
 	rawCPE := m.Criteria
 	cpe, err := wfn.Parse(rawCPE)
@@ -428,7 +427,6 @@ var productLanguageMappings = []struct {
 	{productPrefix: "vscode-", cpeTargetSW: "visual_studio_code"},
 }
 
-//nolint:gocritic // hugeParam
 func handleCPELanguage(cpe wfn.Attributes) wfn.Attributes {
 	for _, m := range productLanguageMappings {
 		if strings.HasPrefix(cpe.Product, m.productPrefix) {

@@ -1,18 +1,22 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"chainguard.dev/melange/pkg/build"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
+	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln/nvdapi"
 )
-
-const defaultSecfixesTrackerHostname = "secfixes-tracker-q67u43ydxq-uc.a.run.app"
 
 //nolint:gosec // This is not a hard-coded credential value, it's the name of the env var to reference.
 const envVarNameForNVDAPIKey = "WOLFICTL_NVD_API_KEY"
@@ -23,10 +27,26 @@ func AdvisoryDiscover() *cobra.Command {
 		Use:           "discover",
 		Short:         "search for new potential vulnerabilities and create advisories for them",
 		SilenceErrors: true,
+		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
 
-			index, err := newConfigIndexFromArgs(args...)
+			resolvedDistroDir := resolveDistroDir(p.distroRepoDir)
+
+			if resolvedDistroDir == "" {
+				return errors.New("no packages selected: please specify a package name or a distro directory")
+			}
+
+			fsys := rwfsOS.DirFS(resolvedDistroDir)
+			buildCfgs, err := buildconfigs.NewIndex(fsys)
+			if err != nil {
+				return fmt.Errorf("unable to select packages: %w", err)
+			}
+
+			selectedPackages := getSelectedOrDistroPackages(p.packageName, buildCfgs)
+
+			advisoriesFsys := rwfsOS.DirFS(resolveAdvisoriesDir(p.advisoriesRepoDir))
+			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoriesFsys)
 			if err != nil {
 				return err
 			}
@@ -34,7 +54,9 @@ func AdvisoryDiscover() *cobra.Command {
 			apiKey := p.resolveNVDAPIKey()
 
 			err = advisory.Discover(advisory.DiscoverOptions{
-				BuildCfgs:             index,
+				SelectedPackages:      selectedPackages,
+				BuildCfgs:             buildCfgs,
+				AdvisoryCfgs:          advisoryCfgs,
 				PackageRepositoryURL:  p.packageRepositoryURL,
 				Arches:                []string{"x86_64", "aarch64"},
 				VulnerabilityDetector: nvdapi.NewDetector(http.DefaultClient, nvdapi.DefaultHost, apiKey),
@@ -55,15 +77,24 @@ func AdvisoryDiscover() *cobra.Command {
 }
 
 type discoverParams struct {
-	packageRepositoryURL    string
-	secfixesTrackerHostname string
-	nvdAPIKey               string
+	packageName string
+
+	distroRepoDir, advisoriesRepoDir string
+
+	packageRepositoryURL string
+
+	nvdAPIKey string
 }
 
 func (p *discoverParams) addFlagsTo(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&p.secfixesTrackerHostname, "host", defaultSecfixesTrackerHostname, "hostname for secfixes-tracker")
-	cmd.Flags().StringVar(&p.nvdAPIKey, "nvd-api-key", "", fmt.Sprintf("NVD API key (Can also be set via the environment variable '%s'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to https://nvd.nist.gov/developers/request-an-api-key .)", envVarNameForNVDAPIKey))
+	addPackageFlag(&p.packageName, cmd)
+
+	addDistroDirFlag(&p.distroRepoDir, cmd)
+	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
+
 	cmd.Flags().StringVarP(&p.packageRepositoryURL, "package-repo-url", "r", "https://packages.wolfi.dev/os", "URL of the APK package repository")
+
+	cmd.Flags().StringVar(&p.nvdAPIKey, "nvd-api-key", "", fmt.Sprintf("NVD API key (Can also be set via the environment variable '%s'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to https://nvd.nist.gov/developers/request-an-api-key .)", envVarNameForNVDAPIKey))
 }
 
 func (p *discoverParams) resolveNVDAPIKey() string {
@@ -81,4 +112,17 @@ func (p *discoverParams) resolveNVDAPIKey() string {
 	log.Print("⚠️  no NVD API key supplied. Searching NVD will be significantly faster if you use an API key. See command help for more information.")
 
 	return ""
+}
+
+func getSelectedOrDistroPackages(packageName string, buildCfgs *configs.Index[build.Configuration]) []string {
+	if packageName != "" {
+		return []string{packageName}
+	}
+
+	var pkgs []string
+	buildCfgs.Select().Each(func(e configs.Entry[build.Configuration]) {
+		pkgs = append(pkgs, e.Configuration().Package.Name)
+	})
+
+	return pkgs
 }

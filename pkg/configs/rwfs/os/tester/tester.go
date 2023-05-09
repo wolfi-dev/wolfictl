@@ -21,6 +21,8 @@ const specialFileContentForSkippingDiff = "# skip"
 
 var expectedSuffixWithYAML = expectedSuffix + ".yaml"
 
+var _ rwfs.FS = (*FS)(nil)
+
 type FS struct {
 	rootDir  string
 	fixtures map[string]*testFile
@@ -90,6 +92,22 @@ func expectedName(original string) string {
 
 	expectedFile := strings.Join([]string{parts[0] + expectedSuffix, parts[1]}, ".")
 	return filepath.Join(dir, expectedFile)
+}
+
+func (fsys *FS) Create(name string) (rwfs.File, error) {
+	tf := new(testFile)
+	tf.path = name
+
+	err := tf.loadExpected(fsys)
+	if err != nil {
+		return nil, err
+	}
+
+	tf.writtenBack = new(bytes.Buffer)
+
+	fsys.addTestFile(name, tf)
+
+	return tf, nil
 }
 
 func (fsys *FS) Open(name string) (fs.File, error) {
@@ -165,27 +183,20 @@ func (fsys *FS) addTestFile(path string, tf *testFile) {
 }
 
 func (fsys *FS) addFixtureFileFromOS(path string) error {
-	originalBytes, err := fsys.readPath(path)
-	if err != nil {
-		return fmt.Errorf("unable to load fixture %q into tester.FS: %w", path, err)
-	}
-
-	expectedFile := expectedName(path)
-	expectedBytes, err := fsys.readPath(expectedFile)
-	if err != nil {
-		return fmt.Errorf("unable to load fixture %q into tester.FS: no expected file %q: %w", path, expectedFile, err)
-	}
-
 	tf := new(testFile)
-	tf.originalBytes = originalBytes
-
-	forBuf := make([]byte, len(originalBytes))
-	copy(forBuf, originalBytes)
-	tf.originalRead = bytes.NewBuffer(forBuf)
-
-	tf.expectedRead = bytes.NewBuffer(expectedBytes)
-	tf.writtenBack = new(bytes.Buffer)
 	tf.path = path
+
+	err := tf.loadOriginal(fsys)
+	if err != nil {
+		return err
+	}
+
+	err = tf.loadExpected(fsys)
+	if err != nil {
+		return err
+	}
+
+	tf.writtenBack = new(bytes.Buffer)
 
 	fsys.addTestFile(path, tf)
 
@@ -260,4 +271,31 @@ func (t *testFile) Close() error {
 
 func (t *testFile) Write(p []byte) (n int, err error) {
 	return t.writtenBack.Write(p)
+}
+
+func (t *testFile) loadOriginal(fsys *FS) error {
+	originalBytes, err := fsys.readPath(t.path)
+	if err != nil {
+		return fmt.Errorf("unable to load fixture %q into tester.FS: %w", t.path, err)
+	}
+
+	t.originalBytes = originalBytes
+
+	forBuf := make([]byte, len(originalBytes))
+	copy(forBuf, originalBytes)
+	t.originalRead = bytes.NewBuffer(forBuf)
+
+	return nil
+}
+
+func (t *testFile) loadExpected(fsys *FS) error {
+	expectedFile := expectedName(t.path)
+	expectedBytes, err := fsys.readPath(expectedFile)
+	if err != nil {
+		return fmt.Errorf("unable to load fixture %q into tester.FS: no expected file %q: %w", t.path, expectedFile, err)
+	}
+
+	t.expectedRead = bytes.NewBuffer(expectedBytes)
+
+	return nil
 }

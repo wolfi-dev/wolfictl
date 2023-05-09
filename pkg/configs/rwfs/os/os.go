@@ -14,6 +14,11 @@ type FS struct {
 	rootDir string
 }
 
+func (fsys FS) Create(name string) (rwfs.File, error) {
+	p := fsys.fullPath(name)
+	return os.Create(p)
+}
+
 var _ rwfs.FS = (*FS)(nil)
 
 func (fsys FS) Open(name string) (fs.File, error) {

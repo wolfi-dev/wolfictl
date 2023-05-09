@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"strings"
 
+	"github.com/chainguard-dev/yam/pkg/yam"
+	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 	"gopkg.in/yaml.v3"
 )
@@ -109,9 +111,10 @@ func newIndex[T Configuration](cfgDecodeFunc func(string) (*T, error)) Index[T] 
 	return index
 }
 
-// Select returns a Selection for the Index, which allows the caller to begin chaining selection clauses.
+// Select returns a Selection for the Index, which allows the caller to begin
+// chaining selection clauses.
 func (i *Index[T]) Select() Selection[T] {
-	cfgs := i.Configurations()
+	cfgs := i.cfgs
 
 	entries := make([]Entry[T], 0, len(cfgs))
 	for idx := range cfgs {
@@ -124,28 +127,50 @@ func (i *Index[T]) Select() Selection[T] {
 	}
 }
 
-// Configurations returns all decoded configurations stored in the Index.
-func (i *Index[T]) Configurations() []T {
-	return i.cfgs
-}
-
-// FlatMap applies the given predicate function to each entry in the given
-// selection. It returns all predicate function outputs, each of which is a
-// slice, flattened into a single slice. If the predicate function returns an
-// error, Map stops processing and returns that error to its caller.
-func FlatMap[K any, T Configuration](selection Selection[T], predicate func(Entry[T]) ([]K, error)) ([]K, error) {
-	var result []K
-
-	for _, e := range selection.entries {
-		ts, err := predicate(e)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, ts...)
+// Create creates a new configuration file at the given path, with the given
+// cfg. The new configuration is automatically added to the Index.
+func (i *Index[T]) Create(path string, cfg T) error {
+	file, err := i.fsys.Create(path)
+	if err != nil {
+		return err
 	}
 
-	return result, nil
+	err = yaml.NewEncoder(file).Encode(cfg)
+	if err != nil {
+		return err
+	}
+	_ = file.Close()
+
+	err = i.format(path) // i.e. using yam
+	if err != nil {
+		return err
+	}
+
+	err = i.processAndAdd(path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i *Index[T]) format(path string) error {
+	fileForFormatting, err := i.fsys.OpenAsWritable(path)
+	if err != nil {
+		return err
+	}
+	formatted.NewEncoder(fileForFormatting).AutomaticConfig()
+	encOpts, err := formatted.ReadConfig()
+
+	// If we found a format config, use it.
+	if err == nil {
+		err := yam.Format(yamFsysAdapter{i.fsys}, []string{path}, yam.FormatOptions{EncodeOptions: *encOpts})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // update updates the given entry in the index using the provided EntryUpdater.
@@ -156,7 +181,7 @@ func (i *Index[T]) update(entry Entry[T], entryUpdater EntryUpdater[T]) error {
 	}
 
 	id := entry.id()
-	err = i.processAndUpdate(entry.Path(), i.byID[id])
+	err = i.processAndUpdate(entry.getPath(), i.byID[id])
 	if err != nil {
 		return fmt.Errorf("unable to process and update index entry for %q: %w", id, err)
 	}
@@ -210,6 +235,7 @@ func (i *Index[T]) process(path string) (*entry[T], error) {
 	}
 
 	return &entry[T]{
+		index:    i,
 		path:     path,
 		yamlRoot: yamlRoot,
 		cfg:      *cfg,
@@ -245,11 +271,12 @@ func (i *Index[T]) updateAtIndex(e *entry[T], entryIndex int) {
 	i.cfgs[entryIndex] = e.cfg
 	i.byID[e.id()] = entryIndex
 	i.byName[(*e.Configuration()).Name()] = entryIndex
-	i.byPath[e.Path()] = entryIndex
+	i.byPath[e.getPath()] = entryIndex
 }
 
 func (i *Index[T]) entry(idx int) Entry[T] {
 	return entry[T]{
+		index:    i,
 		path:     i.paths[idx],
 		yamlRoot: i.yamlRoots[idx],
 		cfg:      i.cfgs[idx],

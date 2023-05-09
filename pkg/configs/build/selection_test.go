@@ -13,7 +13,7 @@ import (
 func TestSelection(t *testing.T) {
 	fsys := rwos.DirFS("testdata/index-1")
 
-	index, err := configs.NewIndex[build.Configuration](fsys, NewConfigurationDecodeFunc(fsys))
+	index, err := configs.NewIndex[build.Configuration](fsys, newConfigurationDecodeFunc(fsys))
 	require.NoError(t, err)
 
 	s := index.Select()

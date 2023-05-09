@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	"golang.org/x/exp/slices"
 )
 
@@ -34,8 +33,7 @@ type Need interface {
 }
 
 type secfixesNeed struct {
-	index         *configs.Index[build.Configuration]
-	configEntry   configs.Entry[build.Configuration]
+	configEntry   configs.Entry[advisoryconfigs.Document]
 	version, vuln string
 }
 
@@ -58,14 +56,14 @@ func (n secfixesNeed) Resolve() error {
 		return nil
 	}
 
-	updateSecfixes := buildconfigs.NewSecfixesSectionUpdater(func(cfg build.Configuration) (build.Secfixes, error) {
+	updateSecfixes := advisoryconfigs.NewSecfixesSectionUpdater(func(cfg advisoryconfigs.Document) (advisoryconfigs.Secfixes, error) {
 		secfixes := cfg.Secfixes
 
 		secfixes[n.version] = append(secfixes[n.version], n.vuln)
 		return secfixes, nil
 	})
 
-	err := n.index.Select().UpdateEntries(updateSecfixes)
+	err := n.configEntry.Update(updateSecfixes)
 	if err != nil {
 		return fmt.Errorf("unable to resolve need: %w", err)
 	}
@@ -78,8 +76,7 @@ func (n secfixesNeed) String() string {
 }
 
 type advisoriesNeed struct {
-	index        *configs.Index[build.Configuration]
-	configEntry  configs.Entry[build.Configuration]
+	configEntry  configs.Entry[advisoryconfigs.Document]
 	status       vex.Status
 	vuln         string
 	fixedVersion string
@@ -114,8 +111,8 @@ func (n advisoriesNeed) Resolve() error {
 		justification = vex.VulnerableCodeNotInExecutePath
 	}
 
-	updateAdvisories := buildconfigs.NewAdvisoriesSectionUpdater(func(cfg build.Configuration) (build.Advisories, error) {
-		newAdvisoryEntry := build.AdvisoryContent{
+	updateAdvisories := advisoryconfigs.NewAdvisoriesSectionUpdater(func(cfg advisoryconfigs.Document) (advisoryconfigs.Advisories, error) {
+		newAdvisoryEntry := advisoryconfigs.Entry{
 			Timestamp:     timestamp,
 			Status:        n.status,
 			Justification: justification,
@@ -128,7 +125,7 @@ func (n advisoriesNeed) Resolve() error {
 		return advisories, nil
 	})
 
-	err := n.index.Select().UpdateEntries(updateAdvisories)
+	err := n.configEntry.Update(updateAdvisories)
 	if err != nil {
 		return fmt.Errorf("unable to resolve need: %w", err)
 	}
@@ -146,54 +143,44 @@ func (n advisoriesNeed) String() string {
 	return fmt.Sprintf("%s: need an advisories entry for %s: %s%s", cfg.Package.Name, n.vuln, n.status, inFixedVersion)
 }
 
-func NeedsFromIndex(index *configs.Index[build.Configuration]) ([]Need, error) {
-	needs, err := configs.FlatMap(index.Select(), func(e configs.Entry[build.Configuration]) ([]Need, error) {
-		var needs []Need
+func DetermineNeeds(selection configs.Selection[advisoryconfigs.Document]) ([]Need, error) {
+	var needs []Need
 
-		secfixesNeeds := GetSecfixesNeeds(e, index)
+	selection.Each(func(entry configs.Entry[advisoryconfigs.Document]) {
+		secfixesNeeds := getSecfixesNeeds(entry)
 		needs = append(needs, secfixesNeeds...)
 
-		advisoriesNeeds := GetAdvisoriesNeeds(e, index)
+		advisoriesNeeds := getAdvisoriesNeeds(entry)
 		needs = append(needs, advisoriesNeeds...)
-
-		return needs, nil
 	})
-	if err != nil {
-		return nil, fmt.Errorf("unable to calculate needs for index: %w", err)
-	}
 
 	return needs, nil
 }
 
-// GetSecfixesNeeds returns a list of the Needs that must be met in the `secfixes`
+// getSecfixesNeeds returns a list of the DetermineNeeds that must be met in the `secfixes`
 // section, as informed by analyzing the `advisories` section.
-func GetSecfixesNeeds(
-	configEntry configs.Entry[build.Configuration],
-	index *configs.Index[build.Configuration],
-) []Need {
-	var needs []Need
+func getSecfixesNeeds(entry configs.Entry[advisoryconfigs.Document]) []Need {
+	cfg := entry.Configuration()
 
-	cfg := configEntry.Configuration()
+	var needs []Need
 	for vuln, entries := range cfg.Advisories {
 		if len(entries) == 0 {
 			continue
 		}
 
-		entry := advisory.Latest(entries)
+		advisoryEntry := advisory.Latest(entries)
 
-		switch entry.Status {
+		switch advisoryEntry.Status {
 		case vex.StatusFixed:
 			needs = append(needs, secfixesNeed{
-				index:       index,
-				configEntry: configEntry,
-				version:     entry.FixedVersion,
+				configEntry: entry,
+				version:     advisoryEntry.FixedVersion,
 				vuln:        vuln,
 			})
 
 		case vex.StatusNotAffected:
 			needs = append(needs, secfixesNeed{
-				index:       index,
-				configEntry: configEntry,
+				configEntry: entry,
 				version:     nakVersion,
 				vuln:        vuln,
 			})
@@ -203,15 +190,14 @@ func GetSecfixesNeeds(
 	return needs
 }
 
-// GetAdvisoriesNeeds returns a list of the Needs that must be met in the `advisories`
+// getAdvisoriesNeeds returns a list of the DetermineNeeds that must be met in the `advisories`
 // section, as informed by analyzing the `secfixes` section.
-func GetAdvisoriesNeeds(
-	configEntry configs.Entry[build.Configuration],
-	index *configs.Index[build.Configuration],
+func getAdvisoriesNeeds(
+	entry configs.Entry[advisoryconfigs.Document],
 ) []Need {
-	var needs []Need
+	cfg := entry.Configuration()
 
-	cfg := configEntry.Configuration()
+	var needs []Need
 	for version, vulns := range cfg.Secfixes {
 		for _, vuln := range vulns {
 			neededStatus := vex.StatusFixed
@@ -225,8 +211,7 @@ func GetAdvisoriesNeeds(
 			}
 
 			needs = append(needs, advisoriesNeed{
-				index:        index,
-				configEntry:  configEntry,
+				configEntry:  entry,
 				status:       neededStatus,
 				vuln:         vuln,
 				fixedVersion: neededFixedVersion,
@@ -237,7 +222,7 @@ func GetAdvisoriesNeeds(
 	return needs
 }
 
-// Unmet filters the given set of Needs down to just the set of needs that are
+// Unmet filters the given set of DetermineNeeds down to just the set of needs that are
 // not met.
 func Unmet(needs []Need) []Need {
 	var result []Need
