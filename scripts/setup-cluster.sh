@@ -14,25 +14,34 @@ kubectl annotate serviceaccount default --overwrite \
   "iam.gke.io/gcp-service-account=${SA}@${PROJECT}.iam.gserviceaccount.com"
 
 # Install the secrets store CSI driver.
-CSI_DRIVER_VERSION=v1.2.4
+CSI_DRIVER_VERSION=1.3.2
 kubectl apply \
-  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/${CSI_DRIVER_VERSION}/deploy/rbac-secretproviderclass.yaml" \
-  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/${CSI_DRIVER_VERSION}/deploy/csidriver.yaml" \
-  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/${CSI_DRIVER_VERSION}/deploy/secrets-store.csi.x-k8s.io_secretproviderclasses.yaml" \
-  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/${CSI_DRIVER_VERSION}/deploy/secrets-store.csi.x-k8s.io_secretproviderclasspodstatuses.yaml" \
-  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/${CSI_DRIVER_VERSION}/deploy/secrets-store-csi-driver.yaml"
+  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/rbac-secretproviderclass.yaml" \
+  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/csidriver.yaml" \
+  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/secrets-store.csi.x-k8s.io_secretproviderclasses.yaml" \
+  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/secrets-store.csi.x-k8s.io_secretproviderclasspodstatuses.yaml" \
+  -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/secrets-store-csi-driver.yaml"
+
+# Replace the upstream CSI driver with our own Chainguard Image equivalent.
+# If this image is not available, comment this out to use the upstream directly.
+kubectl set image ds/csi-secrets-store \
+  -n kube-system \
+  secrets-store=cgr.dev/chainguard/secrets-store-csi-driver:${CSI_DRIVER_VERSION}
 
 # Install the GCP provider for the secrets store CSI driver.
-GCP_PLUGIN_VERSION=v1.1.0
-kubectl apply -f "https://raw.githubusercontent.com/GoogleCloudPlatform/secrets-store-csi-driver-provider-gcp/${GCP_PLUGIN_VERSION}/deploy/provider-gcp-plugin.yaml"
+GCP_PLUGIN_VERSION=1.2.0
+kubectl apply -f "https://raw.githubusercontent.com/GoogleCloudPlatform/secrets-store-csi-driver-provider-gcp/v${GCP_PLUGIN_VERSION}/deploy/provider-gcp-plugin.yaml"
+
+# Replace the upstream GCP CSI driver with our own Chainguard Image equivalent.
+# If this image is not available, comment this out to use the upstream directly.
+kubectl set image daemonset/csi-secrets-store-provider-gcp \
+  -n kube-system \
+  provider=cgr.dev/chainguard/secrets-store-csi-driver-provider-gcp:${GCP_PLUGIN_VERSION}
 
 # Patch the secrets store CSI driver and GCP provider to tolerate Arm nodes.
 kubectl patch daemonset csi-secrets-store-provider-gcp \
   -n kube-system \
-  --patch-file=arm-patch-1.yaml
-kubectl patch daemonset csi-secrets-store \
-  -n kube-system \
-  --patch-file=arm-patch-2.yaml
+  --patch-file=scripts/arm-patch.yaml
 
 # Wait for DaemonSets to become ready.
 kubectl rollout status daemonset -n kube-system csi-secrets-store
@@ -80,7 +89,7 @@ spec:
             privileged: true
       containers:
         - name: pause
-          image: gcr.io/google_containers/pause
+          image: registry.k8s.io/kubernetes/pause:3.9
           resources:
             limits:
               cpu: 50m
