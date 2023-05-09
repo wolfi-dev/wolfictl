@@ -484,7 +484,7 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 	err = gitOpts.LabelIssue(context.Background(), newPR.Owner, newPR.RepoName, *pr.Number, &o.IssueLabels)
 	if err != nil {
-		log.Printf("Failed to apply labels [%s] to PR #%d", strings.Join(o.IssueLabels[:], ","), pr.Number)
+		log.Printf("Failed to apply labels [%s] to PR #%d", strings.Join(o.IssueLabels, ","), pr.Number)
 	}
 	if newVersion.ReplaceExistingPRNumber != 0 {
 		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)

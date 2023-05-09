@@ -116,7 +116,7 @@ func (o GitOptions) CommentIssue(ctx context.Context, owner, repo, comment strin
 	return issue.GetHTMLURL(), err
 }
 
-func (o GitOptions) LabelIssue(ctx context.Context, owner string, repo string, number int, labels *[]string) error {
+func (o GitOptions) LabelIssue(ctx context.Context, owner, repo string, number int, labels *[]string) error {
 	ir := &github.IssueRequest{
 		Labels: labels,
 	}
