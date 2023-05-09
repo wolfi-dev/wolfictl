@@ -17,6 +17,9 @@ func TestBuildDatabase(t *testing.T) {
 
 	opts := BuildDatabaseOptions{
 		AdvisoryCfgs: advisoryCfgs,
+		URLPrefix:    "https://packages.wolfi.dev",
+		Archs:        []string{"x86_64"},
+		Repo:         "os",
 	}
 
 	database, err := BuildDatabase(opts)
