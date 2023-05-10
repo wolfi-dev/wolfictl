@@ -49,6 +49,7 @@ type Options struct {
 	Logger                 *log.Logger
 	GitHubHTTPClient       *http2.RLHTTPClient
 	ErrorMessages          map[string]string
+	IssueLabels            []string
 }
 
 type NewVersionResults struct {
@@ -510,11 +511,15 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	// create the pull request
-	prLink, err := gitOpts.OpenPullRequest(newPR)
+	pr, err := gitOpts.OpenPullRequest(newPR)
+	prLink := pr.GetHTMLURL()
 	if err != nil {
 		return "", fmt.Errorf("failed to create pull request: %w", err)
 	}
-
+	err = gitOpts.LabelIssue(context.Background(), newPR.Owner, newPR.RepoName, *pr.Number, &o.IssueLabels)
+	if err != nil {
+		log.Printf("Failed to apply labels [%s] to PR #%d", strings.Join(o.IssueLabels, ","), pr.Number)
+	}
 	if newVersion.ReplaceExistingPRNumber != 0 {
 		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
@@ -623,6 +628,7 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 		RepoName:    gitURL.Name,
 		PackageName: packageName,
 		Title:       gh.GetUpdateIssueTitle(packageName, version.Version),
+		Labels:      o.IssueLabels,
 	}
 	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
 	if err != nil {

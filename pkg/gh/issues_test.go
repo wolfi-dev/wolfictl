@@ -97,6 +97,7 @@ func TestOpenIssue(t *testing.T) {
 		PackageName: "foo-package",
 		Comment:     "This is a test issue",
 		Title:       GetErrorIssueTitle("wolfi-bot", "foo-package"),
+		Labels:      []string{"prawn", "cocktail"},
 	}
 	htmlURL, err := gitOptions.OpenIssue(ctx, issues)
 
