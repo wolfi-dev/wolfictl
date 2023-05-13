@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +14,7 @@ import (
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
+	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln/nvdapi"
 )
 
@@ -31,25 +31,36 @@ func AdvisoryDiscover() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
 
-			resolvedDistroDir := resolveDistroDir(p.distroRepoDir)
+			distroRepoDir := resolveDistroDir(p.distroRepoDir)
+			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
+			if distroRepoDir == "" || advisoriesRepoDir == "" {
+				if p.doNotDetectDistro {
+					return fmt.Errorf("distro repo dir and/or advisories repo dir was left unspecified")
+				}
 
-			if resolvedDistroDir == "" {
-				return errors.New("no packages selected: please specify a package name or a distro directory")
+				d, err := distro.Detect()
+				if err != nil {
+					return fmt.Errorf("distro repo dir and/or advisories repo dir was left unspecified, and distro auto-detection failed: %w", err)
+				}
+
+				distroRepoDir = d.DistroRepoDir
+				advisoriesRepoDir = d.AdvisoriesRepoDir
+				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
-			fsys := rwfsOS.DirFS(resolvedDistroDir)
+			advisoriesFsys := rwfsOS.DirFS(advisoriesRepoDir)
+			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoriesFsys)
+			if err != nil {
+				return err
+			}
+
+			fsys := rwfsOS.DirFS(distroRepoDir)
 			buildCfgs, err := buildconfigs.NewIndex(fsys)
 			if err != nil {
 				return fmt.Errorf("unable to select packages: %w", err)
 			}
 
 			selectedPackages := getSelectedOrDistroPackages(p.packageName, buildCfgs)
-
-			advisoriesFsys := rwfsOS.DirFS(resolveAdvisoriesDir(p.advisoriesRepoDir))
-			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoriesFsys)
-			if err != nil {
-				return err
-			}
 
 			apiKey := p.resolveNVDAPIKey()
 
@@ -77,6 +88,8 @@ func AdvisoryDiscover() *cobra.Command {
 }
 
 type discoverParams struct {
+	doNotDetectDistro bool
+
 	packageName string
 
 	distroRepoDir, advisoriesRepoDir string
@@ -87,6 +100,8 @@ type discoverParams struct {
 }
 
 func (p *discoverParams) addFlagsTo(cmd *cobra.Command) {
+	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
+
 	addPackageFlag(&p.packageName, cmd)
 
 	addDistroDirFlag(&p.distroRepoDir, cmd)
