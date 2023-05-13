@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -9,6 +10,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
+	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
 func AdvisorySyncSecfixes() *cobra.Command {
@@ -21,7 +23,17 @@ func AdvisorySyncSecfixes() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
 			if advisoriesRepoDir == "" {
-				advisoriesRepoDir = defaultAdvisoriesRepoDir
+				if p.doNotDetectDistro {
+					return fmt.Errorf("no advisories repo dir specified")
+				}
+
+				d, err := distro.Detect()
+				if err != nil {
+					return fmt.Errorf("no advisories repo dir specified, and distro auto-detection failed: %w", err)
+				}
+
+				advisoriesRepoDir = d.AdvisoriesRepoDir
+				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
 			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
@@ -73,6 +85,8 @@ func AdvisorySyncSecfixes() *cobra.Command {
 }
 
 type syncSecfixesParams struct {
+	doNotDetectDistro bool
+
 	advisoriesRepoDir string
 
 	packageName string
@@ -81,6 +95,8 @@ type syncSecfixesParams struct {
 }
 
 func (p *syncSecfixesParams) addFlagsTo(cmd *cobra.Command) {
+	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
+
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 
 	addPackageFlag(&p.packageName, cmd)

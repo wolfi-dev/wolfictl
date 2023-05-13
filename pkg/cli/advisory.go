@@ -6,12 +6,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
 const (
@@ -56,6 +58,12 @@ func resolveAdvisoriesDir(cliFlagValue string) string {
 	}
 
 	return ""
+}
+
+var distroMutedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#888"))
+
+func renderDetectedDistro(d distro.DetectedDistro) string {
+	return distroMutedStyle.Render("Auto-detected distro: ") + d.Name + "\n\n"
 }
 
 func resolveTimestamp(ts string) (time.Time, error) {
@@ -145,4 +153,12 @@ func addDistroDirFlag(val *string, cmd *cobra.Command) {
 
 func addAdvisoriesDirFlag(val *string, cmd *cobra.Command) {
 	cmd.Flags().StringVarP(val, "advisories-repo-dir", "a", "", fmt.Sprintf("directory containing the advisories repository (can also be set with environment variable `%s`)", envVarNameForAdvisoriesDir))
+}
+
+func addNoPromptFlag(val *bool, cmd *cobra.Command) {
+	cmd.Flags().BoolVar(val, "no-prompt", false, "do not prompt the user for input")
+}
+
+func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
+	cmd.Flags().BoolVar(val, "no-distro-detection", false, "do not attempt to auto-detect the distro")
 }
