@@ -1,8 +1,9 @@
 package field
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 )
 
@@ -11,18 +12,18 @@ type Field interface {
 	IsDone() bool
 	Value() string
 
-	SetDone() Field
 	SetBlur() Field
 	SetFocus() (Field, tea.Cmd)
 	Update(tea.Msg) (Field, tea.Cmd)
-	UpdateRequest(value string, request advisory.Request) advisory.Request
+	UpdateRequest(request advisory.Request) advisory.Request
+	SubmitValue() (Field, error)
 }
 
-var (
-	focusedStyle        = lipgloss.NewStyle()
-	blurredStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-	cursorStyle         = focusedStyle.Copy()
-	noStyle             = lipgloss.NewStyle()
-	helpStyle           = blurredStyle.Copy()
-	cursorModeHelpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
-)
+type ErrValueNotAccepted struct {
+	Value  string
+	Reason error
+}
+
+func (e ErrValueNotAccepted) Error() string {
+	return fmt.Sprintf("entered value %q is not accepted: %s", e.Value, e.Reason.Error())
+}

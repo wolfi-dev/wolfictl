@@ -2,6 +2,7 @@ package versions
 
 import (
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/go-version"
@@ -78,6 +79,29 @@ func TestGitHubReleases_SortVersions(t *testing.T) {
 			sort.Sort(ByLatest(versions))
 
 			assert.Equal(t, test.expectedLatestVersion, versions[len(versions)-1].Original())
+		})
+	}
+}
+
+func TestSort_ByLatestStrings(t *testing.T) {
+	cases := []struct {
+		input    []string
+		expected []string
+	}{
+		{
+			input:    []string{"1.2.3", "1.1.1", "2.3.4", "0.1.3"},
+			expected: []string{"2.3.4", "1.2.3", "1.1.1", "0.1.3"},
+		},
+		{
+			input:    []string{"0.1.0-r5", "0.1.0-r4", "0.2.0-r0"},
+			expected: []string{"0.2.0-r0", "0.1.0-r5", "0.1.0-r4"},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(strings.Join(tt.input, ","), func(t *testing.T) {
+			sort.Sort(ByLatestStrings(tt.input))
+			assert.Equal(t, tt.expected, tt.input)
 		})
 	}
 }
