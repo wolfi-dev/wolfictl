@@ -94,4 +94,5 @@ func TestDetect(t *testing.T) {
 	assert.Equal(t, "Wolfi", d.Name)
 	assert.Equal(t, expectedDistroRepoDir, d.DistroRepoDir)
 	assert.Equal(t, expectedAdvisoriesRepoDir, d.AdvisoriesRepoDir)
+	assert.Equal(t, "https://packages.wolfi.dev/os", d.APKRepositoryURL)
 }
