@@ -2,6 +2,7 @@ package advisory
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
@@ -11,32 +12,43 @@ const apkURL = "{{urlprefix}}/{{reponame}}/{{arch}}/{{pkg.name}}-{{pkg.ver}}.apk
 
 // BuildDatabaseOptions contains the options for building a database.
 type BuildDatabaseOptions struct {
-	AdvisoryCfgs *configs.Index[advisory.Document]
+	AdvisoryCfgIndices []*configs.Index[advisory.Document]
 
 	URLPrefix string
 	Archs     []string
 	Repo      string
 }
 
+var ErrNoPackageSecurityData = errors.New("no package security data found")
+
 // BuildDatabase builds a security database from the given options.
 func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
-	cfgs := opts.AdvisoryCfgs.Select().Configurations()
-
 	var packageEntries []PackageEntry
 
-	for _, cfg := range cfgs {
-		if len(cfg.Secfixes) == 0 {
-			continue
+	for _, index := range opts.AdvisoryCfgIndices {
+		var cfgPackageEntries []PackageEntry
+
+		for _, cfg := range index.Select().Configurations() {
+			if len(cfg.Secfixes) == 0 {
+				continue
+			}
+
+			pe := PackageEntry{
+				Pkg: Package{
+					Name:     cfg.Package.Name,
+					Secfixes: Secfixes(cfg.Secfixes),
+				},
+			}
+
+			cfgPackageEntries = append(cfgPackageEntries, pe)
 		}
 
-		pe := PackageEntry{
-			Pkg: Package{
-				Name:     cfg.Package.Name,
-				Secfixes: Secfixes(cfg.Secfixes),
-			},
+		if len(cfgPackageEntries) == 0 {
+			// Catch the unexpected case where an advisories directory contains no security data.
+			return nil, ErrNoPackageSecurityData
 		}
 
-		packageEntries = append(packageEntries, pe)
+		packageEntries = append(packageEntries, cfgPackageEntries...)
 	}
 
 	db := Database{

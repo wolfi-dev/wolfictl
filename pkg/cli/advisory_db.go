@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
@@ -19,8 +20,7 @@ func AdvisoryDB() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
-			if advisoriesRepoDir == "" {
+			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")
 				}
@@ -30,21 +30,26 @@ func AdvisoryDB() *cobra.Command {
 					return fmt.Errorf("no advisories repo dir specified, and distro auto-detection failed: %w", err)
 				}
 
-				advisoriesRepoDir = d.AdvisoriesRepoDir
+				p.advisoriesRepoDirs = append(p.advisoriesRepoDirs, d.AdvisoriesRepoDir)
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
-			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoryFsys)
-			if err != nil {
-				return err
+			indices := make([]*configs.Index[advisoryconfigs.Document], 0, len(p.advisoriesRepoDirs))
+			for _, dir := range p.advisoriesRepoDirs {
+				advisoryFsys := rwos.DirFS(dir)
+				index, err := advisoryconfigs.NewIndex(advisoryFsys)
+				if err != nil {
+					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
+				}
+
+				indices = append(indices, index)
 			}
 
 			opts := advisory.BuildDatabaseOptions{
-				AdvisoryCfgs: advisoryCfgs,
-				URLPrefix:    p.urlPrefix,
-				Archs:        p.archs,
-				Repo:         p.repo,
+				AdvisoryCfgIndices: indices,
+				URLPrefix:          p.urlPrefix,
+				Archs:              p.archs,
+				Repo:               p.repo,
 			}
 
 			database, err := advisory.BuildDatabase(opts)
@@ -79,7 +84,7 @@ func AdvisoryDB() *cobra.Command {
 type dbParams struct {
 	doNotDetectDistro bool
 
-	advisoriesRepoDir string
+	advisoriesRepoDirs []string
 
 	outputLocation string
 
@@ -91,7 +96,7 @@ type dbParams struct {
 func (p *dbParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 
-	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
+	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "directory containing an advisories repository")
 
 	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout)")
 
