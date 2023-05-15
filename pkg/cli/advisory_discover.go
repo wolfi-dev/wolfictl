@@ -31,6 +31,8 @@ func AdvisoryDiscover() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
 
+			packageRepositoryURL := p.packageRepositoryURL
+
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)
 			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
 			if distroRepoDir == "" || advisoriesRepoDir == "" {
@@ -45,6 +47,11 @@ func AdvisoryDiscover() *cobra.Command {
 
 				distroRepoDir = d.DistroRepoDir
 				advisoriesRepoDir = d.AdvisoriesRepoDir
+
+				if packageRepositoryURL == "" {
+					packageRepositoryURL = d.APKRepositoryURL
+				}
+
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
@@ -68,7 +75,7 @@ func AdvisoryDiscover() *cobra.Command {
 				SelectedPackages:      selectedPackages,
 				BuildCfgs:             buildCfgs,
 				AdvisoryCfgs:          advisoryCfgs,
-				PackageRepositoryURL:  p.packageRepositoryURL,
+				PackageRepositoryURL:  packageRepositoryURL,
 				Arches:                []string{"x86_64", "aarch64"},
 				VulnerabilityDetector: nvdapi.NewDetector(http.DefaultClient, nvdapi.DefaultHost, apiKey),
 			})
@@ -107,7 +114,7 @@ func (p *discoverParams) addFlagsTo(cmd *cobra.Command) {
 	addDistroDirFlag(&p.distroRepoDir, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 
-	cmd.Flags().StringVarP(&p.packageRepositoryURL, "package-repo-url", "r", "https://packages.wolfi.dev/os", "URL of the APK package repository")
+	cmd.Flags().StringVarP(&p.packageRepositoryURL, "package-repo-url", "r", "", "URL of the APK package repository")
 
 	cmd.Flags().StringVar(&p.nvdAPIKey, "nvd-api-key", "", fmt.Sprintf("NVD API key (Can also be set via the environment variable '%s'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to https://nvd.nist.gov/developers/request-an-api-key .)", envVarNameForNVDAPIKey))
 }
