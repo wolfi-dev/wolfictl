@@ -273,10 +273,10 @@ do
   sleep $interval
 done
 
-# Don't cache the APKINDEX, and make it public.
+# Don't cache the APKINDEX, and leave it public if it already is.
 gcloud --quiet storage cp \
 	--cache-control=no-store \
-	--canned-acl=publicRead \
+	--preserve-acl \
 	"./packages/**/APKINDEX.tar.gz" gs://{{.bucket}}{{.arch}}/ || true
 
 # apks will be cached in CDN for an hour by default.
