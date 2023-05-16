@@ -13,7 +13,7 @@ require (
 	chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e
 	chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030
 	cloud.google.com/go/storage v1.30.1
-	github.com/chainguard-dev/yam v0.0.0-20230411155911-ba3a3357c32e
+	github.com/chainguard-dev/yam v0.0.0-20230515182324-679f6de74032
 	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
 	github.com/charmbracelet/lipgloss v0.7.1
