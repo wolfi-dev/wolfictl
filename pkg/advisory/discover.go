@@ -45,9 +45,14 @@ type DiscoverOptions struct {
 func Discover(opts DiscoverOptions) error {
 	ctx := context.Background()
 
+	packageRepositoryURL := opts.PackageRepositoryURL
+	if packageRepositoryURL == "" {
+		return fmt.Errorf("package repository URL must be specified")
+	}
+
 	var apkindexes []*repository.ApkIndex
 	for _, arch := range opts.Arches {
-		apkindex, err := index.Index(arch, opts.PackageRepositoryURL)
+		apkindex, err := index.Index(arch, packageRepositoryURL)
 		if err != nil {
 			return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
 		}

@@ -19,7 +19,6 @@ import (
 const (
 	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR"
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"
-	defaultAdvisoriesRepoDir   = "."
 )
 
 func Advisory() *cobra.Command {
@@ -62,7 +61,7 @@ func resolveAdvisoriesDir(cliFlagValue string) string {
 
 var distroMutedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#888"))
 
-func renderDetectedDistro(d distro.DetectedDistro) string {
+func renderDetectedDistro(d distro.Distro) string {
 	return distroMutedStyle.Render("Auto-detected distro: ") + d.Name + "\n\n"
 }
 
