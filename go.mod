@@ -6,13 +6,11 @@ replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go 
 
 replace k8s.io/client-go => k8s.io/client-go v0.25.3
 
-// Required after upgrading to latest melange, matches https://github.com/mattmoor/mink/blob/b9148a39b2d8bbc69ca9aaf5e89a7613c0b179d8/go.mod#LL90C18-L90C52
-replace knative.dev/pkg => knative.dev/pkg v0.0.0-20220407210145-4d62e1dbb943
-
 require (
 	chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e
 	chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030
 	cloud.google.com/go/storage v1.30.1
+	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230515182324-679f6de74032
 	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
@@ -26,13 +24,12 @@ require (
 	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/google/go-cmp v0.5.9
-	github.com/google/go-containerregistry v0.14.1-0.20230425172351-b7c6e9dc3944
+	github.com/google/go-containerregistry v0.15.1
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
-	github.com/mattmoor/mink v1.3.1
 	github.com/openvex/go-vex v0.2.0
 	github.com/openvex/vexctl v0.2.1-0.20230407231622-35f56dd77d36
 	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a
@@ -49,7 +46,7 @@ require (
 	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
 	golang.org/x/oauth2 v0.7.0
-	golang.org/x/sync v0.1.0
+	golang.org/x/sync v0.2.0
 	golang.org/x/text v0.9.0
 	golang.org/x/time v0.3.0
 	google.golang.org/api v0.120.0
@@ -130,9 +127,9 @@ require (
 	github.com/digitorus/pkcs7 v0.0.0-20221212123742-001c36b64ec3 // indirect
 	github.com/digitorus/timestamp v0.0.0-20221019182153-ef3b63b79b31 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
-	github.com/docker/cli v23.0.4+incompatible // indirect
-	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v23.0.4+incompatible // indirect
+	github.com/docker/cli v23.0.5+incompatible // indirect
+	github.com/docker/distribution v2.8.2+incompatible // indirect
+	github.com/docker/docker v23.0.5+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
@@ -214,7 +211,7 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
+	github.com/opencontainers/image-spec v1.1.0-rc3 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/owenrumney/go-sarif v1.1.1 // indirect
 	github.com/pborman/uuid v1.2.1 // indirect
@@ -285,7 +282,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog/v2 v2.90.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20230123170611-3dfa6bdaa2d5 // indirect
-	knative.dev/pkg v0.0.0-20230125083639-408ad0773f47 // indirect
 	mvdan.cc/sh/v3 v3.5.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
