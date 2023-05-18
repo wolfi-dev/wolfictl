@@ -204,6 +204,10 @@ else
   ls {{.signingKeyName}}.rsa
 fi
 
+# In order to run "git log" on the packaged .git metadata we need to
+# make sure that we don't hit "dubious permission" errors.
+git config --global --add safe.directory /workspace
+
 set +e # Always touch start-gcloud-cp to start uploading buitl packages, even if the build fails.
 find ./packages -print -exec touch \{} \;
 MELANGE=/usr/bin/melange MELANGE_DIR=/usr/share/melange KEY=${KEY} ARCH={{.arch}} REPO=./packages MELANGE_EXTRA_OPTS="{{.melangeBuildOpts}}" make {{.targets}}
