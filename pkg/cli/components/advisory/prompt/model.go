@@ -1,7 +1,8 @@
-package createprompt
+package prompt
 
 import (
-	"strings"
+	"errors"
+	"regexp"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,34 +13,69 @@ import (
 
 type Model struct {
 	// internal data
-	focusIndex int
-	fields     []field.Field
+	focusIndex                 int
+	fields                     []field.Field
+	allowedPackagesFunc        func() []string
+	allowedVulnerabilitiesFunc func(packageName string) []string
+	allowedFixedVersionsFunc   func(packageName string) []string
 
 	// input/output data
 	Request advisory.Request
 
 	// output data
+
+	// EarlyExit is set to true if the user asks to exit the prompt early.
 	EarlyExit bool
 }
 
-var (
-	packageFieldConfig = field.TextFieldConfiguration{
+func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
+	allowedValues := m.allowedPackagesFunc()
+
+	return field.TextFieldConfiguration{
 		Prompt: "Package: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Package = value
 			return req
 		},
+		AllowedValues:     allowedValues,
+		EmptyValueHelpMsg: "Type to find a package.",
+		NoMatchHelpMsg:    "No matching package found.",
+		ValidationRules: []field.TextValidationRule{
+			field.NotEmpty,
+		},
+	}
+}
+
+var cveIDRegex = regexp.MustCompile(`^CVE-\d{4}-\d{4,}$`)
+
+var ValidCVEID = field.TextValidationRule(func(value string) error {
+	if !cveIDRegex.MatchString(value) {
+		return errors.New("must be a CVE ID")
 	}
 
-	vulnerabilityFieldConfig = field.TextFieldConfiguration{
+	return nil
+})
+
+func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
+	allowedValues := m.allowedVulnerabilitiesFunc(m.Request.Package)
+
+	return field.TextFieldConfiguration{
 		Prompt: "Vulnerability: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Vulnerability = value
 			return req
 		},
+		EmptyValueHelpMsg: "Provide a valid vulnerability ID.",
+		ValidationRules: []field.TextValidationRule{
+			field.NotEmpty,
+			ValidCVEID,
+		},
+		AllowedValues: allowedValues,
 	}
+}
 
-	statusFieldConfig = field.ListFieldConfiguration{
+func (m Model) newStatusFieldConfig() field.ListFieldConfiguration {
+	return field.ListFieldConfiguration{
 		Prompt: "Status: ",
 		Options: []string{
 			string(vex.StatusFixed),
@@ -52,16 +88,20 @@ var (
 			return req
 		},
 	}
+}
 
-	actionFieldConfig = field.TextFieldConfiguration{
+func (m Model) newActionFieldConfig() field.TextFieldConfiguration {
+	return field.TextFieldConfiguration{
 		Prompt: "Action: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Action = value
 			return req
 		},
 	}
+}
 
-	justificationFieldConfig = field.ListFieldConfiguration{
+func (m Model) newJustificationFieldConfig() field.ListFieldConfiguration {
+	return field.ListFieldConfiguration{
 		Prompt:  "Justification: ",
 		Options: vex.Justifications(),
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
@@ -69,21 +109,42 @@ var (
 			return req
 		},
 	}
+}
 
-	// TODO: default to latest
-	fixedVersionFieldConfig = field.TextFieldConfiguration{
+func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldConfiguration {
+	allowedVersions := m.allowedFixedVersionsFunc(packageName)
+
+	cfg := field.TextFieldConfiguration{
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.FixedVersion = value
 			return req
 		},
+		AllowedValues:  allowedVersions,
+		NoMatchHelpMsg: "No matching version found.",
 	}
-)
 
-func New(cr advisory.Request) Model {
+	if len(allowedVersions) >= 1 {
+		cfg.DefaultSuggestion = allowedVersions[0]
+	}
+
+	return cfg
+}
+
+type Configuration struct {
+	Request                    advisory.Request
+	AllowedPackagesFunc        func() []string
+	AllowedVulnerabilitiesFunc func(packageName string) []string
+	AllowedFixedVersionsFunc   func(packageName string) []string
+}
+
+func New(config Configuration) Model {
 	m := Model{
-		Request:    cr,
-		focusIndex: 0,
+		Request: config.Request,
+
+		allowedPackagesFunc:        config.AllowedPackagesFunc,
+		allowedVulnerabilitiesFunc: config.AllowedVulnerabilitiesFunc,
+		allowedFixedVersionsFunc:   config.AllowedFixedVersionsFunc,
 	}
 
 	m, _ = m.addMissingFields()
@@ -97,19 +158,19 @@ func New(cr advisory.Request) Model {
 // fields needed to be added.
 func (m Model) addMissingFields() (Model, bool) {
 	if m.Request.Package == "" {
-		f := field.NewTextField(packageFieldConfig)
+		f := field.NewTextField(m.newPackageFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
 	if m.Request.Vulnerability == "" {
-		f := field.NewTextField(vulnerabilityFieldConfig)
+		f := field.NewTextField(m.newVulnerabilityFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
 	if m.Request.Status == "" {
-		f := field.NewListField(statusFieldConfig)
+		f := field.NewListField(m.newStatusFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
@@ -117,21 +178,21 @@ func (m Model) addMissingFields() (Model, bool) {
 	switch m.Request.Status {
 	case vex.StatusFixed:
 		if m.Request.FixedVersion == "" {
-			f := field.NewTextField(fixedVersionFieldConfig)
+			f := field.NewTextField(m.newFixedVersionFieldConfig(m.Request.Package))
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
 	case vex.StatusAffected:
 		if m.Request.Action == "" {
-			f := field.NewTextField(actionFieldConfig)
+			f := field.NewTextField(m.newActionFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
 	case vex.StatusNotAffected:
 		if m.Request.Justification == "" {
-			f := field.NewListField(justificationFieldConfig)
+			f := field.NewListField(m.newJustificationFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
@@ -158,16 +219,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			sel := m.fields[m.focusIndex]
 
-			if f, ok := sel.(field.TextField); ok {
-				// for now, text fields can't be left empty; so 'enter' should do nothing.
-				if strings.TrimSpace(f.Value()) == "" {
-					// do nothing
+			sel, err := sel.SubmitValue()
+			if err != nil {
+				var inner field.ErrValueNotAccepted
+				if errors.As(err, &inner) {
+					// Value isn't ready to be submitted; do nothing.
 					return m, nil
 				}
+
+				// TODO: Handle other errors
 			}
 
-			m.Request = sel.UpdateRequest(sel.Value(), m.Request)
-			m.fields[m.focusIndex] = sel.SetDone()
+			m.Request = sel.UpdateRequest(m.Request)
+			m.fields[m.focusIndex] = sel
 
 			// Move on to the next field
 

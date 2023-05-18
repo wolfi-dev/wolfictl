@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/list"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 )
 
 type ListField struct {
@@ -24,8 +25,8 @@ type ListFieldConfiguration struct {
 
 func NewListField(cfg ListFieldConfiguration) ListField {
 	l := list.New(cfg.Prompt, cfg.Options)
-	l.SelectedStyle = focusedStyle
-	l.UnselectedStyle = blurredStyle
+	l.SelectedStyle = styles.Accented()
+	l.UnselectedStyle = styles.Secondary()
 
 	return ListField{
 		prompt:         cfg.Prompt,
@@ -34,21 +35,27 @@ func NewListField(cfg ListFieldConfiguration) ListField {
 	}
 }
 
-func (f ListField) UpdateRequest(value string, req advisory.Request) advisory.Request {
+func (f ListField) UpdateRequest(req advisory.Request) advisory.Request {
+	value := f.Value()
 	return f.requestUpdater(value, req)
 }
 
-func (f ListField) Update(msg tea.Msg) (Field, tea.Cmd) {
-	var cmd tea.Cmd
+func (f ListField) SubmitValue() (Field, error) {
+	return f.setDone(), nil
+}
 
-	if f.input.Focused() {
-		f.input, cmd = f.input.Update(msg)
+func (f ListField) Update(msg tea.Msg) (Field, tea.Cmd) {
+	if f.done {
+		return f, nil
 	}
+
+	var cmd tea.Cmd
+	f.input, cmd = f.input.Update(msg)
 
 	return f, cmd
 }
 
-func (f ListField) SetDone() Field {
+func (f ListField) setDone() ListField {
 	f.done = true
 	return f
 }
@@ -78,10 +85,10 @@ func (f ListField) View() string {
 		lines = append(lines, f.input.View())
 		helpText := fmt.Sprintf(
 			"%s %s %s %s",
-			cursorModeHelpStyle.Render("Enter"),
-			helpStyle.Render("to confirm value."),
-			cursorModeHelpStyle.Render("Ctrl+C"),
-			helpStyle.Render("to quit."),
+			helpKeyStyle.Render("Enter"),
+			helpExplanationStyle.Render("to confirm."),
+			helpKeyStyle.Render("Ctrl+C"),
+			helpExplanationStyle.Render("to quit."),
 		)
 
 		lines = append(lines, helpText)

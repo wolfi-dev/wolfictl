@@ -57,3 +57,33 @@ func NewVersion(v string) (*version.Version, error) {
 	v = strings.ReplaceAll(v, "_", "")
 	return version.NewVersion(v)
 }
+
+// ByLatestStrings is like ByLatest but lets the user pass in strings instead of Version objects.
+type ByLatestStrings []string
+
+func (by ByLatestStrings) Len() int {
+	return len(by)
+}
+
+func (by ByLatestStrings) Less(i, j int) bool {
+	vi, err := NewVersion(by[i])
+	if err != nil {
+		return false
+	}
+	vj, err := NewVersion(by[j])
+	if err != nil {
+		return false
+	}
+	if equal(vi.Segments(), vj.Segments()) {
+		if vj.Metadata() != "" {
+			if vj.Metadata() > vi.Metadata() {
+				return false
+			}
+		}
+	}
+	return vi.GreaterThan(vj)
+}
+
+func (by ByLatestStrings) Swap(i, j int) {
+	by[i], by[j] = by[j], by[i]
+}

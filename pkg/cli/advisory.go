@@ -4,16 +4,21 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
+	"chainguard.dev/melange/pkg/build"
 	"github.com/openvex/go-vex/pkg/vex"
+	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
+	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 const (
@@ -59,10 +64,8 @@ func resolveAdvisoriesDir(cliFlagValue string) string {
 	return ""
 }
 
-var distroMutedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#888"))
-
 func renderDetectedDistro(d distro.Distro) string {
-	return distroMutedStyle.Render("Auto-detected distro: ") + d.Name + "\n\n"
+	return styles.Secondary().Render("Auto-detected distro: ") + d.Name + "\n\n"
 }
 
 func resolveTimestamp(ts string) (time.Time, error) {
@@ -160,4 +163,31 @@ func addNoPromptFlag(val *bool, cmd *cobra.Command) {
 
 func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
 	cmd.Flags().BoolVar(val, "no-distro-detection", false, "do not attempt to auto-detect the distro")
+}
+
+func newAllowedFixedVersionsFunc(apkindexes []*repository.ApkIndex, buildCfgs *configs.Index[build.Configuration]) func(packageName string) []string {
+	return func(packageName string) []string {
+		allowedVersionSet := make(map[string]struct{})
+
+		// Get published versions using APKINDEX data.
+
+		for _, apkindex := range apkindexes {
+			for _, pkg := range apkindex.Packages {
+				if pkg.Name == packageName {
+					allowedVersionSet[pkg.Version] = struct{}{}
+				}
+			}
+		}
+
+		// Also ensure the currently defined version is included in the set, even if it's not been published yet.
+
+		pkg := buildCfgs.Select().WhereName(packageName).Configurations()[0].Package
+		currentVersion := fmt.Sprintf("%s-r%d", pkg.Version, pkg.Epoch)
+		allowedVersionSet[currentVersion] = struct{}{}
+
+		allowedVersions := lo.Keys(allowedVersionSet)
+		sort.Sort(versions.ByLatestStrings(allowedVersions))
+
+		return allowedVersions
+	}
 }
