@@ -59,10 +59,8 @@ wolfictl: $(SRCS) ## Builds wolfictl
 	go build -trimpath $(BUILDFLAGS) -ldflags "$(LDFLAGS)" -o $@ ./
 
 .PHONY: install
-install: $(SRCS) ## Installs wolfictl into BINDIR (default /usr/bin)
+install: wolfictl ## Installs wolfictl into BINDIR (default /usr/bin)
 	install -Dm755 wolfictl ${DESTDIR}${BINDIR}/wolfictl
-	install -dm755 ${DESTDIR}/usr/share/wolfictl/pipelines
-	tar c -C pipelines . | tar x -C "${DESTDIR}/usr/share/wolfictl/pipelines"
 
 #####################
 # lint / test section
