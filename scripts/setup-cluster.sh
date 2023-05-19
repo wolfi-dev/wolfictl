@@ -26,7 +26,7 @@ kubectl apply \
 # If this image is not available, comment this out to use the upstream directly.
 kubectl set image ds/csi-secrets-store \
   -n kube-system \
-  secrets-store=cgr.dev/chainguard/secrets-store-csi-driver:${CSI_DRIVER_VERSION}
+  secrets-store=cgr.dev/chainguard/secrets-store-csi-driver:latest
 
 # Install the GCP provider for the secrets store CSI driver.
 GCP_PLUGIN_VERSION=1.2.0
@@ -36,7 +36,7 @@ kubectl apply -f "https://raw.githubusercontent.com/GoogleCloudPlatform/secrets-
 # If this image is not available, comment this out to use the upstream directly.
 kubectl set image daemonset/csi-secrets-store-provider-gcp \
   -n kube-system \
-  provider=cgr.dev/chainguard/secrets-store-csi-driver-provider-gcp:${GCP_PLUGIN_VERSION}
+  provider=cgr.dev/chainguard/secrets-store-csi-driver-provider-gcp:latest
 
 # Patch the secrets store CSI driver and GCP provider to tolerate Arm nodes.
 kubectl patch daemonset csi-secrets-store-provider-gcp \
