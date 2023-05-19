@@ -14,7 +14,7 @@ kubectl annotate serviceaccount default --overwrite \
   "iam.gke.io/gcp-service-account=${SA}@${PROJECT}.iam.gserviceaccount.com"
 
 # Install the secrets store CSI driver.
-CSI_DRIVER_VERSION=1.3.2
+CSI_DRIVER_VERSION=1.3.3
 kubectl apply \
   -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/rbac-secretproviderclass.yaml" \
   -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/csidriver.yaml" \
