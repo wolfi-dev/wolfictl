@@ -23,10 +23,16 @@ kubectl apply \
   -f "https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/v${CSI_DRIVER_VERSION}/deploy/secrets-store-csi-driver.yaml"
 
 # Replace the upstream CSI driver with our own Chainguard Image equivalent.
-# If this image is not available, comment this out to use the upstream directly.
+# If these images are not available, comment this out to use the upstream directly.
 kubectl set image ds/csi-secrets-store \
   -n kube-system \
   secrets-store=cgr.dev/chainguard/secrets-store-csi-driver:latest
+kubectl set image ds/csi-secrets-store \
+  -n kube-system \
+  liveness-probe=cgr.dev/chainguard/kubernetes-csi-livenessprobe:latest
+kubectl set image ds/csi-secrets-store \
+  -n kube-system
+  node-driver-registrar=cgr.dev/chainguard/kubernetes-csi-node-driver-registrar:latest
 
 # Install the GCP provider for the secrets store CSI driver.
 GCP_PLUGIN_VERSION=1.2.0
