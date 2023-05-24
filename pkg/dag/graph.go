@@ -318,7 +318,9 @@ func (g *Graph) addDanglingPackage(name string, parent Package) error {
 // order, meaning that packages earlier in the list depend on packages later in
 // the list.
 func (g Graph) Sorted() ([]Package, error) {
-	nodes, err := graph.TopologicalSort(g.Graph)
+	nodes, err := graph.StableTopologicalSort(g.Graph, func(i string, j string) bool {
+		return i > j
+	})
 	if err != nil {
 		return nil, err
 	}
