@@ -11,15 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 
 	"github.com/google/go-github/v50/github"
 
 	"github.com/openvex/go-vex/pkg/vex"
-
-	"github.com/wolfi-dev/wolfictl/pkg/configs"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 
@@ -266,7 +263,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	if err != nil {
 		return err
 	}
-	return o.doFollowupSync(advisoryCfgs.Select())
+	return nil
 }
 
 func (o *PackageOptions) request(vuln string) advisory.Request {
@@ -306,29 +303,6 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 //	}
 //	return releaseURL, nil
 // }
-
-func (o *PackageOptions) doFollowupSync(selection configs.Selection[advisoryconfigs.Document]) error {
-	needs, err := sync.DetermineNeeds(selection)
-	if err != nil {
-		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
-	}
-
-	unmetNeeds := sync.Unmet(needs)
-
-	if len(unmetNeeds) == 0 {
-		log.Printf("INFO: No secfixes data needed to be added from this advisory. Secfixes data is in sync. 👍")
-		return nil
-	}
-
-	for _, n := range unmetNeeds {
-		err := n.Resolve()
-		if err != nil {
-			return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
-		}
-	}
-
-	return nil
-}
 
 func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 	wt, err := repo.Worktree()
