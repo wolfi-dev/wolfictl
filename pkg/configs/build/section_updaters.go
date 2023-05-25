@@ -6,36 +6,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 )
 
-func NewAdvisoriesSectionUpdater(
-	updater configs.SectionUpdater[build.Advisories, build.Configuration],
-) configs.EntryUpdater[build.Configuration] {
-	yamlASTMutater := configs.NewTargetedYAMLASTMutater[build.Advisories, build.Configuration](
-		"advisories",
-		updater,
-		func(cfg build.Configuration, data build.Advisories) build.Configuration {
-			cfg.Advisories = data
-			return cfg
-		},
-	)
-
-	return configs.NewYAMLUpdateFunc[build.Configuration](yamlASTMutater)
-}
-
-func NewSecfixesSectionUpdater(
-	updater configs.SectionUpdater[build.Secfixes, build.Configuration],
-) configs.EntryUpdater[build.Configuration] {
-	yamlASTMutater := configs.NewTargetedYAMLASTMutater[build.Secfixes, build.Configuration](
-		"secfixes",
-		updater,
-		func(cfg build.Configuration, data build.Secfixes) build.Configuration {
-			cfg.Secfixes = data
-			return cfg
-		},
-	)
-
-	return configs.NewYAMLUpdateFunc[build.Configuration](yamlASTMutater)
-}
-
 func NewPackageSectionUpdater(
 	updater configs.SectionUpdater[build.Package, build.Configuration],
 ) configs.EntryUpdater[build.Configuration] {

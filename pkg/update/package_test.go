@@ -52,10 +52,10 @@ fix CVEs
 	// create a new release tag 1.2.5
 	createTestTag(t, r, "1.2.5")
 
-	// run secfixes, current version 1.2.5, previous 1.2.4 and assert only two CVEs returned in list
+	// run advisories, current version 1.2.5, previous 1.2.4 and assert only two CVEs returned in list
 	o := PackageOptions{
-		Secfixes: true,
-		Logger:   log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		Advisories: true,
+		Logger:     log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
 	previousVersion, err := version.NewVersion("1.2.4")

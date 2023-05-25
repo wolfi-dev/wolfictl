@@ -41,7 +41,7 @@ type PackageOptions struct {
 	TargetRepo            string
 	Version               string
 	Epoch                 string
-	Secfixes              bool
+	Advisories            bool
 	DryRun                bool
 	UseGitSign            bool
 	Logger                *log.Logger
@@ -113,9 +113,9 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 		return fmt.Errorf("failed to switch to working git branch: %w", err)
 	}
 
-	// optionally update secfixes based on commit since the previous release
-	if o.Secfixes {
-		err := o.updateSecfixes(repo)
+	// optionally update advisories based on commit since the previous release
+	if o.Advisories {
+		err := o.updateAdvisories(repo)
 		if err != nil {
 			return fmt.Errorf("failed to update secfixes: %w", err)
 		}
@@ -138,7 +138,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 }
 
 // if we are executing the update command in a git repository then check for CVE fixes
-func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
+func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return err
