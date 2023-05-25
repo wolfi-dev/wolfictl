@@ -11,15 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 
 	"github.com/google/go-github/v50/github"
 
 	"github.com/openvex/go-vex/pkg/vex"
-
-	"github.com/wolfi-dev/wolfictl/pkg/configs"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 
@@ -44,7 +41,7 @@ type PackageOptions struct {
 	TargetRepo            string
 	Version               string
 	Epoch                 string
-	Secfixes              bool
+	Advisories            bool
 	DryRun                bool
 	UseGitSign            bool
 	Logger                *log.Logger
@@ -116,9 +113,9 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 		return fmt.Errorf("failed to switch to working git branch: %w", err)
 	}
 
-	// optionally update secfixes based on commit since the previous release
-	if o.Secfixes {
-		err := o.updateSecfixes(repo)
+	// optionally update advisories based on commit since the previous release
+	if o.Advisories {
+		err := o.updateAdvisories(repo)
 		if err != nil {
 			return fmt.Errorf("failed to update secfixes: %w", err)
 		}
@@ -141,7 +138,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 }
 
 // if we are executing the update command in a git repository then check for CVE fixes
-func (o *PackageOptions) updateSecfixes(repo *git.Repository) error {
+func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -266,7 +263,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	if err != nil {
 		return err
 	}
-	return o.doFollowupSync(advisoryCfgs.Select())
+	return nil
 }
 
 func (o *PackageOptions) request(vuln string) advisory.Request {
@@ -306,29 +303,6 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 //	}
 //	return releaseURL, nil
 // }
-
-func (o *PackageOptions) doFollowupSync(selection configs.Selection[advisoryconfigs.Document]) error {
-	needs, err := sync.DetermineNeeds(selection)
-	if err != nil {
-		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
-	}
-
-	unmetNeeds := sync.Unmet(needs)
-
-	if len(unmetNeeds) == 0 {
-		log.Printf("INFO: No secfixes data needed to be added from this advisory. Secfixes data is in sync. 👍")
-		return nil
-	}
-
-	for _, n := range unmetNeeds {
-		err := n.Resolve()
-		if err != nil {
-			return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
-		}
-	}
-
-	return nil
-}
 
 func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 	wt, err := repo.Worktree()

@@ -28,7 +28,7 @@ func Package() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&o.DryRun, "dry-run", false, "prints proposed package updates rather than creating a pull request")
-	cmd.Flags().BoolVar(&o.Secfixes, "sec-fixes", true, "checks commit messages since last release, for `fixes: CVE###` and generates melange security advisories")
+	cmd.Flags().BoolVar(&o.Advisories, "sec-fixes", true, "checks commit messages since last release, for `fixes: CVE###` and generates melange security advisories")
 	cmd.Flags().StringVar(&o.PullRequestBaseBranch, "pull-request-base-branch", "main", "base branch to create a pull request against")
 	cmd.Flags().StringVar(&o.TargetRepo, "target-repo", "https://github.com/wolfi-dev/os", "target git repository containing melange configuration to update")
 	cmd.Flags().StringVar(&o.Version, "version", "", "version to bump melange package to")

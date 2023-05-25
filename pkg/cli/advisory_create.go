@@ -107,9 +107,6 @@ func AdvisoryCreate() *cobra.Command {
 				var returnedModel tea.Model
 				program := tea.NewProgram(m)
 
-				// try to be helpful: if we're prompting, automatically enable secfixes sync
-				p.requestParams.sync = true
-
 				if returnedModel, err = program.Run(); err != nil {
 					return err
 				}
@@ -132,13 +129,6 @@ func AdvisoryCreate() *cobra.Command {
 			err = advisory.Create(req, opts)
 			if err != nil {
 				return err
-			}
-
-			if p.requestParams.sync {
-				err := doFollowupSync(advisoryCfgs.Select().WhereName(req.Package))
-				if err != nil {
-					return err
-				}
 			}
 
 			return nil

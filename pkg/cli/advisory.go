@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sort"
 	"time"
@@ -12,10 +11,8 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	"github.com/wolfi-dev/wolfictl/pkg/advisory/sync"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"gitlab.alpinelinux.org/alpine/go/repository"
@@ -81,33 +78,11 @@ func resolveTimestamp(ts string) (time.Time, error) {
 	return t, nil
 }
 
-func doFollowupSync(selection configs.Selection[advisoryconfigs.Document]) error {
-	needs, err := sync.DetermineNeeds(selection)
-
-	if err != nil {
-		return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
-	}
-
-	unmetNeeds := sync.Unmet(needs)
-
-	if len(unmetNeeds) == 0 {
-		log.Printf("INFO: No secfixes data needed to be added from this advisory. Secfixes data is in sync. 👍")
-		return nil
-	}
-
-	for _, n := range unmetNeeds {
-		err := n.Resolve()
-		if err != nil {
-			return fmt.Errorf("unable to sync secfixes data for advisory: %w", err)
-		}
-	}
-
-	return nil
-}
-
 type advisoryRequestParams struct {
 	packageName, vuln, status, action, impact, justification, timestamp, fixedVersion string
-	sync                                                                              bool
+
+	// Deprecated: This flag is no longer used, and so this field is ignored.
+	sync bool
 }
 
 func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
@@ -121,6 +96,8 @@ func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp for VEX statement")
 	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for fixed status)")
 	cmd.Flags().BoolVar(&p.sync, "sync", false, "synchronize secfixes data immediately after updating advisory")
+
+	_ = cmd.Flags().MarkDeprecated("sync", "because 'secfixes' data is no longer used. This flag now has no effect, and it will be removed in an upcoming version.") //nolint:errcheck
 }
 
 func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
