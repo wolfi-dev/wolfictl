@@ -1,12 +1,28 @@
 package:
   name: cups
 
-secfixes:
-  2.4.2-r0:
-    - CVE-2022-26691
-
 advisories:
   CVE-2022-26691:
     - timestamp: 2022-10-25T13:38:24-04:00
       status: fixed
       fixed-version: 2.4.2-r0
+  CVE-2022-33333:
+    - timestamp: 2022-10-25T13:38:24-04:00
+      status: fixed
+      fixed-version: 2.4.2-r0
+    - timestamp: 2022-11-25T13:38:24-04:00
+      status: affected # This means CVE-2022-33333 should not be represented in the secdb.
+  CVE-2022-44444:
+    - timestamp: 2022-10-25T13:38:24-04:00
+      status: fixed
+      fixed-version: 2.4.2-r0
+    - timestamp: 2022-11-25T13:38:24-04:00
+      status: not_affected # This means CVE-2022-44444 should be NAK-ed in the secdb.
+      justification: component_not_present
+  CVE-2022-55555: # These are sorted incorrectly (by timestamp)! The implementation should still sort by timestamp. And thus, this should be marked as fixed, not NAK-ed.
+    - timestamp: 2022-10-25T14:38:24-04:00
+      status: fixed
+      fixed-version: 2.5.0-r0
+    - timestamp: 2022-10-25T13:38:24-04:00
+      status: not_affected
+      justification: component_not_present
