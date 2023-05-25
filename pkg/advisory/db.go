@@ -3,7 +3,11 @@ package advisory
 import (
 	"encoding/json"
 	"errors"
+	"sort"
 
+	"github.com/openvex/go-vex/pkg/vex"
+	"github.com/samber/lo"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 )
@@ -23,20 +27,46 @@ var ErrNoPackageSecurityData = errors.New("no package security data found")
 
 // BuildDatabase builds a security database from the given options.
 func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
-	var packageEntries []PackageEntry
+	var packageEntries []secdb.PackageEntry
 
 	for _, index := range opts.AdvisoryCfgIndices {
-		var cfgPackageEntries []PackageEntry
+		var cfgPackageEntries []secdb.PackageEntry
 
 		for _, cfg := range index.Select().Configurations() {
-			if len(cfg.Secfixes) == 0 {
+			if len(cfg.Advisories) == 0 {
 				continue
 			}
 
-			pe := PackageEntry{
-				Pkg: Package{
+			advisoryVulns := lo.Keys(cfg.Advisories)
+			sort.Strings(advisoryVulns)
+
+			secfixes := make(secdb.Secfixes)
+
+			for _, vuln := range advisoryVulns {
+				entries := cfg.Advisories[vuln]
+
+				if len(entries) == 0 {
+					continue
+				}
+
+				latest := Latest(entries)
+				switch latest.Status {
+				case vex.StatusFixed:
+					version := latest.FixedVersion
+					secfixes[version] = append(secfixes[version], vuln)
+				case vex.StatusNotAffected:
+					secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vuln)
+				}
+			}
+
+			if len(secfixes) == 0 {
+				continue
+			}
+
+			pe := secdb.PackageEntry{
+				Pkg: secdb.Package{
 					Name:     cfg.Package.Name,
-					Secfixes: Secfixes(cfg.Secfixes),
+					Secfixes: secfixes,
 				},
 			}
 
@@ -51,7 +81,7 @@ func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
 		packageEntries = append(packageEntries, cfgPackageEntries...)
 	}
 
-	db := Database{
+	db := secdb.Database{
 		APKURL:    apkURL,
 		Archs:     opts.Archs,
 		Repo:      opts.Repo,
@@ -61,22 +91,3 @@ func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
 
 	return json.MarshalIndent(db, "", "  ")
 }
-
-type Database struct {
-	APKURL    string         `json:"apkurl"`
-	Archs     []string       `json:"archs"`
-	Repo      string         `json:"reponame"`
-	URLPrefix string         `json:"urlprefix"`
-	Packages  []PackageEntry `json:"packages"`
-}
-
-type PackageEntry struct {
-	Pkg Package `json:"pkg"`
-}
-
-type Package struct {
-	Name     string   `json:"name"`
-	Secfixes Secfixes `json:"secfixes"`
-}
-
-type Secfixes map[string][]string
