@@ -32,7 +32,9 @@ func newConfigurationDecodeFunc(fsys fs.FS) func(string) (*Document, error) {
 
 func DecodeDocument(r io.Reader) (*Document, error) {
 	doc := &Document{}
-	err := yaml.NewDecoder(r).Decode(doc)
+	decoder := yaml.NewDecoder(r)
+	decoder.KnownFields(true)
+	err := decoder.Decode(doc)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +44,6 @@ func DecodeDocument(r io.Reader) (*Document, error) {
 
 type Document struct {
 	Package Package `yaml:"package"`
-
-	Secfixes Secfixes `yaml:"secfixes,omitempty"`
 
 	Advisories Advisories `yaml:"advisories,omitempty"`
 }
@@ -55,8 +55,6 @@ func (d Document) Name() string {
 type Package struct {
 	Name string `yaml:"name"`
 }
-
-type Secfixes map[string][]string
 
 type Advisories map[string][]Entry
 
