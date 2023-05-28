@@ -65,6 +65,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	// indexes is a cache of all repositories. Only some might be used for each package.
 	var (
 		indexes = make(map[string]apko.NamedIndex)
+		keys    = make(map[string][]byte)
 		errs    []error
 	)
 
@@ -103,6 +104,9 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			origKeys    = c.Environment.Contents.Keyring
 			repos       []string
 			lookupRepos = []apko.NamedIndex{}
+			// validKeys contains list of keys valid for this package; as opposed to
+			// keys, which is the master list of all keys we have encountered
+			validKeys = map[string][]byte{}
 		)
 		for _, repo := range append(origRepos, opts.repos...) {
 			if index, ok := indexes[repo]; !ok {
@@ -111,19 +115,24 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 				lookupRepos = append(lookupRepos, index)
 			}
 		}
-		keyMap := make(map[string][]byte)
+		// ensure any keys listed in this package are in the master map of keys
 		for _, key := range append(origKeys, opts.keys...) {
+			if _, ok := keys[key]; ok {
+				validKeys[key] = keys[key]
+				continue
+			}
 			b, err := getKeyMaterial(key)
 			if err != nil {
 				return nil, fmt.Errorf("failed to get key material for %s: %w", key, err)
 			}
 			// we can have no error, but still no bytes, as we ignore missing files
 			if b != nil {
-				keyMap[key] = b
+				keys[key] = b
+				validKeys[key] = b
 			}
 		}
 		if len(repos) > 0 {
-			loadedRepos, err := apko.GetRepositoryIndexes(repos, keyMap, arch)
+			loadedRepos, err := apko.GetRepositoryIndexes(repos, keys, arch)
 			if err != nil {
 				return nil, fmt.Errorf("unable to load repositories for %s: %w", c.String(), err)
 			}
