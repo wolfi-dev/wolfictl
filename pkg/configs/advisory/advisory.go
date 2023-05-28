@@ -56,7 +56,7 @@ type Package struct {
 	Name string `yaml:"name"`
 }
 
-type Advisories map[string][]Entry
+type Advisories map[string]Advisory
 
 type Entry struct {
 	Timestamp       time.Time         `yaml:"timestamp"`

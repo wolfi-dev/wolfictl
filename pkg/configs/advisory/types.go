@@ -24,12 +24,12 @@ type DetectionEvent struct {
 	Detector Detector `yaml:"detector"`
 
 	// Subject identifies the particular software that the Detector claims is vulnerable.
-	Subject Subject
+	Subject Subject `yaml:"subject"`
 
 	// VulnerabilityIDs lists any known IDs of the underlying vulnerability found in
 	// the Subject. This list SHOULD include a CVE ID (from NVD) if one is known.
 	// Other IDs MAY be included, such as GHSA IDs or GoVulnDB IDs.
-	VulnerabilityIDs []string
+	VulnerabilityIDs []string `yaml:"vulnerability-ids"`
 
 	// PackageVersions lists the versions of the package that the Detector claims are vulnerable.
 	PackageVersions []string `yaml:"package-versions"`
@@ -37,10 +37,25 @@ type DetectionEvent struct {
 	// Severity is a non-authoritative severity rating for the vulnerability. This
 	// is included as a convenience, but more comprehensive severity scores SHOULD
 	// be obtained from the underlying vulnerability data source(s).
-	Severity Severity
+	Severity Severity `yaml:"severity"`
 }
 
 type Severity int
+
+func (s Severity) String() string {
+	switch s {
+	case SeverityLow:
+		return "low"
+	case SeverityMedium:
+		return "medium"
+	case SeverityHigh:
+		return "high"
+	case SeverityCritical:
+		return "critical"
+	default:
+		return "unknown"
+	}
+}
 
 const (
 	SeverityUnknown Severity = iota
@@ -56,11 +71,11 @@ func (e DetectionEvent) Time() time.Time {
 	return e.Timestamp
 }
 
-type Detector int
+type Detector string
 
 const (
-	UnknownDetector Detector = iota
-	NVDAPIDetector
+	UnknownDetector Detector = "unknown-detector"
+	NVDAPIDetector  Detector = "nvd-api-detector"
 	// GrypeDetector
 )
 
@@ -76,6 +91,8 @@ type SBOMComponentReference struct {
 	ComponentID  string   `yaml:"component-id"`
 }
 
+// SBOMKind is an enum that identifies the kind of SBOM that a component reference is pointing to.
+// TODO: maybe this should be a string, since order doesn't matter?
 type SBOMKind int
 
 const (
@@ -85,8 +102,10 @@ const (
 	Syft
 )
 
+// FalsePositiveDeterminationEvent is an event that indicates that a previously
+// detected vulnerability was determined to be a false positive.
 type FalsePositiveDeterminationEvent struct {
-	Timestamp time.Time
+	Timestamp time.Time `yaml:"timestamp"`
 }
 
 var _ Event = (*FalsePositiveDeterminationEvent)(nil)
@@ -96,7 +115,7 @@ func (e FalsePositiveDeterminationEvent) Time() time.Time {
 }
 
 type TruePositiveDeterminationEvent struct {
-	Timestamp time.Time
+	Timestamp time.Time `yaml:"timestamp"`
 }
 
 var _ Event = (*TruePositiveDeterminationEvent)(nil)
@@ -106,8 +125,8 @@ func (e TruePositiveDeterminationEvent) Time() time.Time {
 }
 
 type FixAppliedEvent struct {
-	Timestamp           time.Time
-	FixedPackageVersion string
+	Timestamp           time.Time `yaml:"timestamp"`
+	FixedPackageVersion string    `yaml:"fixed-package-version"`
 }
 
 var _ Event = (*FixAppliedEvent)(nil)
@@ -117,7 +136,7 @@ func (e FixAppliedEvent) Time() time.Time {
 }
 
 type UpdatedVulnerabilityDataEvent struct {
-	Timestamp time.Time
+	Timestamp time.Time `yaml:"timestamp"`
 }
 
 var _ Event = (*UpdatedVulnerabilityDataEvent)(nil)

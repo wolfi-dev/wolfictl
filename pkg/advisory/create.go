@@ -25,7 +25,7 @@ func Create(req Request, opts CreateOptions) error {
 	switch count {
 	case 0:
 		// i.e. no advisories file for this package yet
-		return createAdvisoryConfig(opts.AdvisoryCfgs, req)
+		return createAdvisoryConfig(opts.AdvisoryCfgs, req.Package, advisoryEntry
 
 	case 1:
 		// i.e. exactly one advisories file for this package
@@ -50,17 +50,14 @@ func Create(req Request, opts CreateOptions) error {
 	return fmt.Errorf("cannot create advisory: found %d advisory documents for package %q", count, req.Package)
 }
 
-func createAdvisoryConfig(cfgs *configs.Index[advisory.Document], req Request) error {
-	advisories := make(advisory.Advisories)
-
-	vulnID := req.Vulnerability
-	advisories[vulnID] = append(advisories[vulnID], req.toAdvisoryEntry())
-
-	err := cfgs.Create(fmt.Sprintf("%s.advisories.yaml", req.Package), advisory.Document{
+func createAdvisoryConfig(cfgs *configs.Index[advisory.Document], pkgName string, adv advisory.Advisory) error {
+	err := cfgs.Create(fmt.Sprintf("%s.advisories.yaml", pkgName), advisory.Document{
 		Package: advisory.Package{
-			Name: req.Package,
+			Name: pkgName,
 		},
-		Advisories: advisories,
+		Advisories: advisory.Advisories{
+			adv.ID: adv,
+		},
 	})
 	if err != nil {
 		return err

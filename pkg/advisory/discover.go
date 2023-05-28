@@ -96,27 +96,25 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			return fmt.Errorf("unable to parse CPE URI %q: %w", match.CPE.URI, err)
 		}
 
-		e := DetectionEvent{
-			Timestamp: time.Now(),
-			Detector:  NVDAPIDetector,
-			Subject: Subject{
-				CPE: *cpe,
-			},
-			VulnerabilityIDs: []string{match.Vulnerability.ID},
-			PackageVersions:  nil,
-			Severity:         SeverityUnknown,
-		}
-
 		advCfgEntries := opts.AdvisoryCfgs.Select().WhereName(pkg)
 		vulnID := match.Vulnerability.ID
 		if advCfgEntries.Len() == 0 {
 			// create a brand-new advisory config
 
-			err := createAdvisoryConfig(opts.AdvisoryCfgs, Request{
-				Package:       pkg,
-				Vulnerability: vulnID,
-				Status:        vex.StatusUnderInvestigation,
-				Timestamp:     time.Now(),
+			err := createAdvisoryConfig(opts.AdvisoryCfgs, pkg, advisoryconfigs.Advisory{
+				ID: vulnID,
+				Events: []advisoryconfigs.Event{
+					advisoryconfigs.DetectionEvent{
+						Timestamp: time.Now(),
+						Detector:  advisoryconfigs.NVDAPIDetector,
+						Subject: advisoryconfigs.Subject{
+							CPE: *cpe,
+						},
+						VulnerabilityIDs: []string{vulnID},
+						PackageVersions:  []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
+						Severity:         advisoryconfigs.SeverityUnknown,
+					},
+				},
 			})
 			if err != nil {
 				return fmt.Errorf("unable to record new advisory: %w", err)
