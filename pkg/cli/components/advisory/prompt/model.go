@@ -108,7 +108,7 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Event.Data = advisoryconfigs.Fixed{
-				FixedPackageVersion: value,
+				FixedVersion: value,
 			}
 			return req
 		},

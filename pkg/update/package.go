@@ -272,7 +272,7 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 		Package:       o.PackageName,
 		Vulnerability: vuln,
 		Event: event.NewFixed(time.Now(), event.Fixed{
-			FixedPackageVersion: fixedVersion,
+			FixedVersion: fixedVersion,
 		}),
 	}
 }

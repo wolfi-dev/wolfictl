@@ -52,7 +52,7 @@ func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
 				latest := Latest(events)
 				switch d := latest.Data.(type) {
 				case event.Fixed:
-					version := d.FixedPackageVersion
+					version := d.FixedVersion
 					secfixes[version] = append(secfixes[version], vuln)
 				case event.FalsePositiveDetermination:
 					secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vuln)

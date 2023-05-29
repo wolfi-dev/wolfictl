@@ -53,17 +53,17 @@ type Subject struct {
 }
 
 type SBOMComponentReference struct {
-	SBOMKind     SBOMKind `yaml:"sbom-kind"`
+	SBOMType     SBOMType `yaml:"sbom-type"`
 	SBOMLocation string   `yaml:"sbom-location"`
 	ComponentID  string   `yaml:"component-id"`
 }
 
-// SBOMKind identifies the kind of SBOM that a component reference is pointing
+// SBOMType identifies the type of SBOM that a component reference is pointing
 // to.
-type SBOMKind string
+type SBOMType string
 
 const (
-	SBOMKindSPDX      SBOMKind = "spdx"
-	SBOMKindCycloneDX SBOMKind = "cyclonedx"
-	SBOMKindSyft      SBOMKind = "syft"
+	SBOMTypeSPDX      SBOMType = "spdx"
+	SBOMTypeCycloneDX SBOMType = "cyclonedx"
+	SBOMTypeSyft      SBOMType = "syft"
 )

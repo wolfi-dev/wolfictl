@@ -8,7 +8,7 @@ type FalsePositiveDetermination struct {
 	Notes string      `yaml:"notes"`
 }
 
-var (
+const (
 	// FPTypeVulnerabilityNotValid indicates that the vulnerability is not a valid
 	// security problem. The vulnerability might be disputed or not valid for other
 	// reasons.

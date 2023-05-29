@@ -2,9 +2,12 @@ package event
 
 import "time"
 
-// Fixed is an event that indicates that a vulnerability has been fixed.
+// Fixed is an event that indicates that a vulnerability has been remediated in
+// an updated version of the distribution package.
 type Fixed struct {
-	FixedPackageVersion string `yaml:"fixed-package-version"`
+	// FixedVersion is the version of the distribution package that contains
+	// the fix to the vulnerability.
+	FixedVersion string `yaml:"fixed-version"`
 }
 
 func NewFixed(timestamp time.Time, event Fixed) Event {
