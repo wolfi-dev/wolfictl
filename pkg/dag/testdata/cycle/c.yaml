@@ -1,0 +1,11 @@
+package:
+  name: c
+  version: "1.5.5"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+environment:
+  contents:
+    packages:
+      - d

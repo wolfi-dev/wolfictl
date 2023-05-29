@@ -1,0 +1,12 @@
+package:
+  name: b
+  version: "1.2.3"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+environment:
+  contents:
+    packages:
+      - c
+      - d
