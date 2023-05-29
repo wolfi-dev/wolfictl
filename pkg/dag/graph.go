@@ -262,43 +262,58 @@ func (g *Graph) addAppropriatePackage(resolver *apko.PkgResolver, c Package, dep
 // It discovers what the current dependency is that is causing the potential loop,
 // removes the last edge in that cycle, and regenerates that dependency without the previous target.
 func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apko.PkgResolver, localRepoSource string) error {
-	sp, err := graph.ShortestPath(g.Graph, c.target, c.src)
-	if err != nil {
-		return fmt.Errorf("unable to find shortest path: %w", err)
-	}
-	if len(sp) < 2 {
-		return fmt.Errorf("there is no path from %s to %s", c.target, c.src)
-	}
-	// the last edge in the cycle is the one that caused the cycle
-	removeSrc, removeTarget := sp[len(sp)-2], sp[len(sp)-1]
+	// cycle through, removing all "shortest path" until we can resolve the cycle,
+	// then add them back
+	var (
+		removed []cycle
+		origs   []string
+	)
+	for {
+		sp, err := graph.ShortestPath(g.Graph, c.target, c.src)
+		if err != nil {
+			return fmt.Errorf("unable to find shortest path: %w", err)
+		}
+		if len(sp) < 2 {
+			return fmt.Errorf("there is no path from %s to %s", c.target, c.src)
+		}
+		// the last edge in the cycle is the one that caused the cycle
+		removeSrc, removeTarget := sp[len(sp)-2], sp[len(sp)-1]
+		removed = append(removed, cycle{
+			src:    removeSrc,
+			target: removeTarget,
+		})
 
-	edge, err := g.Graph.Edge(removeSrc, removeTarget)
-	if err != nil {
-		return fmt.Errorf("unable to find last edge %s -> %s: %w", removeSrc, removeTarget, err)
+		edge, err := g.Graph.Edge(removeSrc, removeTarget)
+		if err != nil {
+			return fmt.Errorf("unable to find last edge %s -> %s: %w", removeSrc, removeTarget, err)
+		}
+		if edge.Properties.Attributes == nil {
+			return fmt.Errorf("original edge %s -> %s has no attributes", removeSrc, removeTarget)
+		}
+		origs = append(origs, edge.Properties.Attributes["target-origin"])
+		// try to reverse the direction of the edge
+		if err := g.Graph.RemoveEdge(removeSrc, removeTarget); err != nil {
+			return fmt.Errorf("unable to remove original edge %s -> %s: %w", removeSrc, removeTarget, err)
+		}
+		// add in our new edge
+		if err := g.Graph.AddEdge(c.src, c.target, graph.EdgeAttribute("target-origin", dep)); err == nil {
+			break
+		}
 	}
-	if edge.Properties.Attributes == nil {
-		return fmt.Errorf("original edge %s -> %s has no attributes", removeSrc, removeTarget)
-	}
-	origDep := edge.Properties.Attributes["target-origin"]
-	// try to reverse the direction of the edge
-	if err := g.Graph.RemoveEdge(removeSrc, removeTarget); err != nil {
-		return fmt.Errorf("unable to remove original edge %s -> %s: %w", removeSrc, removeTarget, err)
-	}
-	// add in our new edge
-	if err := g.Graph.AddEdge(c.src, c.target, graph.EdgeAttribute("target-origin", dep)); err != nil {
-		return fmt.Errorf("unable to add replacement edge %s -> %s: %w", c.src, c.target, err)
-	}
-	// now we need to re-add the edge that was removed, but with a different target
-	config, err := g.Graph.Vertex(removeSrc)
-	if err != nil {
-		return fmt.Errorf("unable to find original vertex %s: %w", removeSrc, err)
-	}
-	cycle, err := g.addAppropriatePackage(resolver, config, origDep, localRepoSource)
-	if err != nil {
-		return fmt.Errorf("unable to re-add original edge %s -> %s: %w", removeSrc, origDep, err)
-	}
-	if cycle != nil {
-		return fmt.Errorf("unable re-add original edge with new dep still causes cycle %s -> %s: %w", removeSrc, dep, err)
+	// now we need to re-add the edges that were removed, but with different targets
+	for i, rem := range removed {
+		origDep := origs[i]
+		config, err := g.Graph.Vertex(rem.src)
+		if err != nil {
+			return fmt.Errorf("unable to find original vertex %s: %w", rem.src, err)
+		}
+		cycle, err := g.addAppropriatePackage(resolver, config, origDep, localRepoSource)
+		if err != nil {
+			return fmt.Errorf("unable to re-add original edge %s -> %s: %w", rem.src, origDep, err)
+		}
+		if cycle != nil {
+			return fmt.Errorf("unable re-add original edge with new dep still causes cycle %s -> %s: %w", rem.src, dep, err)
+		}
 	}
 	return nil
 }
