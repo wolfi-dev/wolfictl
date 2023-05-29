@@ -16,7 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.lsp.dev/uri"
 
-	apko "chainguard.dev/apko/pkg/apk/impl"
+	apk "github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
 // Graph represents an interdependent set of packages defined in one or more Melange configurations,
@@ -64,9 +64,10 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 	// indexes is a cache of all repositories. Only some might be used for each package.
 	var (
-		indexes = make(map[string]apko.NamedIndex)
-		keys    = make(map[string][]byte)
-		errs    []error
+		indexes   = make(map[string]apk.NamedIndex)
+		keys      = make(map[string][]byte)
+		resolvers = make(map[string]*apk.PkgResolver)
+		errs      []error
 	)
 
 	// 1. go through each known origin package, add it as a vertex
@@ -103,13 +104,14 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			origRepos   = c.Environment.Contents.Repositories
 			origKeys    = c.Environment.Contents.Keyring
 			repos       []string
-			lookupRepos = []apko.NamedIndex{}
+			lookupRepos = []apk.NamedIndex{}
 			// validKeys contains list of keys valid for this package; as opposed to
 			// keys, which is the master list of all keys we have encountered
 			validKeys = map[string][]byte{}
 		)
 		for _, repo := range append(origRepos, opts.repos...) {
-			if index, ok := indexes[repo]; !ok {
+			key := apk.IndexURL(repo, arch)
+			if index, ok := indexes[key]; !ok {
 				repos = append(repos, repo)
 			} else {
 				lookupRepos = append(lookupRepos, index)
@@ -132,7 +134,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			}
 		}
 		if len(repos) > 0 {
-			loadedRepos, err := apko.GetRepositoryIndexes(repos, keys, arch)
+			loadedRepos, err := apk.GetRepositoryIndexes(repos, keys, arch)
 			if err != nil {
 				return nil, fmt.Errorf("unable to load repositories for %s: %w", c.String(), err)
 			}
@@ -144,7 +146,23 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		// add our own packages list to the lookupRepos
 		localRepo := pkgs.Repository(arch)
 		lookupRepos = append(lookupRepos, localRepo)
-		resolver := apko.NewPkgResolver(lookupRepos)
+
+		// creating a resolver can be expensive, so we cache any that already exist that have exactly
+		// the same repositories.
+		// This does leave an extra "," at the end, but it doesn't really matter, it is good enough.
+		// Anything else would require converting it into []string and then joining it,
+		// which is more expensive unnecessarily.
+		var resolverKey string
+		for _, repo := range lookupRepos {
+			resolverKey += repo.Source() + ","
+		}
+		var resolver *apk.PkgResolver
+		if r, ok := resolvers[resolverKey]; ok {
+			resolver = r
+		} else {
+			resolver = apk.NewPkgResolver(lookupRepos)
+			resolvers[resolverKey] = resolver
+		}
 		localRepoSource := localRepo.Source()
 		for _, buildDep := range c.Environment.Contents.Packages {
 			if buildDep == "" {
@@ -181,7 +199,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 // addAppropriatePackage adds the appropriate package to the graph, and returns any cycle that was created.
 // The c *Configuration is the source package, while the dep represents the dependency.
-func (g *Graph) addAppropriatePackage(resolver *apko.PkgResolver, c Package, dep, localRepo string) (*cycle, error) {
+func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep, localRepo string) (*cycle, error) {
 	var (
 		pkg         Package
 		cycleTarget string
@@ -261,7 +279,7 @@ func (g *Graph) addAppropriatePackage(resolver *apko.PkgResolver, c Package, dep
 // resolveCycle resolves a cycle by trying to reverse the order.
 // It discovers what the current dependency is that is causing the potential loop,
 // removes the last edge in that cycle, and regenerates that dependency without the previous target.
-func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apko.PkgResolver, localRepoSource string) error {
+func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apk.PkgResolver, localRepoSource string) error {
 	// cycle through, removing all "shortest path" until we can resolve the cycle,
 	// then add them back
 	var (
