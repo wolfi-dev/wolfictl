@@ -7,6 +7,7 @@ import (
 
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 	"gopkg.in/yaml.v3"
 )
@@ -58,6 +59,9 @@ type Package struct {
 
 type Advisories map[string]Advisory
 
+// Entry is an entry in an advisory.
+//
+// Deprecated: Use event.Event instead.
 type Entry struct {
 	Timestamp       time.Time         `yaml:"timestamp"`
 	Status          vex.Status        `yaml:"status"`
@@ -65,4 +69,9 @@ type Entry struct {
 	ImpactStatement string            `yaml:"impact,omitempty"`
 	ActionStatement string            `yaml:"action,omitempty"`
 	FixedVersion    string            `yaml:"fixed-version,omitempty"`
+}
+
+type Advisory struct {
+	ID     string        `yaml:"id"`
+	Events []event.Event `yaml:"events"`
 }

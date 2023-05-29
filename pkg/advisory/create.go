@@ -5,6 +5,7 @@ import (
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 )
 
 // CreateOptions configures the Create operation.
@@ -21,7 +22,7 @@ func Create(req Request, opts CreateOptions) error {
 
 	adv := advisory.Advisory{
 		ID: req.Vulnerability,
-		Events: []advisory.Event{
+		Events: []event.Event{
 			req.Event,
 		},
 	}

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 
 	"github.com/google/go-github/v50/github"
@@ -270,7 +271,7 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 	return advisory.Request{
 		Package:       o.PackageName,
 		Vulnerability: vuln,
-		Event: advisoryconfigs.NewFixedEvent(time.Now(), advisoryconfigs.FixedEvent{
+		Event: event.NewFixed(time.Now(), event.Fixed{
 			FixedPackageVersion: fixedVersion,
 		}),
 	}

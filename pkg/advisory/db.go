@@ -9,6 +9,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 )
 
 const apkURL = "{{urlprefix}}/{{reponame}}/{{arch}}/{{pkg.name}}-{{pkg.ver}}.apk"
@@ -50,10 +51,10 @@ func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
 
 				latest := Latest(events)
 				switch d := latest.Data.(type) {
-				case advisory.FixedEvent:
+				case event.Fixed:
 					version := d.FixedPackageVersion
 					secfixes[version] = append(secfixes[version], vuln)
-				case advisory.FalsePositiveDeterminationEvent:
+				case event.FalsePositiveDetermination:
 					secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vuln)
 				}
 			}

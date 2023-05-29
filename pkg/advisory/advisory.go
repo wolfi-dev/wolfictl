@@ -3,7 +3,7 @@ package advisory
 import (
 	"sort"
 
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 )
 
 // Latest returns the latest event among the given set of events for an

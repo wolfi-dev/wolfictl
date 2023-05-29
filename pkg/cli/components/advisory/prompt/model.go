@@ -9,7 +9,7 @@ import (
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/field"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 )
 
 type Model struct {
@@ -79,9 +79,9 @@ func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
 		Prompt: "Event Type: ",
 		Options: []string{
-			advisoryconfigs.EventTypeFixed,
-			advisoryconfigs.EventTypeFalsePositiveDetermination,
-			advisoryconfigs.EventTypeTruePositiveDetermination,
+			advisoryconfigs.TypeFixed,
+			advisoryconfigs.TypeFalsePositiveDetermination,
+			advisoryconfigs.TypeTruePositiveDetermination,
 		},
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Event.Type = value
@@ -107,7 +107,7 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 	cfg := field.TextFieldConfiguration{
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Event.Data = advisoryconfigs.FixedEvent{
+			req.Event.Data = advisoryconfigs.Fixed{
 				FixedPackageVersion: value,
 			}
 			return req

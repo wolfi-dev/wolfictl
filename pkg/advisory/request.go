@@ -3,14 +3,14 @@ package advisory
 import (
 	"errors"
 
-	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 )
 
 // Request specifies the parameters for creating a new advisory or updating an existing advisory.
 type Request struct {
 	Package       string
 	Vulnerability string
-	Event         advisory.Event
+	Event         event.Event
 }
 
 // Validate returns an error if the Request is invalid.

@@ -13,6 +13,7 @@ import (
 	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	event2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gitlab.alpinelinux.org/alpine/go/repository"
@@ -97,19 +98,19 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			return fmt.Errorf("unable to parse CPE URI %q: %w", match.CPE.URI, err)
 		}
 
-		event := advisoryconfigs.NewDetectionEvent(time.Now(), advisoryconfigs.DetectionEvent{
-			Detector: advisoryconfigs.DetectorNVDAPI,
-			Subject: advisoryconfigs.Subject{
+		event := event2.NewDetection(time.Now(), event2.Detection{
+			Detector: event2.DetectorNVDAPI,
+			Subject: event2.Subject{
 				CPE: *cpe,
 			},
 			VulnerabilityIDs: []string{vulnerabilityID},
 			PackageVersions:  []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
-			Severity:         advisoryconfigs.SeverityUnknown,
+			Severity:         event2.SeverityUnknown,
 		})
 
 		adv := advisoryconfigs.Advisory{
 			ID: vulnerabilityID,
-			Events: []advisoryconfigs.Event{
+			Events: []event2.Event{
 				event,
 			},
 		}
