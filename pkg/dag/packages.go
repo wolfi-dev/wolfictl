@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	apko "chainguard.dev/apko/pkg/apk/impl"
 	"chainguard.dev/melange/pkg/build"
+	apk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
@@ -334,7 +334,7 @@ func (p Packages) Sub(names ...string) (*Packages, error) {
 
 // Repository provide the Packages as a repository.RepositoryWithIndex. To be used in other places that require
 // using alpine/go structs instead of ours.
-func (p Packages) Repository(arch string) apko.NamedIndex {
+func (p Packages) Repository(arch string) apk.NamedIndex {
 	repo := repository.NewRepositoryFromComponents(Local, "latest", "", arch)
 	packages := make([]*repository.Package, 0)
 	for _, byVersion := range p.packages {
@@ -373,7 +373,7 @@ func (p Packages) Repository(arch string) apko.NamedIndex {
 		Packages:    packages,
 	}
 
-	return apko.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
+	return apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
 }
 
 func packageNameFromProvides(prov string) (name, version string) {

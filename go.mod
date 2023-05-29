@@ -10,6 +10,7 @@ require (
 	chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e
 	chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030
 	cloud.google.com/go/storage v1.30.1
+	github.com/chainguard-dev/go-apk v0.0.0-20230529173142-c78bd5ba3cae
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230515182324-679f6de74032
 	github.com/charmbracelet/bubbles v0.15.0
@@ -114,7 +115,6 @@ require (
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/buildkite/agent/v3 v3.45.0 // indirect
-	github.com/chainguard-dev/go-apk v0.0.0-20230501082831-d4a4a3b48750 // indirect
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20221129204813-6a4d6ed5d396 // indirect
 	github.com/clbanning/mxj/v2 v2.5.7 // indirect
 	github.com/cloudflare/circl v1.3.1 // indirect
@@ -266,7 +266,7 @@ require (
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/tools v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
