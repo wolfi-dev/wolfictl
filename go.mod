@@ -7,7 +7,7 @@ replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go 
 replace k8s.io/client-go => k8s.io/client-go v0.25.3
 
 require (
-	chainguard.dev/apko v0.7.4-0.20230427160853-4082ea6e082e
+	chainguard.dev/apko v0.8.0
 	chainguard.dev/melange v0.3.1-0.20230502151024-40098bfea030
 	cloud.google.com/go/storage v1.30.1
 	github.com/chainguard-dev/go-apk v0.0.0-20230529173142-c78bd5ba3cae
