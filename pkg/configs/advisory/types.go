@@ -103,7 +103,7 @@ type Subject struct {
 
 	// SBOMComponentReference *SBOMComponentReference
 }
-s
+
 type SBOMComponentReference struct {
 	SBOMKind     SBOMKind `yaml:"sbom-kind"`
 	SBOMLocation string   `yaml:"sbom-location"`
