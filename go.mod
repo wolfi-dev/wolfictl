@@ -46,18 +46,18 @@ require (
 	gitlab.alpinelinux.org/alpine/go v0.7.0
 	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
-	golang.org/x/oauth2 v0.7.0
+	golang.org/x/oauth2 v0.8.0
 	golang.org/x/sync v0.2.0
 	golang.org/x/text v0.9.0
 	golang.org/x/time v0.3.0
 	google.golang.org/api v0.120.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.26.3
-	k8s.io/apimachinery v0.26.3
+	k8s.io/apimachinery v0.27.1
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	k8s.io/utils v0.0.0-20230115233650-391b47cb4029
-	sigs.k8s.io/release-sdk v0.10.0
-	sigs.k8s.io/release-utils v0.7.3
+	k8s.io/utils v0.0.0-20230209194617-a36077c30491
+	sigs.k8s.io/release-sdk v0.10.1
+	sigs.k8s.io/release-utils v0.7.4-0.20230502075013-5274b69697f0
 )
 
 require (
@@ -117,7 +117,7 @@ require (
 	github.com/buildkite/agent/v3 v3.45.0 // indirect
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20221129204813-6a4d6ed5d396 // indirect
 	github.com/clbanning/mxj/v2 v2.5.7 // indirect
-	github.com/cloudflare/circl v1.3.1 // indirect
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.14.3 // indirect
@@ -265,9 +265,9 @@ require (
 	golang.org/x/build v0.0.0-20221229213058-1f2478aa0ea8 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/tools v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -280,8 +280,8 @@ require (
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/klog/v2 v2.90.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20230123170611-3dfa6bdaa2d5 // indirect
+	k8s.io/klog/v2 v2.90.1 // indirect
+	k8s.io/kube-openapi v0.0.0-20230308215209-15aac26d736a // indirect
 	mvdan.cc/sh/v3 v3.5.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
