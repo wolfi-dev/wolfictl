@@ -2,9 +2,7 @@ package advisory
 
 import (
 	"errors"
-	"time"
 
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 )
 
@@ -12,12 +10,7 @@ import (
 type Request struct {
 	Package       string
 	Vulnerability string
-	Status        vex.Status
-	Action        string
-	Impact        string
-	Justification vex.Justification
-	FixedVersion  string
-	Timestamp     time.Time
+	Event         advisory.Event
 }
 
 // Validate returns an error if the Request is invalid.
@@ -30,35 +23,7 @@ func (req Request) Validate() error {
 		return errors.New("vulnerability cannot be empty")
 	}
 
-	if req.Status == "" {
-		return errors.New("status cannot be empty")
-	}
-
-	switch req.Status {
-	case vex.StatusFixed:
-		if req.FixedVersion == "" {
-			return errors.New("fixed version cannot be empty if status is 'fixed'")
-		}
-	case vex.StatusAffected:
-		if req.Action == "" {
-			return errors.New("action cannot be empty if status is 'affected'")
-		}
-	case vex.StatusNotAffected:
-		if req.Justification == "" {
-			return errors.New("justification cannot be empty if status is 'not affected'")
-		}
-	}
+	// TODO: validate event
 
 	return nil
-}
-
-func (req Request) toAdvisoryEntry() advisory.Entry {
-	return advisory.Entry{
-		Timestamp:       req.Timestamp,
-		Status:          req.Status,
-		Justification:   req.Justification,
-		ImpactStatement: req.Impact,
-		ActionStatement: req.Action,
-		FixedVersion:    req.FixedVersion,
-	}
 }

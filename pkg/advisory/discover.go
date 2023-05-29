@@ -9,7 +9,6 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/facebookincubator/nvdtools/wfn"
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -89,6 +88,8 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			continue
 		}
 
+		vulnerabilityID := match.Vulnerability.ID
+
 		// TODO: create a Detection Event
 
 		cpe, err := wfn.Parse(match.CPE.URI)
@@ -96,26 +97,28 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			return fmt.Errorf("unable to parse CPE URI %q: %w", match.CPE.URI, err)
 		}
 
+		event := advisoryconfigs.NewDetectionEvent(time.Now(), advisoryconfigs.DetectionEvent{
+			Detector: advisoryconfigs.NVDAPIDetector,
+			Subject: advisoryconfigs.Subject{
+				CPE: *cpe,
+			},
+			VulnerabilityIDs: []string{vulnerabilityID},
+			PackageVersions:  []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
+			Severity:         advisoryconfigs.SeverityUnknown,
+		})
+
+		adv := advisoryconfigs.Advisory{
+			ID: vulnerabilityID,
+			Events: []advisoryconfigs.Event{
+				event,
+			},
+		}
+
 		advCfgEntries := opts.AdvisoryCfgs.Select().WhereName(pkg)
-		vulnID := match.Vulnerability.ID
 		if advCfgEntries.Len() == 0 {
 			// create a brand-new advisory config
 
-			err := createAdvisoryConfig(opts.AdvisoryCfgs, pkg, advisoryconfigs.Advisory{
-				ID: vulnID,
-				Events: []advisoryconfigs.Event{
-					advisoryconfigs.DetectionEvent{
-						Timestamp: time.Now(),
-						Detector:  advisoryconfigs.NVDAPIDetector,
-						Subject: advisoryconfigs.Subject{
-							CPE: *cpe,
-						},
-						VulnerabilityIDs: []string{vulnID},
-						PackageVersions:  []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
-						Severity:         advisoryconfigs.SeverityUnknown,
-					},
-				},
-			})
+			err := createAdvisoryConfig(opts.AdvisoryCfgs, pkg, adv)
 			if err != nil {
 				return fmt.Errorf("unable to record new advisory: %w", err)
 			}
@@ -127,34 +130,29 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		advCfgEntry, _ := advCfgEntries.First() //nolint:errcheck
 		advCfg := advCfgEntry.Configuration()
-		if _, ok := advCfg.Advisories[vulnID]; ok {
+		if _, ok := advCfg.Advisories[vulnerabilityID]; ok {
 			// advisory already exists in config
 			continue
 		}
 
-		log.Printf("🐛 new potential vulnerability for package %q: %s", advCfg.Package.Name, hyperlinkCVE(vulnID))
+		log.Printf("🐛 new potential vulnerability for package %q: %s", advCfg.Package.Name, hyperlinkCVE(vulnerabilityID))
 
 		u := advisoryconfigs.NewAdvisoriesSectionUpdater(func(cfg advisoryconfigs.Document) (advisoryconfigs.Advisories, error) {
 			advisories := cfg.Advisories
-			advisories[vulnID] = append(advisories[vulnID], advisoryEntryForNewDiscovery())
+			adv := advisories[vulnerabilityID]
+			adv.Events = append(adv.Events, event)
+			advisories[vulnerabilityID] = adv
 
 			return advisories, nil
 		})
 
-		err := advCfgEntry.Update(u)
+		err = advCfgEntry.Update(u)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func advisoryEntryForNewDiscovery() advisoryconfigs.Entry {
-	return advisoryconfigs.Entry{
-		Timestamp: time.Now(),
-		Status:    vex.StatusUnderInvestigation,
-	}
 }
 
 func determinePackagesToLookup(apkindexes []*repository.ApkIndex, selectedPackageNames []string) []string {

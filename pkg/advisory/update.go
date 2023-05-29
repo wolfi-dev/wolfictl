@@ -13,11 +13,10 @@ type UpdateOptions struct {
 	AdvisoryCfgs *configs.Index[advisory.Document]
 }
 
-// Update adds a new entry to an existing advisory (named by the vuln parameter)
+// Update adds a new event to an existing advisory (named by the vuln parameter)
 // in the configuration at the provided path.
 func Update(req Request, opts UpdateOptions) error {
 	vulnID := req.Vulnerability
-	advisoryEntry := req.toAdvisoryEntry()
 
 	advisoryCfgs := opts.AdvisoryCfgs.Select().WhereName(req.Package)
 	if count := advisoryCfgs.Len(); count != 1 {
@@ -30,7 +29,9 @@ func Update(req Request, opts UpdateOptions) error {
 			return advisory.Advisories{}, fmt.Errorf("no advisory exists for %s", vulnID)
 		}
 
-		advisories[vulnID] = append(advisories[vulnID], advisoryEntry)
+		adv := advisories[vulnID]
+		adv.Events = append(adv.Events, req.Event)
+		advisories[vulnID] = adv
 
 		return advisories, nil
 	})

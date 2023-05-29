@@ -9,6 +9,7 @@ import (
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/field"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 )
 
 type Model struct {
@@ -74,27 +75,16 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 	}
 }
 
-func (m Model) newStatusFieldConfig() field.ListFieldConfiguration {
+func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
-		Prompt: "Status: ",
+		Prompt: "Event Type: ",
 		Options: []string{
-			string(vex.StatusFixed),
-			string(vex.StatusNotAffected),
-			string(vex.StatusAffected),
-			string(vex.StatusUnderInvestigation),
+			advisoryconfigs.EventTypeFixed,
+			advisoryconfigs.EventTypeFalsePositiveDetermination,
+			advisoryconfigs.EventTypeTruePositiveDetermination,
 		},
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Status = vex.Status(value)
-			return req
-		},
-	}
-}
-
-func (m Model) newActionFieldConfig() field.TextFieldConfiguration {
-	return field.TextFieldConfiguration{
-		Prompt: "Action: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Action = value
+			req.Event.Type = value
 			return req
 		},
 	}
@@ -117,7 +107,9 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 	cfg := field.TextFieldConfiguration{
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.FixedVersion = value
+			req.Event.Data = advisoryconfigs.FixedEvent{
+				FixedPackageVersion: value,
+			}
 			return req
 		},
 		AllowedValues:  allowedVersions,
@@ -170,7 +162,7 @@ func (m Model) addMissingFields() (Model, bool) {
 	}
 
 	if m.Request.Status == "" {
-		f := field.NewListField(m.newStatusFieldConfig())
+		f := field.NewListField(m.newEventTypeFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}

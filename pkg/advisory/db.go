@@ -5,7 +5,6 @@ import (
 	"errors"
 	"sort"
 
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -43,18 +42,18 @@ func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
 			secfixes := make(secdb.Secfixes)
 
 			for _, vuln := range advisoryVulns {
-				entries := cfg.Advisories[vuln]
+				events := cfg.Advisories[vuln].Events
 
-				if len(entries) == 0 {
+				if len(events) == 0 {
 					continue
 				}
 
-				latest := Latest(entries)
-				switch latest.Status {
-				case vex.StatusFixed:
-					version := latest.FixedVersion
+				latest := Latest(events)
+				switch d := latest.Data.(type) {
+				case advisory.FixedEvent:
+					version := d.FixedPackageVersion
 					secfixes[version] = append(secfixes[version], vuln)
-				case vex.StatusNotAffected:
+				case advisory.FalsePositiveDeterminationEvent:
 					secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vuln)
 				}
 			}

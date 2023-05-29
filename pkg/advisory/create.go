@@ -16,26 +16,30 @@ type CreateOptions struct {
 // Create creates a new advisory in the `advisories` section of the configuration
 // at the provided path.
 func Create(req Request, opts CreateOptions) error {
-	vulnID := req.Vulnerability
-	advisoryEntry := req.toAdvisoryEntry()
-
 	advisoryCfgs := opts.AdvisoryCfgs.Select().WhereName(req.Package)
 	count := advisoryCfgs.Len()
+
+	adv := advisory.Advisory{
+		ID: req.Vulnerability,
+		Events: []advisory.Event{
+			req.Event,
+		},
+	}
 
 	switch count {
 	case 0:
 		// i.e. no advisories file for this package yet
-		return createAdvisoryConfig(opts.AdvisoryCfgs, req.Package, advisoryEntry
+		return createAdvisoryConfig(opts.AdvisoryCfgs, req.Package, adv)
 
 	case 1:
 		// i.e. exactly one advisories file for this package
 		u := advisory.NewAdvisoriesSectionUpdater(func(cfg advisory.Document) (advisory.Advisories, error) {
 			advisories := cfg.Advisories
-			if _, existsAlready := advisories[vulnID]; existsAlready {
-				return advisory.Advisories{}, fmt.Errorf("advisory already exists for %s", vulnID)
+			if _, existsAlready := advisories[req.Vulnerability]; existsAlready {
+				return advisory.Advisories{}, fmt.Errorf("advisory already exists for %s", req.Vulnerability)
 			}
 
-			advisories[vulnID] = append(advisories[vulnID], advisoryEntry)
+			advisories[req.Vulnerability] = adv
 
 			return advisories, nil
 		})

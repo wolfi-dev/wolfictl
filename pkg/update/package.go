@@ -16,8 +16,6 @@ import (
 
 	"github.com/google/go-github/v50/github"
 
-	"github.com/openvex/go-vex/pkg/vex"
-
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 
 	"github.com/pkg/errors"
@@ -272,9 +270,9 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 	return advisory.Request{
 		Package:       o.PackageName,
 		Vulnerability: vuln,
-		Status:        vex.StatusFixed,
-		Timestamp:     time.Now(),
-		FixedVersion:  fixedVersion,
+		Event: advisoryconfigs.NewFixedEvent(time.Now(), advisoryconfigs.FixedEvent{
+			FixedPackageVersion: fixedVersion,
+		}),
 	}
 }
 
