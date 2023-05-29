@@ -98,7 +98,7 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 		}
 
 		event := advisoryconfigs.NewDetectionEvent(time.Now(), advisoryconfigs.DetectionEvent{
-			Detector: advisoryconfigs.NVDAPIDetector,
+			Detector: advisoryconfigs.DetectorNVDAPI,
 			Subject: advisoryconfigs.Subject{
 				CPE: *cpe,
 			},

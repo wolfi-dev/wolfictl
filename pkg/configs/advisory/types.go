@@ -94,8 +94,7 @@ func NewDetectionEvent(timestamp time.Time, event DetectionEvent) Event {
 type Detector string
 
 const (
-	UnknownDetector Detector = "unknown-detector"
-	NVDAPIDetector  Detector = "nvd-api-detector"
+	DetectorNVDAPI Detector = "nvd-api"
 	// GrypeDetector
 )
 
@@ -104,24 +103,21 @@ type Subject struct {
 
 	// SBOMComponentReference *SBOMComponentReference
 }
-
+s
 type SBOMComponentReference struct {
 	SBOMKind     SBOMKind `yaml:"sbom-kind"`
 	SBOMLocation string   `yaml:"sbom-location"`
 	ComponentID  string   `yaml:"component-id"`
 }
 
-// SBOMKind is an enum that identifies the kind of SBOM that a component
-// reference is pointing to.
-//
-// TODO: maybe this should be a string, since order doesn't matter?
-type SBOMKind int
+// SBOMKind identifies the kind of SBOM that a component reference is pointing
+// to.
+type SBOMKind string
 
 const (
-	Unknown SBOMKind = iota
-	SPDX
-	CycloneDX
-	Syft
+	SBOMKindSPDX      SBOMKind = "spdx"
+	SBOMKindCycloneDX SBOMKind = "cyclonedx"
+	SBOMKindSyft      SBOMKind = "syft"
 )
 
 // FalsePositiveDeterminationEvent is an event that indicates that a previously
@@ -200,9 +196,15 @@ type FPNoVulnerableVersionUsed struct {
 }
 
 type FPVulnerableCodeNotPresent struct {
+	// VulnerableCodeReferences is a list of references to vulnerable code that is
+	// not present in the package.
+	VulnerableCodeReferences []string `yaml:"vulnerable-code-references"`
 }
 
 type FPVulnerableCodeNotInExecutePath struct {
+	// VulnerableCodeReferences is a list of references to vulnerable code that is
+	// present in the package but never executed.
+	VulnerableCodeReferences []string `yaml:"vulnerable-code-references"`
 }
 
 // TruePositiveDeterminationEvent is an event that indicates that a previously
@@ -221,7 +223,4 @@ func NewFixedEvent(timestamp time.Time, event FixedEvent) Event {
 		Timestamp: timestamp,
 		Data:      event,
 	}
-}
-
-type UpdatedVulnerabilityDataEvent struct {
 }
