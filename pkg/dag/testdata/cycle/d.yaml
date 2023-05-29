@@ -1,0 +1,11 @@
+package:
+  name: d
+  version: "2.0.0"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+environment:
+  contents:
+    packages:
+      - a

@@ -2,6 +2,7 @@ package dag
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -225,5 +226,35 @@ func TestNewGraph(t *testing.T) {
 				assert.True(t, vertex.Resolved())
 			}
 		})
+	})
+	t.Run("resolve cycle", func(t *testing.T) {
+		var (
+			testDir          = "testdata/cycle"
+			cyclePackageRepo = filepath.Join(testDir, "packages")
+			cycleKey         = filepath.Join(cyclePackageRepo, "key.rsa.pub")
+			expectedDeps     = map[string][]string{
+				"a": {"b:1.2.3-r1@local", "c:1.5.5-r1@local", "d:1.0.0-r0@testdata/cycle/packages/x86_64"},
+				"b": {"c:1.5.5-r1@local", "d:1.0.0-r0@testdata/cycle/packages/x86_64"},
+				"c": {"d:1.0.0-r0@testdata/cycle/packages/x86_64"},
+				"d": {"a:1.3.5-r1@local"},
+			}
+		)
+		pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+		require.NoError(t, err)
+		graph, err := NewGraph(pkgs, WithRepos(cyclePackageRepo), WithKeys(cycleKey))
+		require.NoError(t, err)
+		amap, err := graph.Graph.AdjacencyMap()
+		require.NoError(t, err)
+		for k, v := range expectedDeps {
+			allConfigs := pkgs.Config(k, true)
+			require.Len(t, allConfigs, 1, "no configs for %s", k)
+			confKey := packageHash(allConfigs[0])
+			require.Contains(t, amap, confKey, "missing key %s", confKey)
+			var deps []string
+			for d := range amap[confKey] {
+				deps = append(deps, d)
+			}
+			assert.ElementsMatch(t, v, deps, "unexpected dependencies for %s", k)
+		}
 	})
 }

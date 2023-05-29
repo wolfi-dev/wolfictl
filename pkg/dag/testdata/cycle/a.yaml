@@ -1,0 +1,13 @@
+package:
+  name: a
+  version: "1.3.5"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+environment:
+  contents:
+    packages:
+      - b
+      - c
+      - d
