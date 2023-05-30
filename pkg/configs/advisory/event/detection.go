@@ -52,6 +52,16 @@ type Subject struct {
 	// SBOMComponentReference *SBOMComponentReference
 }
 
+// TODO: don't do this, just make CPE a string
+func (s Subject) MarshalYAML() (interface{}, error) {
+	wfn := s.CPE.BindToFmtString()
+	return struct {
+		CPE string `yaml:"cpe"`
+	}{
+		CPE: wfn,
+	}, nil
+}
+
 type SBOMComponentReference struct {
 	SBOMType     SBOMType `yaml:"sbom-type"`
 	SBOMLocation string   `yaml:"sbom-location"`

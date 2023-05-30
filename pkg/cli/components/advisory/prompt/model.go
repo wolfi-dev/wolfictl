@@ -3,10 +3,10 @@ package prompt
 import (
 	"errors"
 	"regexp"
+	"time"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/field"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
@@ -84,6 +84,7 @@ func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 			event.TypeTruePositiveDetermination,
 		},
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			req.Event.Timestamp = time.Now()
 			req.Event.Type = value
 			return req
 		},
@@ -92,13 +93,19 @@ func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 
 func (m Model) newFalsePositiveTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
-		Prompt:  "False Positive Type: ",
-		Options: vex.Justifications(),
+		Prompt: "False Positive Type: ",
+		Options: []string{
+			event.FPTypeVulnerabilityNotValid,
+			event.FPTypeComponentVulnerabilityMismatch,
+			event.FPTypeNoVulnerableVersionUsed,
+			event.FPTypeVulnerableCodeNotPresent,
+			event.FPTypeVulnerableCodeNotInExecutePath,
+		},
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Event.Data = event.FalsePositiveDetermination{
-				Type:  event.FPTypeComponentVulnerabilityMismatch, // Value, but we should probably map friendly names to enum values
-				Data:  nil,                                        // leave blank until next question?
-				Notes: "",                                         // let's not fill this for now, but maybe soon, akin to Impact Statement
+				Type:  value, // we should probably map friendly names to enum values
+				Data:  nil,   // leave blank until next question?
+				Notes: "",    // let's not fill this for now, but maybe soon, akin to Impact Statement
 			}
 			return req
 		},
