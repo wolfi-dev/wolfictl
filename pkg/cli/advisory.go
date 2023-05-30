@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/build"
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -89,32 +88,15 @@ func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
 	addPackageFlag(&p.packageName, cmd)
 	addVulnFlag(&p.vuln, cmd)
 
-	cmd.Flags().StringVarP(&p.status, "status", "s", "", "status for VEX statement")
-	cmd.Flags().StringVar(&p.action, "action", "", "action statement for VEX statement (used only for affected status)")
-	cmd.Flags().StringVar(&p.impact, "impact", "", "impact statement for VEX statement (used only for not_affected status)")
-	cmd.Flags().StringVar(&p.justification, "justification", "", "justification for VEX statement (used only for not_affected status)")
-	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp for VEX statement")
-	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for fixed status)")
 	cmd.Flags().BoolVar(&p.sync, "sync", false, "synchronize secfixes data immediately after updating advisory")
 
 	_ = cmd.Flags().MarkDeprecated("sync", "because 'secfixes' data is no longer used. This flag now has no effect, and it will be removed in an upcoming version.") //nolint:errcheck
 }
 
 func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
-	timestamp, err := resolveTimestamp(p.timestamp)
-	if err != nil {
-		return advisory.Request{}, fmt.Errorf("unable to process timestamp: %w", err)
-	}
-
 	return advisory.Request{
 		Package:       p.packageName,
 		Vulnerability: p.vuln,
-		Status:        vex.Status(p.status),
-		Action:        p.action,
-		Impact:        p.impact,
-		Justification: vex.Justification(p.justification),
-		Timestamp:     timestamp,
-		FixedVersion:  p.fixedVersion,
 	}, nil
 }
 

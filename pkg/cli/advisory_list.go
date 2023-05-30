@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -52,8 +53,8 @@ func AdvisoryList() *cobra.Command {
 			var output string
 
 			for _, cfg := range cfgs {
-				for vuln, entries := range cfg.Advisories {
-					if len(entries) == 0 {
+				for vuln, adv := range cfg.Advisories {
+					if len(adv.Events) == 0 {
 						// nothing to show
 						continue
 					}
@@ -63,21 +64,21 @@ func AdvisoryList() *cobra.Command {
 						continue
 					}
 
-					latest := advisory.Latest(entries)
+					latest := advisory.Latest(adv.Events)
 
-					if p.unresolved && latest.Status != vex.StatusAffected && latest.Status != vex.StatusUnderInvestigation {
+					if p.unresolved && (latest.Type == event.TypeFalsePositiveDetermination || latest.Type == event.TypeFixed) {
 						// user only wants to see unresolved advisories
 						continue
 					}
 
 					if p.history {
-						sort.SliceStable(entries, func(i, j int) bool {
-							return entries[i].Timestamp.Before(entries[j].Timestamp)
+						sort.SliceStable(adv.Events, func(i, j int) bool {
+							return adv.Events[i].Timestamp.Before(adv.Events[j].Timestamp)
 						})
 
-						for _, item := range entries {
-							timestamp := item.Timestamp
-							statusDescription := renderListItem(item)
+						for _, e := range adv.Events {
+							timestamp := e.Timestamp
+							statusDescription := renderListItem(e)
 							output += fmt.Sprintf("%s: %s: %s @ %s\n", cfg.Package.Name, vuln, statusDescription, timestamp)
 						}
 
@@ -121,24 +122,20 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, fmt.Sprintf("only show advisories whose latest status is %s or %s", vex.StatusAffected, vex.StatusUnderInvestigation))
 }
 
-func renderListItem(entry advisoryconfigs.Entry) string {
-	switch entry.Status {
-	case vex.StatusUnderInvestigation:
-		return string(entry.Status)
+func renderListItem(e event.Event) string {
+	switch e.Type {
+	case event.TypeDetection:
+		return e.Type
 
-	case vex.StatusAffected:
-		expanded := ""
-		if as := entry.ActionStatement; as != "" {
-			expanded = fmt.Sprintf(": %s", as)
-		}
-		return fmt.Sprintf("%s%s", entry.Status, expanded)
+	case event.TypeTruePositiveDetermination:
+		return fmt.Sprintf("%s%s", e.Type, e.Data.(event.TruePositiveDetermination).Notes)
 
-	case vex.StatusFixed:
-		return fmt.Sprintf("%s (%s)", entry.Status, entry.FixedVersion)
+	case event.TypeFixed:
+		return fmt.Sprintf("%s (%s)", e.Type, e.Data.(event.Fixed).FixedVersion)
 
-	case vex.StatusNotAffected:
-		return fmt.Sprintf("%s (%s)", entry.Status, entry.Justification)
+	case event.TypeFalsePositiveDetermination:
+		return fmt.Sprintf("%s (%s)", e.Type, e.Data.(event.FalsePositiveDetermination).Type)
 	}
 
-	return "INVALID STATUS"
+	return fmt.Sprintf("UNABLE TO RENDER EVENT OF TYPE %q", e.Type)
 }

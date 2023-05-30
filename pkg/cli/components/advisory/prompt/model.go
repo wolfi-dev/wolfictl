@@ -9,7 +9,7 @@ import (
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/field"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 )
 
 type Model struct {
@@ -79,9 +79,9 @@ func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
 		Prompt: "Event Type: ",
 		Options: []string{
-			advisoryconfigs.TypeFixed,
-			advisoryconfigs.TypeFalsePositiveDetermination,
-			advisoryconfigs.TypeTruePositiveDetermination,
+			event.TypeFixed,
+			event.TypeFalsePositiveDetermination,
+			event.TypeTruePositiveDetermination,
 		},
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Event.Type = value
@@ -90,12 +90,16 @@ func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 	}
 }
 
-func (m Model) newJustificationFieldConfig() field.ListFieldConfiguration {
+func (m Model) newFalsePositiveTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
-		Prompt:  "Justification: ",
+		Prompt:  "False Positive Type: ",
 		Options: vex.Justifications(),
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Justification = vex.Justification(value)
+			req.Event.Data = event.FalsePositiveDetermination{
+				Type:  event.FPTypeComponentVulnerabilityMismatch, // Value, but we should probably map friendly names to enum values
+				Data:  nil,                                        // leave blank until next question?
+				Notes: "",                                         // let's not fill this for now, but maybe soon, akin to Impact Statement
+			}
 			return req
 		},
 	}
@@ -107,7 +111,7 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 	cfg := field.TextFieldConfiguration{
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Event.Data = advisoryconfigs.Fixed{
+			req.Event.Data = event.Fixed{
 				FixedVersion: value,
 			}
 			return req
@@ -161,35 +165,27 @@ func (m Model) addMissingFields() (Model, bool) {
 		return m, true
 	}
 
-	if m.Request.Status == "" {
+	if m.Request.Event.Type == "" {
 		f := field.NewListField(m.newEventTypeFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
-	switch m.Request.Status {
-	case vex.StatusFixed:
-		if m.Request.FixedVersion == "" {
+	switch m.Request.Event.Type {
+	case event.TypeFixed:
+		if m.Request.Event.Data == nil {
 			f := field.NewTextField(m.newFixedVersionFieldConfig(m.Request.Package))
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
-	case vex.StatusAffected:
-		if m.Request.Action == "" {
-			f := field.NewTextField(m.newActionFieldConfig())
+	case event.TypeFalsePositiveDetermination:
+		if m.Request.Event.Data == nil {
+			f := field.NewListField(m.newFalsePositiveTypeFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
-	case vex.StatusNotAffected:
-		if m.Request.Justification == "" {
-			f := field.NewListField(m.newJustificationFieldConfig())
-			m.fields = append(m.fields, f)
-			return m, true
-		}
-
-		// TODO: Prompt for Impact if folks want to enter it. (There's a gotcha if adding it if left blank.)
 	}
 
 	return m, false
