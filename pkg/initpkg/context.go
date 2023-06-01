@@ -12,6 +12,7 @@ import (
 	melange_build "chainguard.dev/melange/pkg/build"
 	melange_util "chainguard.dev/melange/pkg/util"
 	yam "github.com/chainguard-dev/yam/pkg/yam/formatted"
+	"github.com/dprotaso/go-yit"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -256,6 +257,13 @@ func (ctx *Context) Run() error {
 	if err := rootNode.Encode(ctx.Build); err != nil {
 		return err
 	}
+
+	envIter := yit.FromNode(rootNode).ValuesForMap(yit.WithValue("environment"), yit.All)
+	envNode, ok := envIter()
+	if !ok {
+		return fmt.Errorf("environment node missing")
+	}
+	envNode.HeadComment = "TODO: Ensure that all package dependencies are included here."
 
 	if err := enc.Encode(rootNode); err != nil {
 		return err
