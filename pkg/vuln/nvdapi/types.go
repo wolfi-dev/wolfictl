@@ -127,3 +127,33 @@ type CpeMatch struct {
 func vulnerabilityToCve(v Vulnerability, _ int) Cve {
 	return v.Cve
 }
+
+func getSeverity(cve Cve) string {
+	m := cve.Metrics
+
+	if len(m.CvssMetricV31) > 0 {
+		return normalizeSeverity(m.CvssMetricV31[0].CvssData.BaseSeverity)
+	}
+
+	if len(m.CvssMetricV30) > 0 {
+		return normalizeSeverity(m.CvssMetricV30[0].CvssData.BaseSeverity)
+	}
+
+	return ""
+}
+
+func normalizeSeverity(severity string) string {
+	switch severity {
+	case SeverityLow, SeverityMedium, SeverityHigh, SeverityCritical:
+		return severity
+	default:
+		return ""
+	}
+}
+
+const (
+	SeverityLow      = "LOW"
+	SeverityMedium   = "MEDIUM"
+	SeverityHigh     = "HIGH"
+	SeverityCritical = "CRITICAL"
+)

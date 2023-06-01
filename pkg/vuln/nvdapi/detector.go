@@ -148,6 +148,8 @@ func determineVulnMatch(cve *Cve, packageName, requestCPE string) (*vuln.Match, 
 		return nil, errors.New("input CVE was nil")
 	}
 
+	severity := getSeverity(*cve)
+
 	for _, configuration := range cve.Configurations {
 		if configuration.Operator == "AND" {
 			// For now, let's ignore AND-ed nodes. They usually mean that something is
@@ -195,8 +197,9 @@ func determineVulnMatch(cve *Cve, packageName, requestCPE string) (*vuln.Match, 
 						VersionRange: vr,
 					},
 					Vulnerability: vuln.Vulnerability{
-						ID:  cve.ID,
-						URL: fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", cve.ID),
+						ID:       cve.ID,
+						URL:      fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", cve.ID),
+						Severity: severity,
 					},
 				}
 

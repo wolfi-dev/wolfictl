@@ -46,7 +46,7 @@ func DecodeDocument(r io.Reader) (*Document, error) {
 type Document struct {
 	Package Package `yaml:"package"`
 
-	Advisories Advisories `yaml:"advisories,omitempty"`
+	Advisories []Advisory `yaml:"advisories,omitempty"`
 }
 
 func (d Document) Name() string {
@@ -56,8 +56,6 @@ func (d Document) Name() string {
 type Package struct {
 	Name string `yaml:"name"`
 }
-
-type Advisories map[string]Advisory
 
 // Entry is an entry in an advisory.
 //

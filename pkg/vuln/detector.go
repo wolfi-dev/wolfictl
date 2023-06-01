@@ -21,7 +21,7 @@ type Package struct {
 }
 
 type Vulnerability struct {
-	ID, URL string
+	ID, URL, Severity string
 }
 
 type CPE struct {

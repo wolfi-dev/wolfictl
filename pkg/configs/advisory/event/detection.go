@@ -2,8 +2,6 @@ package event
 
 import (
 	"time"
-
-	"github.com/facebookincubator/nvdtools/wfn"
 )
 
 // Detection is an event that indicates that a potential vulnerability was
@@ -12,14 +10,16 @@ type Detection struct {
 	// Detector identifies the kind of detector that found the vulnerability match.
 	Detector Detector `yaml:"detector"`
 
-	// Subject identifies the particular software that the Detector claims is
+	// MatchTarget identifies the particular software that the Detector claims is
 	// vulnerable.
-	Subject Subject `yaml:"subject"`
+	MatchTarget MatchTarget `yaml:"match-target"`
+	// TODO: rename to "match-target"?
 
 	// VulnerabilityIDs lists any known IDs of the underlying vulnerability found in
-	// the Subject. This list SHOULD include a CVE ID (from NVD) if one is known.
+	// the MatchTarget. This list SHOULD include a CVE ID (from NVD) if one is known.
 	// Other IDs MAY be included, such as GHSA IDs or GoVulnDB IDs.
 	VulnerabilityIDs []string `yaml:"vulnerability-ids"`
+	// TODO: put under new field "vulnerability", along with things like "severity"?
 
 	// PackageVersions lists the versions of the package that the Detector claims
 	// are vulnerable.
@@ -46,20 +46,10 @@ const (
 	// GrypeDetector
 )
 
-type Subject struct {
-	CPE wfn.Attributes `yaml:"cpe"`
+type MatchTarget struct {
+	CPE string `yaml:"cpe"`
 
 	// SBOMComponentReference *SBOMComponentReference
-}
-
-// TODO: don't do this, just make CPE a string
-func (s Subject) MarshalYAML() (interface{}, error) {
-	wfn := s.CPE.BindToFmtString()
-	return struct {
-		CPE string `yaml:"cpe"`
-	}{
-		CPE: wfn,
-	}, nil
 }
 
 type SBOMComponentReference struct {
@@ -76,4 +66,14 @@ const (
 	SBOMTypeSPDX      SBOMType = "spdx"
 	SBOMTypeCycloneDX SBOMType = "cyclonedx"
 	SBOMTypeSyft      SBOMType = "syft"
+)
+
+type Severity string
+
+const (
+	SeverityUnknown  Severity = "unknown"
+	SeverityLow      Severity = "low"
+	SeverityMedium   Severity = "medium"
+	SeverityHigh     Severity = "high"
+	SeverityCritical Severity = "critical"
 )

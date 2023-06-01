@@ -34,7 +34,7 @@ func Create(req Request, opts CreateOptions) error {
 
 	case 1:
 		// i.e. exactly one advisories file for this package
-		u := advisory.NewAdvisoriesSectionUpdater(func(cfg advisory.Document) (advisory.Advisories, error) {
+		u := advisory.NewAdvisoriesSectionUpdater(func(cfg advisory.Document) ([]advisory.Advisory, error) {
 			advisories := cfg.Advisories
 			if _, existsAlready := advisories[req.Vulnerability]; existsAlready {
 				return advisory.Advisories{}, fmt.Errorf("advisory already exists for %s", req.Vulnerability)

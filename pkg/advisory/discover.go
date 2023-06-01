@@ -13,9 +13,10 @@ import (
 	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
-	event2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory/event"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	"github.com/wolfi-dev/wolfictl/pkg/vuln/nvdapi"
 	"gitlab.alpinelinux.org/alpine/go/repository"
 	"golang.org/x/exp/slices"
 )
@@ -93,25 +94,25 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		// TODO: create a Detection Event
 
-		cpe, err := wfn.Parse(match.CPE.URI)
+		_, err := wfn.Parse(match.CPE.URI)
 		if err != nil {
 			return fmt.Errorf("unable to parse CPE URI %q: %w", match.CPE.URI, err)
 		}
 
-		event := event2.NewDetection(time.Now(), event2.Detection{
-			Detector: event2.DetectorNVDAPI,
-			Subject: event2.Subject{
-				CPE: *cpe,
+		e := event.NewDetection(time.Now(), event.Detection{
+			Detector: event.DetectorNVDAPI,
+			MatchTarget: event.MatchTarget{
+				CPE: match.CPE.URI,
 			},
 			VulnerabilityIDs: []string{vulnerabilityID},
 			PackageVersions:  []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
-			Severity:         event2.SeverityUnknown,
+			Severity:         mapNVDAPISeverity(match.Vulnerability.Severity),
 		})
 
 		adv := advisoryconfigs.Advisory{
 			ID: vulnerabilityID,
-			Events: []event2.Event{
-				event,
+			Events: []event.Event{
+				e,
 			},
 		}
 
@@ -141,7 +142,7 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 		u := advisoryconfigs.NewAdvisoriesSectionUpdater(func(cfg advisoryconfigs.Document) (advisoryconfigs.Advisories, error) {
 			advisories := cfg.Advisories
 			adv := advisories[vulnerabilityID]
-			adv.Events = append(adv.Events, event)
+			adv.Events = append(adv.Events, e)
 			advisories[vulnerabilityID] = adv
 
 			return advisories, nil
@@ -202,4 +203,19 @@ func hyperlinkCVE(id string) string {
 	}
 
 	return termlink.Link(id, fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", id))
+}
+
+func mapNVDAPISeverity(s string) event.Severity {
+	switch s {
+	case nvdapi.SeverityLow:
+		return event.SeverityLow
+	case nvdapi.SeverityMedium:
+		return event.SeverityMedium
+	case nvdapi.SeverityHigh:
+		return event.SeverityHigh
+	case nvdapi.SeverityCritical:
+		return event.SeverityCritical
+	default:
+		return event.SeverityUnknown
+	}
 }
