@@ -92,6 +92,17 @@ func New(opts ...Option) (*Context, error) {
 // fetches the source, then synthesizes a git-checkout node on the Melange
 // pipeline.
 func (ctx *Context) InterpretGitHub(u *url.URL) error {
+	rawURI := u.String()
+	re := regexp.MustCompile(`https://github\.com/([^/]+)/([^/]+)`)
+
+	match := re.FindStringSubmatch(rawURI)
+	if len(match) != 3 {
+		return fmt.Errorf("github project URI is malformed")
+	}
+
+	log.Printf("github repo owner: %s", match[1])
+	log.Printf("package name: %s", match[2])
+
 	return nil
 }
 
@@ -160,9 +171,10 @@ func (ctx *Context) InterpretURI(uri string) error {
 		return err
 	}
 
-	if u.Hostname() == "github.com" {
-		return ctx.InterpretGitHub(u)
-	}
+	// TODO: Support using GitHub API to use git-checkout instead.
+	// if u.Hostname() == "github.com" {
+	//	return ctx.InterpretGitHub(u)
+	// }
 
 	for _, tarballSuffix := range tarballSuffixes {
 		if strings.HasSuffix(u.Path, tarballSuffix) {
@@ -250,6 +262,8 @@ func (ctx *Context) Run() error {
 	}
 
 	log.Printf("wrote %s", outFileName)
+	log.Printf(" ")
+	log.Printf("Please review %s and address all TODO items / comments.", outFileName)
 
 	return nil
 }
