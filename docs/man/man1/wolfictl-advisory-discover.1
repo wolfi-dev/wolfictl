@@ -20,12 +20,33 @@ search for new potential vulnerabilities and create advisories for them
 
 .SH OPTIONS
 .PP
+\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
+    directory containing the advisories repository (can also be set with environment variable \fB\fCWOLFICTL\_ADVISORIES\_REPO\_DIR\fR)
+
+.PP
+\fB\-d\fP, \fB\-\-distro\-repo\-dir\fP=""
+    directory containing the distro repository (can also be set with environment variable \fB\fCWOLFICTL\_DISTRO\_REPO\_DIR\fR)
+
+.PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
     help for discover
 
 .PP
-\fB\-\-host\fP="secfixes\-tracker\-q67u43ydxq\-uc.a.run.app"
-    hostname for secfixes\-tracker
+\fB\-\-no\-distro\-detection\fP[=false]
+    do not attempt to auto\-detect the distro
+
+.PP
+\fB\-\-nvd\-api\-key\fP=""
+    NVD API key (Can also be set via the environment variable 'WOLFICTL\_NVD\_API\_KEY'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to 
+\[la]https://nvd.nist.gov/developers/request-an-api-key\[ra] .)
+
+.PP
+\fB\-p\fP, \fB\-\-package\fP=""
+    package name
+
+.PP
+\fB\-r\fP, \fB\-\-package\-repo\-url\fP=""
+    URL of the APK package repository
 
 
 .SH SEE ALSO

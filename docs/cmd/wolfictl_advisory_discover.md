@@ -15,8 +15,13 @@ search for new potential vulnerabilities and create advisories for them
 ### Options
 
 ```
-  -h, --help          help for discover
-      --host string   hostname for secfixes-tracker (default "secfixes-tracker-q67u43ydxq-uc.a.run.app")
+  -a, --advisories-repo-dir WOLFICTL_ADVISORIES_REPO_DIR   directory containing the advisories repository (can also be set with environment variable WOLFICTL_ADVISORIES_REPO_DIR)
+  -d, --distro-repo-dir WOLFICTL_DISTRO_REPO_DIR           directory containing the distro repository (can also be set with environment variable WOLFICTL_DISTRO_REPO_DIR)
+  -h, --help                                               help for discover
+      --no-distro-detection                                do not attempt to auto-detect the distro
+      --nvd-api-key string                                 NVD API key (Can also be set via the environment variable 'WOLFICTL_NVD_API_KEY'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to https://nvd.nist.gov/developers/request-an-api-key .)
+  -p, --package string                                     package name
+  -r, --package-repo-url string                            URL of the APK package repository
 ```
 
 ### SEE ALSO
