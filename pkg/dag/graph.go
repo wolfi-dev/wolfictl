@@ -243,23 +243,22 @@ func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep,
 				return nil, fmt.Errorf("unable to add vertex for %s dependency %s: %w", c, dep, err)
 			}
 			target := packageHash(pkg)
-			if isCycle, err := graph.CreatesCycle(g.Graph, packageHash(c), target); err != nil || isCycle {
-				pkg = nil
-				// we only take the first cycleTarget we find, as we prefer the highest one
-				if cycleTarget == "" {
-					cycleTarget = target
-				}
-				continue
-			}
 			err := g.Graph.AddEdge(packageHash(c), target, graph.EdgeAttribute("target-origin", dep))
 			switch {
 			case err == nil || errors.Is(err, graph.ErrEdgeAlreadyExists):
 				// no error, so we can keep the vertex and we have our match
 				return nil, nil
+			case errors.Is(err, graph.ErrEdgeCreatesCycle):
+				pkg = nil
+				if cycleTarget == "" {
+					cycleTarget = target
+				}
+				continue
 			default:
 				return nil, fmt.Errorf("%s: add edge dependency %s error: %w", c, dep, err)
 			}
 		}
+
 		// did we find a valid dep?
 		if pkg == nil {
 			if cycleTarget != "" {
