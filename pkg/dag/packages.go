@@ -6,6 +6,7 @@ import (
 	"log"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"chainguard.dev/melange/pkg/build"
@@ -336,7 +337,17 @@ func (p Packages) Sub(names ...string) (*Packages, error) {
 // using alpine/go structs instead of ours.
 func (p Packages) Repository(arch string) apk.NamedIndex {
 	repo := repository.NewRepositoryFromComponents(Local, "latest", "", arch)
-	packages := make([]*repository.Package, 0)
+
+	// Precompute the number of packages to avoid growslice.
+	size := 0
+	for _, byVersion := range p.packages {
+		for _, config := range byVersion {
+			size++ // top-level package
+			size += len(config.Subpackages)
+		}
+	}
+
+	packages := make([]*repository.Package, 0, size)
 	for _, byVersion := range p.packages {
 		for _, config := range byVersion {
 			packages = append(packages, &repository.Package{
@@ -389,5 +400,5 @@ func packageNameFromProvides(prov string) (name, version string) {
 }
 
 func fullVersion(pkg *build.Package) string {
-	return fmt.Sprintf("%s-r%d", pkg.Version, pkg.Epoch)
+	return pkg.Version + "-r" + strconv.FormatUint(pkg.Epoch, 10)
 }
