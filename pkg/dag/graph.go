@@ -32,7 +32,7 @@ type Graph struct {
 // packageHash given anything that implements Package, return the hash to be used
 // for the node in the graph.
 func packageHash(p Package) string {
-	return fmt.Sprintf("%s:%s@%s", p.Name(), p.Version(), p.Source())
+	return p.Name() + ":" + p.Version() + "@" + p.Source()
 }
 
 func newGraph() graph.Graph[string, Package] {
@@ -70,6 +70,11 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		errs      []error
 	)
 
+	// TODO: should we repeat across multiple arches? Use c.Package.TargetArchitecture []string
+	var arch = "x86_64"
+	localRepo := pkgs.Repository(arch)
+	localRepoSource := localRepo.Source()
+
 	// 1. go through each known origin package, add it as a vertex
 	// 2. go through each of its subpackages, add them as vertices, with the sub dependent on the origin
 	// 3. go through each of its dependencies, add them as vertices, with the origin dependent on the dependency
@@ -96,8 +101,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 				}
 			}
 		}
-		// TODO: should we repeat across multiple arches? Use c.Package.TargetArchitecture []string
-		var arch = "x86_64"
+
 		// get all of the repositories that are referenced by the package
 
 		var (
@@ -143,8 +147,8 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 				lookupRepos = append(lookupRepos, repo)
 			}
 		}
+
 		// add our own packages list to the lookupRepos
-		localRepo := pkgs.Repository(arch)
 		lookupRepos = append(lookupRepos, localRepo)
 
 		// creating a resolver can be expensive, so we cache any that already exist that have exactly
@@ -163,7 +167,6 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			resolver = apk.NewPkgResolver(lookupRepos)
 			resolvers[resolverKey] = resolver
 		}
-		localRepoSource := localRepo.Source()
 		for _, buildDep := range c.Environment.Contents.Packages {
 			if buildDep == "" {
 				errs = append(errs, fmt.Errorf("empty package name in environment packages for %q", c.Package.Name))
@@ -194,6 +197,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	if errs != nil {
 		return nil, fmt.Errorf("unable to build graph:\n%w", errors.Join(errs...))
 	}
+
 	return g, nil
 }
 
