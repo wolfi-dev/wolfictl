@@ -146,12 +146,6 @@ func NewPackages(fsys fs.FS, dirPath string) (*Packages, error) {
 		}
 
 		if d.Type().IsRegular() && strings.HasSuffix(path, ".yaml") && !strings.HasPrefix(d.Name(), ".") {
-			f, err := fsys.Open(path)
-			if err != nil {
-				return err
-			}
-			defer f.Close()
-
 			p := filepath.Join(dirPath, path)
 			buildc, err := build.ParseConfiguration(p)
 			if err != nil {
