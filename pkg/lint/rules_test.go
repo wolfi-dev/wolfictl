@@ -49,6 +49,22 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			file: "forbidden-repository-tagged.yaml",
+			want: EvalResult{
+				File: "forbidden-repository-tagged",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "tagged-repository-in-environment-repos",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[tagged-repository-in-environment-repos]: repository \"@local ./foo\" is tagged (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			file: "forbidden-keyring.yaml",
 			want: EvalResult{
 				File: "forbidden-keyring",
