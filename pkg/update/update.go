@@ -592,6 +592,7 @@ func (o *Options) createErrorMessageIssue(repo *git.Repository, packageName, mes
 		PackageName: packageName,
 		Comment:     message,
 		Title:       gh.GetErrorIssueTitle(bot, packageName),
+		Labels:      o.IssueLabels,
 	}
 	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
 	if err != nil {
