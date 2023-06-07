@@ -1,0 +1,24 @@
+package:
+  name: forbidden-repository-tagged
+  version: 1.0.0
+  epoch: 0
+  description: A package with a forbidden tagged repository
+  target-architecture:
+    - all
+  copyright:
+    - license: Apache-2.0
+      paths:
+        - "*"
+environment:
+  contents:
+    repositories:
+      - '@local ./foo'
+    packages:
+      - foo
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://test.com/foo/bar/baz.tar.gz
+      expected-sha512: 6d8e828fa406518b4b3f55b0e5f62bbd5cf25cb5782d1884b9d5eaf61fb0614deaacad4236ab7420fa5b3868c79df226ae1aa5193bb136c556aa52853eeca553
+  - runs: |
+      go build .
