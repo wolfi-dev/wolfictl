@@ -74,10 +74,14 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	var arch = "x86_64"
 	localRepo := pkgs.Repository(arch)
 	localRepoSource := localRepo.Source()
+	localOnlyResolver := apk.NewPkgResolver([]apk.NamedIndex{localRepo})
+	resolvers[localRepoSource] = localOnlyResolver
 
-	// 1. go through each known origin package, add it as a vertex
-	// 2. go through each of its subpackages, add them as vertices, with the sub dependent on the origin
-	// 3. go through each of its dependencies, add them as vertices, with the origin dependent on the dependency
+	// the order of adding packages is quite important:
+	// 1. Go through each origin package and add it as a vertex
+	// 2. Go through each of its subpackages and add them as vertices, with the sub dependent on the origin
+	// 3. Add runtime dependencies for each package, as they are much more constrained than the build-time, and only can go to the local repo.
+	// 4. Add environment build-time dependencies
 	for _, c := range pkgs.Packages() {
 		version := fullVersion(&c.Package)
 		if err := g.addVertex(c); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
@@ -101,9 +105,18 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 				}
 			}
 		}
+	}
 
+	for _, c := range pkgs.Packages() {
+		// add packages from the runtime dependencies first, as they are constrained to the local repository
+		addErrs := g.resolvePackages(c, "runtime", localRepoSource, localOnlyResolver, c.Package.Dependencies.Runtime)
+		if len(addErrs) > 0 {
+			errs = append(errs, addErrs...)
+		}
+	}
+
+	for _, c := range pkgs.Packages() {
 		// get all of the repositories that are referenced by the package
-
 		var (
 			origRepos   = c.Environment.Contents.Repositories
 			origKeys    = c.Environment.Contents.Keyring
@@ -160,45 +173,61 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		for _, repo := range lookupRepos {
 			resolverKey += repo.Source() + ","
 		}
-		var resolver *apk.PkgResolver
+		var (
+			resolver *apk.PkgResolver
+			addErrs  []error
+		)
+
+		// add packages from build-time, as they could be local only, or might have upstream
 		if r, ok := resolvers[resolverKey]; ok {
 			resolver = r
 		} else {
 			resolver = apk.NewPkgResolver(lookupRepos)
 			resolvers[resolverKey] = resolver
 		}
-		for _, buildDep := range c.Environment.Contents.Packages {
-			if buildDep == "" {
-				errs = append(errs, fmt.Errorf("empty package name in environment packages for %q", c.Package.Name))
-				continue
-			}
-			// need to resolve the package given the available versions
-			// this could be in the current packages set, or in one to which it refers
-			// 1. look in c.Environments.Contents.Repositories and c.Environments.Contents.Keyring
-			// 2. if there are Repositories, download their index
-			// 3. try to resolve first in Repositories and then in current packages
-
-			cycle, err := g.addAppropriatePackage(resolver, c, buildDep, localRepoSource)
-			if err != nil {
-				errs = append(errs, err)
-				continue
-			}
-			// resolve any cycle
-			if cycle != nil {
-				if err := g.resolveCycle(cycle, buildDep, resolver, localRepoSource); err != nil {
-					sp, _ := graph.ShortestPath(g.Graph, cycle.target, cycle.src) //nolint:errcheck // we do not need to check for an error, as we have an error
-					log.Errorf("unresolvable cycle: %s -> %s, caused by: %s", cycle.src, cycle.target, strings.Join(sp, " -> "))
-					errs = append(errs, err)
-					continue
-				}
-			}
+		addErrs = g.resolvePackages(c, "environment", localRepoSource, resolver, c.Environment.Contents.Packages)
+		if len(addErrs) > 0 {
+			errs = append(errs, addErrs...)
 		}
+
+		// we also need to add packages that are in Packages.Dependencies.Runtime, but these should come *only*
+		// from local
 	}
 	if errs != nil {
 		return nil, fmt.Errorf("unable to build graph:\n%w", errors.Join(errs...))
 	}
 
 	return g, nil
+}
+
+func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource string, resolver *apk.PkgResolver, pkgs []string) (errs []error) {
+	for _, buildDep := range pkgs {
+		if buildDep == "" {
+			errs = append(errs, fmt.Errorf("empty package name in %s packages for %q", source, parent.Package.Name))
+			continue
+		}
+		// handle the negative for a package
+		// if it was a conflict prevention, we do not care about it for graph, only for install time
+		if strings.HasPrefix(buildDep, "!") {
+			continue
+		}
+
+		cycle, err := g.addAppropriatePackage(resolver, parent, buildDep, localRepoSource)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		// resolve any cycle
+		if cycle != nil {
+			if err := g.resolveCycle(cycle, buildDep, resolver, localRepoSource); err != nil {
+				sp, _ := graph.ShortestPath(g.Graph, cycle.target, cycle.src) //nolint:errcheck // we do not need to check for an error, as we have an error
+				log.Errorf("unresolvable cycle: %s -> %s, caused by: %s", cycle.src, cycle.target, strings.Join(sp, " -> "))
+				errs = append(errs, err)
+				continue
+			}
+		}
+	}
+	return
 }
 
 // addAppropriatePackage adds the appropriate package to the graph, and returns any cycle that was created.
@@ -333,7 +362,7 @@ func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apk.PkgResolver, lo
 			return fmt.Errorf("unable to re-add original edge %s -> %s: %w", rem.src, origDep, err)
 		}
 		if cycle != nil {
-			return fmt.Errorf("unable re-add original edge with new dep still causes cycle %s -> %s: %w", rem.src, dep, err)
+			return fmt.Errorf("unable to re-add original edge with new dep still causes cycle %s -> %s", rem.src, dep)
 		}
 	}
 	return nil
