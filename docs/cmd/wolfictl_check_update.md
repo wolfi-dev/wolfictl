@@ -15,7 +15,7 @@ Check Wolfi update configs
 ### Options
 
 ```
-  -d, --directory string          directory containing melange configs (default "/Users/jason/git/wolfictl")
+  -d, --directory string          directory containing melange configs (default ".")
   -h, --help                      help for update
       --override-version string   override the local melange config version to test an update works as expected
 ```

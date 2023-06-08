@@ -20,7 +20,7 @@ Check so name files have not changed in upgrade
   -h, --help                       help for so-name
       --package-list-file string   name of the package to compare (default "packages.log")
       --package-name stringArray   override using package-list-file and specify a single package name to compare
-      --packages-dir string        directory containing new packages (default "/Users/jason/git/wolfictl/packages")
+      --packages-dir string        directory containing new packages (default "packages")
 ```
 
 ### SEE ALSO

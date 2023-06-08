@@ -10,7 +10,7 @@ wolfictl\-advisory\-list \- list advisories for specific packages or across all 
 
 .SH SYNOPSIS
 .PP
-\fBwolfictl advisory list [configs...]\fP
+\fBwolfictl advisory list\fP
 
 
 .SH DESCRIPTION
@@ -20,6 +20,10 @@ list advisories for specific packages or across all of Wolfi
 
 .SH OPTIONS
 .PP
+\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
+    directory containing the advisories repository (can also be set with environment variable \fB\fCWOLFICTL\_ADVISORIES\_REPO\_DIR\fR)
+
+.PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
     help for list
 
@@ -28,11 +32,19 @@ list advisories for specific packages or across all of Wolfi
     show full history for advisories
 
 .PP
+\fB\-\-no\-distro\-detection\fP[=false]
+    do not attempt to auto\-detect the distro
+
+.PP
+\fB\-p\fP, \fB\-\-package\fP=""
+    package name
+
+.PP
 \fB\-\-unresolved\fP[=false]
     only show advisories whose latest status is affected or under\_investigation
 
 .PP
-\fB\-\-vuln\fP=""
+\fB\-V\fP, \fB\-\-vuln\fP=""
     vulnerability ID for advisory
 
 

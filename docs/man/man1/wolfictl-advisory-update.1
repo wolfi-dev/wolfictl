@@ -10,7 +10,7 @@ wolfictl\-advisory\-update \- append an entry to an existing package advisory
 
 .SH SYNOPSIS
 .PP
-\fBwolfictl advisory update <package-name>\fP
+\fBwolfictl advisory update\fP
 
 
 .SH DESCRIPTION
@@ -22,6 +22,18 @@ append an entry to an existing package advisory
 .PP
 \fB\-\-action\fP=""
     action statement for VEX statement (used only for affected status)
+
+.PP
+\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
+    directory containing the advisories repository (can also be set with environment variable \fB\fCWOLFICTL\_ADVISORIES\_REPO\_DIR\fR)
+
+.PP
+\fB\-\-arch\fP=[x86\_64,aarch64]
+    package architectures to find published versions for
+
+.PP
+\fB\-d\fP, \fB\-\-distro\-repo\-dir\fP=""
+    directory containing the distro repository (can also be set with environment variable \fB\fCWOLFICTL\_DISTRO\_REPO\_DIR\fR)
 
 .PP
 \fB\-\-fixed\-version\fP=""
@@ -40,19 +52,31 @@ append an entry to an existing package advisory
     justification for VEX statement (used only for not\_affected status)
 
 .PP
-\fB\-\-status\fP=""
-    status for VEX statement
+\fB\-\-no\-distro\-detection\fP[=false]
+    do not attempt to auto\-detect the distro
 
 .PP
-\fB\-\-sync\fP[=false]
-    synchronize secfixes data immediately after updating advisory
+\fB\-\-no\-prompt\fP[=false]
+    do not prompt the user for input
+
+.PP
+\fB\-p\fP, \fB\-\-package\fP=""
+    package name
+
+.PP
+\fB\-r\fP, \fB\-\-package\-repo\-url\fP=""
+    URL of the APK package repository
+
+.PP
+\fB\-s\fP, \fB\-\-status\fP=""
+    status for VEX statement
 
 .PP
 \fB\-\-timestamp\fP="now"
     timestamp for VEX statement
 
 .PP
-\fB\-\-vuln\fP=""
+\fB\-V\fP, \fB\-\-vuln\fP=""
     vulnerability ID for advisory
 
 

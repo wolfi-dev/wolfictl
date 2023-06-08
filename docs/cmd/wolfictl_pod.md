@@ -22,6 +22,7 @@ Generate a kubernetes pod to run the build
       --cpu string                       CPU request (default "1")
       --create                           create the pod (default true)
   -d, --dir string                       directory to search for melange configs (default ".")
+      --gcloud-image string              image to use for gcloud stuff (default "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim")
   -h, --help                             help for pod
       --melange-build-options string     additional options to pass to the melange build
   -n, --namespace string                 namespace to create the pod in (default "default")
