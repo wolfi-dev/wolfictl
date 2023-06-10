@@ -95,6 +95,15 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 			latestVersion = strings.ReplaceAll(latestVersion, p.Config.Update.VersionSeparator, ".")
 		}
 
+		// strip any prefix or suffix from the version
+		if p.Config.Update.ReleaseMonitor.StripPrefix != "" {
+			latestVersion = strings.TrimPrefix(latestVersion, p.Config.Update.ReleaseMonitor.StripPrefix)
+		}
+
+		if p.Config.Update.ReleaseMonitor.StripSuffix != "" {
+			latestVersion = strings.TrimSuffix(latestVersion, p.Config.Update.ReleaseMonitor.StripSuffix)
+		}
+
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
 			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
