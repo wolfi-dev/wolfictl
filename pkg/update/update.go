@@ -631,20 +631,36 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 		Title:       gh.GetUpdateIssueTitle(packageName, version.Version),
 		Labels:      o.IssueLabels,
 	}
-	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
+
+	existingIssues, err := gitOpts.ListIssues(context.Background(), gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
 		return "", err
 	}
 
-	if existingIssue > 0 {
-		return "", nil
+	// if the issue already exists then don't create a new one
+	for _, issue := range existingIssues {
+		if *issue.Title == i.Title {
+			return "", nil
+		}
 	}
 
+	// create a new issue
 	issueLink, err := gitOpts.OpenIssue(context.Background(), i)
 	if err != nil {
 		return "", err
 	}
 	o.Logger.Println(color.GreenString(fmt.Sprintf("%s opened issue %s", packageName, issueLink)))
+
+	// if there's an existing issue with the same package but older version then close it
+	for _, issue := range existingIssues {
+		if strings.HasPrefix(*issue.Title, packageName+"/") {
+			err = gitOpts.CloseIssue(context.Background(), gitURL.Organisation, gitURL.Name, fmt.Sprintf("superseded by %s", issueLink), *issue.Number)
+			if err != nil {
+				return "", err
+			}
+		}
+	}
+
 	return "", nil
 }
 

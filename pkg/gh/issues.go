@@ -102,6 +102,18 @@ func (o GitOptions) OpenIssue(ctx context.Context, r *Issues) (string, error) {
 	return issue.GetHTMLURL(), nil
 }
 
+func (o GitOptions) CloseIssue(background context.Context, organisation, name, comment string, i int) error {
+	issue := &github.IssueRequest{
+		State: github.String("closed"),
+		Body:  github.String(comment),
+	}
+	_, _, err := o.GithubClient.Issues.Edit(background, organisation, name, i, issue)
+	if err != nil {
+		return fmt.Errorf("error closing issue %d: %s", i, err)
+	}
+	return nil
+}
+
 func (o GitOptions) CommentIssue(ctx context.Context, owner, repo, comment string, number int) (string, error) {
 	ic := &github.IssueComment{
 		Body: github.String(comment),

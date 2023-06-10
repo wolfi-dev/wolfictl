@@ -2,6 +2,7 @@ package gh
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -104,4 +105,27 @@ func TestOpenIssue(t *testing.T) {
 	// Assert that the returned HTML URL is correct and there's no error
 	assert.NoError(t, err)
 	assert.Equal(t, "https://github.com/cheese/crisps/issues/1", htmlURL)
+}
+
+func TestGitOptions_CloseIssue(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{"number":1,"state":"closed","body":"test comment"}`)
+	}))
+	defer testServer.Close()
+
+	httpClient := testServer.Client()
+	ctx := context.Background()
+
+	baseURL := testServer.URL
+	client := github.NewClient(httpClient)
+	var err error
+	client.BaseURL, err = url.Parse(baseURL + "/")
+	assert.NoError(t, err)
+
+	gitOptions := GitOptions{
+		GithubClient: client,
+	}
+
+	err = gitOptions.CloseIssue(ctx, "testOrg", "testRepo", "test comment", 1)
+	assert.NoError(t, err)
 }
