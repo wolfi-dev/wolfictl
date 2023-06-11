@@ -5,12 +5,12 @@ import (
 )
 
 func NewAdvisoriesSectionUpdater(
-	updater configs.SectionUpdater[[]Advisory, Document],
+	updater configs.SectionUpdater[Advisories, Document],
 ) configs.EntryUpdater[Document] {
-	yamlASTMutater := configs.NewTargetedYAMLASTMutater[[]Advisory, Document](
+	yamlASTMutater := configs.NewTargetedYAMLASTMutater[Advisories, Document](
 		"advisories",
 		updater,
-		func(cfg Document, data []Advisory) Document {
+		func(cfg Document, data Advisories) Document {
 			cfg.Advisories = data
 			return cfg
 		},

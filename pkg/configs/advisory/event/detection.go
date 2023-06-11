@@ -40,7 +40,7 @@ const (
 type MatchTarget struct {
 	CPE string `yaml:"cpe"`
 
-	// SBOMComponentReference *SBOMComponentReference
+	// SBOM *SBOMComponentReference `yaml:"sbom"`
 }
 
 type Vulnerability struct {
@@ -61,9 +61,9 @@ type Vulnerability struct {
 
 // TODO: introduce these types when adding the next Detector (likely Grype).
 // type SBOMComponentReference struct {
-// 	SBOMType     SBOMType `yaml:"sbom-type"`
-// 	SBOMLocation string   `yaml:"sbom-location"`
-// 	ComponentID  string   `yaml:"component-id"`
+// 	Type        SBOMType `yaml:"type"`
+// 	URL         string   `yaml:"url"`
+// 	ComponentID string   `yaml:"component-id"`
 // }
 //
 // // SBOMType identifies the type of SBOM that a component reference is pointing
@@ -74,6 +74,11 @@ type Vulnerability struct {
 // 	SBOMTypeSPDX      SBOMType = "spdx"
 // 	SBOMTypeCycloneDX SBOMType = "cyclonedx"
 // 	SBOMTypeSyft      SBOMType = "syft"
+//
+// 	// The SBOMTypeDynamic value instructs data consumers to look at the URL field
+// 	// to find a method of deterministically producing an SBOM just-in-time that is
+// 	// expected to contain a component with the provided ComponentID.
+// 	SBOMTypeDynamic SBOMType = "dynamic"
 // )
 
 type Severity string

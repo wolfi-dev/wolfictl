@@ -46,15 +46,22 @@ func DecodeDocument(r io.Reader) (*Document, error) {
 type Document struct {
 	Package Package `yaml:"package"`
 
-	Advisories []Advisory `yaml:"advisories,omitempty"`
-}
-
-func (d Document) Name() string {
-	return d.Package.Name
+	Advisories Advisories `yaml:"advisories,omitempty"`
 }
 
 type Package struct {
 	Name string `yaml:"name"`
+}
+
+type Advisories map[string]Advisory
+
+type Advisory struct {
+	ID     string        `yaml:"-"`
+	Events []event.Event `yaml:"events"`
+}
+
+func (d Document) Name() string {
+	return d.Package.Name
 }
 
 // Entry is an entry in an advisory.
@@ -67,9 +74,4 @@ type Entry struct {
 	ImpactStatement string            `yaml:"impact,omitempty"`
 	ActionStatement string            `yaml:"action,omitempty"`
 	FixedVersion    string            `yaml:"fixed-version,omitempty"`
-}
-
-type Advisory struct {
-	ID     string        `yaml:"id"`
-	Events []event.Event `yaml:"events"`
 }
