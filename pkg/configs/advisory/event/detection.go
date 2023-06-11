@@ -13,22 +13,13 @@ type Detection struct {
 	// MatchTarget identifies the particular software that the Detector claims is
 	// vulnerable.
 	MatchTarget MatchTarget `yaml:"match-target"`
-	// TODO: rename to "match-target"?
 
-	// VulnerabilityIDs lists any known IDs of the underlying vulnerability found in
-	// the MatchTarget. This list SHOULD include a CVE ID (from NVD) if one is known.
-	// Other IDs MAY be included, such as GHSA IDs or GoVulnDB IDs.
-	VulnerabilityIDs []string `yaml:"vulnerability-ids"`
-	// TODO: put under new field "vulnerability", along with things like "severity"?
+	// Vulnerability describes the vulnerability to which the package was matched.
+	Vulnerability Vulnerability `yaml:"vulnerability"`
 
 	// PackageVersions lists the versions of the package that the Detector claims
 	// are vulnerable.
 	PackageVersions []string `yaml:"package-versions"`
-
-	// Severity is a non-authoritative severity rating for the vulnerability. This
-	// is included as a convenience, but more comprehensive severity scores SHOULD
-	// be obtained from the underlying vulnerability data source(s).
-	Severity Severity `yaml:"severity"`
 }
 
 func NewDetection(timestamp time.Time, event Detection) Event {
@@ -43,7 +34,7 @@ type Detector string
 
 const (
 	DetectorNVDAPI Detector = "nvd-api"
-	// GrypeDetector
+	// DetectorGrype
 )
 
 type MatchTarget struct {
@@ -52,21 +43,38 @@ type MatchTarget struct {
 	// SBOMComponentReference *SBOMComponentReference
 }
 
-type SBOMComponentReference struct {
-	SBOMType     SBOMType `yaml:"sbom-type"`
-	SBOMLocation string   `yaml:"sbom-location"`
-	ComponentID  string   `yaml:"component-id"`
+type Vulnerability struct {
+	// ID is the unique identifier for the vulnerability record in an upstream
+	// vulnerability database. Example values are "CVE-2023-11111",
+	// "GHSA-vp9c-fpxx-744v", etc.
+	ID string `yaml:"id"`
+
+	// Aliases lists any known IDs of this vulnerability in additional databases.
+	// Each list item value should match the format of the ID field.
+	Aliases []string `yaml:"aliases,omitempty"`
+
+	// Severity is a non-authoritative severity rating for the vulnerability. This
+	// is included as a convenience, but more comprehensive severity scores SHOULD
+	// be obtained from the underlying vulnerability data source(s).
+	Severity Severity `yaml:"severity"`
 }
 
-// SBOMType identifies the type of SBOM that a component reference is pointing
-// to.
-type SBOMType string
-
-const (
-	SBOMTypeSPDX      SBOMType = "spdx"
-	SBOMTypeCycloneDX SBOMType = "cyclonedx"
-	SBOMTypeSyft      SBOMType = "syft"
-)
+// TODO: introduce these types when adding the next Detector (likely Grype).
+// type SBOMComponentReference struct {
+// 	SBOMType     SBOMType `yaml:"sbom-type"`
+// 	SBOMLocation string   `yaml:"sbom-location"`
+// 	ComponentID  string   `yaml:"component-id"`
+// }
+//
+// // SBOMType identifies the type of SBOM that a component reference is pointing
+// // to.
+// type SBOMType string
+//
+// const (
+// 	SBOMTypeSPDX      SBOMType = "spdx"
+// 	SBOMTypeCycloneDX SBOMType = "cyclonedx"
+// 	SBOMTypeSyft      SBOMType = "syft"
+// )
 
 type Severity string
 
