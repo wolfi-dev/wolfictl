@@ -104,9 +104,11 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			MatchTarget: event.MatchTarget{
 				CPE: match.CPE.URI,
 			},
-			VulnerabilityIDs: []string{vulnerabilityID},
-			PackageVersions:  []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
-			Severity:         mapNVDAPISeverity(match.Vulnerability.Severity),
+			Vulnerability: event.Vulnerability{
+				ID:       vulnerabilityID,
+				Severity: mapNVDAPISeverity(match.Vulnerability.Severity),
+			},
+			PackageVersions: []string{fmt.Sprintf("%s-r%d", buildCfg.Package.Version, buildCfg.Package.Epoch)},
 		})
 
 		adv := advisoryconfigs.Advisory{
