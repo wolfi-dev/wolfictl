@@ -33,6 +33,8 @@ import (
 	"k8s.io/utils/pointer"
 )
 
+var rootUser int64 = 0
+
 func gcloudProjectID(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "gcloud", "config", "get-value", "project")
 	b, err := cmd.Output()
@@ -150,6 +152,7 @@ func cmdPod() *cobra.Command {
 							Name:      "workspace",
 							MountPath: "/workspace",
 						}},
+						SecurityContext: &corev1.SecurityContext{RunAsUser: &rootUser},
 						Command: []string{"bash", "-c", template(`
 set -euo pipefail
 # Download all packages so we can avoid rebuilding them.
