@@ -84,7 +84,7 @@ func (m Model) newEventTypeFieldConfig() field.ListFieldConfiguration {
 			event.TypeTruePositiveDetermination,
 		},
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Event.Timestamp = time.Now()
+			req.Event.Timestamp = time.Now().UTC()
 			req.Event.Type = value
 			return req
 		},

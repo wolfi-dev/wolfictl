@@ -99,7 +99,7 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			return fmt.Errorf("unable to parse CPE URI %q: %w", match.CPE.URI, err)
 		}
 
-		e := event.NewDetection(time.Now(), event.Detection{
+		e := event.NewDetection(time.Now().UTC(), event.Detection{
 			Detector: event.DetectorNVDAPI,
 			MatchTarget: event.MatchTarget{
 				CPE: match.CPE.URI,

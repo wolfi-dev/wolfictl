@@ -4,8 +4,8 @@ package event
 // detected vulnerability was determined to be a false positive.
 type FalsePositiveDetermination struct {
 	Type  string      `yaml:"type"`
-	Data  interface{} `yaml:"data"`
-	Notes string      `yaml:"notes"`
+	Data  interface{} `yaml:"data,omitempty"`
+	Notes string      `yaml:"notes,omitempty"`
 }
 
 const (

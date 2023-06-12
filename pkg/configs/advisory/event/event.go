@@ -23,5 +23,5 @@ type Event struct {
 
 	// Data is the event-specific data. The type of this field is determined by the
 	// Type field.
-	Data interface{} `yaml:"data"`
+	Data interface{} `yaml:"data,omitempty"`
 }

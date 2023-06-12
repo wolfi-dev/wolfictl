@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"time"
 
 	"chainguard.dev/melange/pkg/build"
 	"github.com/samber/lo"
@@ -62,19 +61,6 @@ func resolveAdvisoriesDir(cliFlagValue string) string {
 
 func renderDetectedDistro(d distro.Distro) string {
 	return styles.Secondary().Render("Auto-detected distro: ") + d.Name + "\n\n"
-}
-
-func resolveTimestamp(ts string) (time.Time, error) {
-	if ts == "now" {
-		return time.Now(), nil
-	}
-
-	t, err := time.Parse(time.RFC3339, ts)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to parse timestamp: %w", err)
-	}
-
-	return t, nil
 }
 
 type advisoryRequestParams struct {
