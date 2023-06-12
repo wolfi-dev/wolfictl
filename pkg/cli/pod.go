@@ -279,7 +279,7 @@ done
 gsutil cp \
 	-h "Cache-Control:no-store" \
 	-a public-read \
-	"./packages/${{.arch}}/APKINDEX.tar.gz" gs://{{.bucket}}{{.arch}}/ || true
+	"./packages/{{.arch}}/APKINDEX.tar.gz" gs://{{.bucket}}{{.arch}}/ || true
 
 # apks will be cached in CDN for an hour by default.
 gcloud --quiet storage cp \
