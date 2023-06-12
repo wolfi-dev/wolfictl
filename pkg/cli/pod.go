@@ -33,7 +33,7 @@ import (
 	"k8s.io/utils/pointer"
 )
 
-var rootUser int64 = 0
+var rootUser int64 // 0
 
 func gcloudProjectID(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "gcloud", "config", "get-value", "project")
