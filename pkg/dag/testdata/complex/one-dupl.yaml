@@ -10,10 +10,6 @@ package:
         - "*"
       attestation:
       license: Apache-2.0
-  dependencies:
-    runtime:
-      - bash
-      - gcc
 environment:
   contents:
     packages:

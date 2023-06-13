@@ -11,9 +11,6 @@ package:
       attestation:
       license: Apache-2.0
   dependencies:
-    runtime:
-      - bash
-      - gcc
     provides:
       - two-provides-explicit=10.11.12
       - two-provides-implicit
