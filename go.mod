@@ -36,7 +36,7 @@ require (
 	github.com/openvex/go-vex v0.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.38.1
-	github.com/savioxavier/termlink v1.2.1
+	github.com/savioxavier/termlink v1.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -118,7 +118,6 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/jwalton/go-supportscolor v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.16.6 // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
