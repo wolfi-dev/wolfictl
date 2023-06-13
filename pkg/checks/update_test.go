@@ -140,7 +140,7 @@ func createTestRepo(t *testing.T, dir, tag string) string {
 func TestUpdateKeyExists(t *testing.T) {
 	dir := t.TempDir()
 	// create a temporary file with an update key
-	yamlData := []byte("name: cheese\nupdate:\n  foo: true\n")
+	yamlData := []byte("package:\n  name: cheese\n  version: 1\nupdate:\n  manual: true\n")
 	fileContainsUpdate := filepath.Join(dir, "contains.yaml")
 	err := os.WriteFile(fileContainsUpdate, yamlData, os.ModePerm)
 	if err != nil {
@@ -154,7 +154,7 @@ func TestUpdateKeyExists(t *testing.T) {
 	assert.Empty(t, checkErrors)
 
 	// create a temporary file without an update key
-	yamlData = []byte("name: cheese\n")
+	yamlData = []byte("package:\n  name: cheese\n  version: 1\n")
 	fileNoContainsUpdate := filepath.Join(dir, "does_not_contain.yaml")
 	if err != nil {
 		t.Fatal(err)

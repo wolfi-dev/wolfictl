@@ -15,10 +15,6 @@ package:
       script: |
         #!/bin/busybox sh
         /bin/busybox --install -s
-secfixes:
-  1.35.0-r3:
-    - CVE-2022-28391
-    - CVE-2022-30065
 environment:
   contents:
     packages:
@@ -55,15 +51,6 @@ pipeline:
       install -m755 busybox "${{targets.destdir}}"/bin/busybox
       install -m644 securetty "${{targets.destdir}}"/etc/securetty
   - uses: strip
-advisories:
-  CVE-2022-28391:
-    - timestamp: 2022-10-11T20:37:21+00:00
-      status: fixed
-      fixed-version: 1.35.0-r3
-  CVE-2022-30065:
-    - timestamp: 2022-10-11T20:37:21+00:00
-      status: fixed
-      fixed-version: 1.35.0-r3
 update:
   enabled: false
   release-monitor:

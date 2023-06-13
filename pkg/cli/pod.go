@@ -499,7 +499,7 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 				// With log streaming done, poll until the Pod reports as Succeeded, or fail otherwise.
 				// Sometimes even when the containers are Completed successfully,
 				// the Pod doesn't say it's Succeeded for a little bit, and we shouldn't fail in that case.
-				if err := wait.PollImmediate(5*time.Second, time.Minute, func() (bool, error) {
+				if err := wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, true, func(ctx context.Context) (bool, error) {
 					p, err = k.clientset.CoreV1().Pods(p.Namespace).Get(ctx, p.Name, metav1.GetOptions{})
 					if err != nil {
 						return true, err
