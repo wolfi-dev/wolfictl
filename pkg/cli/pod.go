@@ -278,6 +278,8 @@ do
   sleep $interval
 done
 
+set -x
+
 # Don't cache the APKINDEX, and leave it public if it already is.
 gcloud --quiet storage cp \
 	--cache-control=no-store \
