@@ -19,7 +19,7 @@ require (
 	github.com/charmbracelet/bubbletea v0.24.2
 	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/cpuguy83/go-md2man v1.0.10
-	github.com/dominikbraun/graph v0.22.3-0.20230609075221-c6cb265d89e9
+	github.com/dominikbraun/graph v0.22.3
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/facebookincubator/nvdtools v0.1.5
 	github.com/fatih/color v1.15.0
