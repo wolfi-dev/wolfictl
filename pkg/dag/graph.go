@@ -83,7 +83,6 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	// 3. Add runtime dependencies for each package, as they are much more constrained than the build-time, and only can go to the local repo.
 	// 4. Add environment build-time dependencies
 	for _, c := range pkgs.Packages() {
-		version := fullVersion(&c.Package)
 		if err := g.addVertex(c); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 			errs = append(errs, err)
 			continue
@@ -91,9 +90,6 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		for i := range c.Subpackages {
 			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
 			for _, subpkgVersion := range subpkg {
-				if fullVersion(&subpkgVersion.Package) == version {
-					continue
-				}
 				if err := g.addVertex(subpkgVersion); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 					errs = append(errs, fmt.Errorf("unable to add vertex for %q subpackage %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
 					continue
@@ -109,7 +105,8 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 	for _, c := range pkgs.Packages() {
 		// add packages from the runtime dependencies first, as they are constrained to the local repository
-		addErrs := g.resolvePackages(c, "runtime", localRepoSource, localOnlyResolver, c.Package.Dependencies.Runtime)
+		// For runtime packages, it is allowed to resolve itself.
+		addErrs := g.resolvePackages(c, "runtime", localRepoSource, localOnlyResolver, c.Package.Dependencies.Runtime, true)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
@@ -185,7 +182,9 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			resolver = apk.NewPkgResolver(lookupRepos)
 			resolvers[resolverKey] = resolver
 		}
-		addErrs = g.resolvePackages(c, "environment", localRepoSource, resolver, c.Environment.Contents.Packages)
+		// wolfi-dev has a policy for environment packages not to use a package to fulfull a dependency, if that package is myself.
+		// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
+		addErrs = g.resolvePackages(c, "environment", localRepoSource, resolver, c.Environment.Contents.Packages, false)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
@@ -200,7 +199,13 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	return g, nil
 }
 
-func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource string, resolver *apk.PkgResolver, pkgs []string) (errs []error) {
+// resolvePackages given a package `parent`, a list of packages `pkgs` and a `resolver`,
+// use the resolver to find all of the packages that fulfill the requirements and add them
+// to the graph as the parent's dependencies.
+// Optionally, can allow self to resolve dependencies or not. This is policy driven/
+// In general, wolfi/os does *not* allow self to resolve for build environment,
+// and *does* allow self to resolve for runtime environment.
+func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource string, resolver *apk.PkgResolver, pkgs []string, allowSelf bool) (errs []error) {
 	for _, buildDep := range pkgs {
 		if buildDep == "" {
 			errs = append(errs, fmt.Errorf("empty package name in %s packages for %q", source, parent.Package.Name))
@@ -212,15 +217,15 @@ func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource s
 			continue
 		}
 
-		cycle, err := g.addAppropriatePackage(resolver, parent, buildDep, localRepoSource)
+		cycle, err := g.addAppropriatePackage(resolver, parent, buildDep, localRepoSource, allowSelf)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
 		// resolve any cycle
 		if cycle != nil {
-			if err := g.resolveCycle(cycle, buildDep, resolver, localRepoSource); err != nil {
-				sp, _ := graph.ShortestPath(g.Graph, cycle.target, cycle.src) //nolint:errcheck // we do not need to check for an error, as we have an error
+			sp, _ := graph.ShortestPath(g.Graph, cycle.target, cycle.src) //nolint:errcheck // we do not need to check for an error, as we have an error
+			if err := g.resolveCycle(cycle, buildDep, resolver, localRepoSource, allowSelf); err != nil {
 				log.Errorf("unresolvable cycle: %s -> %s, caused by: %s", cycle.src, cycle.target, strings.Join(sp, " -> "))
 				errs = append(errs, err)
 				continue
@@ -232,7 +237,8 @@ func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource s
 
 // addAppropriatePackage adds the appropriate package to the graph, and returns any cycle that was created.
 // The c *Configuration is the source package, while the dep represents the dependency.
-func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep, localRepo string) (*cycle, error) {
+// Whether or not this package is allowed to resolve itself is policy driven.
+func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep, localRepo string, allowSelf bool) (*cycle, error) {
 	var (
 		pkg         Package
 		cycleTarget string
@@ -248,9 +254,13 @@ func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep,
 	default:
 		// no error and we had at least one package listed in `resolved`
 		for _, r := range resolved {
-			// wolfi-dev has a policy not to use a package to fulfull a dependency, if that package is myself.
-			// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
-			if r.Version == c.Version() && dep == c.Name() {
+			// if we allow self, and our name or origin is the same as dep, and the version is the same, then we are done
+			isSelf := r.Version == c.Version() && (dep == c.Name() || r.Origin == c.Name())
+			if allowSelf && isSelf {
+				return nil, nil
+			}
+			// we do not allow self, so if match, ignore it and look for next one
+			if isSelf {
 				continue
 			}
 			resolvedSource := r.Repository().IndexUri()
@@ -311,7 +321,7 @@ func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep,
 // resolveCycle resolves a cycle by trying to reverse the order.
 // It discovers what the current dependency is that is causing the potential loop,
 // removes the last edge in that cycle, and regenerates that dependency without the previous target.
-func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apk.PkgResolver, localRepoSource string) error {
+func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apk.PkgResolver, localRepoSource string, allowSelf bool) error {
 	// cycle through, removing all "shortest path" until we can resolve the cycle,
 	// then add them back
 	var (
@@ -357,7 +367,7 @@ func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apk.PkgResolver, lo
 		if err != nil {
 			return fmt.Errorf("unable to find original vertex %s: %w", rem.src, err)
 		}
-		cycle, err := g.addAppropriatePackage(resolver, config, origDep, localRepoSource)
+		cycle, err := g.addAppropriatePackage(resolver, config, origDep, localRepoSource, allowSelf)
 		if err != nil {
 			return fmt.Errorf("unable to re-add original edge %s -> %s: %w", rem.src, origDep, err)
 		}
