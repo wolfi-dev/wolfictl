@@ -9,24 +9,32 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 	"sort"
 	"strings"
 
 	"github.com/dominikbraun/graph"
 	log "github.com/sirupsen/logrus"
+	"gitlab.alpinelinux.org/alpine/go/repository"
 	"go.lsp.dev/uri"
 
 	apk "github.com/chainguard-dev/go-apk/pkg/apk"
+)
+
+const (
+	attributePkgList = "package-list"
+	attributeDepName = "dependency-name"
 )
 
 // Graph represents an interdependent set of packages defined in one or more Melange configurations,
 // as defined in Packages, as well as upstream repositories and their package indexes,
 // as declared in those configurations files. The graph is directed and acyclic.
 type Graph struct {
-	Graph    graph.Graph[string, Package]
-	packages *Packages
-	opts     *graphOptions
-	byName   map[string][]string // maintains a listing of all known hashes for a given name
+	Graph     graph.Graph[string, Package]
+	packages  *Packages
+	opts      *graphOptions
+	resolvers map[string]*apk.PkgResolver // maintains a listing of all resolvers by key
+	byName    map[string][]string         // maintains a listing of all known hashes for a given name
 }
 
 // packageHash given anything that implements Package, return the hash to be used
@@ -42,6 +50,7 @@ func newGraph() graph.Graph[string, Package] {
 // cycle represents pairs of edges that create a cycle in the graph
 type cycle struct {
 	src, target string
+	attrs       map[string]string
 }
 
 // NewGraph returns a new Graph using the packages, including names and versions, in the Packages struct.
@@ -56,18 +65,18 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		}
 	}
 	g := &Graph{
-		Graph:    newGraph(),
-		packages: pkgs,
-		opts:     opts,
-		byName:   map[string][]string{},
+		Graph:     newGraph(),
+		packages:  pkgs,
+		opts:      opts,
+		resolvers: make(map[string]*apk.PkgResolver),
+		byName:    map[string][]string{},
 	}
 
 	// indexes is a cache of all repositories. Only some might be used for each package.
 	var (
-		indexes   = make(map[string]apk.NamedIndex)
-		keys      = make(map[string][]byte)
-		resolvers = make(map[string]*apk.PkgResolver)
-		errs      []error
+		indexes = make(map[string]apk.NamedIndex)
+		keys    = make(map[string][]byte)
+		errs    []error
 	)
 
 	// TODO: should we repeat across multiple arches? Use c.Package.TargetArchitecture []string
@@ -75,7 +84,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	localRepo := pkgs.Repository(arch)
 	localRepoSource := localRepo.Source()
 	localOnlyResolver := apk.NewPkgResolver([]apk.NamedIndex{localRepo})
-	resolvers[localRepoSource] = localOnlyResolver
+	g.resolvers[localRepoSource] = localOnlyResolver
 
 	// the order of adding packages is quite important:
 	// 1. Go through each origin package and add it as a vertex
@@ -87,6 +96,8 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			errs = append(errs, err)
 			continue
 		}
+		// add the origin package as its own resolver, so that the subpackage can resolve to it
+		g.resolvers[c.String()] = singlePackageResolver(c, arch)
 		for i := range c.Subpackages {
 			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
 			for _, subpkgVersion := range subpkg {
@@ -94,7 +105,11 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 					errs = append(errs, fmt.Errorf("unable to add vertex for %q subpackage %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
 					continue
 				}
-				if err := g.Graph.AddEdge(packageHash(subpkgVersion), packageHash(c)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+				parentHash := packageHash(c)
+				attrs := map[string]string{
+					attributePkgList: parentHash,
+				}
+				if err := g.Graph.AddEdge(packageHash(subpkgVersion), parentHash, graph.EdgeAttributes(attrs)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
 					// a subpackage always must depend on its origin package. It is not acceptable to have any errors, other than that we already know about that dependency.
 					errs = append(errs, fmt.Errorf("unable to add edge for subpackage %q from %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
 					continue
@@ -106,7 +121,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	for _, c := range pkgs.Packages() {
 		// add packages from the runtime dependencies first, as they are constrained to the local repository
 		// For runtime packages, it is allowed to resolve itself.
-		addErrs := g.resolvePackages(c, "runtime", localRepoSource, localOnlyResolver, c.Package.Dependencies.Runtime, true)
+		addErrs := g.resolvePackages(c, "runtime", localRepoSource, localRepoSource, c.Package.Dependencies.Runtime, true)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
@@ -166,25 +181,22 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		// This does leave an extra "," at the end, but it doesn't really matter, it is good enough.
 		// Anything else would require converting it into []string and then joining it,
 		// which is more expensive unnecessarily.
-		var resolverKey string
-		for _, repo := range lookupRepos {
-			resolverKey += repo.Source() + ","
-		}
 		var (
-			resolver *apk.PkgResolver
-			addErrs  []error
+			keys    []string
+			addErrs []error
 		)
+		for _, repo := range lookupRepos {
+			keys = append(keys, repo.Source())
+		}
+		resolverKey := strings.Join(keys, ",")
 
 		// add packages from build-time, as they could be local only, or might have upstream
-		if r, ok := resolvers[resolverKey]; ok {
-			resolver = r
-		} else {
-			resolver = apk.NewPkgResolver(lookupRepos)
-			resolvers[resolverKey] = resolver
+		if _, ok := g.resolvers[resolverKey]; !ok {
+			g.resolvers[resolverKey] = apk.NewPkgResolver(lookupRepos)
 		}
 		// wolfi-dev has a policy for environment packages not to use a package to fulfull a dependency, if that package is myself.
 		// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
-		addErrs = g.resolvePackages(c, "environment", localRepoSource, resolver, c.Environment.Contents.Packages, false)
+		addErrs = g.resolvePackages(c, "environment", localRepoSource, resolverKey, c.Environment.Contents.Packages, false)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
@@ -205,7 +217,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 // Optionally, can allow self to resolve dependencies or not. This is policy driven/
 // In general, wolfi/os does *not* allow self to resolve for build environment,
 // and *does* allow self to resolve for runtime environment.
-func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource string, resolver *apk.PkgResolver, pkgs []string, allowSelf bool) (errs []error) {
+func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource, resolverKey string, pkgs []string, allowSelf bool) (errs []error) {
 	for _, buildDep := range pkgs {
 		if buildDep == "" {
 			errs = append(errs, fmt.Errorf("empty package name in %s packages for %q", source, parent.Package.Name))
@@ -217,15 +229,14 @@ func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource s
 			continue
 		}
 
-		cycle, err := g.addAppropriatePackage(resolver, parent, buildDep, localRepoSource, allowSelf)
+		cycle, err := g.addAppropriatePackageFromResolver(resolverKey, parent, buildDep, localRepoSource, allowSelf)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
 		// resolve any cycle
 		if cycle != nil {
-			sp, _ := graph.ShortestPath(g.Graph, cycle.target, cycle.src) //nolint:errcheck // we do not need to check for an error, as we have an error
-			if err := g.resolveCycle(cycle, buildDep, resolver, localRepoSource, allowSelf); err != nil {
+			if sp, err := g.resolveCycle(cycle, buildDep); err != nil {
 				log.Errorf("unresolvable cycle: %s -> %s, caused by: %s", cycle.src, cycle.target, strings.Join(sp, " -> "))
 				errs = append(errs, err)
 				continue
@@ -235,14 +246,18 @@ func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource s
 	return
 }
 
-// addAppropriatePackage adds the appropriate package to the graph, and returns any cycle that was created.
+// addAppropriatePackageFromResolver adds the appropriate package to the graph, and returns any cycle that was created.
 // The c *Configuration is the source package, while the dep represents the dependency.
 // Whether or not this package is allowed to resolve itself is policy driven.
-func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep, localRepo string, allowSelf bool) (*cycle, error) {
+func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package, dep, localRepo string, allowSelf bool) (*cycle, error) {
 	var (
-		pkg         Package
-		cycleTarget string
+		pkg    Package
+		pkgKey = packageHash(c)
 	)
+	resolver, ok := g.resolvers[resolverKey]
+	if !ok {
+		return nil, fmt.Errorf("unable to find resolver for %s", resolverKey)
+	}
 	resolved, err := resolver.ResolvePackage(dep)
 	switch {
 	case (err != nil || len(resolved) == 0) && g.opts.allowUnresolved:
@@ -253,6 +268,11 @@ func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep,
 		return nil, fmt.Errorf("%s: unable to resolve dependency %s: %w", c, dep, err)
 	default:
 		// no error and we had at least one package listed in `resolved`
+		// make a list of all the possible packages that could fulfill this dependency
+		var (
+			matchList = make([]string, 0, len(resolved))
+			pkgs      = make([]Package, 0, len(resolved))
+		)
 		for _, r := range resolved {
 			// if we allow self, and our name or origin is the same as dep, and the version is the same, then we are done
 			isSelf := r.Version == c.Version() && (dep == c.Name() || r.Origin == c.Name())
@@ -285,97 +305,163 @@ func (g *Graph) addAppropriatePackage(resolver *apk.PkgResolver, c Package, dep,
 			if err := g.addVertex(pkg); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 				return nil, fmt.Errorf("unable to add vertex for %s dependency %s: %w", c, dep, err)
 			}
-			target := packageHash(pkg)
-			err := g.Graph.AddEdge(packageHash(c), target, graph.EdgeAttribute("target-origin", dep))
-			switch {
-			case err == nil || errors.Is(err, graph.ErrEdgeAlreadyExists):
-				// no error, so we can keep the vertex and we have our match
-				return nil, nil
-			case errors.Is(err, graph.ErrEdgeCreatesCycle):
-				pkg = nil
-				if cycleTarget == "" {
-					cycleTarget = target
-				}
-				continue
-			default:
-				return nil, fmt.Errorf("%s: add edge dependency %s error: %w", c, dep, err)
+			pkgs = append(pkgs, pkg)
+			matchList = append(matchList, packageHash(pkg))
+		}
+		var (
+			allPkgs = strings.Join(matchList, " ")
+			attrs   = map[string]string{
+				attributePkgList: allPkgs,
+				attributeDepName: dep,
+			}
+		)
+		// make sure the vertexes exist
+		for _, p := range pkgs {
+			if err := g.addVertex(p); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+				return nil, fmt.Errorf("unable to add vertex for %s dependency %s: %w", c, dep, err)
 			}
 		}
-
-		// did we find a valid dep?
-		if pkg == nil {
-			if cycleTarget != "" {
-				return &cycle{src: packageHash(c), target: cycleTarget}, nil
-			}
-			if !g.opts.allowUnresolved {
-				return nil, fmt.Errorf("%s: unfulfilled dependency %s", c, dep)
-			}
-			if err := g.addDanglingPackage(dep, c); err != nil {
-				return nil, fmt.Errorf("%s: unable to add dangling package %s: %w", c, dep, err)
-			}
+		// try to add from the list
+		cycle, err := g.addAppropriatePackageFromList(pkgKey, matchList, attrs)
+		if err != nil {
+			return nil, fmt.Errorf("unable to add %s dependency %s: %w", c, dep, err)
+		}
+		if cycle != nil {
+			return cycle, nil
 		}
 	}
 	return nil, nil
 }
 
+func (g *Graph) addAppropriatePackageFromList(pkgKey string, matchList []string, attrs map[string]string) (*cycle, error) {
+	var cycleTarget string
+	for _, target := range matchList {
+		err := g.Graph.AddEdge(pkgKey, target, graph.EdgeAttributes(attrs))
+		switch {
+		case err == nil || errors.Is(err, graph.ErrEdgeAlreadyExists):
+			// no error, so we can keep the vertex and we have our match
+			return nil, nil
+		case errors.Is(err, graph.ErrEdgeCreatesCycle):
+			// created a cycle, so track it
+			if cycleTarget == "" {
+				cycleTarget = target
+			}
+			continue
+		default:
+			return nil, fmt.Errorf("%s: add edge dependency %s error: %w", pkgKey, attrs[attributeDepName], err)
+		}
+	}
+	// if we got this far, nothing we added had no error, so we have a cycle
+	return &cycle{src: pkgKey, target: cycleTarget, attrs: attrs}, nil
+}
+
 // resolveCycle resolves a cycle by trying to reverse the order.
 // It discovers what the current dependency is that is causing the potential loop,
 // removes the last edge in that cycle, and regenerates that dependency without the previous target.
-func (g *Graph) resolveCycle(c *cycle, dep string, resolver *apk.PkgResolver, localRepoSource string, allowSelf bool) error {
+func (g *Graph) resolveCycle(c *cycle, dep string) ([]string, error) {
 	// cycle through, removing all "shortest path" until we can resolve the cycle,
 	// then add them back
 	var (
 		removed []cycle
-		origs   []string
+	)
+	origSp, err := graph.ShortestPath(g.Graph, c.target, c.src)
+	if err != nil {
+		return nil, fmt.Errorf("unable to find shortest path: %w", err)
+	}
+	var (
+		sp    = origSp
+		found bool
 	)
 	for {
-		sp, err := graph.ShortestPath(g.Graph, c.target, c.src)
-		if err != nil {
-			return fmt.Errorf("unable to find shortest path: %w", err)
-		}
-		if len(sp) < 2 {
-			return fmt.Errorf("there is no path from %s to %s", c.target, c.src)
-		}
-		// the last edge in the cycle is the one that caused the cycle
-		removeSrc, removeTarget := sp[len(sp)-2], sp[len(sp)-1]
-		removed = append(removed, cycle{
-			src:    removeSrc,
-			target: removeTarget,
-		})
+		var loop bool
+		// start with the last one
+		for i := len(sp) - 1; i >= 1; i-- {
+			removeSrc, removeTarget := sp[i-1], sp[i]
 
-		edge, err := g.Graph.Edge(removeSrc, removeTarget)
-		if err != nil {
-			return fmt.Errorf("unable to find last edge %s -> %s: %w", removeSrc, removeTarget, err)
+			edge, err := g.Graph.Edge(removeSrc, removeTarget)
+			if err != nil {
+				return origSp, fmt.Errorf("unable to find last edge %s -> %s: %w", removeSrc, removeTarget, err)
+			}
+			if edge.Properties.Attributes == nil {
+				return origSp, fmt.Errorf("original edge %s -> %s has no attributes", removeSrc, removeTarget)
+			}
+			// get the size of the possible candidates
+			candidates := strings.Split(edge.Properties.Attributes[attributePkgList], " ")
+
+			// if we have only one candidate, we can't remove it
+			if len(candidates) < 2 {
+				continue
+			}
+			// Try to remove the edge we are testing, add back the original, and then
+			// add the one we removed. If it works, we are done. If not,
+			// move one step higher in the shortestpath chain.
+			if err := g.Graph.RemoveEdge(removeSrc, removeTarget); err != nil {
+				return origSp, fmt.Errorf("unable to remove original edge %s -> %s: %w", removeSrc, removeTarget, err)
+			}
+			// see if we would be able to add the edge in now
+			newSp, err := graph.ShortestPath(g.Graph, c.target, c.src)
+			switch {
+			case err != nil:
+				// it would work
+				if err := g.Graph.AddEdge(c.src, c.target, graph.EdgeAttributes(c.attrs)); err != nil {
+					return origSp, fmt.Errorf("unable to add edge back in, even though it should not create a cycle %s -> %s: %w", c.src, c.target, err)
+				}
+				// it worked, so now see if we can put the original back
+				for i := 1; i < len(candidates); i++ {
+					candidate := candidates[i]
+					err = g.Graph.AddEdge(removeSrc, candidate, graph.EdgeAttributes(edge.Properties.Attributes))
+					if err == nil {
+						found = true
+						break
+					}
+				}
+				if found {
+					i = 0
+					break
+				}
+				if err := g.Graph.RemoveEdge(c.src, c.target); err != nil {
+					return origSp, fmt.Errorf("unable to remove edge %s -> %s: %w", c.src, c.target, err)
+				}
+			case reflect.DeepEqual(newSp, sp):
+				// the new shortest path is the same as the old one, so removing this one does not help
+				if err := g.Graph.AddEdge(removeSrc, removeTarget, graph.EdgeAttributes(edge.Properties.Attributes)); err != nil {
+					return origSp, fmt.Errorf("unable to add edge back in, even though it should not create a cycle %s -> %s: %w", removeSrc, removeTarget, err)
+				}
+			default:
+				// not the same, so there must be multiple paths to the target
+				// keep this one removed, this shortestpath cycle is done, look for the next one
+				removed = append(removed, cycle{src: removeSrc, target: removeTarget, attrs: edge.Properties.Attributes})
+				sp = newSp
+				i = 0
+				loop = true
+			}
 		}
-		if edge.Properties.Attributes == nil {
-			return fmt.Errorf("original edge %s -> %s has no attributes", removeSrc, removeTarget)
-		}
-		origs = append(origs, edge.Properties.Attributes["target-origin"])
-		// try to reverse the direction of the edge
-		if err := g.Graph.RemoveEdge(removeSrc, removeTarget); err != nil {
-			return fmt.Errorf("unable to remove original edge %s -> %s: %w", removeSrc, removeTarget, err)
-		}
-		// add in our new edge
-		if err := g.Graph.AddEdge(c.src, c.target, graph.EdgeAttribute("target-origin", dep)); err == nil {
+		// if we made it this far, we ran through the entire current shortestpath,
+		// so we can break out of the loop
+		if !loop {
 			break
 		}
 	}
+	if !found {
+		return origSp, fmt.Errorf("there is no single step to remove to clear from %s to %s", c.target, c.src)
+	}
+	// at this point, we should have removed exactly one edge
 	// now we need to re-add the edges that were removed, but with different targets
-	for i, rem := range removed {
-		origDep := origs[i]
+	for _, rem := range removed {
+		origDep := rem.attrs[attributeDepName]
 		config, err := g.Graph.Vertex(rem.src)
 		if err != nil {
-			return fmt.Errorf("unable to find original vertex %s: %w", rem.src, err)
+			return origSp, fmt.Errorf("unable to find original vertex %s: %w", rem.src, err)
 		}
-		cycle, err := g.addAppropriatePackage(resolver, config, origDep, localRepoSource, allowSelf)
+		cycle, err := g.addAppropriatePackageFromList(packageHash(config), strings.Split(rem.attrs[attributePkgList], " "), rem.attrs)
 		if err != nil {
-			return fmt.Errorf("unable to re-add original edge %s -> %s: %w", rem.src, origDep, err)
+			return origSp, fmt.Errorf("unable to re-add original edge %s -> %s: %w", rem.src, origDep, err)
 		}
 		if cycle != nil {
-			return fmt.Errorf("unable to re-add original edge with new dep still causes cycle %s -> %s", rem.src, dep)
+			return origSp, fmt.Errorf("unable to re-add original edge with new dep still causes cycle %s -> %s", rem.src, dep)
 		}
 	}
-	return nil
+	return origSp, nil
 }
 
 // addVertex adds a vertex to the internal graph, while also tracking its hash by name
@@ -703,4 +789,28 @@ func getKeyMaterial(key string) ([]byte, error) {
 		return nil, fmt.Errorf("key scheme %s not supported", asURL.Scheme)
 	}
 	return b, nil
+}
+
+func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
+	repo := repository.NewRepositoryFromComponents(Local, "latest", "", arch)
+	packages := []*repository.Package{
+		{
+			Arch:         arch,
+			Name:         pkg.Package.Name,
+			Version:      fullVersion(&pkg.Package),
+			Description:  pkg.Package.Description,
+			License:      pkg.Package.LicenseExpression(),
+			Origin:       pkg.Package.Name,
+			URL:          pkg.Package.URL,
+			Dependencies: pkg.Environment.Contents.Packages,
+			Provides:     pkg.Package.Dependencies.Provides,
+			RepoCommit:   pkg.Package.Commit,
+		},
+	}
+	index := &repository.ApkIndex{
+		Description: pkg.String(),
+		Packages:    packages,
+	}
+	idx := apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
+	return apk.NewPkgResolver([]apk.NamedIndex{idx})
 }
