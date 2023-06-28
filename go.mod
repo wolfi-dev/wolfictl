@@ -52,7 +52,7 @@ require (
 	google.golang.org/api v0.129.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.28.0-alpha.2
-	k8s.io/apimachinery v0.28.0-alpha.2
+	k8s.io/apimachinery v0.28.0-alpha.3
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 	sigs.k8s.io/release-utils v0.7.5-0.20230601212346-3866fe05b204
