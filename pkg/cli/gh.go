@@ -12,6 +12,7 @@ func Gh() *cobra.Command {
 
 	cmd.AddCommand(
 		Release(),
+		Gc(),
 	)
 
 	return cmd
