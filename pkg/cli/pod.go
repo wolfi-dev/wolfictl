@@ -287,7 +287,9 @@ gcloud --quiet storage cp \
 	"./packages/{{.arch}}/APKINDEX.tar.gz" gs://{{.bucket}}{{.arch}}/ || true
 
 # apks will be cached in CDN for an hour by default.
+# Don't upload the object if it already exists.
 gcloud --quiet storage cp \
+	--no-clobber \
 	"./packages/{{.arch}}/*.apk" gs://{{.bucket}}{{.arch}}/ || true
 `, map[string]string{"bucket": bucket, "arch": arch}),
 					},
