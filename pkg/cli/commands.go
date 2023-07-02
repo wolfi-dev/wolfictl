@@ -26,6 +26,7 @@ func New() *cobra.Command {
 		cmdMake(),
 		Check(),
 		Lint(),
+		Ls(),
 		Update(),
 		VEX(),
 		version.Version(),
