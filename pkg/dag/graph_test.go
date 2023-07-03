@@ -34,7 +34,6 @@ func TestNewGraph(t *testing.T) {
 			expectedDeps := []string{
 				"ca-certificates-bundle:@unknown",
 				"build-base:@unknown",
-				"busybox:@unknown",
 				"binutils:@unknown",
 				"wget:@unknown",
 				"scanelf:@unknown",
@@ -70,7 +69,6 @@ func TestNewGraph(t *testing.T) {
 			expectedDeps := []string{
 				"ca-certificates-bundle:20220614-r1@testdata/packages/x86_64",
 				"build-base:1-r2@testdata/packages/x86_64",
-				"busybox:1.35.0-r2@testdata/packages/x86_64",
 				"binutils:2.39-r1@testdata/packages/x86_64",
 				"wget:1.21.3-r1@testdata/packages/x86_64",
 				"scanelf:1.3.4-r1@testdata/packages/x86_64",
