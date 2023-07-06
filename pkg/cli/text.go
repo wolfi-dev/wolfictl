@@ -119,7 +119,7 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 		case typePackageVersion:
 			fmt.Fprintf(w, "%s\n", pkg.Version)
 		case typePackageNameAndVersion:
-			fmt.Fprintf(w, "%s-%s\n", pkg.Name, pkg.Version)
+			fmt.Fprintf(w, "%s-%s-r%d\n", pkg.Name, pkg.Version, pkg.Epoch)
 		default:
 			return fmt.Errorf("invalid type: %s", t)
 		}
