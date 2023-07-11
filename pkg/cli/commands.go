@@ -15,6 +15,7 @@ func New() *cobra.Command {
 
 	cmd.AddCommand(
 		Advisory(),
+		Build(),
 		Bump(),
 		Gh(),
 		Apk(),
