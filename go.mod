@@ -11,7 +11,7 @@ replace k8s.io/client-go => k8s.io/client-go v0.28.0-alpha.2
 require (
 	chainguard.dev/apko v0.8.1-0.20230609082444-066c0429217e
 	chainguard.dev/melange v0.3.1-0.20230610175009-d0c69f86598f
-	cloud.google.com/go/storage v1.30.1
+	cloud.google.com/go/storage v1.31.0
 	github.com/chainguard-dev/go-apk v0.0.0-20230613093544-1bf6ea16cc45
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230612072630-1e2fc91b1eb4
