@@ -9,13 +9,13 @@ replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go 
 replace k8s.io/client-go => k8s.io/client-go v0.28.0-alpha.2
 
 require (
-	chainguard.dev/apko v0.8.1-0.20230609082444-066c0429217e
-	chainguard.dev/melange v0.3.1-0.20230610175009-d0c69f86598f
-	cloud.google.com/go/storage v1.30.1
+	chainguard.dev/apko v0.9.0
+	chainguard.dev/melange v0.4.0
+	cloud.google.com/go/storage v1.31.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.63.2-0.20230710175255-d6bd01a4fa5b
 	github.com/anchore/syft v0.84.2-0.20230710173641-4ab9f393fc4f
-	github.com/chainguard-dev/go-apk v0.0.0-20230613093544-1bf6ea16cc45
+	github.com/chainguard-dev/go-apk v0.0.0-20230630173347-b8abc44cc8ca
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230612072630-1e2fc91b1eb4
 	github.com/charmbracelet/bubbles v0.16.1
@@ -45,7 +45,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/tmc/dot v0.0.0-20210901225022-f9bc17da75c0
-	gitlab.alpinelinux.org/alpine/go v0.7.1-0.20230522152417-bbb20ba03a25
+	gitlab.alpinelinux.org/alpine/go v0.7.1-0.20230613043312-f696350aabb4
 	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/oauth2 v0.9.0
@@ -88,7 +88,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/avast/retry-go v3.0.0+incompatible // indirect
-	github.com/aws/aws-sdk-go v1.44.248 // indirect
+	github.com/aws/aws-sdk-go v1.44.288 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/becheran/wildmatch-go v1.0.0 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
@@ -145,6 +145,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-getter v1.7.1 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.4 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/ijt/goparsify v0.0.0-20221203142333-3a5276334b8d // indirect
@@ -181,6 +182,7 @@ require (
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/moby/spdystream v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/muesli/ansi v0.0.0-20211031195517-c9f0611b6c70 // indirect
@@ -192,8 +194,8 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc3 // indirect
-	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a // indirect
+	github.com/opencontainers/image-spec v1.1.0-rc4 // indirect
+	github.com/package-url/packageurl-go v0.1.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
@@ -207,9 +209,9 @@ require (
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/sigstore/cosign/v2 v2.0.3-0.20230425232139-17cc13812d8a // indirect
-	github.com/sigstore/rekor v1.2.1 // indirect
-	github.com/sigstore/sigstore v1.6.5 // indirect
+	github.com/sigstore/cosign/v2 v2.1.1 // indirect
+	github.com/sigstore/rekor v1.2.2-0.20230530122220-67cc9e58bd23 // indirect
+	github.com/sigstore/sigstore v1.7.1 // indirect
 	github.com/skeema/knownhosts v1.1.1 // indirect
 	github.com/spdx/tools-golang v0.5.2 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
@@ -256,6 +258,7 @@ require (
 	gorm.io/gorm v1.23.10 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230606174411-725288a7abf1 // indirect
+	knative.dev/pkg v0.0.0-20230531073936-5671699f23d9 // indirect
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
