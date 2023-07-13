@@ -21,7 +21,7 @@ linters:
   enable:
     - asciicheck
     - bodyclose
-    - depguard
+    # - depguard is disabled because I didn't see us using it (e.g. defining our allowed deps), but it's causing lint errors locally. If we want to use it, we should define our allowed deps.
     - dogsled
     - dupl
     - durationcheck
@@ -42,7 +42,7 @@ linters:
     - importas
     - ineffassign
     - makezero
-    #- misspell
+    # - misspell
     - nakedret
     - nolintlint
     # - prealloc is disabled because it is terrible. Following this rule doesn't necessarily improve the readability or performance of the code, and it can encourage wasteful allocations depending on the circumstance.
