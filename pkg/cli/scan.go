@@ -15,10 +15,12 @@ import (
 )
 
 func Scan() *cobra.Command {
+	p := &scanParams{}
 	cmd := &cobra.Command{
-		Use:   "scan <path/to/package.apk> ...",
-		Short: "Scan an apk file for vulnerabilities",
-		Args:  cobra.MinimumNArgs(1),
+		Use:           "scan <path/to/package.apk> ...",
+		Short:         "Scan an apk file for vulnerabilities",
+		Args:          cobra.MinimumNArgs(1),
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
 				apkFilePath := arg
@@ -42,13 +44,26 @@ func Scan() *cobra.Command {
 					tree := newFindingsTree(findings)
 					fmt.Println(tree.render())
 				}
+
+				if p.requireZeroFindings && len(findings) > 0 {
+					return fmt.Errorf("more than 0 vulnerabilities found")
+				}
 			}
 
 			return nil
 		},
 	}
 
+	p.addFlagsTo(cmd)
 	return cmd
+}
+
+type scanParams struct {
+	requireZeroFindings bool
+}
+
+func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
 }
 
 type findingsTree struct {
