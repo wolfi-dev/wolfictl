@@ -2,7 +2,7 @@ query {
 
   r: repository(owner: "golang", name: "go") {
     nameWithOwner
-    refs(refPrefix: "refs/tags/", query: "go1.19", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
+    refs(refPrefix: "refs/tags/", query: "go1.19", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 50) {
       totalCount
       nodes {
         name
@@ -15,7 +15,7 @@ query {
 
   r: repository(owner: "openjdk", name: "jdk11u") {
     nameWithOwner
-    refs(refPrefix: "refs/tags/", query: "jdk-11", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
+    refs(refPrefix: "refs/tags/", query: "jdk-11", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 50) {
       totalCount
       nodes {
         name

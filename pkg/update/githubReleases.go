@@ -42,7 +42,7 @@ query {
 {{ range  $index, $r := .RepoList }}
   r{{$r.PackageName}}: repository(owner: "{{$r.Owner}}", name: "{{$r.Name}}") {
     nameWithOwner
-    refs(refPrefix: "refs/tags/", query: "{{.Filter}}", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 100) {
+    refs(refPrefix: "refs/tags/", query: "{{.Filter}}", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 50) {
       totalCount
       nodes {
         name
@@ -275,7 +275,7 @@ func (o GitHubReleaseOptions) getGitHubTagVersions(repoList map[string]string) (
 
 func (o GitHubReleaseOptions) getResultsFromTemplate(templateType string, repos []RepoInfo) (map[string]NewVersionResults, error) {
 	// batch the requests sent to graphql API else we can get a bad gateway error returned
-	batchSize := 15
+	batchSize := 10
 	results := make(map[string]NewVersionResults)
 
 	for i := 0; i < len(repos); i += batchSize {

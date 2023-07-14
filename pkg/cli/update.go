@@ -21,6 +21,7 @@ type options struct {
 	useGitSign             bool
 	createIssues           bool
 	issueLabels            []string
+	maxRetries             int
 }
 
 func Update() *cobra.Command {
@@ -45,6 +46,7 @@ func Update() *cobra.Command {
 	cmd.Flags().BoolVar(&o.useGitSign, "use-gitsign", false, "enable gitsign to sign the git commits")
 	cmd.Flags().BoolVar(&o.createIssues, "create-issues", true, "creates GitHub Issues for failed package updates")
 	cmd.Flags().StringArrayVar(&o.issueLabels, "github-labels", []string{}, "Optional: provide a list of labels to apply to updater generated issues and pull requests")
+	cmd.Flags().IntVar(&o.maxRetries, "max-retries", 3, "maximum number of retries for failed package updates")
 
 	cmd.AddCommand(
 		Package(),
@@ -73,6 +75,7 @@ func (o options) UpdateCmd(_ context.Context, repoURI string) error {
 	updateContext.UseGitSign = o.useGitSign
 	updateContext.CreateIssues = o.createIssues
 	updateContext.IssueLabels = o.issueLabels
+	updateContext.MaxRetries = o.maxRetries
 	if err := updateContext.Update(); err != nil {
 		return fmt.Errorf("creating updates: %w", err)
 	}
