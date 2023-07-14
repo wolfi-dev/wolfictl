@@ -20,7 +20,7 @@ func TestNewGraph(t *testing.T) {
 			testDir = "testdata/basic"
 		)
 		t.Run("allowed dangling", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
 			graph, err := NewGraph(pkgs, WithAllowUnresolved())
 			require.NoError(t, err)
@@ -51,7 +51,7 @@ func TestNewGraph(t *testing.T) {
 			}
 		})
 		t.Run("has expected tree", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
 			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
@@ -89,13 +89,13 @@ func TestNewGraph(t *testing.T) {
 	t.Run("complex", func(t *testing.T) {
 		var testDir = "testdata/complex"
 		t.Run("allowed dangling", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
 			_, err = NewGraph(pkgs, WithAllowUnresolved())
 			require.NoError(t, err)
 		})
 		t.Run("external dependencies only", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
 			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
@@ -130,7 +130,7 @@ func TestNewGraph(t *testing.T) {
 			}
 		})
 		t.Run("internal and external dependencies", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
 			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
@@ -176,7 +176,7 @@ func TestNewGraph(t *testing.T) {
 		})
 
 		t.Run("internal dependencies numbered", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
 			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
@@ -237,7 +237,7 @@ func TestNewGraph(t *testing.T) {
 				"d": {"a:1.3.5-r1@local"},
 			}
 		)
-		pkgs, err := NewPackages(os.DirFS(testDir), testDir)
+		pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
 		require.NoError(t, err)
 		graph, err := NewGraph(pkgs, WithRepos(cyclePackageRepo), WithKeys(cycleKey))
 		require.NoError(t, err)
