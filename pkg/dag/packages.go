@@ -126,7 +126,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 //
 // The repetition of the path is necessary because of how the upstream parser in melange
 // requires the full path to the directory to be passed in.
-func NewPackages(fsys fs.FS, dirPath string) (*Packages, error) {
+func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		packages: make(map[string][]*Configuration),
@@ -195,6 +195,7 @@ func NewPackages(fsys fs.FS, dirPath string) (*Packages, error) {
 			// .environment.contents.packages so the next block can include those as build deps.
 			pctx := &build.PipelineContext{
 				Context: &build.Context{
+					PipelineDir:   pipelineDir,
 					Configuration: *c.Configuration,
 				},
 				Package: &c.Package,

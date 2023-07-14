@@ -11,7 +11,7 @@ import (
 )
 
 func cmdMake() *cobra.Command {
-	var dir, arch string
+	var dir, pipelineDir, arch string
 	var dryrun bool
 	text := &cobra.Command{
 		Use:   "make",
@@ -19,7 +19,7 @@ func cmdMake() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
@@ -59,6 +59,7 @@ func cmdMake() *cobra.Command {
 		},
 	}
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
+	text.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	text.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
 	text.Flags().BoolVar(&dryrun, "dryrun", false, "if true, only print `make` commands")
 	return text

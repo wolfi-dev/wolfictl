@@ -45,7 +45,7 @@ func gcloudProjectID(ctx context.Context) (string, error) {
 }
 
 func cmdPod() *cobra.Command {
-	var dir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, gcloudImage, cachedig, bucket, srcBucket, publicKeyBucket, signingKeyName, melangeBuildOpts string
+	var dir, pipelineDir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, gcloudImage, cachedig, bucket, srcBucket, publicKeyBucket, signingKeyName, melangeBuildOpts string
 
 	var create, watch, secretKey bool
 	var pendingTimeout time.Duration
@@ -74,7 +74,7 @@ func cmdPod() *cobra.Command {
 
 			targets := []string{"all"}
 			if len(args) > 0 {
-				pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+				pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
 				if err != nil {
 					return err
 				}
@@ -355,6 +355,7 @@ gcloud --quiet storage cp \
 		},
 	}
 	pod.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
+	pod.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	pod.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
 	pod.Flags().StringVar(&bundleRepo, "bundle-repo", "", "OCI repository to push the bundle to; if unset, gcr.io/$PROJECT/dag")
 	pod.Flags().StringVar(&project, "project", "", "GCP project; if unset, detects project configured by gcloud")
