@@ -12,7 +12,7 @@ import (
 )
 
 func cmdSVG() *cobra.Command {
-	var dir string
+	var dir, pipelineDir string
 	var showDependents bool
 	d := &cobra.Command{
 		Use:   "dot",
@@ -27,7 +27,7 @@ Generate .dot output and pipe it to dot to generate a PNG
   wolfictl dot | dot -Tpng > graph.png
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
@@ -72,6 +72,7 @@ Generate .dot output and pipe it to dot to generate a PNG
 		},
 	}
 	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
+	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	return d
 }

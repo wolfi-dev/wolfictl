@@ -14,7 +14,7 @@ import (
 )
 
 func cmdText() *cobra.Command {
-	var dir, arch, t string
+	var dir, pipelineDir, arch, t string
 	var showDependents bool
 	text := &cobra.Command{
 		Use:   "text",
@@ -22,7 +22,7 @@ func cmdText() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir)
+			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
@@ -66,6 +66,7 @@ func cmdText() *cobra.Command {
 		},
 	}
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
+	text.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	text.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
 	text.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	text.Flags().StringVarP(&t, "type", "t", string(typeTarget), fmt.Sprintf("What type of text to emit; values can be one of: %v", textTypes))
