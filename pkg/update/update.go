@@ -50,6 +50,7 @@ type Options struct {
 	GitHubHTTPClient       *http2.RLHTTPClient
 	ErrorMessages          map[string]string
 	IssueLabels            []string
+	MaxRetries             int
 }
 
 type NewVersionResults struct {
@@ -95,52 +96,74 @@ func New() Options {
 }
 
 func (o *Options) Update() error {
-	// clone the melange config git repo into a temp folder so we can work with it
-	tempDir, err := os.MkdirTemp("", "wolfictl")
-	if err != nil {
-		return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
-	}
-	if o.DryRun {
-		o.Logger.Printf("using working directory %s", tempDir)
-	} else {
-		defer os.Remove(tempDir)
+	var err error
+	var repo *git.Repository
+	var latestVersions map[string]NewVersionResults
+	var packagesToUpdate map[string]NewVersionResults
+
+	// retry the whole process a few times in case of issues with the git repo
+	for i := 0; i < o.MaxRetries; i++ {
+		// clone the melange config git repo into a temp folder so we can work with it
+		tempDir, err := os.MkdirTemp("", "wolfictl")
+		if err != nil {
+			return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
+		}
+		if o.DryRun {
+			o.Logger.Printf("using working directory %s", tempDir)
+		} else {
+			defer os.Remove(tempDir)
+		}
+
+		cloneOpts := &git.CloneOptions{
+			URL:               o.RepoURI,
+			Progress:          os.Stdout,
+			RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+			Auth:              wgit.GetGitAuth(),
+			Depth:             1,
+		}
+
+		repo, err = git.PlainClone(tempDir, false, cloneOpts)
+		if err != nil {
+			return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
+		}
+
+		// get the latest upstream versions available
+		if latestVersions == nil {
+			latestVersions, err = o.GetLatestVersions(tempDir, o.PackageNames)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get package updates")
+			}
+		}
+
+		// compare latest upstream versions with melange package versions and return a map of packages to update
+		if packagesToUpdate == nil {
+			packagesToUpdate, err = o.getPackagesToUpdate(latestVersions)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get package updates")
+			}
+		}
+
+		// skip packages for which we already have an open issue or pull request
+		packagesToUpdate, err = o.removeExistingUpdates(repo, packagesToUpdate)
+		if err != nil {
+			return errors.Wrapf(err, "failed to get package updates")
+		}
+
+		// update melange configs in our cloned git repository with any new package versions
+		err = o.updatePackagesGitRepository(repo, packagesToUpdate)
+		if err != nil {
+			// we occasionally get errors when pushing to git and creating issues, so we should retry using a clean clone
+			o.Logger.Printf("attempt %d: failed to update packages in git repository: %s", i+1, err)
+			continue
+		}
+
+		// If we reach here, it means the task has been successful and we can break the loop
+		break
 	}
 
-	cloneOpts := &git.CloneOptions{
-		URL:               o.RepoURI,
-		Progress:          os.Stdout,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
-		Auth:              wgit.GetGitAuth(),
-		Depth:             1,
-	}
-
-	repo, err := git.PlainClone(tempDir, false, cloneOpts)
+	// Check if an error still exists after the loop (i.e., all retry attempts failed)
 	if err != nil {
-		return fmt.Errorf("failed to clone repository %s into %s: %w", o.RepoURI, tempDir, err)
-	}
-
-	// get the latest upstream versions available
-	latestVersions, err := o.GetLatestVersions(tempDir, o.PackageNames)
-	if err != nil {
-		return errors.Wrapf(err, "failed to get package updates")
-	}
-
-	// compare latest upstream versions with melange package versions and return a map of packages to update
-	packagesToUpdate, err := o.getPackagesToUpdate(latestVersions)
-	if err != nil {
-		return errors.Wrapf(err, "failed to get package updates")
-	}
-
-	// skip packages for which we already have an open issue or pull request
-	packagesToUpdate, err = o.removeExistingUpdates(repo, packagesToUpdate)
-	if err != nil {
-		return errors.Wrapf(err, "failed to get package updates")
-	}
-
-	// update melange configs in our cloned git repository with any new package versions
-	err = o.updatePackagesGitRepository(repo, packagesToUpdate)
-	if err != nil {
-		return fmt.Errorf("failed to update packages in git repository: %w", err)
+		return fmt.Errorf("after %d attempts, failed to update packages in git repository: %w", o.MaxRetries, err)
 	}
 
 	// certain errors should not halt the updates, either create a GitHub Issue or print them
