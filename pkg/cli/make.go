@@ -12,7 +12,7 @@ import (
 
 func cmdMake() *cobra.Command {
 	var dir, pipelineDir, arch string
-	var dryrun bool
+	var dryrun, buildtimeReposForRuntime bool
 	text := &cobra.Command{
 		Use:   "make",
 		Short: "Run make for all targets in order",
@@ -23,7 +23,7 @@ func cmdMake() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs)
+			g, err := dag.NewGraph(pkgs, dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime))
 			if err != nil {
 				return err
 			}
@@ -62,5 +62,6 @@ func cmdMake() *cobra.Command {
 	text.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	text.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
 	text.Flags().BoolVar(&dryrun, "dryrun", false, "if true, only print `make` commands")
+	text.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	return text
 }

@@ -1,0 +1,21 @@
+package:
+  name: a
+  version: "1.3.5"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  dependencies:
+    runtime:
+    - b
+    - d
+environment:
+  contents:
+    repositories:
+    - testdata/runtime/packages # because this is run relative to pkg/dag/
+    keyring:
+    - testdata/runtime/packages/key.rsa.pub # because this is run relative to pkg/dag/
+    packages:
+      - b
+      - c
+      - d
