@@ -34,11 +34,15 @@ var (
 		name: "Wolfi",
 		distroRemoteURLs: []string{
 			"git@github.com:wolfi-dev/os.git",
+			"git@github.com:wolfi-dev/os",
 			"https://github.com/wolfi-dev/os.git",
+			"https://github.com/wolfi-dev/os",
 		},
 		advisoriesRemoteURLs: []string{
 			"git@github.com:wolfi-dev/advisories.git",
+			"git@github.com:wolfi-dev/advisories",
 			"https://github.com/wolfi-dev/advisories.git",
+			"https://github.com/wolfi-dev/advisories",
 		},
 		apkRepositoryURL: "https://packages.wolfi.dev/os",
 		supportedArchitectures: []string{
@@ -51,11 +55,15 @@ var (
 		name: "Chainguard",
 		distroRemoteURLs: []string{
 			"git@github.com:chainguard-dev/enterprise-packages.git",
+			"git@github.com:chainguard-dev/enterprise-packages",
 			"https://github.com/chainguard-dev/enterprise-packages.git",
+			"https://github.com/chainguard-dev/enterprise-packages",
 		},
 		advisoriesRemoteURLs: []string{
 			"git@github.com:chainguard-dev/enterprise-advisories.git",
+			"git@github.com:chainguard-dev/enterprise-advisories",
 			"https://github.com/chainguard-dev/enterprise-advisories.git",
+			"https://github.com/chainguard-dev/enterprise-advisories",
 		},
 		apkRepositoryURL: "https://packages.cgr.dev/os",
 		supportedArchitectures: []string{
