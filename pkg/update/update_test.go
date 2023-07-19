@@ -166,3 +166,75 @@ func Test_extractVersionFromTitle(t *testing.T) {
 		})
 	}
 }
+
+func TestOptions_getPackagesToUpdate(t *testing.T) {
+	logger := log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)
+	melangeConfigs := map[string]*melange.Packages{
+		"foo": {
+			Config: build.Configuration{
+				Package: build.Package{
+					Name:    "foo",
+					Version: "1.0.0",
+				},
+				Pipeline: []build.Pipeline{
+					{
+						Uses: "git-checkout",
+						With: map[string]string{
+							"expected-commit": "1234567890",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	type args struct {
+		latestVersions map[string]NewVersionResults
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]NewVersionResults
+	}{
+		{
+			name: "no packages to update",
+			args: args{
+				latestVersions: map[string]NewVersionResults{
+					"foo": {Version: "1.0.0", Commit: "1234567890", BumpEpoch: false}, // same version and commit
+				},
+			},
+			want: map[string]NewVersionResults{},
+		},
+		{
+			name: "update with new version",
+			args: args{
+				latestVersions: map[string]NewVersionResults{
+					"foo": {Version: "2.0.0"},
+				},
+			},
+			want: map[string]NewVersionResults{"foo": {Version: "2.0.0", BumpEpoch: false}}, // new version
+		},
+		{
+			// if versions match but the commit doesn't then we need to update the commit
+			// this can occur when an upstream project recreated a tag with a new commit
+			name: "update as we have incorrect expected commit",
+			args: args{
+				latestVersions: map[string]NewVersionResults{
+					"foo": {Version: "1.0.0", Commit: "4444444444"},
+				},
+			},
+			want: map[string]NewVersionResults{"foo": {Version: "1.0.0", Commit: "4444444444", BumpEpoch: true}}, // new commit
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := &Options{
+				PackageConfigs: melangeConfigs,
+				Logger:         logger,
+			}
+			got, err := o.getPackagesToUpdate(tt.args.latestVersions)
+			assert.NoError(t, err)
+			assert.Equalf(t, tt.want, got, "getPackagesToUpdate(%v)", tt.args.latestVersions)
+		})
+	}
+}
