@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -14,6 +15,11 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 )
 
+const (
+	outputFormatOutline = "outline"
+	outputFormatJSON    = "json"
+)
+
 func Scan() *cobra.Command {
 	p := &scanParams{}
 	cmd := &cobra.Command{
@@ -22,6 +28,16 @@ func Scan() *cobra.Command {
 		Args:          cobra.MinimumNArgs(1),
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if p.outputFormat == "" {
+				p.outputFormat = outputFormatOutline
+			}
+
+			if p.outputFormat != outputFormatJSON && p.outputFormat != outputFormatOutline {
+				return fmt.Errorf("invalid output format %q, must be one of [%s]", p.outputFormat, strings.Join([]string{outputFormatOutline, outputFormatJSON}, ", "))
+			}
+
+			var results []Result
+
 			for _, arg := range args {
 				apkFilePath := arg
 				apkFile, err := os.Open(apkFilePath)
@@ -37,15 +53,33 @@ func Scan() *cobra.Command {
 				}
 				apkFile.Close()
 
-				if len(findings) == 0 {
-					fmt.Println("✅ No vulnerabilities found")
-				} else {
-					tree := newFindingsTree(findings)
-					fmt.Println(tree.render())
+				results = append(results, Result{
+					Target: Target{
+						File:     path.Base(apkFilePath),
+						FullPath: apkFilePath,
+					},
+					Findings: findings,
+				})
+
+				if p.outputFormat == outputFormatOutline {
+					if len(findings) == 0 {
+						fmt.Println("✅ No vulnerabilities found")
+					} else {
+						tree := newFindingsTree(findings)
+						fmt.Println(tree.render())
+					}
 				}
 
 				if p.requireZeroFindings && len(findings) > 0 {
 					return fmt.Errorf("more than 0 vulnerabilities found")
+				}
+			}
+
+			if p.outputFormat == outputFormatJSON {
+				enc := json.NewEncoder(os.Stdout)
+				err := enc.Encode(results)
+				if err != nil {
+					return fmt.Errorf("failed to marshal results to JSON: %w", err)
 				}
 			}
 
@@ -60,11 +94,23 @@ func Scan() *cobra.Command {
 type scanParams struct {
 	requireZeroFindings bool
 	localDBFilePath     string
+	outputFormat        string
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
+	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join([]string{outputFormatOutline, outputFormatJSON}, "|"), outputFormatOutline))
+}
+
+type Result struct {
+	Target   Target
+	Findings []*scan.Finding
+}
+
+type Target struct {
+	File     string
+	FullPath string
 }
 
 type findingsTree struct {
