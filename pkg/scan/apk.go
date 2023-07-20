@@ -52,7 +52,7 @@ var syftCatalogersEnabled = []string{
 }
 
 // APK scans an APK file for vulnerabilities.
-func APK(f io.Reader) ([]*Finding, error) {
+func APK(f io.Reader, localDBFile string) ([]*Finding, error) {
 	// Create a temp directory to house the unpacked APK file
 	tempDir, err := os.MkdirTemp("", "wolfictl-scan-*")
 	if err != nil {
@@ -87,7 +87,22 @@ func APK(f io.Reader) ([]*Finding, error) {
 
 	syftPkgs := packageCollection.Sorted()
 
-	datastore, _, dbCloser, err := grype.LoadVulnerabilityDB(grypeDBConfig, true)
+	updateDB := true
+	if localDBFile != "" {
+		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFile)
+		dbCurator, err := db.NewCurator(grypeDBConfig)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create the grype db import config: %w", err)
+		}
+
+		if err := dbCurator.ImportFrom(localDBFile); err != nil {
+			return nil, fmt.Errorf("unable to import vulnerability database: %w", err)
+		}
+
+		updateDB = false
+	}
+
+	datastore, _, dbCloser, err := grype.LoadVulnerabilityDB(grypeDBConfig, updateDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
 	}

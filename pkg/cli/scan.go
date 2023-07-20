@@ -29,13 +29,12 @@ func Scan() *cobra.Command {
 					return fmt.Errorf("failed to open apk file: %w", err)
 				}
 
-				fmt.Println(path.Base(apkFilePath))
+				fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(apkFilePath))
 
-				findings, err := scan.APK(apkFile)
+				findings, err := scan.APK(apkFile, p.localDBFilePath)
 				if err != nil {
 					return err
 				}
-
 				apkFile.Close()
 
 				if len(findings) == 0 {
@@ -60,10 +59,12 @@ func Scan() *cobra.Command {
 
 type scanParams struct {
 	requireZeroFindings bool
+	localDBFilePath     string
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
+	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
 }
 
 type findingsTree struct {
