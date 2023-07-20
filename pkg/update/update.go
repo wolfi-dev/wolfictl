@@ -58,6 +58,7 @@ type NewVersionResults struct {
 	Commit                     string
 	ReplaceExistingIssueNumber int
 	ReplaceExistingPRNumber    int
+	BumpEpoch                  bool
 }
 
 const (
@@ -316,6 +317,12 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	if err != nil {
 		// add this to the list of messages to print at the end of the update
 		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, newVersion.Version, err.Error()), nil
+	}
+
+	// if the new version has a bump epoch flag set, increment the epoch
+	// this can happen if we have a new expected commit sha but the version hasn't changed
+	if newVersion.BumpEpoch {
+		config.Config.Package.Epoch++
 	}
 
 	worktree, err := repo.Worktree()
@@ -719,6 +726,23 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 						c.Package.Name, c.Package.Version, latestVersionSemver.Original())))
 
 			results[c.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original(), Commit: v.Commit}
+		}
+
+		// if versions match but the commit doesn't then we need to update the commit
+		// this can occur when an upstream project recreated a tag with a new commit
+		if currentVersionSemver.Equal(latestVersionSemver) {
+			for i := range pc.Config.Pipeline {
+				pipeline := &pc.Config.Pipeline[i]
+				if pipeline.Uses == "git-checkout" {
+					if pipeline.With["expected-commit"] != v.Commit {
+						o.Logger.Printf(
+							color.YellowString("expected commit %s does not match latest commit %s for package %s", pipeline.With["expected-commit"], v.Commit, c.Package.Name))
+
+						results[c.Package.Name] = NewVersionResults{Version: latestVersionSemver.Original(), Commit: v.Commit, BumpEpoch: true}
+						break
+					}
+				}
+			}
 		}
 	}
 	return results, nil
