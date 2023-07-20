@@ -27,6 +27,7 @@ func New() *cobra.Command {
 		Check(),
 		Lint(),
 		Ls(),
+		SBOM(),
 		Scan(),
 		Update(),
 		VEX(),
