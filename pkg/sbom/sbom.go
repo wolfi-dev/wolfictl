@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 
 	"github.com/anchore/syft/syft"
+	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/linux"
+	"github.com/anchore/syft/syft/pkg"
 	"github.com/anchore/syft/syft/pkg/cataloger"
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
@@ -43,6 +46,17 @@ func Generate(f io.Reader, distroID string) (*sbom.SBOM, error) {
 		return nil, fmt.Errorf("failed to unpack apk file: %w", err)
 	}
 
+	// Analyze the APK metadata
+	pkginfo, err := os.Open(path.Join(tempDir, pkginfoPath))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read %s: %w", pkginfoPath, err)
+	}
+	defer pkginfo.Close()
+	apkPackage, err := newAPKPackage(pkginfo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create APK package: %w", err)
+	}
+
 	src, err := source.NewFromDirectory(
 		source.DirectoryConfig{
 			Path: tempDir,
@@ -60,6 +74,8 @@ func Generate(f io.Reader, distroID string) (*sbom.SBOM, error) {
 		return nil, fmt.Errorf("failed to catalog packages: %w", err)
 	}
 
+	packageCollection.Add(*apkPackage)
+
 	s := sbom.SBOM{
 		Artifacts: sbom.Artifacts{
 			Packages: packageCollection,
@@ -74,4 +90,40 @@ func Generate(f io.Reader, distroID string) (*sbom.SBOM, error) {
 	}
 
 	return &s, nil
+}
+
+func newAPKPackage(r io.Reader) (*pkg.Package, error) {
+	pkginfo, err := parsePkgInfo(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse APK metadata: %w", err)
+	}
+
+	metadata := pkg.ApkMetadata{
+		Package:       pkginfo.PkgName,
+		OriginPackage: pkginfo.Origin,
+		Version:       pkginfo.PkgVer,
+		Architecture:  pkginfo.Arch,
+		URL:           pkginfo.URL,
+		Description:   pkginfo.PkgDesc,
+		Size:          int(pkginfo.Size),
+		Dependencies:  pkginfo.Depends,
+		Provides:      pkginfo.Provides,
+		Checksum:      pkginfo.DataHash,
+		GitCommit:     pkginfo.Commit,
+	}
+
+	p := pkg.Package{
+		Name:         pkginfo.PkgName,
+		Version:      pkginfo.PkgVer,
+		FoundBy:      "wolfictl",
+		Locations:    file.NewLocationSet(file.NewLocation(pkginfoPath)),
+		Licenses:     pkg.NewLicenseSet(pkg.NewLicense(pkginfo.License)),
+		Type:         pkg.ApkPkg,
+		MetadataType: pkg.ApkMetadataType,
+		Metadata:     metadata,
+	}
+
+	p.SetID()
+
+	return &p, nil
 }
