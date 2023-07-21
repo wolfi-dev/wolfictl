@@ -100,6 +100,21 @@ func (m Model) newActionFieldConfig() field.TextFieldConfiguration {
 	}
 }
 
+func (m Model) newImpactFieldConfig() field.TextFieldConfiguration {
+	return field.TextFieldConfiguration{
+		Prompt: "Impact: ",
+		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			req.Impact = value
+			return req
+		},
+		ValidationRules: []field.TextValidationRule{
+			func(_ string) error {
+				return nil
+			},
+		},
+	}
+}
+
 func (m Model) newJustificationFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
 		Prompt:  "Justification: ",
@@ -197,7 +212,11 @@ func (m Model) addMissingFields() (Model, bool) {
 			return m, true
 		}
 
-		// TODO: Prompt for Impact if folks want to enter it. (There's a gotcha if adding it if left blank.)
+		if m.Request.Impact == "" {
+			f := field.NewTextField(m.newImpactFieldConfig())
+			m.fields = append(m.fields, f)
+			return m, true
+		}
 	}
 
 	return m, false
