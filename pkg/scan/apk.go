@@ -17,6 +17,8 @@ import (
 	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/file"
+	"github.com/anchore/syft/syft/formats/syftjson"
+	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
@@ -34,21 +36,35 @@ var grypeDBConfig = db.Config{
 }
 
 // APK scans an APK file for vulnerabilities.
-func APK(f io.Reader, localDBFile string) ([]*Finding, error) {
+func APK(f io.Reader, localDBFilePath string) ([]*Finding, error) {
 	s, err := sbom.Generate(f, "wolfi") // TODO: make this configurable
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate SBOM: %w", err)
 	}
 
+	return scan(s, localDBFilePath)
+}
+
+// APKSBOM scans an SBOM of an APK for vulnerabilities.
+func APKSBOM(r io.Reader, localDBFilePath string) ([]*Finding, error) {
+	s, err := syftjson.Format().Decode(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)
+	}
+
+	return scan(s, localDBFilePath)
+}
+
+func scan(s *sbomSyft.SBOM, localDBFilePath string) ([]*Finding, error) {
 	updateDB := true
-	if localDBFile != "" {
-		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFile)
+	if localDBFilePath != "" {
+		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFilePath)
 		dbCurator, err := db.NewCurator(grypeDBConfig)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create the grype db import config: %w", err)
 		}
 
-		if err := dbCurator.ImportFrom(localDBFile); err != nil {
+		if err := dbCurator.ImportFrom(localDBFilePath); err != nil {
 			return nil, fmt.Errorf("unable to import vulnerability database: %w", err)
 		}
 
