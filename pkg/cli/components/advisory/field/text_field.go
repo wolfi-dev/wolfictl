@@ -72,7 +72,6 @@ type TextValidationRule func(string) error
 func NewTextField(cfg TextFieldConfiguration) TextField {
 	t := textinput.New()
 	t.Cursor.Style = styles.Default()
-	t.CharLimit = 32
 
 	t.Prompt = cfg.Prompt
 
