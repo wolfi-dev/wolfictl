@@ -133,7 +133,7 @@ func addDistroDirFlag(val *string, cmd *cobra.Command) {
 }
 
 func addAdvisoriesDirFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "advisories-repo-dir", "a", "", fmt.Sprintf("directory containing the advisories repository (can also be set with environment variable `%s`)", envVarNameForAdvisoriesDir))
+	cmd.Flags().StringVarP(val, "advisories-repo-dir", "a", "", fmt.Sprintf("directory containing the advisories repository or the URL for the Git Repository (can also be set with environment variable `%s`)", envVarNameForAdvisoriesDir))
 }
 
 func addNoPromptFlag(val *bool, cmd *cobra.Command) {
