@@ -20,13 +20,14 @@ func cmdText() *cobra.Command {
 		Use:   "text",
 		Short: "Print a sorted list of downstream dependent packages",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs)
+			g, err := dag.NewGraph(ctx, pkgs)
 			if err != nil {
 				return err
 			}
@@ -53,7 +54,7 @@ func cmdText() *cobra.Command {
 					}
 				} else {
 					roots := args
-					subgraph, err = g.SubgraphWithRoots(roots)
+					subgraph, err = g.SubgraphWithRoots(ctx, roots)
 					if err != nil {
 						return err
 					}

@@ -27,11 +27,11 @@ Generate .dot output and pipe it to dot to generate a PNG
   wolfictl dot | dot -Tpng > graph.png
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(cmd.Context(), os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs)
+			g, err := dag.NewGraph(cmd.Context(), pkgs)
 			if err != nil {
 				return err
 			}
@@ -58,7 +58,7 @@ Generate .dot output and pipe it to dot to generate a PNG
 					}
 				} else {
 					roots := args
-					subgraph, err = g.SubgraphWithRoots(roots)
+					subgraph, err = g.SubgraphWithRoots(cmd.Context(), roots)
 					if err != nil {
 						return err
 					}

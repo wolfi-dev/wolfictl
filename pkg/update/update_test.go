@@ -1,6 +1,7 @@
 package update
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -59,7 +60,7 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	// fake a new version available
 	newVersion := map[string]NewVersionResults{"cheese": {Version: "1.5.10"}}
 	errorMessages := make(map[string]string)
-	err = o.updatePackagesGitRepository(r, newVersion)
+	err = o.updatePackagesGitRepository(context.Background(), r, newVersion)
 	assert.NoError(t, err)
 	assert.Empty(t, errorMessages)
 

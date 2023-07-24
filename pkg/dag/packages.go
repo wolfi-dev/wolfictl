@@ -1,6 +1,7 @@
 package dag
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"log"
@@ -82,10 +83,10 @@ func (p *Packages) addConfiguration(name string, configuration *Configuration) e
 	return nil
 }
 
-func (p *Packages) addProvides(c *Configuration, provides []string) error {
+func (p *Packages) addProvides(_ context.Context, c *Configuration, provides []string) error {
 	for _, prov := range provides {
-		pctx := &build.PipelineContext{
-			Context: &build.Context{
+		pctx := &build.PipelineBuild{
+			Build: &build.Build{
 				Configuration: *c.Configuration,
 			},
 			Package: &c.Package,
@@ -126,7 +127,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 //
 // The repetition of the path is necessary because of how the upstream parser in melange
 // requires the full path to the directory to be passed in.
-func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
+func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		packages: make(map[string][]*Configuration),
@@ -166,7 +167,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 				return err
 			}
 			pkgs.addPackage(name, c)
-			if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
+			if err := pkgs.addProvides(ctx, c, c.Package.Dependencies.Provides); err != nil {
 				return err
 			}
 
@@ -185,7 +186,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 				if err := pkgs.addConfiguration(name, c); err != nil {
 					return err
 				}
-				if err := pkgs.addProvides(c, subpkg.Dependencies.Provides); err != nil {
+				if err := pkgs.addProvides(ctx, c, subpkg.Dependencies.Provides); err != nil {
 					return err
 				}
 
@@ -193,8 +194,8 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 			}
 			// Resolve all `uses` used by the pipeline. This updates the set of
 			// .environment.contents.packages so the next block can include those as build deps.
-			pctx := &build.PipelineContext{
-				Context: &build.Context{
+			pctx := &build.PipelineBuild{
+				Build: &build.Build{
 					PipelineDir:   pipelineDir,
 					Configuration: *c.Configuration,
 				},
@@ -205,7 +206,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 				if err := s.ApplyNeeds(pctx); err != nil {
 					return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
 				}
-				c.Environment.Contents.Packages = pctx.Context.Configuration.Environment.Contents.Packages
+				c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
 			}
 		}
 

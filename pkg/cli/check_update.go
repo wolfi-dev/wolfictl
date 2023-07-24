@@ -21,7 +21,7 @@ func CheckUpdate() *cobra.Command {
 		SilenceErrors:     true,
 		Short:             "Check Wolfi update configs",
 		RunE: func(cmd *cobra.Command, files []string) error {
-			return o.CheckUpdates(files)
+			return o.CheckUpdates(cmd.Context(), files)
 		},
 	}
 

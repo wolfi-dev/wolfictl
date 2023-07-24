@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -43,7 +44,7 @@ func SetupUpdate() (*update.Options, lint.EvalRuleErrors) {
 }
 
 // CheckUpdates will use the melange update config to get the latest versions and validate fetch and git-checkout pipelines
-func (o CheckUpdateOptions) CheckUpdates(files []string) error {
+func (o CheckUpdateOptions) CheckUpdates(ctx context.Context, files []string) error {
 	updateOpts, checkErrors := SetupUpdate()
 
 	changedPackages := GetPackagesToUpdate(files)
@@ -62,7 +63,7 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 	}
 
 	if len(checkErrors) == 0 {
-		err := o.processUpdates(latestVersions, &checkErrors)
+		err := o.processUpdates(ctx, latestVersions, &checkErrors)
 		if err != nil {
 			addCheckError(&checkErrors, err)
 		}
@@ -182,7 +183,7 @@ func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]upd
 }
 
 // iterate over slice of packages, optionally override the package.version and verify fetch + git-checkout work with latest versions
-func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) error {
+func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) error {
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
 		return err
@@ -211,7 +212,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		}
 
 		// melange bump will modify the modified copy of the melange config
-		err = melange.Bump(tmpConfigFile, newVersion.Version, newVersion.Commit)
+		err = melange.Bump(ctx, tmpConfigFile, newVersion.Version, newVersion.Commit)
 		if err != nil {
 			addCheckError(checkErrors, errors.Wrapf(err, "package %s: failed to validate update config, melange bump", packageName))
 			continue
@@ -222,8 +223,8 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			return err
 		}
 
-		pctx := &build.PipelineContext{
-			Context: &build.Context{
+		pctx := &build.PipelineBuild{
+			Build: &build.Build{
 				Configuration: *updated,
 			},
 			Package: &updated.Package,
@@ -242,7 +243,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		}
 
 		// download or git clone sources into a temp folder to validate the update config
-		verifyPipelines(o, updated, mutations, checkErrors)
+		verifyPipelines(ctx, o, updated, mutations, checkErrors)
 	}
 	return nil
 }
@@ -253,13 +254,13 @@ func applyOverrides(options *CheckUpdateOptions, dryRunConfig *build.Configurati
 	}
 }
 
-func verifyPipelines(o CheckUpdateOptions, updated *build.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
+func verifyPipelines(ctx context.Context, o CheckUpdateOptions, updated *build.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
 	for i := range updated.Pipeline {
 		var err error
 		pipeline := updated.Pipeline[i]
 
 		if pipeline.Uses == "fetch" {
-			err = o.verifyFetch(&pipeline, mutations)
+			err = o.verifyFetch(ctx, &pipeline, mutations)
 		}
 		if pipeline.Uses == "git-checkout" {
 			err = o.verifyGitCheckout(&pipeline, mutations)
@@ -270,7 +271,7 @@ func verifyPipelines(o CheckUpdateOptions, updated *build.Configuration, mutatio
 	}
 }
 
-func (o CheckUpdateOptions) verifyFetch(p *build.Pipeline, m map[string]string) error {
+func (o CheckUpdateOptions) verifyFetch(ctx context.Context, p *build.Pipeline, m map[string]string) error {
 	uriValue := p.With["uri"]
 	if uriValue == "" {
 		return fmt.Errorf("no uri to fetch")
@@ -284,7 +285,7 @@ func (o CheckUpdateOptions) verifyFetch(p *build.Pipeline, m map[string]string) 
 
 	o.Logger.Printf("downloading sources from %s into a temporary directory, this may take a while", evaluatedURI)
 
-	filename, err := util.DownloadFile(evaluatedURI)
+	filename, err := util.DownloadFile(ctx, evaluatedURI)
 	if err != nil {
 		return errors.Wrapf(err, "failed to verify fetch %s", evaluatedURI)
 	}

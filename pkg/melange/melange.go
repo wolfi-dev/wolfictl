@@ -1,6 +1,7 @@
 package melange
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -155,8 +156,8 @@ func ReadMelangeConfig(filename string) (build.Configuration, error) {
 	return *packageConfig, err
 }
 
-func Bump(configFile, version, expectedCommit string) error {
-	ctx, err := renovate.New(renovate.WithConfig(configFile))
+func Bump(ctx context.Context, configFile, version, expectedCommit string) error {
+	r, err := renovate.New(renovate.WithConfig(configFile))
 	if err != nil {
 		return err
 	}
@@ -166,5 +167,5 @@ func Bump(configFile, version, expectedCommit string) error {
 		bump.WithExpectedCommit(expectedCommit),
 	)
 
-	return ctx.Renovate(bumpRenovator)
+	return r.Renovate(ctx, bumpRenovator)
 }

@@ -54,8 +54,7 @@ func cmdPod() *cobra.Command {
 		Use:   "pod",
 		Short: "Generate a kubernetes pod to run the build",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Don't use cmd.Context() since we want to capture signals to kill the pod.
-			ctx := context.Background()
+			ctx := cmd.Context()
 
 			arch := types.ParseArchitecture(arch).ToAPK()
 
@@ -74,16 +73,16 @@ func cmdPod() *cobra.Command {
 
 			targets := []string{"all"}
 			if len(args) > 0 {
-				pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+				pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 				if err != nil {
 					return err
 				}
-				g, err := dag.NewGraph(pkgs)
+				g, err := dag.NewGraph(ctx, pkgs)
 				if err != nil {
 					return err
 				}
 
-				subgraph, err := g.SubgraphWithRoots(args)
+				subgraph, err := g.SubgraphWithRoots(ctx, args)
 				if err != nil {
 					return err
 				}
@@ -346,7 +345,8 @@ gcloud --quiet storage cp \
 				}
 				log.Println("created pod:", p.Name)
 				if watch {
-					return k8s.watch(ctx, p)
+					// Don't use cmd.Context() since we want to capture signals to kill the pod.
+					return k8s.watch(context.Background(), p)
 				}
 				return nil
 			}

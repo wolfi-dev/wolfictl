@@ -19,11 +19,11 @@ func cmdMake() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(cmd.Context(), os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs)
+			g, err := dag.NewGraph(cmd.Context(), pkgs)
 			if err != nil {
 				return err
 			}

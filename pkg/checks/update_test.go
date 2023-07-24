@@ -2,6 +2,7 @@ package checks
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -51,7 +52,7 @@ func TestProcessUpdatesGitCheckout(t *testing.T) {
 		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
-	err = o.processUpdates(latestVersions, &checkErrors)
+	err = o.processUpdates(context.Background(), latestVersions, &checkErrors)
 	assert.NoError(t, err)
 	assert.Len(t, checkErrors, 0)
 }
@@ -90,7 +91,7 @@ func TestProcessUpdatesFetch(t *testing.T) {
 		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
-	err = o.processUpdates(latestVersions, &checkErrors)
+	err = o.processUpdates(context.Background(), latestVersions, &checkErrors)
 	assert.NoError(t, err)
 	assert.Len(t, checkErrors, 0)
 }

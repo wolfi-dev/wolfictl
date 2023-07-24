@@ -2,6 +2,7 @@ package dag
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -57,7 +58,7 @@ type cycle struct {
 // It parses the packages to create the dependency graph.
 // If the list of packages creates a cycle, an error is returned.
 // If a package cannot be resolved, an error is returned, unless WithAllowUnresolved is set.
-func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
+func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	var opts = &graphOptions{}
 	for _, option := range options {
 		if err := option(opts); err != nil {
@@ -83,7 +84,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	var arch = "x86_64"
 	localRepo := pkgs.Repository(arch)
 	localRepoSource := localRepo.Source()
-	localOnlyResolver := apk.NewPkgResolver([]apk.NamedIndex{localRepo})
+	localOnlyResolver := apk.NewPkgResolver(ctx, []apk.NamedIndex{localRepo})
 	g.resolvers[localRepoSource] = localOnlyResolver
 
 	// the order of adding packages is quite important:
@@ -97,7 +98,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			continue
 		}
 		// add the origin package as its own resolver, so that the subpackage can resolve to it
-		g.resolvers[c.String()] = singlePackageResolver(c, arch)
+		g.resolvers[c.String()] = singlePackageResolver(ctx, c, arch)
 		for i := range c.Subpackages {
 			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
 			for _, subpkgVersion := range subpkg {
@@ -163,7 +164,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			}
 		}
 		if len(repos) > 0 {
-			loadedRepos, err := apk.GetRepositoryIndexes(repos, keys, arch)
+			loadedRepos, err := apk.GetRepositoryIndexes(ctx, repos, keys, arch)
 			if err != nil {
 				return nil, fmt.Errorf("unable to load repositories for %s: %w", c.String(), err)
 			}
@@ -192,7 +193,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 		// add packages from build-time, as they could be local only, or might have upstream
 		if _, ok := g.resolvers[resolverKey]; !ok {
-			g.resolvers[resolverKey] = apk.NewPkgResolver(lookupRepos)
+			g.resolvers[resolverKey] = apk.NewPkgResolver(ctx, lookupRepos)
 		}
 		// wolfi-dev has a policy for environment packages not to use a package to fulfull a dependency, if that package is myself.
 		// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
@@ -524,13 +525,13 @@ func (g Graph) ReverseSorted() ([]Package, error) {
 //
 // In other words, the new subgraph will contain all dependencies (transitively)
 // of all packages whose names were given as the `roots` argument.
-func (g Graph) SubgraphWithRoots(roots []string) (*Graph, error) {
+func (g Graph) SubgraphWithRoots(ctx context.Context, roots []string) (*Graph, error) {
 	// subgraph needs to create a new graph, but it also has a subset of Packages
 	subPkgs, err := g.packages.Sub(roots...)
 	if err != nil {
 		return nil, err
 	}
-	return NewGraph(subPkgs)
+	return NewGraph(ctx, subPkgs)
 }
 
 // SubgraphWithLeaves returns a new Graph that's a subgraph of g, where the set of
@@ -791,7 +792,7 @@ func getKeyMaterial(key string) ([]byte, error) {
 	return b, nil
 }
 
-func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
+func singlePackageResolver(ctx context.Context, pkg *Configuration, arch string) *apk.PkgResolver {
 	repo := repository.NewRepositoryFromComponents(Local, "latest", "", arch)
 	packages := []*repository.Package{
 		{
@@ -812,5 +813,5 @@ func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
 		Packages:    packages,
 	}
 	idx := apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
-	return apk.NewPkgResolver([]apk.NamedIndex{idx})
+	return apk.NewPkgResolver(ctx, []apk.NamedIndex{idx})
 }
