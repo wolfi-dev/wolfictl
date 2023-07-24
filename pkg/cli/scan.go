@@ -39,24 +39,29 @@ func Scan() *cobra.Command {
 			var results []Result
 
 			for _, arg := range args {
-				apkFilePath := arg
-				apkFile, err := os.Open(apkFilePath)
+				inputFilePath := arg
+				inputFile, err := os.Open(inputFilePath)
 				if err != nil {
-					return fmt.Errorf("failed to open apk file: %w", err)
+					return fmt.Errorf("failed to open input file: %w", err)
 				}
 
-				fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(apkFilePath))
+				fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(inputFilePath))
 
-				findings, err := scan.APK(apkFile, p.localDBFilePath)
-				if err != nil {
-					return err
+				var findings []*scan.Finding
+				if p.sbomInput {
+					findings, err = scan.APKSBOM(inputFile, p.localDBFilePath)
+				} else {
+					findings, err = scan.APK(inputFile, p.localDBFilePath)
 				}
-				apkFile.Close()
+				if err != nil {
+					return fmt.Errorf("failed to scan: %w", err)
+				}
+				inputFile.Close()
 
 				results = append(results, Result{
 					Target: Target{
-						File:     path.Base(apkFilePath),
-						FullPath: apkFilePath,
+						File:     path.Base(inputFilePath),
+						FullPath: inputFilePath,
 					},
 					Findings: findings,
 				})
@@ -95,12 +100,14 @@ type scanParams struct {
 	requireZeroFindings bool
 	localDBFilePath     string
 	outputFormat        string
+	sbomInput           bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join([]string{outputFormatOutline, outputFormatJSON}, "|"), outputFormatOutline))
+	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
 }
 
 type Result struct {

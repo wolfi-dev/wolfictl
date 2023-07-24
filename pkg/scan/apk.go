@@ -16,12 +16,11 @@ import (
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/grype/grype/vulnerability"
-	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/file"
-	"github.com/anchore/syft/syft/pkg/cataloger"
-	"github.com/anchore/syft/syft/source"
+	"github.com/anchore/syft/syft/formats/syftjson"
+	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/samber/lo"
-	"github.com/wolfi-dev/wolfictl/pkg/tar"
+	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
 
 const grypeDBListingURL = "https://toolbox-data.anchore.io/grype/databases/listing.json"
@@ -36,66 +35,36 @@ var grypeDBConfig = db.Config{
 	MaxAllowedBuiltAge:  24 * time.Hour,
 }
 
-var syftCatalogersEnabled = []string{
-	"apkdb",
-	"binary",
-	"dotnet-deps",
-	"go-module-binary",
-	"graalvm-native-image",
-	"java",
-	"javascript-package",
-	"php-composer-installed",
-	"portage",
-	"python-package",
-	"r-package-cataloger",
-	"ruby-gemspec",
+// APK scans an APK file for vulnerabilities.
+func APK(f io.Reader, localDBFilePath string) ([]*Finding, error) {
+	s, err := sbom.Generate(f, "wolfi") // TODO: make this configurable
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate SBOM: %w", err)
+	}
+
+	return scan(s, localDBFilePath)
 }
 
-// APK scans an APK file for vulnerabilities.
-func APK(f io.Reader, localDBFile string) ([]*Finding, error) {
-	// Create a temp directory to house the unpacked APK file
-	tempDir, err := os.MkdirTemp("", "wolfictl-scan-*")
+// APKSBOM scans an SBOM of an APK for vulnerabilities.
+func APKSBOM(r io.Reader, localDBFilePath string) ([]*Finding, error) {
+	s, err := syftjson.Format().Decode(r)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create temp directory: %w", err)
-	}
-	defer os.RemoveAll(tempDir)
-
-	// Unpack apk to temp directory
-	err = tar.Untar(f, tempDir)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unpack apk file: %w", err)
+		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)
 	}
 
-	// TODO: use a managed cache of APK SBOMs (Syft format)
+	return scan(s, localDBFilePath)
+}
 
-	src, err := source.NewFromDirectory(
-		source.DirectoryConfig{
-			Path: tempDir,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create source from directory: %w", err)
-	}
-
-	cfg := cataloger.DefaultConfig()
-	cfg.Catalogers = syftCatalogersEnabled
-
-	packageCollection, _, distro, err := syft.CatalogPackages(src, cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to catalog packages: %w", err)
-	}
-
-	syftPkgs := packageCollection.Sorted()
-
+func scan(s *sbomSyft.SBOM, localDBFilePath string) ([]*Finding, error) {
 	updateDB := true
-	if localDBFile != "" {
-		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFile)
+	if localDBFilePath != "" {
+		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFilePath)
 		dbCurator, err := db.NewCurator(grypeDBConfig)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create the grype db import config: %w", err)
 		}
 
-		if err := dbCurator.ImportFrom(localDBFile); err != nil {
+		if err := dbCurator.ImportFrom(localDBFilePath); err != nil {
 			return nil, fmt.Errorf("unable to import vulnerability database: %w", err)
 		}
 
@@ -109,11 +78,14 @@ func APK(f io.Reader, localDBFile string) ([]*Finding, error) {
 	defer dbCloser.Close()
 
 	matcher := grype.DefaultVulnerabilityMatcher(*datastore)
-	sourceDescription := src.Describe()
+
+	syftPkgs := s.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})
+
+	// Find vulnerability matches
 	matchesCollection, _, err := matcher.FindMatches(grypePkgs, grypePkg.Context{
-		Source: &sourceDescription,
-		Distro: distro,
+		Source: &s.Source,
+		Distro: s.Artifacts.LinuxDistribution,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to find vulnerability matches: %w", err)
