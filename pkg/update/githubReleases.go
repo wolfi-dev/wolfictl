@@ -42,7 +42,7 @@ query {
 {{ range  $index, $r := .RepoList }}
   r{{$r.PackageName}}: repository(owner: "{{$r.Owner}}", name: "{{$r.Name}}") {
     nameWithOwner
-    refs(refPrefix: "refs/tags/", query: "{{.Filter}}", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, last: 50) {
+    refs(refPrefix: "refs/tags/", query: "{{.Filter}}", orderBy: {field: TAG_COMMIT_DATE, direction: DESC}, first: 50) {
       totalCount
       nodes {
         name
