@@ -13,7 +13,7 @@ import (
 
 func cmdSVG() *cobra.Command {
 	var dir, pipelineDir string
-	var showDependents bool
+	var showDependents, buildtimeReposForRuntime bool
 	d := &cobra.Command{
 		Use:   "dot",
 		Short: "Generate graphviz .dot output",
@@ -31,7 +31,7 @@ Generate .dot output and pipe it to dot to generate a PNG
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs)
+			g, err := dag.NewGraph(pkgs, dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime))
 			if err != nil {
 				return err
 			}
@@ -74,6 +74,7 @@ Generate .dot output and pipe it to dot to generate a PNG
 	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
 	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
+	d.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	return d
 }
 

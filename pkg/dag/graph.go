@@ -119,96 +119,126 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	}
 
 	for _, c := range pkgs.Packages() {
-		// add packages from the runtime dependencies first, as they are constrained to the local repository
+		// add packages from the runtime dependencies
+		runtimeAddRepos := opts.runtimeRepos
+		runtimeAddKeys := opts.runtimeKeys
+		if opts.buildtimeReposForRuntime {
+			runtimeAddRepos = append(runtimeAddRepos, c.Environment.Contents.Repositories...)
+			runtimeAddKeys = append(runtimeAddKeys, c.Environment.Contents.Keyring...)
+		}
+		resolverKey, err := g.addResolverForRepos(arch,
+			localRepo,
+			indexes,
+			keys,
+			runtimeAddRepos,
+			runtimeAddKeys,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create resolver for %s: %w", c.String(), err)
+		}
+
 		// For runtime packages, it is allowed to resolve itself.
-		addErrs := g.resolvePackages(c, "runtime", localRepoSource, localRepoSource, c.Package.Dependencies.Runtime, true)
+		addErrs := g.resolvePackages(c, "runtime", localRepoSource, resolverKey, c.Package.Dependencies.Runtime, true)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
 	}
 
 	for _, c := range pkgs.Packages() {
-		// get all of the repositories that are referenced by the package
-		var (
-			origRepos   = c.Environment.Contents.Repositories
-			origKeys    = c.Environment.Contents.Keyring
-			repos       []string
-			lookupRepos = []apk.NamedIndex{}
-			// validKeys contains list of keys valid for this package; as opposed to
-			// keys, which is the master list of all keys we have encountered
-			validKeys = map[string][]byte{}
+		// add packages from the buildtime dependencies
+		resolverKey, err := g.addResolverForRepos(arch,
+			localRepo,
+			indexes,
+			keys,
+			append(c.Environment.Contents.Repositories, opts.repos...),
+			append(c.Environment.Contents.Keyring, opts.keys...),
 		)
-		for _, repo := range append(origRepos, opts.repos...) {
-			key := apk.IndexURL(repo, arch)
-			if index, ok := indexes[key]; !ok {
-				repos = append(repos, repo)
-			} else {
-				lookupRepos = append(lookupRepos, index)
-			}
-		}
-		// ensure any keys listed in this package are in the master map of keys
-		for _, key := range append(origKeys, opts.keys...) {
-			if _, ok := keys[key]; ok {
-				validKeys[key] = keys[key]
-				continue
-			}
-			b, err := getKeyMaterial(key)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get key material for %s: %w", key, err)
-			}
-			// we can have no error, but still no bytes, as we ignore missing files
-			if b != nil {
-				keys[key] = b
-				validKeys[key] = b
-			}
-		}
-		if len(repos) > 0 {
-			loadedRepos, err := apk.GetRepositoryIndexes(repos, keys, arch)
-			if err != nil {
-				return nil, fmt.Errorf("unable to load repositories for %s: %w", c.String(), err)
-			}
-			for _, repo := range loadedRepos {
-				indexes[repo.Source()] = repo
-				lookupRepos = append(lookupRepos, repo)
-			}
+		if err != nil {
+			return nil, fmt.Errorf("unable to create resolver for %s: %w", c.String(), err)
 		}
 
-		// add our own packages list to the lookupRepos
-		lookupRepos = append(lookupRepos, localRepo)
-
-		// creating a resolver can be expensive, so we cache any that already exist that have exactly
-		// the same repositories.
-		// This does leave an extra "," at the end, but it doesn't really matter, it is good enough.
-		// Anything else would require converting it into []string and then joining it,
-		// which is more expensive unnecessarily.
-		var (
-			keys    []string
-			addErrs []error
-		)
-		for _, repo := range lookupRepos {
-			keys = append(keys, repo.Source())
-		}
-		resolverKey := strings.Join(keys, ",")
-
-		// add packages from build-time, as they could be local only, or might have upstream
-		if _, ok := g.resolvers[resolverKey]; !ok {
-			g.resolvers[resolverKey] = apk.NewPkgResolver(lookupRepos)
-		}
 		// wolfi-dev has a policy for environment packages not to use a package to fulfull a dependency, if that package is myself.
 		// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
-		addErrs = g.resolvePackages(c, "environment", localRepoSource, resolverKey, c.Environment.Contents.Packages, false)
+		addErrs := g.resolvePackages(c, "environment", localRepoSource, resolverKey, c.Environment.Contents.Packages, false)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
-
-		// we also need to add packages that are in Packages.Dependencies.Runtime, but these should come *only*
-		// from local
 	}
 	if errs != nil {
 		return nil, fmt.Errorf("unable to build graph:\n%w", errors.Join(errs...))
 	}
 
 	return g, nil
+}
+
+// addResolverForRepos adds a resolver for a specific set of repositories,
+// returning the resolverKey to look it up.
+// Adds the local repository if provided.
+func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, indexes map[string]apk.NamedIndex, allKeys map[string][]byte, addRepos, addKeys []string) (resolverKey string, err error) {
+	var (
+		repos       []string
+		lookupRepos = []apk.NamedIndex{}
+		// validKeys contains list of keys valid for this package; as opposed to
+		// keys, which is the master list of all keys we have encountered
+		validKeys = map[string][]byte{}
+	)
+	for _, repo := range addRepos {
+		key := apk.IndexURL(repo, arch)
+		if index, ok := indexes[key]; !ok {
+			repos = append(repos, repo)
+		} else {
+			lookupRepos = append(lookupRepos, index)
+		}
+	}
+	// ensure any keys listed in this package are in the master map of keys
+	for _, key := range addKeys {
+		if _, ok := allKeys[key]; ok {
+			validKeys[key] = allKeys[key]
+			continue
+		}
+		b, err := getKeyMaterial(key)
+		if err != nil {
+			return "", fmt.Errorf("failed to get key material for %s: %w", key, err)
+		}
+		// we can have no error, but still no bytes, as we ignore missing files
+		if b != nil {
+			allKeys[key] = b
+			validKeys[key] = b
+		}
+	}
+	if len(repos) > 0 {
+		loadedRepos, err := apk.GetRepositoryIndexes(repos, allKeys, arch)
+		if err != nil {
+			return "", err
+		}
+		for _, repo := range loadedRepos {
+			indexes[repo.Source()] = repo
+			lookupRepos = append(lookupRepos, repo)
+		}
+	}
+
+	// add our own packages list to the lookupRepos
+	if localRepo != nil {
+		lookupRepos = append(lookupRepos, localRepo)
+	}
+
+	// creating a resolver can be expensive, so we cache any that already exist that have exactly
+	// the same repositories.
+	// This does leave an extra "," at the end, but it doesn't really matter, it is good enough.
+	// Anything else would require converting it into []string and then joining it,
+	// which is more expensive unnecessarily.
+	var keys []string
+
+	for _, repo := range lookupRepos {
+		keys = append(keys, repo.Source())
+	}
+	resolverKey = strings.Join(keys, ",")
+
+	// add packages from build-time, as they could be local only, or might have upstream
+	if _, ok := g.resolvers[resolverKey]; !ok {
+		g.resolvers[resolverKey] = apk.NewPkgResolver(lookupRepos)
+	}
+	return resolverKey, nil
 }
 
 // resolvePackages given a package `parent`, a list of packages `pkgs` and a `resolver`,

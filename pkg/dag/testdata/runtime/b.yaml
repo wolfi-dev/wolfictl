@@ -1,0 +1,10 @@
+package:
+  name: b
+  version: "1.2.3"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  dependencies:
+    runtime:
+    - c
