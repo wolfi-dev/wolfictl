@@ -4,11 +4,16 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
+
+	"github.com/spf13/cobra"
+	"sigs.k8s.io/release-sdk/git"
+	"sigs.k8s.io/release-sdk/github"
 
 	"github.com/openvex/go-vex/pkg/vex"
-	"github.com/spf13/cobra"
+
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	advisoryConfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -36,13 +41,32 @@ func AdvisoryList() *cobra.Command {
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
+			if strings.HasPrefix(advisoriesRepoDir, "https://") {
+				// ie. https://github.com/openvex/vexctl.git
+				temp := strings.SplitAfterN(advisoriesRepoDir, "/", 4)
+				// here will be openvex/vexctl.git
+				tempSlug := strings.TrimSuffix(temp[3], ".git")
+				userOrg, userRepo, err := git.ParseRepoSlug(tempSlug)
+				if err != nil {
+					return fmt.Errorf("parsing user's fork: %w", err)
+				}
+
+				repo, err := github.PrepareFork(p.repoBranch, userOrg, userRepo, userOrg, userRepo)
+				if err != nil {
+					return fmt.Errorf("while preparing %s clone: %w", tempSlug, err)
+				}
+
+				advisoriesRepoDir = repo.Dir()
+				defer os.Remove(repo.Dir())
+			}
+
 			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoriesFsys)
+			advisoryCfgs, err := advisoryConfigs.NewIndex(advisoriesFsys)
 			if err != nil {
 				return err
 			}
 
-			var cfgs []advisoryconfigs.Document
+			var cfgs []advisoryConfigs.Document
 			if pkg := p.packageName; pkg != "" {
 				cfgs = advisoryCfgs.Select().WhereName(pkg).Configurations()
 			} else {
@@ -107,6 +131,7 @@ type listParams struct {
 	vuln        string
 	history     bool
 	unresolved  bool
+	repoBranch  string
 }
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
@@ -119,9 +144,10 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 
 	cmd.Flags().BoolVar(&p.history, "history", false, "show full history for advisories")
 	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, fmt.Sprintf("only show advisories whose latest status is %s or %s", vex.StatusAffected, vex.StatusUnderInvestigation))
+	cmd.Flags().StringVar(&p.repoBranch, "repository-branch-name", "main", "in case of using a Git repository when passing the flag --advisories-repo-dir you can specify the branch name. default to main")
 }
 
-func renderListItem(entry advisoryconfigs.Entry) string {
+func renderListItem(entry advisoryConfigs.Entry) string {
 	switch entry.Status {
 	case vex.StatusUnderInvestigation:
 		return string(entry.Status)
