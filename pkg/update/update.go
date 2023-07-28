@@ -169,6 +169,13 @@ func (o *Options) Update() error {
 
 	// certain errors should not halt the updates, either create a GitHub Issue or print them
 	for k, message := range o.ErrorMessages {
+		// don't create an issue if we get an error about a missing git object
+		// this happens intermittently and tends to recover on the next run
+		// not able to reproduce locally, only seems to happen in GitHub Actions
+		if strings.Contains(message, "failed to git push: object not found") {
+			o.Logger.Printf("%s: %s\n", k, color.RedString(message))
+			continue
+		}
 		if o.CreateIssues {
 			issueURL, err := o.createErrorMessageIssue(repo, k, message)
 			if err != nil {
