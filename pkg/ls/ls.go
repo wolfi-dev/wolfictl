@@ -5,12 +5,12 @@ import (
 	"strings"
 	"text/template"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 )
 
 type ListOptions struct {
-	BuildCfgIndices []*configs.Index[build.Configuration]
+	BuildCfgIndices []*configs.Index[config.Configuration]
 
 	// IncludeSubpackages indicates whether subpackages should be included in the results.
 	IncludeSubpackages bool
@@ -50,7 +50,7 @@ func List(opts ListOptions) ([]string, error) {
 	}
 
 	for _, requestedPkg := range opts.RequestedPackages {
-		var cfgsForRequestedPkg []build.Configuration
+		var cfgsForRequestedPkg []config.Configuration
 
 		for _, index := range opts.BuildCfgIndices {
 			cfgs := index.Select().WhereName(requestedPkg).Configurations()
@@ -74,13 +74,13 @@ func List(opts ListOptions) ([]string, error) {
 
 // renderResultItem renders a result item using the provided template. If tmpl
 // is nil, the package name is returned. The item parameter's type should be
-// build.Configuration or build.Subpackage.
+// config.Configuration or config.Subpackage.
 func renderResultItem(item any, tmpl *template.Template) (string, error) {
 	if tmpl == nil {
 		switch item := item.(type) {
-		case build.Configuration:
+		case config.Configuration:
 			return item.Package.Name, nil
-		case build.Subpackage:
+		case config.Subpackage:
 			return item.Name, nil
 		default:
 			return "", fmt.Errorf("unexpected type %T", item)
@@ -96,7 +96,7 @@ func renderResultItem(item any, tmpl *template.Template) (string, error) {
 	return b.String(), nil
 }
 
-func listPackageNames(cfgs []build.Configuration, includeSubpackages bool, tmpl *template.Template) ([]string, error) {
+func listPackageNames(cfgs []config.Configuration, includeSubpackages bool, tmpl *template.Template) ([]string, error) {
 	var results []string
 
 	for i := range cfgs {

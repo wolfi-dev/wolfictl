@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -144,7 +144,7 @@ func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
 	cmd.Flags().BoolVar(val, "no-distro-detection", false, "do not attempt to auto-detect the distro")
 }
 
-func newAllowedFixedVersionsFunc(apkindexes []*repository.ApkIndex, buildCfgs *configs.Index[build.Configuration]) func(packageName string) []string {
+func newAllowedFixedVersionsFunc(apkindexes []*repository.ApkIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {
 	return func(packageName string) []string {
 		allowedVersionSet := make(map[string]struct{})
 

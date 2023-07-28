@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/hashicorp/go-multierror"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -14,7 +14,7 @@ import (
 
 type ValidateOptions struct {
 	// BuildCfgs is the Index of build configurations on which to operate (not used yet).
-	BuildCfgs *configs.Index[build.Configuration]
+	BuildCfgs *configs.Index[config.Configuration]
 
 	// AdvisoryCfgs is the Index of advisories on which to operate.
 	AdvisoryCfgs *configs.Index[advisoryconfigs.Document]

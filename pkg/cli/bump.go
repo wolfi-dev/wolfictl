@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -123,7 +123,7 @@ modifying anything in the filesystem.
 }
 
 func bumpEpoch(opts bumpOptions, path string) error {
-	cfg, err := build.ParseConfiguration(path)
+	cfg, err := config.ParseConfiguration(path)
 	if err != nil {
 		return fmt.Errorf("unable to parse configuration at %q: %w", path, err)
 	}

@@ -3,7 +3,7 @@ package ls
 import (
 	"testing"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -98,7 +98,7 @@ func TestList(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			indices := make([]*configs.Index[build.Configuration], 0, len(tt.distroDirs))
+			indices := make([]*configs.Index[config.Configuration], 0, len(tt.distroDirs))
 			for _, dir := range tt.distroDirs {
 				distroFsys := rwos.DirFS(dir)
 				buildCfgs, err := buildconfigs.NewIndex(distroFsys)

@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"chainguard.dev/apko/pkg/build/types"
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/dominikbraun/graph"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
@@ -130,11 +130,11 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 	return nil
 }
 
-func makefileEntry(pkgName string, p *build.Package) string {
+func makefileEntry(pkgName string, p *config.Package) string {
 	return fmt.Sprintf("$(eval $(call build-package,%s,%s-%d))", pkgName, p.Version, p.Epoch)
 }
 
-func makeTarget(pkgName, arch string, p *build.Package) string {
+func makeTarget(pkgName, arch string, p *config.Package) string {
 	// note: using pkgName here because it may be a subpackage, not the main package declared within the config (i.e. `p.Name`)
 	return fmt.Sprintf("make packages/%s/%s-%s-r%d.apk", arch, pkgName, p.Version, p.Epoch)
 }

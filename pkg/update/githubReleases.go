@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 
 	"github.com/pkg/errors"
 
@@ -164,7 +164,7 @@ type QueryReleasesResponse struct {
 }
 
 func NewGitHubReleaseOptions(packageConfigs map[string]*melange.Packages, ghClient *http2.RLHTTPClient) GitHubReleaseOptions {
-	configsByHash := make(map[string]build.Configuration)
+	configsByHash := make(map[string]config.Configuration)
 
 	// maintain a map of melange build configs for easy lookup when we get a response back from GitHub
 	for _, pc := range packageConfigs {
@@ -192,7 +192,7 @@ type GitHubReleaseOptions struct {
 	PackageConfigs   map[string]*melange.Packages
 
 	// hash is used to create graphql queries, maintain a map of associated configs
-	ConfigsByHash map[string]build.Configuration
+	ConfigsByHash map[string]config.Configuration
 	ErrorMessages map[string]string
 }
 

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	apk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
@@ -27,7 +28,7 @@ const (
 // the Configuration.Package.Version field with the epoch added as `-r<epoch>`. In the case of a
 // subpackage or provided item, the Name and Version fields may be different.
 type Configuration struct {
-	*build.Configuration
+	*config.Configuration
 	Path    string
 	name    string
 	version string
@@ -84,11 +85,11 @@ func (p *Packages) addConfiguration(name string, configuration *Configuration) e
 
 func (p *Packages) addProvides(c *Configuration, provides []string) error {
 	for _, prov := range provides {
-		pctx := &build.PipelineContext{
-			Context: &build.Context{
+		pctx := &build.PipelineBuild{
+			Build: &build.Build{
 				Configuration: *c.Configuration,
 			},
-			Package: &c.Package,
+			Package: &build.PackageContext{Package: &c.Package},
 		}
 		template, err := build.MutateWith(pctx, nil)
 		if err != nil {
@@ -147,7 +148,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 
 		if d.Type().IsRegular() && strings.HasSuffix(path, ".yaml") && !strings.HasPrefix(d.Name(), ".") {
 			p := filepath.Join(dirPath, path)
-			buildc, err := build.ParseConfiguration(p)
+			buildc, err := config.ParseConfiguration(p)
 			if err != nil {
 				return err
 			}
@@ -193,19 +194,19 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 			}
 			// Resolve all `uses` used by the pipeline. This updates the set of
 			// .environment.contents.packages so the next block can include those as build deps.
-			pctx := &build.PipelineContext{
-				Context: &build.Context{
+			pctx := &build.PipelineBuild{
+				Build: &build.Build{
 					PipelineDir:   pipelineDir,
 					Configuration: *c.Configuration,
 				},
-				Package: &c.Package,
+				Package: &build.PackageContext{Package: &c.Package},
 			}
 			for i := range c.Pipeline {
-				s := c.Pipeline[i]
+				s := &build.PipelineContext{Pipeline: &c.Pipeline[i]}
 				if err := s.ApplyNeeds(pctx); err != nil {
 					return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
 				}
-				c.Environment.Contents.Packages = pctx.Context.Configuration.Environment.Contents.Packages
+				c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
 			}
 		}
 
@@ -263,12 +264,12 @@ func (p Packages) ConfigByKey(key string) *Configuration {
 
 // PkgInfo returns the build.Package struct for a given package name.
 // If no such package name is found in the packages, return nil package and nil error.
-func (p Packages) PkgInfo(pkgName string) (*build.Package, error) {
-	config := p.Config(pkgName, true)
-	if len(config) == 0 {
+func (p Packages) PkgInfo(pkgName string) (*config.Package, error) {
+	loadedCfg := p.Config(pkgName, true)
+	if len(loadedCfg) == 0 {
 		return nil, nil
 	}
-	c := config[0]
+	c := loadedCfg[0]
 	if pkgName != c.Package.Name {
 		return nil, nil
 	}
@@ -394,6 +395,6 @@ func packageNameFromProvides(prov string) (name, version string) {
 	return
 }
 
-func fullVersion(pkg *build.Package) string {
+func fullVersion(pkg *config.Package) string {
 	return pkg.Version + "-r" + strconv.FormatUint(pkg.Epoch, 10)
 }

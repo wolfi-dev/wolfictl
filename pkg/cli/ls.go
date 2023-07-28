@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
@@ -36,7 +36,7 @@ func Ls() *cobra.Command {
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
-			indices := make([]*configs.Index[build.Configuration], 0, len(p.distroRepoDirs))
+			indices := make([]*configs.Index[config.Configuration], 0, len(p.distroRepoDirs))
 			for _, dir := range p.distroRepoDirs {
 				distroFsys := rwos.DirFS(dir)
 				index, err := buildconfigs.NewIndex(distroFsys)
