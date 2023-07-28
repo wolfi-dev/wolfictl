@@ -3,21 +3,21 @@ package build
 import (
 	"io/fs"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 )
 
-func NewIndex(fsys rwfs.FS) (*configs.Index[build.Configuration], error) {
-	return configs.NewIndex[build.Configuration](fsys, newConfigurationDecodeFunc(fsys))
+func NewIndex(fsys rwfs.FS) (*configs.Index[config.Configuration], error) {
+	return configs.NewIndex[config.Configuration](fsys, newConfigurationDecodeFunc(fsys))
 }
 
-func NewIndexFromPaths(fsys rwfs.FS, paths ...string) (*configs.Index[build.Configuration], error) {
-	return configs.NewIndexFromPaths[build.Configuration](fsys, newConfigurationDecodeFunc(fsys), paths...)
+func NewIndexFromPaths(fsys rwfs.FS, paths ...string) (*configs.Index[config.Configuration], error) {
+	return configs.NewIndexFromPaths[config.Configuration](fsys, newConfigurationDecodeFunc(fsys), paths...)
 }
 
-func newConfigurationDecodeFunc(fsys fs.FS) func(string) (*build.Configuration, error) {
-	return func(path string) (*build.Configuration, error) {
-		return build.ParseConfiguration(path, build.WithFS(fsys))
+func newConfigurationDecodeFunc(fsys fs.FS) func(string) (*config.Configuration, error) {
+	return func(path string) (*config.Configuration, error) {
+		return config.ParseConfiguration(path, config.WithFS(fsys))
 	}
 }

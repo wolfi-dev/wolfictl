@@ -3,7 +3,7 @@ package build
 import (
 	"testing"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -13,7 +13,7 @@ import (
 func TestSelection(t *testing.T) {
 	fsys := rwos.DirFS("testdata/index-1")
 
-	index, err := configs.NewIndex[build.Configuration](fsys, newConfigurationDecodeFunc(fsys))
+	index, err := configs.NewIndex[config.Configuration](fsys, newConfigurationDecodeFunc(fsys))
 	require.NoError(t, err)
 
 	s := index.Select()

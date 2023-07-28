@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 
@@ -20,9 +20,9 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	packageConfigs := make(map[string]*melange.Packages)
 
 	packageConfigs["cosign"] = &melange.Packages{
-		Config: build.Configuration{
-			Package: build.Package{Name: "cosign", Version: "1.10.1"},
-			Update: build.Update{GitHubMonitor: &build.GitHubMonitor{
+		Config: config.Configuration{
+			Package: config.Package{Name: "cosign", Version: "1.10.1"},
+			Update: config.Update{GitHubMonitor: &config.GitHubMonitor{
 				Identifier:  "sigstore/cosign",
 				StripPrefix: "v",
 			}},
@@ -30,9 +30,9 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 	}
 
 	packageConfigs["jenkins"] = &melange.Packages{
-		Config: build.Configuration{
-			Package: build.Package{Name: "jenkins", Version: "2.370"},
-			Update: build.Update{GitHubMonitor: &build.GitHubMonitor{
+		Config: config.Configuration{
+			Package: config.Package{Name: "jenkins", Version: "2.370"},
+			Update: config.Update{GitHubMonitor: &config.GitHubMonitor{
 				Identifier:  "jenkinsci/jenkins",
 				StripPrefix: "jenkins-",
 			}},
@@ -43,7 +43,7 @@ func TestMonitorService_parseGitHubReleases(t *testing.T) {
 		packageName     string
 		initialVersion  string
 		expectedVersion string
-		githubMonitor   build.GitHubMonitor
+		githubMonitor   config.GitHubMonitor
 	}{
 		{
 			name:            "multiple_repos",
@@ -117,17 +117,17 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 		name            string
 		packageName     string
 		expectedVersion string
-		updateConfig    build.Configuration
+		updateConfig    config.Configuration
 	}{
 		{
 			name:            "parse_go_tags",
 			packageName:     "go-1.19",
 			expectedVersion: "1.19.7",
-			updateConfig: build.Configuration{
-				Package: build.Package{Name: "go-1.19", Version: "1.19.1"},
-				Update: build.Update{
+			updateConfig: config.Configuration{
+				Package: config.Package{Name: "go-1.19", Version: "1.19.1"},
+				Update: config.Update{
 					Enabled: true,
-					GitHubMonitor: &build.GitHubMonitor{
+					GitHubMonitor: &config.GitHubMonitor{
 						Identifier:  "golang/go",
 						TagFilter:   "go1.19",
 						StripPrefix: "go",
@@ -139,11 +139,11 @@ func TestMonitorService_parseGitHubTags(t *testing.T) {
 			name:            "parse_java_tags",
 			packageName:     "openjdk-11",
 			expectedVersion: "11.0.19+5",
-			updateConfig: build.Configuration{
-				Package: build.Package{Name: "openjdk-11", Version: "11.0.16"},
-				Update: build.Update{
+			updateConfig: config.Configuration{
+				Package: config.Package{Name: "openjdk-11", Version: "11.0.16"},
+				Update: config.Update{
 					Enabled: true,
-					GitHubMonitor: &build.GitHubMonitor{
+					GitHubMonitor: &config.GitHubMonitor{
 						Identifier:  "openjdk/jdk11u",
 						TagFilter:   "jdk-11",
 						StripPrefix: "jdk-",
@@ -259,47 +259,47 @@ func Test_getCommit(t *testing.T) {
 func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
 	tests := []struct {
 		name          string
-		melangeConfig build.Configuration
+		melangeConfig config.Configuration
 		version       string
 		want          string
 		wantErr       assert.ErrorAssertionFunc
 	}{
-		{name: "regex", melangeConfig: build.Configuration{
-			Update: build.Update{
+		{name: "regex", melangeConfig: config.Configuration{
+			Update: config.Update{
 				IgnoreRegexPatterns: []string{"dec*"},
-				GitHubMonitor:       &build.GitHubMonitor{},
+				GitHubMonitor:       &config.GitHubMonitor{},
 			},
 		}, version: "1.2.3dec11", want: "", wantErr: assert.NoError},
-		{name: "regex_error", melangeConfig: build.Configuration{
-			Update: build.Update{
+		{name: "regex_error", melangeConfig: config.Configuration{
+			Update: config.Update{
 				IgnoreRegexPatterns: []string{"ab(c"},
-				GitHubMonitor:       &build.GitHubMonitor{},
+				GitHubMonitor:       &config.GitHubMonitor{},
 			},
 		}, version: "1.2.3dec11", want: "", wantErr: assert.Error},
-		{name: "strip_prefix", melangeConfig: build.Configuration{
-			Update: build.Update{
-				GitHubMonitor: &build.GitHubMonitor{
+		{name: "strip_prefix", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
 					StripPrefix: "v",
 				},
 			},
 		}, version: "v1.2.3", want: "1.2.3", wantErr: assert.NoError},
-		{name: "strip_suffix", melangeConfig: build.Configuration{
-			Update: build.Update{
-				GitHubMonitor: &build.GitHubMonitor{
+		{name: "strip_suffix", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
 					StripSuffix: "blah",
 				},
 			},
 		}, version: "1.2.3blah", want: "1.2.3", wantErr: assert.NoError},
-		{name: "tag-filter", melangeConfig: build.Configuration{
-			Update: build.Update{
-				GitHubMonitor: &build.GitHubMonitor{
+		{name: "tag-filter", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
 					TagFilter: "v",
 				},
 			},
 		}, version: "1.2.3", want: "", wantErr: assert.NoError},
-		{name: "tag-filter", melangeConfig: build.Configuration{
-			Update: build.Update{
-				GitHubMonitor: &build.GitHubMonitor{
+		{name: "tag-filter", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
 					TagFilter: "v",
 				},
 			},
@@ -310,7 +310,7 @@ func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
 			o := GitHubReleaseOptions{}
 
 			packageConfigs := make(map[string]*melange.Packages)
-			configsByHash := make(map[string]build.Configuration)
+			configsByHash := make(map[string]config.Configuration)
 
 			packageConfigs["foo"] = &melange.Packages{Config: tt.melangeConfig}
 			packageConfigs["foo"].Hash = "bar"

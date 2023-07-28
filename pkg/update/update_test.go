@@ -13,7 +13,7 @@ import (
 
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
 
@@ -67,7 +67,7 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 	rsData, err := os.ReadFile(filepath.Join(dir, "melange", "cheese.yaml"))
 	assert.NoError(t, err)
 
-	rsMelangeConfig := &build.Configuration{}
+	rsMelangeConfig := &config.Configuration{}
 	err = yaml.Unmarshal(rsData, rsMelangeConfig)
 	assert.NoError(t, err)
 
@@ -171,12 +171,12 @@ func TestOptions_getPackagesToUpdate(t *testing.T) {
 	logger := log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix)
 	melangeConfigs := map[string]*melange.Packages{
 		"foo": {
-			Config: build.Configuration{
-				Package: build.Package{
+			Config: config.Configuration{
+				Package: config.Package{
 					Name:    "foo",
 					Version: "1.0.0",
 				},
-				Pipeline: []build.Pipeline{
+				Pipeline: []config.Pipeline{
 					{
 						Uses: "git-checkout",
 						With: map[string]string{

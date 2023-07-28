@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -87,7 +87,7 @@ func AdvisoryCreate() *cobra.Command {
 				// prompt for missing fields
 
 				allowedPackages := func() []string {
-					return lo.Map(buildCfgs.Select().Configurations(), func(cfg build.Configuration, _ int) string {
+					return lo.Map(buildCfgs.Select().Configurations(), func(cfg config.Configuration, _ int) string {
 						return cfg.Package.Name
 					})
 				}

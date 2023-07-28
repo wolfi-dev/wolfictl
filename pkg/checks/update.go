@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/fatih/color"
 
 	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -108,7 +110,7 @@ func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 		}
 
 		// now make sure update config is configured
-		c, err := build.ParseConfiguration(file)
+		c, err := config.ParseConfiguration(file)
 		if err != nil {
 			addCheckError(checkErrors, errors.Wrapf(err, "failed to parse %s", file))
 			continue
@@ -159,7 +161,7 @@ func handleErrorMessages(updateOpts *update.Options, checkErrors *lint.EvalRuleE
 // check if the current package.version is the latest according to the update config
 func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) {
 	for k, v := range latestVersions {
-		c, err := build.ParseConfiguration(filepath.Join(o.Dir, k+".yaml"))
+		c, err := config.ParseConfiguration(filepath.Join(o.Dir, k+".yaml"))
 		if err != nil {
 			addCheckError(checkErrors, err)
 			continue
@@ -193,7 +195,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 	for packageName, newVersion := range latestVersions {
 		srcConfigFile := filepath.Join(o.Dir, packageName+".yaml")
 
-		dryRunConfig, err := build.ParseConfiguration(srcConfigFile)
+		dryRunConfig, err := config.ParseConfiguration(srcConfigFile)
 		if err != nil {
 			return err
 		}
@@ -217,16 +219,16 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			continue
 		}
 
-		updated, err := build.ParseConfiguration(tmpConfigFile)
+		updated, err := config.ParseConfiguration(tmpConfigFile)
 		if err != nil {
 			return err
 		}
 
-		pctx := &build.PipelineContext{
-			Context: &build.Context{
+		pctx := &build.PipelineBuild{
+			Build: &build.Build{
 				Configuration: *updated,
 			},
-			Package: &updated.Package,
+			Package: &build.PackageContext{Package: &updated.Package},
 		}
 
 		// get a map of variable mutations we can substitute vars in URLs
@@ -247,13 +249,13 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 	return nil
 }
 
-func applyOverrides(options *CheckUpdateOptions, dryRunConfig *build.Configuration) {
+func applyOverrides(options *CheckUpdateOptions, dryRunConfig *config.Configuration) {
 	if options.OverrideVersion != "" {
 		dryRunConfig.Package.Version = options.OverrideVersion
 	}
 }
 
-func verifyPipelines(o CheckUpdateOptions, updated *build.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
+func verifyPipelines(o CheckUpdateOptions, updated *config.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
 	for i := range updated.Pipeline {
 		var err error
 		pipeline := updated.Pipeline[i]
@@ -270,21 +272,21 @@ func verifyPipelines(o CheckUpdateOptions, updated *build.Configuration, mutatio
 	}
 }
 
-func (o CheckUpdateOptions) verifyFetch(p *build.Pipeline, m map[string]string) error {
+func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string) error {
 	uriValue := p.With["uri"]
 	if uriValue == "" {
 		return fmt.Errorf("no uri to fetch")
 	}
 
 	// evaluate var substitutions
-	evaluatedURI, err := build.MutateStringFromMap(m, uriValue)
+	evaluatedURI, err := util.MutateStringFromMap(m, uriValue)
 	if err != nil {
 		return err
 	}
 
 	o.Logger.Printf("downloading sources from %s into a temporary directory, this may take a while", evaluatedURI)
 
-	filename, err := util.DownloadFile(evaluatedURI)
+	filename, err := util.DownloadFile(context.TODO(), evaluatedURI)
 	if err != nil {
 		return errors.Wrapf(err, "failed to verify fetch %s", evaluatedURI)
 	}
@@ -294,7 +296,7 @@ func (o CheckUpdateOptions) verifyFetch(p *build.Pipeline, m map[string]string) 
 	return os.RemoveAll(filename)
 }
 
-func (o CheckUpdateOptions) verifyGitCheckout(p *build.Pipeline, m map[string]string) error {
+func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]string) error {
 	repoValue := p.With["repository"]
 	if repoValue == "" {
 		return fmt.Errorf("no repository to checkout")
@@ -306,7 +308,7 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *build.Pipeline, m map[string]st
 	}
 
 	// evaluate var substitutions
-	evaluatedTag, err := build.MutateStringFromMap(m, tagValue)
+	evaluatedTag, err := util.MutateStringFromMap(m, tagValue)
 	if err != nil {
 		return err
 	}

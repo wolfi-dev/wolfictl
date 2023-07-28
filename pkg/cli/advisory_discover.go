@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -136,13 +136,13 @@ func (p *discoverParams) resolveNVDAPIKey() string {
 	return ""
 }
 
-func getSelectedOrDistroPackages(packageName string, buildCfgs *configs.Index[build.Configuration]) []string {
+func getSelectedOrDistroPackages(packageName string, buildCfgs *configs.Index[config.Configuration]) []string {
 	if packageName != "" {
 		return []string{packageName}
 	}
 
 	var pkgs []string
-	buildCfgs.Select().Each(func(e configs.Entry[build.Configuration]) {
+	buildCfgs.Select().Each(func(e configs.Entry[config.Configuration]) {
 		pkgs = append(pkgs, e.Configuration().Package.Name)
 	})
 

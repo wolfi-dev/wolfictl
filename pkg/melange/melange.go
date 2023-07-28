@@ -1,6 +1,7 @@
 package melange
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,12 +12,12 @@ import (
 	"chainguard.dev/melange/pkg/renovate"
 	"chainguard.dev/melange/pkg/renovate/bump"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/pkg/errors"
 )
 
 type Packages struct {
-	Config   build.Configuration
+	Config   config.Configuration
 	Filename string
 	Dir      string
 	NoLint   []string
@@ -50,7 +51,7 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages
 		for _, packageName := range packageNames {
 			filename := packageName + ".yaml"
 			fullPath := filepath.Join(dir, filename)
-			config, err := ReadMelangeConfig(fullPath)
+			loadedCfg, err := ReadMelangeConfig(fullPath)
 			if err != nil {
 				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
@@ -60,8 +61,8 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages
 				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
 
-			p[config.Package.Name] = &Packages{
-				Config:   config,
+			p[loadedCfg.Package.Name] = &Packages{
+				Config:   loadedCfg,
 				Filename: filename,
 				Dir:      dir,
 				NoLint:   nolint,
@@ -147,10 +148,10 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 }
 
 // ReadMelangeConfig reads a single melange config from the provided filename.
-func ReadMelangeConfig(filename string) (build.Configuration, error) {
-	packageConfig, err := build.ParseConfiguration(filename)
+func ReadMelangeConfig(filename string) (config.Configuration, error) {
+	packageConfig, err := config.ParseConfiguration(filename)
 	if err != nil {
-		return build.Configuration{}, err
+		return config.Configuration{}, err
 	}
 	return *packageConfig, err
 }
@@ -166,5 +167,5 @@ func Bump(configFile, version, expectedCommit string) error {
 		bump.WithExpectedCommit(expectedCommit),
 	)
 
-	return ctx.Renovate(bumpRenovator)
+	return ctx.Renovate(context.TODO(), bumpRenovator)
 }

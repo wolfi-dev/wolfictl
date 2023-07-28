@@ -3,7 +3,7 @@ package build
 import (
 	"testing"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/tester"
 )
@@ -25,7 +25,7 @@ func TestBuildConfigsIndex(t *testing.T) {
 
 	const modifiedPackageName = "foobar"
 
-	packageSectionUpdater := NewPackageSectionUpdater(func(cfg build.Configuration) (build.Package, error) {
+	packageSectionUpdater := NewPackageSectionUpdater(func(cfg config.Configuration) (config.Package, error) {
 		p := cfg.Package
 		p.Name = modifiedPackageName
 		return p, nil

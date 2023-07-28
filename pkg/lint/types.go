@@ -1,12 +1,12 @@
 package lint
 
 import (
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/hashicorp/go-multierror"
 )
 
 // Function is a function that lints a single configuration.
-type Function func(build.Configuration) error
+type Function func(config.Configuration) error
 
 // ConditionFunc is a function that checks if a rule should be executed.
 type ConditionFunc func() bool

@@ -2,6 +2,7 @@ package dag
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -83,7 +84,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	var arch = "x86_64"
 	localRepo := pkgs.Repository(arch)
 	localRepoSource := localRepo.Source()
-	localOnlyResolver := apk.NewPkgResolver([]apk.NamedIndex{localRepo})
+	localOnlyResolver := apk.NewPkgResolver(context.TODO(), []apk.NamedIndex{localRepo})
 	g.resolvers[localRepoSource] = localOnlyResolver
 
 	// the order of adding packages is quite important:
@@ -207,7 +208,7 @@ func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, index
 		}
 	}
 	if len(repos) > 0 {
-		loadedRepos, err := apk.GetRepositoryIndexes(repos, allKeys, arch)
+		loadedRepos, err := apk.GetRepositoryIndexes(context.TODO(), repos, allKeys, arch)
 		if err != nil {
 			return "", err
 		}
@@ -236,7 +237,7 @@ func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, index
 
 	// add packages from build-time, as they could be local only, or might have upstream
 	if _, ok := g.resolvers[resolverKey]; !ok {
-		g.resolvers[resolverKey] = apk.NewPkgResolver(lookupRepos)
+		g.resolvers[resolverKey] = apk.NewPkgResolver(context.TODO(), lookupRepos)
 	}
 	return resolverKey, nil
 }
@@ -842,5 +843,5 @@ func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
 		Packages:    packages,
 	}
 	idx := apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
-	return apk.NewPkgResolver([]apk.NamedIndex{idx})
+	return apk.NewPkgResolver(context.TODO(), []apk.NamedIndex{idx})
 }

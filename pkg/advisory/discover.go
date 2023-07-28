@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
@@ -24,7 +24,7 @@ type DiscoverOptions struct {
 	SelectedPackages []string
 
 	// BuildCfgs is the Index of build configurations on which to operate.
-	BuildCfgs *configs.Index[build.Configuration]
+	BuildCfgs *configs.Index[config.Configuration]
 
 	// AdvisoryCfgs is the Index of advisories on which to operate.
 	AdvisoryCfgs *configs.Index[advisoryconfigs.Document]

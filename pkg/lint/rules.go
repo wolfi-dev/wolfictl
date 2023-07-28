@@ -14,7 +14,7 @@ import (
 
 	"golang.org/x/exp/slices"
 
-	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 )
 
 var (
@@ -44,7 +44,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "no-makefile-entry-for-package",
 			Description: "every package should have a corresponding entry in Makefile",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				exist, err := l.checkMakefile(config.Package.Name)
 				if err != nil {
 					return err
@@ -62,7 +62,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "forbidden-repository-used",
 			Description: "do not specify a forbidden repository",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, repo := range config.Environment.Contents.Repositories {
 					if slices.Contains(forbiddenRepositories, repo) {
 						return fmt.Errorf("forbidden repository %s is used", repo)
@@ -75,7 +75,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "forbidden-keyring-used",
 			Description: "do not specify a forbidden keyring",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, keyring := range config.Environment.Contents.Keyring {
 					if slices.Contains(forbiddenKeyrings, keyring) {
 						return fmt.Errorf("forbidden keyring %s is used", keyring)
@@ -88,7 +88,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "valid-copyright-header",
 			Description: "every package should have a valid copyright header",
 			Severity:    SeverityInfo,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				if len(config.Package.Copyright) == 0 {
 					return fmt.Errorf("copyright header is missing")
 				}
@@ -104,7 +104,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "contains-epoch",
 			Description: "every package should have an epoch",
 			Severity:    SeverityError,
-			LintFunc: func(_ build.Configuration) error {
+			LintFunc: func(_ config.Configuration) error {
 				var node yaml.Node
 				fileInfo, err := os.Stat(l.options.Path)
 				if err != nil {
@@ -151,7 +151,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "valid-pipeline-fetch-uri",
 			Description: "every fetch pipeline should have a valid uri",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == "fetch" {
 						uri, ok := p.With["uri"]
@@ -170,7 +170,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "valid-pipeline-fetch-digest",
 			Description: "every fetch pipeline should have a valid digest",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == "fetch" {
 						hashGiven := false
@@ -198,7 +198,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "no-repeated-deps",
 			Description: "no repeated dependencies",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				seen := map[string]struct{}{}
 				for _, p := range config.Environment.Contents.Packages {
 					if _, ok := seen[p]; ok {
@@ -213,7 +213,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "bad-template-var",
 			Description: "bad template variable",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				badTemplateVars := []string{
 					"$pkgdir",
 					"$pkgver",
@@ -250,7 +250,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "bad-version",
 			Description: "version is malformed",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				version := config.Package.Version
 				if len(versionRegex.FindAllStringSubmatch(version, -1)) == 0 {
 					return fmt.Errorf("invalid version %s, could not parse", version)
@@ -262,7 +262,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "valid-pipeline-git-checkout-commit",
 			Description: "every git-checkout pipeline should have a valid expected-commit",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == "git-checkout" {
 						if commit, ok := p.With["expected-commit"]; ok {
@@ -281,7 +281,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "valid-pipeline-git-checkout-tag",
 			Description: "every git-checkout pipeline should have a tag",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == "git-checkout" {
 						if _, ok := p.With["tag"]; !ok {
@@ -296,7 +296,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "check-when-version-changes",
 			Description: "check comments to make sure they are updated when version changes",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				re := regexp.MustCompile(`# CHECK-WHEN-VERSION-CHANGES: (.+)`)
 				var checkString = func(s string) error {
 					match := re.FindStringSubmatch(s)
@@ -329,7 +329,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "tagged-repository-in-environment-repos",
 			Description: "remove tagged repositories like @local from the repositories block",
 			Severity:    SeverityError,
-			LintFunc: func(config build.Configuration) error {
+			LintFunc: func(config config.Configuration) error {
 				for _, repo := range config.Environment.Contents.Repositories {
 					if repo[0] == '@' {
 						return fmt.Errorf("repository %q is tagged", repo)
