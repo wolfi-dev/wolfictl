@@ -13,8 +13,8 @@ require (
 	chainguard.dev/melange v0.4.1-0.20230728095210-1a45952a5b7b
 	cloud.google.com/go/storage v1.31.0
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.63.2-0.20230710175255-d6bd01a4fa5b
-	github.com/anchore/syft v0.84.2-0.20230710173641-4ab9f393fc4f
+	github.com/anchore/grype v0.65.0
+	github.com/anchore/syft v0.86.1
 	github.com/chainguard-dev/go-apk v0.0.0-20230710230135-7fc46e8b3c4d
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230612072630-1e2fc91b1eb4
@@ -84,8 +84,10 @@ require (
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
 	github.com/anchore/sqlite v1.4.6-0.20220607210448-bcc6ee5c4963 // indirect
-	github.com/anchore/stereoscope v0.0.0-20230627195312-cd49355d934e // indirect
+	github.com/anchore/stereoscope v0.0.0-20230727211946-d1f3d766295e // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46 // indirect
+	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/avast/retry-go v3.0.0+incompatible // indirect
@@ -111,6 +113,7 @@ require (
 	github.com/dominodatalab/os-release v0.0.0-20190522011736-bcdb4a3e3c2f // indirect
 	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.10.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
@@ -146,7 +149,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-getter v1.7.1 // indirect
+	github.com/hashicorp/go-getter v1.7.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.4 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
@@ -207,6 +210,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
+	github.com/saferwall/pe v1.4.4 // indirect
 	github.com/sahilm/fuzzy v0.1.0 // indirect
 	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
@@ -216,11 +220,11 @@ require (
 	github.com/sigstore/rekor v1.2.2 // indirect
 	github.com/sigstore/sigstore v1.7.1 // indirect
 	github.com/skeema/knownhosts v1.2.0 // indirect
-	github.com/spdx/tools-golang v0.5.2 // indirect
+	github.com/spdx/tools-golang v0.5.3 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/sylabs/sif/v2 v2.8.1 // indirect
+	github.com/sylabs/sif/v2 v2.11.5 // indirect
 	github.com/sylabs/squashfs v0.6.1 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/theupdateframework/go-tuf v0.5.2 // indirect
@@ -228,7 +232,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/vbatts/go-mtree v0.5.3 // indirect
 	github.com/vbatts/tar-split v0.11.3 // indirect
-	github.com/vifraa/gopom v0.2.1 // indirect
+	github.com/vifraa/gopom v0.2.2 // indirect
 	github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651 // indirect
 	github.com/wagoodman/go-progress v0.0.0-20230301185719-21920a456ad5 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
@@ -237,6 +241,7 @@ require (
 	github.com/yookoala/realpath v1.0.0 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
 	go.mongodb.org/mongo-driver v1.12.0 // indirect
+	go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.16.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
@@ -272,7 +277,7 @@ require (
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.23.1 // indirect
+	modernc.org/sqlite v1.24.0 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.1.0 // indirect
 	mvdan.cc/sh/v3 v3.6.0 // indirect
