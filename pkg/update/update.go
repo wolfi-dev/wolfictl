@@ -737,6 +737,10 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 
 		// if versions match but the commit doesn't then we need to update the commit
 		// this can occur when an upstream project recreated a tag with a new commit
+		// if release monitor was used we won't have a commit sha
+		if v.Commit == "" {
+			return results, nil
+		}
 		if currentVersionSemver.Equal(latestVersionSemver) {
 			for i := range pc.Config.Pipeline {
 				pipeline := &pc.Config.Pipeline[i]

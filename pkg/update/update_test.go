@@ -215,6 +215,16 @@ func TestOptions_getPackagesToUpdate(t *testing.T) {
 			want: map[string]NewVersionResults{"foo": {Version: "2.0.0", BumpEpoch: false}}, // new version
 		},
 		{
+			// simulates an update from Release Monitor
+			name: "no update and no commit sha",
+			args: args{
+				latestVersions: map[string]NewVersionResults{
+					"foo": {Version: "1.0.0", Commit: "", BumpEpoch: false}, // same version and no commit
+				},
+			},
+			want: map[string]NewVersionResults{},
+		},
+		{
 			// if versions match but the commit doesn't then we need to update the commit
 			// this can occur when an upstream project recreated a tag with a new commit
 			name: "update as we have incorrect expected commit",
