@@ -39,4 +39,4 @@ jobs:
         with:
           repository: 'wolfi-dev/os'
           path: 'wolfi-os'
-      - run: wolfictl text -d wolfi-os --type=name --pipeline-dir=wolfi-os/pipelines/
+      - run: ./wolfictl text -d wolfi-os --type=name --pipeline-dir=wolfi-os/pipelines/
