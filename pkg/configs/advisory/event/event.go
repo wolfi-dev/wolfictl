@@ -6,9 +6,9 @@ import (
 
 const (
 	TypeDetection                  = "detection"
-	TypeFalsePositiveDetermination = "false-positive-determination"
 	TypeTruePositiveDetermination  = "true-positive-determination"
 	TypeFixed                      = "fixed"
+	TypeFalsePositiveDetermination = "false-positive-determination"
 )
 
 // Event is a timestamped record of new information regarding the investigation

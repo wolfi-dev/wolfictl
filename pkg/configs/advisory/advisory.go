@@ -44,6 +44,8 @@ func DecodeDocument(r io.Reader) (*Document, error) {
 }
 
 type Document struct {
+	SchemaVersion string `yaml:"schema-version"`
+
 	Package Package `yaml:"package"`
 
 	Advisories Advisories `yaml:"advisories,omitempty"`
@@ -56,7 +58,13 @@ type Package struct {
 type Advisories map[string]Advisory
 
 type Advisory struct {
-	ID     string        `yaml:"-"`
+	ID string `yaml:"-"`
+
+	// Aliases lists any known IDs of this vulnerability in databases.
+	Aliases []string `yaml:"aliases,omitempty"`
+
+	// Events is a list of timestamped events that occurred during the investigation and
+	// resolution of the vulnerability.
 	Events []event.Event `yaml:"events"`
 }
 

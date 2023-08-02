@@ -18,6 +18,10 @@ type Detection struct {
 	// are vulnerable.
 	PackageVersions []string `yaml:"package-versions"`
 
+	// Architectures lists the architectures of the package that the Detector claims
+	// are vulnerable.
+	Architectures []string `yaml:"architectures"`
+
 	// Vulnerability describes the vulnerability to which the package was matched.
 	Vulnerability Vulnerability `yaml:"vulnerability"`
 }
@@ -44,10 +48,6 @@ type MatchTarget struct {
 }
 
 type Vulnerability struct {
-	// Aliases lists any known IDs of this vulnerability in additional databases.
-	// Each list item value should match the format of the ID field.
-	Aliases []string `yaml:"aliases,omitempty"`
-
 	// ID is the unique identifier for the vulnerability record in an upstream
 	// vulnerability database. Example values are "CVE-2023-11111",
 	// "GHSA-vp9c-fpxx-744v", etc.
