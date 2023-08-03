@@ -4,28 +4,34 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const pkginfoPath = ".PKGINFO"
 
 type pkgInfo struct {
-	PkgName  string
-	PkgVer   string
-	Arch     string
-	Size     int64
-	Origin   string
-	PkgDesc  string
-	URL      string
-	Commit   string
-	License  string
-	Depends  []string
-	Provides []string
-	DataHash string
+	PkgName   string
+	PkgVer    string
+	Arch      string
+	Size      int64
+	Origin    string
+	PkgDesc   string
+	URL       string
+	Commit    string
+	License   string
+	Depends   []string
+	Provides  []string
+	BuildTime time.Time
+	DataHash  string
 }
 
 func parsePkgInfo(r io.Reader) (*pkgInfo, error) {
+	// TODO: Use an upstream function to handle APK metadata parsing, such as
+	//  https://gitlab.alpinelinux.org/alpine/go/-/blob/master/repository/package.go#L49.
+
 	info := &pkgInfo{}
 
 	scanner := bufio.NewScanner(r)
@@ -74,10 +80,15 @@ func parsePkgInfo(r io.Reader) (*pkgInfo, error) {
 			info.Depends = append(info.Depends, value)
 		case "provides":
 			info.Provides = append(info.Provides, value)
+		case "builddate":
+			intValue, err := strconv.ParseInt(value, 10, 64)
+			if err != nil {
+				// We shouldn't raise an error because this isn't fatal. But we should warn the user.
+				log.Printf("failed to parse build date %q: %s", value, err.Error())
+			}
+			info.BuildTime = time.Unix(intValue, 0).UTC()
 		case "datahash":
 			info.DataHash = value
-		default:
-			fmt.Printf("Unknown key: %s\n", key)
 		}
 	}
 
