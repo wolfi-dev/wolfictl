@@ -2,12 +2,6 @@ module github.com/wolfi-dev/wolfictl
 
 go 1.20
 
-replace gitlab.alpinelinux.org/alpine/go => gitlab.alpinelinux.org/jdolitsky/go v0.5.2-0.20230428222852-3db8d023b49b
-
-// See https://github.com/kubernetes/kube-openapi/issues/404
-// And https://github.com/kubernetes/client-go/issues/1084#issuecomment-1584750974
-replace k8s.io/client-go => k8s.io/client-go v0.28.0-alpha.2
-
 require (
 	chainguard.dev/apko v0.9.1-0.20230711074042-37b82f3a5bd8
 	chainguard.dev/melange v0.4.1-0.20230728095210-1a45952a5b7b
@@ -56,7 +50,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.28.0-alpha.4
 	k8s.io/apimachinery v0.28.0-alpha.4
-	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
+	k8s.io/client-go v0.28.0-alpha.4
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 	sigs.k8s.io/release-utils v0.7.5-0.20230601212346-3866fe05b204
 )
