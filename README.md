@@ -14,3 +14,9 @@ See the [wolfictl command reference](https://github.com/wolfi-dev/wolfictl/blob/
 
 [Check so_name docs](./docs/check_so_name.md) - CI check for detecting ABI breaking changes in package version updates
 [Update docs](./docs/update.md) - for detecting new upstream wolfi package versions and creating a pull request to update Wolfi
+
+## Releases
+
+This repo is configured to automatically create weekly tagged patch releases, mainly so that it can be more easily packaged in Wolfi itself.
+
+Releases happen Monday at 00:00 UTC, and can be manually run as necessary.
