@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 )
 
@@ -19,6 +21,11 @@ const (
 	outputFormatOutline = "outline"
 	outputFormatJSON    = "json"
 )
+
+// const (
+// 	advisoryFilterResolved = "resolved"
+// 	advisoryFilterAll      = "all"
+// )
 
 func Scan() *cobra.Command {
 	p := &scanParams{}
@@ -44,19 +51,49 @@ func Scan() *cobra.Command {
 				if err != nil {
 					return fmt.Errorf("failed to open input file: %w", err)
 				}
+				defer inputFile.Close()
 
 				fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(inputFilePath))
 
-				var findings []*scan.Finding
+				// Get SBOM of the APK
+
+				var apkSBOM io.Reader
 				if p.sbomInput {
-					findings, err = scan.APKSBOM(inputFile, p.localDBFilePath)
+					apkSBOM = inputFile
 				} else {
-					findings, err = scan.APK(inputFile, p.localDBFilePath)
+					// TODO: consider using a cache for generated SBOMs to save time for the user
+
+					s, err := sbom.Generate(inputFile, "wolfi") // TODO: make this configurable
+					if err != nil {
+						return fmt.Errorf("failed to generate SBOM: %w", err)
+					}
+
+					reader, err := sbom.ToSyftJSON(s)
+					if err != nil {
+						return fmt.Errorf("failed to convert SBOM to Syft JSON: %w", err)
+					}
+					apkSBOM = reader
 				}
+
+				// Do vulnerability scan
+
+				findings, err := scan.APKSBOM(apkSBOM, p.localDBFilePath)
 				if err != nil {
-					return fmt.Errorf("failed to scan: %w", err)
+					return fmt.Errorf("failed to scan APK: %w", err)
 				}
-				inputFile.Close()
+
+				// Apply advisory filter to scan results if requested
+
+				// switch p.advisoryFilter {
+				// case advisoryFilterResolved:
+				// 	findings = filterResolved(findings)
+				// case advisoryFilterAll:
+				// 	// Do nothing
+				// default:
+				// 	// Leave all results untouched!
+				// }
+
+				// Prepare final output
 
 				results = append(results, Result{
 					Target: Target{
@@ -101,6 +138,7 @@ type scanParams struct {
 	localDBFilePath     string
 	outputFormat        string
 	sbomInput           bool
+	advisoryFilter      string
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -108,6 +146,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join([]string{outputFormatOutline, outputFormatJSON}, "|"), outputFormatOutline))
 	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
+	cmd.Flags().StringVarP(&p.advisoryFilter, "advisory-filter", "A", "", fmt.Sprintf("exclude vulnerability matches that are addressed by the specified set of advisories (%s)", strings.Join([]string{advisoryFilterResolved, advisoryFilterAll}, "|")))
 }
 
 type Result struct {
