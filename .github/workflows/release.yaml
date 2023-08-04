@@ -1,0 +1,21 @@
+name: release
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # weekly on Monday at 00:00
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - name: Bump patch version and push tag
+        uses: mathieudutour/github-tag-action@fcfbdceb3093f6d85a3b194740f8c6cec632f4e2 # v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
