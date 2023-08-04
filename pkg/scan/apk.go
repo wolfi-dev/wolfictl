@@ -17,7 +17,7 @@ import (
 	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/file"
-	"github.com/anchore/syft/syft/formats/syftjson"
+	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
@@ -35,19 +35,36 @@ var grypeDBConfig = db.Config{
 	MaxAllowedBuiltAge:  24 * time.Hour,
 }
 
-// APK scans an APK file for vulnerabilities.
-func APK(f io.Reader, localDBFilePath string) ([]*Finding, error) {
-	s, err := sbom.Generate(f, "wolfi") // TODO: make this configurable
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate SBOM: %w", err)
+type Result struct {
+	TargetAPK TargetAPK
+	Findings  []*Finding
+}
+
+type TargetAPK struct {
+	Name    string
+	Version string
+}
+
+func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
+	// There should be exactly one APK package in the SBOM, and it should be the APK
+	// we intended to scan.
+
+	pkgs := s.Artifacts.Packages.Sorted(pkg.ApkPkg)
+	if len(pkgs) != 1 {
+		return TargetAPK{}, fmt.Errorf("expected exactly one APK package, found %d", len(pkgs))
 	}
 
-	return scan(s, localDBFilePath)
+	p := pkgs[0]
+
+	return TargetAPK{
+		Name:    p.Name,
+		Version: p.Version,
+	}, nil
 }
 
 // APKSBOM scans an SBOM of an APK for vulnerabilities.
-func APKSBOM(r io.Reader, localDBFilePath string) ([]*Finding, error) {
-	s, err := syftjson.Format().Decode(r)
+func APKSBOM(r io.Reader, localDBFilePath string) (*Result, error) {
+	s, err := sbom.FromSyftJSON(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)
 	}
@@ -55,7 +72,12 @@ func APKSBOM(r io.Reader, localDBFilePath string) ([]*Finding, error) {
 	return scan(s, localDBFilePath)
 }
 
-func scan(s *sbomSyft.SBOM, localDBFilePath string) ([]*Finding, error) {
+func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
+	apk, err := newTargetAPK(s)
+	if err != nil {
+		return nil, err
+	}
+
 	updateDB := true
 	if localDBFilePath != "" {
 		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFilePath)
@@ -104,7 +126,12 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) ([]*Finding, error) {
 		findings = append(findings, finding)
 	}
 
-	return findings, nil
+	result := &Result{
+		TargetAPK: apk,
+		Findings:  findings,
+	}
+
+	return result, nil
 }
 
 // Finding represents a vulnerability finding for a single package.

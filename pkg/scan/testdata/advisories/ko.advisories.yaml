@@ -1,0 +1,17 @@
+package:
+  name: ko
+
+advisories:
+  CVE-1999-11111:
+    - timestamp: 2023-05-04T10:34:34.169879-04:00
+      status: under-investigation
+
+  CVE-2000-22222:
+    - timestamp: 2023-05-04T10:34:34.169879-04:00
+      status: not_affected
+      justification: component_not_present
+
+  GHSA-2h5h-59f5-c5x9:
+    - timestamp: 2023-05-04T10:34:34.169879-04:00
+      status: fixed
+      fixed-version: 0.13.0-r3

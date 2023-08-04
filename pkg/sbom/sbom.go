@@ -145,3 +145,13 @@ func ToSyftJSON(s *sbom.SBOM) (io.Reader, error) {
 
 	return buf, nil
 }
+
+// FromSyftJSON returns an SBOM from a reader of the Syft JSON format.
+func FromSyftJSON(r io.Reader) (*sbom.SBOM, error) {
+	s, err := syftjson.Format().Decode(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode Syft JSON: %w", err)
+	}
+
+	return s, nil
+}
