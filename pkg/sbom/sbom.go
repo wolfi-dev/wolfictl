@@ -1,6 +1,8 @@
 package sbom
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -8,6 +10,7 @@ import (
 
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/file"
+	"github.com/anchore/syft/syft/formats/syftjson"
 	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/anchore/syft/syft/pkg/cataloger"
@@ -126,4 +129,19 @@ func newAPKPackage(r io.Reader) (*pkg.Package, error) {
 	p.SetID()
 
 	return &p, nil
+}
+
+// ToSyftJSON returns the SBOM as a reader of the Syft JSON format.
+func ToSyftJSON(s *sbom.SBOM) (io.Reader, error) {
+	buf := new(bytes.Buffer)
+
+	model := syftjson.ToFormatModel(*s)
+	enc := json.NewEncoder(buf)
+	enc.SetEscapeHTML(false)
+	err := enc.Encode(model)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode SBOM: %w", err)
+	}
+
+	return buf, nil
 }
