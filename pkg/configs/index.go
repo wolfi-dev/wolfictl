@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"path"
 	"strings"
 
+	yamutil "github.com/chainguard-dev/yam/pkg/util"
 	"github.com/chainguard-dev/yam/pkg/yam"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
@@ -88,8 +90,8 @@ func NewIndexFromPaths[T Configuration](fsys rwfs.FS, cfgDecodeFunc func(string)
 	index := newIndex(cfgDecodeFunc)
 	index.fsys = fsys
 
-	for _, path := range paths {
-		err := index.processAndAdd(path)
+	for _, filepath := range paths {
+		err := index.processAndAdd(filepath)
 		if err != nil {
 			return nil, err
 		}
@@ -129,8 +131,8 @@ func (i *Index[T]) Select() Selection[T] {
 
 // Create creates a new configuration file at the given path, with the given
 // cfg. The new configuration is automatically added to the Index.
-func (i *Index[T]) Create(path string, cfg T) error {
-	file, err := i.fsys.Create(path)
+func (i *Index[T]) Create(filepath string, cfg T) error {
+	file, err := i.fsys.Create(filepath)
 	if err != nil {
 		return err
 	}
@@ -141,12 +143,12 @@ func (i *Index[T]) Create(path string, cfg T) error {
 	}
 	_ = file.Close()
 
-	err = i.format(path) // i.e. using yam
+	err = i.format(filepath) // i.e. using yam
 	if err != nil {
 		return err
 	}
 
-	err = i.processAndAdd(path)
+	err = i.processAndAdd(filepath)
 	if err != nil {
 		return err
 	}
@@ -154,20 +156,29 @@ func (i *Index[T]) Create(path string, cfg T) error {
 	return nil
 }
 
-func (i *Index[T]) format(path string) error {
-	fileForFormatting, err := i.fsys.OpenAsWritable(path)
+func (i *Index[T]) format(filepath string) error {
+	fileForFormatting, err := i.fsys.OpenAsWritable(filepath)
 	if err != nil {
 		return err
 	}
-	formatted.NewEncoder(fileForFormatting).AutomaticConfig()
-	encOpts, err := formatted.ReadConfig()
+	defer fileForFormatting.Close()
 
-	// If we found a format config, use it.
-	if err == nil {
-		err := yam.Format(yamFsysAdapter{i.fsys}, []string{path}, yam.FormatOptions{EncodeOptions: *encOpts})
-		if err != nil {
-			return err
-		}
+	yamConfig, err := i.fsys.Open(path.Join(path.Dir(filepath), yamutil.ConfigFileName))
+	if err != nil {
+		// This formatting was "best effort", so just return without formatting in this case.
+		return err
+	}
+	defer yamConfig.Close()
+
+	encodeOptions, err := formatted.ReadConfigFrom(yamConfig)
+	if err != nil {
+		// This formatting was "best effort", so just return without formatting in this case.
+		return err
+	}
+
+	err = yam.Format(yamFsysAdapter{i.fsys}, []string{filepath}, yam.FormatOptions{EncodeOptions: *encodeOptions})
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -192,51 +203,57 @@ func (i *Index[T]) update(entry Entry[T], entryUpdater EntryUpdater[T]) error {
 // processAndAdd decodes the configuration file at the given path into both a
 // YAML AST and a configuration (type T), and it then adds a new entry to the
 // Index.
-func (i *Index[T]) processAndAdd(path string) error {
-	entry, err := i.process(path)
+func (i *Index[T]) processAndAdd(filepath string) error {
+	entry, err := i.process(filepath)
 	if err != nil {
 		return err
 	}
 	err = i.add(entry)
 	if err != nil {
-		return fmt.Errorf("unable to add entry to index for %q: %w", path, err)
+		return fmt.Errorf("unable to add entry to index for %q: %w", filepath, err)
 	}
 
 	return nil
 }
 
-func (i *Index[T]) processAndUpdate(path string, entryIndex int) error {
-	entry, err := i.process(path)
+func (i *Index[T]) processAndUpdate(filepath string, entryIndex int) error {
+	entry, err := i.process(filepath)
 	if err != nil {
 		return err
 	}
+
+	err = i.format(filepath)
+	if err != nil {
+		return err
+	}
+
 	i.updateAtIndex(entry, entryIndex)
 
 	return nil
 }
 
-func (i *Index[T]) process(path string) (*entry[T], error) {
+func (i *Index[T]) process(filepath string) (*entry[T], error) {
 	// TODO: for the follow operations, consider noting the error and moving on, rather than stopping the indexing.
 
-	f, err := i.fsys.Open(path)
+	f, err := i.fsys.Open(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("unable to open configuration at %q: %w", path, err)
+		return nil, fmt.Errorf("unable to open configuration at %q: %w", filepath, err)
 	}
 
 	yamlRoot := &yaml.Node{}
 	err = yaml.NewDecoder(f).Decode(yamlRoot)
 	if err != nil {
-		return nil, fmt.Errorf("unable to decode YAML at %q: %w", path, err)
+		return nil, fmt.Errorf("unable to decode YAML at %q: %w", filepath, err)
 	}
 
-	cfg, err := i.cfgDecodeFunc(path)
+	cfg, err := i.cfgDecodeFunc(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse configuration at %q: %w", path, err)
+		return nil, fmt.Errorf("unable to parse configuration at %q: %w", filepath, err)
 	}
 
 	return &entry[T]{
 		index:    i,
-		path:     path,
+		path:     filepath,
 		yamlRoot: yamlRoot,
 		cfg:      *cfg,
 	}, nil
