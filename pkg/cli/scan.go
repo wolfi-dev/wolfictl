@@ -2,7 +2,9 @@ package cli
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"sort"
@@ -12,12 +14,12 @@ import (
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
+	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
-)
-
-const (
-	outputFormatOutline = "outline"
-	outputFormatJSON    = "json"
+	"golang.org/x/exp/slices"
 )
 
 func Scan() *cobra.Command {
@@ -32,41 +34,68 @@ func Scan() *cobra.Command {
 				p.outputFormat = outputFormatOutline
 			}
 
-			if p.outputFormat != outputFormatJSON && p.outputFormat != outputFormatOutline {
-				return fmt.Errorf("invalid output format %q, must be one of [%s]", p.outputFormat, strings.Join([]string{outputFormatOutline, outputFormatJSON}, ", "))
+			// Validate inputs
+
+			var advisoryCfgs *configs.Index[advisoryconfigs.Document]
+
+			if !slices.Contains(validOutputFormats, p.outputFormat) {
+				return fmt.Errorf(
+					"invalid output format %q, must be one of [%s]",
+					p.outputFormat,
+					strings.Join(validOutputFormats, ", "),
+				)
 			}
 
-			var results []Result
+			if p.advisoryFilterSet != "" {
+				if !slices.Contains(scan.ValidAdvisoriesSets, p.advisoryFilterSet) {
+					return fmt.Errorf(
+						"invalid advisory filter set %q, must be one of [%s]",
+						p.advisoryFilterSet,
+						strings.Join(scan.ValidAdvisoriesSets, ", "),
+					)
+				}
 
-			for _, arg := range args {
-				inputFilePath := arg
-				inputFile, err := os.Open(inputFilePath)
+				if p.advisoriesRepoDir == "" {
+					return errors.New("advisory-based filtering requested, but no advisories repo dir was provided")
+				}
+
+				advisoriesFsys := rwos.DirFS(p.advisoriesRepoDir)
+				var err error
+				advisoryCfgs, err = advisoryconfigs.NewIndex(advisoriesFsys)
 				if err != nil {
-					return fmt.Errorf("failed to open input file: %w", err)
+					return fmt.Errorf("failed to load advisory documents: %w", err)
 				}
+			}
 
-				fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(inputFilePath))
+			// Do a scan for each arg
 
-				var findings []*scan.Finding
-				if p.sbomInput {
-					findings, err = scan.APKSBOM(inputFile, p.localDBFilePath)
-				} else {
-					findings, err = scan.APK(inputFile, p.localDBFilePath)
-				}
+			var scans []inputScan
+
+			for _, input := range args {
+				scannedInput, err := scanInput(input, p)
 				if err != nil {
-					return fmt.Errorf("failed to scan: %w", err)
+					return err
 				}
-				inputFile.Close()
 
-				results = append(results, Result{
-					Target: Target{
-						File:     path.Base(inputFilePath),
-						FullPath: inputFilePath,
-					},
-					Findings: findings,
-				})
+				// If requested, filter scan results using advisories
 
+				if set := p.advisoryFilterSet; set != "" {
+					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryCfgs, set)
+					if err != nil {
+						return fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", input, err)
+					}
+
+					scannedInput.Result.Findings = findings
+				}
+
+				scans = append(scans, *scannedInput)
+
+				// Handle CLI options
+
+				findings := scannedInput.Result.Findings
 				if p.outputFormat == outputFormatOutline {
+					// Print output immediately
+
 					if len(findings) == 0 {
 						fmt.Println("✅ No vulnerabilities found")
 					} else {
@@ -74,17 +103,17 @@ func Scan() *cobra.Command {
 						fmt.Println(tree.render())
 					}
 				}
-
 				if p.requireZeroFindings && len(findings) > 0 {
+					// Exit with error immediately if any vulnerabilities are found
 					return fmt.Errorf("more than 0 vulnerabilities found")
 				}
 			}
 
 			if p.outputFormat == outputFormatJSON {
 				enc := json.NewEncoder(os.Stdout)
-				err := enc.Encode(results)
+				err := enc.Encode(scans)
 				if err != nil {
-					return fmt.Errorf("failed to marshal results to JSON: %w", err)
+					return fmt.Errorf("failed to marshal scans to JSON: %w", err)
 				}
 			}
 
@@ -96,28 +125,78 @@ func Scan() *cobra.Command {
 	return cmd
 }
 
+func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
+	inputFile, err := os.Open(inputFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open input file: %w", err)
+	}
+	defer inputFile.Close()
+
+	fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(inputFilePath))
+
+	// Get SBOM of the APK
+
+	var apkSBOM io.Reader
+	if p.sbomInput {
+		apkSBOM = inputFile
+	} else {
+		s, err := sbom.Generate(inputFile, p.distro)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
+		}
+
+		reader, err := sbom.ToSyftJSON(s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert SBOM to Syft JSON: %w", err)
+		}
+		apkSBOM = reader
+	}
+
+	// Do vulnerability scan!
+
+	result, err := scan.APKSBOM(apkSBOM, p.localDBFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFilePath, err)
+	}
+
+	is := &inputScan{
+		InputFile: inputFilePath,
+		Result:    result,
+	}
+
+	return is, nil
+}
+
 type scanParams struct {
 	requireZeroFindings bool
 	localDBFilePath     string
 	outputFormat        string
 	sbomInput           bool
+	distro              string
+	advisoryFilterSet   string
+	advisoriesRepoDir   string
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
-	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join([]string{outputFormatOutline, outputFormatJSON}, "|"), outputFormatOutline))
+	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
 	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
+	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
+	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
+	cmd.Flags().StringVarP(&p.advisoriesRepoDir, "advisories-repo-dir", "a", "", "local directory for advisory data")
 }
 
-type Result struct {
-	Target   Target
-	Findings []*scan.Finding
-}
+const (
+	outputFormatOutline = "outline"
+	outputFormatJSON    = "json"
+)
 
-type Target struct {
-	File     string
-	FullPath string
+var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
+
+type inputScan struct {
+	InputFile string
+	Result    *scan.Result
 }
 
 type findingsTree struct {

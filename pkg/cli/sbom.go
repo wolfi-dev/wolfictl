@@ -1,15 +1,14 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"sort"
 	"strings"
 
 	"github.com/anchore/syft/syft/file"
-	"github.com/anchore/syft/syft/formats/syftjson"
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -54,12 +53,14 @@ func SBOM() *cobra.Command {
 				fmt.Println(tree.render())
 
 			case sbomFormatSyftJSON:
-				model := syftjson.ToFormatModel(*s)
-				enc := json.NewEncoder(os.Stdout)
-				enc.SetEscapeHTML(false)
-				err = enc.Encode(model)
+				jsonReader, err := sbom.ToSyftJSON(s)
 				if err != nil {
 					return fmt.Errorf("failed to encode SBOM: %w", err)
+				}
+
+				_, err = io.Copy(os.Stdout, jsonReader)
+				if err != nil {
+					return fmt.Errorf("failed to write SBOM: %w", err)
 				}
 			}
 
