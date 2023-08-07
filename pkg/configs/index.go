@@ -166,14 +166,14 @@ func (i *Index[T]) format(filepath string) error {
 	yamConfig, err := i.fsys.Open(path.Join(path.Dir(filepath), yamutil.ConfigFileName))
 	if err != nil {
 		// This formatting was "best effort", so just return without formatting in this case.
-		return err
+		return nil
 	}
 	defer yamConfig.Close()
 
 	encodeOptions, err := formatted.ReadConfigFrom(yamConfig)
 	if err != nil {
 		// This formatting was "best effort", so just return without formatting in this case.
-		return err
+		return nil
 	}
 
 	err = yam.Format(yamFsysAdapter{i.fsys}, []string{filepath}, yam.FormatOptions{EncodeOptions: *encodeOptions})
