@@ -5,6 +5,19 @@
 
 `wolfictl` is a command line tool for working with Wolfi
 
+## Installation
+
+You can install  `wolfictl` straight from its source code. To do this, clone the git repository and then run `go install`:
+
+```bash
+# Clone the repo
+
+git clone git@github.com:wolfi-dev/wolfictl.git wolfictl && cd $_
+
+# Install the `wolfictl` command
+
+go install
+```
 
 ## Commands
 
