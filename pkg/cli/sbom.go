@@ -45,9 +45,9 @@ func SBOM() *cobra.Command {
 
 			var s *sbomSyft.SBOM
 			if p.disableSBOMCache {
-				s, err = sbom.Generate(apkFilePath, apkFile, "wolfi") // TODO: make distro configurable
+				s, err = sbom.Generate(apkFilePath, apkFile, p.distro)
 			} else {
-				s, err = sbom.CachedGenerate(apkFilePath, apkFile, "wolfi") // TODO: make distro configurable
+				s, err = sbom.CachedGenerate(apkFilePath, apkFile, p.distro)
 			}
 			if err != nil {
 				return fmt.Errorf("failed to generate SBOM: %w", err)
@@ -80,11 +80,13 @@ func SBOM() *cobra.Command {
 
 type sbomParams struct {
 	outputFormat     string
+	distro           string
 	disableSBOMCache bool
 }
 
 func (p *sbomParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", sbomFormatOutline, "output format (outline, syft-json)")
+	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to report in SBOM")
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 }
 
