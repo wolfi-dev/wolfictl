@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
@@ -140,7 +141,12 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 	if p.sbomInput {
 		apkSBOM = inputFile
 	} else {
-		s, err := sbom.Generate(inputFile, p.distro)
+		var s *sbomSyft.SBOM
+		if p.disableSBOMCache {
+			s, err = sbom.Generate(inputFilePath, inputFile, p.distro)
+		} else {
+			s, err = sbom.CachedGenerate(inputFilePath, inputFile, p.distro)
+		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
 		}
@@ -175,6 +181,7 @@ type scanParams struct {
 	distro              string
 	advisoryFilterSet   string
 	advisoriesRepoDir   string
+	disableSBOMCache    bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -185,6 +192,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
 	cmd.Flags().StringVarP(&p.advisoriesRepoDir, "advisories-repo-dir", "a", "", "local directory for advisory data")
+	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 }
 
 const (
