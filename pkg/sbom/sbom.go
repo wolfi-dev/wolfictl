@@ -86,13 +86,26 @@ func Generate(f io.Reader, distroID string) (*sbom.SBOM, error) {
 				ID: distroID,
 			},
 		},
-		Source: src.Describe(),
+		Source: getDeterministicSourceDescription(src),
 		Descriptor: sbom.Descriptor{
 			Name: "wolfictl",
 		},
 	}
 
 	return &s, nil
+}
+
+func getDeterministicSourceDescription(src *source.DirectorySource) source.Description {
+	description := src.Describe()
+
+	description.ID = "(redacted for determinism)"
+	description.Name = "(tmpdir: redacted for determinism)"
+	metadata := source.DirectorySourceMetadata{
+		Path: "(tmpdir: redacted for determinism)",
+	}
+	description.Metadata = metadata
+
+	return description
 }
 
 func newAPKPackage(r io.Reader) (*pkg.Package, error) {
