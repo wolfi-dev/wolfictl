@@ -36,7 +36,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
-	github.com/openvex/go-vex v0.2.0
+	github.com/openvex/go-vex v0.2.1
 	github.com/package-url/packageurl-go v0.1.2-0.20230717211154-3587d8c2829e
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.38.1
