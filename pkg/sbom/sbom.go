@@ -35,7 +35,7 @@ var syftCatalogersEnabled = []string{
 }
 
 // Generate creates an SBOM for the given APK file.
-func Generate(f io.Reader, distroID string) (*sbom.SBOM, error) {
+func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
 	// Create a temp directory to house the unpacked APK file
 	tempDir, err := os.MkdirTemp("", "wolfictl-sbom-*")
 	if err != nil {
@@ -86,13 +86,26 @@ func Generate(f io.Reader, distroID string) (*sbom.SBOM, error) {
 				ID: distroID,
 			},
 		},
-		Source: src.Describe(),
+		Source: getDeterministicSourceDescription(src, inputFilePath),
 		Descriptor: sbom.Descriptor{
 			Name: "wolfictl",
 		},
 	}
 
 	return &s, nil
+}
+
+func getDeterministicSourceDescription(src *source.DirectorySource, inputFilePath string) source.Description {
+	description := src.Describe()
+
+	description.ID = "(redacted for determinism)"
+	description.Name = inputFilePath
+	metadata := source.DirectorySourceMetadata{
+		Path: inputFilePath,
+	}
+	description.Metadata = metadata
+
+	return description
 }
 
 func newAPKPackage(r io.Reader) (*pkg.Package, error) {

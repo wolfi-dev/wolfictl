@@ -10,6 +10,7 @@ import (
 
 	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/pkg"
+	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
@@ -42,7 +43,12 @@ func SBOM() *cobra.Command {
 
 			fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(apkFilePath))
 
-			s, err := sbom.Generate(apkFile, "wolfi") // TODO: make distro configurable
+			var s *sbomSyft.SBOM
+			if p.disableSBOMCache {
+				s, err = sbom.Generate(apkFilePath, apkFile, p.distro)
+			} else {
+				s, err = sbom.CachedGenerate(apkFilePath, apkFile, p.distro)
+			}
 			if err != nil {
 				return fmt.Errorf("failed to generate SBOM: %w", err)
 			}
@@ -73,11 +79,15 @@ func SBOM() *cobra.Command {
 }
 
 type sbomParams struct {
-	outputFormat string
+	outputFormat     string
+	distro           string
+	disableSBOMCache bool
 }
 
 func (p *sbomParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", sbomFormatOutline, "output format (outline, syft-json)")
+	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to report in SBOM")
+	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 }
 
 type packageTree struct {
