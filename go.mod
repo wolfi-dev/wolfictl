@@ -37,6 +37,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/openvex/go-vex v0.2.0
+	github.com/package-url/packageurl-go v0.1.2-0.20230717211154-3587d8c2829e
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.38.1
 	github.com/savioxavier/termlink v1.3.0
@@ -201,7 +202,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc4 // indirect
-	github.com/package-url/packageurl-go v0.1.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect

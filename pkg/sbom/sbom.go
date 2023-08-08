@@ -9,13 +9,16 @@ import (
 	"path"
 
 	"github.com/anchore/syft/syft"
+	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/formats/syftjson"
 	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/anchore/syft/syft/pkg/cataloger"
+	cpegen "github.com/anchore/syft/syft/pkg/cataloger/common/cpe"
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
+	"github.com/package-url/packageurl-go"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
@@ -55,7 +58,7 @@ func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, e
 		return nil, fmt.Errorf("failed to read %s: %w", pkginfoPath, err)
 	}
 	defer pkginfo.Close()
-	apkPackage, err := newAPKPackage(pkginfo)
+	apkPackage, err := newAPKPackage(pkginfo, distroID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create APK package: %w", err)
 	}
@@ -108,7 +111,7 @@ func getDeterministicSourceDescription(src *source.DirectorySource, inputFilePat
 	return description
 }
 
-func newAPKPackage(r io.Reader) (*pkg.Package, error) {
+func newAPKPackage(r io.Reader, distroID string) (*pkg.Package, error) {
 	pkginfo, err := parsePkgInfo(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse APK metadata: %w", err)
@@ -139,9 +142,32 @@ func newAPKPackage(r io.Reader) (*pkg.Package, error) {
 		Metadata:     metadata,
 	}
 
+	p.PURL = generatePURL(*pkginfo, distroID)
+	p.CPEs = generateCPEs(p)
+
 	p.SetID()
 
 	return &p, nil
+}
+
+func generatePURL(info pkgInfo, distroID string) string {
+	purlQualifiers := []packageurl.Qualifier{
+		{Key: pkg.PURLQualifierArch, Value: info.Arch},
+	}
+	if info.Origin != "" {
+		purlQualifiers = append(purlQualifiers, packageurl.Qualifier{Key: "origin", Value: info.Origin})
+	}
+
+	return packageurl.NewPackageURL(packageurl.TypeApk, distroID, info.PkgName, info.PkgVer, purlQualifiers, "").String()
+}
+
+func generateCPEs(p pkg.Package) []cpe.CPE {
+	dictionaryCPE, ok := cpegen.DictionaryFind(p)
+	if ok {
+		return []cpe.CPE{dictionaryCPE}
+	}
+
+	return cpegen.Generate(p)
 }
 
 // ToSyftJSON returns the SBOM as a reader of the Syft JSON format.
