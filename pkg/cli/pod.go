@@ -479,23 +479,9 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 
 				// Start streaming logs.
 				var errg errgroup.Group
-				stream := func(container string) func() error {
-					return func() error {
-						rc, err := k.clientset.CoreV1().Pods(p.Namespace).GetLogs(p.Name, &corev1.PodLogOptions{
-							Container: container,
-							Follow:    true,
-						}).Stream(ctx)
-						if err != nil {
-							return err
-						}
-						defer rc.Close()
-						_, err = io.Copy(os.Stdout, rc)
-						return fmt.Errorf("streaming logs: %w", err)
-					}
-				}
-				errg.Go(stream("build"))
+				errg.Go(k.streamLogs(ctx, p, "build"))
 				if k.bucket != "" {
-					errg.Go(stream("gcloud-cp"))
+					errg.Go(k.streamLogs(ctx, p, "gcloud-cp"))
 				}
 				if err := errg.Wait(); err != nil {
 					return err
@@ -546,6 +532,25 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 				return fmt.Errorf("unknown phase: %s", p.Status.Phase)
 			}
 		}
+	}
+}
+
+func (k *k8s) streamLogs(ctx context.Context, p *corev1.Pod, container string) func() error {
+	return func() error {
+		rc, err := k.clientset.CoreV1().Pods(p.Namespace).GetLogs(p.Name, &corev1.PodLogOptions{
+			Container: container,
+			Follow:    true,
+		}).Stream(ctx)
+		if err != nil {
+			return err
+		}
+		defer rc.Close()
+		_, err = io.Copy(os.Stdout, rc)
+		if err != nil {
+			return fmt.Errorf("streaming logs: %w", err)
+		}
+
+		return nil
 	}
 }
 
