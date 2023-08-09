@@ -54,8 +54,7 @@ func cmdPod() *cobra.Command {
 		Use:   "pod",
 		Short: "Generate a kubernetes pod to run the build",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Don't use cmd.Context() since we want to capture signals to kill the pod.
-			ctx := context.Background()
+			ctx := cmd.Context()
 
 			arch := types.ParseArchitecture(arch).ToAPK()
 
@@ -108,7 +107,7 @@ func cmdPod() *cobra.Command {
 			}
 			dig, err := kontext.Bundle(ctx, dir, t)
 			if err != nil {
-				return err
+				return fmt.Errorf("bundling kontext: %w", err)
 			}
 			log.Println("bundled source context to", dig)
 
@@ -338,15 +337,18 @@ gcloud --quiet storage cp \
 			if create {
 				k8s, err := newK8s(pendingTimeout, bucket)
 				if err != nil {
-					return err
+					return fmt.Errorf("creating k8s client: %w", err)
 				}
 				p, err = k8s.create(ctx, p)
 				if err != nil {
-					return err
+					return fmt.Errorf("creating pod: %w", err)
 				}
 				log.Println("created pod:", p.Name)
 				if watch {
-					return k8s.watch(ctx, p)
+					// Don't use cmd.Context() since we want to capture signals to kill the pod.
+					if err := k8s.watch(context.Background(), p); err != nil {
+						return fmt.Errorf("watching pod: %w", err)
+					}
 				}
 				return nil
 			}
@@ -421,9 +423,10 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 			// TODO: Prompt to delete the pod.
 			if err := k.clientset.CoreV1().Pods(p.Namespace).Delete(context.Background(), p.Name, metav1.DeleteOptions{}); err != nil {
 				log.Println("failed to delete pod:", err)
+			} else {
+				// TODO: Wait for pod to be deleted.
+				log.Println("deleted pod: ", p.Name)
 			}
-			// TODO: Wait for pod to be deleted.
-			log.Println("deleted pod: ", p.Name)
 			os.Exit(1)
 		case <-ctx.Done():
 			return
@@ -434,7 +437,7 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 		FieldSelector: "metadata.name=" + p.Name,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("creating watch: %w", err)
 	}
 
 	for {
@@ -487,7 +490,7 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 						}
 						defer rc.Close()
 						_, err = io.Copy(os.Stdout, rc)
-						return err
+						return fmt.Errorf("streaming logs: %w", err)
 					}
 				}
 				errg.Go(stream("build"))
@@ -506,7 +509,7 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 				if err := wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, true, func(ctx context.Context) (bool, error) {
 					p, err = k.clientset.CoreV1().Pods(p.Namespace).Get(ctx, p.Name, metav1.GetOptions{})
 					if err != nil {
-						return true, err
+						return true, fmt.Errorf("getting pod: %w", err)
 					}
 					log.Println("=== STATUS")
 					if err := yaml.NewEncoder(os.Stderr).Encode(p.Status); err != nil {
