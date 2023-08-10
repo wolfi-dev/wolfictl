@@ -218,7 +218,7 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 			return errors.Wrapf(err, "failed to parse new version %s", existingVersionStr)
 		}
 
-		// let's now compare the major segments as only major version increments indicate a break ABI compatability
+		// let's now compare the major segments as only major version increments indicate a break ABI compatibility
 		newVersionMajor := version.Segments()[0]
 		existingVersionMajor := existingVersion.Segments()[0]
 		if newVersionMajor > existingVersionMajor {
