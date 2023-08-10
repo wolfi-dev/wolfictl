@@ -25,6 +25,6 @@ aarch64|gnutls-c++|3.7.8-r0
 
 The check will inspect the new main apk package and related subpackages, fetching the latest current versions from the apk repository and compare the `*.so` files.
 
-If `*.so` files are found then we check that the versions remain the same to ensure ABI compatability.
+If `*.so` files are found then we check that the versions remain the same to ensure ABI compatibility.
 
 e.g. if version `0.0.1` contains a file `foo.so.1` and a proposed `0.0.2` contains `foo.so.2` then this command will fail.

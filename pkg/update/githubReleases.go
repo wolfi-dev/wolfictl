@@ -378,7 +378,7 @@ func (o GitHubReleaseOptions) get(requestQuery string) ([]byte, error) {
 	}
 
 	if len(e.Errors) > 0 {
-		return b, fmt.Errorf("error reponse from github %s", e.Errors[0].Message)
+		return b, fmt.Errorf("error response from github %s", e.Errors[0].Message)
 	}
 	return b, nil
 }

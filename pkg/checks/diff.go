@@ -33,7 +33,7 @@ func NewDiff() *DiffOptions {
 	return o
 }
 
-// Diff compare a newly built apk with the latest in an APK repository, writing teh differences to a file diff.log
+// Diff compare a newly built apk with the latest in an APK repository, writing the differences to a file diff.log
 func (o *DiffOptions) Diff() error {
 	// create two temp folders we can use to explode the apks and compare their contents
 	dirExistingApk, err := os.MkdirTemp("", "wolfictl-apk-*")
