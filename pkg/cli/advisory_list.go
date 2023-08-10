@@ -3,12 +3,9 @@ package cli
 import (
 	"fmt"
 	"os"
-	"sort"
 
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -37,12 +34,12 @@ func AdvisoryList() *cobra.Command {
 			}
 
 			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoriesFsys)
+			advisoryCfgs, err := v2.NewIndex(advisoriesFsys)
 			if err != nil {
 				return err
 			}
 
-			var cfgs []advisoryconfigs.Document
+			var cfgs []v2.Document
 			if pkg := p.packageName; pkg != "" {
 				cfgs = advisoryCfgs.Select().WhereName(pkg).Configurations()
 			} else {
@@ -52,40 +49,36 @@ func AdvisoryList() *cobra.Command {
 			var output string
 
 			for _, cfg := range cfgs {
-				for vuln, entries := range cfg.Advisories {
-					if len(entries) == 0 {
+				for _, adv := range cfg.Advisories {
+					if len(adv.Events) == 0 {
 						// nothing to show
 						continue
 					}
 
-					if p.vuln != "" && p.vuln != vuln {
+					if p.vuln != "" && p.vuln != adv.ID { // TODO: check aliases, too
 						// user specified a particular different vulnerability
 						continue
 					}
 
-					latest := advisory.Latest(entries)
-
-					if p.unresolved && latest.Status != vex.StatusAffected && latest.Status != vex.StatusUnderInvestigation {
+					if p.unresolved && adv.Resolved() {
 						// user only wants to see unresolved advisories
 						continue
 					}
 
 					if p.history {
-						sort.SliceStable(entries, func(i, j int) bool {
-							return entries[i].Timestamp.Before(entries[j].Timestamp)
-						})
-
-						for _, item := range entries {
-							timestamp := item.Timestamp
-							statusDescription := renderListItem(item)
-							output += fmt.Sprintf("%s: %s: %s @ %s\n", cfg.Package.Name, vuln, statusDescription, timestamp)
+						// user wants to see the full history
+						sorted := adv.SortedEvents()
+						for _, event := range sorted {
+							timestamp := event.Timestamp
+							statusDescription := renderListItem(event)
+							output += fmt.Sprintf("%s: %s: %s @ %s\n", cfg.Package.Name, adv.ID, statusDescription, timestamp)
 						}
 
 						continue
 					}
 
-					statusDescription := renderListItem(*latest)
-					output += fmt.Sprintf("%s: %s: %s\n", cfg.Package.Name, vuln, statusDescription)
+					statusDescription := renderListItem(adv.Latest())
+					output += fmt.Sprintf("%s: %s: %s\n", cfg.Package.Name, adv.ID, statusDescription)
 				}
 			}
 
@@ -118,27 +111,50 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	addVulnFlag(&p.vuln, cmd)
 
 	cmd.Flags().BoolVar(&p.history, "history", false, "show full history for advisories")
-	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, fmt.Sprintf("only show advisories whose latest status is %s or %s", vex.StatusAffected, vex.StatusUnderInvestigation))
+	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, "only show advisories considered to be unresolved")
 }
 
-func renderListItem(entry advisoryconfigs.Entry) string {
-	switch entry.Status {
-	case vex.StatusUnderInvestigation:
-		return string(entry.Status)
+func renderListItem(event v2.Event) string {
+	switch t := event.Type; t {
+	case v2.EventTypeAnalysisNotPlanned, v2.EventTypeFixNotPlanned:
+		return t
 
-	case vex.StatusAffected:
+	case v2.EventTypeDetection:
 		expanded := ""
-		if as := entry.ActionStatement; as != "" {
-			expanded = fmt.Sprintf(": %s", as)
+		if data, ok := event.Data.(v2.Detection); ok && data.Type != "" {
+			switch data.Type {
+			case v2.DetectionTypeManual:
+				expanded = "manual"
+
+			case v2.DetectionTypeNVDAPI:
+				if data, ok := data.Data.(v2.DetectionNVDAPI); ok {
+					expanded = fmt.Sprintf("nvdapi: %s", data.CPEFound)
+				}
+			}
 		}
-		return fmt.Sprintf("%s%s", entry.Status, expanded)
+		return fmt.Sprintf("%s (%s)", t, expanded)
 
-	case vex.StatusFixed:
-		return fmt.Sprintf("%s (%s)", entry.Status, entry.FixedVersion)
+	case v2.EventTypeTruePositiveDetermination:
+		expanded := ""
+		if data, ok := event.Data.(v2.TruePositiveDetermination); ok && data.Note != "" {
+			expanded = data.Note
+		}
+		return fmt.Sprintf("%s (%s)", t, expanded)
 
-	case vex.StatusNotAffected:
-		return fmt.Sprintf("%s (%s)", entry.Status, entry.Justification)
+	case v2.EventTypeFixed:
+		expanded := ""
+		if data, ok := event.Data.(v2.Fixed); ok && data.FixedVersion != "" {
+			expanded = data.FixedVersion
+		}
+		return fmt.Sprintf("%s (%s)", t, expanded)
+
+	case v2.EventTypeFalsePositiveDetermination:
+		expanded := ""
+		if data, ok := event.Data.(v2.FalsePositiveDetermination); ok && data.Type != "" {
+			expanded = data.Type
+		}
+		return fmt.Sprintf("%s (%s)", t, expanded)
 	}
 
-	return "INVALID STATUS"
+	return "INVALID EVENT TYPE"
 }

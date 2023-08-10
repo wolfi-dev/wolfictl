@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -14,7 +14,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 	cases := []struct {
 		name                string
 		result              *Result
-		advisoryIndexGetter func(t *testing.T) *configs.Index[advisoryconfigs.Document]
+		advisoryIndexGetter func(t *testing.T) *configs.Index[v2.Document]
 		advisoryFilterSet   string
 		expectedFindings    []*Finding
 		errAssertion        assert.ErrorAssertionFunc
@@ -30,7 +30,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 		{
 			name:                "nil advisory index",
 			result:              &Result{},
-			advisoryIndexGetter: func(_ *testing.T) *configs.Index[advisoryconfigs.Document] { return nil },
+			advisoryIndexGetter: func(_ *testing.T) *configs.Index[v2.Document] { return nil },
 			advisoryFilterSet:   "",
 			expectedFindings:    nil,
 			errAssertion:        assert.Error,
@@ -237,11 +237,11 @@ func TestFilterWithAdvisories(t *testing.T) {
 	}
 }
 
-func getAdvisoriesIndex(t *testing.T) *configs.Index[advisoryconfigs.Document] {
+func getAdvisoriesIndex(t *testing.T) *configs.Index[v2.Document] {
 	t.Helper()
 
 	advFS := rwos.DirFS(path.Join("testdata", "advisories"))
-	index, err := advisoryconfigs.NewIndex(advFS)
+	index, err := v2.NewIndex(advFS)
 	if err != nil {
 		t.Fatal(err)
 	}

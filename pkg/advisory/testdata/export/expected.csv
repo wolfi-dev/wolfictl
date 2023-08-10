@@ -1,23 +1,23 @@
-package,advisory,status,fixed_version,justification,impact,action
-brotli,CVE-2020-8927,fixed,1.0.9-r0,,,
-ko,GHSA-232p-vwff-86mp,fixed,0.13.0-r3,,,
-ko,GHSA-2h5h-59f5-c5x9,fixed,0.13.0-r3,,,
-ko,GHSA-33pg-m6jh-5237,fixed,0.13.0-r3,,,
-ko,GHSA-6wrf-mxfj-pf5p,fixed,0.13.0-r3,,,
-ko,GHSA-hw7c-3rfg-p46j,fixed,0.13.0-r3,,,
-openssl,CVE-2022-3358,fixed,3.0.7-r0,,,
-openssl,CVE-2022-3602,fixed,3.0.7-r0,,,
-openssl,CVE-2022-3786,fixed,3.0.7-r0,,,
-openssl,CVE-2022-3996,fixed,3.0.7-r1,,,
-openssl,CVE-2022-4203,fixed,3.0.8-r0,,,
-openssl,CVE-2022-4304,fixed,3.0.8-r0,,,
-openssl,CVE-2022-4450,fixed,3.0.8-r0,,,
-openssl,CVE-2023-0215,fixed,3.0.8-r0,,,
-openssl,CVE-2023-0216,fixed,3.0.8-r0,,,
-openssl,CVE-2023-0217,fixed,3.0.8-r0,,,
-openssl,CVE-2023-0286,fixed,3.0.8-r0,,,
-openssl,CVE-2023-0401,fixed,3.0.8-r0,,,
-openssl,CVE-2023-0464,fixed,3.1.0-r1,,,
-openssl,CVE-2023-0465,fixed,3.1.0-r2,,,
-openssl,CVE-2023-0466,not_affected,,vulnerable_code_not_present,This was a case of documentation not matching function behavior. The upstream maintainers decided to update the documentation rather than change the behavior. See https://www.openssl.org/news/secadv/20230328.txt,
-openssl,CVE-2023-1255,fixed,3.1.0-r5,,,
+package,advisory_id,event_timestamp,event_type,false_positive_type,note,fixed_version
+brotli,CVE-2020-8927,2022-09-15 02:40:18 +0000 UTC,fixed,,,1.0.9-r0
+ko,GHSA-33pg-m6jh-5237,2023-05-04 10:34:34.117098 -0400 EDT,fixed,,,0.13.0-r3
+ko,GHSA-232p-vwff-86mp,2023-05-04 10:34:34.07704 -0400 EDT,fixed,,,0.13.0-r3
+ko,GHSA-hw7c-3rfg-p46j,2023-05-04 10:34:34.199688 -0400 EDT,fixed,,,0.13.0-r3
+ko,GHSA-2h5h-59f5-c5x9,2023-05-04 10:34:34.169879 -0400 EDT,fixed,,,0.13.0-r3
+ko,GHSA-6wrf-mxfj-pf5p,2023-05-04 10:34:34.141361 -0400 EDT,fixed,,,0.13.0-r3
+openssl,CVE-2023-0464,2023-03-23 02:31:00.664255 -0700 -0700,fixed,,,3.1.0-r1
+openssl,CVE-2023-1255,2023-04-20 09:29:24.558074 -0700 -0700,fixed,,,3.1.0-r5
+openssl,CVE-2022-3358,2022-11-01 16:49:56 +0000 UTC,fixed,,,3.0.7-r0
+openssl,CVE-2022-3602,2022-11-01 16:49:56 +0000 UTC,fixed,,,3.0.7-r0
+openssl,CVE-2023-0216,2023-02-07 11:50:29.806824 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2022-4203,2023-02-07 11:50:00.020081 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2023-0215,2023-02-07 11:50:08.401769 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2023-0286,2023-02-07 11:49:30.049397 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2023-0401,2023-02-07 11:50:53.191261 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2023-0465,2023-03-28 07:54:27.093515 -0700 -0700,fixed,,,3.1.0-r2
+openssl,CVE-2023-0466,2023-04-08 12:32:54.797413 -0400 EDT,false-positive-determination,vulnerability-record-analysis-contested,This was a case of documentation not matching function behavior. The upstream maintainers decided to update the documentation rather than change the behavior. See https://www.openssl.org/news/secadv/20230328.txt,
+openssl,CVE-2022-3786,2022-11-01 16:49:56 +0000 UTC,fixed,,,3.0.7-r0
+openssl,CVE-2022-4304,2023-02-07 11:49:50.211721 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2023-0217,2023-02-07 11:50:39.207629 -0500 EST,fixed,,,3.0.8-r0
+openssl,CVE-2022-3996,2022-12-22 17:26:45 +0000 UTC,fixed,,,3.0.7-r1
+openssl,CVE-2022-4450,2023-02-07 11:50:17.798241 -0500 EST,fixed,,,3.0.8-r0

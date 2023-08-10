@@ -1,8 +1,12 @@
+schema-version: "2"
+
 package:
   name: brotli
 
 advisories:
-  CVE-2020-8927:
-    - timestamp: 2022-09-15T02:40:18+00:00
-      status: fixed
-      fixed-version: 1.0.9-r0
+  - id: CVE-2020-8927
+    events:
+      - timestamp: 2022-09-15T02:40:18Z
+        type: fixed
+        data:
+          fixed-version: 1.0.9-r0

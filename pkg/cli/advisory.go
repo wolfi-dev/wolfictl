@@ -4,23 +4,24 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"chainguard.dev/melange/pkg/config"
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
-//nolint:gosec // These are not credential values.
+
 const (
-	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR"
+	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR" //nolint:gosec
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"
 )
 
@@ -39,6 +40,7 @@ func Advisory() *cobra.Command {
 	cmd.AddCommand(AdvisoryDB())
 	cmd.AddCommand(AdvisoryValidate())
 	cmd.AddCommand(AdvisoryExport())
+	cmd.AddCommand(AdvisoryMigrate())
 
 	return cmd
 }
@@ -81,19 +83,19 @@ func resolveTimestamp(ts string) (time.Time, error) {
 }
 
 type advisoryRequestParams struct {
-	packageName, vuln, status, action, impact, justification, timestamp, fixedVersion string
+	packageName, vuln, eventType, truePositiveNote, falsePositiveNote, falsePositiveType, timestamp, fixedVersion string
 }
 
 func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
 	addPackageFlag(&p.packageName, cmd)
 	addVulnFlag(&p.vuln, cmd)
 
-	cmd.Flags().StringVarP(&p.status, "status", "s", "", "status for VEX statement")
-	cmd.Flags().StringVar(&p.action, "action", "", "action statement for VEX statement (used only for affected status)")
-	cmd.Flags().StringVar(&p.impact, "impact", "", "impact statement for VEX statement (used only for not_affected status)")
-	cmd.Flags().StringVar(&p.justification, "justification", "", "justification for VEX statement (used only for not_affected status)")
-	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp for VEX statement")
-	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for fixed status)")
+	cmd.Flags().StringVarP(&p.eventType, "type", "t", "", fmt.Sprintf("type of event [%s]", strings.Join(v2.EventTypes, ", ")))
+	cmd.Flags().StringVar(&p.truePositiveNote, "tp-note", "", "prose explanation of the true positive (used only for true positives)")
+	cmd.Flags().StringVar(&p.falsePositiveNote, "fp-note", "", "prose explanation of the false positive (used only for false positives)")
+	cmd.Flags().StringVar(&p.falsePositiveType, "fp-type", "", fmt.Sprintf("type of false positive [%s]", strings.Join(v2.FPTypes, ", ")))
+	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp of the event (RFC3339 format)")
+	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for 'fixed' event type)")
 }
 
 func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
@@ -102,16 +104,35 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 		return advisory.Request{}, fmt.Errorf("unable to process timestamp: %w", err)
 	}
 
-	return advisory.Request{
-		Package:       p.packageName,
-		Vulnerability: p.vuln,
-		Status:        vex.Status(p.status),
-		Action:        p.action,
-		Impact:        p.impact,
-		Justification: vex.Justification(p.justification),
-		Timestamp:     timestamp,
-		FixedVersion:  p.fixedVersion,
-	}, nil
+	req := advisory.Request{
+		Package:         p.packageName,
+		VulnerabilityID: p.vuln,
+		Event: v2.Event{
+			Timestamp: timestamp,
+			Type:      p.eventType,
+			Data:      nil,
+		},
+	}
+
+	switch req.Event.Type {
+	case v2.EventTypeFixed:
+		req.Event.Data = v2.Fixed{
+			FixedVersion: p.fixedVersion,
+		}
+
+	case v2.EventTypeFalsePositiveDetermination:
+		req.Event.Data = v2.FalsePositiveDetermination{
+			Type: p.falsePositiveType,
+			Note: p.falsePositiveNote,
+		}
+
+	case v2.EventTypeTruePositiveDetermination:
+		req.Event.Data = v2.TruePositiveDetermination{
+			Note: p.truePositiveNote,
+		}
+	}
+
+	return req, nil
 }
 
 func addPackageFlag(val *string, cmd *cobra.Command) {

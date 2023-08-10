@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -34,10 +34,10 @@ func AdvisoryDB() *cobra.Command {
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
-			indices := make([]*configs.Index[advisoryconfigs.Document], 0, len(p.advisoriesRepoDirs))
+			indices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
 			for _, dir := range p.advisoriesRepoDirs {
 				advisoryFsys := rwos.DirFS(dir)
-				index, err := advisoryconfigs.NewIndex(advisoryFsys)
+				index, err := v2.NewIndex(advisoryFsys)
 				if err != nil {
 					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
 				}
@@ -46,7 +46,7 @@ func AdvisoryDB() *cobra.Command {
 			}
 
 			opts := advisory.BuildDatabaseOptions{
-				AdvisoryCfgIndices: indices,
+				AdvisoryDocIndices: indices,
 				URLPrefix:          p.urlPrefix,
 				Archs:              p.archs,
 				Repo:               p.repo,

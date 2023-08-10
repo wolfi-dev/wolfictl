@@ -171,7 +171,7 @@ func parseMatch(m cpeMatch) (vuln.Match, error) {
 		Package: vuln.Package{
 			Name: path.Base(m.Package),
 		},
-		CPE: vuln.CPE{
+		CPEFound: vuln.CPE{
 			URI:          m.CPEUri,
 			VersionRange: vr,
 		},

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/prompt"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
@@ -54,7 +54,7 @@ func AdvisoryUpdate() *cobra.Command {
 			}
 
 			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoryFsys)
+			advisoryCfgs, err := v2.NewIndex(advisoryFsys)
 			if err != nil {
 				return err
 			}
@@ -87,7 +87,7 @@ func AdvisoryUpdate() *cobra.Command {
 				// prompt for missing fields
 
 				allowedPackages := func() []string {
-					return lo.Map(advisoryCfgs.Select().Configurations(), func(cfg advisoryconfigs.Document, _ int) string {
+					return lo.Map(advisoryCfgs.Select().Configurations(), func(cfg v2.Document, _ int) string {
 						return cfg.Package.Name
 					})
 				}
@@ -95,7 +95,9 @@ func AdvisoryUpdate() *cobra.Command {
 				allowedVulnerabilities := func(packageName string) []string {
 					var vulnerabilities []string
 					for _, cfg := range advisoryCfgs.Select().WhereName(packageName).Configurations() {
-						vulns := lo.Keys(cfg.Advisories)
+						vulns := lo.Map(cfg.Advisories, func(adv v2.Advisory, _ int) string {
+							return adv.ID
+						})
 						sort.Strings(vulns)
 						vulnerabilities = append(vulnerabilities, vulns...)
 					}

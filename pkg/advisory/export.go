@@ -3,18 +3,16 @@ package advisory
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"io"
-	"log"
-	"sort"
 
-	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"gopkg.in/yaml.v3"
 )
 
 type ExportOptions struct {
-	AdvisoryCfgIndices []*configs.Index[v1.Document]
+	AdvisoryDocIndices []*configs.Index[v2.Document]
 }
 
 // ExportCSV returns a reader of advisory data encoded as CSV.
@@ -24,39 +22,52 @@ func ExportCSV(opts ExportOptions) (io.Reader, error) {
 	defer csvWriter.Flush()
 
 	// Write the header row
-	header := []string{"package", "advisory", "status", "fixed_version", "justification", "impact", "action"}
+	header := []string{"package", "advisory_id", "event_timestamp", "event_type", "false_positive_type", "note", "fixed_version"}
 	err := csvWriter.Write(header)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, index := range opts.AdvisoryCfgIndices {
-		pkgs := index.Select().Configurations()
+	for _, index := range opts.AdvisoryDocIndices {
+		documents := index.Select().Configurations()
 
-		for _, pkg := range pkgs {
-			ids := lo.Keys(pkg.Advisories)
-			sort.Strings(ids)
+		for _, doc := range documents {
+			for _, adv := range doc.Advisories {
+				for _, event := range adv.Events {
+					var falsePositiveType, note, fixedVersion string
 
-			for _, advisoryID := range ids {
-				entries := pkg.Advisories[advisoryID]
-				latest := Latest(entries)
+					switch event.Type {
+					case v2.EventTypeTruePositiveDetermination:
+						note = event.Data.(v2.TruePositiveDetermination).Note
 
-				if latest == nil {
-					continue
-				}
+					case v2.EventTypeFalsePositiveDetermination:
+						fp, _ := event.Data.(v2.FalsePositiveDetermination) //nolint:errcheck
+						falsePositiveType = fp.Type
+						note = fp.Note
 
-				row := []string{
-					pkg.Package.Name,
-					advisoryID,
-					string(latest.Status),
-					latest.FixedVersion,
-					string(latest.Justification),
-					latest.ImpactStatement,
-					latest.ActionStatement,
-				}
+					case v2.EventTypeFixed:
+						fixedVersion = event.Data.(v2.Fixed).FixedVersion
 
-				if err := csvWriter.Write(row); err != nil {
-					return nil, err
+					case v2.EventTypeFixNotPlanned:
+						note = event.Data.(v2.FixNotPlanned).Note
+
+					case v2.EventTypeAnalysisNotPlanned:
+						note = event.Data.(v2.AnalysisNotPlanned).Note
+					}
+
+					row := []string{
+						doc.Package.Name,
+						adv.ID,
+						event.Timestamp.String(),
+						event.Type,
+						falsePositiveType,
+						note,
+						fixedVersion,
+					}
+
+					if err := csvWriter.Write(row); err != nil {
+						return nil, err
+					}
 				}
 			}
 		}
@@ -65,11 +76,11 @@ func ExportCSV(opts ExportOptions) (io.Reader, error) {
 	return buf, nil
 }
 
-// Export returns a reader of advisory data encoded as CSV.
+// ExportYAML returns a reader of advisory data encoded as YAML.
 func ExportYAML(opts ExportOptions) (io.Reader, error) {
 	buf := new(bytes.Buffer)
 
-	for _, index := range opts.AdvisoryCfgIndices {
+	for _, index := range opts.AdvisoryDocIndices {
 		pkgs := index.Select().Configurations()
 
 		for i, pkg := range pkgs {
@@ -79,7 +90,7 @@ func ExportYAML(opts ExportOptions) (io.Reader, error) {
 
 			d, err := yaml.Marshal(pkg)
 			if err != nil {
-				log.Fatalf("error: %v", err)
+				return nil, fmt.Errorf("failed to marshal package %q: %v", pkg.Package.Name, err)
 			}
 			buf.Write(d)
 		}

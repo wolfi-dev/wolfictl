@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/samber/lo"
-	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 const (
@@ -17,7 +16,7 @@ const (
 var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll}
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
-func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[advisoryconfigs.Document], advisoryFilterSet string) ([]*Finding, error) {
+func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Document], advisoryFilterSet string) ([]*Finding, error) {
 	if result == nil {
 		return nil, fmt.Errorf("result cannot be nil")
 	}
@@ -38,17 +37,22 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[advisoryco
 	switch advisoryFilterSet {
 	case AdvisoriesSetAll:
 		resultFindings := lo.Filter(result.Findings, func(finding *Finding, _ int) bool {
-			adv := packageAdvisories[finding.Vulnerability.ID]
-
-			// If the advisory contains any entries, filter it out!
-			if len(adv) >= 1 {
-				return false
+			adv, ok := packageAdvisories.GetByVulnerabilityID(finding.Vulnerability.ID)
+			if ok {
+				// If the advisory contains any events, filter it out!
+				if len(adv.Events) >= 1 {
+					return false
+				}
 			}
 
 			// Also check any listed aliases
 			for _, alias := range finding.Vulnerability.Aliases {
-				adv := packageAdvisories[alias]
-				if len(adv) >= 1 {
+				adv, ok := packageAdvisories.GetByVulnerabilityID(alias)
+				if !ok {
+					continue
+				}
+
+				if len(adv.Events) >= 1 {
 					return false
 				}
 			}
@@ -60,17 +64,21 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[advisoryco
 
 	case AdvisoriesSetResolved:
 		resultFindings := lo.Filter(result.Findings, func(finding *Finding, _ int) bool {
-			adv := packageAdvisories[finding.Vulnerability.ID]
-
-			if advisory.IsResolved(adv, result.TargetAPK.Version) {
-				return false
+			adv, ok := packageAdvisories.GetByVulnerabilityID(finding.Vulnerability.ID)
+			if ok {
+				if adv.ResolvedAtVersion(result.TargetAPK.Version) {
+					return false
+				}
 			}
 
 			// Also check any listed aliases
 			for _, alias := range finding.Vulnerability.Aliases {
-				adv := packageAdvisories[alias]
+				adv, ok := packageAdvisories.GetByVulnerabilityID(alias)
+				if !ok {
+					continue
+				}
 
-				if advisory.IsResolved(adv, result.TargetAPK.Version) {
+				if adv.ResolvedAtVersion(result.TargetAPK.Version) {
 					return false
 				}
 			}

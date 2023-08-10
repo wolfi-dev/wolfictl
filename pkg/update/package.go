@@ -11,12 +11,10 @@ import (
 	"strings"
 	"time"
 
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 
 	"github.com/google/go-github/v50/github"
-
-	"github.com/openvex/go-vex/pkg/vex"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 
@@ -247,7 +245,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	fullFilePath := filepath.Join(p.Dir, p.Filename)
 
 	fsys := rwfsOS.DirFS("/")
-	advisoryCfgs, err := advisoryconfigs.NewIndexFromPaths(fsys, fullFilePath)
+	advisoryCfgs, err := v2.NewIndexFromPaths(fsys, fullFilePath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get new index for package %s config file %s", o.PackageName, p.Filename)
 	}
@@ -270,11 +268,15 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 	fixedVersion := fmt.Sprintf("%s-r%s", strings.TrimPrefix(o.Version, "v"), o.Epoch)
 
 	return advisory.Request{
-		Package:       o.PackageName,
-		Vulnerability: vuln,
-		Status:        vex.StatusFixed,
-		Timestamp:     time.Now(),
-		FixedVersion:  fixedVersion,
+		Package:         o.PackageName,
+		VulnerabilityID: vuln,
+		Event: v2.Event{
+			Timestamp: time.Now(),
+			Type:      v2.EventTypeFixed,
+			Data: v2.Fixed{
+				FixedVersion: fixedVersion,
+			},
+		},
 	}
 }
 
