@@ -8,7 +8,7 @@ import (
 
 func VEX() *cobra.Command {
 	cmd := &cobra.Command{
-		Deprecated: "This command does nothing, and will be revmoved in a future version.",
+		Deprecated: "This command does nothing, and will be removed in a future version.",
 		Use:        "vex",
 		Short:      "Tools to generate VEX statements for Wolfi packages and images",
 		Long: `wolfictl vex: Tools to generate VEX statements for Wolfi packages and images
@@ -70,8 +70,7 @@ purl:
 	pkg:apk/wolfi/curl@7.87.0-r0
 	
 wolfictl will read the melange configuration file that created the package and
-create a VEX document containing impact assessments in its advisories and
-secfixes.
+create a VEX document containing impact assessments in its advisories.
 
 wolfictl will read the melange config files from an existing wolfi-dev/os clone
 or, if not specified, it will clone the repo for you.

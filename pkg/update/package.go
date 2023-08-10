@@ -117,7 +117,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	if o.Advisories {
 		err := o.updateAdvisories(repo)
 		if err != nil {
-			return fmt.Errorf("failed to update secfixes: %w", err)
+			return fmt.Errorf("failed to update advisories: %w", err)
 		}
 	}
 
@@ -325,7 +325,7 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 		return err
 	}
 
-	commitMessage := fmt.Sprintf("add advisory and secfixes %s", strings.Join(fixes, " "))
+	commitMessage := fmt.Sprintf("add advisory %s", strings.Join(fixes, " "))
 
 	commitOpts := &git.CommitOptions{}
 	commitOpts.Author = wolfigit.GetGitAuthorSignature()

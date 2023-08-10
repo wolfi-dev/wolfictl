@@ -34,7 +34,6 @@ func Advisory() *cobra.Command {
 	cmd.AddCommand(AdvisoryList())
 	cmd.AddCommand(AdvisoryCreate())
 	cmd.AddCommand(AdvisoryUpdate())
-	cmd.AddCommand(AdvisorySyncSecfixes())
 	cmd.AddCommand(AdvisoryDiscover())
 	cmd.AddCommand(AdvisoryDB())
 	cmd.AddCommand(AdvisoryValidate())
@@ -82,9 +81,6 @@ func resolveTimestamp(ts string) (time.Time, error) {
 
 type advisoryRequestParams struct {
 	packageName, vuln, status, action, impact, justification, timestamp, fixedVersion string
-
-	// Deprecated: This flag is no longer used, and so this field is ignored.
-	sync bool
 }
 
 func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
@@ -97,9 +93,6 @@ func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.justification, "justification", "", "justification for VEX statement (used only for not_affected status)")
 	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp for VEX statement")
 	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for fixed status)")
-	cmd.Flags().BoolVar(&p.sync, "sync", false, "synchronize secfixes data immediately after updating advisory")
-
-	_ = cmd.Flags().MarkDeprecated("sync", "because 'secfixes' data is no longer used. This flag now has no effect, and it will be removed in an upcoming version.") //nolint:errcheck
 }
 
 func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
