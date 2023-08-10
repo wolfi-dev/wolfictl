@@ -48,9 +48,13 @@ func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
 
 var cveIDRegex = regexp.MustCompile(`^CVE-\d{4}-\d{4,}$`)
 
+// grabbed this regex from Github Docs
+// see https://docs.github.com/en/code-security/security-advisories/global-security-advisories/about-the-github-advisory-database#about-ghsa-ids
+var ghsaRegex = regexp.MustCompile(`GHSA(-[23456789cfghjmpqrvwx]{4}){3}`)
+
 var ValidCVEID = field.TextValidationRule(func(value string) error {
-	if !cveIDRegex.MatchString(value) {
-		return errors.New("must be a CVE ID")
+	if !cveIDRegex.MatchString(value) && !ghsaRegex.MatchString(value) {
+		return errors.New("must be a CVE or GHSA ID")
 	}
 
 	return nil
