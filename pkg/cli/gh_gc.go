@@ -14,6 +14,7 @@ func Gc() *cobra.Command {
 
 	cmd.AddCommand(
 		Branch(),
+		Issues(),
 	)
 
 	return cmd
