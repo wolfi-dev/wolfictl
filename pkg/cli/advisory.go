@@ -34,7 +34,6 @@ func Advisory() *cobra.Command {
 	cmd.AddCommand(AdvisoryList())
 	cmd.AddCommand(AdvisoryCreate())
 	cmd.AddCommand(AdvisoryUpdate())
-	cmd.AddCommand(AdvisorySyncSecfixes())
 	cmd.AddCommand(AdvisoryDiscover())
 	cmd.AddCommand(AdvisoryDB())
 	cmd.AddCommand(AdvisoryValidate())
