@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gitlab.alpinelinux.org/alpine/go/repository"
@@ -27,7 +27,7 @@ type DiscoverOptions struct {
 	BuildCfgs *configs.Index[config.Configuration]
 
 	// AdvisoryCfgs is the Index of advisories on which to operate.
-	AdvisoryCfgs *configs.Index[advisoryconfigs.Document]
+	AdvisoryCfgs *configs.Index[v1.Document]
 
 	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").
 	PackageRepositoryURL string
@@ -117,7 +117,7 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		log.Printf("🐛 new potential vulnerability for package %q: %s", advCfg.Package.Name, hyperlinkCVE(vulnID))
 
-		u := advisoryconfigs.NewAdvisoriesSectionUpdater(func(cfg advisoryconfigs.Document) (advisoryconfigs.Advisories, error) {
+		u := v1.NewAdvisoriesSectionUpdater(func(cfg v1.Document) (v1.Advisories, error) {
 			advisories := cfg.Advisories
 			advisories[vulnID] = append(advisories[vulnID], advisoryEntryForNewDiscovery())
 
@@ -133,8 +133,8 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 	return nil
 }
 
-func advisoryEntryForNewDiscovery() advisoryconfigs.Entry {
-	return advisoryconfigs.Entry{
+func advisoryEntryForNewDiscovery() v1.Entry {
+	return v1.Entry{
 		Timestamp: time.Now(),
 		Status:    vex.StatusUnderInvestigation,
 	}

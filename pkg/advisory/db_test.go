@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 

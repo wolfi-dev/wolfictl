@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/prompt"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"

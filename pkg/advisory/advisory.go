@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/openvex/go-vex/pkg/vex"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 

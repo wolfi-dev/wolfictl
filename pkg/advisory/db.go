@@ -9,14 +9,14 @@ import (
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 )
 
 const apkURL = "{{urlprefix}}/{{reponame}}/{{arch}}/{{pkg.name}}-{{pkg.ver}}.apk"
 
 // BuildDatabaseOptions contains the options for building a database.
 type BuildDatabaseOptions struct {
-	AdvisoryCfgIndices []*configs.Index[advisory.Document]
+	AdvisoryCfgIndices []*configs.Index[v1.Document]
 
 	URLPrefix string
 	Archs     []string

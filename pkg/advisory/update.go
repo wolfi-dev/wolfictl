@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 )
 
 // UpdateOptions configures the Update operation.
 type UpdateOptions struct {
 	// AdvisoryCfgs is the Index of advisory configurations on which to operate.
-	AdvisoryCfgs *configs.Index[advisory.Document]
+	AdvisoryCfgs *configs.Index[v1.Document]
 }
 
 // Update adds a new entry to an existing advisory (named by the vuln parameter)
@@ -24,10 +24,10 @@ func Update(req Request, opts UpdateOptions) error {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
 	}
 
-	u := advisory.NewAdvisoriesSectionUpdater(func(cfg advisory.Document) (advisory.Advisories, error) {
+	u := v1.NewAdvisoriesSectionUpdater(func(cfg v1.Document) (v1.Advisories, error) {
 		advisories := cfg.Advisories
 		if _, existsAlready := advisories[vulnID]; !existsAlready {
-			return advisory.Advisories{}, fmt.Errorf("no advisory exists for %s", vulnID)
+			return v1.Advisories{}, fmt.Errorf("no advisory exists for %s", vulnID)
 		}
 
 		advisories[vulnID] = append(advisories[vulnID], advisoryEntry)

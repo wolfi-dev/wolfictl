@@ -9,12 +9,12 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 	"gopkg.in/yaml.v3"
 )
 
 type ExportOptions struct {
-	AdvisoryCfgIndices []*configs.Index[advisory.Document]
+	AdvisoryCfgIndices []*configs.Index[v1.Document]
 }
 
 // ExportCSV returns a reader of advisory data encoded as CSV.

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/openvex/go-vex/pkg/vex"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
 )
 
 // Request specifies the parameters for creating a new advisory or updating an existing advisory.
@@ -52,8 +52,8 @@ func (req Request) Validate() error {
 	return nil
 }
 
-func (req Request) toAdvisoryEntry() advisory.Entry {
-	return advisory.Entry{
+func (req Request) toAdvisoryEntry() v1.Entry {
+	return v1.Entry{
 		Timestamp:       req.Timestamp,
 		Status:          req.Status,
 		Justification:   req.Justification,
