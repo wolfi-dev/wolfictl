@@ -503,7 +503,7 @@ func (k *k8s) watch(ctx context.Context, p *corev1.Pod) error {
 					}
 					return p.Status.Phase == corev1.PodSucceeded, nil
 				}); err != nil {
-					return err
+					return fmt.Errorf("polling pod status: %w", err)
 				}
 				log.Printf("succeeded! took %s", time.Since(p.CreationTimestamp.Time).Round(time.Second))
 				return nil
@@ -542,12 +542,12 @@ func (k *k8s) streamLogs(ctx context.Context, p *corev1.Pod, container string) f
 			Follow:    true,
 		}).Stream(ctx)
 		if err != nil {
-			return err
+			return fmt.Errorf("creating log stream for %q container: %w", container, err)
 		}
 		defer rc.Close()
 		_, err = io.Copy(os.Stdout, rc)
 		if err != nil {
-			return fmt.Errorf("streaming logs: %w", err)
+			return fmt.Errorf("streaming logs for %q container: %w", container, err)
 		}
 
 		return nil
