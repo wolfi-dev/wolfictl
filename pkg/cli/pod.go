@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp" // Implicit GCP auth.
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var rootUser int64 // 0
@@ -188,7 +188,7 @@ gsutil cp {{.publicKeyBucket}}{{.signingKeyName}}.rsa.pub .
 							MountPath: "/tmp",
 						}},
 						SecurityContext: &corev1.SecurityContext{
-							Privileged: pointer.Bool(true),
+							Privileged: ptr.To(true),
 						},
 						Command: []string{"sh", "-c", template(`
 set -euo pipefail
@@ -324,7 +324,7 @@ gcloud --quiet storage cp \
 					VolumeSource: corev1.VolumeSource{
 						CSI: &corev1.CSIVolumeSource{
 							Driver:   "secrets-store.csi.k8s.io",
-							ReadOnly: pointer.Bool(true),
+							ReadOnly: ptr.To(true),
 							VolumeAttributes: map[string]string{
 								"secretProviderClass": "melange-key",
 							},
