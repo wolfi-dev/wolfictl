@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -237,7 +238,41 @@ func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[stri
 		maps.Copy(o.ErrorMessages, errorMessages)
 		maps.Copy(latestVersions, v)
 	}
-	return latestVersions, nil
+
+	return o.mutatePackageVersions(latestVersions)
+}
+
+// Apply any post-process version-transforms to the detected update versions.
+func (o *Options) mutatePackageVersions(packageVersions map[string]NewVersionResults) (map[string]NewVersionResults, error) {
+	mutatedPackageVersions := map[string]NewVersionResults{}
+
+	for k, nv := range packageVersions {
+		pc, ok := o.PackageConfigs[k]
+		if !ok {
+			return map[string]NewVersionResults{}, fmt.Errorf("package %s not found in PackageConfigs", k)
+		}
+
+		if len(pc.Config.Update.VersionTransform) == 0 {
+			mutatedPackageVersions[k] = nv
+			continue
+		}
+
+		scratchVersion := nv.Version
+
+		for _, tf := range pc.Config.Update.VersionTransform {
+			matcher, err := regexp.Compile(tf.Match)
+			if err != nil {
+				return map[string]NewVersionResults{}, fmt.Errorf("unable to compile version transform regex: %w", err)
+			}
+
+			scratchVersion = matcher.ReplaceAllString(scratchVersion, tf.Replace)
+		}
+
+		nv.Version = scratchVersion
+		mutatedPackageVersions[k] = nv
+	}
+
+	return mutatedPackageVersions, nil
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
