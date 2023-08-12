@@ -13,6 +13,14 @@ import (
 	"github.com/anchore/grype/grype/db"
 	v5 "github.com/anchore/grype/grype/db/v5"
 	"github.com/anchore/grype/grype/match"
+	"github.com/anchore/grype/grype/matcher"
+	"github.com/anchore/grype/grype/matcher/dotnet"
+	"github.com/anchore/grype/grype/matcher/golang"
+	"github.com/anchore/grype/grype/matcher/java"
+	"github.com/anchore/grype/grype/matcher/javascript"
+	"github.com/anchore/grype/grype/matcher/python"
+	"github.com/anchore/grype/grype/matcher/ruby"
+	"github.com/anchore/grype/grype/matcher/stock"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/grype/grype/vulnerability"
@@ -99,13 +107,13 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
 	}
 	defer dbCloser.Close()
 
-	matcher := grype.DefaultVulnerabilityMatcher(*datastore)
+	vulnerabilityMatcher := newGrypeVulnerabilityMatcher(*datastore)
 
 	syftPkgs := s.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})
 
 	// Find vulnerability matches
-	matchesCollection, _, err := matcher.FindMatches(grypePkgs, grypePkg.Context{
+	matchesCollection, _, err := vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{
 		Source: &s.Source,
 		Distro: s.Artifacts.LinuxDistribution,
 	})
@@ -203,4 +211,25 @@ func getFixedVersion(vuln vulnerability.Vulnerability) string {
 	}
 
 	return strings.Join(vuln.Fix.Versions, ", ")
+}
+
+func newGrypeVulnerabilityMatcher(datastore store.Store) *grype.VulnerabilityMatcher {
+	return &grype.VulnerabilityMatcher{
+		Store:    datastore,
+		Matchers: createMatchers(),
+	}
+}
+
+func createMatchers() []matcher.Matcher {
+	return matcher.NewDefaultMatchers(
+		matcher.Config{
+			Java:       java.MatcherConfig{UseCPEs: true},
+			Ruby:       ruby.MatcherConfig{UseCPEs: true},
+			Python:     python.MatcherConfig{UseCPEs: true},
+			Dotnet:     dotnet.MatcherConfig{UseCPEs: true},
+			Javascript: javascript.MatcherConfig{UseCPEs: true},
+			Golang:     golang.MatcherConfig{UseCPEs: true},
+			Stock:      stock.MatcherConfig{UseCPEs: true},
+		},
+	)
 }
