@@ -72,7 +72,7 @@ Generate .dot output and pipe it to dot to generate a PNG
 		},
 	}
 	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
-	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "pipelines", "directory used to extend defined built-in pipelines")
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	d.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	return d
