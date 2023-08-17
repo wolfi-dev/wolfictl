@@ -7,7 +7,7 @@ require (
 	chainguard.dev/melange v0.4.1-0.20230811161639-0d6fbb7ed19a
 	cloud.google.com/go/storage v1.31.0
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.65.0
+	github.com/anchore/grype v0.65.2
 	github.com/anchore/syft v0.87.1
 	github.com/chainguard-dev/go-apk v0.0.0-20230710230135-7fc46e8b3c4d
 	github.com/chainguard-dev/kontext v0.1.0
