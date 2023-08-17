@@ -49,8 +49,8 @@ require (
 	golang.org/x/time v0.3.0
 	google.golang.org/api v0.136.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.28.0-alpha.4
-	k8s.io/apimachinery v0.28.0-alpha.4
+	k8s.io/api v0.29.0-alpha.0
+	k8s.io/apimachinery v0.29.0-alpha.0
 	k8s.io/client-go v0.28.0-alpha.4
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 	sigs.k8s.io/release-utils v0.7.5-0.20230601212346-3866fe05b204
@@ -265,7 +265,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/gorm v1.23.10 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20230606174411-725288a7abf1 // indirect
+	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	knative.dev/pkg v0.0.0-20230531073936-5671699f23d9 // indirect
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
