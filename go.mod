@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go/storage v1.31.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.65.0
-	github.com/anchore/syft v0.86.1
+	github.com/anchore/syft v0.87.1
 	github.com/chainguard-dev/go-apk v0.0.0-20230710230135-7fc46e8b3c4d
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230807153807-4de7c531f3e1
@@ -229,7 +229,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/vbatts/go-mtree v0.5.3 // indirect
 	github.com/vbatts/tar-split v0.11.3 // indirect
-	github.com/vifraa/gopom v0.2.2 // indirect
+	github.com/vifraa/gopom v1.0.0 // indirect
 	github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651 // indirect
 	github.com/wagoodman/go-progress v0.0.0-20230301185719-21920a456ad5 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
@@ -270,11 +270,11 @@ require (
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
-	modernc.org/libc v1.22.5 // indirect
+	modernc.org/libc v1.24.1 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
-	modernc.org/memory v1.5.0 // indirect
+	modernc.org/memory v1.6.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.24.0 // indirect
+	modernc.org/sqlite v1.25.0 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.1.0 // indirect
 	mvdan.cc/sh/v3 v3.6.0 // indirect
