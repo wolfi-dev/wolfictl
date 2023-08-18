@@ -283,12 +283,12 @@ set -x
 flagToGrantPublicRead=""
 
 # If this gsutil command exits 0, then fine-gained access is enabled (i.e. uniform bucket level access is disabled).
-gsutil acl get gs://{{.bucket}} && flagToGrantPublicRead="-a publicRead"
+gsutil acl get gs://{{.bucket}} && flagToGrantPublicRead="--canned-acl=publicRead"
 
 # Don't cache the APKINDEX, and make it public if we can.
 gcloud --quiet storage cp \
 	--cache-control=no-store \
-	"${flagToGrantPublicRead}" \
+	${flagToGrantPublicRead} \
 	"./packages/{{.arch}}/APKINDEX.tar.gz" gs://{{.bucket}}{{.arch}}/ || true
 
 # apks will be cached in CDN for an hour by default.
