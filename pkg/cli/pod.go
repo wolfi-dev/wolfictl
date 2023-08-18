@@ -279,10 +279,16 @@ done
 
 set -x
 
-# Don't cache the APKINDEX, and leave it public if it already is.
+# If the bucket allows fine-grained access control, we can grant public read on the APKINDEX object, and we *should* do this because we want the APKINDEX to be public, always.
+flagToGrantPublicRead=""
+
+# If this gsutil command exits 0, then fine-gained access is enabled (i.e. uniform bucket level access is disabled).
+gsutil acl get gs://{{.bucket}} && flagToGrantPublicRead="-a publicRead"
+
+# Don't cache the APKINDEX, and make it public if we can.
 gcloud --quiet storage cp \
 	--cache-control=no-store \
-	--preserve-acl \
+	"${flagToGrantPublicRead}" \
 	"./packages/{{.arch}}/APKINDEX.tar.gz" gs://{{.bucket}}{{.arch}}/ || true
 
 # apks will be cached in CDN for an hour by default.
