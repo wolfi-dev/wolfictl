@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
-	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/dag"
 	"golang.org/x/exp/maps"
+
+	"github.com/wolfi-dev/wolfictl/pkg/dag"
 )
 
 func Build() *cobra.Command {
@@ -40,6 +40,7 @@ func Build() *cobra.Command {
 					pipelineDir: pipelineDir,
 					stdout:      cmd.OutOrStdout(),
 					stderr:      cmd.ErrOrStderr(),
+					archs:       archs,
 					dryrun:      dryrun,
 					done:        make(chan struct{}),
 					deps:        map[string]chan struct{}{},
@@ -120,9 +121,8 @@ func Build() *cobra.Command {
 					return fmt.Errorf("failed to build %s: %w", t.pkg, err)
 				}
 				delete(tasks, t.pkg)
-				log.Printf("DONE %s (%d/%d)", t.pkg, count-len(tasks), count)
+				log.Printf("Finished building %s (%d/%d)", t.pkg, count-len(tasks), count)
 			}
-			log.Println("ALL DONE!!")
 			return nil
 		},
 	}
@@ -139,6 +139,7 @@ type task struct {
 	pkg, dir, pipelineDir string
 	stdout, stderr        io.Writer
 	dryrun                bool
+	archs                 []string
 
 	err         error
 	deps        map[string]chan struct{}
@@ -150,6 +151,7 @@ func (t *task) start(ctx context.Context) {
 
 	defer close(t.done) // signal that we're done, one way or another.
 	tick := time.NewTicker(30 * time.Second)
+	defer tick.Stop()
 	for depname, dep := range t.deps {
 		select {
 		case <-tick.C:
@@ -176,11 +178,10 @@ func (t *task) do(ctx context.Context) {
 	if t.pkg == "ko-fips" {
 		return
 	}
-	c := exec.CommandContext(ctx, "make", "BUILDWORLD=no", "MELANGE_EXTRA_OPTS=--runner=kubernetes", fmt.Sprintf("package/%s", t.pkg)) //nolint:gosec
+	c := exec.CommandContext(ctx, "make", "BUILDWORLD=no", fmt.Sprintf("package/%s", t.pkg)) //nolint:gosec
 	c.Dir = t.dir
 	fmt.Fprintln(t.stderr, c.String())
 	if t.dryrun {
-		time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
 		return
 	}
 
