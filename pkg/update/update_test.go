@@ -186,6 +186,22 @@ func TestOptions_getPackagesToUpdate(t *testing.T) {
 				},
 			},
 		},
+		"bar": {
+			Config: config.Configuration{
+				Package: config.Package{
+					Name:    "foo",
+					Version: "1.0.0",
+				},
+				Pipeline: []config.Pipeline{
+					{
+						Uses: "git-checkout",
+						With: map[string]string{
+							"expected-commit": "1234567890",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	type args struct {
@@ -234,6 +250,18 @@ func TestOptions_getPackagesToUpdate(t *testing.T) {
 				},
 			},
 			want: map[string]NewVersionResults{"foo": {Version: "1.0.0", Commit: "4444444444", BumpEpoch: true}}, // new commit
+		},
+		{
+			// simulates an update from Release Monitor
+			name: "test bug when one package has no commit sha but another requires an update",
+			args: args{
+				latestVersions: map[string]NewVersionResults{
+
+					"foo": {Version: "1.0.0", Commit: "", BumpEpoch: false},
+					"bar": {Version: "2.0.0", Commit: "", BumpEpoch: false},
+				},
+			},
+			want: map[string]NewVersionResults{"foo": {Version: "2.0.0", BumpEpoch: false}}, // new version
 		},
 	}
 	for _, tt := range tests {
