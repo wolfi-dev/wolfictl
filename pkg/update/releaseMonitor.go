@@ -34,6 +34,18 @@ const (
 	releaseMonitorURL = "https://release-monitoring.org/api/v2/versions/?project_id=%d"
 )
 
+type CustomTransport struct {
+	Transport http.RoundTripper
+	Token     string
+}
+
+func (t *CustomTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.Token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Token %s", t.Token))
+	}
+	return t.Transport.RoundTrip(req)
+}
+
 func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[string]*melange.Packages) (packagesToUpdate map[string]NewVersionResults, errorMessages map[string]string) {
 	packagesToUpdate = make(map[string]NewVersionResults)
 	errorMessages = make(map[string]string)

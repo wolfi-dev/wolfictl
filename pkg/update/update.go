@@ -46,7 +46,7 @@ type Options struct {
 	GithubReleaseQuery     bool
 	UseGitSign             bool
 	CreateIssues           bool
-	Client                 *http2.RLHTTPClient
+	ReleaseMonitorClient   *http2.RLHTTPClient
 	Logger                 *log.Logger
 	GitHubHTTPClient       *http2.RLHTTPClient
 	ErrorMessages          map[string]string
@@ -77,13 +77,28 @@ func New() Options {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
-	options := Options{
-		Client: &http2.RLHTTPClient{
-			Client: http.DefaultClient,
+	token := os.Getenv("RELEASE_MONITOR_TOKEN")
 
-			// 1 request every (n) second(s) to avoid DOS'ing server
-			Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
+	var rateLimitDuration time.Duration
+	if token == "" {
+		rateLimitDuration = 5 * time.Second
+	} else {
+		rateLimitDuration = 1 * time.Second / 2
+	}
+
+	client := &http.Client{
+		Transport: &CustomTransport{
+			Transport: http.DefaultTransport,
+			Token:     token,
 		},
+	}
+
+	options := Options{
+		ReleaseMonitorClient: &http2.RLHTTPClient{
+			Client:      client,
+			Ratelimiter: rate.NewLimiter(rate.Every(rateLimitDuration), 1),
+		},
+
 		GitHubHTTPClient: &http2.RLHTTPClient{
 			Client: oauth2.NewClient(context.Background(), ts),
 
@@ -228,7 +243,7 @@ func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[stri
 	if o.ReleaseMonitoringQuery {
 		// get latest versions from https://release-monitoring.org/
 		m := MonitorService{
-			Client: o.Client,
+			Client: o.ReleaseMonitorClient,
 			Logger: o.Logger,
 		}
 		v, errorMessages := m.getLatestReleaseMonitorVersions(o.PackageConfigs)
@@ -774,7 +789,7 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 		// this can occur when an upstream project recreated a tag with a new commit
 		// if release monitor was used we won't have a commit sha
 		if v.Commit == "" {
-			return results, nil
+			continue
 		}
 		if currentVersionSemver.Equal(latestVersionSemver) {
 			for i := range pc.Config.Pipeline {
