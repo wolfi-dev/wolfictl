@@ -3,18 +3,21 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
+	"chainguard.dev/apko/pkg/build/types"
+	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
+	"golang.org/x/sync/errgroup"
 )
 
 func Build() *cobra.Command {
@@ -22,6 +25,8 @@ func Build() *cobra.Command {
 	var dir, pipelineDir string
 	var jobs int
 	var dryrun bool
+	// TODO: buildworld bool (build deps vs get them from package repo)
+	// TODO: builddownstream bool (build things that depend on listed packages)
 	cmd := &cobra.Command{
 		Use:           "build",
 		SilenceErrors: true,
@@ -33,26 +38,21 @@ func Build() *cobra.Command {
 			}
 			jobch := make(chan struct{}, jobs)
 
+			if pipelineDir == "" {
+				pipelineDir = filepath.Join(dir, "pipelines")
+			}
+
 			newTask := func(pkg string) *task {
 				return &task{
 					pkg:         pkg,
 					dir:         dir,
 					pipelineDir: pipelineDir,
-					stdout:      cmd.OutOrStdout(),
-					stderr:      cmd.ErrOrStderr(),
 					archs:       archs,
 					dryrun:      dryrun,
 					done:        make(chan struct{}),
 					deps:        map[string]chan struct{}{},
 					jobch:       jobch,
 				}
-			}
-
-			if len(args) == 1 {
-				// Build only this one package.
-				t := newTask(args[0])
-				go t.start(ctx)
-				return t.wait(ctx)
 			}
 
 			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
@@ -64,8 +64,8 @@ func Build() *cobra.Command {
 				return err
 			}
 			if len(args) > 1 {
-				// If multiple args were passed, build only the subgraph based on these packages.
-				g, err = g.SubgraphWithRoots(args)
+				// If multiple args were passed, build only the necessary packages to build these packages.
+				g, err = g.SubgraphWithLeaves(args)
 				if err != nil {
 					return err
 				}
@@ -93,6 +93,8 @@ func Build() *cobra.Command {
 					tasks[pkg] = newTask(pkg)
 				}
 				for k, v := range m {
+					// The package list is in the form of "pkg:version",
+					// but we only care about the package name.
 					if strings.HasPrefix(k, pkg+":") {
 						for _, dep := range v {
 							d, _, _ := strings.Cut(dep.Target, ":")
@@ -110,7 +112,6 @@ func Build() *cobra.Command {
 				return fmt.Errorf("no packages to build")
 			}
 
-			// TODO: limit concurrency, without starving the graph.
 			for _, t := range tasks {
 				go t.start(ctx)
 			}
@@ -130,16 +131,15 @@ func Build() *cobra.Command {
 	cmd.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
 	cmd.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
-	cmd.Flags().StringSliceVar(&archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build") // TODO: actually use this
+	cmd.Flags().StringSliceVar(&archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
 	return cmd
 }
 
 type task struct {
 	pkg, dir, pipelineDir string
-	stdout, stderr        io.Writer
-	dryrun                bool
 	archs                 []string
+	dryrun                bool
 
 	err         error
 	deps        map[string]chan struct{}
@@ -169,25 +169,59 @@ func (t *task) start(ctx context.Context) {
 	defer func() { <-t.jobch }()
 
 	// all deps are done and we're clear to launch.
-	t.do(ctx)
+	t.err = t.do(ctx)
 }
 
-func (t *task) do(ctx context.Context) {
-	// TODO: remove make indirection, invoke melange directly as a library.
-	// TODO: pass --pipeline-dir to melange; until then, skip ko-fips
-	if t.pkg == "ko-fips" {
-		return
-	}
-	c := exec.CommandContext(ctx, "make", "BUILDWORLD=no", fmt.Sprintf("package/%s", t.pkg)) //nolint:gosec
-	c.Dir = t.dir
-	fmt.Fprintln(t.stderr, c.String())
-	if t.dryrun {
-		return
+func (t *task) do(ctx context.Context) error {
+	cfg, err := config.ParseConfiguration(fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
+	if err != nil {
+		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	c.Stdout = t.stdout
-	c.Stderr = t.stderr
-	t.err = c.Run()
+	var bcs []*build.Build
+	for _, arch := range t.archs {
+		// See if we already have the package built.
+		apk := filepath.Join(t.dir, "packages", arch, fmt.Sprintf("%s-%s-r%d.apk", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch))
+		if _, err := os.Stat(apk); err == nil {
+			log.Printf("skipping %s, already built", apk)
+			continue
+		}
+
+		fn := fmt.Sprintf("%s.yaml", t.pkg)
+		if t.dryrun {
+			log.Printf("DRYRUN: would have built %s", apk)
+			continue
+		}
+		log.Println("will build:", apk)
+		bc, err := build.New(ctx,
+			build.WithArch(types.ParseArchitecture(arch)),
+			build.WithConfig(filepath.Join(t.dir, fn)),
+			build.WithPipelineDir(t.pipelineDir),
+			build.WithExtraKeys([]string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}),
+			build.WithExtraRepos([]string{"https://packages.wolfi.dev/os"}),
+			build.WithSigningKey(filepath.Join(t.dir, "local-melange.rsa")),
+			build.WithRunner("docker"), // TODO: flag build.WithRunner("kubernetes"),
+			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
+			build.WithNamespace("wolfi"),
+			build.WithLogPolicy([]string{"builtin:stderr"}),
+			build.WithSourceDir(filepath.Join(t.dir, t.pkg)),
+			build.WithCacheSource("gs://wolfi-sources/"),
+			build.WithCacheDir("./melange-cache/"), // TODO: flag
+			build.WithOutDir(filepath.Join(t.dir, "packages")),
+		)
+		if err != nil {
+			return err
+		}
+		bcs = append(bcs, bc)
+	}
+	var errg errgroup.Group
+	for _, bc := range bcs {
+		bc := bc
+		errg.Go(func() error {
+			return bc.BuildPackage(ctx)
+		})
+	}
+	return errg.Wait()
 }
 
 func (t *task) wait(ctx context.Context) error {
