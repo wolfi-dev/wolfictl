@@ -671,6 +671,18 @@ func FilterNotLocal() Filter {
 	return FilterNotSources(Local)
 }
 
+// Filter out non-main packages -- we only care about config file names, not each subpackage.
+func OnlyMainPackages(pkgs *Packages) Filter {
+	return func(pkg Package) bool {
+		p, err := pkgs.PkgInfo(pkg.Name())
+		if err != nil {
+			log.Fatalf("error getting package info for %q: %v", pkg.Name(), err)
+			return false
+		}
+		return p != nil && p.Name != ""
+	}
+}
+
 // Filter returns a new Graph that's a subgraph of g, where the set of nodes
 // in the new graph are filtered by the provided parameters.
 // Must provide a func to which each Vertex of type Package is processed, and should return
@@ -726,7 +738,7 @@ func (g Graph) Filter(filter Filter) (*Graph, error) {
 func (g Graph) DependenciesOf(node string) []string {
 	adjacencyMap, err := g.Graph.AdjacencyMap()
 	if err != nil {
-		return nil
+		panic(err)
 	}
 
 	var dependencies []string
@@ -739,6 +751,28 @@ func (g Graph) DependenciesOf(node string) []string {
 		// sort for deterministic output
 		sort.Strings(dependencies)
 		return dependencies
+	}
+
+	return nil
+}
+
+// RequirementsOf returns a slice of the names of the given package's requirements, sorted alphabetically.
+func (g Graph) RequirementsOf(node string) []string {
+	predecessorMap, err := g.Graph.PredecessorMap()
+	if err != nil {
+		panic(err)
+	}
+
+	var requirements []string
+
+	if deps, ok := predecessorMap[node]; ok {
+		for dep := range deps {
+			requirements = append(requirements, dep)
+		}
+
+		// sort for deterministic output
+		sort.Strings(requirements)
+		return requirements
 	}
 
 	return nil
