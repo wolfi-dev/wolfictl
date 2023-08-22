@@ -3,7 +3,7 @@ module github.com/wolfi-dev/wolfictl
 go 1.20
 
 require (
-	chainguard.dev/apko v0.9.1-0.20230711074042-37b82f3a5bd8
+	chainguard.dev/apko v0.10.0
 	chainguard.dev/melange v0.4.1-0.20230811161639-0d6fbb7ed19a
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.65.2
@@ -84,7 +84,6 @@ require (
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
-	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/aws/aws-sdk-go v1.44.288 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/becheran/wildmatch-go v1.0.0 // indirect

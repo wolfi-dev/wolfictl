@@ -1,5 +1,5 @@
-chainguard.dev/apko v0.9.1-0.20230711074042-37b82f3a5bd8 h1:JEoyunyKNXDJd7hbKNHT9ZgwO994h6kwyN/UQX0FSok=
-chainguard.dev/apko v0.9.1-0.20230711074042-37b82f3a5bd8/go.mod h1:II9b/9pR4hPZKmp/6umhCO7JvJV1711rBEJW6aw5d7I=
+chainguard.dev/apko v0.10.0 h1:KL6chrNjOcbW425jstUGC2lliuYhc/vQzwL7r5o9iPI=
+chainguard.dev/apko v0.10.0/go.mod h1:f3YxZEHr34DbfCU7Oqp3BvMW462Pvua1km+MldGJ6qs=
 chainguard.dev/melange v0.4.1-0.20230811161639-0d6fbb7ed19a h1:MXILTHfovfVHESofLzCUX20xd+VkxVusT3vpfGe8yPI=
 chainguard.dev/melange v0.4.1-0.20230811161639-0d6fbb7ed19a/go.mod h1:hgUDM/10P4fMztCNEgl/r2y2VBX2d1hetIPPIzkvlIk=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -277,8 +277,6 @@ github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3d
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
 github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
-github.com/avast/retry-go v3.0.0+incompatible h1:4SOWQ7Qs+oroOTQOYnAHqelpCO0biHSxpiH9JdtuBj0=
-github.com/avast/retry-go v3.0.0+incompatible/go.mod h1:XtSnn+n/sHqQIpZ10K1qAevBhOOCWBLXXy3hyiqqBrY=
 github.com/aws/aws-sdk-go v1.44.122/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
 github.com/aws/aws-sdk-go v1.44.288 h1:Ln7fIao/nl0ACtelgR1I4AiEw/GLNkKcXfCaHupUW5Q=
 github.com/aws/aws-sdk-go v1.44.288/go.mod h1:aVsgQcEevwlmQ7qHE9I3h+dtQgpqhFB+i8Phjh7fkwI=
