@@ -271,6 +271,22 @@ func TestLinter_Rules(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			file: "missing-github-update-git-checkout.yaml",
+			want: EvalResult{
+				File: "missing-github-update-git-checkout",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "git-checkout-must-use-github-updates",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[git-checkout-must-use-github-updates]: configure update.github when using git-checkout (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

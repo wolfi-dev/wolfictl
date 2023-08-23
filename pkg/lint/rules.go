@@ -35,6 +35,8 @@ var (
 	versionRegex = regexp.MustCompile(`^([0-9]+)((\.[0-9]+)*)([a-z]?)((_alpha|_beta|_pre|_rc)([0-9]*))?((_cvs|_svn|_git|_hg|_p)([0-9]*))?((-r)([0-9]+))?$`)
 )
 
+const gitCheckout = "git-checkout"
+
 func init() { versionRegex.Longest() }
 
 // AllRules is a list of all available rules to evaluate.
@@ -264,7 +266,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
-					if p.Uses == "git-checkout" {
+					if p.Uses == gitCheckout {
 						if commit, ok := p.With["expected-commit"]; ok {
 							if !reValidSHA1.MatchString(commit) {
 								return fmt.Errorf("expected-commit is not valid SHA1")
@@ -283,7 +285,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
-					if p.Uses == "git-checkout" {
+					if p.Uses == gitCheckout {
 						if _, ok := p.With["tag"]; !ok {
 							return fmt.Errorf("tag is missing")
 						}
@@ -333,6 +335,21 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				for _, repo := range config.Environment.Contents.Repositories {
 					if repo[0] == '@' {
 						return fmt.Errorf("repository %q is tagged", repo)
+					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "git-checkout-must-use-github-updates",
+			Description: "when using git-checkout, must use github updates so we can get the expected-commit",
+			Severity:    SeverityError,
+			LintFunc: func(config config.Configuration) error {
+				for _, p := range config.Pipeline {
+					if p.Uses == gitCheckout {
+						if config.Update.Enabled && config.Update.GitHubMonitor == nil {
+							return fmt.Errorf("configure update.github when using git-checkout")
+						}
 					}
 				}
 				return nil
