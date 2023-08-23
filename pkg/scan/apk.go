@@ -175,6 +175,9 @@ func mapMatchToFinding(m match.Match, datastore *store.Store) (*Finding, error) 
 		if err != nil {
 			return nil, fmt.Errorf("unable to get metadata for related vulnerability %s: %w", relatedRef.ID, err)
 		}
+		if relatedMetadata == nil {
+			continue
+		}
 		relatedMetadatas = append(relatedMetadatas, relatedMetadata)
 	}
 
