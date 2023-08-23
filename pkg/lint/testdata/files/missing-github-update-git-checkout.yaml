@@ -1,0 +1,22 @@
+package:
+  name: missing-github-update-git-checkout
+  version: 1.0.0
+  epoch: 0
+  description: "a package with missing github update config"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+
+pipeline:
+  - uses: git-checkout
+    with:
+      uri: https://test.com/missing-copyright/${{package.version}}.tar.gz
+      tag: v1.2.3
+      expected-commit: 1234567890123456789012345678901234567890
+
+update:
+  enabled: true
+  release-monitor:
+    identifier: 11551
