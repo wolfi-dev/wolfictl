@@ -51,7 +51,17 @@ func AdvisoryExport() *cobra.Command {
 				AdvisoryCfgIndices: indices,
 			}
 
-			export, err := advisory.Export(opts)
+			var export io.Reader
+			var err error
+			switch p.format {
+			case OutputYAML:
+				export, err = advisory.ExportYAML(opts)
+			case OutputCSV, OutputDefault:
+				export, err = advisory.ExportCSV(opts)
+			default:
+				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%q, %q, %q]", p.format, OutputDefault, OutputYAML, OutputCSV)
+			}
+
 			if err != nil {
 				return fmt.Errorf("unable to export advisory data: %w", err)
 			}
@@ -67,6 +77,7 @@ func AdvisoryExport() *cobra.Command {
 				defer outputFile.Close()
 			}
 
+			fmt.Println(export)
 			_, err = io.Copy(outputFile, export)
 			if err != nil {
 				return fmt.Errorf("unable to export data to specified location: %w", err)
@@ -86,7 +97,19 @@ type exportParams struct {
 	advisoriesRepoDirs []string
 
 	outputLocation string
+
+	// format controls how commands will produce their output.
+	format string
 }
+
+const (
+	// OutputDefault default output.
+	OutputDefault = ""
+	// OutputJSON JSON output.
+	OutputYAML = "yaml"
+	// OutputCSV CSV output.
+	OutputCSV = "csv"
+)
 
 func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
@@ -94,4 +117,7 @@ func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "directory containing an advisories repository")
 
 	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout)")
+
+	cmd.Flags().StringVarP(&p.format, "format", "f", "",
+		fmt.Sprintf("Output format. One of: [%q, %q, %q]", OutputDefault, OutputYAML, OutputCSV))
 }

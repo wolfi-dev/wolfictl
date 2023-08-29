@@ -13,7 +13,7 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
-func TestExport(t *testing.T) {
+func TestExportCSV(t *testing.T) {
 	cases := []struct {
 		name               string
 		advisoryDirs       []string
@@ -44,7 +44,7 @@ func TestExport(t *testing.T) {
 				AdvisoryCfgIndices: indices,
 			}
 
-			exported, err := Export(opts)
+			exported, err := ExportCSV(opts)
 			tt.errorAssertion(t, err)
 
 			exportedBytes, err := io.ReadAll(exported)
@@ -55,7 +55,7 @@ func TestExport(t *testing.T) {
 				require.NoError(t, err)
 
 				if diff := cmp.Diff(string(expectedBytes), string(exportedBytes)); diff != "" {
-					t.Errorf("Export() produced unexpected data (-want +got):\n%s", diff)
+					t.Errorf("ExportCSV() produced unexpected data (-want +got):\n%s", diff)
 				}
 			}
 		})

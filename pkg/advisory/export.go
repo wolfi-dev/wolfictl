@@ -4,19 +4,21 @@ import (
 	"bytes"
 	"encoding/csv"
 	"io"
+	"log"
 	"sort"
 
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	"gopkg.in/yaml.v2"
 )
 
 type ExportOptions struct {
 	AdvisoryCfgIndices []*configs.Index[advisory.Document]
 }
 
-// Export returns a reader of advisory data encoded as CSV.
-func Export(opts ExportOptions) (io.Reader, error) {
+// ExportCSV returns a reader of advisory data encoded as CSV.
+func ExportCSV(opts ExportOptions) (io.Reader, error) {
 	buf := new(bytes.Buffer)
 	csvWriter := csv.NewWriter(buf)
 	defer csvWriter.Flush()
@@ -57,6 +59,29 @@ func Export(opts ExportOptions) (io.Reader, error) {
 					return nil, err
 				}
 			}
+		}
+	}
+
+	return buf, nil
+}
+
+// Export returns a reader of advisory data encoded as CSV.
+func ExportYAML(opts ExportOptions) (io.Reader, error) {
+	buf := new(bytes.Buffer)
+
+	for _, index := range opts.AdvisoryCfgIndices {
+		pkgs := index.Select().Configurations()
+
+		for i, pkg := range pkgs {
+			if i != 0 {
+				buf.WriteString("---\n")
+			}
+
+			d, err := yaml.Marshal(pkg)
+			if err != nil {
+				log.Fatalf("error: %v", err)
+			}
+			buf.Write(d)
 		}
 	}
 
