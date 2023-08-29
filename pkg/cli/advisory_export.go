@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -56,10 +57,10 @@ func AdvisoryExport() *cobra.Command {
 			switch p.format {
 			case OutputYAML:
 				export, err = advisory.ExportYAML(opts)
-			case OutputCSV, OutputDefault:
+			case OutputCSV:
 				export, err = advisory.ExportCSV(opts)
 			default:
-				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%q, %q, %q]", p.format, OutputDefault, OutputYAML, OutputCSV)
+				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV}, ", "))
 			}
 
 			if err != nil {
@@ -77,7 +78,6 @@ func AdvisoryExport() *cobra.Command {
 				defer outputFile.Close()
 			}
 
-			fmt.Println(export)
 			_, err = io.Copy(outputFile, export)
 			if err != nil {
 				return fmt.Errorf("unable to export data to specified location: %w", err)
@@ -103,9 +103,7 @@ type exportParams struct {
 }
 
 const (
-	// OutputDefault default output.
-	OutputDefault = ""
-	// OutputJSON JSON output.
+	// OutputYAML YAML output.
 	OutputYAML = "yaml"
 	// OutputCSV CSV output.
 	OutputCSV = "csv"
@@ -118,6 +116,5 @@ func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 
 	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout)")
 
-	cmd.Flags().StringVarP(&p.format, "format", "f", "",
-		fmt.Sprintf("Output format. One of: [%q, %q, %q]", OutputDefault, OutputYAML, OutputCSV))
+	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV}, ", ")))
 }
