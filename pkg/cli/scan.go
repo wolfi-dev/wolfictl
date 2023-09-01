@@ -140,17 +140,17 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 		if err := t.Close(); err != nil {
 			return nil, err
 		}
-		fmt.Fprintln(os.Stderr, "Will process apk from stdin")
+		fmt.Fprintln(os.Stderr, "Will process from stdin")
 		inputFilePath = t.Name()
 	} else if strings.HasPrefix(inputFilePath, "https://") {
 		// Fetch the remote apk into a temp file.
 		t, err := os.CreateTemp("", "wolfictl-scan-")
 		if err != nil {
-			return nil, fmt.Errorf("failed to create temp file for remote apk: %w", err)
+			return nil, fmt.Errorf("failed to create temp file for remote: %w", err)
 		}
 		resp, err := http.Get(inputFilePath) //nolint:gosec
 		if err != nil {
-			return nil, fmt.Errorf("failed to download remote apk: %w", err)
+			return nil, fmt.Errorf("failed to download from remote: %w", err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
@@ -158,7 +158,7 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 			if err != nil {
 				return nil, err
 			}
-			return nil, fmt.Errorf("failed to download remote apk (%d): %s", resp.StatusCode, string(all))
+			return nil, fmt.Errorf("failed to download from remote (%d): %s", resp.StatusCode, string(all))
 		}
 		if _, err := io.Copy(t, resp.Body); err != nil {
 			return nil, err
