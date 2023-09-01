@@ -68,17 +68,17 @@ func renderDetectedDistro(d distro.Distro) string {
 	return styles.Secondary().Render("Auto-detected distro: ") + d.Name + "\n\n"
 }
 
-func resolveTimestamp(ts string) (time.Time, error) {
+func resolveTimestamp(ts string) (v2.Timestamp, error) {
 	if ts == "now" {
-		return time.Now(), nil
+		return v2.Now(), nil
 	}
 
 	t, err := time.Parse(time.RFC3339, ts)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to parse timestamp: %w", err)
+		return v2.Timestamp{}, fmt.Errorf("unable to parse timestamp: %w", err)
 	}
 
-	return t, nil
+	return v2.Timestamp(t), nil
 }
 
 type advisoryRequestParams struct {

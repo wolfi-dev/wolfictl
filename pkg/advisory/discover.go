@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"time"
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/samber/lo"
@@ -145,7 +144,7 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 func advisoryEventForNewDiscovery(match vuln.Match) v2.Event {
 	return v2.Event{
-		Timestamp: time.Now(),
+		Timestamp: v2.Now(),
 		Type:      v2.EventTypeDetection,
 		Data: v2.Detection{
 			Type: v2.DetectionTypeNVDAPI,

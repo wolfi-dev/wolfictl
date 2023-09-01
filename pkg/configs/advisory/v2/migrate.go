@@ -72,7 +72,7 @@ func migrateV1Entry(v1Entry v1.Entry) (*Event, error) {
 	case vex.StatusUnderInvestigation:
 		return &Event{
 			Type:      EventTypeDetection,
-			Timestamp: v1Entry.Timestamp,
+			Timestamp: Timestamp(v1Entry.Timestamp),
 			Data: Detection{
 				Type: DetectionTypeManual,
 			},
@@ -88,14 +88,14 @@ func migrateV1Entry(v1Entry v1.Entry) (*Event, error) {
 		}
 		return &Event{
 			Type:      EventTypeTruePositiveDetermination,
-			Timestamp: v1Entry.Timestamp,
+			Timestamp: Timestamp(v1Entry.Timestamp),
 			Data:      data,
 		}, nil
 
 	case vex.StatusFixed:
 		return &Event{
 			Type:      EventTypeFixed,
-			Timestamp: v1Entry.Timestamp,
+			Timestamp: Timestamp(v1Entry.Timestamp),
 			Data: Fixed{
 				FixedVersion: v1Entry.FixedVersion,
 			},
@@ -109,7 +109,7 @@ func migrateV1Entry(v1Entry v1.Entry) (*Event, error) {
 
 		return &Event{
 			Type:      EventTypeFalsePositiveDetermination,
-			Timestamp: v1Entry.Timestamp,
+			Timestamp: Timestamp(v1Entry.Timestamp),
 			Data: FalsePositiveDetermination{
 				Type: fpType,
 				Note: v1Entry.ImpactStatement,

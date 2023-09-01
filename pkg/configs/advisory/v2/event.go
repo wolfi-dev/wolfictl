@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -39,7 +38,7 @@ var (
 // and resolution of a potential vulnerability match.
 type Event struct {
 	// Timestamp is the time at which the event occurred.
-	Timestamp time.Time `yaml:"timestamp"`
+	Timestamp Timestamp `yaml:"timestamp"`
 
 	// Type is a string that identifies the kind of event. This field is used to
 	// determine how to unmarshal the Data field.
@@ -51,7 +50,7 @@ type Event struct {
 }
 
 type partialEvent struct {
-	Timestamp time.Time `yaml:"timestamp"`
+	Timestamp Timestamp `yaml:"timestamp"`
 	Type      string    `yaml:"type"`
 	Data      yaml.Node
 }

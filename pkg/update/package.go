@@ -271,7 +271,7 @@ func (o *PackageOptions) request(vuln string) advisory.Request {
 		Package:         o.PackageName,
 		VulnerabilityID: vuln,
 		Event: v2.Event{
-			Timestamp: time.Now(),
+			Timestamp: v2.Now(),
 			Type:      v2.EventTypeFixed,
 			Data: v2.Fixed{
 				FixedVersion: fixedVersion,

@@ -12,8 +12,8 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
-	testTime := time.Date(2022, 9, 26, 0, 0, 0, 0, time.UTC)
-	brotliExistingEventTime := time.Date(2022, 9, 15, 2, 40, 18, 0, time.UTC)
+	testTime := v2.Timestamp(time.Date(2022, 9, 26, 0, 0, 0, 0, time.UTC))
+	brotliExistingEventTime := v2.Timestamp(time.Date(2022, 9, 15, 2, 40, 18, 0, time.UTC))
 
 	tests := []struct {
 		name        string

@@ -9,7 +9,7 @@ import (
 )
 
 func TestDocument_Validate(t *testing.T) {
-	testTime := time.Date(2022, 9, 26, 0, 0, 0, 0, time.UTC)
+	testTime := Timestamp(time.Date(2022, 9, 26, 0, 0, 0, 0, time.UTC))
 	testValidAdvisory := Advisory{
 		ID: "CVE-2020-0001",
 		Events: []Event{
