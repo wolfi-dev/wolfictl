@@ -18,6 +18,7 @@ import (
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
+//nolint:gosec // These are not credential values.
 const (
 	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR"
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"
