@@ -46,11 +46,9 @@ func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
 					continue
 				}
 
-				sort.Slice(advisory.Events, func(i, j int) bool {
-					return advisory.Events[i].Timestamp.Before(advisory.Events[j].Timestamp)
-				})
+				sortedEvents := advisory.SortedEvents()
 
-				latest := advisory.Events[len(advisory.Events)-1]
+				latest := sortedEvents[len(advisory.Events)-1]
 				vulnID := advisory.ID // TODO: should there be a .GetCVE() method on Advisory?
 
 				switch latest.Type {

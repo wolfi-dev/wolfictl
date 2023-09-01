@@ -131,7 +131,7 @@ func AdvisoryUpdate() *cobra.Command {
 			}
 
 			opts := advisory.UpdateOptions{
-				AdvisoryCfgs: advisoryCfgs,
+				AdvisoryDocs: advisoryCfgs,
 			}
 
 			err = advisory.Update(req, opts)

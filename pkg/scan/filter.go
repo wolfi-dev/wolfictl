@@ -37,7 +37,7 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 	switch advisoryFilterSet {
 	case AdvisoriesSetAll:
 		resultFindings := lo.Filter(result.Findings, func(finding *Finding, _ int) bool {
-			adv, ok := packageAdvisories.GetByVulnerabilityID(finding.Vulnerability.ID)
+			adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
 			if ok {
 				// If the advisory contains any events, filter it out!
 				if len(adv.Events) >= 1 {
@@ -47,7 +47,7 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 
 			// Also check any listed aliases
 			for _, alias := range finding.Vulnerability.Aliases {
-				adv, ok := packageAdvisories.GetByVulnerabilityID(alias)
+				adv, ok := packageAdvisories.GetByVulnerability(alias)
 				if !ok {
 					continue
 				}
@@ -64,7 +64,7 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 
 	case AdvisoriesSetResolved:
 		resultFindings := lo.Filter(result.Findings, func(finding *Finding, _ int) bool {
-			adv, ok := packageAdvisories.GetByVulnerabilityID(finding.Vulnerability.ID)
+			adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
 			if ok {
 				if adv.ResolvedAtVersion(result.TargetAPK.Version) {
 					return false
@@ -73,7 +73,7 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 
 			// Also check any listed aliases
 			for _, alias := range finding.Vulnerability.Aliases {
-				adv, ok := packageAdvisories.GetByVulnerabilityID(alias)
+				adv, ok := packageAdvisories.GetByVulnerability(alias)
 				if !ok {
 					continue
 				}

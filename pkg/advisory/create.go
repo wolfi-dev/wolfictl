@@ -9,32 +9,32 @@ import (
 
 // CreateOptions configures the Create operation.
 type CreateOptions struct {
-	// AdvisoryCfgs is the Index of advisory configurations on which to operate.
-	AdvisoryCfgs *configs.Index[v2.Document]
+	// AdvisoryDocs is the Index of advisory documents on which to operate.
+	AdvisoryDocs *configs.Index[v2.Document]
 }
 
-// Create creates a new advisory in the `advisories` section of the configuration
-// at the provided path.
+// Create creates a new advisory in the `advisories` section of the document at
+// the provided path.
 func Create(req Request, opts CreateOptions) error {
 	err := req.Validate()
 	if err != nil {
 		return err
 	}
 
-	advisoryCfgs := opts.AdvisoryCfgs.Select().WhereName(req.Package)
-	count := advisoryCfgs.Len()
+	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
+	count := documents.Len()
 
 	switch count {
 	case 0:
 		// i.e. no advisories file for this package yet
-		return createAdvisoryConfig(opts.AdvisoryCfgs, req)
+		return createAdvisoryConfig(opts.AdvisoryDocs, req)
 
 	case 1:
 		newAdvisoryID := req.VulnerabilityID
 
 		// i.e. exactly one advisories file for this package
 		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
-			if doc.Advisories.Contains(newAdvisoryID) {
+			if _, exists := doc.Advisories.Get(newAdvisoryID); exists {
 				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", newAdvisoryID, req.Package)
 			}
 
@@ -48,7 +48,7 @@ func Create(req Request, opts CreateOptions) error {
 
 			return advs, nil
 		})
-		err := advisoryCfgs.Update(u)
+		err := documents.Update(u)
 		if err != nil {
 			return fmt.Errorf("unable to create advisory %q for %q: %w", newAdvisoryID, req.Package, err)
 		}

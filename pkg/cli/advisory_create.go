@@ -123,7 +123,7 @@ func AdvisoryCreate() *cobra.Command {
 			}
 
 			opts := advisory.CreateOptions{
-				AdvisoryCfgs: advisoryCfgs,
+				AdvisoryDocs: advisoryCfgs,
 			}
 
 			err = advisory.Create(req, opts)

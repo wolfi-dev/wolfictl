@@ -256,7 +256,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	}
 
 	err = advisory.Create(req, advisory.CreateOptions{
-		AdvisoryCfgs: advisoryCfgs,
+		AdvisoryDocs: advisoryCfgs,
 	})
 	if err != nil {
 		return err

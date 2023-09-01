@@ -9,16 +9,16 @@ import (
 
 // UpdateOptions configures the Update operation.
 type UpdateOptions struct {
-	// AdvisoryCfgs is the Index of advisory configurations on which to operate.
-	AdvisoryCfgs *configs.Index[v2.Document]
+	// AdvisoryDocs is the Index of advisory documents on which to operate.
+	AdvisoryDocs *configs.Index[v2.Document]
 }
 
-// Update adds a new entry to an existing advisory (named by the vuln parameter)
-// in the configuration at the provided path.
+// Update adds a new event to an existing advisory (named by the vuln parameter)
+// in the document at the provided path.
 func Update(req Request, opts UpdateOptions) error {
 	vulnID := req.VulnerabilityID
 
-	documents := opts.AdvisoryCfgs.Select().WhereName(req.Package)
+	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
 	if count := documents.Len(); count != 1 {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
 	}

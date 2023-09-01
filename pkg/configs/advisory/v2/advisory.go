@@ -34,11 +34,15 @@ func (adv Advisory) Latest() Event {
 // SortedEvents returns the events in the advisory, sorted by timestamp, from
 // oldest to newest.
 func (adv Advisory) SortedEvents() []Event {
-	sort.Slice(adv.Events, func(i, j int) bool {
-		return adv.Events[i].Timestamp.Before(adv.Events[j].Timestamp)
+	// avoid mutating the original slice
+	sorted := make([]Event, len(adv.Events))
+	copy(sorted, adv.Events)
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].Timestamp.Before(sorted[j].Timestamp)
 	})
 
-	return adv.Events
+	return sorted
 }
 
 // Resolved returns true if the advisory indicates that the vulnerability does

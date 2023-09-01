@@ -112,7 +112,7 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		advCfgEntry, _ := advisoryDocuments.First() //nolint:errcheck
 		document := advCfgEntry.Configuration()
-		if document.Advisories.Contains(vulnID) { // TODO: this should check aliases, too!
+		if _, exists := document.Advisories.GetByVulnerability(vulnID); exists {
 			// advisory already exists in config
 			continue
 		}

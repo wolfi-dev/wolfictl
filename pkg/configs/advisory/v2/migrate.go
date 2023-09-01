@@ -138,8 +138,6 @@ func migrateV1Justification(j vex.Justification) (string, error) {
 		return FPTypeInlineMitigationsExist, nil
 	}
 
-	// Don't allow VulnerableCodeNotPresent because it's too ambiguous.
-
 	// To ease the migration to v2 via pre-migration review of existing data.
 	if fpType := string(j); slices.Contains(FPTypes, fpType) {
 		return fpType, nil

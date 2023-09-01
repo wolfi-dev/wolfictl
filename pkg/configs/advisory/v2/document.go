@@ -10,6 +10,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// SchemaVersion is the latest known schema version for advisory documents.
+// Wolfictl can only operate on documents that use a schema version that is
+// equal to or earlier than this version and that is not earlier than this
+// version's MAJOR number.
 const SchemaVersion = "2"
 
 type Document struct {
@@ -99,16 +103,8 @@ func (advs Advisories) Validate() error {
 	)
 }
 
-func (advs Advisories) Contains(advisoryID string) bool {
-	for _, adv := range advs {
-		if adv.ID == advisoryID {
-			return true
-		}
-	}
-
-	return false
-}
-
+// Get returns the advisory with the given ID. If such an advisory does not
+// exist, the second return value will be false; otherwise it will be true.
 func (advs Advisories) Get(id string) (Advisory, bool) {
 	for _, adv := range advs {
 		if adv.ID == id {
@@ -119,10 +115,11 @@ func (advs Advisories) Get(id string) (Advisory, bool) {
 	return Advisory{}, false
 }
 
-// GetByVulnerabilityID returns the advisory that references the given ID as its
-// advisory ID or as an alias. If such an advisory does not exist, the second
-// return value will be false, otherwise it will be true.
-func (advs Advisories) GetByVulnerabilityID(id string) (Advisory, bool) {
+// GetByVulnerability returns the advisory that references the given
+// vulnerability ID as its advisory ID or as one of the advisory's aliases. If
+// such an advisory does not exist, the second return value will be false;
+// otherwise it will be true.
+func (advs Advisories) GetByVulnerability(id string) (Advisory, bool) {
 	for _, adv := range advs {
 		if adv.ID == id {
 			return adv, true

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"gopkg.in/yaml.v3"
@@ -33,7 +34,9 @@ func ExportCSV(opts ExportOptions) (io.Reader, error) {
 
 		for _, doc := range documents {
 			for _, adv := range doc.Advisories {
-				for _, event := range adv.Events {
+				sortedEvents := adv.SortedEvents()
+
+				for _, event := range sortedEvents {
 					var falsePositiveType, note, fixedVersion string
 
 					switch event.Type {
@@ -81,16 +84,22 @@ func ExportYAML(opts ExportOptions) (io.Reader, error) {
 	buf := new(bytes.Buffer)
 
 	for _, index := range opts.AdvisoryDocIndices {
-		pkgs := index.Select().Configurations()
+		docs := index.Select().Configurations()
 
-		for i, pkg := range pkgs {
+		for i, doc := range docs {
+			// Sort events for each advisory
+			doc.Advisories = lo.Map(doc.Advisories, func(adv v2.Advisory, _ int) v2.Advisory {
+				adv.Events = adv.SortedEvents()
+				return adv
+			})
+
 			if i != 0 {
 				buf.WriteString("---\n")
 			}
 
-			d, err := yaml.Marshal(pkg)
+			d, err := yaml.Marshal(doc)
 			if err != nil {
-				return nil, fmt.Errorf("failed to marshal package %q: %v", pkg.Package.Name, err)
+				return nil, fmt.Errorf("failed to marshal package %q: %v", doc.Package.Name, err)
 			}
 			buf.Write(d)
 		}
