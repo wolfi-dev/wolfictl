@@ -40,5 +40,5 @@ func (req Request) Validate() error {
 		return errors.New("event cannot be zero")
 	}
 
-	return req.Event.Validate(0)
+	return req.Event.Validate()
 }

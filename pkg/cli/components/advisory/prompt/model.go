@@ -46,13 +46,7 @@ func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
 	}
 }
 
-var validCVEID = field.TextValidationRule(func(value string) error {
-	if !vuln.RegexCVE.MatchString(value) && !vuln.RegexGHSA.MatchString(value) {
-		return errors.New("must be a CVE or GHSA ID")
-	}
-
-	return nil
-})
+var validCVEID = field.TextValidationRule(vuln.ValidateID)
 
 func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 	allowedValues := m.allowedVulnerabilitiesFunc(m.Request.Package)

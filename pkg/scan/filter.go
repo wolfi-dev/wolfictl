@@ -38,11 +38,9 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 	case AdvisoriesSetAll:
 		resultFindings := lo.Filter(result.Findings, func(finding *Finding, _ int) bool {
 			adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
-			if ok {
-				// If the advisory contains any events, filter it out!
-				if len(adv.Events) >= 1 {
-					return false
-				}
+			// If the advisory contains any events, filter it out!
+			if ok && len(adv.Events) >= 1 {
+				return false
 			}
 
 			// Also check any listed aliases
@@ -65,10 +63,8 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 	case AdvisoriesSetResolved:
 		resultFindings := lo.Filter(result.Findings, func(finding *Finding, _ int) bool {
 			adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
-			if ok {
-				if adv.ResolvedAtVersion(result.TargetAPK.Version) {
-					return false
-				}
+			if ok && adv.ResolvedAtVersion(result.TargetAPK.Version) {
+				return false
 			}
 
 			// Also check any listed aliases

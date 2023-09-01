@@ -113,13 +113,11 @@ func decodeTypedEventData[T EventTypeData](pe partialEvent) (Event, error) {
 	return event, nil
 }
 
-func (e Event) Validate(eventIndex int) error {
-	return labelError(fmt.Sprintf("(index %d)", eventIndex),
-		errors.Join(
-			e.validateTimestamp(),
-			e.validateType(),
-			e.validateData(),
-		),
+func (e Event) Validate() error {
+	return errors.Join(
+		e.validateTimestamp(),
+		e.validateType(),
+		e.validateData(),
 	)
 }
 

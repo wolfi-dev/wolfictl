@@ -1,13 +1,16 @@
 package v2
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type labeledError struct {
 	label string
 	err   error
 }
 
-// Error implements the error interface.
+// Error returns the error as a message string (to implement the error
+// interface).
 func (l labeledError) Error() string {
 	return fmt.Sprintf("%s: %s", l.label, l.err.Error())
 }

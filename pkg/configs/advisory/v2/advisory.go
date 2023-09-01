@@ -121,7 +121,11 @@ func (adv Advisory) validateEvents() error {
 
 	return labelError("events",
 		errors.Join(lo.Map(adv.Events, func(event Event, i int) error {
-			return event.Validate(i)
+			err := event.Validate()
+			if err != nil {
+				return labelError(fmt.Sprintf("event %d", i), err)
+			}
+			return nil
 		})...),
 	)
 }
