@@ -322,6 +322,7 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 					return nil, fmt.Errorf("unable to find package %s-%s in local repository", r.Name, r.Version)
 				}
 				for _, config := range configs {
+					config := config
 					if fullVersion(&config.Package) == r.Version {
 						pkg = config
 						break

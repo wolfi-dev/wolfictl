@@ -345,30 +345,31 @@ func (p Packages) Repository(arch string) apk.NamedIndex {
 
 	packages := make([]*repository.Package, 0, size)
 	for _, byVersion := range p.packages {
-		for _, config := range byVersion {
+		for _, cfg := range byVersion {
+			cfg := cfg
 			packages = append(packages, &repository.Package{
 				Arch:         arch,
-				Name:         config.Package.Name,
-				Version:      fullVersion(&config.Package),
-				Description:  config.Package.Description,
-				License:      config.Package.LicenseExpression(),
-				Origin:       config.Package.Name,
-				URL:          config.Package.URL,
-				Dependencies: config.Environment.Contents.Packages,
-				Provides:     config.Package.Dependencies.Provides,
-				RepoCommit:   config.Package.Commit,
+				Name:         cfg.Package.Name,
+				Version:      fullVersion(&cfg.Package),
+				Description:  cfg.Package.Description,
+				License:      cfg.Package.LicenseExpression(),
+				Origin:       cfg.Package.Name,
+				URL:          cfg.Package.URL,
+				Dependencies: cfg.Environment.Contents.Packages,
+				Provides:     cfg.Package.Dependencies.Provides,
+				RepoCommit:   cfg.Package.Commit,
 			})
-			for i := range config.Subpackages {
-				sub := config.Subpackages[i]
+			for i := range cfg.Subpackages {
+				sub := cfg.Subpackages[i]
 				packages = append(packages, &repository.Package{
 					Arch:         arch,
 					Name:         sub.Name,
-					Version:      fullVersion(&config.Package),
+					Version:      fullVersion(&cfg.Package),
 					Description:  sub.Description,
-					License:      config.Package.LicenseExpression(),
-					Origin:       config.Package.Name,
-					URL:          config.Package.URL,
-					Dependencies: config.Environment.Contents.Packages,
+					License:      cfg.Package.LicenseExpression(),
+					Origin:       cfg.Package.Name,
+					URL:          cfg.Package.URL,
+					Dependencies: cfg.Environment.Contents.Packages,
 					Provides:     sub.Dependencies.Provides,
 					RepoCommit:   sub.Commit,
 				})
