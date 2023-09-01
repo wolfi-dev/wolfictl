@@ -143,7 +143,7 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 		fmt.Fprintln(os.Stderr, "Will process from stdin")
 		inputFilePath = t.Name()
 	} else if strings.HasPrefix(inputFilePath, "https://") {
-		// Fetch the remote apk into a temp file.
+		// Fetch the remote URL into a temp file.
 		t, err := os.CreateTemp("", "wolfictl-scan-")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create temp file for remote: %w", err)
