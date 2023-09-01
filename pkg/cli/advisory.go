@@ -19,7 +19,6 @@ import (
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
-
 const (
 	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR" //nolint:gosec
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"

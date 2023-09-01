@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -34,6 +36,42 @@ func (d Detection) Validate() error {
 	if !slices.Contains(DetectionTypes, d.Type) {
 		return fmt.Errorf("invalid detection type %q, must be one of [%s]", d.Type, strings.Join(DetectionTypes, ", "))
 	}
+	return nil
+}
+
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
+func (d *Detection) UnmarshalYAML(v *yaml.Node) error {
+	type partialDetection struct {
+		Type string    `yaml:"type"`
+		Data yaml.Node `yaml:"data"`
+	}
+
+	// Unmarshal the detection type and timestamp as a "partial detection" before
+	// unmarshalling the detection-type-specific data.
+	var partial partialDetection
+	if err := v.Decode(&partial); err != nil {
+		return err
+	}
+
+	// Unmarshal the detection-type-specific data.
+	switch partial.Type {
+	case DetectionTypeManual:
+		// No data associated with this type.
+
+	case DetectionTypeNVDAPI:
+		var data DetectionNVDAPI
+		if err := partial.Data.Decode(&data); err != nil {
+			return err
+		}
+		d.Data = data
+
+	default:
+		return fmt.Errorf("invalid detection type %q, must be one of [%s]", partial.Type, strings.Join(DetectionTypes, ", "))
+	}
+
+	// Copy the data from the partial detection.
+	d.Type = partial.Type
+
 	return nil
 }
 
