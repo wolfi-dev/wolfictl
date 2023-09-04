@@ -86,7 +86,6 @@ require (
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
-	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/aws/aws-sdk-go v1.44.288 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/becheran/wildmatch-go v1.0.0 // indirect
@@ -139,7 +138,6 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
-	github.com/google/go-github/v54 v54.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/licensecheck v0.3.1 // indirect
@@ -178,7 +176,6 @@ require (
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.0.0-20230301153543-ba94b245509b // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
-	github.com/kubescape/go-git-url v0.0.25 // indirect
 	github.com/letsencrypt/boulder v0.0.0-20230823180119-72e01b337abc // indirect
 	github.com/lima-vm/go-qcow2reader v0.1.1 // indirect
 	github.com/lima-vm/lima v0.17.2 // indirect
@@ -253,7 +250,6 @@ require (
 	github.com/vifraa/gopom v1.0.0 // indirect
 	github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651 // indirect
 	github.com/wagoodman/go-progress v0.0.0-20230301185719-21920a456ad5 // indirect
-	github.com/whilp/git-urls v1.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
@@ -301,8 +297,9 @@ require (
 	modernc.org/sqlite v1.25.0 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.1.0 // indirect
-	mvdan.cc/sh/v3 v3.5.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace github.com/anchore/syft v0.89.0 => github.com/dlorenc/syft v0.0.0-20230903122655-de526c676fcb
