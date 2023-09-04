@@ -27,6 +27,17 @@ func TestDetection_Validate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "nvdapi missing CPE data",
+			detection: Detection{
+				Type: DetectionTypeNVDAPI,
+				Data: DetectionNVDAPI{
+					CPESearched: "",
+					CPEFound:    "cpe:2.3:a:tinyxml_project:tinyxml:*:*:*:*:*:*:*:*",
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "invalid type",
 			detection: Detection{
 				Type: "foo",
@@ -37,6 +48,17 @@ func TestDetection_Validate(t *testing.T) {
 			name: "no type",
 			detection: Detection{
 				Type: "",
+			},
+			wantErr: true,
+		},
+		{
+			name: "mismatched type and data",
+			detection: Detection{
+				Type: DetectionTypeManual,
+				Data: DetectionNVDAPI{
+					CPESearched: "cpe:2.3:a:*:tinyxml:*:*:*:*:*:*:*:*",
+					CPEFound:    "cpe:2.3:a:tinyxml_project:tinyxml:*:*:*:*:*:*:*:*",
+				},
 			},
 			wantErr: true,
 		},

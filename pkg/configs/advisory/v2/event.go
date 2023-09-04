@@ -155,10 +155,10 @@ func (e Event) validateData() error {
 		return validateTypedEventData[FalsePositiveDetermination](e.Data)
 
 	case EventTypeAnalysisNotPlanned:
-		// no validation needed currently
+		return validateTypedEventData[AnalysisNotPlanned](e.Data)
 
 	case EventTypeFixNotPlanned:
-		// no validation needed currently
+		return validateTypedEventData[FixNotPlanned](e.Data)
 	}
 
 	return nil

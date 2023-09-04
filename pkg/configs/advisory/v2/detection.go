@@ -1,10 +1,12 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
 
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gopkg.in/yaml.v3"
 )
 
@@ -33,10 +35,41 @@ type Detection struct {
 
 // Validate returns an error if the Detection data is invalid.
 func (d Detection) Validate() error {
+	return errors.Join(
+		d.validateType(),
+		d.validateData(),
+	)
+}
+
+func (d Detection) validateType() error {
 	if !slices.Contains(DetectionTypes, d.Type) {
-		return fmt.Errorf("invalid detection type %q, must be one of [%s]", d.Type, strings.Join(DetectionTypes, ", "))
+		return fmt.Errorf("type is %q but must be one of [%v]", d.Type, strings.Join(DetectionTypes, ", "))
 	}
+
 	return nil
+}
+
+func (d Detection) validateData() error {
+	switch d.Type {
+	case DetectionTypeManual:
+		if d.Data != nil {
+			return fmt.Errorf("data must be nil for detection type %q", d.Type)
+		}
+
+	case DetectionTypeNVDAPI:
+		return validateTypedDetectionData[DetectionNVDAPI](d.Data)
+	}
+
+	return nil
+}
+
+func validateTypedDetectionData[T interface{ Validate() error }](data interface{}) error {
+	d, ok := data.(T)
+	if !ok {
+		return fmt.Errorf("data must be of type %T", new(T))
+	}
+
+	return d.Validate()
 }
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface.
@@ -79,4 +112,14 @@ func (d *Detection) UnmarshalYAML(v *yaml.Node) error {
 type DetectionNVDAPI struct {
 	CPESearched string `yaml:"cpeSearched"`
 	CPEFound    string `yaml:"cpeFound"`
+}
+
+// Validate returns an error if the DetectionNVDAPI data is invalid.
+func (d DetectionNVDAPI) Validate() error {
+	return labelError("nvdapi detection data",
+		errors.Join(
+			labelError("cpeSearched", vuln.ValidateCPE(d.CPESearched)),
+			labelError("cpeFound", vuln.ValidateCPE(d.CPEFound)),
+		),
+	)
 }
