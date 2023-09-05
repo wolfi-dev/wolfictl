@@ -2,13 +2,13 @@ package prompt
 
 import (
 	"errors"
-	"regexp"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/field"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 type Model struct {
@@ -46,19 +46,7 @@ func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
 	}
 }
 
-var cveIDRegex = regexp.MustCompile(`^CVE-\d{4}-\d{4,}$`)
-
-// grabbed this regex from Github Docs
-// see https://docs.github.com/en/code-security/security-advisories/global-security-advisories/about-the-github-advisory-database#about-ghsa-ids
-var ghsaRegex = regexp.MustCompile(`GHSA(-[23456789cfghjmpqrvwx]{4}){3}`)
-
-var ValidCVEID = field.TextValidationRule(func(value string) error {
-	if !cveIDRegex.MatchString(value) && !ghsaRegex.MatchString(value) {
-		return errors.New("must be a CVE or GHSA ID")
-	}
-
-	return nil
-})
+var validCVEID = field.TextValidationRule(vuln.ValidateID)
 
 func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 	allowedValues := m.allowedVulnerabilitiesFunc(m.Request.Package)
@@ -66,49 +54,55 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
 		Prompt: "Vulnerability: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Vulnerability = value
+			req.VulnerabilityID = value
 			return req
 		},
 		EmptyValueHelpMsg: "Provide a valid vulnerability ID.",
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
-			ValidCVEID,
+			validCVEID,
 		},
 		AllowedValues: allowedValues,
 	}
 }
 
-func (m Model) newStatusFieldConfig() field.ListFieldConfiguration {
+func (m Model) newTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
-		Prompt: "Status: ",
-		Options: []string{
-			string(vex.StatusFixed),
-			string(vex.StatusNotAffected),
-			string(vex.StatusAffected),
-			string(vex.StatusUnderInvestigation),
-		},
+		Prompt:  "Type: ",
+		Options: v2.EventTypes,
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Status = vex.Status(value)
+			req.Event.Type = value
 			return req
 		},
 	}
 }
 
-func (m Model) newActionFieldConfig() field.TextFieldConfiguration {
+func (m Model) newTruePositiveNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
-		Prompt: "Action: ",
+		Prompt: "Note: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Action = value
+			if req.Event.Data == nil {
+				req.Event.Data = v2.TruePositiveDetermination{
+					Note: value,
+				}
+			}
 			return req
 		},
 	}
 }
 
-func (m Model) newImpactFieldConfig() field.TextFieldConfiguration {
+func (m Model) newFalsePositiveNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
-		Prompt: "Impact: ",
+		Prompt: "Note: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Impact = value
+			if req.Event.Data == nil {
+				req.Event.Data = v2.FalsePositiveDetermination{
+					Note: value,
+				}
+			} else if data, ok := req.Event.Data.(v2.FalsePositiveDetermination); ok {
+				data.Note = value
+				req.Event.Data = data
+			}
 			return req
 		},
 		ValidationRules: []field.TextValidationRule{
@@ -119,12 +113,19 @@ func (m Model) newImpactFieldConfig() field.TextFieldConfiguration {
 	}
 }
 
-func (m Model) newJustificationFieldConfig() field.ListFieldConfiguration {
+func (m Model) newFalsePositiveTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
-		Prompt:  "Justification: ",
-		Options: vex.Justifications(),
+		Prompt:  "False Positive Type: ",
+		Options: v2.FPTypes,
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Justification = vex.Justification(value)
+			if req.Event.Data == nil {
+				req.Event.Data = v2.FalsePositiveDetermination{
+					Type: value,
+				}
+			} else if data, ok := req.Event.Data.(v2.FalsePositiveDetermination); ok {
+				data.Type = value
+				req.Event.Data = data
+			}
 			return req
 		},
 	}
@@ -136,7 +137,11 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 	cfg := field.TextFieldConfiguration{
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.FixedVersion = value
+			if req.Event.Data == nil {
+				req.Event.Data = v2.Fixed{
+					FixedVersion: value,
+				}
+			}
 			return req
 		},
 		AllowedValues:  allowedVersions,
@@ -182,42 +187,42 @@ func (m Model) addMissingFields() (Model, bool) {
 		return m, true
 	}
 
-	if m.Request.Vulnerability == "" {
+	if m.Request.VulnerabilityID == "" {
 		f := field.NewTextField(m.newVulnerabilityFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
-	if m.Request.Status == "" {
-		f := field.NewListField(m.newStatusFieldConfig())
+	if m.Request.Event.Type == "" {
+		f := field.NewListField(m.newTypeFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
-	switch m.Request.Status {
-	case vex.StatusFixed:
-		if m.Request.FixedVersion == "" {
+	switch e := m.Request.Event; e.Type {
+	case v2.EventTypeFixed:
+		if data, ok := e.Data.(v2.Fixed); !ok || data.FixedVersion == "" {
 			f := field.NewTextField(m.newFixedVersionFieldConfig(m.Request.Package))
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
-	case vex.StatusAffected:
-		if m.Request.Action == "" {
-			f := field.NewTextField(m.newActionFieldConfig())
+	case v2.EventTypeTruePositiveDetermination:
+		if data, ok := e.Data.(v2.TruePositiveDetermination); !ok || data.Note == "" {
+			f := field.NewTextField(m.newTruePositiveNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
-	case vex.StatusNotAffected:
-		if m.Request.Justification == "" {
-			f := field.NewListField(m.newJustificationFieldConfig())
+	case v2.EventTypeFalsePositiveDetermination:
+		if data, ok := e.Data.(v2.FalsePositiveDetermination); !ok || data.Type == "" {
+			f := field.NewListField(m.newFalsePositiveTypeFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
-		if m.Request.Impact == "" {
-			f := field.NewTextField(m.newImpactFieldConfig())
+		if data, ok := e.Data.(v2.FalsePositiveDetermination); !ok || data.Note == "" {
+			f := field.NewTextField(m.newFalsePositiveNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
@@ -254,6 +259,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			m.Request = sel.UpdateRequest(m.Request)
+
+			// We should move this business logic snippet somewhere else eventually.
+			if m.Request.Event.Type == v2.EventTypeDetection {
+				m.Request.Event.Data = v2.Detection{Type: v2.DetectionTypeManual}
+			}
+
 			m.fields[m.focusIndex] = sel
 
 			// Move on to the next field

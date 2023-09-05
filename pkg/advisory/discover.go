@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"time"
 
 	"chainguard.dev/melange/pkg/config"
-	"github.com/openvex/go-vex/pkg/vex"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gitlab.alpinelinux.org/alpine/go/repository"
@@ -27,7 +25,7 @@ type DiscoverOptions struct {
 	BuildCfgs *configs.Index[config.Configuration]
 
 	// AdvisoryCfgs is the Index of advisories on which to operate.
-	AdvisoryCfgs *configs.Index[advisoryconfigs.Document]
+	AdvisoryCfgs *configs.Index[v2.Document]
 
 	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").
 	PackageRepositoryURL string
@@ -84,20 +82,23 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 	for i := range matches {
 		match := matches[i]
-		if !match.CPE.VersionRange.Includes(buildCfg.Package.Version) {
+		if !match.CPEFound.VersionRange.Includes(buildCfg.Package.Version) {
 			continue
 		}
 
-		advCfgEntries := opts.AdvisoryCfgs.Select().WhereName(pkg)
 		vulnID := match.Vulnerability.ID
-		if advCfgEntries.Len() == 0 {
+
+		advisoryDocuments := opts.AdvisoryCfgs.Select().WhereName(pkg)
+		if advisoryDocuments.Len() == 0 {
 			// create a brand-new advisory config
 
+			newEvent := advisoryEventForNewDiscovery(match)
+
+			// TODO: why isn't this using advisory.Create? Could this be the source of that one bug?
 			err := createAdvisoryConfig(opts.AdvisoryCfgs, Request{
-				Package:       pkg,
-				Vulnerability: vulnID,
-				Status:        vex.StatusUnderInvestigation,
-				Timestamp:     time.Now(),
+				Package:         pkg,
+				VulnerabilityID: vulnID,
+				Event:           newEvent,
 			})
 			if err != nil {
 				return fmt.Errorf("unable to record new advisory: %w", err)
@@ -108,18 +109,29 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		// there's an existing advisories config
 
-		advCfgEntry, _ := advCfgEntries.First() //nolint:errcheck
-		advCfg := advCfgEntry.Configuration()
-		if _, ok := advCfg.Advisories[vulnID]; ok {
+		advCfgEntry, _ := advisoryDocuments.First() //nolint:errcheck
+		document := advCfgEntry.Configuration()
+		if _, exists := document.Advisories.GetByVulnerability(vulnID); exists {
 			// advisory already exists in config
 			continue
 		}
 
-		log.Printf("🐛 new potential vulnerability for package %q: %s", advCfg.Package.Name, hyperlinkCVE(vulnID))
+		log.Printf("🐛 new potential vulnerability for package %q: %s", document.Package.Name, hyperlinkCVE(vulnID))
 
-		u := advisoryconfigs.NewAdvisoriesSectionUpdater(func(cfg advisoryconfigs.Document) (advisoryconfigs.Advisories, error) {
-			advisories := cfg.Advisories
-			advisories[vulnID] = append(advisories[vulnID], advisoryEntryForNewDiscovery())
+		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+			advisories := doc.Advisories
+			adv, ok := advisories.Get(vulnID)
+			if !ok {
+				adv = v2.Advisory{
+					ID: vulnID,
+					// TODO: We could add aliases here, too!
+				}
+			}
+			adv.Events = append(adv.Events, advisoryEventForNewDiscovery(match))
+			advisories = advisories.Update(vulnID, adv)
+
+			// Ensure the package's advisory list is sorted before returning it.
+			sort.Sort(advisories)
 
 			return advisories, nil
 		})
@@ -133,10 +145,17 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 	return nil
 }
 
-func advisoryEntryForNewDiscovery() advisoryconfigs.Entry {
-	return advisoryconfigs.Entry{
-		Timestamp: time.Now(),
-		Status:    vex.StatusUnderInvestigation,
+func advisoryEventForNewDiscovery(match vuln.Match) v2.Event {
+	return v2.Event{
+		Timestamp: v2.Now(),
+		Type:      v2.EventTypeDetection,
+		Data: v2.Detection{
+			Type: v2.DetectionTypeNVDAPI,
+			Data: v2.DetectionNVDAPI{
+				CPESearched: match.CPESearched.URI,
+				CPEFound:    match.CPEFound.URI,
+			},
+		},
 	}
 }
 

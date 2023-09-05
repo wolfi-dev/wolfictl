@@ -1,17 +1,26 @@
+schema-version: "2"
+
 package:
   name: ko
 
 advisories:
-  CVE-1999-11111:
-    - timestamp: 2023-05-04T10:34:34.169879-04:00
-      status: under-investigation
+  - id: CVE-1999-11111
+    events:
+      - timestamp: 2023-05-04T10:34:34.169879-04:00
+        type: detection
+        data:
+          type: manual
 
-  CVE-2000-22222:
-    - timestamp: 2023-05-04T10:34:34.169879-04:00
-      status: not_affected
-      justification: component_not_present
+  - id: CVE-2000-22222
+    events:
+      - timestamp: 2023-05-04T10:34:34.169879-04:00
+        type: false-positive-determination
+        data:
+          type: component-vulnerability-mismatch
 
-  GHSA-2h5h-59f5-c5x9:
-    - timestamp: 2023-05-04T10:34:34.169879-04:00
-      status: fixed
-      fixed-version: 0.13.0-r3
+  - id: GHSA-2h5h-59f5-c5x9
+    events:
+      - timestamp: 2023-05-04T10:34:34.169879-04:00
+        type: fixed
+        data:
+          fixed-version: 0.13.0-r3

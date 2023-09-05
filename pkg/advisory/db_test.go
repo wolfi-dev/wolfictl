@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -51,16 +51,16 @@ func TestBuildDatabase(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			indices := make([]*configs.Index[advisoryconfigs.Document], 0, len(tt.advisoryDirs))
+			indices := make([]*configs.Index[v2.Document], 0, len(tt.advisoryDirs))
 			for _, dir := range tt.advisoryDirs {
 				advisoryFsys := rwos.DirFS(dir)
-				advisoryCfgs, err := advisoryconfigs.NewIndex(advisoryFsys)
+				advisoryCfgs, err := v2.NewIndex(advisoryFsys)
 				require.NoError(t, err)
 				indices = append(indices, advisoryCfgs)
 			}
 
 			opts := BuildDatabaseOptions{
-				AdvisoryCfgIndices: indices,
+				AdvisoryDocIndices: indices,
 				URLPrefix:          "https://packages.wolfi.dev",
 				Archs:              []string{"x86_64"},
 				Repo:               "os",

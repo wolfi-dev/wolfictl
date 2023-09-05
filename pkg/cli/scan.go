@@ -17,7 +17,7 @@ import (
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
@@ -38,7 +38,7 @@ func Scan() *cobra.Command {
 
 			// Validate inputs
 
-			var advisoryCfgs *configs.Index[advisoryconfigs.Document]
+			var advisoryCfgs *configs.Index[v2.Document]
 
 			if !slices.Contains(validOutputFormats, p.outputFormat) {
 				return fmt.Errorf(
@@ -63,7 +63,7 @@ func Scan() *cobra.Command {
 
 				advisoriesFsys := rwos.DirFS(p.advisoriesRepoDir)
 				var err error
-				advisoryCfgs, err = advisoryconfigs.NewIndex(advisoriesFsys)
+				advisoryCfgs, err = v2.NewIndex(advisoriesFsys)
 				if err != nil {
 					return fmt.Errorf("failed to load advisory documents: %w", err)
 				}

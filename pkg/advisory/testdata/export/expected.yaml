@@ -1,0 +1,147 @@
+schema-version: "2"
+package:
+    name: brotli
+advisories:
+    - id: CVE-2020-8927
+      events:
+        - timestamp: 2022-09-15T02:40:18Z
+          type: fixed
+          data:
+            fixed-version: 1.0.9-r0
+---
+schema-version: "2"
+package:
+    name: ko
+advisories:
+    - id: GHSA-33pg-m6jh-5237
+      events:
+        - timestamp: 2023-05-04T14:34:34Z
+          type: fixed
+          data:
+            fixed-version: 0.13.0-r3
+    - id: GHSA-232p-vwff-86mp
+      events:
+        - timestamp: 2023-05-04T14:34:34Z
+          type: fixed
+          data:
+            fixed-version: 0.13.0-r3
+    - id: GHSA-hw7c-3rfg-p46j
+      events:
+        - timestamp: 2023-05-04T14:34:34Z
+          type: fixed
+          data:
+            fixed-version: 0.13.0-r3
+    - id: GHSA-2h5h-59f5-c5x9
+      events:
+        - timestamp: 2023-05-04T14:34:34Z
+          type: fixed
+          data:
+            fixed-version: 0.13.0-r3
+    - id: GHSA-6wrf-mxfj-pf5p
+      events:
+        - timestamp: 2023-05-04T14:34:34Z
+          type: fixed
+          data:
+            fixed-version: 0.13.0-r3
+---
+schema-version: "2"
+package:
+    name: openssl
+advisories:
+    - id: CVE-2023-0464
+      events:
+        - timestamp: 2023-03-23T09:31:00Z
+          type: fixed
+          data:
+            fixed-version: 3.1.0-r1
+    - id: CVE-2023-1255
+      events:
+        - timestamp: 2023-04-20T16:29:24Z
+          type: fixed
+          data:
+            fixed-version: 3.1.0-r5
+    - id: CVE-2022-3358
+      events:
+        - timestamp: 2022-11-01T16:49:56Z
+          type: fixed
+          data:
+            fixed-version: 3.0.7-r0
+    - id: CVE-2022-3602
+      events:
+        - timestamp: 2022-11-01T16:49:56Z
+          type: fixed
+          data:
+            fixed-version: 3.0.7-r0
+    - id: CVE-2023-0216
+      events:
+        - timestamp: 2023-02-07T16:50:29Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2022-4203
+      events:
+        - timestamp: 2023-02-07T16:50:00Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2023-0215
+      events:
+        - timestamp: 2023-02-07T16:50:08Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2023-0286
+      events:
+        - timestamp: 2023-02-07T16:49:30Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2023-0401
+      events:
+        - timestamp: 2023-02-07T16:50:53Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2023-0465
+      events:
+        - timestamp: 2023-03-28T14:54:27Z
+          type: fixed
+          data:
+            fixed-version: 3.1.0-r2
+    - id: CVE-2023-0466
+      events:
+        - timestamp: 2023-04-08T16:32:54Z
+          type: false-positive-determination
+          data:
+            type: vulnerability-record-analysis-contested
+            note: This was a case of documentation not matching function behavior. The upstream maintainers decided to update the documentation rather than change the behavior. See https://www.openssl.org/news/secadv/20230328.txt
+    - id: CVE-2022-3786
+      events:
+        - timestamp: 2022-11-01T16:49:56Z
+          type: fixed
+          data:
+            fixed-version: 3.0.7-r0
+    - id: CVE-2022-4304
+      events:
+        - timestamp: 2023-02-07T16:49:50Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2023-0217
+      events:
+        - timestamp: 2023-02-07T16:50:39Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0
+    - id: CVE-2022-3996
+      events:
+        - timestamp: 2022-12-22T17:26:45Z
+          type: fixed
+          data:
+            fixed-version: 3.0.7-r1
+    - id: CVE-2022-4450
+      events:
+        - timestamp: 2023-02-07T16:50:17Z
+          type: fixed
+          data:
+            fixed-version: 3.0.8-r0

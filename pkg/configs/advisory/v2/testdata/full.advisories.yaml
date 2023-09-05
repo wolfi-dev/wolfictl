@@ -1,0 +1,73 @@
+schema-version: "2"
+
+package:
+  name: full
+
+advisories:
+  - id: CVE-2000-0001
+    aliases:
+      - GHSA-xxxx-xxxx-xxx9
+      - GO-2000-0001
+    events:
+      - timestamp: 2000-01-01T00:00:00Z
+        type: detection
+        data:
+          type: manual
+      - timestamp: 2000-01-01T00:00:00Z
+        type: detection
+        data:
+          type: nvdapi
+          data:
+            cpeSearched: cpe:2.3:a:*:tinyxml:*:*:*:*:*:*:*:*
+            cpeFound: cpe:2.3:a:tinyxml_project:tinyxml:*:*:*:*:*:*:*:*
+      - timestamp: 2000-01-01T00:00:00Z
+        type: true-positive-determination
+        data:
+          note: Something something true positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: vulnerability-record-analysis-contested
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: component-vulnerability-mismatch
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: vulnerable-code-version-not-used
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: vulnerable-code-not-included-in-package
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: vulnerable-code-not-in-execution-path
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: vulnerable-code-cannot-be-controlled-by-adversary
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: inline-mitigations-exist
+          note: Something something false positive.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: fixed
+        data:
+          fixed-version: 1.2.3-r4
+      - timestamp: 2000-01-01T00:00:00Z
+        type: analysis-not-planned
+        data:
+          note: Something something analysis not planned.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: fix-not-planned
+        data:
+          note: Something something fix not planned.

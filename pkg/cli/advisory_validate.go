@@ -3,10 +3,12 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	advisoryconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -35,7 +37,7 @@ func AdvisoryValidate() *cobra.Command {
 			}
 
 			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := advisoryconfigs.NewIndex(advisoryFsys)
+			advisoryCfgs, err := v2.NewIndex(advisoryFsys)
 			if err != nil {
 				return err
 			}
@@ -46,7 +48,11 @@ func AdvisoryValidate() *cobra.Command {
 
 			validationErr := advisory.Validate(opts)
 			if validationErr != nil {
-				fmt.Fprintf(os.Stderr, "❌ advisory data is not valid.%s\n", validationErr)
+				fmt.Fprintf(
+					os.Stderr,
+					"❌ advisory data is not valid.\n\n%s\n",
+					renderValidationError(validationErr, 0),
+				)
 				os.Exit(1)
 			}
 
@@ -68,4 +74,34 @@ type validateParams struct {
 func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
+}
+
+func renderValidationError(err error, depth int) string {
+	if err == nil {
+		return ""
+	}
+
+	switch e := err.(type) {
+	case interface {
+		Label() string
+		Unwrap() error
+	}:
+		return fmt.Sprintf("%s%s:\n%s", indent(depth), e.Label(), renderValidationError(e.Unwrap(), depth+1))
+
+	case interface{ Unwrap() []error }:
+		errs := e.Unwrap()
+
+		return strings.Join(
+			lo.Map(errs, func(err error, _ int) string {
+				return renderValidationError(err, depth)
+			}),
+			"\n",
+		)
+	}
+
+	return fmt.Sprintf("%s%s", indent(depth), err)
+}
+
+func indent(depth int) string {
+	return strings.Repeat("  ", depth)
 }

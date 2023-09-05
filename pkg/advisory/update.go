@@ -2,39 +2,47 @@ package advisory
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/advisory"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // UpdateOptions configures the Update operation.
 type UpdateOptions struct {
-	// AdvisoryCfgs is the Index of advisory configurations on which to operate.
-	AdvisoryCfgs *configs.Index[advisory.Document]
+	// AdvisoryDocs is the Index of advisory documents on which to operate.
+	AdvisoryDocs *configs.Index[v2.Document]
 }
 
-// Update adds a new entry to an existing advisory (named by the vuln parameter)
-// in the configuration at the provided path.
+// Update adds a new event to an existing advisory (named by the vuln parameter)
+// in the document at the provided path.
 func Update(req Request, opts UpdateOptions) error {
-	vulnID := req.Vulnerability
-	advisoryEntry := req.toAdvisoryEntry()
+	vulnID := req.VulnerabilityID
 
-	advisoryCfgs := opts.AdvisoryCfgs.Select().WhereName(req.Package)
-	if count := advisoryCfgs.Len(); count != 1 {
+	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
+	if count := documents.Len(); count != 1 {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
 	}
 
-	u := advisory.NewAdvisoriesSectionUpdater(func(cfg advisory.Document) (advisory.Advisories, error) {
-		advisories := cfg.Advisories
-		if _, existsAlready := advisories[vulnID]; !existsAlready {
-			return advisory.Advisories{}, fmt.Errorf("no advisory exists for %s", vulnID)
+	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+		advisories := doc.Advisories
+
+		adv, ok := advisories.Get(vulnID)
+		if !ok {
+			return nil, fmt.Errorf("advisory %q does not exist", vulnID)
 		}
 
-		advisories[vulnID] = append(advisories[vulnID], advisoryEntry)
+		// TODO: update the advisory's aliases, too
+
+		adv.Events = append(adv.Events, req.Event)
+		advisories = advisories.Update(vulnID, adv)
+
+		// Ensure the package's advisory list is sorted before returning it.
+		sort.Sort(advisories)
 
 		return advisories, nil
 	})
-	err := advisoryCfgs.Update(u)
+	err := documents.Update(u)
 	if err != nil {
 		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vulnID, req.Package, err)
 	}

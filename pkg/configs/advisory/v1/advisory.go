@@ -1,4 +1,4 @@
-package advisory
+package v1
 
 import (
 	"io"

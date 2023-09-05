@@ -190,7 +190,10 @@ func determineVulnMatch(cve *Cve, packageName, requestCPE string) (*vuln.Match, 
 					Package: vuln.Package{
 						Name: packageName,
 					},
-					CPE: vuln.CPE{
+					CPESearched: vuln.CPE{
+						URI: requestCPE,
+					},
+					CPEFound: vuln.CPE{
 						URI:          cpeMatch.Criteria,
 						VersionRange: vr,
 					},

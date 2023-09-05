@@ -156,6 +156,16 @@ func (i *Index[T]) Create(filepath string, cfg T) error {
 	return nil
 }
 
+// Path returns the path to the configuration file for the given name.
+func (i *Index[T]) Path(name string) string {
+	idx, ok := i.byName[name]
+	if !ok {
+		return ""
+	}
+
+	return i.paths[idx]
+}
+
 func (i *Index[T]) format(filepath string) error {
 	fileForFormatting, err := i.fsys.OpenAsWritable(filepath)
 	if err != nil {
