@@ -145,3 +145,17 @@ func (advs Advisories) Update(id string, advisory Advisory) Advisories {
 
 	return advs
 }
+
+// Implement sort.Interface for Advisories.
+
+func (advs Advisories) Len() int {
+	return len(advs)
+}
+
+func (advs Advisories) Less(i, j int) bool {
+	return advs[i].ID < advs[j].ID
+}
+
+func (advs Advisories) Swap(i, j int) {
+	advs[i], advs[j] = advs[j], advs[i]
+}

@@ -2,6 +2,7 @@ package advisory
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -35,6 +36,9 @@ func Update(req Request, opts UpdateOptions) error {
 
 		adv.Events = append(adv.Events, req.Event)
 		advisories = advisories.Update(vulnID, adv)
+
+		// Ensure the package's advisory list is sorted before returning it.
+		sort.Sort(advisories)
 
 		return advisories, nil
 	})

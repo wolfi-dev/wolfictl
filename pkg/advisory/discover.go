@@ -130,6 +130,9 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			adv.Events = append(adv.Events, advisoryEventForNewDiscovery(match))
 			advisories = advisories.Update(vulnID, adv)
 
+			// Ensure the package's advisory list is sorted before returning it.
+			sort.Sort(advisories)
+
 			return advisories, nil
 		})
 

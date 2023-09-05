@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"slices"
+	"sort"
 
 	"github.com/openvex/go-vex/pkg/vex"
 	v1 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v1"
@@ -44,6 +45,9 @@ func migrateV1Advisories(v1Advisories v1.Advisories) (Advisories, error) {
 
 		advisories = append(advisories, *advisory)
 	}
+
+	// Ensure the advisory list is sorted before returning it.
+	sort.Sort(advisories)
 
 	return advisories, nil
 }

@@ -117,13 +117,15 @@ func TestUpdate(t *testing.T) {
 	}
 
 	dirFS := os.DirFS("testdata/create/advisories")
-	memFS := memfs.New(dirFS)
-	advisoryDocs, err := v2.NewIndex(memFS)
-	require.NoError(t, err)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := Update(tt.req, UpdateOptions{
+			// We want a fresh memfs for each test case.
+			memFS := memfs.New(dirFS)
+			advisoryDocs, err := v2.NewIndex(memFS)
+			require.NoError(t, err)
+
+			err = Update(tt.req, UpdateOptions{
 				AdvisoryDocs: advisoryDocs,
 			})
 

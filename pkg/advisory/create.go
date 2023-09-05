@@ -2,6 +2,7 @@ package advisory
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -38,15 +39,18 @@ func Create(req Request, opts CreateOptions) error {
 				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", newAdvisoryID, req.Package)
 			}
 
-			advs := doc.Advisories
+			advisories := doc.Advisories
 			newAdvisory := v2.Advisory{
 				ID:      newAdvisoryID,
 				Aliases: req.Aliases,
 				Events:  []v2.Event{req.Event},
 			}
-			advs = append(advs, newAdvisory)
+			advisories = append(advisories, newAdvisory)
 
-			return advs, nil
+			// Ensure the package's advisory list is sorted before returning it.
+			sort.Sort(advisories)
+
+			return advisories, nil
 		})
 		err := documents.Update(u)
 		if err != nil {
