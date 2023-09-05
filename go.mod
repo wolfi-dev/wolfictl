@@ -3,12 +3,12 @@ module github.com/wolfi-dev/wolfictl
 go 1.21
 
 require (
-	chainguard.dev/apko v0.9.1-0.20230711074042-37b82f3a5bd8
-	chainguard.dev/melange v0.4.1-0.20230811161639-0d6fbb7ed19a
+	chainguard.dev/apko v0.10.1-0.20230827210213-0f242ef6963e
+	chainguard.dev/melange v0.4.1-0.20230902152104-4a36e43488ec
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.66.0
 	github.com/anchore/syft v0.89.0
-	github.com/chainguard-dev/go-apk v0.0.0-20230710230135-7fc46e8b3c4d
+	github.com/chainguard-dev/go-apk v0.0.0-20230827110006-8c3041a3534a
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230807153807-4de7c531f3e1
 	github.com/charmbracelet/bubbles v0.16.1
@@ -41,14 +41,14 @@ require (
 	github.com/tmc/dot v0.0.0-20210901225022-f9bc17da75c0
 	gitlab.alpinelinux.org/alpine/go v0.7.1-0.20230613043312-f696350aabb4
 	go.lsp.dev/uri v0.3.0
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
+	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
 	golang.org/x/oauth2 v0.11.0
 	golang.org/x/sync v0.3.0
 	golang.org/x/text v0.12.0
 	golang.org/x/time v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.28.0
-	k8s.io/apimachinery v0.28.0
+	k8s.io/apimachinery v0.28.1
 	k8s.io/client-go v0.28.0
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 	sigs.k8s.io/release-utils v0.7.5-0.20230601212346-3866fe05b204
@@ -86,7 +86,6 @@ require (
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
-	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/aws/aws-sdk-go v1.44.288 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/becheran/wildmatch-go v1.0.0 // indirect
@@ -177,7 +176,7 @@ require (
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.0.0-20230301153543-ba94b245509b // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
-	github.com/letsencrypt/boulder v0.0.0-20230818170305-4768d2df2cde // indirect
+	github.com/letsencrypt/boulder v0.0.0-20230823180119-72e01b337abc // indirect
 	github.com/lima-vm/go-qcow2reader v0.1.1 // indirect
 	github.com/lima-vm/lima v0.17.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -263,7 +262,7 @@ require (
 	go.opentelemetry.io/otel v1.16.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
-	golang.org/x/build v0.0.0-20230630152042-ac6243232470 // indirect
+	golang.org/x/build v0.0.0-20230825202850-d75d44855ad1 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
@@ -302,3 +301,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace github.com/anchore/syft v0.89.0 => github.com/dlorenc/syft v0.0.0-20230903122655-de526c676fcb
