@@ -25,6 +25,8 @@ func Build() *cobra.Command {
 	var dir, pipelineDir string
 	var jobs int
 	var dryrun bool
+	var extraKeys, extraRepos []string
+
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
 	cmd := &cobra.Command{
@@ -59,7 +61,9 @@ func Build() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs)
+			g, err := dag.NewGraph(pkgs,
+				dag.WithKeys(extraKeys...),
+				dag.WithRepos(extraRepos...))
 			if err != nil {
 				return err
 			}
@@ -133,6 +137,8 @@ func Build() *cobra.Command {
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringSliceVar(&archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
+	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
+	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 	return cmd
 }
 
