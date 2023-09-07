@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 
 	"github.com/dominikbraun/graph"
@@ -28,6 +29,10 @@ Generate .dot output and pipe it to dot to generate a PNG
   wolfictl dot | dot -Tpng > graph.png
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if pipelineDir == "" {
+				pipelineDir = filepath.Join(dir, "pipelines")
+			}
+
 			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err

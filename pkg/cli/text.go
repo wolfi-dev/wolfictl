@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/config"
@@ -20,6 +21,10 @@ func cmdText() *cobra.Command {
 		Use:   "text",
 		Short: "Print a sorted list of downstream dependent packages",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if pipelineDir == "" {
+				pipelineDir = filepath.Join(dir, "pipelines")
+			}
+
 			arch := types.ParseArchitecture(arch).ToAPK()
 
 			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)

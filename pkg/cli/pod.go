@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	gotemplate "text/template"
@@ -55,6 +56,10 @@ func cmdPod() *cobra.Command {
 		Short: "Generate a kubernetes pod to run the build",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+
+			if pipelineDir == "" {
+				pipelineDir = filepath.Join(dir, "pipelines")
+			}
 
 			arch := types.ParseArchitecture(arch).ToAPK()
 
