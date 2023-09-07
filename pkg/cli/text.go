@@ -17,6 +17,7 @@ import (
 func cmdText() *cobra.Command {
 	var dir, pipelineDir, arch, t string
 	var showDependents, buildtimeReposForRuntime bool
+	var extraKeys, extraRepos []string
 	text := &cobra.Command{
 		Use:   "text",
 		Short: "Print a sorted list of downstream dependent packages",
@@ -31,7 +32,10 @@ func cmdText() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs, dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime))
+			g, err := dag.NewGraph(pkgs,
+				dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
+				dag.WithKeys(extraKeys...),
+				dag.WithRepos(extraRepos...))
 			if err != nil {
 				return err
 			}
@@ -76,6 +80,8 @@ func cmdText() *cobra.Command {
 	text.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	text.Flags().StringVarP(&t, "type", "t", string(typeTarget), fmt.Sprintf("What type of text to emit; values can be one of: %v", textTypes))
 	text.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
+	text.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
+	text.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 	return text
 }
 

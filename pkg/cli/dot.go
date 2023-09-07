@@ -16,6 +16,7 @@ import (
 func cmdSVG() *cobra.Command {
 	var dir, pipelineDir string
 	var showDependents, buildtimeReposForRuntime bool
+	var extraKeys, extraRepos []string
 	d := &cobra.Command{
 		Use:   "dot",
 		Short: "Generate graphviz .dot output",
@@ -37,7 +38,11 @@ Generate .dot output and pipe it to dot to generate a PNG
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs, dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime))
+			g, err := dag.NewGraph(pkgs,
+				dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
+				dag.WithKeys(extraKeys...),
+				dag.WithRepos(extraRepos...),
+			)
 			if err != nil {
 				return err
 			}
@@ -81,6 +86,8 @@ Generate .dot output and pipe it to dot to generate a PNG
 	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	d.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
+	d.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
+	d.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 	return d
 }
 

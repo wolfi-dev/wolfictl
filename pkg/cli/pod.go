@@ -51,6 +51,8 @@ func cmdPod() *cobra.Command {
 	var create, watch, secretKey, buildtimeReposForRuntime bool
 	var pendingTimeout time.Duration
 
+	var extraKeys, extraRepos []string
+
 	pod := &cobra.Command{
 		Use:   "pod",
 		Short: "Generate a kubernetes pod to run the build",
@@ -82,7 +84,10 @@ func cmdPod() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				g, err := dag.NewGraph(pkgs, dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime))
+				g, err := dag.NewGraph(pkgs,
+					dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
+					dag.WithKeys(extraKeys...),
+					dag.WithRepos(extraRepos...))
 				if err != nil {
 					return err
 				}
@@ -389,6 +394,8 @@ gcloud --quiet storage cp \
 	pod.Flags().StringVar(&melangeBuildOpts, "melange-build-options", "", "additional options to pass to the melange build")
 	pod.Flags().StringVar(&gcloudImage, "gcloud-image", "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim", "image to use for gcloud stuff")
 	pod.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
+	pod.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
+	pod.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 
 	_ = pod.MarkFlagRequired("repo") //nolint:errcheck
 	return pod
