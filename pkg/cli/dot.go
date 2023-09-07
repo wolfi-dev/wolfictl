@@ -2,12 +2,10 @@ package cli
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
 
-	"github.com/dominikbraun/graph"
 	"github.com/spf13/cobra"
 	"github.com/tmc/dot"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
@@ -20,14 +18,15 @@ func cmdSVG() *cobra.Command {
 	d := &cobra.Command{
 		Use:   "dot",
 		Short: "Generate graphviz .dot output",
+		Args:  cobra.MinimumNArgs(1),
 		Long: `
 Generate .dot output and pipe it to dot to generate an SVG
 
-  wolfictl dot | dot -Tsvg > graph.svg
+  wolfictl dot zlib | dot -Tsvg > graph.svg
 
 Generate .dot output and pipe it to dot to generate a PNG
 
-  wolfictl dot | dot -Tpng > graph.png
+  wolfictl dot zlib | dot -Tpng > graph.png
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if pipelineDir == "" {
@@ -36,50 +35,86 @@ Generate .dot output and pipe it to dot to generate a PNG
 
 			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
-				return err
+				return fmt.Errorf("NewPackages: %w", err)
 			}
+
 			g, err := dag.NewGraph(pkgs,
 				dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...),
 			)
 			if err != nil {
+				return fmt.Errorf("building graph: %w", err)
+			}
+
+			out := dot.NewGraph("images")
+			out.SetType(dot.DIGRAPH)
+
+			amap, err := g.Graph.AdjacencyMap()
+			if err != nil {
 				return err
 			}
 
-			if len(args) == 0 {
-				if showDependents {
-					log.Print("warning: the 'show dependents' option has no effect without specifying one or more package names")
-				}
-			} else {
-				// ensure all packages exist in the graph
-				for _, arg := range args {
-					if _, err := g.Graph.Vertex(arg); err == graph.ErrVertexNotFound {
-						return fmt.Errorf("package %q not found in graph", arg)
-					}
-				}
-
-				// determine if we're examining dependencies or dependents
-				var subgraph *dag.Graph
-				if showDependents {
-					leaves := args
-					subgraph, err = g.SubgraphWithLeaves(leaves)
-					if err != nil {
-						return err
-					}
-				} else {
-					roots := args
-					subgraph, err = g.SubgraphWithRoots(roots)
-					if err != nil {
-						return err
-					}
-				}
-
-				g = subgraph
+			pmap, err := g.Graph.PredecessorMap()
+			if err != nil {
+				return err
 			}
 
-			summarize(*g)
-			return viz(*g)
+			for _, node := range args {
+				n := dot.NewNode(node)
+				out.AddNode(n)
+
+				byName, err := g.NodesByName(node)
+				if err != nil {
+					return err
+				}
+
+				if len(byName) == 0 {
+					return fmt.Errorf("could not find node %q", node)
+				}
+
+				for _, name := range byName {
+					dependencies, ok := amap[dag.PackageHash(name)]
+					if !ok {
+						continue
+					}
+
+					deps := make([]string, 0, len(dependencies))
+					for dep := range dependencies {
+						deps = append(deps, dep)
+					}
+					sort.Strings(deps)
+
+					for _, dep := range deps {
+						d := dot.NewNode(dep)
+						out.AddNode(d)
+						out.AddEdge(dot.NewEdge(n, d))
+					}
+
+					if !showDependents {
+						continue
+					}
+
+					predecessors, ok := pmap[dag.PackageHash(name)]
+					if !ok {
+						continue
+					}
+
+					preds := make([]string, 0, len(predecessors))
+					for pred := range predecessors {
+						preds = append(preds, pred)
+					}
+					sort.Strings(preds)
+
+					for _, pred := range preds {
+						d := dot.NewNode(pred)
+						out.AddNode(d)
+						out.AddEdge(dot.NewEdge(d, n))
+					}
+				}
+			}
+			fmt.Println(out.String())
+			return nil
 		},
 	}
 	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
@@ -89,54 +124,4 @@ Generate .dot output and pipe it to dot to generate a PNG
 	d.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	d.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 	return d
-}
-
-func summarize(g dag.Graph) {
-	order, err := g.Graph.Order()
-	if err != nil {
-		log.Printf("unable to get number of nodes in graph: %s", err)
-		return
-	}
-	log.Println("nodes:", order)
-
-	size, err := g.Graph.Size()
-	if err != nil {
-		log.Printf("unable to get number of edges in graph: %s", err)
-		return
-	}
-	log.Println("edges:", size)
-}
-
-func viz(g dag.Graph) error {
-	out := dot.NewGraph("images")
-	out.SetType(dot.DIGRAPH)
-
-	nodes := g.Packages()
-
-	adjacencyMap, err := g.Graph.AdjacencyMap()
-	if err != nil {
-		return err
-	}
-
-	for _, node := range nodes {
-		n := dot.NewNode(node)
-		out.AddNode(n)
-
-		if deps, ok := adjacencyMap[node]; ok {
-			dependencies := make([]string, 0, len(deps))
-			for dep := range deps {
-				dependencies = append(dependencies, dep)
-			}
-			sort.Strings(dependencies)
-
-			for _, dependency := range dependencies {
-				d := dot.NewNode(dependency)
-				out.AddNode(d)
-				out.AddEdge(dot.NewEdge(n, d))
-			}
-		}
-	}
-
-	fmt.Println(out.String())
-	return nil
 }
