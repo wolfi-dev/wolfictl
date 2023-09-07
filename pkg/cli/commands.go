@@ -20,7 +20,6 @@ func New() *cobra.Command {
 		Gh(),
 		Apk(),
 		Index(),
-		cmdPod(),
 		cmdSVG(),
 		cmdText(),
 		Check(),
