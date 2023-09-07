@@ -29,8 +29,8 @@ func TestNewGraph(t *testing.T) {
 			allBusybox := pkgs.Config("busybox", false)
 			require.Len(t, allBusybox, 1)
 			busybox := allBusybox[0]
-			require.Contains(t, amap, packageHash(busybox))
-			busyboxDeps := amap[packageHash(busybox)]
+			require.Contains(t, amap, PackageHash(busybox))
+			busyboxDeps := amap[PackageHash(busybox)]
 			expectedDeps := []string{
 				"ca-certificates-bundle:@unknown",
 				"build-base:@unknown",
@@ -43,7 +43,7 @@ func TestNewGraph(t *testing.T) {
 			// the direct dependencies from environment.contents.packages should be dangling, i.e. unresolved
 			for _, dep := range expectedDeps {
 				assert.Contains(t, busyboxDeps, dep)
-				assert.Equal(t, busyboxDeps[dep].Source, packageHash(busybox))
+				assert.Equal(t, busyboxDeps[dep].Source, PackageHash(busybox))
 				assert.Equal(t, busyboxDeps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
@@ -60,8 +60,8 @@ func TestNewGraph(t *testing.T) {
 			allBusybox := pkgs.Config("busybox", false)
 			require.Len(t, allBusybox, 1)
 			busybox := allBusybox[0]
-			require.Contains(t, amap, packageHash(busybox))
-			busyboxDeps := amap[packageHash(busybox)]
+			require.Contains(t, amap, PackageHash(busybox))
+			busyboxDeps := amap[PackageHash(busybox)]
 			// these deps are taken from the environment.contents.packages of testdata/busybox.yaml
 			// these do not include versions or sources, which are calculated by the graph.
 			// so we need to get the correct deps.
@@ -78,7 +78,7 @@ func TestNewGraph(t *testing.T) {
 			// the direct dependencies from environment.contents.packages should be dangling, i.e. unresolved
 			for _, dep := range expectedDeps {
 				assert.Contains(t, busyboxDeps, dep)
-				assert.Equal(t, busyboxDeps[dep].Source, packageHash(busybox))
+				assert.Equal(t, busyboxDeps[dep].Source, PackageHash(busybox))
 				assert.Equal(t, busyboxDeps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
@@ -105,8 +105,8 @@ func TestNewGraph(t *testing.T) {
 			require.Len(t, configs, 2) // there is both one and one-dupl; same package name, same config, different versions
 			// one and one-dupl files are identical, except for version, so their graphs should look the same
 			for _, conf := range configs {
-				require.Contains(t, amap, packageHash(conf))
-				deps := amap[packageHash(conf)]
+				require.Contains(t, amap, PackageHash(conf))
+				deps := amap[PackageHash(conf)]
 				expectedDeps := []string{
 					"wolfi-baselayout:1-r2@testdata/packages/x86_64",
 					"ca-certificates-bundle:20220614-r1@testdata/packages/x86_64",
@@ -121,7 +121,7 @@ func TestNewGraph(t *testing.T) {
 				// the direct dependencies from environment.contents.packages should be dangling, i.e. unresolved
 				for _, dep := range expectedDeps {
 					assert.Contains(t, deps, dep)
-					assert.Equal(t, deps[dep].Source, packageHash(conf))
+					assert.Equal(t, deps[dep].Source, PackageHash(conf))
 					assert.Equal(t, deps[dep].Target, dep)
 					vertex, err := graph.Graph.Vertex(dep)
 					require.NoError(t, err)
@@ -139,8 +139,8 @@ func TestNewGraph(t *testing.T) {
 			allConfigs := pkgs.Config("three-other", true)
 			require.Len(t, allConfigs, 1)
 			conf := allConfigs[0]
-			require.Contains(t, amap, packageHash(conf))
-			deps := amap[packageHash(conf)]
+			require.Contains(t, amap, PackageHash(conf))
+			deps := amap[PackageHash(conf)]
 			// external dependencies, therefore dangling
 			externalDeps := []string{
 				"wolfi-baselayout:1-r2@testdata/packages/x86_64",
@@ -157,7 +157,7 @@ func TestNewGraph(t *testing.T) {
 			// the external dependencies should be dangling, i.e. unresolved
 			for _, dep := range externalDeps {
 				assert.Contains(t, deps, dep)
-				assert.Equal(t, deps[dep].Source, packageHash(conf))
+				assert.Equal(t, deps[dep].Source, PackageHash(conf))
 				assert.Equal(t, deps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
@@ -166,11 +166,11 @@ func TestNewGraph(t *testing.T) {
 			// the internal dependencies should be resolved
 			for _, dep := range internalDeps {
 				assert.Contains(t, deps, dep)
-				assert.Equal(t, deps[dep].Source, packageHash(conf))
+				assert.Equal(t, deps[dep].Source, PackageHash(conf))
 				assert.Equal(t, deps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
-				assert.Equal(t, packageHash(vertex), dep)
+				assert.Equal(t, PackageHash(vertex), dep)
 				assert.True(t, vertex.Resolved())
 			}
 		})
@@ -185,8 +185,8 @@ func TestNewGraph(t *testing.T) {
 			allConfigs := pkgs.Config("two", true)
 			require.Len(t, allConfigs, 1)
 			conf := allConfigs[0]
-			require.Contains(t, amap, packageHash(conf))
-			deps := amap[packageHash(conf)]
+			require.Contains(t, amap, PackageHash(conf))
+			deps := amap[PackageHash(conf)]
 			// external dependencies, therefore dangling
 			externalDeps := []string{
 				"wolfi-baselayout:1-r2@testdata/packages/x86_64",
@@ -207,7 +207,7 @@ func TestNewGraph(t *testing.T) {
 			// the external dependencies should be dangling, i.e. unresolved
 			for _, dep := range externalDeps {
 				assert.Contains(t, deps, dep)
-				assert.Equal(t, deps[dep].Source, packageHash(conf))
+				assert.Equal(t, deps[dep].Source, PackageHash(conf))
 				assert.Equal(t, deps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
@@ -216,11 +216,11 @@ func TestNewGraph(t *testing.T) {
 			// the internal dependencies should be resolved
 			for _, dep := range internalDeps {
 				assert.Contains(t, deps, dep)
-				assert.Equal(t, deps[dep].Source, packageHash(conf))
+				assert.Equal(t, deps[dep].Source, PackageHash(conf))
 				assert.Equal(t, deps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
-				assert.Equal(t, packageHash(vertex), dep)
+				assert.Equal(t, PackageHash(vertex), dep)
 				assert.True(t, vertex.Resolved())
 			}
 		})
@@ -246,7 +246,7 @@ func TestNewGraph(t *testing.T) {
 		for k, v := range expectedDeps {
 			allConfigs := pkgs.Config(k, true)
 			require.Len(t, allConfigs, 1, "no configs for %s", k)
-			confKey := packageHash(allConfigs[0])
+			confKey := PackageHash(allConfigs[0])
 			require.Contains(t, amap, confKey, "missing key %s", confKey)
 			var deps []string
 			for d := range amap[confKey] {
@@ -278,7 +278,7 @@ func TestNewGraph(t *testing.T) {
 		for k, v := range expectedDeps {
 			allConfigs := pkgs.Config(k, true)
 			require.Len(t, allConfigs, 1, "no configs for %s", k)
-			confKey := packageHash(allConfigs[0])
+			confKey := PackageHash(allConfigs[0])
 			require.Contains(t, amap, confKey, "missing key %s", confKey)
 			var deps []string
 			for d := range amap[confKey] {

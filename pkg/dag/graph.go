@@ -38,14 +38,14 @@ type Graph struct {
 	byName    map[string][]string         // maintains a listing of all known hashes for a given name
 }
 
-// packageHash given anything that implements Package, return the hash to be used
+// PackageHash given anything that implements Package, return the hash to be used
 // for the node in the graph.
-func packageHash(p Package) string {
+func PackageHash(p Package) string {
 	return p.Name() + ":" + p.Version() + "@" + p.Source()
 }
 
 func newGraph() graph.Graph[string, Package] {
-	return graph.New(packageHash, graph.Directed(), graph.Acyclic(), graph.PreventCycles())
+	return graph.New(PackageHash, graph.Directed(), graph.Acyclic(), graph.PreventCycles())
 }
 
 // cycle represents pairs of edges that create a cycle in the graph
@@ -106,11 +106,11 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 					errs = append(errs, fmt.Errorf("unable to add vertex for %q subpackage %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
 					continue
 				}
-				parentHash := packageHash(c)
+				parentHash := PackageHash(c)
 				attrs := map[string]string{
 					attributePkgList: parentHash,
 				}
-				if err := g.Graph.AddEdge(packageHash(subpkgVersion), parentHash, graph.EdgeAttributes(attrs)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+				if err := g.Graph.AddEdge(PackageHash(subpkgVersion), parentHash, graph.EdgeAttributes(attrs)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
 					// a subpackage always must depend on its origin package. It is not acceptable to have any errors, other than that we already know about that dependency.
 					errs = append(errs, fmt.Errorf("unable to add edge for subpackage %q from %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
 					continue
@@ -283,7 +283,7 @@ func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource, 
 func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package, dep, localRepo string, allowSelf bool) (*cycle, error) {
 	var (
 		pkg    Package
-		pkgKey = packageHash(c)
+		pkgKey = PackageHash(c)
 	)
 	resolver, ok := g.resolvers[resolverKey]
 	if !ok {
@@ -338,7 +338,7 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 				return nil, fmt.Errorf("unable to add vertex for %s dependency %s: %w", c, dep, err)
 			}
 			pkgs = append(pkgs, pkg)
-			matchList = append(matchList, packageHash(pkg))
+			matchList = append(matchList, PackageHash(pkg))
 		}
 		var (
 			allPkgs = strings.Join(matchList, " ")
@@ -485,7 +485,7 @@ func (g *Graph) resolveCycle(c *cycle, dep string) ([]string, error) {
 		if err != nil {
 			return origSp, fmt.Errorf("unable to find original vertex %s: %w", rem.src, err)
 		}
-		cycle, err := g.addAppropriatePackageFromList(packageHash(config), strings.Split(rem.attrs[attributePkgList], " "), rem.attrs)
+		cycle, err := g.addAppropriatePackageFromList(PackageHash(config), strings.Split(rem.attrs[attributePkgList], " "), rem.attrs)
 		if err != nil {
 			return origSp, fmt.Errorf("unable to re-add original edge %s -> %s: %w", rem.src, origDep, err)
 		}
@@ -501,7 +501,7 @@ func (g *Graph) addVertex(pkg Package) error {
 	if err := g.Graph.AddVertex(pkg); err != nil {
 		return err
 	}
-	g.byName[pkg.Name()] = append(g.byName[pkg.Name()], packageHash(pkg))
+	g.byName[pkg.Name()] = append(g.byName[pkg.Name()], PackageHash(pkg))
 	return nil
 }
 
@@ -510,7 +510,7 @@ func (g *Graph) addDanglingPackage(name string, parent Package) error {
 	if err := g.addVertex(pkg); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 		return err
 	}
-	if err := g.Graph.AddEdge(packageHash(parent), packageHash(pkg)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+	if err := g.Graph.AddEdge(PackageHash(parent), PackageHash(pkg)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
 		return err
 	}
 	return nil
