@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/dominikbraun/graph"
 	"github.com/spf13/cobra"
@@ -100,14 +101,27 @@ func viz(g dag.Graph) error {
 
 	nodes := g.Packages()
 
+	adjacencyMap, err := g.Graph.AdjacencyMap()
+	if err != nil {
+		return err
+	}
+
 	for _, node := range nodes {
 		n := dot.NewNode(node)
 		out.AddNode(n)
 
-		for _, dependency := range g.DependenciesOf(node) {
-			d := dot.NewNode(dependency)
-			out.AddNode(d)
-			out.AddEdge(dot.NewEdge(n, d))
+		if deps, ok := adjacencyMap[node]; ok {
+			dependencies := make([]string, 0, len(deps))
+			for dep := range deps {
+				dependencies = append(dependencies, dep)
+			}
+			sort.Strings(dependencies)
+
+			for _, dependency := range dependencies {
+				d := dot.NewNode(dependency)
+				out.AddNode(d)
+				out.AddEdge(dot.NewEdge(n, d))
+			}
 		}
 	}
 
