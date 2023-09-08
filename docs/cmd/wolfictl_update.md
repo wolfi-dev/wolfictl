@@ -17,6 +17,7 @@ Proposes melange package update(s) via a pull request
 ```
       --create-issues                     creates GitHub Issues for failed package updates (default true)
       --dry-run                           prints proposed package updates rather than creating a pull request
+      --github-labels stringArray         Optional: provide a list of labels to apply to updater generated issues and pull requests
       --github-release-query              query the GitHub graphql API for latest releases (default true)
   -h, --help                              help for update
       --package-name stringArray          Optional: provide a specific package name to check for updates rather than searching all packages in a repo URI
@@ -24,7 +25,6 @@ Proposes melange package update(s) via a pull request
       --pull-request-title string         the title to use when creating a pull request (default "%s/%s package update")
       --release-monitoring-query          query https://release-monitoring.org/ API for latest releases (default true)
       --use-gitsign                       enable gitsign to sign the git commits
-      --github-label                      specify a label to apply to all update related issues and PRs
 ```
 
 ### SEE ALSO

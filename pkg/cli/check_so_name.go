@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -21,10 +20,7 @@ func SoName() *cobra.Command {
 		},
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		cwd = "."
-	}
+	cwd := "."
 
 	cmd.Flags().StringVarP(&o.Dir, "directory", "d", ".", "directory containing melange configs")
 	cmd.Flags().StringVar(&o.PackagesDir, "packages-dir", filepath.Join(cwd, "packages"), "directory containing new packages")

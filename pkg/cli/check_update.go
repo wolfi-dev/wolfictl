@@ -2,7 +2,6 @@ package cli
 
 import (
 	"log"
-	"os"
 
 	"github.com/wolfi-dev/wolfictl/pkg/checks"
 
@@ -31,10 +30,7 @@ func CheckUpdate() *cobra.Command {
 }
 
 func checkUpdateFlags(cmd *cobra.Command, o *checks.CheckUpdateOptions) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		cwd = "."
-	}
+	cwd := "."
 
 	cmd.Flags().StringVarP(&o.Dir, "directory", "d", cwd, "directory containing melange configs")
 	cmd.Flags().StringVarP(&o.OverrideVersion, "override-version", "", "", "override the local melange config version to test an update works as expected")

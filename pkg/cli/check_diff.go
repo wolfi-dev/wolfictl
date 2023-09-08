@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 
@@ -35,10 +34,7 @@ func Diff() *cobra.Command {
 		},
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		cwd = "."
-	}
+	cwd := "."
 
 	cmd.Flags().StringVar(&o.Dir, "dir", cwd, "directory the command is executed from and will contain the resulting diff.log file")
 	cmd.Flags().StringVar(&o.PackagesDir, "packages-dir", filepath.Join(cwd, "packages"), "directory containing new packages")
