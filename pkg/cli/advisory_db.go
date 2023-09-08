@@ -12,7 +12,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
-func AdvisoryDB() *cobra.Command {
+func cmdAdvisoryDB() *cobra.Command {
 	p := &dbParams{}
 	cmd := &cobra.Command{
 		Use:           "db",

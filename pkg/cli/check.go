@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Check() *cobra.Command {
+func cmdCheck() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "check",
 		Aliases:       []string{"checks"},

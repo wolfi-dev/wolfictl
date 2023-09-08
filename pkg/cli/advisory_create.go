@@ -18,7 +18,7 @@ import (
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
-func AdvisoryCreate() *cobra.Command {
+func cmdAdvisoryCreate() *cobra.Command {
 	p := &createParams{}
 	cmd := &cobra.Command{
 		Use:           "create",

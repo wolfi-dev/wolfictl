@@ -10,7 +10,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
-func AdvisoryList() *cobra.Command {
+func cmdAdvisoryList() *cobra.Command {
 	p := &listParams{}
 	cmd := &cobra.Command{
 		Use:           "list",

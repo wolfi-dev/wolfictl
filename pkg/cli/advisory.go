@@ -24,7 +24,7 @@ const (
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"
 )
 
-func Advisory() *cobra.Command {
+func cmdAdvisory() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "advisory",
 		Aliases:       []string{"adv"},
@@ -32,14 +32,14 @@ func Advisory() *cobra.Command {
 		Short:         "Utilities for viewing and modifying Wolfi advisory data",
 	}
 
-	cmd.AddCommand(AdvisoryList())
-	cmd.AddCommand(AdvisoryCreate())
-	cmd.AddCommand(AdvisoryUpdate())
-	cmd.AddCommand(AdvisoryDiscover())
-	cmd.AddCommand(AdvisoryDB())
-	cmd.AddCommand(AdvisoryValidate())
-	cmd.AddCommand(AdvisoryExport())
-	cmd.AddCommand(AdvisoryMigrate())
+	cmd.AddCommand(cmdAdvisoryList())
+	cmd.AddCommand(cmdAdvisoryCreate())
+	cmd.AddCommand(cmdAdvisoryUpdate())
+	cmd.AddCommand(cmdAdvisoryDiscover())
+	cmd.AddCommand(cmdAdvisoryDB())
+	cmd.AddCommand(cmdAdvisoryValidate())
+	cmd.AddCommand(cmdAdvisoryExport())
+	cmd.AddCommand(cmdAdvisoryMigrate())
 
 	return cmd
 }

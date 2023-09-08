@@ -18,7 +18,7 @@ import (
 	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
-func AdvisoryUpdate() *cobra.Command {
+func cmdAdvisoryUpdate() *cobra.Command {
 	p := &updateParams{}
 	cmd := &cobra.Command{
 		Use:           "update",

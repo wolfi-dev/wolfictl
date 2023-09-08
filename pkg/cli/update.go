@@ -24,7 +24,7 @@ type options struct {
 	maxRetries             int
 }
 
-func Update() *cobra.Command {
+func cmdUpdate() *cobra.Command {
 	o := &options{}
 	cmd := &cobra.Command{
 		Use:     "update",

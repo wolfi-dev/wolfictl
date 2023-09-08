@@ -13,7 +13,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
-func AdvisoryValidate() *cobra.Command {
+func cmdAdvisoryValidate() *cobra.Command {
 	p := &validateParams{}
 	cmd := &cobra.Command{
 		Use:           "validate",

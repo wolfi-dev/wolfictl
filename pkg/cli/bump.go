@@ -52,7 +52,7 @@ func updateMakefile(repoDir, packageName, latestVersion string, epoch uint64) er
 	return nil
 }
 
-func Bump() *cobra.Command {
+func cmdBump() *cobra.Command {
 	opts := bumpOptions{}
 	cmd := &cobra.Command{
 		Use:     "bump [flags] config[.yaml] [config[.yaml]...]",
@@ -71,7 +71,7 @@ the version in each matching configuration file:
     wolfictl bump openssl
     wolfictl bump lib*.yaml
 
-The command assumes it is being run from the top of the wolfi/os 
+The command assumes it is being run from the top of the wolfi/os
 repository. To look for files in another location use the --repo flag.
 You can use --dry-run to see which versions will be bumped without
 modifying anything in the filesystem.

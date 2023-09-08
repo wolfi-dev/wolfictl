@@ -14,7 +14,7 @@ type lintOptions struct {
 	skipRules []string
 }
 
-func Lint() *cobra.Command {
+func cmdLint() *cobra.Command {
 	o := &lintOptions{}
 	cmd := &cobra.Command{
 		Use:               "lint",
@@ -33,7 +33,7 @@ func Lint() *cobra.Command {
 	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "prints the all of available rules and exits")
 	cmd.Flags().StringArrayVarP(&o.skipRules, "skip-rule", "", []string{}, "list of rules to skip")
 
-	cmd.AddCommand(LintYam())
+	cmd.AddCommand(cmdLintYam())
 
 	return cmd
 }
