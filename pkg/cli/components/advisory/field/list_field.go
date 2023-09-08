@@ -11,6 +11,7 @@ import (
 )
 
 type ListField struct {
+	id             string
 	prompt         string
 	input          list.Model
 	done           bool
@@ -18,6 +19,9 @@ type ListField struct {
 }
 
 type ListFieldConfiguration struct {
+	// ID is a unique identifier for the field.
+	ID string
+
 	Prompt         string
 	Options        []string
 	RequestUpdater func(value string, req advisory.Request) advisory.Request
@@ -29,10 +33,15 @@ func NewListField(cfg ListFieldConfiguration) ListField {
 	l.UnselectedStyle = styles.Secondary()
 
 	return ListField{
+		id:             cfg.ID,
 		prompt:         cfg.Prompt,
 		input:          l,
 		requestUpdater: cfg.RequestUpdater,
 	}
+}
+
+func (f ListField) ID() string {
+	return f.id
 }
 
 func (f ListField) UpdateRequest(req advisory.Request) advisory.Request {

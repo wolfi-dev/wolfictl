@@ -28,10 +28,23 @@ type Model struct {
 	EarlyExit bool
 }
 
+const (
+	fieldIDPackage                = "package"
+	fieldIDVulnerability          = "vulnerability"
+	fieldIDEventType              = "event-type"
+	fieldIDFixedVersion           = "fixed-version"
+	fieldIDTruePositiveNote       = "true-positive-note"
+	fieldIDFalsePositiveType      = "false-positive-type"
+	fieldIDFalsePositiveNote      = "false-positive-note"
+	fieldIDFixNotPlannedNote      = "fix-not-planned-note"
+	fieldIDAnalysisNotPlannedNote = "analysis-not-planned-note"
+)
+
 func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
 	allowedValues := m.allowedPackagesFunc()
 
 	return field.TextFieldConfiguration{
+		ID:     fieldIDPackage,
 		Prompt: "Package: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.Package = value
@@ -52,6 +65,7 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 	allowedValues := m.allowedVulnerabilitiesFunc(m.Request.Package)
 
 	return field.TextFieldConfiguration{
+		ID:     fieldIDVulnerability,
 		Prompt: "Vulnerability: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			req.VulnerabilityID = value
@@ -68,6 +82,7 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 
 func (m Model) newTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
+		ID:      fieldIDEventType,
 		Prompt:  "Type: ",
 		Options: v2.EventTypes,
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
@@ -79,20 +94,70 @@ func (m Model) newTypeFieldConfig() field.ListFieldConfiguration {
 
 func (m Model) newTruePositiveNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
+		ID:     fieldIDTruePositiveNote,
 		Prompt: "Note: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			if value == "" {
+				req.Event.Data = nil
+				return req
+			}
+
 			if req.Event.Data == nil {
 				req.Event.Data = v2.TruePositiveDetermination{
 					Note: value,
 				}
 			}
+
 			return req
+		},
+	}
+}
+
+func (m Model) newFixNotPlannedNoteFieldConfig() field.TextFieldConfiguration {
+	return field.TextFieldConfiguration{
+		ID:     fieldIDFixNotPlannedNote,
+		Prompt: "Note: ",
+		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			if req.Event.Data == nil {
+				req.Event.Data = v2.FixNotPlanned{
+					Note: value,
+				}
+			} else if data, ok := req.Event.Data.(v2.FixNotPlanned); ok {
+				data.Note = value
+				req.Event.Data = data
+			}
+			return req
+		},
+		ValidationRules: []field.TextValidationRule{
+			field.NotEmpty,
+		},
+	}
+}
+
+func (m Model) newAnalysisNotPlannedNoteFieldConfig() field.TextFieldConfiguration {
+	return field.TextFieldConfiguration{
+		ID:     fieldIDAnalysisNotPlannedNote,
+		Prompt: "Note: ",
+		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			if req.Event.Data == nil {
+				req.Event.Data = v2.AnalysisNotPlanned{
+					Note: value,
+				}
+			} else if data, ok := req.Event.Data.(v2.AnalysisNotPlanned); ok {
+				data.Note = value
+				req.Event.Data = data
+			}
+			return req
+		},
+		ValidationRules: []field.TextValidationRule{
+			field.NotEmpty,
 		},
 	}
 }
 
 func (m Model) newFalsePositiveNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
+		ID:     fieldIDFalsePositiveNote,
 		Prompt: "Note: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			if req.Event.Data == nil {
@@ -106,15 +171,14 @@ func (m Model) newFalsePositiveNoteFieldConfig() field.TextFieldConfiguration {
 			return req
 		},
 		ValidationRules: []field.TextValidationRule{
-			func(_ string) error {
-				return nil
-			},
+			field.NotEmpty,
 		},
 	}
 }
 
 func (m Model) newFalsePositiveTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
+		ID:      fieldIDFalsePositiveType,
 		Prompt:  "False Positive Type: ",
 		Options: v2.FPTypes,
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
@@ -135,6 +199,7 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 	allowedVersions := m.allowedFixedVersionsFunc(packageName)
 
 	cfg := field.TextFieldConfiguration{
+		ID:     fieldIDFixedVersion,
 		Prompt: "Fixed Version: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
 			if req.Event.Data == nil {
@@ -153,6 +218,16 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 	}
 
 	return cfg
+}
+
+func (m Model) hasFieldWithID(id string) bool {
+	for _, f := range m.fields {
+		if f.ID() == id {
+			return true
+		}
+	}
+
+	return false
 }
 
 type Configuration struct {
@@ -208,7 +283,12 @@ func (m Model) addMissingFields() (Model, bool) {
 		}
 
 	case v2.EventTypeTruePositiveDetermination:
-		if data, ok := e.Data.(v2.TruePositiveDetermination); !ok || data.Note == "" {
+		// This field is optional. If we've already asked for it, don't ask again.
+		if m.hasFieldWithID(fieldIDTruePositiveNote) {
+			return m, false
+		}
+
+		if _, ok := e.Data.(v2.TruePositiveDetermination); !ok {
 			f := field.NewTextField(m.newTruePositiveNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
@@ -223,6 +303,20 @@ func (m Model) addMissingFields() (Model, bool) {
 
 		if data, ok := e.Data.(v2.FalsePositiveDetermination); !ok || data.Note == "" {
 			f := field.NewTextField(m.newFalsePositiveNoteFieldConfig())
+			m.fields = append(m.fields, f)
+			return m, true
+		}
+
+	case v2.EventTypeFixNotPlanned:
+		if data, ok := e.Data.(v2.FixNotPlanned); !ok || data.Note == "" {
+			f := field.NewTextField(m.newFixNotPlannedNoteFieldConfig())
+			m.fields = append(m.fields, f)
+			return m, true
+		}
+
+	case v2.EventTypeAnalysisNotPlanned:
+		if data, ok := e.Data.(v2.AnalysisNotPlanned); !ok || data.Note == "" {
+			f := field.NewTextField(m.newAnalysisNotPlannedNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}

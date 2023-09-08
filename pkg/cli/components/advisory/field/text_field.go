@@ -22,6 +22,7 @@ const maxSuggestionsDisplayed = 4
 var ErrValueNotInAllowedSet = errors.New("value not in allowed set")
 
 type TextField struct {
+	id             string
 	allowedValues  []string
 	requestUpdater func(value string, req advisory.Request) advisory.Request
 
@@ -39,6 +40,9 @@ type TextField struct {
 }
 
 type TextFieldConfiguration struct {
+	// ID is a unique identifier for the field.
+	ID string
+
 	// Prompt is the text shown before the input field. (E.g. "Name: ")
 	Prompt string
 
@@ -76,6 +80,7 @@ func NewTextField(cfg TextFieldConfiguration) TextField {
 	t.Prompt = cfg.Prompt
 
 	return TextField{
+		id:                cfg.ID,
 		input:             t,
 		requestUpdater:    cfg.RequestUpdater,
 		allowedValues:     cfg.AllowedValues,
@@ -92,6 +97,10 @@ func NotEmpty(value string) error {
 	}
 
 	return nil
+}
+
+func (f TextField) ID() string {
+	return f.id
 }
 
 func (f TextField) runAllValidationRules(value string) error {

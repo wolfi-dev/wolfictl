@@ -8,6 +8,7 @@ import (
 )
 
 type Field interface {
+	ID() string
 	View() string
 	IsDone() bool
 	Value() string
