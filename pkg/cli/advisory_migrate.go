@@ -14,7 +14,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func AdvisoryMigrate() *cobra.Command {
+func cmdAdvisoryMigrate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "migrate <path/to/advisories.yaml>",
 		Short:         "Migrate advisory files to v2 schema from v1 schema",

@@ -23,7 +23,7 @@ var repos = map[string]string{
 	"stage3": "https://packages.wolfi.dev/bootstrap/stage3",
 }
 
-func Apk() *cobra.Command {
+func cmdApk() *cobra.Command {
 	var arch, repo string
 	cmd := &cobra.Command{
 		Use:  "apk",
@@ -90,7 +90,7 @@ func Apk() *cobra.Command {
 	return cmd
 }
 
-func Index() *cobra.Command {
+func cmdIndex() *cobra.Command {
 	var arch, repo string
 	cmd := &cobra.Command{
 		Use:  "index",

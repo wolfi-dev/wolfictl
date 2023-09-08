@@ -14,7 +14,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
-func AdvisoryExport() *cobra.Command {
+func cmdAdvisoryExport() *cobra.Command {
 	p := &exportParams{}
 	cmd := &cobra.Command{
 		Use:           "export",

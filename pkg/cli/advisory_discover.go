@@ -21,7 +21,7 @@ import (
 //nolint:gosec // This is not a hard-coded credential value, it's the name of the env var to reference.
 const envVarNameForNVDAPIKey = "WOLFICTL_NVD_API_KEY"
 
-func AdvisoryDiscover() *cobra.Command {
+func cmdAdvisoryDiscover() *cobra.Command {
 	p := &discoverParams{}
 	cmd := &cobra.Command{
 		Use:           "discover",

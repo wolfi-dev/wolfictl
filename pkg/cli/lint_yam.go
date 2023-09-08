@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func LintYam() *cobra.Command {
+func cmdLintYam() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "yam [file]...",
 		SilenceErrors: true,

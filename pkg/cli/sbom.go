@@ -22,7 +22,7 @@ const (
 	sbomFormatSyftJSON = "syft-json"
 )
 
-func SBOM() *cobra.Command {
+func cmdSBOM() *cobra.Command {
 	p := &sbomParams{}
 	cmd := &cobra.Command{
 		Use:           "sbom <path/to/package.apk>",

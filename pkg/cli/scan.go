@@ -24,7 +24,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func Scan() *cobra.Command {
+func cmdScan() *cobra.Command {
 	p := &scanParams{}
 	cmd := &cobra.Command{
 		Use:           "scan <path/to/package.apk> ...",

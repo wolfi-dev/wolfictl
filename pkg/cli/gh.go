@@ -2,7 +2,7 @@ package cli
 
 import "github.com/spf13/cobra"
 
-func Gh() *cobra.Command {
+func cmdGh() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "gh",
 		DisableAutoGenTag: true,

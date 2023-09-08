@@ -14,7 +14,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/ls"
 )
 
-func Ls() *cobra.Command {
+func cmdLs() *cobra.Command {
 	p := &lsParams{}
 	cmd := &cobra.Command{
 		Use:           "ls [packages]",

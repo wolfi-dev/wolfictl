@@ -20,7 +20,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func Build() *cobra.Command {
+func cmdBuild() *cobra.Command {
 	var archs []string
 	var dir, pipelineDir string
 	var jobs int
