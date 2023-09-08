@@ -18,22 +18,24 @@ import (
 )
 
 type DiscoverOptions struct {
-	// SelectedPackages is a list of packages to include in search. If empty, all packages will be included in search.
+	// SelectedPackages is a list of packages to include in search. If empty, all
+	// packages will be included in search.
 	SelectedPackages []string
 
 	// BuildCfgs is the Index of build configurations on which to operate.
 	BuildCfgs *configs.Index[config.Configuration]
 
-	// AdvisoryCfgs is the Index of advisories on which to operate.
-	AdvisoryCfgs *configs.Index[v2.Document]
+	// AdvisoryDocs is the Index of advisory documents on which to operate.
+	AdvisoryDocs *configs.Index[v2.Document]
 
-	// PackageRepositoryURL is the URL to the distro's package repository (e.g. "https://packages.wolfi.dev/os").
+	// PackageRepositoryURL is the URL to the distro's package repository (e.g.
+	// "https://packages.wolfi.dev/os").
 	PackageRepositoryURL string
 
 	// The Arches to select during discovery (e.g. "x86_64").
 	Arches []string
 
-	// VulnerabilityDetector is how Discover finds for vulnerabilities for packages.
+	// VulnerabilityDetector is how Discover finds vulnerabilities for packages.
 	VulnerabilityDetector vuln.Detector
 }
 
@@ -88,14 +90,14 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		vulnID := match.Vulnerability.ID
 
-		advisoryDocuments := opts.AdvisoryCfgs.Select().WhereName(pkg)
+		advisoryDocuments := opts.AdvisoryDocs.Select().WhereName(pkg)
 		if advisoryDocuments.Len() == 0 {
 			// create a brand-new advisory config
 
 			newEvent := advisoryEventForNewDiscovery(match)
 
 			// TODO: why isn't this using advisory.Create? Could this be the source of that one bug?
-			err := createAdvisoryConfig(opts.AdvisoryCfgs, Request{
+			err := createAdvisoryConfig(opts.AdvisoryDocs, Request{
 				Package:         pkg,
 				VulnerabilityID: vulnID,
 				Event:           newEvent,
@@ -103,6 +105,8 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			if err != nil {
 				return fmt.Errorf("unable to record new advisory: %w", err)
 			}
+
+			log.Printf("🐛 new potential vulnerability for package %q: %s", pkg, hyperlinkCVE(vulnID))
 
 			continue
 		}
@@ -115,8 +119,6 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			// advisory already exists in config
 			continue
 		}
-
-		log.Printf("🐛 new potential vulnerability for package %q: %s", document.Package.Name, hyperlinkCVE(vulnID))
 
 		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 			advisories := doc.Advisories
@@ -140,6 +142,8 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 		if err != nil {
 			return err
 		}
+
+		log.Printf("🐛 new potential vulnerability for package %q: %s", document.Package.Name, hyperlinkCVE(vulnID))
 	}
 
 	return nil
