@@ -62,8 +62,8 @@ var (
 	// based on trial and error, and trying to minimize the chance of receiving HTTP
 	// 403s from NVD, while still maximizing the rate of lookups.
 
-	rateLimiterWithoutAuth = rate.NewLimiter(rate.Every(time.Second*30/3), 1)  // 5 reqs per 30 sec
-	rateLimiterWithAuth    = rate.NewLimiter(rate.Every(time.Second*30/47), 1) // 50 reqs per 30 sec
+	rateLimiterWithoutAuth = rate.NewLimiter(rate.Every(time.Second*30/3), 1)  // ~5 reqs per 30 sec
+	rateLimiterWithAuth    = rate.NewLimiter(rate.Every(time.Second*30/50), 1) // ~50 reqs per 30 sec
 )
 
 // VulnerabilitiesForPackages uses CPE-based queries to the NVD API to detect
@@ -115,6 +115,11 @@ func (s *Detector) vulnerabilitiesForPackage(ctx context.Context, name string) (
 
 	cves, err := s.doSearch(ctx, requestCPE)
 	if err != nil {
+		if errors.Is(err, ErrRateLimited) {
+			log.Printf("🚫 rate limited by NVD! waiting 1 minute...")
+			time.Sleep(time.Minute)
+			return s.vulnerabilitiesForPackage(ctx, name)
+		}
 		return nil, err
 	}
 
