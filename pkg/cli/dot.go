@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/dot"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/skratchdot/open-golang/open"
@@ -23,7 +22,7 @@ import (
 
 func cmdSVG() *cobra.Command { //nolint:gocyclo
 	var dir, pipelineDir string
-	var showDependents, buildtimeReposForRuntime, web bool
+	var showDependents, recursive, span, buildtimeReposForRuntime, web bool
 	var extraKeys, extraRepos []string
 	d := &cobra.Command{
 		Use:   "dot",
@@ -37,6 +36,14 @@ Generate .dot output and pipe it to dot to generate an SVG
 Generate .dot output and pipe it to dot to generate a PNG
 
   wolfictl dot zlib | dot -Tpng > graph.png
+
+Open browser to explore crane
+
+  wolfictl dot --web crane
+
+Open browser to explore crane's deps recursively, only showing a minimum subgraph
+
+  wolfictl dot --web -R -S crane
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if pipelineDir == "" {
@@ -68,13 +75,16 @@ Generate .dot output and pipe it to dot to generate a PNG
 			}
 
 			render := func(args []string) (*dot.Graph, error) {
+				todo := []string{}
+				queued := map[string]struct{}{}
+
 				out := dot.NewGraph("images")
 				if err := out.Set("rankdir", "LR"); err != nil {
 					return nil, err
 				}
 				out.SetType(dot.DIGRAPH)
 
-				for _, node := range args {
+				renderNode := func(node string) error {
 					var byName []dag.Package
 					config := pkgs.ConfigByKey(node)
 					if config != nil {
@@ -82,23 +92,36 @@ Generate .dot output and pipe it to dot to generate a PNG
 					} else {
 						byName, err = g.NodesByName(node)
 						if err != nil {
-							return nil, err
+							return err
 						}
 
 						if len(byName) == 0 {
-							return nil, fmt.Errorf("could not find node %q", node)
+							return fmt.Errorf("could not find node %q", node)
 						}
 					}
 
 					for _, name := range byName {
-						pkgver, source := split(dag.PackageHash(name))
+						h := dag.PackageHash(name)
+
+						pkgver, source := split(h)
 						n := dot.NewNode(pkgver)
 						if err := n.Set("tooltip", source); err != nil {
-							return nil, err
+							return err
+						}
+						if pkgs.ConfigByKey(pkgver) != nil {
+							if web {
+								if err := n.Set("URL", link(args, pkgver)); err != nil {
+									return err
+								}
+							}
+						} else {
+							if err := n.Set("color", "red"); err != nil {
+								return err
+							}
 						}
 						out.AddNode(n)
 
-						dependencies, ok := amap[dag.PackageHash(name)]
+						dependencies, ok := amap[h]
 						if !ok {
 							continue
 						}
@@ -110,19 +133,31 @@ Generate .dot output and pipe it to dot to generate a PNG
 						sort.Strings(deps)
 
 						for _, dep := range deps {
+							if recursive || span {
+								if _, ok := queued[dep]; ok {
+									if span {
+										continue
+									}
+								} else {
+									todo = append(todo, dep)
+									queued[dep] = struct{}{}
+								}
+							}
+
 							pkgver, source := split(dep)
 							d := dot.NewNode(pkgver)
 							if err := d.Set("tooltip", source); err != nil {
-								return nil, err
+								return err
 							}
-							if web {
-								nodes := slices.Clone(args)
-								nodes = append(nodes, pkgver)
-
-								if pkgs.ConfigByKey(pkgver) != nil {
-									if err := d.Set("URL", "/?node="+strings.Join(nodes, "&node=")); err != nil {
-										return nil, err
+							if pkgs.ConfigByKey(pkgver) != nil {
+								if web {
+									if err := d.Set("URL", link(args, pkgver)); err != nil {
+										return err
 									}
+								}
+							} else {
+								if err := d.Set("color", "red"); err != nil {
+									return err
 								}
 							}
 							out.AddNode(d)
@@ -133,7 +168,7 @@ Generate .dot output and pipe it to dot to generate a PNG
 							continue
 						}
 
-						predecessors, ok := pmap[dag.PackageHash(name)]
+						predecessors, ok := pmap[h]
 						if !ok {
 							continue
 						}
@@ -148,20 +183,41 @@ Generate .dot output and pipe it to dot to generate a PNG
 							pkgver, source := split(pred)
 							d := dot.NewNode(pkgver)
 							if err := d.Set("tooltip", source); err != nil {
-								return nil, err
+								return err
 							}
-							if web {
-								nodes := slices.Clone(args)
-								nodes = append(nodes, pkgver)
-
-								if pkgs.ConfigByKey(pkgver) != nil {
-									if err := d.Set("URL", "/?node="+strings.Join(nodes, "&node=")); err != nil {
-										return nil, err
+							if pkgs.ConfigByKey(pkgver) != nil {
+								if web {
+									if err := d.Set("URL", link(args, pkgver)); err != nil {
+										return err
 									}
 								}
 							}
 							out.AddNode(d)
 							out.AddEdge(dot.NewEdge(d, n))
+						}
+					}
+
+					return nil
+				}
+
+				for _, node := range args {
+					if err := renderNode(node); err != nil {
+						return nil, err
+					}
+				}
+
+				if recursive {
+					var node string
+					for len(todo) != 0 {
+						node, todo = pop(todo)
+
+						pkgver, _ := split(node)
+						if pkgs.ConfigByKey(pkgver) == nil {
+							continue
+						}
+
+						if err := renderNode(pkgver); err != nil {
+							return nil, err
 						}
 					}
 				}
@@ -233,6 +289,8 @@ Generate .dot output and pipe it to dot to generate a PNG
 	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
 	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
+	d.Flags().BoolVarP(&recursive, "recursive", "R", false, "recurse through package dependencies")
+	d.Flags().BoolVarP(&span, "spanning-tree", "S", false, "does something like a spanning tree to avoid a huge number of edges")
 	d.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	d.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	d.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
@@ -252,4 +310,18 @@ func split(in string) (pkgver, source string) {
 	}
 
 	return fmt.Sprintf("%s-%s", pkg, ver), source
+}
+
+func pop(a []string) (result string, stack []string) {
+	return a[len(a)-1], a[:len(a)-1]
+}
+
+func link(args []string, pkgver string) string {
+	filtered := []string{}
+	for _, a := range args {
+		if a != pkgver {
+			filtered = append(filtered, a)
+		}
+	}
+	return "/?node=" + pkgver + "&node=" + strings.Join(filtered, "&node=")
 }
