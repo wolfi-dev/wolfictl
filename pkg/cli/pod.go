@@ -20,7 +20,6 @@ import (
 	"github.com/chainguard-dev/kontext"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/dag"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
@@ -79,36 +78,6 @@ func cmdPod() *cobra.Command {
 			}
 
 			targets := []string{"all"}
-			if len(args) > 0 {
-				pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
-				if err != nil {
-					return err
-				}
-				g, err := dag.NewGraph(pkgs,
-					dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
-					dag.WithKeys(extraKeys...),
-					dag.WithRepos(extraRepos...))
-				if err != nil {
-					return err
-				}
-
-				subgraph, err := g.SubgraphWithRoots(args)
-				if err != nil {
-					return err
-				}
-
-				targets = nil
-				for _, node := range subgraph.Packages() {
-					pkg, err := pkgs.PkgInfo(node)
-					if err != nil {
-						return err
-					}
-					if pkg == nil {
-						continue
-					}
-					targets = append(targets, makeTarget(node, arch, pkg))
-				}
-			}
 
 			// Bundle the source context into an image.
 			t, err := name.NewTag(bundleRepo, name.WeakValidation)

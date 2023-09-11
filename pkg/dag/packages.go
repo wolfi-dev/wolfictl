@@ -312,7 +312,9 @@ func (p Packages) PackageNames() []string {
 // If a listed element does not exist, returns an error.
 func (p Packages) Sub(names ...string) (*Packages, error) {
 	pkgs := &Packages{
-		configs: make(map[string][]*Configuration),
+		configs:  make(map[string][]*Configuration),
+		index:    make(map[string]*Configuration),
+		packages: make(map[string][]*Configuration),
 	}
 	for _, name := range names {
 		if c, ok := p.configs[name]; ok {

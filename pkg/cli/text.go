@@ -3,25 +3,23 @@ package cli
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/config"
-	"github.com/dominikbraun/graph"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
 )
 
 func cmdText() *cobra.Command {
 	var dir, pipelineDir, arch, t string
-	var showDependents, buildtimeReposForRuntime bool
 	var extraKeys, extraRepos []string
 	text := &cobra.Command{
 		Use:   "text",
 		Short: "Print a sorted list of downstream dependent packages",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if pipelineDir == "" {
 				pipelineDir = filepath.Join(dir, "pipelines")
 			}
@@ -33,42 +31,10 @@ func cmdText() *cobra.Command {
 				return err
 			}
 			g, err := dag.NewGraph(pkgs,
-				dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...))
 			if err != nil {
 				return err
-			}
-
-			if len(args) == 0 {
-				if showDependents {
-					log.Print("warning: the 'show dependents' option has no effect without specifying one or more package names")
-				}
-			} else {
-				// ensure all packages exist in the graph
-				for _, arg := range args {
-					if _, err := g.Graph.Vertex(arg); err == graph.ErrVertexNotFound {
-						return fmt.Errorf("package %q not found in graph", arg)
-					}
-				}
-
-				// determine if we're examining dependencies or dependents
-				var subgraph *dag.Graph
-				if showDependents {
-					leaves := args
-					subgraph, err = g.SubgraphWithLeaves(leaves)
-					if err != nil {
-						return err
-					}
-				} else {
-					roots := args
-					subgraph, err = g.SubgraphWithRoots(roots)
-					if err != nil {
-						return err
-					}
-				}
-
-				g = subgraph
 			}
 
 			return text(*g, pkgs, arch, textType(t), os.Stdout)
@@ -77,9 +43,7 @@ func cmdText() *cobra.Command {
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
 	text.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	text.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
-	text.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	text.Flags().StringVarP(&t, "type", "t", string(typeTarget), fmt.Sprintf("What type of text to emit; values can be one of: %v", textTypes))
-	text.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	text.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	text.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 	return text
