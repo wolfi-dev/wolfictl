@@ -22,7 +22,7 @@ import (
 
 func cmdBuild() *cobra.Command {
 	var archs []string
-	var dir, pipelineDir string
+	var dir, pipelineDir, runner string
 	var jobs int
 	var dryrun bool
 	var extraKeys, extraRepos []string
@@ -50,6 +50,7 @@ func cmdBuild() *cobra.Command {
 					pkg:         pkg,
 					dir:         dir,
 					pipelineDir: pipelineDir,
+					runner:      runner,
 					archs:       archs,
 					dryrun:      dryrun,
 					done:        make(chan struct{}),
@@ -129,6 +130,7 @@ func cmdBuild() *cobra.Command {
 
 	cmd.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
 	cmd.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	cmd.Flags().StringVar(&runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringSliceVar(&archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
@@ -138,9 +140,9 @@ func cmdBuild() *cobra.Command {
 }
 
 type task struct {
-	pkg, dir, pipelineDir string
-	archs                 []string
-	dryrun                bool
+	pkg, dir, pipelineDir, runner string
+	archs                         []string
+	dryrun                        bool
 
 	err         error
 	deps        map[string]chan struct{}
@@ -201,7 +203,7 @@ func (t *task) do(ctx context.Context) error {
 			build.WithExtraKeys([]string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}),
 			build.WithExtraRepos([]string{"https://packages.wolfi.dev/os"}),
 			build.WithSigningKey(filepath.Join(t.dir, "local-melange.rsa")),
-			build.WithRunner("docker"), // TODO: flag build.WithRunner("kubernetes"),
+			build.WithRunner(t.runner),
 			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
 			build.WithNamespace("wolfi"),
 			build.WithLogPolicy([]string{"builtin:stderr"}),
