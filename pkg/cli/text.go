@@ -73,20 +73,26 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 		return err
 	}
 
-	// Filter out non-main packages -- we only care about config file names, not each subpackage.
-	filtered, err = filtered.Filter(dag.OnlyMainPackages(pkgs))
-	if err != nil {
-		return err
-	}
-
 	all, err := filtered.ReverseSorted()
 	if err != nil {
 		return err
 	}
 
+	// Track how many packages we emit.
+	got := 0
+
 	for _, node := range all {
 		name := node.Name()
-		pkg, _ := pkgs.PkgInfo(name) //nolint:errcheck
+		pkg, err := pkgs.PkgInfo(name)
+		if err != nil {
+			return err
+		}
+
+		if pkg == nil {
+			// Expected for subpackages.
+			continue
+		}
+
 		switch t {
 		case typeTarget:
 			fmt.Fprintf(w, "%s\n", makeTarget(name, arch, pkg))
@@ -101,6 +107,19 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 		default:
 			return fmt.Errorf("invalid type: %s", t)
 		}
+
+		got++
+	}
+
+	// Check that we emit the same number of packages as filtering only main packages.
+	mains, err := filtered.Filter(dag.OnlyMainPackages(pkgs))
+	if err != nil {
+		return err
+	}
+	want := len(mains.Packages())
+
+	if want != got {
+		return fmt.Errorf("wanted %d packages, got %d", want, got)
 	}
 
 	return nil
