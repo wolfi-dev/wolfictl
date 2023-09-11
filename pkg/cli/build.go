@@ -32,6 +32,7 @@ func cmdBuild() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "build",
 		SilenceErrors: true,
+		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
@@ -67,13 +68,7 @@ func cmdBuild() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(args) > 1 {
-				// If multiple args were passed, build only the necessary packages to build these packages.
-				g, err = g.SubgraphWithLeaves(args)
-				if err != nil {
-					return err
-				}
-			}
+
 			// Only return local packages
 			g, err = g.Filter(dag.FilterLocal())
 			if err != nil {
