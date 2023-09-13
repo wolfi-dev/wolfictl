@@ -795,7 +795,9 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 			for i := range pc.Config.Pipeline {
 				pipeline := &pc.Config.Pipeline[i]
 				if pipeline.Uses == "git-checkout" {
-					if pipeline.With["expected-commit"] != v.Commit {
+					expectedCommit := pipeline.With["expected-commit"]
+
+					if expectedCommit != "" && expectedCommit != v.Commit {
 						o.Logger.Printf(
 							color.YellowString("expected commit %s does not match latest commit %s for package %s", pipeline.With["expected-commit"], v.Commit, c.Package.Name))
 
