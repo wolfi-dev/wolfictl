@@ -343,17 +343,17 @@ func debug(wt *git.Worktree) ([]byte, error) {
 
 func (o *Options) updateGitPackage(repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
 	// get the filename from the map of melange configs we loaded at the start
-	config, ok := o.PackageConfigs[packageName]
+	pc, ok := o.PackageConfigs[packageName]
 	if !ok {
 		return "", fmt.Errorf("no melange config found for package %s", packageName)
 	}
 
 	// if manual update create an issue rather than a pull request
-	if config.Config.Update.Manual {
+	if pc.Config.Update.Manual {
 		return o.createNewVersionIssue(repo, packageName, newVersion)
 	}
 
-	configFile := filepath.Join(config.Dir, config.Filename)
+	configFile := filepath.Join(pc.Dir, pc.Filename)
 	if configFile == "" {
 		return "", fmt.Errorf("no config filename found for package %s", packageName)
 	}
@@ -368,7 +368,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	// if the new version has a bump epoch flag set, increment the epoch
 	// this can happen if we have a new expected commit sha but the version hasn't changed
 	if newVersion.BumpEpoch {
-		config.Config.Package.Epoch++
+		pc.Config.Package.Epoch++
 	}
 
 	worktree, err := repo.Worktree()
@@ -377,13 +377,13 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	}
 
 	// this needs to be the relative path set when reading the files initially
-	_, err = worktree.Add(config.Filename)
+	_, err = worktree.Add(pc.Filename)
 	if err != nil {
 		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
 	}
 
 	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-	err = o.updateMakefile(config.Dir, packageName, newVersion.Version, worktree)
+	err = o.updateMakefile(pc.Dir, packageName, newVersion.Version, worktree)
 	if err != nil {
 		return fmt.Sprintf("failed to update Makefile: %s", err.Error()), nil
 	}
@@ -397,7 +397,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 		}
 	}
 	// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
-	err = o.updateGitModules(config.Dir, packageName, latestVersionWithPrefix, worktree)
+	err = o.updateGitModules(pc.Dir, packageName, latestVersionWithPrefix, worktree)
 	if err != nil {
 		return fmt.Sprintf("failed to update git modules: %s", err.Error()), nil
 	}
