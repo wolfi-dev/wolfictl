@@ -31,6 +31,7 @@ func cmdText() *cobra.Command {
 				return err
 			}
 			g, err := dag.NewGraph(pkgs,
+				dag.WithBuildtimeReposRuntime(true),
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...))
 			if err != nil {
