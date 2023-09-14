@@ -121,18 +121,12 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 	for _, c := range pkgs.Packages() {
 		// add packages from the runtime dependencies
-		runtimeAddRepos := opts.runtimeRepos
-		runtimeAddKeys := opts.runtimeKeys
-		if opts.buildtimeReposForRuntime {
-			runtimeAddRepos = append(runtimeAddRepos, c.Environment.Contents.Repositories...)
-			runtimeAddKeys = append(runtimeAddKeys, c.Environment.Contents.Keyring...)
-		}
 		resolverKey, err := g.addResolverForRepos(arch,
 			localRepo,
 			indexes,
 			keys,
-			runtimeAddRepos,
-			runtimeAddKeys,
+			c.Environment.Contents.Repositories,
+			c.Environment.Contents.Keyring,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create resolver for %s: %w", c.String(), err)

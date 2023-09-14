@@ -255,36 +255,4 @@ func TestNewGraph(t *testing.T) {
 			assert.ElementsMatch(t, v, deps, "unexpected dependencies for %s", k)
 		}
 	})
-
-	t.Run("runtime", func(t *testing.T) {
-		var (
-			testDir      = "testdata/runtime"
-			expectedDeps = map[string][]string{
-				"a": {"b:1.2.3-r1@local", "c:1.5.5-r1@local", "d:1.0.0-r0@testdata/runtime/packages/x86_64"},
-				"b": {"c:1.5.5-r1@local"},
-				"c": {},
-			}
-		)
-		pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
-		require.NoError(t, err)
-		_, err = NewGraph(pkgs)
-		require.Error(t, err, "should have error because of no source for d")
-
-		graph, err := NewGraph(pkgs, WithBuildtimeReposRuntime(true))
-		require.NoError(t, err)
-
-		amap, err := graph.Graph.AdjacencyMap()
-		require.NoError(t, err)
-		for k, v := range expectedDeps {
-			allConfigs := pkgs.Config(k, true)
-			require.Len(t, allConfigs, 1, "no configs for %s", k)
-			confKey := PackageHash(allConfigs[0])
-			require.Contains(t, amap, confKey, "missing key %s", confKey)
-			var deps []string
-			for d := range amap[confKey] {
-				deps = append(deps, d)
-			}
-			assert.ElementsMatch(t, v, deps, "unexpected dependencies for %s", k)
-		}
-	})
 }
