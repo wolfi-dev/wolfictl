@@ -190,6 +190,15 @@ func (t *task) do(ctx context.Context) error {
 			continue
 		}
 
+		sdir := filepath.Join(t.dir, t.pkg)
+		if _, err := os.Stat(sdir); os.IsNotExist(err) {
+			if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
+				return fmt.Errorf("creating source directory %s: %v", sdir, err)
+			}
+		} else if err != nil {
+			return fmt.Errorf("creating source directory: %v", err)
+		}
+
 		fn := fmt.Sprintf("%s.yaml", t.pkg)
 		if t.dryrun {
 			log.Printf("DRYRUN: would have built %s", apk)
@@ -207,7 +216,7 @@ func (t *task) do(ctx context.Context) error {
 			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
 			build.WithNamespace("wolfi"),
 			build.WithLogPolicy([]string{"builtin:stderr"}),
-			build.WithSourceDir(filepath.Join(t.dir, t.pkg)),
+			build.WithSourceDir(sdir),
 			build.WithCacheSource("gs://wolfi-sources/"),
 			build.WithCacheDir("./melange-cache/"), // TODO: flag
 			build.WithOutDir(filepath.Join(t.dir, "packages")),
