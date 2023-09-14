@@ -22,7 +22,7 @@ import (
 
 func cmdSVG() *cobra.Command { //nolint:gocyclo
 	var dir, pipelineDir string
-	var showDependents, recursive, span, buildtimeReposForRuntime, web bool
+	var showDependents, recursive, span, web bool
 	var extraKeys, extraRepos []string
 	d := &cobra.Command{
 		Use:   "dot",
@@ -56,7 +56,6 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 			}
 
 			g, err := dag.NewGraph(pkgs,
-				dag.WithBuildtimeReposRuntime(buildtimeReposForRuntime),
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...),
 			)
@@ -291,7 +290,6 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	d.Flags().BoolVarP(&recursive, "recursive", "R", false, "recurse through package dependencies")
 	d.Flags().BoolVarP(&span, "spanning-tree", "S", false, "does something like a spanning tree to avoid a huge number of edges")
-	d.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	d.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	d.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 	d.Flags().BoolVar(&web, "web", false, "do a website")

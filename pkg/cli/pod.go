@@ -47,7 +47,7 @@ func gcloudProjectID(ctx context.Context) (string, error) {
 func cmdPod() *cobra.Command {
 	var dir, pipelineDir, arch, project, bundleRepo, ns, cpu, ram, sa, sdkimg, gcloudImage, cachedig, bucket, srcBucket, publicKeyBucket, signingKeyName, melangeBuildOpts string
 
-	var create, watch, secretKey, buildtimeReposForRuntime bool
+	var create, watch, secretKey bool
 	var pendingTimeout time.Duration
 
 	var extraKeys, extraRepos []string
@@ -362,7 +362,6 @@ gcloud --quiet storage cp \
 	pod.Flags().StringVar(&signingKeyName, "signing-key-name", "wolfi-signing", "the signing key name to use, the name is important when when signing e.g. keyName=wolfi-signing")
 	pod.Flags().StringVar(&melangeBuildOpts, "melange-build-options", "", "additional options to pass to the melange build")
 	pod.Flags().StringVar(&gcloudImage, "gcloud-image", "gcr.io/google.com/cloudsdktool/google-cloud-cli:slim", "image to use for gcloud stuff")
-	pod.Flags().BoolVar(&buildtimeReposForRuntime, "buildtime-repos-for-runtime", false, "use buildtime environment repositories to resolve runtime graph as well")
 	pod.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	pod.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
 
