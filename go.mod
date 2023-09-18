@@ -1,13 +1,13 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.21.0
+go 1.21.1
 
 require (
 	chainguard.dev/apko v0.10.1-0.20230827210213-0f242ef6963e
 	chainguard.dev/melange v0.4.1-0.20230906205108-017c39007181
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.66.0
-	github.com/anchore/syft v0.89.1-0.20230907195442-3842d28e9007
+	github.com/anchore/grype v0.68.1
+	github.com/anchore/syft v0.90.0
 	github.com/chainguard-dev/go-apk v0.0.0-20230827110006-8c3041a3534a
 	github.com/chainguard-dev/kontext v0.1.0
 	github.com/chainguard-dev/yam v0.0.0-20230807153807-4de7c531f3e1
@@ -73,7 +73,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
-	github.com/anchore/clio v0.0.0-20230823172630-c42d666061af // indirect
+	github.com/anchore/clio v0.0.0-20230915181724-f1acbce87918 // indirect
 	github.com/anchore/fangs v0.0.0-20230818131516-2186b10924fe // indirect
 	github.com/anchore/go-logger v0.0.0-20230725134548-c21dafa1ec5a // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
@@ -81,7 +81,7 @@ require (
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
 	github.com/anchore/sqlite v1.4.6-0.20220607210448-bcc6ee5c4963 // indirect
-	github.com/anchore/stereoscope v0.0.0-20230829142608-334c2222e137 // indirect
+	github.com/anchore/stereoscope v0.0.0-20230907152702-057dda3667e7 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46 // indirect
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
@@ -249,7 +249,7 @@ require (
 	github.com/vbatts/tar-split v0.11.5 // indirect
 	github.com/vifraa/gopom v1.0.0 // indirect
 	github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651 // indirect
-	github.com/wagoodman/go-progress v0.0.0-20230301185719-21920a456ad5 // indirect
+	github.com/wagoodman/go-progress v0.0.0-20230911172108-cf810b7e365c // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
