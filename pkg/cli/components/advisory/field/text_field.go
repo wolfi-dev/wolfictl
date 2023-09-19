@@ -13,7 +13,7 @@ import (
 
 var (
 	selectedSuggestionStyle = styles.Accented().Copy().Underline(true)
-	helpKeyStyle            = styles.FaintAccent().Copy()
+	helpKeyStyle            = styles.FaintAccent().Copy().Bold(true)
 	helpExplanationStyle    = styles.Faint().Copy()
 )
 

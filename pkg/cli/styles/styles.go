@@ -13,7 +13,7 @@ var (
 
 	accentedLight    = lipgloss.NewStyle().Foreground(lipgloss.Color("#000000"))
 	secondaryLight   = lipgloss.NewStyle().Foreground(lipgloss.Color("#444444"))
-	faintLight       = lipgloss.NewStyle().Foreground(lipgloss.Color("#AAAAAA"))
+	faintLight       = lipgloss.NewStyle().Foreground(lipgloss.Color("#aaaaaa"))
 	faintAccentLight = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
 )
 
