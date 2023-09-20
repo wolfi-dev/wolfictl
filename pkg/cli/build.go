@@ -21,8 +21,8 @@ import (
 )
 
 func cmdBuild() *cobra.Command {
-	var archs, logPolicy []string
-	var dir, pipelineDir, runner string
+	var archs []string
+	var dir, pipelineDir, runner, logDir string
 	var jobs int
 	var dryrun bool
 	var extraKeys, extraRepos []string
@@ -56,7 +56,7 @@ func cmdBuild() *cobra.Command {
 					done:        make(chan struct{}),
 					deps:        map[string]chan struct{}{},
 					jobch:       jobch,
-					logPolicy:   logPolicy,
+					logDir:      logDir,
 				}
 			}
 
@@ -137,14 +137,14 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
 	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
-	cmd.Flags().StringSliceVar(&logPolicy, "log-policy", []string{"builtin:stderr"}, "Logging policy to use")
+	cmd.Flags().StringVar(&logDir, "log-dir", "buildlogs", "subdirectory where buildlogs will be written when specified (packages/$arch/buildlogs/$apk.log)")
 	return cmd
 }
 
 type task struct {
-	pkg, dir, pipelineDir, runner string
-	archs, logPolicy              []string
-	dryrun                        bool
+	pkg, dir, pipelineDir, runner, logDir string
+	archs                                 []string
+	dryrun                                bool
 
 	err         error
 	deps        map[string]chan struct{}
@@ -186,9 +186,10 @@ func (t *task) do(ctx context.Context) error {
 	var bcs []*build.Build
 	for _, arch := range t.archs {
 		// See if we already have the package built.
-		apk := filepath.Join(t.dir, "packages", arch, fmt.Sprintf("%s-%s-r%d.apk", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch))
-		if _, err := os.Stat(apk); err == nil {
-			log.Printf("skipping %s, already built", apk)
+		apk := fmt.Sprintf("%s-%s-r%d.apk", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
+		apkPath := filepath.Join(t.dir, "packages", arch, apk)
+		if _, err := os.Stat(apkPath); err == nil {
+			log.Printf("skipping %s, already built", apkPath)
 			continue
 		}
 
@@ -201,12 +202,21 @@ func (t *task) do(ctx context.Context) error {
 			return fmt.Errorf("creating source directory: %v", err)
 		}
 
+		logPolicy := []string{"builtin:stderr"}
+		if t.logDir != "" {
+			// mirror wolfi/os Makefile semantics of: ./packages/$arch/buildlogs/$apk.log
+			logPolicy = append(logPolicy, fmt.Sprintf("%s/%s.log",
+				filepath.Join(t.dir, "packages", string(types.ParseArchitecture(arch)), t.logDir),
+				apk,
+			))
+		}
+
 		fn := fmt.Sprintf("%s.yaml", t.pkg)
 		if t.dryrun {
-			log.Printf("DRYRUN: would have built %s", apk)
+			log.Printf("DRYRUN: would have built %s", apkPath)
 			continue
 		}
-		log.Println("will build:", apk)
+		log.Println("will build:", apkPath)
 		bc, err := build.New(ctx,
 			build.WithArch(types.ParseArchitecture(arch)),
 			build.WithConfig(filepath.Join(t.dir, fn)),
@@ -217,7 +227,7 @@ func (t *task) do(ctx context.Context) error {
 			build.WithRunner(t.runner),
 			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
 			build.WithNamespace("wolfi"),
-			build.WithLogPolicy(t.logPolicy),
+			build.WithLogPolicy(logPolicy),
 			build.WithSourceDir(sdir),
 			build.WithCacheSource("gs://wolfi-sources/"),
 			build.WithCacheDir("./melange-cache/"), // TODO: flag
