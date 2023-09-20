@@ -21,7 +21,7 @@ import (
 )
 
 func cmdBuild() *cobra.Command {
-	var archs []string
+	var archs, logPolicy []string
 	var dir, pipelineDir, runner string
 	var jobs int
 	var dryrun bool
@@ -56,6 +56,7 @@ func cmdBuild() *cobra.Command {
 					done:        make(chan struct{}),
 					deps:        map[string]chan struct{}{},
 					jobch:       jobch,
+					logPolicy:   logPolicy,
 				}
 			}
 
@@ -136,12 +137,13 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
 	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
 	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringSliceVar(&logPolicy, "log-policy", []string{"builtin:stderr"}, "Logging policy to use")
 	return cmd
 }
 
 type task struct {
 	pkg, dir, pipelineDir, runner string
-	archs                         []string
+	archs, logPolicy              []string
 	dryrun                        bool
 
 	err         error
@@ -215,7 +217,7 @@ func (t *task) do(ctx context.Context) error {
 			build.WithRunner(t.runner),
 			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
 			build.WithNamespace("wolfi"),
-			build.WithLogPolicy([]string{"builtin:stderr"}),
+			build.WithLogPolicy(t.logPolicy),
 			build.WithSourceDir(sdir),
 			build.WithCacheSource("gs://wolfi-sources/"),
 			build.WithCacheDir("./melange-cache/"), // TODO: flag
