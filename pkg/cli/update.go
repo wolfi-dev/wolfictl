@@ -20,6 +20,7 @@ type options struct {
 	createIssues           bool
 	issueLabels            []string
 	maxRetries             int
+	pkgPath                string
 }
 
 func cmdUpdate() *cobra.Command {
@@ -45,6 +46,7 @@ func cmdUpdate() *cobra.Command {
 	cmd.Flags().BoolVar(&o.createIssues, "create-issues", true, "creates GitHub Issues for failed package updates")
 	cmd.Flags().StringArrayVar(&o.issueLabels, "github-labels", []string{}, "Optional: provide a list of labels to apply to updater generated issues and pull requests")
 	cmd.Flags().IntVar(&o.maxRetries, "max-retries", 3, "maximum number of retries for failed package updates")
+	cmd.Flags().StringVar(&o.pkgPath, "path", "", "path in the git repo containing the melange yaml files")
 
 	cmd.AddCommand(
 		Package(),
@@ -76,6 +78,7 @@ func (o options) UpdateCmd(_ context.Context, repoURI string) error {
 	updateContext.CreateIssues = o.createIssues
 	updateContext.IssueLabels = o.issueLabels
 	updateContext.MaxRetries = o.maxRetries
+	updateContext.PkgPath = o.pkgPath
 	if err := updateContext.Update(); err != nil {
 		return fmt.Errorf("creating updates: %w", err)
 	}

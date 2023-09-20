@@ -54,6 +54,7 @@ type Options struct {
 	ErrorMessages          map[string]string
 	IssueLabels            []string
 	MaxRetries             int
+	PkgPath                string
 }
 
 type NewVersionResults struct {
@@ -213,7 +214,7 @@ func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[stri
 	latestVersions := make(map[string]NewVersionResults)
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
-	o.PackageConfigs, err = melange.ReadPackageConfigs(packageNames, dir)
+	o.PackageConfigs, err = melange.ReadPackageConfigs(packageNames, filepath.Join(dir, o.PkgPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get package configs: %w", err)
 	}
@@ -377,7 +378,11 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	}
 
 	// this needs to be the relative path set when reading the files initially
-	_, err = worktree.Add(pc.Filename)
+	fileRelPath := pc.Filename
+	if o.PkgPath != "" {
+		fileRelPath = filepath.Join(o.PkgPath, pc.Filename)
+	}
+	_, err = worktree.Add(fileRelPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
 	}
