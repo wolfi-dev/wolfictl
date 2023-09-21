@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v55/github"
 	"github.com/stretchr/testify/assert"
 )
 
