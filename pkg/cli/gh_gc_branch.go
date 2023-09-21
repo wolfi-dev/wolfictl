@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v55/github"
 
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"golang.org/x/oauth2"

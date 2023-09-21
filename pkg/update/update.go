@@ -19,7 +19,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v55/github"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
