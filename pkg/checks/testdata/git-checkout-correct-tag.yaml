@@ -1,0 +1,19 @@
+package:
+  name: git-checkout-correct-tag
+  version: 1.10.0
+  epoch: 0
+  description: scandir, a better directory iterator and faster os.walk()
+
+pipeline:
+  - uses: git-checkout
+    with:
+      expected-commit: 982e6ba60e7165ef965567eacd7138149c9ce292
+      repository: https://github.com/benhoyt/scandir
+      tag: v${{package.version}}
+
+update:
+  enabled: true
+  manual: false
+  github:
+    identifier: benhoyt/scandir
+    strip-prefix: v
