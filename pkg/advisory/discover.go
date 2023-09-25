@@ -3,18 +3,15 @@ package advisory
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/samber/lo"
-	"github.com/savioxavier/termlink"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gitlab.alpinelinux.org/alpine/go/repository"
-	"golang.org/x/exp/slices"
 )
 
 type DiscoverOptions struct {
@@ -37,39 +34,79 @@ type DiscoverOptions struct {
 
 	// VulnerabilityDetector is how Discover finds vulnerabilities for packages.
 	VulnerabilityDetector vuln.Detector
+
+	// VulnEvents is a channel of events that occur during vulnerability discovery.
+	VulnEvents chan<- interface{}
 }
 
 // Discover searches for new vulnerabilities that match packages in a config
 // index, and adds new advisories to configs for vulnerabilities that haven't
 // been noted yet.
-func Discover(opts DiscoverOptions) error {
-	ctx := context.Background()
+func Discover(ctx context.Context, opts DiscoverOptions) error {
+	var packagesToLookup []string
 
-	packageRepositoryURL := opts.PackageRepositoryURL
-	if packageRepositoryURL == "" {
-		return fmt.Errorf("package repository URL must be specified")
-	}
-
-	var apkindexes []*repository.ApkIndex
-	for _, arch := range opts.Arches {
-		apkindex, err := index.Index(arch, packageRepositoryURL)
-		if err != nil {
-			return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
+	// If the user has specified a set of packages to search for, we'll only search
+	// for those. This also helps us skip the cost of downloading APKINDEXes.
+	if len(opts.SelectedPackages) >= 1 {
+		packagesToLookup = opts.SelectedPackages
+	} else {
+		packageRepositoryURL := opts.PackageRepositoryURL
+		if packageRepositoryURL == "" {
+			return fmt.Errorf("package repository URL must be specified")
 		}
-		apkindexes = append(apkindexes, apkindex)
-	}
 
-	packagesToLookup := determinePackagesToLookup(apkindexes, opts.SelectedPackages)
+		var apkindexes []*repository.ApkIndex
+		for _, arch := range opts.Arches {
+			apkindex, err := index.Index(arch, packageRepositoryURL)
+			if err != nil {
+				return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
+			}
+			apkindexes = append(apkindexes, apkindex)
+		}
 
-	vulnMatches, err := opts.VulnerabilityDetector.VulnerabilitiesForPackages(ctx, packagesToLookup...)
-	if err != nil {
-		return err
+		packagesToLookup = uniquePackageNamesFromAPKINDEXes(apkindexes)
 	}
 
 	for _, pkg := range packagesToLookup {
-		pkgVulnMatches := vulnMatches[pkg]
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 
-		err := processPkgVulnMatches(opts, pkg, pkgVulnMatches)
+		pkg := pkg
+		err := opts.discoverMatchesForPackage(ctx, pkg)
+		if err != nil {
+			return err
+		}
+	}
+
+	opts.VulnEvents <- vuln.EventMatchingFinished{}
+
+	return nil
+}
+
+func (opts DiscoverOptions) discoverMatchesForPackage(ctx context.Context, pkg string) error {
+	opts.VulnEvents <- vuln.EventPackageMatchingStarting{Package: pkg}
+
+	matches, err := opts.VulnerabilityDetector.VulnerabilitiesForPackage(ctx, pkg)
+	if ctx.Err() != nil {
+		return err
+	}
+	if err != nil {
+		opts.VulnEvents <- vuln.EventPackageMatchingError{Package: pkg, Err: err}
+	}
+
+	matches = opts.filterMatchesForPackage(pkg, matches)
+
+	opts.VulnEvents <- vuln.EventPackageMatchingFinished{Package: pkg, Matches: matches}
+
+	for i := range matches {
+		match := matches[i]
+		err := Create(Request{
+			Package:         pkg,
+			VulnerabilityID: match.Vulnerability.ID,
+			Aliases:         nil,
+			Event:           advisoryEventForNewDiscovery(match),
+		}, CreateOptions{opts.AdvisoryDocs})
 		if err != nil {
 			return err
 		}
@@ -78,9 +115,11 @@ func Discover(opts DiscoverOptions) error {
 	return nil
 }
 
-func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Match) error {
+func (opts DiscoverOptions) filterMatchesForPackage(pkg string, matches []vuln.Match) []vuln.Match {
 	buildCfgEntry, _ := opts.BuildCfgs.Select().WhereName(pkg).First() //nolint:errcheck
 	buildCfg := buildCfgEntry.Configuration()
+
+	var filteredMatches []vuln.Match
 
 	for i := range matches {
 		match := matches[i]
@@ -90,24 +129,12 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 
 		vulnID := match.Vulnerability.ID
 
+		// TODO: We shouldn't need to know about documents here, we should just have a
+		//  query against the total dataset for this package-vuln pair.
+
 		advisoryDocuments := opts.AdvisoryDocs.Select().WhereName(pkg)
 		if advisoryDocuments.Len() == 0 {
-			// create a brand-new advisory config
-
-			newEvent := advisoryEventForNewDiscovery(match)
-
-			// TODO: why isn't this using advisory.Create? Could this be the source of that one bug?
-			err := createAdvisoryConfig(opts.AdvisoryDocs, Request{
-				Package:         pkg,
-				VulnerabilityID: vulnID,
-				Event:           newEvent,
-			})
-			if err != nil {
-				return fmt.Errorf("unable to record new advisory: %w", err)
-			}
-
-			log.Printf("🐛 new potential vulnerability for package %q: %s", pkg, hyperlinkCVE(vulnID))
-
+			filteredMatches = append(filteredMatches, match)
 			continue
 		}
 
@@ -120,33 +147,10 @@ func processPkgVulnMatches(opts DiscoverOptions, pkg string, matches []vuln.Matc
 			continue
 		}
 
-		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
-			advisories := doc.Advisories
-			adv, ok := advisories.Get(vulnID)
-			if !ok {
-				adv = v2.Advisory{
-					ID: vulnID,
-					// TODO: We could add aliases here, too!
-				}
-			}
-			adv.Events = append(adv.Events, advisoryEventForNewDiscovery(match))
-			advisories = advisories.Update(vulnID, adv)
-
-			// Ensure the package's advisory list is sorted before returning it.
-			sort.Sort(advisories)
-
-			return advisories, nil
-		})
-
-		err := advCfgEntry.Update(u)
-		if err != nil {
-			return err
-		}
-
-		log.Printf("🐛 new potential vulnerability for package %q: %s", document.Package.Name, hyperlinkCVE(vulnID))
+		filteredMatches = append(filteredMatches, match)
 	}
 
-	return nil
+	return filteredMatches
 }
 
 func advisoryEventForNewDiscovery(match vuln.Match) v2.Event {
@@ -163,7 +167,7 @@ func advisoryEventForNewDiscovery(match vuln.Match) v2.Event {
 	}
 }
 
-func determinePackagesToLookup(apkindexes []*repository.ApkIndex, selectedPackageNames []string) []string {
+func uniquePackageNamesFromAPKINDEXes(apkindexes []*repository.ApkIndex) []string {
 	packagesFound := make(map[string]struct{})
 
 	for _, apkindex := range apkindexes {
@@ -179,11 +183,6 @@ func determinePackagesToLookup(apkindexes []*repository.ApkIndex, selectedPackag
 			}
 			name := pkg.Origin
 
-			// skip package if we've specified a disjoint set of packages to search for
-			if len(selectedPackageNames) >= 1 && !slices.Contains(selectedPackageNames, name) {
-				continue
-			}
-
 			// skip redundant recording of package name
 			if _, ok := packagesFound[name]; ok {
 				continue
@@ -193,20 +192,8 @@ func determinePackagesToLookup(apkindexes []*repository.ApkIndex, selectedPackag
 		}
 	}
 
-	log.Printf("🔎 discovered %d package(s) to search for in NVD", len(packagesFound))
-
 	packagesToLookup := lo.Keys(packagesFound)
 	sort.Strings(packagesToLookup)
 
 	return packagesToLookup
-}
-
-var termSupportsHyperlinks = termlink.SupportsHyperlinks()
-
-func hyperlinkCVE(id string) string {
-	if !termSupportsHyperlinks {
-		return id
-	}
-
-	return termlink.Link(id, fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", id))
 }

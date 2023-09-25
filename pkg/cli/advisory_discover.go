@@ -1,21 +1,25 @@
 package cli
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"chainguard.dev/melange/pkg/config"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/matchwatcher"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln/nvdapi"
+	"golang.org/x/sync/errgroup"
 )
 
 //nolint:gosec // This is not a hard-coded credential value, it's the name of the env var to reference.
@@ -29,8 +33,6 @@ func cmdAdvisoryDiscover() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			start := time.Now()
-
 			packageRepositoryURL := p.packageRepositoryURL
 
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)
@@ -68,23 +70,49 @@ func cmdAdvisoryDiscover() *cobra.Command {
 			}
 
 			selectedPackages := getSelectedOrDistroPackages(p.packageName, buildCfgs)
-
 			apiKey := p.resolveNVDAPIKey()
 
-			err = advisory.Discover(advisory.DiscoverOptions{
-				SelectedPackages:      selectedPackages,
-				BuildCfgs:             buildCfgs,
-				AdvisoryDocs:          advisoryCfgs,
-				PackageRepositoryURL:  packageRepositoryURL,
-				Arches:                []string{"x86_64", "aarch64"},
-				VulnerabilityDetector: nvdapi.NewDetector(http.DefaultClient, nvdapi.DefaultHost, apiKey),
+			ctx := context.Background()
+			g, ctx := errgroup.WithContext(ctx)
+			events := make(chan interface{})
+
+			g.Go(func() error {
+				defer close(events)
+				model := matchwatcher.New(events, len(selectedPackages))
+				final, err := tea.NewProgram(model, tea.WithContext(ctx)).Run()
+
+				if err != nil {
+					return err
+				}
+
+				if m, ok := final.(matchwatcher.Model); ok && m.Err != nil {
+					return m.Err
+				}
+
+				// Return a sentinel error to cancel the other goroutines.
+				return errNormalExit
 			})
-			if err != nil {
+
+			g.Go(func() error {
+				err = advisory.Discover(ctx, advisory.DiscoverOptions{
+					SelectedPackages:      selectedPackages,
+					BuildCfgs:             buildCfgs,
+					AdvisoryDocs:          advisoryCfgs,
+					PackageRepositoryURL:  packageRepositoryURL,
+					Arches:                []string{"x86_64", "aarch64"},
+					VulnerabilityDetector: nvdapi.NewDetector(http.DefaultClient, nvdapi.DefaultHost, apiKey),
+					VulnEvents:            events,
+				})
+				return err
+			})
+
+			if err := g.Wait(); err != nil {
+				if errors.Is(err, errNormalExit) {
+					return nil
+				}
+
 				return err
 			}
-
-			finish := time.Now()
-			log.Printf("⏱️  vulnerability discovery took %s", finish.Sub(start))
 
 			return nil
 		},
@@ -93,6 +121,8 @@ func cmdAdvisoryDiscover() *cobra.Command {
 	p.addFlagsTo(cmd)
 	return cmd
 }
+
+var errNormalExit = errors.New("normal exit")
 
 type discoverParams struct {
 	doNotDetectDistro bool
