@@ -78,8 +78,22 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 		return err
 	}
 
-	// Track how many packages we emit.
-	got := 0
+	// Check that we emit the same set of packages as filtering only main packages.
+	gmain, err := filtered.Filter(dag.OnlyMainPackages(pkgs))
+	if err != nil {
+		return err
+	}
+	mains, err := gmain.ReverseSorted()
+	if err != nil {
+		return err
+	}
+	want := make(map[string]struct{}, len(mains))
+	for _, main := range mains {
+		name := main.Name()
+		want[name] = struct{}{}
+	}
+
+	got := make(map[string]struct{}, len(want))
 
 	for _, node := range all {
 		name := node.Name()
@@ -108,18 +122,23 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 			return fmt.Errorf("invalid type: %s", t)
 		}
 
-		got++
+		if _, ok := want[name]; !ok {
+			return fmt.Errorf("found unexpected package %q", name)
+		}
+
+		if _, ok := got[name]; ok {
+			return fmt.Errorf("found duplicate package %q", name)
+		}
+
+		got[name] = struct{}{}
 	}
 
-	// Check that we emit the same number of packages as filtering only main packages.
-	mains, err := filtered.Filter(dag.OnlyMainPackages(pkgs))
-	if err != nil {
-		return err
-	}
-	want := len(mains.Packages())
-
-	if want != got {
-		return fmt.Errorf("wanted %d packages, got %d", want, got)
+	// Make sure we didn't miss anything somehow.
+	for _, main := range mains {
+		name := main.Name()
+		if _, ok := got[name]; !ok {
+			return fmt.Errorf("missing package %q", name)
+		}
 	}
 
 	return nil
