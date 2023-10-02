@@ -125,7 +125,11 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
-			name: "complex", existingSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"}, newSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"},
+			name: "complex_chars_with_qualifier", existingSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"}, newSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "ignore_non_standard_version_suffix", existingSonameFiles: []string{"libgs.so.10.02.debug"}, newSonameFiles: []string{"libgs.so.10.02.debug"},
 			wantErr: assert.NoError,
 		},
 	}

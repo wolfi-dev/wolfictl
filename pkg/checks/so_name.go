@@ -186,12 +186,24 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		o.Logger.Printf("no existing soname files, skipping")
 		return nil
 	}
+
+	// regex to match version and optional qualifier
+	// \d+(\.\d+)* captures version numbers that may have multiple parts separated by dots
+	// ([a-zA-Z0-9-_]*) captures optional alphanumeric (including hyphens and underscores) qualifiers
+	r := regexp.MustCompile(`(\d+(\.\d+)*)([a-zA-Z0-9-_]*)`)
+
 	// first turn the existing soname files into a map so it is easier to match with
 	existingSonameMap := make(map[string]string)
 	for _, soname := range existingSonameFiles {
 		o.Logger.Printf("checking soname file %s", soname)
 		sonameParts := strings.Split(soname, ".so")
-		existingSonameMap[sonameParts[0]] = strings.TrimPrefix(sonameParts[1], ".")
+
+		// Find the version and optional qualifier
+		matches := r.FindStringSubmatch(sonameParts[1])
+		if len(matches) > 0 {
+			version := matches[0] // The entire match, including optional qualifier
+			existingSonameMap[sonameParts[0]] = version
+		}
 	}
 
 	// now iterate over new soname files and compare with existing files
@@ -211,6 +223,11 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		existingVersion, err := versions.NewVersion(existingVersionStr)
 		if err != nil {
 			return errors.Wrapf(err, "failed to parse existing version %s", existingVersionStr)
+		}
+
+		matches := r.FindStringSubmatch(versionStr)
+		if len(matches) > 0 {
+			versionStr = matches[0] // The entire match, including optional qualifier
 		}
 
 		version, err := versions.NewVersion(versionStr)
