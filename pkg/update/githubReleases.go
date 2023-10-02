@@ -624,6 +624,11 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		return "", nil
 	}
 
+	v, err := transformVersion(c.Update, v)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to transform version %s", v)
+	}
+
 	return v, nil
 }
 
