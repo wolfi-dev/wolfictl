@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
@@ -120,6 +121,10 @@ type diffResult struct {
 	added    []string
 	modified []string
 	deleted  []string
+
+	// If present, contains .PKGINFO.
+	// [0] = before, [1] = after.
+	pkginfos []string
 }
 
 func diffDirectories(dir1, dir2 string) (diffResult, error) {
@@ -161,7 +166,11 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 			}
 
 			if content1 != content2 {
-				result.modified = append(result.modified, relPath)
+				if filepath.Base(path1) == ".PKGINFO" {
+					result.pkginfos = append(result.pkginfos, content2, content1)
+				} else {
+					result.modified = append(result.modified, relPath)
+				}
 			}
 		}
 
@@ -210,7 +219,6 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 // let's skip wolfi core files
 func shouldSkipFile(path string) bool {
 	return strings.HasSuffix(path, ".rsa.pub") ||
-		strings.EqualFold(filepath.Base(path), ".PKGINFO") ||
 		strings.HasSuffix(path, ".spdx.json")
 }
 
@@ -223,6 +231,11 @@ func writeDiffLog(diff diffResult, filename string, newPackages map[string]NewAp
 		builder.WriteString("\n")
 
 		builder.WriteString("Package " + packageName + ":\n")
+
+		if len(diff.pkginfos) == 2 {
+			cmpdiff := cmp.Diff(diff.pkginfos[0], diff.pkginfos[1])
+			fmt.Fprintf(&builder, "\n.PKGINFO:\n%s\n", cmpdiff)
+		}
 
 		changes := []string{}
 		for _, added := range diff.added {
