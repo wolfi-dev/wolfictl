@@ -115,14 +115,6 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 			latestVersion = strings.TrimSuffix(latestVersion, p.Config.Update.ReleaseMonitor.StripSuffix)
 		}
 
-		latestVersion, err = transformVersion(p.Config.Update, latestVersion)
-		if err != nil {
-			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
-				"failed to apply version transforms to %s for package %s.  Error: %s",
-				latestVersion, p.Config.Package.Name, err,
-			)
-		}
-
 		latestVersionSemver, err := version.NewVersion(latestVersion)
 		if err != nil {
 			errorMessages[p.Config.Package.Name] = fmt.Sprintf(
