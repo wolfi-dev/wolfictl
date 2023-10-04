@@ -12,7 +12,7 @@ func newTestLinterWithDir(path string) *Linter {
 }
 
 func newTestLinterWithFile(path string) *Linter {
-	return New(WithPath(filepath.Join("testdata/files/", path)))
+	return New(WithPath(filepath.Join("testdata/files/", path)), WithSeverity("ERROR"))
 }
 
 func TestLinter_Dir(t *testing.T) {

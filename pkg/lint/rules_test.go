@@ -24,9 +24,9 @@ func TestLinter_Rules(t *testing.T) {
 					{
 						Rule: Rule{
 							Name:     "valid-copyright-header",
-							Severity: SeverityInfo,
+							Severity: SeverityError,
 						},
-						Error: fmt.Errorf("[valid-copyright-header]: copyright header is missing (INFO)"),
+						Error: fmt.Errorf("[valid-copyright-header]: copyright header is missing (ERROR)"),
 					},
 				},
 			},
@@ -215,9 +215,9 @@ func TestLinter_Rules(t *testing.T) {
 					{
 						Rule: Rule{
 							Name:     "valid-copyright-header",
-							Severity: SeverityInfo,
+							Severity: SeverityError,
 						},
-						Error: fmt.Errorf("[valid-copyright-header]: copyright header is missing (INFO)"),
+						Error: fmt.Errorf("[valid-copyright-header]: copyright header is missing (ERROR)"),
 					},
 				},
 			},

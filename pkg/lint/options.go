@@ -10,6 +10,9 @@ type Options struct {
 
 	// Skip rules removes the given slice of rules to be checked
 	SkipRules []string
+
+	// Severity sets the severity of the rules to be checked
+	Severity string
 }
 
 // Option represents a linter option.
@@ -33,5 +36,12 @@ func WithVerbose(verbose bool) Option {
 func WithSkipRules(skipRules []string) Option {
 	return func(o *Options) {
 		o.SkipRules = skipRules
+	}
+}
+
+// WithSeverity sets the severity rules option.
+func WithSeverity(severity string) Option {
+	return func(o *Options) {
+		o.Severity = severity
 	}
 }

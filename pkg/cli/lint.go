@@ -12,6 +12,7 @@ type lintOptions struct {
 	verbose   bool
 	list      bool
 	skipRules []string
+	severity  string
 }
 
 func cmdLint() *cobra.Command {
@@ -32,6 +33,7 @@ func cmdLint() *cobra.Command {
 	cmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbose output")
 	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "prints the all of available rules and exits")
 	cmd.Flags().StringArrayVarP(&o.skipRules, "skip-rule", "", []string{}, "list of rules to skip")
+	cmd.Flags().StringVarP(&o.severity, "severity", "", string(lint.SeverityError), "list of rules to skip")
 
 	cmd.AddCommand(cmdLintYam())
 
@@ -69,5 +71,6 @@ func (o lintOptions) makeLintOptions() []lint.Option {
 		lint.WithPath(o.args[0]),
 		lint.WithVerbose(o.verbose),
 		lint.WithSkipRules(o.skipRules),
+		lint.WithSeverity(o.severity),
 	}
 }

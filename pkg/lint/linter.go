@@ -57,6 +57,11 @@ func (l *Linter) Lint() (Result, error) {
 	for name := range filesToLint {
 		failedRules := make(EvalRuleErrors, 0)
 		for _, rule := range rules {
+			// Check if the rule should be evaluated.
+			if string(rule.Severity) != l.options.Severity {
+				continue
+			}
+
 			// Check if we should skip this rule.
 			shouldEvaluate := true
 			if len(rule.ConditionFuncs) > 0 {

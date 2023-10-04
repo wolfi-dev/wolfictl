@@ -89,7 +89,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 		{
 			Name:        "valid-copyright-header",
 			Description: "every package should have a valid copyright header",
-			Severity:    SeverityInfo,
+			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				if len(config.Package.Copyright) == 0 {
 					return fmt.Errorf("copyright header is missing")
