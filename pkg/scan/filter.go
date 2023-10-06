@@ -25,7 +25,7 @@ func FilterWithAdvisories(result *Result, advisoryCfgs *configs.Index[v2.Documen
 		return nil, fmt.Errorf("advisory configs cannot be nil")
 	}
 
-	documents := advisoryCfgs.Select().WhereName(result.TargetAPK.Name).Configurations()
+	documents := advisoryCfgs.Select().WhereName(result.TargetAPK.Origin()).Configurations()
 	if len(documents) == 0 {
 		// No advisory configs for this package, so we know we wouldn't be able to filter anything.
 		return result.Findings, nil
