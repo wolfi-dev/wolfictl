@@ -41,7 +41,9 @@ func ExportCSV(opts ExportOptions) (io.Reader, error) {
 
 					switch event.Type {
 					case v2.EventTypeTruePositiveDetermination:
-						note = event.Data.(v2.TruePositiveDetermination).Note
+						if event.Data != nil {
+							note = event.Data.(v2.TruePositiveDetermination).Note
+						}
 
 					case v2.EventTypeFalsePositiveDetermination:
 						fp, _ := event.Data.(v2.FalsePositiveDetermination) //nolint:errcheck

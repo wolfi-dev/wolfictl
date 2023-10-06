@@ -1,0 +1,7 @@
+schema-version: "2"
+
+package:
+  name: scenario-5
+
+advisories:
+  - id: GHSA-3333-3333-3333

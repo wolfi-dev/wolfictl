@@ -1,0 +1,7 @@
+schema-version: "2"
+
+package:
+  name: scenario-2
+
+advisories:
+  - id: GHSA-2222-2222-2222

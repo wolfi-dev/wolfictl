@@ -36,7 +36,7 @@ func cmdAdvisoryDiscover() *cobra.Command {
 			packageRepositoryURL := p.packageRepositoryURL
 
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)
-			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
+			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
 			if distroRepoDir == "" || advisoriesRepoDir == "" {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("distro repo dir and/or advisories repo dir was left unspecified")

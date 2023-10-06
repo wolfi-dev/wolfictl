@@ -1,0 +1,9 @@
+schema-version: "2"
+
+package:
+  name: scenario-7
+
+advisories:
+  - id: CVE-2222-2222
+
+  - id: GHSA-2222-2222-2222
