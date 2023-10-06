@@ -49,8 +49,19 @@ type Result struct {
 }
 
 type TargetAPK struct {
-	Name    string
-	Version string
+	Name              string
+	Version           string
+	OriginPackageName string
+}
+
+// Origin returns the name of the origin package, if the package's metadata
+// indicates an origin package. Otherwise, it returns the package name.
+func (t TargetAPK) Origin() string {
+	if t.OriginPackageName != "" {
+		return t.OriginPackageName
+	}
+
+	return t.Name
 }
 
 func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
@@ -64,9 +75,15 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 
 	p := pkgs[0]
 
+	metadata, ok := p.Metadata.(pkg.ApkMetadata)
+	if !ok {
+		return TargetAPK{}, fmt.Errorf("expected APK metadata, found %T", p.Metadata)
+	}
+
 	return TargetAPK{
-		Name:    p.Name,
-		Version: p.Version,
+		Name:              p.Name,
+		Version:           p.Version,
+		OriginPackageName: metadata.OriginPackage,
 	}, nil
 }
 

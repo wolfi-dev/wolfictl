@@ -195,6 +195,27 @@ func TestFilterWithAdvisories(t *testing.T) {
 			errAssertion:        assert.NoError,
 		},
 		{
+			name: "filter set resolved, via origin package",
+			result: &Result{
+				TargetAPK: TargetAPK{
+					Name:              "some-ko-subpackage",
+					Version:           "0.13.0-r4",
+					OriginPackageName: "ko",
+				},
+				Findings: []*Finding{
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-2h5h-59f5-c5x9",
+						},
+					},
+				},
+			},
+			advisoryIndexGetter: getAdvisoriesIndex,
+			advisoryFilterSet:   "resolved",
+			expectedFindings:    []*Finding{},
+			errAssertion:        assert.NoError,
+		},
+		{
 			name: "filter set resolved, but fixed version not reached",
 			result: &Result{
 				TargetAPK: TargetAPK{
