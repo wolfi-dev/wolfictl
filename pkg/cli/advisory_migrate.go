@@ -19,6 +19,7 @@ func cmdAdvisoryMigrate() *cobra.Command {
 		Use:           "migrate <path/to/advisories.yaml>",
 		Short:         "Migrate advisory files to v2 schema from v1 schema",
 		SilenceErrors: true,
+		Deprecated:    "All known advisory documents have already been migrated to v2, so this command should no longer be needed. It will be removed soon.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			yamConfigFile, err := os.Open(".yam.yaml")
 			if err != nil {
