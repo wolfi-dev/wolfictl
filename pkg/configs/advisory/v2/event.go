@@ -57,35 +57,35 @@ type partialEvent struct {
 
 func (e *Event) UnmarshalYAML(v *yaml.Node) error {
 	// Unmarshal the event type and timestamp as a "partial event" before unmarshalling the event-type-specific data.
-	pe := partialEvent{}
-	err := v.Decode(&pe)
+	pe, err := strictUnmarshal[partialEvent](v)
 	if err != nil {
-		return err
+		return fmt.Errorf("strict YAML unmarshaling failed: %w", err)
 	}
+	eventData := *pe
 
 	var event Event
 
 	switch pe.Type {
 	case EventTypeDetection:
-		event, err = decodeTypedEventData[Detection](pe)
+		event, err = decodeTypedEventData[Detection](eventData)
 
 	case EventTypeTruePositiveDetermination:
-		event, err = decodeTypedEventData[TruePositiveDetermination](pe)
+		event, err = decodeTypedEventData[TruePositiveDetermination](eventData)
 
 	case EventTypeFixed:
-		event, err = decodeTypedEventData[Fixed](pe)
+		event, err = decodeTypedEventData[Fixed](eventData)
 
 	case EventTypeFalsePositiveDetermination:
-		event, err = decodeTypedEventData[FalsePositiveDetermination](pe)
+		event, err = decodeTypedEventData[FalsePositiveDetermination](eventData)
 
 	case EventTypeAnalysisNotPlanned:
-		event, err = decodeTypedEventData[AnalysisNotPlanned](pe)
+		event, err = decodeTypedEventData[AnalysisNotPlanned](eventData)
 
 	case EventTypeFixNotPlanned:
-		event, err = decodeTypedEventData[FixNotPlanned](pe)
+		event, err = decodeTypedEventData[FixNotPlanned](eventData)
 
 	default:
-		return fmt.Errorf("unrecognized event type %q, must be one of [%s]", pe.Type, strings.Join(EventTypes, ", "))
+		return fmt.Errorf("unrecognized event type %q, must be one of [%s]", eventData.Type, strings.Join(EventTypes, ", "))
 	}
 
 	if err != nil {
@@ -102,11 +102,11 @@ func decodeTypedEventData[T EventTypeData](pe partialEvent) (Event, error) {
 		Type:      pe.Type,
 	}
 
-	data := new(T)
-	err := pe.Data.Decode(data)
+	data, err := strictUnmarshal[T](&pe.Data)
 	if err != nil {
-		return Event{}, err
+		return Event{}, fmt.Errorf("strict YAML unmarshaling failed: %w", err)
 	}
+
 	event.Data = *data
 
 	return event, nil
