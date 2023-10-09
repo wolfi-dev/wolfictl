@@ -81,9 +81,9 @@ func (d *Detection) UnmarshalYAML(v *yaml.Node) error {
 
 	// Unmarshal the detection type and timestamp as a "partial detection" before
 	// unmarshalling the detection-type-specific data.
-	var partial partialDetection
-	if err := v.Decode(&partial); err != nil {
-		return err
+	partial, err := strictUnmarshal[partialDetection](v)
+	if err != nil {
+		return fmt.Errorf("strict YAML unmarshaling failed: %w", err)
 	}
 
 	// Unmarshal the detection-type-specific data.
