@@ -15,6 +15,7 @@ func cmdAdvisoryList() *cobra.Command {
 	p := &listParams{}
 	cmd := &cobra.Command{
 		Use:           "list",
+		Aliases:       []string{"ls"},
 		Short:         "list advisories for specific packages or across all of Wolfi",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
