@@ -35,7 +35,7 @@ func cmdAdvisory() *cobra.Command {
 	cmd.AddCommand(
 		cmdAdvisoryAlias(),
 		cmdAdvisoryCreate(),
-		cmdAdvisoryDB(),
+		cmdAdvisorySecDB(),
 		cmdAdvisoryDiscover(),
 		cmdAdvisoryExport(),
 		cmdAdvisoryList(),

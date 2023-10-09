@@ -12,8 +12,8 @@ import (
 
 const apkURL = "{{urlprefix}}/{{reponame}}/{{arch}}/{{pkg.name}}-{{pkg.ver}}.apk"
 
-// BuildDatabaseOptions contains the options for building a database.
-type BuildDatabaseOptions struct {
+// BuildSecurityDatabaseOptions contains the options for building a database.
+type BuildSecurityDatabaseOptions struct {
 	AdvisoryDocIndices []*configs.Index[v2.Document]
 
 	URLPrefix string
@@ -23,8 +23,8 @@ type BuildDatabaseOptions struct {
 
 var ErrNoPackageSecurityData = errors.New("no package security data found")
 
-// BuildDatabase builds a security database from the given options.
-func BuildDatabase(opts BuildDatabaseOptions) ([]byte, error) {
+// BuildSecurityDatabase builds an Alpine-style security database from the given options.
+func BuildSecurityDatabase(opts BuildSecurityDatabaseOptions) ([]byte, error) {
 	var packageEntries []secdb.PackageEntry
 
 	for _, index := range opts.AdvisoryDocIndices {

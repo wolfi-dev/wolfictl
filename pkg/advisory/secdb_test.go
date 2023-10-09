@@ -12,7 +12,7 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
-func TestBuildDatabase(t *testing.T) {
+func TestBuildSecurityDatabase(t *testing.T) {
 	cases := []struct {
 		name                   string
 		advisoryDirs           []string
@@ -22,25 +22,25 @@ func TestBuildDatabase(t *testing.T) {
 		{
 			name: "single advisories dir",
 			advisoryDirs: []string{
-				"./testdata/db/advisories",
+				"./testdata/secdb/advisories",
 			},
-			pathToExpectedDatabase: "./testdata/db/security.json",
+			pathToExpectedDatabase: "./testdata/secdb/security.json",
 			errorAssertion:         assert.NoError,
 		},
 		{
 			name: "multiple advisories dirs",
 			advisoryDirs: []string{
-				"./testdata/db/advisories",
-				"./testdata/db/other-advisories",
+				"./testdata/secdb/advisories",
+				"./testdata/secdb/other-advisories",
 			},
-			pathToExpectedDatabase: "./testdata/db/security-multiple.json",
+			pathToExpectedDatabase: "./testdata/secdb/security-multiple.json",
 			errorAssertion:         assert.NoError,
 		},
 		{
 			name: "use a dir with no adv data",
 			advisoryDirs: []string{
-				"./testdata/db/advisories",
-				"./testdata/db/advisories-empty",
+				"./testdata/secdb/advisories",
+				"./testdata/secdb/advisories-empty",
 			},
 			pathToExpectedDatabase: "",
 			errorAssertion: func(t assert.TestingT, err error, i ...interface{}) bool {
@@ -59,14 +59,14 @@ func TestBuildDatabase(t *testing.T) {
 				indices = append(indices, advisoryCfgs)
 			}
 
-			opts := BuildDatabaseOptions{
+			opts := BuildSecurityDatabaseOptions{
 				AdvisoryDocIndices: indices,
 				URLPrefix:          "https://packages.wolfi.dev",
 				Archs:              []string{"x86_64"},
 				Repo:               "os",
 			}
 
-			database, err := BuildDatabase(opts)
+			database, err := BuildSecurityDatabase(opts)
 			tt.errorAssertion(t, err)
 
 			if p := tt.pathToExpectedDatabase; p != "" {
@@ -74,7 +74,7 @@ func TestBuildDatabase(t *testing.T) {
 				require.NoError(t, err)
 
 				if diff := cmp.Diff(expectedDatabase, database); diff != "" {
-					t.Errorf("BuildDatabase() produced an unexpected database (-want +got):\n%s", diff)
+					t.Errorf("BuildSecurityDatabase() produced an unexpected database (-want +got):\n%s", diff)
 				}
 			}
 		})
