@@ -29,7 +29,7 @@ func cmdAdvisory() *cobra.Command {
 		Use:           "advisory",
 		Aliases:       []string{"adv"},
 		SilenceErrors: true,
-		Short:         "Utilities for viewing and modifying Wolfi advisory data",
+		Short:         "Commands for consuming and maintaining security advisory data",
 	}
 
 	cmd.AddCommand(
@@ -146,11 +146,11 @@ func addVulnFlag(val *string, cmd *cobra.Command) {
 }
 
 func addDistroDirFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "distro-repo-dir", "d", "", fmt.Sprintf("directory containing the distro repository (can also be set with environment variable `%s`)", envVarNameForDistroDir))
+	cmd.Flags().StringVarP(val, "distro-repo-dir", "d", "", "directory containing the distro repository")
 }
 
 func addAdvisoriesDirFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "advisories-repo-dir", "a", "", fmt.Sprintf("directory containing the advisories repository (can also be set with environment variable `%s`)", envVarNameForAdvisoriesDir))
+	cmd.Flags().StringVarP(val, "advisories-repo-dir", "a", "", "directory containing the advisories repository")
 }
 
 func addNoPromptFlag(val *bool, cmd *cobra.Command) {

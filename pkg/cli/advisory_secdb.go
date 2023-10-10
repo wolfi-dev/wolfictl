@@ -17,7 +17,7 @@ func cmdAdvisorySecDB() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "secdb",
 		Aliases:       []string{"db"},
-		Short:         "Build a security database from advisory data",
+		Short:         "Build an Alpine-style security database from advisory data",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {

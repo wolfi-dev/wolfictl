@@ -16,8 +16,21 @@ import (
 func cmdAdvisoryValidate() *cobra.Command {
 	p := &validateParams{}
 	cmd := &cobra.Command{
-		Use:           "validate",
-		Short:         "Validate the state of advisory data",
+		Use:   "validate",
+		Short: "Validate the state of advisory data",
+		Long: `Validate the state of the advisory data.
+
+This command examines all advisory documents to check the validity of the data. 
+
+It looks for issues like:
+
+* Missing required fields
+* Extra fields
+* Enum fields with an unrecognized value
+* Basic business logic checks
+
+If any issues are found in the advisory data, the command will exit 1, and will 
+print an error message that specifies where and how the data is invalid.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
