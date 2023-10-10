@@ -60,11 +60,11 @@ func (f *HTTPAliasFinder) GHSAsForCVE(ctx context.Context, cveID string) ([]stri
 		return nil, err
 	}
 
-	cveIDs := lo.Map(ghsas, func(ghsa githubSecurityAdvisoryResponse, _ int) string {
+	ghsaIDs := lo.Map(ghsas, func(ghsa githubSecurityAdvisoryResponse, _ int) string {
 		return ghsa.GHSAID
 	})
 
-	return cveIDs, nil
+	return ghsaIDs, nil
 }
 
 func (f *HTTPAliasFinder) gitHubAPIGet(ctx context.Context, requestPath string, queryParameters map[string]string) (io.ReadCloser, error) {
