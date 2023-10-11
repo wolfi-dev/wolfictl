@@ -50,7 +50,7 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 
 	changedPackages := GetPackagesToUpdate(files)
 
-	validateUpdateConfig(changedPackages, &checkErrors)
+	o.validateUpdateConfig(changedPackages, &checkErrors)
 
 	latestVersions, err := updateOpts.GetLatestVersions(o.Dir, changedPackages)
 	if err != nil {
@@ -74,7 +74,7 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 }
 
 // validates update configuration
-func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
+func (o CheckUpdateOptions) validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 	for _, file := range files {
 		// skip hidden files
 		if strings.HasPrefix(file, ".") {
@@ -85,6 +85,12 @@ func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 		if !strings.HasSuffix(file, ".yaml") {
 			file += ".yaml"
 		}
+
+		// if a directory is specified then join the file name instead of relying on the current working directory
+		if o.Dir != "" {
+			file = filepath.Join(o.Dir, file)
+		}
+
 		yamlData, err := os.ReadFile(file)
 		if err != nil {
 			addCheckError(checkErrors, errors.Wrapf(err, "failed to read %s", file))
@@ -192,7 +198,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 
 	defer os.RemoveAll(tempDir)
 
-	for packageName, newVersion := range latestVersions {
+	for packageName, latestVersion := range latestVersions {
 		srcConfigFile := filepath.Join(o.Dir, packageName+".yaml")
 
 		dryRunConfig, err := config.ParseConfiguration(srcConfigFile)
@@ -200,6 +206,9 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			return err
 		}
 		applyOverrides(&o, dryRunConfig)
+
+		currentVersion := dryRunConfig.Package.Version
+		newVersion := latestVersion.Version
 
 		data, err := yaml.Marshal(dryRunConfig)
 		if err != nil {
@@ -213,7 +222,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		}
 
 		// melange bump will modify the modified copy of the melange config
-		err = melange.Bump(tmpConfigFile, newVersion.Version, newVersion.Commit)
+		err = melange.Bump(tmpConfigFile, latestVersion.Version, latestVersion.Commit)
 		if err != nil {
 			addCheckError(checkErrors, errors.Wrapf(err, "package %s: failed to validate update config, melange bump", packageName))
 			continue
@@ -244,7 +253,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		}
 
 		// download or git clone sources into a temp folder to validate the update config
-		verifyPipelines(o, updated, mutations, checkErrors)
+		verifyPipelines(o, updated, currentVersion, newVersion, mutations, checkErrors)
 	}
 	return nil
 }
@@ -255,7 +264,7 @@ func applyOverrides(options *CheckUpdateOptions, dryRunConfig *config.Configurat
 	}
 }
 
-func verifyPipelines(o CheckUpdateOptions, updated *config.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
+func verifyPipelines(o CheckUpdateOptions, updated *config.Configuration, currentVersion, newVersion string, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
 	for i := range updated.Pipeline {
 		var err error
 		pipeline := updated.Pipeline[i]
@@ -264,7 +273,7 @@ func verifyPipelines(o CheckUpdateOptions, updated *config.Configuration, mutati
 			err = o.verifyFetch(&pipeline, mutations)
 		}
 		if pipeline.Uses == "git-checkout" {
-			err = o.verifyGitCheckout(&pipeline, mutations)
+			err = o.verifyGitCheckout(&pipeline, currentVersion, newVersion, mutations)
 		}
 		if err != nil {
 			addCheckError(checkErrors, err)
@@ -296,7 +305,7 @@ func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string)
 	return os.RemoveAll(filename)
 }
 
-func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]string) error {
+func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, currentVersion, newVersion string, m map[string]string) error {
 	repoValue := p.With["repository"]
 	if repoValue == "" {
 		return fmt.Errorf("no repository to checkout")
@@ -311,6 +320,19 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 	evaluatedTag, err := util.MutateStringFromMap(m, tagValue)
 	if err != nil {
 		return err
+	}
+
+	evaluatedCurrentTag, err := util.MutateStringFromMap(map[string]string{
+		"package.version": currentVersion,
+	}, tagValue)
+	if err != nil {
+		return err
+	}
+
+	// Check whether the evaluated tag matches the upstream version by
+	// respecting the backwards compatibility of error messages.
+	if evaluatedCurrentTag != evaluatedTag && evaluatedCurrentTag != newVersion {
+		return fmt.Errorf("given tag '%s' does not match upstream version '%s'", evaluatedCurrentTag, evaluatedTag)
 	}
 
 	tempDir, err := os.MkdirTemp("", "wolfictl")

@@ -2,6 +2,7 @@ package checks
 
 import (
 	"bytes"
+	"errors"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -147,9 +148,11 @@ func TestUpdateKeyExists(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	o := CheckUpdateOptions{}
+
 	checkErrors := make(lint.EvalRuleErrors, 0)
 	// check update key exists
-	validateUpdateConfig([]string{fileContainsUpdate}, &checkErrors)
+	o.validateUpdateConfig([]string{fileContainsUpdate}, &checkErrors)
 
 	assert.Empty(t, checkErrors)
 
@@ -165,6 +168,55 @@ func TestUpdateKeyExists(t *testing.T) {
 	}
 
 	// check the update key does not exist
-	validateUpdateConfig([]string{fileNoContainsUpdate}, &checkErrors)
+	o.validateUpdateConfig([]string{fileNoContainsUpdate}, &checkErrors)
 	assert.NotEmpty(t, checkErrors)
+}
+
+func TestCheckUpdate(t *testing.T) {
+	d, err := filepath.Abs("./testdata")
+	assert.NoError(t, err)
+
+	o := CheckUpdateOptions{
+		Dir:    d,
+		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+	}
+
+	tests := []struct {
+		name    string
+		file    string
+		wantErr error
+	}{
+		{
+			name:    "upstream repo has 'v' prefix in tag but manifest does not",
+			file:    "git-checkout-wrong-tag.yaml",
+			wantErr: errors.New("given tag '1.10.0' does not match upstream version 'v1.10.0'"),
+		},
+		{
+			name:    "upstream repo has 'v' prefix in tag and also manifest does",
+			file:    "git-checkout-correct-tag.yaml",
+			wantErr: nil,
+		},
+		{
+			name:    "upstream repo has 'v' prefix in tag but only tag prefix is set",
+			file:    "git-checkout-wrong-no-strip.yaml",
+			wantErr: errors.New("ref vv1.10.0: couldn't find remote ref \"refs/tags/vv1.10.0\""),
+		},
+		{
+			name:    "upstream repo has 'v' prefix in tag but only strip prefix is set",
+			file:    "git-checkout-wrong-just-strip.yaml",
+			wantErr: errors.New("ref 1.10.0: couldn't find remote ref \"refs/tags/1.10.0\""),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := o.CheckUpdates([]string{tt.file})
+			if (err != nil) != (tt.wantErr != nil) {
+				t.Fatalf("CheckUpdates() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				assert.Contains(t, err.Error(), tt.wantErr.Error())
+			}
+		})
+	}
 }
