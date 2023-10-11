@@ -125,8 +125,8 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			localRepo,
 			indexes,
 			keys,
-			c.Environment.Contents.Repositories,
-			c.Environment.Contents.Keyring,
+			append(c.Environment.Contents.Repositories, opts.repos...),
+			append(c.Environment.Contents.Keyring, opts.keys...),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create resolver for %s: %w", c.String(), err)
