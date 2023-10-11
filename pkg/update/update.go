@@ -13,8 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"chainguard.dev/melange/pkg/config"
-
 	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
 
 	"github.com/fatih/color"
@@ -256,27 +254,40 @@ func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[stri
 		maps.Copy(latestVersions, v)
 	}
 
-	return latestVersions, nil
+	return o.mutatePackageVersions(latestVersions)
 }
 
-// if provided, transform the version using the update config
-func transformVersion(c config.Update, v string) (string, error) {
-	if len(c.VersionTransform) == 0 {
-		return v, nil
-	}
+// Apply any post-process version-transforms to the detected update versions.
+func (o *Options) mutatePackageVersions(packageVersions map[string]NewVersionResults) (map[string]NewVersionResults, error) {
+	mutatedPackageVersions := map[string]NewVersionResults{}
 
-	mutatedVersion := v
-
-	for _, tf := range c.VersionTransform {
-		matcher, err := regexp.Compile(tf.Match)
-		if err != nil {
-			return v, fmt.Errorf("unable to compile version transform regex: %w", err)
+	for k, nv := range packageVersions {
+		pc, ok := o.PackageConfigs[k]
+		if !ok {
+			return map[string]NewVersionResults{}, fmt.Errorf("package %s not found in PackageConfigs", k)
 		}
 
-		mutatedVersion = matcher.ReplaceAllString(mutatedVersion, tf.Replace)
+		if len(pc.Config.Update.VersionTransform) == 0 {
+			mutatedPackageVersions[k] = nv
+			continue
+		}
+
+		scratchVersion := nv.Version
+
+		for _, tf := range pc.Config.Update.VersionTransform {
+			matcher, err := regexp.Compile(tf.Match)
+			if err != nil {
+				return map[string]NewVersionResults{}, fmt.Errorf("unable to compile version transform regex: %w", err)
+			}
+
+			scratchVersion = matcher.ReplaceAllString(scratchVersion, tf.Replace)
+		}
+
+		nv.Version = scratchVersion
+		mutatedPackageVersions[k] = nv
 	}
 
-	return mutatedVersion, nil
+	return mutatedPackageVersions, nil
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request

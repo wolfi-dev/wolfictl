@@ -304,14 +304,6 @@ func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
 				},
 			},
 		}, version: "v1.2.3", want: "v1.2.3", wantErr: assert.NoError},
-		{name: "transform-version", melangeConfig: config.Configuration{
-			Update: config.Update{
-				VersionTransform: []config.VersionTransform{
-					{Match: "_", Replace: "."},
-				},
-				GitHubMonitor: &config.GitHubMonitor{},
-			},
-		}, version: "1_2_3", want: "1.2.3", wantErr: assert.NoError},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
