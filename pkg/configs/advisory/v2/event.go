@@ -102,6 +102,10 @@ func decodeTypedEventData[T EventTypeData](pe partialEvent) (Event, error) {
 		Type:      pe.Type,
 	}
 
+	if pe.Data.IsZero() {
+		return event, nil
+	}
+
 	data, err := strictUnmarshal[T](&pe.Data)
 	if err != nil {
 		return Event{}, fmt.Errorf("strict YAML unmarshaling failed: %w", err)

@@ -3,6 +3,7 @@ package v2
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"sort"
 
 	"github.com/samber/lo"
@@ -19,6 +20,12 @@ type Advisory struct {
 	// Events is a list of timestamped events that occurred during the investigation
 	// and resolution of the vulnerability.
 	Events []Event `yaml:"events"`
+}
+
+// DescribesVulnerability returns true if the advisory cites the given
+// vulnerability ID in either its ID or its aliases.
+func (adv Advisory) DescribesVulnerability(vulnID string) bool {
+	return adv.ID == vulnID || slices.Contains(adv.Aliases, vulnID)
 }
 
 // Latest returns the latest event in the advisory.
@@ -107,11 +114,20 @@ func (adv Advisory) Validate() error {
 }
 
 func (adv Advisory) validateAliases() error {
-	return labelError("aliases",
-		errors.Join(lo.Map(adv.Aliases, func(alias string, _ int) error {
-			return vuln.ValidateID(alias)
-		})...),
-	)
+	var errs []error
+
+	// Validate aliases as a collection
+	errs = append(errs, validateNoDuplicates(adv.Aliases))
+
+	// Loop through aliases to validate each one
+	for _, alias := range adv.Aliases {
+		errs = append(errs,
+			validateAliasFormat(alias),
+			validateAliasIsNotAdvisoryID(alias, adv.ID),
+		)
+	}
+
+	return labelError("aliases", errors.Join(errs...))
 }
 
 func (adv Advisory) validateEvents() error {
@@ -129,4 +145,33 @@ func (adv Advisory) validateEvents() error {
 			return nil
 		})...),
 	)
+}
+
+func validateAliasFormat(alias string) error {
+	switch {
+	case vuln.RegexGHSA.MatchString(alias),
+		vuln.RegexGO.MatchString(alias):
+		return nil
+	default:
+		return fmt.Errorf("alias %q is not a valid GHSA ID or Go vuln ID", alias)
+	}
+}
+
+func validateAliasIsNotAdvisoryID(alias, advisoryID string) error {
+	if advisoryID == alias {
+		return fmt.Errorf("alias %q cannot duplicate the advisory's ID", alias)
+	}
+
+	return nil
+}
+
+func validateNoDuplicates(items []string) error {
+	seen := make(map[string]struct{})
+	for _, item := range items {
+		if _, ok := seen[item]; ok {
+			return fmt.Errorf("%q is duplicated in the list", item)
+		}
+		seen[item] = struct{}{}
+	}
+	return nil
 }

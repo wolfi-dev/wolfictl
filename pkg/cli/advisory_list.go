@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -18,7 +19,7 @@ func cmdAdvisoryList() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
+			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
 			if advisoriesRepoDir == "" {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")
@@ -55,7 +56,7 @@ func cmdAdvisoryList() *cobra.Command {
 						continue
 					}
 
-					if p.vuln != "" && p.vuln != adv.ID { // TODO: check aliases, too
+					if p.vuln != "" && !adv.DescribesVulnerability(p.vuln) {
 						// user specified a particular different vulnerability
 						continue
 					}
@@ -65,20 +66,32 @@ func cmdAdvisoryList() *cobra.Command {
 						continue
 					}
 
+					vulnID := adv.ID
+					if len(adv.Aliases) > 0 {
+						vulnID += fmt.Sprintf(" (%s)", strings.Join(adv.Aliases, ", "))
+					}
+
 					if p.history {
 						// user wants to see the full history
 						sorted := adv.SortedEvents()
 						for _, event := range sorted {
-							timestamp := event.Timestamp
 							statusDescription := renderListItem(event)
-							output += fmt.Sprintf("%s: %s: %s @ %s\n", cfg.Package.Name, adv.ID, statusDescription, timestamp)
+							timestamp := event.Timestamp
+
+							output += fmt.Sprintf(
+								"%s: %s: %s @ %s\n",
+								cfg.Package.Name,
+								vulnID,
+								statusDescription,
+								timestamp,
+							)
 						}
 
 						continue
 					}
 
 					statusDescription := renderListItem(adv.Latest())
-					output += fmt.Sprintf("%s: %s: %s\n", cfg.Package.Name, adv.ID, statusDescription)
+					output += fmt.Sprintf("%s: %s: %s\n", cfg.Package.Name, vulnID, statusDescription)
 				}
 			}
 

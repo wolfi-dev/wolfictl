@@ -18,29 +18,30 @@ type Selection[T Configuration] struct {
 // WhereName filters the selection down to entries whose name match the given
 // parameter.
 func (s Selection[T]) WhereName(name string) Selection[T] {
-	var entries []Entry[T]
-	for _, e := range s.entries {
+	return s.Where(func(e Entry[T]) bool {
 		cfg := e.Configuration()
 		if cfg == nil {
-			continue
+			return false
 		}
-		if name == (*cfg).Name() {
-			entries = append(entries, e)
-		}
-	}
 
-	return Selection[T]{
-		entries: entries,
-		index:   s.index,
-	}
+		return name == (*cfg).Name()
+	})
 }
 
 // WhereFilePath filters the selection down to entries whose configuration file
 // path match the given parameter.
 func (s Selection[T]) WhereFilePath(p string) Selection[T] {
+	return s.Where(func(e Entry[T]) bool {
+		return p == e.getPath()
+	})
+}
+
+// Where filters the selection down to entries for which the given condition is
+// true.
+func (s Selection[T]) Where(condition func(Entry[T]) bool) Selection[T] {
 	var entries []Entry[T]
 	for _, e := range s.entries {
-		if p == e.getPath() {
+		if condition(e) {
 			entries = append(entries, e)
 		}
 	}

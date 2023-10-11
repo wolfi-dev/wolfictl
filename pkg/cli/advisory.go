@@ -32,14 +32,17 @@ func cmdAdvisory() *cobra.Command {
 		Short:         "Utilities for viewing and modifying Wolfi advisory data",
 	}
 
-	cmd.AddCommand(cmdAdvisoryList())
-	cmd.AddCommand(cmdAdvisoryCreate())
-	cmd.AddCommand(cmdAdvisoryUpdate())
-	cmd.AddCommand(cmdAdvisoryDiscover())
-	cmd.AddCommand(cmdAdvisoryDB())
-	cmd.AddCommand(cmdAdvisoryValidate())
-	cmd.AddCommand(cmdAdvisoryExport())
-	cmd.AddCommand(cmdAdvisoryMigrate())
+	cmd.AddCommand(
+		cmdAdvisoryAlias(),
+		cmdAdvisoryCreate(),
+		cmdAdvisoryDB(),
+		cmdAdvisoryDiscover(),
+		cmdAdvisoryExport(),
+		cmdAdvisoryList(),
+		cmdAdvisoryMigrate(),
+		cmdAdvisoryUpdate(),
+		cmdAdvisoryValidate(),
+	)
 
 	return cmd
 }
@@ -52,7 +55,7 @@ func resolveDistroDir(cliFlagValue string) string {
 	return os.Getenv(envVarNameForDistroDir)
 }
 
-func resolveAdvisoriesDir(cliFlagValue string) string {
+func resolveAdvisoriesDirInput(cliFlagValue string) string {
 	if v := cliFlagValue; v != "" {
 		return v
 	}

@@ -85,6 +85,64 @@ func TestAdvisory_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "duplicate aliases",
+			adv: Advisory{
+				ID: "CVE-2020-0001",
+				Aliases: []string{
+					"GHSA-5j9q-4xjw-3j3q",
+					"GHSA-5j9q-4xjw-3j3q",
+				},
+				Events: []Event{
+					{
+						Timestamp: testTime,
+						Type:      EventTypeDetection,
+						Data: Detection{
+							Type: DetectionTypeManual,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "alias duplicates advisory ID",
+			adv: Advisory{
+				ID: "GHSA-5j9q-4xjw-3j3q",
+				Aliases: []string{
+					"GHSA-5j9q-4xjw-3j3q",
+				},
+				Events: []Event{
+					{
+						Timestamp: testTime,
+						Type:      EventTypeDetection,
+						Data: Detection{
+							Type: DetectionTypeManual,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "CVE in alias instead of advisory ID",
+			adv: Advisory{
+				ID: "GHSA-5j9q-4xjw-3j3q",
+				Aliases: []string{
+					"CVE-2020-0001",
+				},
+				Events: []Event{
+					{
+						Timestamp: testTime,
+						Type:      EventTypeDetection,
+						Data: Detection{
+							Type: DetectionTypeManual,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "no events",
 			adv: Advisory{
 				ID:     "CVE-2020-0001",

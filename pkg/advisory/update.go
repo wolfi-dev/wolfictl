@@ -32,8 +32,6 @@ func Update(req Request, opts UpdateOptions) error {
 			return nil, fmt.Errorf("advisory %q does not exist", vulnID)
 		}
 
-		// TODO: update the advisory's aliases, too
-
 		adv.Events = append(adv.Events, req.Event)
 		advisories = advisories.Update(vulnID, adv)
 

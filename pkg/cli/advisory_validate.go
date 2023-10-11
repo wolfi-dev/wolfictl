@@ -21,7 +21,7 @@ func cmdAdvisoryValidate() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			advisoriesRepoDir := resolveAdvisoriesDir(p.advisoriesRepoDir)
+			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
 			if advisoriesRepoDir == "" {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("advisories repo dir was left unspecified")

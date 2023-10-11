@@ -63,8 +63,6 @@ func migrateV1Advisory(v1Advisory []v1.Entry, advisoryID string) (*Advisory, err
 		events = append(events, *event)
 	}
 
-	// TODO: sort out CVE vs. GHSA in ID and Aliases
-
 	return &Advisory{
 		ID:     advisoryID,
 		Events: events,
