@@ -135,8 +135,8 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringSliceVar(&archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
-	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{}, "path to extra keys to include in the build environment keyring")
-	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
+	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra repositories to include in the build environment")
 	cmd.Flags().StringVar(&logDir, "log-dir", "buildlogs", "subdirectory where buildlogs will be written when specified (packages/$arch/buildlogs/$apk.log)")
 	return cmd
 }
