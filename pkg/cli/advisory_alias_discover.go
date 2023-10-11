@@ -68,10 +68,15 @@ than attempting any kind of merge of the separate advisories.
 				return err
 			}
 
+			selectedPackageSet := make(map[string]struct{})
+			for _, pkg := range p.packages {
+				selectedPackageSet[pkg] = struct{}{}
+			}
+
 			opts := advisory.DiscoverAliasesOptions{
 				AdvisoryDocs:     advisoryDocs,
 				AliasFinder:      advisory.NewHTTPAliasFinder(http.DefaultClient),
-				SelectedPackages: p.packages,
+				SelectedPackages: selectedPackageSet,
 			}
 
 			return advisory.DiscoverAliases(cmd.Context(), opts)

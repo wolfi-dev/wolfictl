@@ -148,7 +148,7 @@ func TestDiscoverAliases(t *testing.T) {
 			opts := DiscoverAliasesOptions{
 				AdvisoryDocs:     advisoryDocs,
 				AliasFinder:      mockAF,
-				SelectedPackages: []string{tt.selectedPackage},
+				SelectedPackages: map[string]struct{}{tt.selectedPackage: {}},
 			}
 
 			err = DiscoverAliases(context.Background(), opts)

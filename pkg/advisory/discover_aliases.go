@@ -3,7 +3,6 @@ package advisory
 import (
 	"context"
 	"fmt"
-	"slices"
 	"sort"
 
 	"github.com/samber/lo"
@@ -22,9 +21,9 @@ type DiscoverAliasesOptions struct {
 	// vulnerabilities.
 	AliasFinder AliasFinder
 
-	// SelectedPackages is the list of packages to operate on. If empty, all
-	// packages will be operated on.
-	SelectedPackages []string
+	// SelectedPackages is the set of packages to operate on. If empty, all packages
+	// will be operated on.
+	SelectedPackages map[string]struct{}
 }
 
 // DiscoverAliases queries external data sources for aliases for the
@@ -37,7 +36,8 @@ func DiscoverAliases(ctx context.Context, opts DiscoverAliasesOptions) error {
 	// advisory documents to just those packages.
 	if len(opts.SelectedPackages) > 0 {
 		documents = lo.Filter(documents, func(doc v2.Document, _ int) bool {
-			return slices.Contains(opts.SelectedPackages, doc.Package.Name)
+			_, ok := opts.SelectedPackages[doc.Package.Name]
+			return ok
 		})
 	}
 
