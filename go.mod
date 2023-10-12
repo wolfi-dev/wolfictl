@@ -6,7 +6,7 @@ require (
 	chainguard.dev/apko v0.10.1-0.20230918194837-e9722fcc3e50
 	chainguard.dev/melange v0.4.1-0.20230925205716-48ed11ff1760
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.70.0
+	github.com/anchore/grype v0.71.0
 	github.com/anchore/syft v0.93.0
 	github.com/chainguard-dev/go-apk v0.0.0-20230906161245-0728258ab917
 	github.com/chainguard-dev/yam v0.0.0-20230807153807-4de7c531f3e1
@@ -21,7 +21,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.9.0
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v55 v55.0.0
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-multierror v1.1.1
@@ -279,7 +279,7 @@ require (
 	golang.org/x/build v0.0.0-20230825202850-d75d44855ad1 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/net v0.16.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect

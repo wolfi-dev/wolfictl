@@ -20,6 +20,7 @@ import (
 	"github.com/anchore/grype/grype/matcher/javascript"
 	"github.com/anchore/grype/grype/matcher/python"
 	"github.com/anchore/grype/grype/matcher/ruby"
+	"github.com/anchore/grype/grype/matcher/rust"
 	"github.com/anchore/grype/grype/matcher/stock"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/store"
@@ -243,12 +244,13 @@ func newGrypeVulnerabilityMatcher(datastore store.Store) *grype.VulnerabilityMat
 func createMatchers() []matcher.Matcher {
 	return matcher.NewDefaultMatchers(
 		matcher.Config{
-			Java:       java.MatcherConfig{UseCPEs: true},
-			Ruby:       ruby.MatcherConfig{UseCPEs: true},
-			Python:     python.MatcherConfig{UseCPEs: true},
-			Dotnet:     dotnet.MatcherConfig{UseCPEs: true},
-			Javascript: javascript.MatcherConfig{UseCPEs: true},
-			Golang:     golang.MatcherConfig{UseCPEs: true},
+			Dotnet:     dotnet.MatcherConfig{UseCPEs: false},
+			Golang:     golang.MatcherConfig{UseCPEs: false},
+			Java:       java.MatcherConfig{UseCPEs: false},
+			Javascript: javascript.MatcherConfig{UseCPEs: false},
+			Python:     python.MatcherConfig{UseCPEs: false},
+			Ruby:       ruby.MatcherConfig{UseCPEs: false},
+			Rust:       rust.MatcherConfig{UseCPEs: false},
 			Stock:      stock.MatcherConfig{UseCPEs: true},
 		},
 	)
