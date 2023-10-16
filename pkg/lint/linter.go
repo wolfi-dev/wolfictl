@@ -3,8 +3,6 @@ package lint
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 
 	"golang.org/x/exp/slices"
 
@@ -126,15 +124,5 @@ func (l *Linter) PrintRules() {
 	l.logger.Println("Available rules:")
 	for _, rule := range AllRules(l) {
 		l.logger.Printf("* %s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
-	}
-}
-
-// checkIfMakefileExists returns a ConditionFunc that checks if the Makefile exists.
-func (l *Linter) checkIfMakefileExists() ConditionFunc {
-	return func() bool {
-		if _, err := os.Stat(filepath.Join(l.options.Path, "Makefile")); err != nil {
-			return false
-		}
-		return true
 	}
 }
