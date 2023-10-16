@@ -1,21 +1,14 @@
 package lint
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"log"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 
 	"golang.org/x/exp/slices"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
@@ -23,10 +16,6 @@ import (
 type Linter struct {
 	// options are the options to configure the linter.
 	options Options
-
-	// makefileBytes is storing the cached bytes of the Makefile
-	// to avoid reading it multiple times.
-	makefileBytes []byte
 
 	// logger is the logger to use.
 	logger *log.Logger
@@ -136,51 +125,4 @@ func (l *Linter) PrintRules() {
 	for _, rule := range AllRules(l) {
 		l.logger.Printf("* %s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
 	}
-}
-
-// checkIfMakefileExists returns a ConditionFunc that checks if the Makefile exists.
-func (l *Linter) checkIfMakefileExists() ConditionFunc {
-	return func() bool {
-		if _, err := os.Stat(filepath.Join(l.options.Path, "Makefile")); err != nil {
-			return false
-		}
-		return true
-	}
-}
-
-// readMakefile reads the Makefile from the file.
-func (l *Linter) readMakefile() error {
-	cmd := exec.Command("make", "-C", l.options.Path, "list") //nolint: gosec
-	b, err := cmd.Output()
-	if err != nil {
-		return errors.Wrapf(err, "failed to call 'make list'")
-	}
-	if len(b) == 0 {
-		return fmt.Errorf("make list is empty")
-	}
-	l.makefileBytes = b
-	return nil
-}
-
-// checkMakefile checks if the given package name is exists in the Makefile.
-func (l *Linter) checkMakefile(packageName string) (bool, error) {
-	// Lazy load the Makefile.
-	if l.makefileBytes == nil {
-		if err := l.readMakefile(); err != nil {
-			return false, err
-		}
-	}
-
-	scanner := bufio.NewScanner(bytes.NewReader(l.makefileBytes))
-	scanner.Split(bufio.ScanWords)
-
-	for scanner.Scan() {
-		word := scanner.Text()
-		if strings.Contains(word, packageName) {
-			// We found the corresponding package in the Makefile.
-			return true, nil
-		}
-	}
-	// If we didn't find the package in the Makefile we return false.
-	return false, nil
 }

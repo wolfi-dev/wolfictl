@@ -38,24 +38,6 @@ const gitCheckout = "git-checkout"
 var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 	return Rules{
 		{
-			Name:        "no-makefile-entry-for-package",
-			Description: "every package should have a corresponding entry in Makefile",
-			Severity:    SeverityError,
-			LintFunc: func(config config.Configuration) error {
-				exist, err := l.checkMakefile(config.Package.Name)
-				if err != nil {
-					return err
-				}
-				if !exist {
-					return fmt.Errorf("package %s is not exist in the Makefile", config.Package.Name)
-				}
-				return nil
-			},
-			ConditionFuncs: []ConditionFunc{
-				l.checkIfMakefileExists(),
-			},
-		},
-		{
 			Name:        "forbidden-repository-used",
 			Description: "do not specify a forbidden repository",
 			Severity:    SeverityError,
