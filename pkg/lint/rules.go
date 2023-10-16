@@ -249,7 +249,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				version := config.Package.Version
-				if err := versions.Validate(version); err != nil {
+				if err := versions.ValidateWithoutEpoch(version); err != nil {
 					return fmt.Errorf("invalid version %s, could not parse", version)
 				}
 				return nil

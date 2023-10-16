@@ -2,7 +2,7 @@ package versions
 
 import "testing"
 
-func TestValidate(t *testing.T) {
+func TestValidateWithoutEpoch(t *testing.T) {
 	cases := []struct {
 		v             string
 		shouldBeValid bool
@@ -35,7 +35,42 @@ func TestValidate(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.v, func(t *testing.T) {
-			err := Validate(tt.v)
+			err := ValidateWithoutEpoch(tt.v)
+			if tt.shouldBeValid && err != nil {
+				t.Errorf("expected %q to be valid, but got error %q", tt.v, err)
+			}
+			if !tt.shouldBeValid && err == nil {
+				t.Errorf("expected %q to be invalid, but got no error", tt.v)
+			}
+		})
+	}
+}
+
+func TestValidateWithEpoch(t *testing.T) {
+	cases := []struct {
+		v             string
+		shouldBeValid bool
+	}{
+		// These are all valid full versions.
+		{"1-r0", true},
+		{"1.0-r0", true},
+		{"1.0.0-r0", true},
+		{"1.0.0-r4-r5", true},
+		{"1.0.0_alpha-r0", true},
+		{"1.0.0-r100000000000000000", true},
+
+		// These are all invalid full versions.
+		{"1.0.0", false},
+		{"1.0.0-r5.2", false},
+		{"1.0.0-r5_pre", false},
+		{"1r6", false},
+		{"1.0.0-r", false},
+		{"1.0-r1-r2-r3", false},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.v, func(t *testing.T) {
+			err := ValidateWithEpoch(tt.v)
 			if tt.shouldBeValid && err != nil {
 				t.Errorf("expected %q to be valid, but got error %q", tt.v, err)
 			}
