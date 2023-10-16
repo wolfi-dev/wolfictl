@@ -21,8 +21,25 @@ import (
 func cmdAdvisoryCreate() *cobra.Command {
 	p := &createParams{}
 	cmd := &cobra.Command{
-		Use:           "create",
-		Short:         "create a new advisory for a package",
+		Use:   "create",
+		Short: "Create a new advisory",
+		Long: `Create a new advisory.
+
+Use this command to create a new advisory, i.e. when the given 
+package/vulnerability combination doesn't already exist in the advisories repo. 
+If the package/vulnerability combination already exists, use the "update" 
+command instead.
+
+This command will prompt for all required fields, and will attempt to fill in 
+as many optional fields as possible. You can abort the advisory creation at any 
+point in the prompt by pressing Ctrl+C.
+
+You can specify required values on the command line using the flags relevant to 
+the advisory you are creating. If not all required values are provided on the 
+command line, the command will prompt for the missing values.
+
+If the --no-prompt flag is specified, then the command will fail if any 
+required fields are missing.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {

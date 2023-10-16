@@ -29,7 +29,7 @@ func cmdAdvisoryDiscover() *cobra.Command {
 	p := &discoverParams{}
 	cmd := &cobra.Command{
 		Use:           "discover",
-		Short:         "search for new potential vulnerabilities and create advisories for them",
+		Short:         "Automatically create advisories by matching distro packages to vulnerabilities in NVD",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -146,7 +146,7 @@ func (p *discoverParams) addFlagsTo(cmd *cobra.Command) {
 
 	cmd.Flags().StringVarP(&p.packageRepositoryURL, "package-repo-url", "r", "", "URL of the APK package repository")
 
-	cmd.Flags().StringVar(&p.nvdAPIKey, "nvd-api-key", "", fmt.Sprintf("NVD API key (Can also be set via the environment variable '%s'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to https://nvd.nist.gov/developers/request-an-api-key .)", envVarNameForNVDAPIKey))
+	cmd.Flags().StringVar(&p.nvdAPIKey, "nvd-api-key", "", fmt.Sprintf("NVD API key (Can also be set via the environment variable '%s'. Using an API key significantly increases the rate limit for API requests. If you need an NVD API key, go to https://nvd.nist.gov/developers/request-an-api-key.)", envVarNameForNVDAPIKey))
 }
 
 func (p *discoverParams) resolveNVDAPIKey() string {

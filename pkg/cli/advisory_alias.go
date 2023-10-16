@@ -7,7 +7,7 @@ import (
 func cmdAdvisoryAlias() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "alias",
-		Short: "Utilities for viewing and modifying Wolfi advisory aliases",
+		Short: "Commands for discovering vulnerability aliases",
 	}
 
 	cmd.AddCommand(

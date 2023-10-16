@@ -12,11 +12,12 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
-func cmdAdvisoryDB() *cobra.Command {
+func cmdAdvisorySecDB() *cobra.Command {
 	p := &dbParams{}
 	cmd := &cobra.Command{
-		Use:           "db",
-		Short:         "Build a security database from advisory data",
+		Use:           "secdb",
+		Aliases:       []string{"db"},
+		Short:         "Build an Alpine-style security database from advisory data",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -45,14 +46,14 @@ func cmdAdvisoryDB() *cobra.Command {
 				indices = append(indices, index)
 			}
 
-			opts := advisory.BuildDatabaseOptions{
+			opts := advisory.BuildSecurityDatabaseOptions{
 				AdvisoryDocIndices: indices,
 				URLPrefix:          p.urlPrefix,
 				Archs:              p.archs,
 				Repo:               p.repo,
 			}
 
-			database, err := advisory.BuildDatabase(opts)
+			database, err := advisory.BuildSecurityDatabase(opts)
 			if err != nil {
 				return err
 			}

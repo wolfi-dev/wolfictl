@@ -13,7 +13,7 @@ import (
 func cmdAdvisoryAliasFind() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "find <vulnerability ID> [<vulnerability ID>...]",
-		Short: "query upstream data sources for aliases for the given vulnerability ID(s)",
+		Short: "Query upstream data sources for aliases for the given vulnerability ID(s)",
 		Long: `This is a utility command to query upstream data sources to find aliases for 
 the given vulnerability ID(s).
 
@@ -23,19 +23,21 @@ GHSA-jfh8-c2jp-5v3q).
 You may specify multiple vulnerability IDs at once.
 
 If your terminal supports hyperlinks, vulnerability IDs in the output will be 
-hyperlinked to the upstream data source.
+hyperlinked to the relevant webpage from the upstream data source.
 `,
 		Example: `
-$ wolfictl advisory alias find CVE-2021-44228                   
-Aliases for CVE-2021-44228:
-  - GHSA-jfh8-c2jp-5v3q
+	$ wolfictl adv alias find CVE-2021-44228
+	Aliases for CVE-2021-44228:
+	  - GHSA-jfh8-c2jp-5v3q
 
-$ wolfictl advisory alias find GHSA-f9jg-8p32-2f55 CVE-2020-8552
-Aliases for GHSA-f9jg-8p32-2f55:
-  - CVE-2021-25743
 
-Aliases for CVE-2020-8552:
-  - GHSA-82hx-w2r5-c2wq`,
+
+	$ wolfictl adv alias find GHSA-f9jg-8p32-2f55 CVE-2020-8552
+	Aliases for GHSA-f9jg-8p32-2f55:
+	  - CVE-2021-25743
+
+	Aliases for CVE-2020-8552:
+	  - GHSA-82hx-w2r5-c2wq`,
 		SilenceErrors: true,
 		Args:          cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

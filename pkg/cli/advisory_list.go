@@ -14,8 +14,37 @@ import (
 func cmdAdvisoryList() *cobra.Command {
 	p := &listParams{}
 	cmd := &cobra.Command{
-		Use:           "list",
-		Short:         "list advisories for specific packages or across all of Wolfi",
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List advisories for specific packages, vulnerabilities, or the entire data set",
+		Long: `List advisories for specific packages, vulnerabilities, or the entire data set.
+
+The 'list' (or 'ls') command prints a list of advisories based on the given 
+selection criteria. By default, all advisories in the current advisory data set 
+will be listed.
+
+FILTERING
+
+You can list advisories for a single package:
+
+	wolfictl adv ls -p glibc
+
+You can list all advisories for a given vulnerability ID across all packages:
+
+	wolfictl adv ls -V CVE-2023-38545
+
+You can show only advisories that are considered not to be "resolved":
+
+	wolfictl adv ls --unresolved
+
+And you can combine the above flags as needed.
+
+HISTORY
+
+Using the --history flag, you can list advisory events instead of just 
+advisories' latest states. This is useful for viewing a summary of an 
+investigation over time for a given package/vulnerability match.'
+`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
