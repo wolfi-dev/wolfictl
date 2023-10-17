@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
 	"sort"
 	"strings"
 
@@ -74,6 +73,10 @@ func cmdScan() *cobra.Command {
 			var scans []inputScan
 
 			for _, input := range args {
+				if p.outputFormat == outputFormatOutline {
+					fmt.Printf("🔎 Scanning %q\n", input)
+				}
+
 				scannedInput, err := scanInput(input, p)
 				if err != nil {
 					return err
@@ -128,50 +131,7 @@ func cmdScan() *cobra.Command {
 }
 
 func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
-	if inputFilePath == "-" {
-		// Read stdin into a temp file.
-		t, err := os.CreateTemp("", "wolfictl-scan-")
-		if err != nil {
-			return nil, fmt.Errorf("failed to create temp file for stdin: %w", err)
-		}
-		if _, err := io.Copy(t, os.Stdin); err != nil {
-			return nil, err
-		}
-		if err := t.Close(); err != nil {
-			return nil, err
-		}
-		fmt.Fprintln(os.Stderr, "Will process from stdin")
-		inputFilePath = t.Name()
-	} else if strings.HasPrefix(inputFilePath, "https://") {
-		// Fetch the remote URL into a temp file.
-		t, err := os.CreateTemp("", "wolfictl-scan-")
-		if err != nil {
-			return nil, fmt.Errorf("failed to create temp file for remote: %w", err)
-		}
-		resp, err := http.Get(inputFilePath) //nolint:gosec
-		if err != nil {
-			return nil, fmt.Errorf("failed to download from remote: %w", err)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			all, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return nil, err
-			}
-			return nil, fmt.Errorf("failed to download from remote (%d): %s", resp.StatusCode, string(all))
-		}
-		if _, err := io.Copy(t, resp.Body); err != nil {
-			return nil, err
-		}
-		if err := t.Close(); err != nil {
-			return nil, err
-		}
-		fmt.Fprintf(os.Stderr, "Will process: %s\n", inputFilePath)
-		inputFilePath = t.Name()
-	} else {
-		fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(inputFilePath))
-	}
-	inputFile, err := os.Open(inputFilePath)
+	inputFile, err := openInputFile(inputFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open input file: %w", err)
 	}
@@ -213,6 +173,70 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 	}
 
 	return is, nil
+}
+
+// openInputFile figures out how to interpret the given input file path to find
+// a file to scan.
+//
+// In order, it will:
+//
+// 1. If the path is "-", read stdin into a temp file and return that.
+//
+// 2. If the path starts with "https://", download the remote file into a temp file and return that.
+//
+// 3. Otherwise, open the file at the given path and return that.
+func openInputFile(inputFilePath string) (*os.File, error) {
+	switch {
+	case inputFilePath == "-":
+		// Read stdin into a temp file.
+		t, err := os.CreateTemp("", "wolfictl-scan-")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create temp file for stdin: %w", err)
+		}
+		if _, err := io.Copy(t, os.Stdin); err != nil {
+			return nil, err
+		}
+		if err := t.Close(); err != nil {
+			return nil, err
+		}
+
+		return t, nil
+
+	case strings.HasPrefix(inputFilePath, "https://"):
+		// Fetch the remote URL into a temp file.
+		t, err := os.CreateTemp("", "wolfictl-scan-")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create temp file for remote: %w", err)
+		}
+		resp, err := http.Get(inputFilePath) //nolint:gosec
+		if err != nil {
+			return nil, fmt.Errorf("failed to download from remote: %w", err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			all, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			return nil, fmt.Errorf("failed to download from remote (%d): %s", resp.StatusCode, string(all))
+		}
+		if _, err := io.Copy(t, resp.Body); err != nil {
+			return nil, err
+		}
+		if err := t.Close(); err != nil {
+			return nil, err
+		}
+
+		return t, nil
+
+	default:
+		inputFile, err := os.Open(inputFilePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open input file: %w", err)
+		}
+
+		return inputFile, nil
+	}
 }
 
 type scanParams struct {
