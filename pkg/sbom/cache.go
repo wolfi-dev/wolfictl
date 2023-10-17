@@ -34,7 +34,6 @@ func cachedSBOMPath(inputFilePath string, f io.Reader) (string, error) {
 // a new SBOM.
 func CachedGenerate(inputFilePath string, f io.ReadSeeker, distroID string) (*sbom.SBOM, error) {
 	// Check cache first
-
 	cachedPath, err := cachedSBOMPath(inputFilePath, f)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute cached SBOM path: %w", err)

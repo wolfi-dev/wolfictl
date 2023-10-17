@@ -216,14 +216,14 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 }
 
 type scanParams struct {
+	disableSBOMCache    bool
+	sbomInput           bool
 	requireZeroFindings bool
 	localDBFilePath     string
 	outputFormat        string
-	sbomInput           bool
 	distro              string
 	advisoryFilterSet   string
 	advisoriesRepoDir   string
-	disableSBOMCache    bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
