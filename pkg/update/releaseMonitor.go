@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 
@@ -139,26 +141,45 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 
 func (m MonitorService) getLatestReleaseVersion(identifier int) (string, error) {
 	targetURL := fmt.Sprintf(releaseMonitorURL, identifier)
-	req, err := http.NewRequest("GET", targetURL, nil)
-	if err != nil {
-		return "", errors.Wrapf(err, "failed creating GET request %s", targetURL)
-	}
+	var err error
 
-	resp, err := m.Client.Do(req)
-	if err != nil {
-		return "", errors.Wrapf(err, "failed getting URI %s", targetURL)
-	}
-	defer resp.Body.Close()
+	// Setup retry variables
+	maxRetries := 3
+	backoffFactor := 2.0
+	initialBackoff := time.Second // 1 second
 
-	if resp.StatusCode != http.StatusOK {
+	for i := 0; i < maxRetries; i++ {
+		req, err := http.NewRequest("GET", targetURL, nil)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed creating GET request %s", targetURL)
+		}
+
+		resp, err := m.Client.Do(req)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed getting URI %s", targetURL)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode == http.StatusOK {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return "", errors.Wrap(err, "reading monitor service mapper data file")
+			}
+			return m.parseVersions(b)
+		}
+
+		// Check if the status code is a 500 or 503, then retry
+		if resp.StatusCode == http.StatusInternalServerError || resp.StatusCode == http.StatusServiceUnavailable {
+			// Calculate the next backoff duration
+			backoffDuration := time.Duration(math.Pow(backoffFactor, float64(i))) * initialBackoff
+			time.Sleep(backoffDuration)
+			continue // Retry
+		}
+
 		return "", fmt.Errorf("non ok http response for URI %s code: %v", targetURL, resp.StatusCode)
 	}
 
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", errors.Wrap(err, "reading monitor service mapper data file")
-	}
-	return m.parseVersions(b)
+	return "", fmt.Errorf("max retries reached; last error: %v", err)
 }
 
 func (m MonitorService) parseVersions(rawdata []byte) (string, error) {
