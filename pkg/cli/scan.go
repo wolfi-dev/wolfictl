@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -16,6 +16,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/buildlog"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -23,6 +24,8 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"golang.org/x/exp/slices"
 )
+
+const buildLogDefaultName = "packages.log"
 
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
@@ -69,12 +72,42 @@ func cmdScan() *cobra.Command {
 				}
 			}
 
-			// Do a scan for each arg
+			if p.packageBuildLogInput && p.sbomInput {
+				return errors.New("cannot specify both -s/--sbom and --build-log")
+			}
+
+			// Use either the build log or the args themselves as scan targets
+
+			var scanInputPaths []string
+			if p.packageBuildLogInput {
+				if len(args) != 1 {
+					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildLogDefaultName)
+				}
+
+				var err error
+				scanInputPaths, err = resolveInputFilePathsFromBuildLog(args[0])
+				if err != nil {
+					return fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
+				}
+			} else {
+				scanInputPaths = args
+			}
+
+			// Do a scan for each scan target
 
 			var scans []inputScan
+			for _, scanInputPath := range scanInputPaths {
+				if p.outputFormat == outputFormatOutline {
+					fmt.Printf("🔎 Scanning %q\n", scanInputPath)
+				}
 
-			for _, input := range args {
-				scannedInput, err := scanInput(input, p)
+				inputFile, err := resolveInputFileFromArg(scanInputPath)
+				if err != nil {
+					return fmt.Errorf("failed to open input file: %w", err)
+				}
+				defer inputFile.Close()
+
+				scannedInput, err := scanInput(inputFile, p)
 				if err != nil {
 					return err
 				}
@@ -84,7 +117,7 @@ func cmdScan() *cobra.Command {
 				if set := p.advisoryFilterSet; set != "" {
 					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryCfgs, set)
 					if err != nil {
-						return fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", input, err)
+						return fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", scanInputPath, err)
 					}
 
 					scannedInput.Result.Findings = findings
@@ -127,8 +160,103 @@ func cmdScan() *cobra.Command {
 	return cmd
 }
 
-func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
-	if inputFilePath == "-" {
+func scanInput(inputFile *os.File, p *scanParams) (*inputScan, error) {
+	inputFileName := inputFile.Name()
+
+	// Get the SBOM of the APK
+	var apkSBOM io.Reader
+	if p.sbomInput {
+		apkSBOM = inputFile
+	} else {
+		var s *sbomSyft.SBOM
+		var err error
+
+		if p.disableSBOMCache {
+			s, err = sbom.Generate(inputFileName, inputFile, p.distro)
+		} else {
+			s, err = sbom.CachedGenerate(inputFileName, inputFile, p.distro)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
+		}
+
+		reader, err := sbom.ToSyftJSON(s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert SBOM to Syft JSON: %w", err)
+		}
+		apkSBOM = reader
+	}
+
+	// Do the vulnerability scan based on the SBOM
+	result, err := scan.APKSBOM(apkSBOM, p.localDBFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFileName, err)
+	}
+
+	is := &inputScan{
+		InputFile: inputFileName,
+		Result:    result,
+	}
+
+	return is, nil
+}
+
+// resolveInputFilePathsFromBuildLog takes the given path to a Melange build log
+// file (or a directory that contains the build log as a "packages.log" file).
+// Once it finds the build log, it parses it, and returns a slice of file paths
+// to APKs to be scanned. Each APK path is created with the assumption that the
+// APKs are located at "./packages/$ARCH/$PACKAGE-$VERSION.apk".
+func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
+	pathToFileOrDirectory := filepath.Clean(buildLogPath)
+
+	info, err := os.Stat(pathToFileOrDirectory)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat build log input: %w", err)
+	}
+
+	var pathToFile string
+	if info.IsDir() {
+		pathToFile = filepath.Join(pathToFileOrDirectory, buildLogDefaultName)
+	} else {
+		pathToFile = pathToFileOrDirectory
+	}
+
+	file, err := os.Open(pathToFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open build log: %w", err)
+	}
+	defer file.Close()
+
+	buildLogEntries, err := buildlog.Parse(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse build log: %w", err)
+	}
+
+	scanInputs := make([]string, 0, len(buildLogEntries))
+	for _, entry := range buildLogEntries {
+		apkName := fmt.Sprintf("%s-%s.apk", entry.Package, entry.FullVersion)
+		apkPath := filepath.Join("packages", entry.Arch, apkName)
+		scanInputs = append(scanInputs, apkPath)
+	}
+
+	return scanInputs, nil
+}
+
+// resolveInputFileFromArg figures out how to interpret the given input file path
+// to find a file to scan. This input file could be either an APK or an SBOM.
+// The objective of this function is to find the file to scan and return a file
+// handle to it.
+//
+// In order, it will:
+//
+// 1. If the path is "-", read stdin into a temp file and return that.
+//
+// 2. If the path starts with "https://", download the remote file into a temp file and return that.
+//
+// 3. Otherwise, open the file at the given path and return that.
+func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
+	switch {
+	case inputFilePath == "-":
 		// Read stdin into a temp file.
 		t, err := os.CreateTemp("", "wolfictl-scan-")
 		if err != nil {
@@ -140,9 +268,10 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 		if err := t.Close(); err != nil {
 			return nil, err
 		}
-		fmt.Fprintln(os.Stderr, "Will process from stdin")
-		inputFilePath = t.Name()
-	} else if strings.HasPrefix(inputFilePath, "https://") {
+
+		return t, nil
+
+	case strings.HasPrefix(inputFilePath, "https://"):
 		// Fetch the remote URL into a temp file.
 		t, err := os.CreateTemp("", "wolfictl-scan-")
 		if err != nil {
@@ -166,64 +295,29 @@ func scanInput(inputFilePath string, p *scanParams) (*inputScan, error) {
 		if err := t.Close(); err != nil {
 			return nil, err
 		}
-		fmt.Fprintf(os.Stderr, "Will process: %s\n", inputFilePath)
-		inputFilePath = t.Name()
-	} else {
-		fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(inputFilePath))
-	}
-	inputFile, err := os.Open(inputFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open input file: %w", err)
-	}
-	defer inputFile.Close()
 
-	// Get SBOM of the APK
+		return t, nil
 
-	var apkSBOM io.Reader
-	if p.sbomInput {
-		apkSBOM = inputFile
-	} else {
-		var s *sbomSyft.SBOM
-		if p.disableSBOMCache {
-			s, err = sbom.Generate(inputFilePath, inputFile, p.distro)
-		} else {
-			s, err = sbom.CachedGenerate(inputFilePath, inputFile, p.distro)
-		}
+	default:
+		inputFile, err := os.Open(inputFilePath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
+			return nil, fmt.Errorf("failed to open input file: %w", err)
 		}
 
-		reader, err := sbom.ToSyftJSON(s)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert SBOM to Syft JSON: %w", err)
-		}
-		apkSBOM = reader
+		return inputFile, nil
 	}
-
-	// Do vulnerability scan!
-
-	result, err := scan.APKSBOM(apkSBOM, p.localDBFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFilePath, err)
-	}
-
-	is := &inputScan{
-		InputFile: inputFilePath,
-		Result:    result,
-	}
-
-	return is, nil
 }
 
 type scanParams struct {
-	requireZeroFindings bool
-	localDBFilePath     string
-	outputFormat        string
-	sbomInput           bool
-	distro              string
-	advisoryFilterSet   string
-	advisoriesRepoDir   string
-	disableSBOMCache    bool
+	requireZeroFindings  bool
+	localDBFilePath      string
+	outputFormat         string
+	sbomInput            bool
+	packageBuildLogInput bool
+	distro               string
+	advisoryFilterSet    string
+	advisoriesRepoDir    string
+	disableSBOMCache     bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -231,6 +325,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
 	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
+	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
 	cmd.Flags().StringVarP(&p.advisoriesRepoDir, "advisories-repo-dir", "a", "", "local directory for advisory data")

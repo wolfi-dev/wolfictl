@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"sort"
 	"strings"
 
@@ -35,13 +34,17 @@ func cmdSBOM() *cobra.Command {
 				return fmt.Errorf("invalid output format %q, must be one of [%s]", p.outputFormat, strings.Join([]string{sbomFormatOutline, sbomFormatSyftJSON}, ", "))
 			}
 
+			// TODO: Bring input retrieval options in line with `wolfictl scan`.
+
 			apkFilePath := args[0]
 			apkFile, err := os.Open(apkFilePath)
 			if err != nil {
 				return fmt.Errorf("failed to open apk file: %w", err)
 			}
 
-			fmt.Fprintf(os.Stderr, "Will process: %s\n", path.Base(apkFilePath))
+			if p.outputFormat == outputFormatOutline {
+				fmt.Printf("🔎 Scanning %q\n", apkFilePath)
+			}
 
 			var s *sbomSyft.SBOM
 			if p.disableSBOMCache {
