@@ -408,8 +408,8 @@ github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c/go.mod h1:Uw6Uezg
 github.com/docker/go-units v0.4.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/dominikbraun/graph v0.22.3-0.20230609075221-c6cb265d89e9 h1:syd9V7VnliWaqaeZ7Qc2jE++BRXCswXkaNh41a36Xmk=
-github.com/dominikbraun/graph v0.22.3-0.20230609075221-c6cb265d89e9/go.mod h1:yOjYyogZLY1LSG9E33JWZJiq5k83Qy2C6POAuiViluc=
+github.com/dominikbraun/graph v0.23.0 h1:TdZB4pPqCLFxYhdyMFb1TBdFxp8XLcJfTTBQucVPgCo=
+github.com/dominikbraun/graph v0.23.0/go.mod h1:yOjYyogZLY1LSG9E33JWZJiq5k83Qy2C6POAuiViluc=
 github.com/dominodatalab/os-release v0.0.0-20190522011736-bcdb4a3e3c2f h1:oEt43goQgsL1DzoOyQ/UZHQw7t9TqwyJec9W0vh0wfE=
 github.com/dominodatalab/os-release v0.0.0-20190522011736-bcdb4a3e3c2f/go.mod h1:RU3x9VqPvzbOGJ3wtP0pPBtUOp4yU/yzA/8qdxgi/6Q=
 github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 h1:PRxIJD8XjimM5aTknUK9w6DHLDox2r2M3DI4i2pnd3w=
