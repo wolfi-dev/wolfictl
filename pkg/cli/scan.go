@@ -94,6 +94,7 @@ func cmdScan() *cobra.Command {
 			// Do a scan for each scan target
 
 			var scans []inputScan
+			var inputPathsFailingRequireZero []string
 			for _, scanInputPath := range scanInputPaths {
 				if p.outputFormat == outputFormatOutline {
 					fmt.Printf("🔎 Scanning %q\n", scanInputPath)
@@ -137,8 +138,8 @@ func cmdScan() *cobra.Command {
 					}
 				}
 				if p.requireZeroFindings && len(findings) > 0 {
-					// Exit with error immediately if any vulnerabilities are found
-					return fmt.Errorf("more than 0 vulnerabilities found")
+					// Accumulate the list of failures to be returned at the end, but we still want to complete all scans
+					inputPathsFailingRequireZero = append(inputPathsFailingRequireZero, scanInputPath)
 				}
 			}
 
@@ -148,6 +149,10 @@ func cmdScan() *cobra.Command {
 				if err != nil {
 					return fmt.Errorf("failed to marshal scans to JSON: %w", err)
 				}
+			}
+
+			if len(inputPathsFailingRequireZero) > 0 {
+				return fmt.Errorf("vulnerabilities found in the following package(s):\n%s", strings.Join(inputPathsFailingRequireZero, "\n"))
 			}
 
 			return nil
