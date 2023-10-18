@@ -12,28 +12,28 @@ import (
 
 func TestFilterWithAdvisories(t *testing.T) {
 	cases := []struct {
-		name                string
-		result              *Result
-		advisoryIndexGetter func(t *testing.T) *configs.Index[v2.Document]
-		advisoryFilterSet   string
-		expectedFindings    []*Finding
-		errAssertion        assert.ErrorAssertionFunc
+		name                  string
+		result                *Result
+		advisoryIndicesGetter func(t *testing.T) []*configs.Index[v2.Document]
+		advisoryFilterSet     string
+		expectedFindings      []*Finding
+		errAssertion          assert.ErrorAssertionFunc
 	}{
 		{
-			name:                "nil result",
-			result:              nil,
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "",
-			expectedFindings:    nil,
-			errAssertion:        assert.Error,
+			name:                  "nil result",
+			result:                nil,
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "",
+			expectedFindings:      nil,
+			errAssertion:          assert.Error,
 		},
 		{
-			name:                "nil advisory index",
-			result:              &Result{},
-			advisoryIndexGetter: func(_ *testing.T) *configs.Index[v2.Document] { return nil },
-			advisoryFilterSet:   "",
-			expectedFindings:    nil,
-			errAssertion:        assert.Error,
+			name:                  "nil advisory index",
+			result:                &Result{},
+			advisoryIndicesGetter: func(_ *testing.T) []*configs.Index[v2.Document] { return nil },
+			advisoryFilterSet:     "",
+			expectedFindings:      nil,
+			errAssertion:          assert.Error,
 		},
 		{
 			name: "no filter set",
@@ -54,10 +54,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "",
-			expectedFindings:    nil,
-			errAssertion:        assert.Error,
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "",
+			expectedFindings:      nil,
+			errAssertion:          assert.Error,
 		},
 		{
 			name: "filter set all",
@@ -89,8 +89,8 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "all",
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "all",
 			expectedFindings: []*Finding{
 				{
 					Vulnerability: Vulnerability{
@@ -122,10 +122,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "all",
-			expectedFindings:    []*Finding{},
-			errAssertion:        assert.NoError,
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "all",
+			expectedFindings:      []*Finding{},
+			errAssertion:          assert.NoError,
 		},
 		{
 			name: "filter set resolved",
@@ -157,8 +157,8 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "resolved",
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "resolved",
 			expectedFindings: []*Finding{
 				{
 					Vulnerability: Vulnerability{
@@ -189,10 +189,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "resolved",
-			expectedFindings:    []*Finding{},
-			errAssertion:        assert.NoError,
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "resolved",
+			expectedFindings:      []*Finding{},
+			errAssertion:          assert.NoError,
 		},
 		{
 			name: "filter set resolved, via origin package",
@@ -210,10 +210,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "resolved",
-			expectedFindings:    []*Finding{},
-			errAssertion:        assert.NoError,
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "resolved",
+			expectedFindings:      []*Finding{},
+			errAssertion:          assert.NoError,
 		},
 		{
 			name: "filter set resolved, but fixed version not reached",
@@ -230,8 +230,8 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 				},
 			},
-			advisoryIndexGetter: getAdvisoriesIndex,
-			advisoryFilterSet:   "resolved",
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "resolved",
 			expectedFindings: []*Finding{
 				{
 					Vulnerability: Vulnerability{
@@ -241,11 +241,47 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			errAssertion: assert.NoError,
 		},
+		{
+			name: "use multiple advisory indices",
+			result: &Result{
+				TargetAPK: TargetAPK{
+					Name:    "ko",
+					Version: "0.13.0-r2",
+				},
+				Findings: []*Finding{
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-2h5h-59f5-c5x9", // In first advisories index (as fixed)
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-bbbb-bbbb-bbbb", // In second advisories index (as true positive)
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-cccc-cccc-cccc", // Not in any of the advisories indices
+						},
+					},
+				},
+			},
+			advisoryIndicesGetter: getMultipleAdvisoriesIndices,
+			advisoryFilterSet:     "all",
+			expectedFindings: []*Finding{
+				{
+					Vulnerability: Vulnerability{
+						ID: "GHSA-cccc-cccc-cccc",
+					},
+				},
+			},
+			errAssertion: assert.NoError,
+		},
 	}
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			index := tt.advisoryIndexGetter(t)
+			index := tt.advisoryIndicesGetter(t)
 
 			var resultFindings []*Finding
 			var err error
@@ -258,7 +294,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 	}
 }
 
-func getAdvisoriesIndex(t *testing.T) *configs.Index[v2.Document] {
+func getSingleAdvisoriesIndex(t *testing.T) []*configs.Index[v2.Document] {
 	t.Helper()
 
 	advFS := rwos.DirFS(path.Join("testdata", "advisories"))
@@ -267,5 +303,25 @@ func getAdvisoriesIndex(t *testing.T) *configs.Index[v2.Document] {
 		t.Fatal(err)
 	}
 
-	return index
+	return []*configs.Index[v2.Document]{index}
+}
+
+func getMultipleAdvisoriesIndices(t *testing.T) []*configs.Index[v2.Document] {
+	t.Helper()
+
+	var indices []*configs.Index[v2.Document]
+
+	for _, dir := range []string{
+		"advisories",
+		"advisories-additional",
+	} {
+		advFS := rwos.DirFS(path.Join("testdata", dir))
+		index, err := v2.NewIndex(advFS)
+		if err != nil {
+			t.Fatal(err)
+		}
+		indices = append(indices, index)
+	}
+
+	return indices
 }

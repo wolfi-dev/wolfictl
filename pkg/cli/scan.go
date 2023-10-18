@@ -39,7 +39,16 @@ func cmdScan() *cobra.Command {
 
 			// Validate inputs
 
-			var advisoryCfgs *configs.Index[v2.Document]
+			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
+			for _, dir := range p.advisoriesRepoDirs {
+				advisoryFsys := rwos.DirFS(dir)
+				index, err := v2.NewIndex(advisoryFsys)
+				if err != nil {
+					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
+				}
+
+				advisoryDocumentIndices = append(advisoryDocumentIndices, index)
+			}
 
 			if !slices.Contains(validOutputFormats, p.outputFormat) {
 				return fmt.Errorf(
@@ -58,16 +67,13 @@ func cmdScan() *cobra.Command {
 					)
 				}
 
-				if p.advisoriesRepoDir == "" {
-					return errors.New("advisory-based filtering requested, but no advisories repo dir was provided")
+				if len(p.advisoriesRepoDirs) == 0 {
+					return errors.New("advisory-based filtering requested, but no advisories repo dirs were provided")
 				}
+			}
 
-				advisoriesFsys := rwos.DirFS(p.advisoriesRepoDir)
-				var err error
-				advisoryCfgs, err = v2.NewIndex(advisoriesFsys)
-				if err != nil {
-					return fmt.Errorf("failed to load advisory documents: %w", err)
-				}
+			if len(p.advisoriesRepoDirs) > 0 && p.advisoryFilterSet == "" {
+				return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
 			}
 
 			if p.packageBuildLogInput && p.sbomInput {
@@ -114,7 +120,7 @@ func cmdScan() *cobra.Command {
 				// If requested, filter scan results using advisories
 
 				if set := p.advisoryFilterSet; set != "" {
-					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryCfgs, set)
+					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryDocumentIndices, set)
 					if err != nil {
 						return fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", scanInputPath, err)
 					}
@@ -323,7 +329,7 @@ type scanParams struct {
 	packageBuildLogInput bool
 	distro               string
 	advisoryFilterSet    string
-	advisoriesRepoDir    string
+	advisoriesRepoDirs   []string
 	disableSBOMCache     bool
 }
 
@@ -335,7 +341,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
-	cmd.Flags().StringVarP(&p.advisoriesRepoDir, "advisories-repo-dir", "a", "", "local directory for advisory data")
+	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 }
 
