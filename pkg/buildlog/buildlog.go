@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// DefaultName is the default name used for a Melange build log file.
+const DefaultName = "packages.log"
+
 // Entry represents a single line in a Melange build log.
 type Entry struct {
 	Arch, Origin, Package, FullVersion string

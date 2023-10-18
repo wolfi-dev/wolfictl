@@ -25,8 +25,6 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const buildLogDefaultName = "packages.log"
-
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
 	cmd := &cobra.Command{
@@ -81,7 +79,7 @@ func cmdScan() *cobra.Command {
 			var scanInputPaths []string
 			if p.packageBuildLogInput {
 				if len(args) != 1 {
-					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildLogDefaultName)
+					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
 				}
 
 				var err error
@@ -205,7 +203,9 @@ func scanInput(inputFile *os.File, p *scanParams) (*inputScan, error) {
 // file (or a directory that contains the build log as a "packages.log" file).
 // Once it finds the build log, it parses it, and returns a slice of file paths
 // to APKs to be scanned. Each APK path is created with the assumption that the
-// APKs are located at "./packages/$ARCH/$PACKAGE-$VERSION.apk".
+// APKs are located at "$BASE/packages/$ARCH/$PACKAGE-$VERSION.apk", where $BASE
+// is the buildLogPath if it's a directory, or the directory containing the
+// buildLogPath if it's a file.
 func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 	pathToFileOrDirectory := filepath.Clean(buildLogPath)
 
@@ -214,11 +214,13 @@ func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 		return nil, fmt.Errorf("failed to stat build log input: %w", err)
 	}
 
-	var pathToFile string
+	var pathToFile, packagesBaseDir string
 	if info.IsDir() {
-		pathToFile = filepath.Join(pathToFileOrDirectory, buildLogDefaultName)
+		pathToFile = filepath.Join(pathToFileOrDirectory, buildlog.DefaultName)
+		packagesBaseDir = pathToFileOrDirectory
 	} else {
 		pathToFile = pathToFileOrDirectory
+		packagesBaseDir = filepath.Dir(pathToFile)
 	}
 
 	file, err := os.Open(pathToFile)
@@ -235,7 +237,7 @@ func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 	scanInputs := make([]string, 0, len(buildLogEntries))
 	for _, entry := range buildLogEntries {
 		apkName := fmt.Sprintf("%s-%s.apk", entry.Package, entry.FullVersion)
-		apkPath := filepath.Join("packages", entry.Arch, apkName)
+		apkPath := filepath.Join(packagesBaseDir, "packages", entry.Arch, apkName)
 		scanInputs = append(scanInputs, apkPath)
 	}
 
