@@ -2,6 +2,7 @@ package scan
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -38,9 +39,8 @@ func FilterWithAdvisories(result *Result, advisoryDocIndices []*configs.Index[v2
 		return result.Findings, nil
 	}
 
-	// Use a copy of the findings so we don't mutate the original result.
-	filteredFindings := make([]*Finding, len(result.Findings))
-	copy(filteredFindings, result.Findings)
+	// Use a copy of the findings, so we don't mutate the original result.
+	filteredFindings := slices.Clone(result.Findings)
 
 	for _, document := range documents {
 		packageAdvisories := document.Advisories
