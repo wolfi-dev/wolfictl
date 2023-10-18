@@ -25,8 +25,6 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const buildLogDefaultName = "packages.log"
-
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
 	cmd := &cobra.Command{
@@ -41,7 +39,16 @@ func cmdScan() *cobra.Command {
 
 			// Validate inputs
 
-			var advisoryCfgs *configs.Index[v2.Document]
+			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
+			for _, dir := range p.advisoriesRepoDirs {
+				advisoryFsys := rwos.DirFS(dir)
+				index, err := v2.NewIndex(advisoryFsys)
+				if err != nil {
+					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
+				}
+
+				advisoryDocumentIndices = append(advisoryDocumentIndices, index)
+			}
 
 			if !slices.Contains(validOutputFormats, p.outputFormat) {
 				return fmt.Errorf(
@@ -60,16 +67,13 @@ func cmdScan() *cobra.Command {
 					)
 				}
 
-				if p.advisoriesRepoDir == "" {
-					return errors.New("advisory-based filtering requested, but no advisories repo dir was provided")
+				if len(p.advisoriesRepoDirs) == 0 {
+					return errors.New("advisory-based filtering requested, but no advisories repo dirs were provided")
 				}
+			}
 
-				advisoriesFsys := rwos.DirFS(p.advisoriesRepoDir)
-				var err error
-				advisoryCfgs, err = v2.NewIndex(advisoriesFsys)
-				if err != nil {
-					return fmt.Errorf("failed to load advisory documents: %w", err)
-				}
+			if len(p.advisoriesRepoDirs) > 0 && p.advisoryFilterSet == "" {
+				return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
 			}
 
 			if p.packageBuildLogInput && p.sbomInput {
@@ -81,7 +85,7 @@ func cmdScan() *cobra.Command {
 			var scanInputPaths []string
 			if p.packageBuildLogInput {
 				if len(args) != 1 {
-					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildLogDefaultName)
+					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
 				}
 
 				var err error
@@ -96,6 +100,7 @@ func cmdScan() *cobra.Command {
 			// Do a scan for each scan target
 
 			var scans []inputScan
+			var inputPathsFailingRequireZero []string
 			for _, scanInputPath := range scanInputPaths {
 				if p.outputFormat == outputFormatOutline {
 					fmt.Printf("🔎 Scanning %q\n", scanInputPath)
@@ -115,7 +120,7 @@ func cmdScan() *cobra.Command {
 				// If requested, filter scan results using advisories
 
 				if set := p.advisoryFilterSet; set != "" {
-					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryCfgs, set)
+					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryDocumentIndices, set)
 					if err != nil {
 						return fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", scanInputPath, err)
 					}
@@ -139,8 +144,8 @@ func cmdScan() *cobra.Command {
 					}
 				}
 				if p.requireZeroFindings && len(findings) > 0 {
-					// Exit with error immediately if any vulnerabilities are found
-					return fmt.Errorf("more than 0 vulnerabilities found")
+					// Accumulate the list of failures to be returned at the end, but we still want to complete all scans
+					inputPathsFailingRequireZero = append(inputPathsFailingRequireZero, scanInputPath)
 				}
 			}
 
@@ -150,6 +155,10 @@ func cmdScan() *cobra.Command {
 				if err != nil {
 					return fmt.Errorf("failed to marshal scans to JSON: %w", err)
 				}
+			}
+
+			if len(inputPathsFailingRequireZero) > 0 {
+				return fmt.Errorf("vulnerabilities found in the following package(s):\n%s", strings.Join(inputPathsFailingRequireZero, "\n"))
 			}
 
 			return nil
@@ -205,7 +214,9 @@ func scanInput(inputFile *os.File, p *scanParams) (*inputScan, error) {
 // file (or a directory that contains the build log as a "packages.log" file).
 // Once it finds the build log, it parses it, and returns a slice of file paths
 // to APKs to be scanned. Each APK path is created with the assumption that the
-// APKs are located at "./packages/$ARCH/$PACKAGE-$VERSION.apk".
+// APKs are located at "$BASE/packages/$ARCH/$PACKAGE-$VERSION.apk", where $BASE
+// is the buildLogPath if it's a directory, or the directory containing the
+// buildLogPath if it's a file.
 func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 	pathToFileOrDirectory := filepath.Clean(buildLogPath)
 
@@ -214,11 +225,13 @@ func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 		return nil, fmt.Errorf("failed to stat build log input: %w", err)
 	}
 
-	var pathToFile string
+	var pathToFile, packagesBaseDir string
 	if info.IsDir() {
-		pathToFile = filepath.Join(pathToFileOrDirectory, buildLogDefaultName)
+		pathToFile = filepath.Join(pathToFileOrDirectory, buildlog.DefaultName)
+		packagesBaseDir = pathToFileOrDirectory
 	} else {
 		pathToFile = pathToFileOrDirectory
+		packagesBaseDir = filepath.Dir(pathToFile)
 	}
 
 	file, err := os.Open(pathToFile)
@@ -235,7 +248,7 @@ func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 	scanInputs := make([]string, 0, len(buildLogEntries))
 	for _, entry := range buildLogEntries {
 		apkName := fmt.Sprintf("%s-%s.apk", entry.Package, entry.FullVersion)
-		apkPath := filepath.Join("packages", entry.Arch, apkName)
+		apkPath := filepath.Join(packagesBaseDir, "packages", entry.Arch, apkName)
 		scanInputs = append(scanInputs, apkPath)
 	}
 
@@ -316,7 +329,7 @@ type scanParams struct {
 	packageBuildLogInput bool
 	distro               string
 	advisoryFilterSet    string
-	advisoriesRepoDir    string
+	advisoriesRepoDirs   []string
 	disableSBOMCache     bool
 }
 
@@ -328,7 +341,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
-	cmd.Flags().StringVarP(&p.advisoriesRepoDir, "advisories-repo-dir", "a", "", "local directory for advisory data")
+	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 }
 

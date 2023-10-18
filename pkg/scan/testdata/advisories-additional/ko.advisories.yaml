@@ -1,0 +1,11 @@
+schema-version: "2"
+
+package:
+  name: ko
+
+advisories:
+  - id: GHSA-bbbb-bbbb-bbbb
+    events:
+      - timestamp: 2023-05-04T10:34:34.169879-04:00
+        type: true-positive-determination
+
