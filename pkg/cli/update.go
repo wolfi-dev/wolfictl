@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"os"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/update"
 )
@@ -58,8 +56,10 @@ func cmdUpdate() *cobra.Command {
 func (o options) UpdateCmd(_ context.Context, repoURI string) error {
 	updateContext := update.New()
 
-	if !o.dryRun && os.Getenv("GITHUB_TOKEN") == "" {
-		return errors.New("no GITHUB_TOKEN token found")
+	if !o.dryRun {
+		if _, err := (ghTokenSource{}).Token(); err != nil {
+			return err
+		}
 	}
 
 	if _, err := url.ParseRequestURI(repoURI); err != nil {
