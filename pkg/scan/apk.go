@@ -245,7 +245,7 @@ func createMatchers() []matcher.Matcher {
 	return matcher.NewDefaultMatchers(
 		matcher.Config{
 			Dotnet:     dotnet.MatcherConfig{UseCPEs: false},
-			Golang:     golang.MatcherConfig{UseCPEs: false},
+			Golang:     golang.MatcherConfig{UseCPEs: false, AlwaysUseCPEForStdlib: true},
 			Java:       java.MatcherConfig{UseCPEs: false},
 			Javascript: javascript.MatcherConfig{UseCPEs: false},
 			Python:     python.MatcherConfig{UseCPEs: false},
