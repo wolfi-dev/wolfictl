@@ -2,20 +2,20 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"log"
-	"os"
 	"strings"
 	"time"
 
+	ghauth "github.com/cli/go-gh/v2/pkg/auth"
 	"github.com/google/go-github/v55/github"
-
-	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
+	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 
-	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
+	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 )
 
 var match string
@@ -34,11 +34,8 @@ wolfictl gh gc branch https://github.com/wolfi-dev/os --match "wolfictl-"
 `,
 		Args: cobra.RangeArgs(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ts := oauth2.StaticTokenSource(
-				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-			)
 			client := &http2.RLHTTPClient{
-				Client: oauth2.NewClient(context.Background(), ts),
+				Client: oauth2.NewClient(context.Background(), ghTokenSource{}),
 
 				// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 				Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
@@ -51,6 +48,15 @@ wolfictl gh gc branch https://github.com/wolfi-dev/os --match "wolfictl-"
 	cmd.Flags().StringVar(&match, "match", "", "pattern to match branches against")
 
 	return cmd
+}
+
+type ghTokenSource struct{}
+
+func (ghTokenSource) Token() (*oauth2.Token, error) {
+	if tok, _ := ghauth.TokenForHost("github.com"); tok != "" {
+		return &oauth2.Token{AccessToken: tok}, nil
+	}
+	return nil, errors.New("could not find github token")
 }
 
 func gcBranches(ghclient *http2.RLHTTPClient, repo, match string) error {
