@@ -88,6 +88,9 @@ Log the new schema version in this document, at the top of the section [Version 
 `(vNext goes here)`
 - (list what was changed)
 
+`v2.0.1`
+- Added new event type "pending-upstream-fix", with a required "note" data field.
+
 `v2`
 - The first officially versioned advisory document schema. ("v1" refers to the prior document format derived from OpenVEX, although these documents were never explicitly given a schema version.)
 - Advisory documents now declare their schema version.

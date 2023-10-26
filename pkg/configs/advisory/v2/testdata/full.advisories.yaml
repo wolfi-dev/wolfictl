@@ -1,4 +1,4 @@
-schema-version: "2"
+schema-version: 2.0.1
 
 package:
   name: full
@@ -71,3 +71,7 @@ advisories:
         type: fix-not-planned
         data:
           note: Something something fix not planned.
+      - timestamp: 2000-01-01T00:00:00Z
+        type: pending-upstream-fix
+        data:
+          note: Something something pending upstream fix.

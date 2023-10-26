@@ -2,6 +2,23 @@ package v2
 
 import "github.com/wolfi-dev/wolfictl/pkg/configs"
 
+func NewSchemaVersionSectionUpdater(newSchemaVersion string) configs.EntryUpdater[Document] {
+	updater := func(_ Document) (string, error) {
+		return newSchemaVersion, nil
+	}
+
+	yamlASTMutater := configs.NewTargetedYAMLASTMutater[string, Document](
+		"schema-version",
+		updater,
+		func(doc Document, data string) Document {
+			doc.SchemaVersion = data
+			return doc
+		},
+	)
+
+	return configs.NewYAMLUpdateFunc[Document](yamlASTMutater)
+}
+
 func NewAdvisoriesSectionUpdater(
 	updater configs.SectionUpdater[Advisories, Document],
 ) configs.EntryUpdater[Document] {

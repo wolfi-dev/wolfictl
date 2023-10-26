@@ -57,6 +57,12 @@ func Create(req Request, opts CreateOptions) error {
 			return fmt.Errorf("unable to create advisory %q for %q: %w", newAdvisoryID, req.Package, err)
 		}
 
+		// Update the schema version to the latest version.
+		err = documents.Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+		if err != nil {
+			return fmt.Errorf("unable to update schema version for %q: %w", req.Package, err)
+		}
+
 		return nil
 	}
 

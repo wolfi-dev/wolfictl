@@ -16,10 +16,17 @@ const (
 	EventTypeFalsePositiveDetermination = "false-positive-determination"
 	EventTypeAnalysisNotPlanned         = "analysis-not-planned"
 	EventTypeFixNotPlanned              = "fix-not-planned"
+	EventTypePendingUpstreamFix         = "pending-upstream-fix"
 )
 
 type EventTypeData interface {
-	Detection | TruePositiveDetermination | Fixed | FalsePositiveDetermination | AnalysisNotPlanned | FixNotPlanned
+	Detection |
+		TruePositiveDetermination |
+		Fixed |
+		FalsePositiveDetermination |
+		AnalysisNotPlanned |
+		FixNotPlanned |
+		PendingUpstreamFix
 }
 
 var (
@@ -31,6 +38,7 @@ var (
 		EventTypeFalsePositiveDetermination,
 		EventTypeAnalysisNotPlanned,
 		EventTypeFixNotPlanned,
+		EventTypePendingUpstreamFix,
 	}
 )
 
@@ -83,6 +91,9 @@ func (e *Event) UnmarshalYAML(v *yaml.Node) error {
 
 	case EventTypeFixNotPlanned:
 		event, err = decodeTypedEventData[FixNotPlanned](eventData)
+
+	case EventTypePendingUpstreamFix:
+		event, err = decodeTypedEventData[PendingUpstreamFix](eventData)
 
 	default:
 		return fmt.Errorf("unrecognized event type %q, must be one of [%s]", eventData.Type, strings.Join(EventTypes, ", "))
@@ -163,6 +174,9 @@ func (e Event) validateData() error {
 
 	case EventTypeFixNotPlanned:
 		return validateTypedEventData[FixNotPlanned](e.Data)
+
+	case EventTypePendingUpstreamFix:
+		return validateTypedEventData[PendingUpstreamFix](e.Data)
 	}
 
 	return nil

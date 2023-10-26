@@ -58,6 +58,9 @@ func ExportCSV(opts ExportOptions) (io.Reader, error) {
 
 					case v2.EventTypeAnalysisNotPlanned:
 						note = event.Data.(v2.AnalysisNotPlanned).Note
+
+					case v2.EventTypePendingUpstreamFix:
+						note = event.Data.(v2.PendingUpstreamFix).Note
 					}
 
 					row := []string{
