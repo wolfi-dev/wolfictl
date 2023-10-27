@@ -14,7 +14,7 @@ import (
 // Wolfictl can only operate on documents that use a schema version that is
 // equal to or earlier than this version and that is not earlier than this
 // version's MAJOR number.
-const SchemaVersion = "2"
+const SchemaVersion = "2.0.1"
 
 type Document struct {
 	SchemaVersion string     `yaml:"schema-version"`

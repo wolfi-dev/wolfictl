@@ -38,6 +38,7 @@ const (
 	fieldIDFalsePositiveNote      = "false-positive-note"
 	fieldIDFixNotPlannedNote      = "fix-not-planned-note"
 	fieldIDAnalysisNotPlannedNote = "analysis-not-planned-note"
+	fieldIDPendingUpstreamFixNote = "pending-upstream-fix-note"
 )
 
 func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
@@ -144,6 +145,27 @@ func (m Model) newAnalysisNotPlannedNoteFieldConfig() field.TextFieldConfigurati
 					Note: value,
 				}
 			} else if data, ok := req.Event.Data.(v2.AnalysisNotPlanned); ok {
+				data.Note = value
+				req.Event.Data = data
+			}
+			return req
+		},
+		ValidationRules: []field.TextValidationRule{
+			field.NotEmpty,
+		},
+	}
+}
+
+func (m Model) newPendingUpstreamReleaseNoteFieldConfig() field.TextFieldConfiguration {
+	return field.TextFieldConfiguration{
+		ID:     fieldIDPendingUpstreamFixNote,
+		Prompt: "Note: ",
+		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			if req.Event.Data == nil {
+				req.Event.Data = v2.PendingUpstreamFix{
+					Note: value,
+				}
+			} else if data, ok := req.Event.Data.(v2.PendingUpstreamFix); ok {
 				data.Note = value
 				req.Event.Data = data
 			}
@@ -317,6 +339,13 @@ func (m Model) addMissingFields() (Model, bool) {
 	case v2.EventTypeAnalysisNotPlanned:
 		if data, ok := e.Data.(v2.AnalysisNotPlanned); !ok || data.Note == "" {
 			f := field.NewTextField(m.newAnalysisNotPlannedNoteFieldConfig())
+			m.fields = append(m.fields, f)
+			return m, true
+		}
+
+	case v2.EventTypePendingUpstreamFix:
+		if data, ok := e.Data.(v2.PendingUpstreamFix); !ok || data.Note == "" {
+			f := field.NewTextField(m.newPendingUpstreamReleaseNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}

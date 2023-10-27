@@ -230,6 +230,13 @@ func TestDocument_full_coverage(t *testing.T) {
 							Note: "Something something fix not planned.",
 						},
 					},
+					{
+						Timestamp: testTime,
+						Type:      EventTypePendingUpstreamFix,
+						Data: PendingUpstreamFix{
+							Note: "Something something pending upstream fix.",
+						},
+					},
 				},
 			},
 		},

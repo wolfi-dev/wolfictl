@@ -78,7 +78,10 @@ func (adv Advisory) ResolvedAtVersion(version string) bool {
 	}
 
 	switch latest := adv.Latest(); latest.Type {
-	case EventTypeFalsePositiveDetermination, EventTypeFixNotPlanned, EventTypeAnalysisNotPlanned:
+	case EventTypeFalsePositiveDetermination,
+		EventTypeFixNotPlanned,
+		EventTypeAnalysisNotPlanned,
+		EventTypePendingUpstreamFix:
 		return true
 
 	case EventTypeFixed:

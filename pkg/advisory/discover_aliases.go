@@ -37,6 +37,12 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 		return fmt.Errorf("advisory %q not found in document %q", advisoryID, doc.Name())
 	}
 
+	_, newGHSAs := lo.Difference(adv.Aliases, ghsas)
+	if len(newGHSAs) == 0 {
+		// No new GHSA aliases were found, so there's nothing to do here.
+		return nil
+	}
+
 	updatedAliases := lo.Uniq(append(adv.Aliases, ghsas...))
 	adv.Aliases = updatedAliases
 
@@ -51,6 +57,12 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(u)
 	if err != nil {
 		return err
+	}
+
+	// Update the schema version to the latest version.
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	if err != nil {
+		return fmt.Errorf("unable to update schema version for %q: %w", doc.Name(), err)
 	}
 
 	return nil
@@ -111,6 +123,12 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(u)
 	if err != nil {
 		return err
+	}
+
+	// Update the schema version to the latest version.
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	if err != nil {
+		return fmt.Errorf("unable to update schema version for %q: %w", doc.Name(), err)
 	}
 
 	return nil

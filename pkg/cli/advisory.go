@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR" //nolint:gosec
+	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR" //nolint:gosec // This isn't a hardcoded credential.
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"
 )
 

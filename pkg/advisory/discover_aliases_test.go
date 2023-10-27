@@ -21,7 +21,7 @@ func TestDiscoverAliases(t *testing.T) {
 			name:            "find GHSA alias for a CVE",
 			selectedPackage: "scenario-1",
 			expectedUpdatedDocument: v2.Document{
-				SchemaVersion: "2",
+				SchemaVersion: v2.SchemaVersion,
 				Package: v2.Package{
 					Name: "scenario-1",
 				},
@@ -37,7 +37,7 @@ func TestDiscoverAliases(t *testing.T) {
 			name:            "find CVE for GHSA advisory ID and move GHSA ID to aliases",
 			selectedPackage: "scenario-2",
 			expectedUpdatedDocument: v2.Document{
-				SchemaVersion: "2",
+				SchemaVersion: v2.SchemaVersion,
 				Package: v2.Package{
 					Name: "scenario-2",
 				},
@@ -53,7 +53,7 @@ func TestDiscoverAliases(t *testing.T) {
 			name:            "no-op for non-CVE, non-GHSA advisory ID",
 			selectedPackage: "scenario-3",
 			expectedUpdatedDocument: v2.Document{
-				SchemaVersion: "2",
+				SchemaVersion: "2", // i.e. doesn't get updated
 				Package: v2.Package{
 					Name: "scenario-3",
 				},
@@ -68,7 +68,7 @@ func TestDiscoverAliases(t *testing.T) {
 			name:            "no-op for CVE advisory ID with no discoverable aliases",
 			selectedPackage: "scenario-4",
 			expectedUpdatedDocument: v2.Document{
-				SchemaVersion: "2",
+				SchemaVersion: "2", // i.e. doesn't get updated
 				Package: v2.Package{
 					Name: "scenario-4",
 				},
@@ -83,7 +83,7 @@ func TestDiscoverAliases(t *testing.T) {
 			name:            "no-op for GHSA advisory ID with no discoverable aliases",
 			selectedPackage: "scenario-5",
 			expectedUpdatedDocument: v2.Document{
-				SchemaVersion: "2",
+				SchemaVersion: "2", // i.e. doesn't get updated
 				Package: v2.Package{
 					Name: "scenario-5",
 				},
@@ -98,7 +98,7 @@ func TestDiscoverAliases(t *testing.T) {
 			name:            "advisory ID changing to a CVE necessitates a re-sort of advisories",
 			selectedPackage: "scenario-6",
 			expectedUpdatedDocument: v2.Document{
-				SchemaVersion: "2",
+				SchemaVersion: v2.SchemaVersion,
 				Package: v2.Package{
 					Name: "scenario-6",
 				},

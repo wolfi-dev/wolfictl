@@ -158,7 +158,9 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 
 func renderListItem(event v2.Event) string {
 	switch t := event.Type; t {
-	case v2.EventTypeAnalysisNotPlanned, v2.EventTypeFixNotPlanned:
+	case v2.EventTypeAnalysisNotPlanned,
+		v2.EventTypeFixNotPlanned,
+		v2.EventTypePendingUpstreamFix:
 		return t
 
 	case v2.EventTypeDetection:

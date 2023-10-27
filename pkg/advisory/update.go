@@ -45,5 +45,11 @@ func Update(req Request, opts UpdateOptions) error {
 		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vulnID, req.Package, err)
 	}
 
+	// Update the schema version to the latest version.
+	err = documents.Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	if err != nil {
+		return fmt.Errorf("unable to update schema version for %q: %w", req.Package, err)
+	}
+
 	return nil
 }
