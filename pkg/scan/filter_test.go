@@ -16,17 +16,9 @@ func TestFilterWithAdvisories(t *testing.T) {
 		result                *Result
 		advisoryIndicesGetter func(t *testing.T) []*configs.Index[v2.Document]
 		advisoryFilterSet     string
-		expectedFindings      []*Finding
+		expectedFindings      []Finding
 		errAssertion          assert.ErrorAssertionFunc
 	}{
-		{
-			name:                  "nil result",
-			result:                nil,
-			advisoryIndicesGetter: getSingleAdvisoriesIndex,
-			advisoryFilterSet:     "",
-			expectedFindings:      nil,
-			errAssertion:          assert.Error,
-		},
 		{
 			name:                  "nil advisory index",
 			result:                &Result{},
@@ -42,7 +34,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "42",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Package: Package{
 							Name:    "compliancebot",
@@ -66,7 +58,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "42",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID: "CVE-2023-1234",
@@ -91,7 +83,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "all",
-			expectedFindings: []*Finding{
+			expectedFindings: []Finding{
 				{
 					Vulnerability: Vulnerability{
 						ID: "CVE-2023-1234",
@@ -107,7 +99,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "42",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID:      "GHSA-1234-1234-1234",
@@ -124,7 +116,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "all",
-			expectedFindings:      []*Finding{},
+			expectedFindings:      []Finding{},
 			errAssertion:          assert.NoError,
 		},
 		{
@@ -134,7 +126,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "42",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID: "CVE-2023-1234",
@@ -159,7 +151,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "resolved",
-			expectedFindings: []*Finding{
+			expectedFindings: []Finding{
 				{
 					Vulnerability: Vulnerability{
 						ID: "CVE-2023-1234",
@@ -180,7 +172,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "42",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID:      "GHSA-abcd-abcd-abcd",
@@ -191,7 +183,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "resolved",
-			expectedFindings:      []*Finding{},
+			expectedFindings:      []Finding{},
 			errAssertion:          assert.NoError,
 		},
 		{
@@ -202,7 +194,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Version:           "0.13.0-r4",
 					OriginPackageName: "ko",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID: "GHSA-2h5h-59f5-c5x9",
@@ -212,7 +204,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "resolved",
-			expectedFindings:      []*Finding{},
+			expectedFindings:      []Finding{},
 			errAssertion:          assert.NoError,
 		},
 		{
@@ -222,7 +214,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "0.13.0-r2",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID: "GHSA-2h5h-59f5-c5x9",
@@ -232,7 +224,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "resolved",
-			expectedFindings: []*Finding{
+			expectedFindings: []Finding{
 				{
 					Vulnerability: Vulnerability{
 						ID: "GHSA-2h5h-59f5-c5x9",
@@ -248,7 +240,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					Name:    "ko",
 					Version: "0.13.0-r2",
 				},
-				Findings: []*Finding{
+				Findings: []Finding{
 					{
 						Vulnerability: Vulnerability{
 							ID: "GHSA-2h5h-59f5-c5x9", // In first advisories index (as fixed)
@@ -268,7 +260,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			advisoryIndicesGetter: getMultipleAdvisoriesIndices,
 			advisoryFilterSet:     "all",
-			expectedFindings: []*Finding{
+			expectedFindings: []Finding{
 				{
 					Vulnerability: Vulnerability{
 						ID: "GHSA-cccc-cccc-cccc",
@@ -283,10 +275,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			index := tt.advisoryIndicesGetter(t)
 
-			var resultFindings []*Finding
+			var resultFindings []Finding
 			var err error
 			assert.NotPanics(t, func() {
-				resultFindings, err = FilterWithAdvisories(tt.result, index, tt.advisoryFilterSet)
+				resultFindings, err = FilterWithAdvisories(*tt.result, index, tt.advisoryFilterSet)
 			})
 			tt.errAssertion(t, err)
 			assert.Equal(t, tt.expectedFindings, resultFindings)

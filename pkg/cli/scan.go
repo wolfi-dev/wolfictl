@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -80,72 +81,41 @@ func cmdScan() *cobra.Command {
 				return errors.New("cannot specify both -s/--sbom and --build-log")
 			}
 
+			if p.triageWithGoVulnCheck && p.sbomInput {
+				return errors.New("cannot specify both -s/--sbom and --govulncheck (govulncheck needs access to actual Go binaries)")
+			}
+
 			// Use either the build log or the args themselves as scan targets
 
-			var scanInputPaths []string
+			var inputs []string
 			if p.packageBuildLogInput {
 				if len(args) != 1 {
 					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
 				}
 
 				var err error
-				scanInputPaths, err = resolveInputFilePathsFromBuildLog(args[0])
+				inputs, err = resolveInputFilePathsFromBuildLog(args[0])
 				if err != nil {
 					return fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
 				}
 			} else {
-				scanInputPaths = args
+				inputs = args
 			}
 
 			// Do a scan for each scan target
 
-			var scans []inputScan
+			var scans []inputScanResult
 			var inputPathsFailingRequireZero []string
-			for _, scanInputPath := range scanInputPaths {
-				if p.outputFormat == outputFormatOutline {
-					fmt.Printf("🔎 Scanning %q\n", scanInputPath)
-				}
-
-				inputFile, err := resolveInputFileFromArg(scanInputPath)
-				if err != nil {
-					return fmt.Errorf("failed to open input file: %w", err)
-				}
-				defer inputFile.Close()
-
-				scannedInput, err := scanInput(inputFile, p)
+			for _, input := range inputs {
+				isr, err := p.doScanCommandForSingleInput(cmd.Context(), input, advisoryDocumentIndices)
 				if err != nil {
 					return err
 				}
+				scans = append(scans, *isr)
 
-				// If requested, filter scan results using advisories
-
-				if set := p.advisoryFilterSet; set != "" {
-					findings, err := scan.FilterWithAdvisories(scannedInput.Result, advisoryDocumentIndices, set)
-					if err != nil {
-						return fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", scanInputPath, err)
-					}
-
-					scannedInput.Result.Findings = findings
-				}
-
-				scans = append(scans, *scannedInput)
-
-				// Handle CLI options
-
-				findings := scannedInput.Result.Findings
-				if p.outputFormat == outputFormatOutline {
-					// Print output immediately
-
-					if len(findings) == 0 {
-						fmt.Println("✅ No vulnerabilities found")
-					} else {
-						tree := newFindingsTree(findings)
-						fmt.Println(tree.render())
-					}
-				}
-				if p.requireZeroFindings && len(findings) > 0 {
+				if p.requireZeroFindings && len(isr.Result.Findings) > 0 {
 					// Accumulate the list of failures to be returned at the end, but we still want to complete all scans
-					inputPathsFailingRequireZero = append(inputPathsFailingRequireZero, scanInputPath)
+					inputPathsFailingRequireZero = append(inputPathsFailingRequireZero, input)
 				}
 			}
 
@@ -169,7 +139,66 @@ func cmdScan() *cobra.Command {
 	return cmd
 }
 
-func scanInput(inputFile *os.File, p *scanParams) (*inputScan, error) {
+func (p *scanParams) doScanCommandForSingleInput(
+	ctx context.Context,
+	input string,
+	advisoryDocumentIndices []*configs.Index[v2.Document],
+) (*inputScanResult, error) {
+	if p.outputFormat == outputFormatOutline {
+		fmt.Printf("🔎 Scanning %q\n", input)
+	}
+
+	inputFile, err := resolveInputFileFromArg(input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open input file: %w", err)
+	}
+
+	result, err := scanInput(inputFile, p)
+	if err != nil {
+		return nil, err
+	}
+
+	// If requested, triage vulnerabilities in Go binaries using govulncheck
+
+	if p.triageWithGoVulnCheck {
+		triagedFindings, err := scan.Triage(ctx, result.Result, inputFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to triage vulnerability matches: %w", err)
+		}
+		result.Result.Findings = triagedFindings
+	}
+
+	inputFile.Close()
+
+	// If requested, filter scan results using advisories
+
+	if set := p.advisoryFilterSet; set != "" {
+		findings, err := scan.FilterWithAdvisories(result.Result, advisoryDocumentIndices, set)
+		if err != nil {
+			return nil, fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", input, err)
+		}
+
+		result.Result.Findings = findings
+	}
+
+	// Handle CLI options
+
+	findings := result.Result.Findings
+	if p.outputFormat == outputFormatOutline {
+		// Print output immediately
+
+		if len(findings) == 0 {
+			fmt.Println("✅ No vulnerabilities found")
+		} else {
+			tree := newFindingsTree(findings)
+			fmt.Println(tree.render())
+		}
+	}
+
+	return result, nil
+}
+
+func scanInput(inputFile *os.File, p *scanParams) (*inputScanResult, error) {
 	inputFileName := inputFile.Name()
 
 	// Get the SBOM of the APK
@@ -177,13 +206,14 @@ func scanInput(inputFile *os.File, p *scanParams) (*inputScan, error) {
 	if p.sbomInput {
 		apkSBOM = inputFile
 	} else {
+		apkFile := inputFile
 		var s *sbomSyft.SBOM
 		var err error
 
 		if p.disableSBOMCache {
-			s, err = sbom.Generate(inputFileName, inputFile, p.distro)
+			s, err = sbom.Generate(inputFileName, apkFile, p.distro)
 		} else {
-			s, err = sbom.CachedGenerate(inputFileName, inputFile, p.distro)
+			s, err = sbom.CachedGenerate(inputFileName, apkFile, p.distro)
 		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
@@ -202,12 +232,12 @@ func scanInput(inputFile *os.File, p *scanParams) (*inputScan, error) {
 		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFileName, err)
 	}
 
-	is := &inputScan{
+	isr := &inputScanResult{
 		InputFile: inputFileName,
-		Result:    result,
+		Result:    *result,
 	}
 
-	return is, nil
+	return isr, nil
 }
 
 // resolveInputFilePathsFromBuildLog takes the given path to a Melange build log
@@ -322,15 +352,16 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 }
 
 type scanParams struct {
-	requireZeroFindings  bool
-	localDBFilePath      string
-	outputFormat         string
-	sbomInput            bool
-	packageBuildLogInput bool
-	distro               string
-	advisoryFilterSet    string
-	advisoriesRepoDirs   []string
-	disableSBOMCache     bool
+	requireZeroFindings   bool
+	localDBFilePath       string
+	outputFormat          string
+	sbomInput             bool
+	packageBuildLogInput  bool
+	distro                string
+	advisoryFilterSet     string
+	advisoriesRepoDirs    []string
+	disableSBOMCache      bool
+	triageWithGoVulnCheck bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -343,6 +374,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
+	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
 }
 
 const (
@@ -352,27 +384,28 @@ const (
 
 var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
 
-type inputScan struct {
+type inputScanResult struct {
 	InputFile string
-	Result    *scan.Result
+	Result    scan.Result
 }
 
 type findingsTree struct {
-	findingsByPackageByLocation map[string]map[string][]*scan.Finding
+	findingsByPackageByLocation map[string]map[string][]scan.Finding
 	packagesByID                map[string]scan.Package
 }
 
-func newFindingsTree(findings []*scan.Finding) *findingsTree {
-	tree := make(map[string]map[string][]*scan.Finding)
+func newFindingsTree(findings []scan.Finding) *findingsTree {
+	tree := make(map[string]map[string][]scan.Finding)
 	packagesByID := make(map[string]scan.Package)
 
-	for _, f := range findings {
+	for i := range findings {
+		f := findings[i]
 		loc := f.Package.Location
 		packageID := f.Package.ID
 		packagesByID[packageID] = f.Package
 
 		if _, ok := tree[loc]; !ok {
-			tree[loc] = make(map[string][]*scan.Finding)
+			tree[loc] = make(map[string][]scan.Finding)
 		}
 
 		tree[loc][packageID] = append(tree[loc][packageID], f)
@@ -426,13 +459,15 @@ func (t findingsTree) render() string {
 				return findings[i].Vulnerability.ID < findings[j].Vulnerability.ID
 			})
 
-			for _, f := range findings {
+			for i := range findings {
+				f := findings[i]
 				line := fmt.Sprintf(
-					"%s           %s %s%s",
+					"%s           %s %s%s%s",
 					verticalLine,
 					renderSeverity(f.Vulnerability.Severity),
 					renderVulnerabilityID(f.Vulnerability),
 					renderFixedIn(f.Vulnerability),
+					renderTriaging(verticalLine, f.TriageAssessments),
 				)
 				lines = append(lines, line)
 			}
@@ -509,8 +544,27 @@ func renderFixedIn(vuln scan.Vulnerability) string {
 	return fmt.Sprintf(" fixed in %s", vuln.FixedVersion)
 }
 
+func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
+	if len(trs) == 0 {
+		return ""
+	}
+
+	var lines []string
+	for _, tr := range trs {
+		lines = append(lines, renderTriageAssessment(verticalLine, tr))
+	}
+
+	return "\n" + strings.Join(lines, "\n")
+}
+
+func renderTriageAssessment(verticalLine string, tr scan.TriageAssessment) string {
+	label := styleBold.Render(fmt.Sprintf("%t positive", tr.TruePositive))
+	return fmt.Sprintf("%s             ⚖️  %s according to %q", verticalLine, label, tr.Source)
+}
+
 var (
 	styleSubtle = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
+	styleBold   = lipgloss.NewStyle().Bold(true)
 
 	styleNegligible = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
 	styleLow        = lipgloss.NewStyle().Foreground(lipgloss.Color("#00ff00"))

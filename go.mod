@@ -46,6 +46,7 @@ require (
 	golang.org/x/sync v0.4.0
 	golang.org/x/text v0.13.0
 	golang.org/x/time v0.3.0
+	golang.org/x/vuln v1.0.1
 	gopkg.in/yaml.v3 v3.0.1
 	sigs.k8s.io/release-utils v0.7.5
 )
@@ -318,3 +319,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc

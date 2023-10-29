@@ -5,14 +5,11 @@ import (
 	"io"
 	"os"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/adrg/xdg"
 	"github.com/anchore/grype/grype"
 	"github.com/anchore/grype/grype/db"
-	v5 "github.com/anchore/grype/grype/db/v5"
-	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/matcher"
 	"github.com/anchore/grype/grype/matcher/dotnet"
 	"github.com/anchore/grype/grype/matcher/golang"
@@ -24,11 +21,8 @@ import (
 	"github.com/anchore/grype/grype/matcher/stock"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/store"
-	"github.com/anchore/grype/grype/vulnerability"
-	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
-	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
 
@@ -46,7 +40,7 @@ var grypeDBConfig = db.Config{
 
 type Result struct {
 	TargetAPK TargetAPK
-	Findings  []*Finding
+	Findings  []Finding
 }
 
 type TargetAPK struct {
@@ -141,7 +135,7 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
 
 	matches := matchesCollection.Sorted()
 
-	var findings []*Finding
+	var findings []Finding
 	for i := range matches {
 		m := matches[i]
 
@@ -149,7 +143,10 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to map match to finding: %w", err)
 		}
-		findings = append(findings, finding)
+		if finding == nil {
+			return nil, fmt.Errorf("failed to map match to finding: nil")
+		}
+		findings = append(findings, *finding)
 	}
 
 	result := &Result{
@@ -158,80 +155,6 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
 	}
 
 	return result, nil
-}
-
-// Finding represents a vulnerability finding for a single package.
-type Finding struct {
-	Package       Package
-	Vulnerability Vulnerability
-}
-
-type Package struct {
-	ID       string
-	Name     string
-	Version  string
-	Type     string
-	Location string
-}
-
-type Vulnerability struct {
-	ID           string
-	Severity     string
-	Aliases      []string
-	FixedVersion string
-}
-
-func mapMatchToFinding(m match.Match, datastore *store.Store) (*Finding, error) {
-	metadata, err := datastore.MetadataProvider.GetMetadata(m.Vulnerability.ID, m.Vulnerability.Namespace)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get metadata for vulnerability %s: %w", m.Vulnerability.ID, err)
-	}
-
-	var relatedMetadatas []*vulnerability.Metadata
-	for _, relatedRef := range m.Vulnerability.RelatedVulnerabilities {
-		relatedMetadata, err := datastore.MetadataProvider.GetMetadata(relatedRef.ID, relatedRef.Namespace)
-		if err != nil {
-			return nil, fmt.Errorf("unable to get metadata for related vulnerability %s: %w", relatedRef.ID, err)
-		}
-		if relatedMetadata == nil {
-			continue
-		}
-		relatedMetadatas = append(relatedMetadatas, relatedMetadata)
-	}
-
-	aliases := lo.Map(relatedMetadatas, func(m *vulnerability.Metadata, _ int) string {
-		return m.ID
-	})
-
-	locations := lo.Map(m.Package.Locations.ToSlice(), func(l file.Location, _ int) string {
-		return "/" + l.RealPath
-	})
-
-	f := &Finding{
-		Package: Package{
-			ID:       string(m.Package.ID),
-			Name:     m.Package.Name,
-			Version:  m.Package.Version,
-			Type:     string(m.Package.Type),
-			Location: strings.Join(locations, ", "),
-		},
-		Vulnerability: Vulnerability{
-			ID:           m.Vulnerability.ID,
-			Severity:     metadata.Severity,
-			Aliases:      aliases,
-			FixedVersion: getFixedVersion(m.Vulnerability),
-		},
-	}
-
-	return f, nil
-}
-
-func getFixedVersion(vuln vulnerability.Vulnerability) string {
-	if vuln.Fix.State != v5.FixedState {
-		return ""
-	}
-
-	return strings.Join(vuln.Fix.Versions, ", ")
 }
 
 func newGrypeVulnerabilityMatcher(datastore store.Store) *grype.VulnerabilityMatcher {
