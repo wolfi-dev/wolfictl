@@ -375,6 +375,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
+	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
 }
 
 const (
