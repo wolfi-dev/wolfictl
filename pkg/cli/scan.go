@@ -194,7 +194,7 @@ func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]
 		// For each input, download the APK from the Wolfi package repository and update `inputs` to point to the downloaded APKs
 
 		if p.outputFormat == outputFormatOutline {
-			fmt.Println("📡 Locating packages to scan remotely")
+			fmt.Println("📡 Finding remote packages")
 		}
 
 		for _, arg := range args {
@@ -671,7 +671,7 @@ func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
 
 func renderTriageAssessment(verticalLine string, tr scan.TriageAssessment) string {
 	label := styleBold.Render(fmt.Sprintf("%t positive", tr.TruePositive))
-	return fmt.Sprintf("%s             ⚖️  %s according to %q", verticalLine, label, tr.Source)
+	return fmt.Sprintf("%s             ⚖️  %s according to %s", verticalLine, label, tr.Source)
 }
 
 var (
