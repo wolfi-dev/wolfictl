@@ -22,9 +22,10 @@ func TestDiff(t *testing.T) {
 	assert.NoError(t, err)
 
 	// create a test server to download the test apk from
+	const apkindexEndpoint = "/APKINDEX.tar.gz"
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		switch req.URL.Path {
-		case "/APKINDEX.tar.gz":
+		case apkindexEndpoint:
 			_, err = rw.Write(apkIndexData)
 			assert.NoError(t, err)
 		case "/test-1.2.3-r0.apk":
@@ -39,7 +40,7 @@ func TestDiff(t *testing.T) {
 	}))
 
 	diffOpts := DiffOptions{
-		ApkIndexURL:         server.URL + "/APKINDEX.tar.gz",
+		ApkIndexURL:         server.URL + apkindexEndpoint,
 		Client:              server.Client(),
 		PackageListFilename: filepath.Join(dir, "packages.log"),
 		Dir:                 resultDir,

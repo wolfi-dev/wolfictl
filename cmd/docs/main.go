@@ -70,7 +70,7 @@ func loadLongDescription(cmd *cobra.Command, path ...string) error {
 		if c.Name() == "" {
 			continue
 		}
-		fullpath := filepath.Join(path[0], strings.Join(append(path[1:], c.Name()), "_")+".md")
+		fullpath := filepath.Join(path[0], strings.Join(append(path[1:], c.Name()), "_")+markdownExtension)
 		if c.HasSubCommands() {
 			if err := loadLongDescription(c, path[0], c.Name()); err != nil {
 				return err
