@@ -17,11 +17,7 @@ const (
 var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll}
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
-func FilterWithAdvisories(result *Result, advisoryDocIndices []*configs.Index[v2.Document], advisoryFilterSet string) ([]*Finding, error) {
-	if result == nil {
-		return nil, fmt.Errorf("result cannot be nil")
-	}
-
+func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
 	if advisoryDocIndices == nil {
 		return nil, fmt.Errorf("advisory configs cannot be nil")
 	}
@@ -60,8 +56,8 @@ func FilterWithAdvisories(result *Result, advisoryDocIndices []*configs.Index[v2
 	return filteredFindings, nil
 }
 
-func filterFindingsWithAllAdvisories(findings []*Finding, packageAdvisories v2.Advisories) []*Finding {
-	return lo.Filter(findings, func(finding *Finding, _ int) bool {
+func filterFindingsWithAllAdvisories(findings []Finding, packageAdvisories v2.Advisories) []Finding {
+	return lo.Filter(findings, func(finding Finding, _ int) bool {
 		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
 		// If the advisory contains any events, filter it out!
 		if ok && len(adv.Events) >= 1 {
@@ -84,8 +80,8 @@ func filterFindingsWithAllAdvisories(findings []*Finding, packageAdvisories v2.A
 	})
 }
 
-func filterFindingsWithResolvedAdvisories(findings []*Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []*Finding {
-	return lo.Filter(findings, func(finding *Finding, _ int) bool {
+func filterFindingsWithResolvedAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
+	return lo.Filter(findings, func(finding Finding, _ int) bool {
 		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
 		if ok && adv.ResolvedAtVersion(currentPackageVersion) {
 			return false

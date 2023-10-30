@@ -33,7 +33,7 @@ linters:
     - gofmt
     - goheader
     - goimports
-    - gomoddirectives
+    # - gomoddirectives is disabled because it wasn't allowing the 'replace' directive, and it didn't look possible to exempt a single line of a go.mod. I'm not a fan of replaces, but they're useful as temporary measures.
     - gomodguard
     - goprintffuncname
     - gosec
