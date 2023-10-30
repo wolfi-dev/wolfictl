@@ -26,6 +26,18 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const (
+	outputFormatOutline = "outline"
+	outputFormatJSON    = "json"
+)
+
+var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
+
+type inputScanResult struct {
+	InputFile string
+	Result    scan.Result
+}
+
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
 	cmd := &cobra.Command{
@@ -139,6 +151,33 @@ func cmdScan() *cobra.Command {
 	return cmd
 }
 
+type scanParams struct {
+	requireZeroFindings   bool
+	localDBFilePath       string
+	outputFormat          string
+	sbomInput             bool
+	packageBuildLogInput  bool
+	distro                string
+	advisoryFilterSet     string
+	advisoriesRepoDirs    []string
+	disableSBOMCache      bool
+	triageWithGoVulnCheck bool
+}
+
+func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
+	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
+	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
+	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
+	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
+	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
+	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
+	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
+	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
+	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
+	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
+}
+
 func (p *scanParams) doScanCommandForSingleInput(
 	ctx context.Context,
 	input string,
@@ -153,7 +192,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 		return nil, fmt.Errorf("failed to open input file: %w", err)
 	}
 
-	result, err := scanInput(inputFile, p)
+	result, err := p.scanFile(inputFile)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +237,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	return result, nil
 }
 
-func scanInput(inputFile *os.File, p *scanParams) (*inputScanResult, error) {
+func (p *scanParams) scanFile(inputFile *os.File) (*inputScanResult, error) {
 	inputFileName := inputFile.Name()
 
 	// Get the SBOM of the APK
@@ -349,45 +388,6 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 
 		return inputFile, nil
 	}
-}
-
-type scanParams struct {
-	requireZeroFindings   bool
-	localDBFilePath       string
-	outputFormat          string
-	sbomInput             bool
-	packageBuildLogInput  bool
-	distro                string
-	advisoryFilterSet     string
-	advisoriesRepoDirs    []string
-	disableSBOMCache      bool
-	triageWithGoVulnCheck bool
-}
-
-func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
-	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
-	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
-	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
-	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
-	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
-	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
-	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
-	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
-	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
-	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
-	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
-}
-
-const (
-	outputFormatOutline = "outline"
-	outputFormatJSON    = "json"
-)
-
-var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
-
-type inputScanResult struct {
-	InputFile string
-	Result    scan.Result
 }
 
 type findingsTree struct {
