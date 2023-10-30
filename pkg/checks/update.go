@@ -73,6 +73,8 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 	return checkErrors.WrapErrors()
 }
 
+const yamlExtension = ".yaml"
+
 // validates update configuration
 func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 	for _, file := range files {
@@ -82,8 +84,8 @@ func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 		}
 
 		// first need to read raw bytes as unmarshalling a struct without a pointer means update will never be nil
-		if !strings.HasSuffix(file, ".yaml") {
-			file += ".yaml"
+		if !strings.HasSuffix(file, yamlExtension) {
+			file += yamlExtension
 		}
 		yamlData, err := os.ReadFile(file)
 		if err != nil {
@@ -140,7 +142,7 @@ func containsKey(parentNode *yaml.Node, key string) error {
 func GetPackagesToUpdate(files []string) []string {
 	packagesToUpdate := []string{}
 	for _, f := range files {
-		packagesToUpdate = append(packagesToUpdate, strings.TrimSuffix(f, ".yaml"))
+		packagesToUpdate = append(packagesToUpdate, strings.TrimSuffix(f, yamlExtension))
 	}
 
 	return packagesToUpdate
@@ -161,7 +163,7 @@ func handleErrorMessages(updateOpts *update.Options, checkErrors *lint.EvalRuleE
 // check if the current package.version is the latest according to the update config
 func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) {
 	for k, v := range latestVersions {
-		c, err := config.ParseConfiguration(filepath.Join(o.Dir, k+".yaml"))
+		c, err := config.ParseConfiguration(filepath.Join(o.Dir, k+yamlExtension))
 		if err != nil {
 			addCheckError(checkErrors, err)
 			continue
@@ -193,7 +195,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 	defer os.RemoveAll(tempDir)
 
 	for packageName, newVersion := range latestVersions {
-		srcConfigFile := filepath.Join(o.Dir, packageName+".yaml")
+		srcConfigFile := filepath.Join(o.Dir, packageName+yamlExtension)
 
 		dryRunConfig, err := config.ParseConfiguration(srcConfigFile)
 		if err != nil {
@@ -206,7 +208,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			return err
 		}
 
-		tmpConfigFile := filepath.Join(tempDir, packageName+".yaml")
+		tmpConfigFile := filepath.Join(tempDir, packageName+yamlExtension)
 		err = os.WriteFile(tmpConfigFile, data, os.FileMode(0o644))
 		if err != nil {
 			return err
