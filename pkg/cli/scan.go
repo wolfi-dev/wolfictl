@@ -21,8 +21,11 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
+	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
+	"gitlab.alpinelinux.org/alpine/go/repository"
 	"golang.org/x/exp/slices"
 )
 
@@ -60,8 +63,10 @@ func cmdScan() *cobra.Command {
 				)
 			}
 
-			if p.packageBuildLogInput && p.sbomInput {
-				return errors.New("cannot specify both -s/--sbom and --build-log")
+			if p.packageBuildLogInput && p.sbomInput ||
+				p.packageBuildLogInput && p.remoteScanning ||
+				p.sbomInput && p.remoteScanning {
+				return errors.New("cannot specify more than one of [--build-log, --sbom, --remote]")
 			}
 
 			if p.triageWithGoVulnCheck && p.sbomInput {
@@ -100,24 +105,12 @@ func cmdScan() *cobra.Command {
 				}
 			}
 
-			// Use either the build log or the args themselves as scan targets
-
-			var inputs []string
-			if p.packageBuildLogInput {
-				if len(args) != 1 {
-					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
-				}
-
-				var err error
-				inputs, err = resolveInputFilePathsFromBuildLog(args[0])
-				if err != nil {
-					return fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
-				}
-			} else {
-				inputs = args
+			inputs, err := p.resolveInputsToScan(cmd.Context(), args)
+			if err != nil {
+				return err
 			}
 
-			// Do a scan for each scan target
+			// Do a scan for each input
 
 			var scans []inputScanResult
 			var inputPathsFailingRequireZero []string
@@ -165,6 +158,7 @@ type scanParams struct {
 	advisoriesRepoDirs    []string
 	disableSBOMCache      bool
 	triageWithGoVulnCheck bool
+	remoteScanning        bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -179,6 +173,43 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
 	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
+	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to scan the latest versions of")
+}
+
+func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]string, error) {
+	var inputs []string
+	switch {
+	case p.packageBuildLogInput:
+		if len(args) != 1 {
+			return nil, fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
+		}
+
+		var err error
+		inputs, err = resolveInputFilePathsFromBuildLog(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
+		}
+
+	case p.remoteScanning:
+		// For each input, download the APK from the Wolfi package repository and update `inputs` to point to the downloaded APKs
+
+		if p.outputFormat == outputFormatOutline {
+			fmt.Println("📡 Locating packages to scan remotely")
+		}
+
+		for _, arg := range args {
+			targetPaths, err := resolveInputForRemoteTarget(ctx, arg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to resolve input %q for remote scanning: %w", arg, err)
+			}
+			inputs = append(inputs, targetPaths...)
+		}
+
+	default:
+		inputs = args
+	}
+
+	return inputs, nil
 }
 
 func (p *scanParams) doScanCommandForSingleInput(
@@ -391,6 +422,77 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 
 		return inputFile, nil
 	}
+}
+
+// resolveInputForRemoteTarget takes the given input string, which is expected
+// to be the name of a Wolfi package (or subpackage), and it queries the Wolfi
+// APK repository to find the latest version of the package for each
+// architecture. It then downloads each APK and returns a slice of file paths to
+// the downloaded APKs.
+//
+// For example, given the input value "calico", this function will find the
+// latest version of the package (e.g. "calico-3.26.3-r3.apk") and download it
+// for each architecture.
+func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, error) {
+	var downloadedAPKFilePaths []string
+	for _, arch := range []string{"x86_64", "aarch64"} {
+		const apkRepositoryURL = "https://packages.wolfi.dev/os"
+		apkindex, err := index.Index(arch, apkRepositoryURL)
+		if err != nil {
+			return nil, fmt.Errorf("getting APKINDEX: %w", err)
+		}
+
+		nameMatches := lo.Filter(apkindex.Packages, func(pkg *repository.Package, _ int) bool {
+			return pkg != nil && pkg.Name == input
+		})
+
+		if len(nameMatches) == 0 {
+			return nil, fmt.Errorf("no Wolfi package found with name %q in arch %q", input, arch)
+		}
+
+		vers := lo.Map(nameMatches, func(pkg *repository.Package, _ int) string {
+			return pkg.Version
+		})
+
+		sort.Sort(versions.ByLatestStrings(vers))
+		latestVersion := vers[0]
+
+		var latestPkg *repository.Package
+		for _, pkg := range nameMatches {
+			if pkg.Version == latestVersion {
+				latestPkg = pkg
+				break
+			}
+		}
+		downloadURL := fmt.Sprintf("%s/%s/%s", apkRepositoryURL, arch, latestPkg.Filename())
+
+		tmpFile, err := os.CreateTemp("", fmt.Sprintf("%s-%s-%s-*.apk", arch, input, latestVersion))
+		if err != nil {
+			return nil, fmt.Errorf("creating temp dir: %w", err)
+		}
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating request for %q: %w", downloadURL, err)
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, fmt.Errorf("downloading %q: %w", downloadURL, err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("downloading %q (status: %d): %w", downloadURL, resp.StatusCode, err)
+		}
+		_, err = io.Copy(tmpFile, resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("saving contents of %q to %q: %w", downloadURL, tmpFile.Name(), err)
+		}
+		resp.Body.Close()
+		tmpFile.Close()
+
+		downloadedAPKFilePaths = append(downloadedAPKFilePaths, tmpFile.Name())
+	}
+
+	return downloadedAPKFilePaths, nil
 }
 
 type findingsTree struct {
