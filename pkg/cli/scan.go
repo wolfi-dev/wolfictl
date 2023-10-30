@@ -655,8 +655,14 @@ func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
 		return ""
 	}
 
+	// Only show one line per triage source
+	seen := make(map[string]struct{})
 	var lines []string
 	for _, tr := range trs {
+		if _, ok := seen[tr.Source]; ok {
+			continue
+		}
+		seen[tr.Source] = struct{}{}
 		lines = append(lines, renderTriageAssessment(verticalLine, tr))
 	}
 
