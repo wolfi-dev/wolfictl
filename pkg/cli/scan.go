@@ -21,10 +21,25 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
+	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
+	"gitlab.alpinelinux.org/alpine/go/repository"
 	"golang.org/x/exp/slices"
 )
+
+const (
+	outputFormatOutline = "outline"
+	outputFormatJSON    = "json"
+)
+
+var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
+
+type inputScanResult struct {
+	InputFile string
+	Result    scan.Result
+}
 
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
@@ -40,23 +55,22 @@ func cmdScan() *cobra.Command {
 
 			// Validate inputs
 
-			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
-			for _, dir := range p.advisoriesRepoDirs {
-				advisoryFsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(advisoryFsys)
-				if err != nil {
-					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
-				}
-
-				advisoryDocumentIndices = append(advisoryDocumentIndices, index)
-			}
-
 			if !slices.Contains(validOutputFormats, p.outputFormat) {
 				return fmt.Errorf(
 					"invalid output format %q, must be one of [%s]",
 					p.outputFormat,
 					strings.Join(validOutputFormats, ", "),
 				)
+			}
+
+			if p.packageBuildLogInput && p.sbomInput ||
+				p.packageBuildLogInput && p.remoteScanning ||
+				p.sbomInput && p.remoteScanning {
+				return errors.New("cannot specify more than one of [--build-log, --sbom, --remote]")
+			}
+
+			if p.triageWithGoVulnCheck && p.sbomInput {
+				return errors.New("cannot specify both -s/--sbom and --govulncheck (govulncheck needs access to actual Go binaries)")
 			}
 
 			if p.advisoryFilterSet != "" {
@@ -73,36 +87,30 @@ func cmdScan() *cobra.Command {
 				}
 			}
 
-			if len(p.advisoriesRepoDirs) > 0 && p.advisoryFilterSet == "" {
-				return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
-			}
+			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
 
-			if p.packageBuildLogInput && p.sbomInput {
-				return errors.New("cannot specify both -s/--sbom and --build-log")
-			}
-
-			if p.triageWithGoVulnCheck && p.sbomInput {
-				return errors.New("cannot specify both -s/--sbom and --govulncheck (govulncheck needs access to actual Go binaries)")
-			}
-
-			// Use either the build log or the args themselves as scan targets
-
-			var inputs []string
-			if p.packageBuildLogInput {
-				if len(args) != 1 {
-					return fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
+			if len(p.advisoriesRepoDirs) > 0 {
+				if p.advisoryFilterSet == "" {
+					return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
 				}
 
-				var err error
-				inputs, err = resolveInputFilePathsFromBuildLog(args[0])
-				if err != nil {
-					return fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
+				for _, dir := range p.advisoriesRepoDirs {
+					advisoryFsys := rwos.DirFS(dir)
+					index, err := v2.NewIndex(advisoryFsys)
+					if err != nil {
+						return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
+					}
+
+					advisoryDocumentIndices = append(advisoryDocumentIndices, index)
 				}
-			} else {
-				inputs = args
 			}
 
-			// Do a scan for each scan target
+			inputs, err := p.resolveInputsToScan(cmd.Context(), args)
+			if err != nil {
+				return err
+			}
+
+			// Do a scan for each input
 
 			var scans []inputScanResult
 			var inputPathsFailingRequireZero []string
@@ -139,6 +147,71 @@ func cmdScan() *cobra.Command {
 	return cmd
 }
 
+type scanParams struct {
+	requireZeroFindings   bool
+	localDBFilePath       string
+	outputFormat          string
+	sbomInput             bool
+	packageBuildLogInput  bool
+	distro                string
+	advisoryFilterSet     string
+	advisoriesRepoDirs    []string
+	disableSBOMCache      bool
+	triageWithGoVulnCheck bool
+	remoteScanning        bool
+}
+
+func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
+	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
+	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
+	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
+	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
+	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
+	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
+	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
+	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
+	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
+	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
+	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
+}
+
+func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]string, error) {
+	var inputs []string
+	switch {
+	case p.packageBuildLogInput:
+		if len(args) != 1 {
+			return nil, fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
+		}
+
+		var err error
+		inputs, err = resolveInputFilePathsFromBuildLog(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
+		}
+
+	case p.remoteScanning:
+		// For each input, download the APK from the Wolfi package repository and update `inputs` to point to the downloaded APKs
+
+		if p.outputFormat == outputFormatOutline {
+			fmt.Println("📡 Locating packages to scan remotely")
+		}
+
+		for _, arg := range args {
+			targetPaths, err := resolveInputForRemoteTarget(ctx, arg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to resolve input %q for remote scanning: %w", arg, err)
+			}
+			inputs = append(inputs, targetPaths...)
+		}
+
+	default:
+		inputs = args
+	}
+
+	return inputs, nil
+}
+
 func (p *scanParams) doScanCommandForSingleInput(
 	ctx context.Context,
 	input string,
@@ -153,7 +226,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 		return nil, fmt.Errorf("failed to open input file: %w", err)
 	}
 
-	result, err := scanInput(inputFile, p)
+	result, err := p.scanFile(inputFile)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +271,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	return result, nil
 }
 
-func scanInput(inputFile *os.File, p *scanParams) (*inputScanResult, error) {
+func (p *scanParams) scanFile(inputFile *os.File) (*inputScanResult, error) {
 	inputFileName := inputFile.Name()
 
 	// Get the SBOM of the APK
@@ -351,43 +424,75 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 	}
 }
 
-type scanParams struct {
-	requireZeroFindings   bool
-	localDBFilePath       string
-	outputFormat          string
-	sbomInput             bool
-	packageBuildLogInput  bool
-	distro                string
-	advisoryFilterSet     string
-	advisoriesRepoDirs    []string
-	disableSBOMCache      bool
-	triageWithGoVulnCheck bool
-}
+// resolveInputForRemoteTarget takes the given input string, which is expected
+// to be the name of a Wolfi package (or subpackage), and it queries the Wolfi
+// APK repository to find the latest version of the package for each
+// architecture. It then downloads each APK and returns a slice of file paths to
+// the downloaded APKs.
+//
+// For example, given the input value "calico", this function will find the
+// latest version of the package (e.g. "calico-3.26.3-r3.apk") and download it
+// for each architecture.
+func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, error) {
+	var downloadedAPKFilePaths []string
+	for _, arch := range []string{"x86_64", "aarch64"} {
+		const apkRepositoryURL = "https://packages.wolfi.dev/os"
+		apkindex, err := index.Index(arch, apkRepositoryURL)
+		if err != nil {
+			return nil, fmt.Errorf("getting APKINDEX: %w", err)
+		}
 
-func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
-	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
-	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
-	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
-	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
-	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
-	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
-	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
-	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
-	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
-	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
-	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
-}
+		nameMatches := lo.Filter(apkindex.Packages, func(pkg *repository.Package, _ int) bool {
+			return pkg != nil && pkg.Name == input
+		})
 
-const (
-	outputFormatOutline = "outline"
-	outputFormatJSON    = "json"
-)
+		if len(nameMatches) == 0 {
+			return nil, fmt.Errorf("no Wolfi package found with name %q in arch %q", input, arch)
+		}
 
-var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
+		vers := lo.Map(nameMatches, func(pkg *repository.Package, _ int) string {
+			return pkg.Version
+		})
 
-type inputScanResult struct {
-	InputFile string
-	Result    scan.Result
+		sort.Sort(versions.ByLatestStrings(vers))
+		latestVersion := vers[0]
+
+		var latestPkg *repository.Package
+		for _, pkg := range nameMatches {
+			if pkg.Version == latestVersion {
+				latestPkg = pkg
+				break
+			}
+		}
+		downloadURL := fmt.Sprintf("%s/%s/%s", apkRepositoryURL, arch, latestPkg.Filename())
+
+		tmpFile, err := os.CreateTemp("", fmt.Sprintf("%s-%s-%s-*.apk", arch, input, latestVersion))
+		if err != nil {
+			return nil, fmt.Errorf("creating temp dir: %w", err)
+		}
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating request for %q: %w", downloadURL, err)
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, fmt.Errorf("downloading %q: %w", downloadURL, err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("downloading %q (status: %d): %w", downloadURL, resp.StatusCode, err)
+		}
+		_, err = io.Copy(tmpFile, resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("saving contents of %q to %q: %w", downloadURL, tmpFile.Name(), err)
+		}
+		resp.Body.Close()
+		tmpFile.Close()
+
+		downloadedAPKFilePaths = append(downloadedAPKFilePaths, tmpFile.Name())
+	}
+
+	return downloadedAPKFilePaths, nil
 }
 
 type findingsTree struct {
@@ -550,8 +655,14 @@ func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
 		return ""
 	}
 
+	// Only show one line per triage source
+	seen := make(map[string]struct{})
 	var lines []string
 	for _, tr := range trs {
+		if _, ok := seen[tr.Source]; ok {
+			continue
+		}
+		seen[tr.Source] = struct{}{}
 		lines = append(lines, renderTriageAssessment(verticalLine, tr))
 	}
 
