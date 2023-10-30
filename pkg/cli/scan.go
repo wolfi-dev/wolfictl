@@ -52,23 +52,20 @@ func cmdScan() *cobra.Command {
 
 			// Validate inputs
 
-			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
-			for _, dir := range p.advisoriesRepoDirs {
-				advisoryFsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(advisoryFsys)
-				if err != nil {
-					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
-				}
-
-				advisoryDocumentIndices = append(advisoryDocumentIndices, index)
-			}
-
 			if !slices.Contains(validOutputFormats, p.outputFormat) {
 				return fmt.Errorf(
 					"invalid output format %q, must be one of [%s]",
 					p.outputFormat,
 					strings.Join(validOutputFormats, ", "),
 				)
+			}
+
+			if p.packageBuildLogInput && p.sbomInput {
+				return errors.New("cannot specify both -s/--sbom and --build-log")
+			}
+
+			if p.triageWithGoVulnCheck && p.sbomInput {
+				return errors.New("cannot specify both -s/--sbom and --govulncheck (govulncheck needs access to actual Go binaries)")
 			}
 
 			if p.advisoryFilterSet != "" {
@@ -85,16 +82,22 @@ func cmdScan() *cobra.Command {
 				}
 			}
 
-			if len(p.advisoriesRepoDirs) > 0 && p.advisoryFilterSet == "" {
-				return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
-			}
+			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
 
-			if p.packageBuildLogInput && p.sbomInput {
-				return errors.New("cannot specify both -s/--sbom and --build-log")
-			}
+			if len(p.advisoriesRepoDirs) > 0 {
+				if p.advisoryFilterSet == "" {
+					return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
+				}
 
-			if p.triageWithGoVulnCheck && p.sbomInput {
-				return errors.New("cannot specify both -s/--sbom and --govulncheck (govulncheck needs access to actual Go binaries)")
+				for _, dir := range p.advisoriesRepoDirs {
+					advisoryFsys := rwos.DirFS(dir)
+					index, err := v2.NewIndex(advisoryFsys)
+					if err != nil {
+						return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
+					}
+
+					advisoryDocumentIndices = append(advisoryDocumentIndices, index)
+				}
 			}
 
 			// Use either the build log or the args themselves as scan targets
