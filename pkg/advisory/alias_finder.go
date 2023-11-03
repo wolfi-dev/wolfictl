@@ -19,16 +19,25 @@ type AliasFinder interface {
 }
 
 type HTTPAliasFinder struct {
-	client *http.Client
+	client          *http.Client
+	cacheGHSAsByCVE map[string][]string
+	cacheCVEByGHSA  map[string]string
 }
 
 func NewHTTPAliasFinder(client *http.Client) *HTTPAliasFinder {
 	return &HTTPAliasFinder{
-		client: client,
+		client:          client,
+		cacheGHSAsByCVE: make(map[string][]string),
+		cacheCVEByGHSA:  make(map[string]string),
 	}
 }
 
 func (f *HTTPAliasFinder) CVEForGHSA(ctx context.Context, ghsaID string) (string, error) {
+	// Check cache first
+	if cveID, ok := f.cacheCVEByGHSA[ghsaID]; ok {
+		return cveID, nil
+	}
+
 	requestPath := fmt.Sprintf("/advisories/%s", url.PathEscape(ghsaID))
 	respBody, err := f.gitHubAPIGet(ctx, requestPath, nil)
 	if err != nil {
@@ -41,10 +50,18 @@ func (f *HTTPAliasFinder) CVEForGHSA(ctx context.Context, ghsaID string) (string
 		return "", err
 	}
 
+	// Update cache
+	f.cacheCVEByGHSA[ghsaID] = ghsa.CVEID
+
 	return ghsa.CVEID, nil
 }
 
 func (f *HTTPAliasFinder) GHSAsForCVE(ctx context.Context, cveID string) ([]string, error) {
+	// Check cache first
+	if ghsaIDs, ok := f.cacheGHSAsByCVE[cveID]; ok {
+		return ghsaIDs, nil
+	}
+
 	respBody, err := f.gitHubAPIGet(
 		ctx,
 		"/advisories",
@@ -63,6 +80,9 @@ func (f *HTTPAliasFinder) GHSAsForCVE(ctx context.Context, cveID string) ([]stri
 	ghsaIDs := lo.Map(ghsas, func(ghsa githubSecurityAdvisoryResponse, _ int) string {
 		return ghsa.GHSAID
 	})
+
+	// Update cache
+	f.cacheGHSAsByCVE[cveID] = ghsaIDs
 
 	return ghsaIDs, nil
 }
