@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	"chainguard.dev/melange/pkg/config"
@@ -39,7 +40,10 @@ the advisory you are creating. If not all required values are provided on the
 command line, the command will prompt for the missing values.
 
 If the --no-prompt flag is specified, then the command will fail if any 
-required fields are missing.`,
+required fields are missing.
+
+This command also performs a follow-up operation to discover aliases for the
+newly created advisory and any other advisories for the same package.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -145,7 +149,16 @@ required fields are missing.`,
 
 			err = advisory.Create(req, opts)
 			if err != nil {
-				return err
+				return fmt.Errorf("unable to create advisory: %w", err)
+			}
+
+			err = advisory.DiscoverAliases(cmd.Context(), advisory.DiscoverAliasesOptions{
+				AdvisoryDocs:     opts.AdvisoryDocs,
+				AliasFinder:      advisory.NewHTTPAliasFinder(http.DefaultClient),
+				SelectedPackages: map[string]struct{}{req.Package: {}},
+			})
+			if err != nil {
+				return fmt.Errorf("unable to discover aliases for newly created advisory: %w", err)
 			}
 
 			return nil
