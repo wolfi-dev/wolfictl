@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"golang.org/x/exp/slices"
 
@@ -26,7 +27,7 @@ func cmdWithdraw() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gone := make(map[string]bool, len(args))
 			for _, s := range args {
-				gone[s] = false
+				gone[strings.TrimSuffix(s, ".apk")] = false
 			}
 
 			return withdraw(cmd.Context(), cmd.OutOrStdout(), cmd.InOrStdin(), key, gone)
