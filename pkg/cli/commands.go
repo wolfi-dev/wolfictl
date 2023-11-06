@@ -29,6 +29,7 @@ func New() *cobra.Command {
 		cmdScan(),
 		cmdUpdate(),
 		cmdVEX(),
+		cmdWithdraw(),
 		version.Version(),
 	)
 
