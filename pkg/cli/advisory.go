@@ -35,11 +35,12 @@ func cmdAdvisory() *cobra.Command {
 	cmd.AddCommand(
 		cmdAdvisoryAlias(),
 		cmdAdvisoryCreate(),
-		cmdAdvisorySecDB(),
+		cmdAdvisoryDiff(),
 		cmdAdvisoryDiscover(),
 		cmdAdvisoryExport(),
 		cmdAdvisoryList(),
 		cmdAdvisoryMigrate(),
+		cmdAdvisorySecDB(),
 		cmdAdvisoryUpdate(),
 		cmdAdvisoryValidate(),
 	)
