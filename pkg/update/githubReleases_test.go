@@ -307,6 +307,13 @@ func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
 		{name: "tag-filter", melangeConfig: config.Configuration{
 			Update: config.Update{
 				GitHubMonitor: &config.GitHubMonitor{
+					TagFilter: "^3.",
+				},
+			},
+		}, version: "6.3.2", want: "", wantErr: assert.NoError},
+		{name: "tag-filter", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
 					TagFilter:   "-ga",
 					StripSuffix: "-ga",
 				},
