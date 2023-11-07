@@ -589,7 +589,11 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 
 	// the github graphql query filter matches any occurrence of the tag filter
 	if ghm.TagFilter != "" {
-		if !strings.Contains(v, ghm.TagFilter) {
+		regex, err := regexp.Compile(ghm.TagFilter)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed to compile regex %s", ghm.TagFilter)
+		}
+		if !regex.MatchString(v) {
 			return "", nil
 		}
 	}
