@@ -343,7 +343,7 @@ func (o GitHubReleaseOptions) get(requestQuery string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	o.Logger.Printf("request query, to check visit https://docs.github.com/en/graphql/overview/explorer %s", requestQuery)
+	o.Logger.Printf("request query, to check visit https://docs.github.com/en/graphql/overview/explorer: %s", requestQuery)
 
 	req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(payloadBytes))
 	if err != nil {
@@ -587,9 +587,9 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		return "", fmt.Errorf("no github update config found for package %s", id)
 	}
 
-	// the github graphql query filter matches any occurrence of the tag filter
+	// the github graphql query filter matches any occurrence, we want to make that more strict and remove any tags that do not START with the filter
 	if ghm.TagFilter != "" {
-		if !strings.Contains(v, ghm.TagFilter) {
+		if !strings.HasPrefix(v, ghm.TagFilter) {
 			return "", nil
 		}
 	}
