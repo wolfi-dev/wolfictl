@@ -70,7 +70,7 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 
 	p := pkgs[0]
 
-	metadata, ok := p.Metadata.(pkg.ApkMetadata)
+	metadata, ok := p.Metadata.(pkg.ApkDBEntry)
 	if !ok {
 		return TargetAPK{}, fmt.Errorf("expected APK metadata, found %T", p.Metadata)
 	}
@@ -83,7 +83,7 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 }
 
 // APKSBOM scans an SBOM of an APK for vulnerabilities.
-func APKSBOM(r io.Reader, localDBFilePath string) (*Result, error) {
+func APKSBOM(r io.ReadSeeker, localDBFilePath string) (*Result, error) {
 	s, err := sbom.FromSyftJSON(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)

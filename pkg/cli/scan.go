@@ -368,7 +368,7 @@ func (p *scanParams) scanFile(inputFile *os.File) (*inputScanResult, error) {
 	inputFileName := inputFile.Name()
 
 	// Get the SBOM of the APK
-	var apkSBOM io.Reader
+	var apkSBOM io.ReadSeeker
 	if p.sbomInput {
 		apkSBOM = inputFile
 	} else {
