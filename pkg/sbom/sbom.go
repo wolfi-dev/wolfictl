@@ -11,7 +11,7 @@ import (
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/file"
-	"github.com/anchore/syft/syft/formats/syftjson"
+	"github.com/anchore/syft/syft/format/syftjson"
 	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/anchore/syft/syft/pkg/cataloger"
@@ -116,8 +116,7 @@ func newAPKPackage(r io.Reader, distroID string) (*pkg.Package, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse APK metadata: %w", err)
 	}
-
-	metadata := pkg.ApkMetadata{
+	metadata := pkg.ApkDBEntry{
 		Package:       pkginfo.PkgName,
 		OriginPackage: pkginfo.Origin,
 		Version:       pkginfo.PkgVer,
@@ -132,14 +131,13 @@ func newAPKPackage(r io.Reader, distroID string) (*pkg.Package, error) {
 	}
 
 	p := pkg.Package{
-		Name:         pkginfo.PkgName,
-		Version:      pkginfo.PkgVer,
-		FoundBy:      "wolfictl",
-		Locations:    file.NewLocationSet(file.NewLocation(pkginfoPath)),
-		Licenses:     pkg.NewLicenseSet(pkg.NewLicense(pkginfo.License)),
-		Type:         pkg.ApkPkg,
-		MetadataType: pkg.ApkMetadataType,
-		Metadata:     metadata,
+		Name:      pkginfo.PkgName,
+		Version:   pkginfo.PkgVer,
+		FoundBy:   "wolfictl",
+		Locations: file.NewLocationSet(file.NewLocation(pkginfoPath)),
+		Licenses:  pkg.NewLicenseSet(pkg.NewLicense(pkginfo.License)),
+		Type:      pkg.ApkPkg,
+		Metadata:  metadata,
 	}
 
 	p.PURL = generatePURL(*pkginfo, distroID)
@@ -171,10 +169,10 @@ func generateCPEs(p pkg.Package) []cpe.CPE {
 }
 
 // ToSyftJSON returns the SBOM as a reader of the Syft JSON format.
-func ToSyftJSON(s *sbom.SBOM) (io.Reader, error) {
+func ToSyftJSON(s *sbom.SBOM) (io.ReadSeeker, error) {
 	buf := new(bytes.Buffer)
 
-	model := syftjson.ToFormatModel(*s)
+	model := syftjson.ToFormatModel(*s, syftjson.DefaultEncoderConfig())
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(false)
 	err := enc.Encode(model)
@@ -182,12 +180,12 @@ func ToSyftJSON(s *sbom.SBOM) (io.Reader, error) {
 		return nil, fmt.Errorf("failed to encode SBOM: %w", err)
 	}
 
-	return buf, nil
+	return bytes.NewReader(buf.Bytes()), nil
 }
 
 // FromSyftJSON returns an SBOM from a reader of the Syft JSON format.
-func FromSyftJSON(r io.Reader) (*sbom.SBOM, error) {
-	s, err := syftjson.Format().Decode(r)
+func FromSyftJSON(r io.ReadSeeker) (*sbom.SBOM, error) {
+	s, _, _, err := syftjson.NewFormatDecoder().Decode(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode Syft JSON: %w", err)
 	}
