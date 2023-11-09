@@ -91,8 +91,8 @@ func TestDetect(t *testing.T) {
 	expectedAdvisoriesRepoDir, err := filepath.EvalSymlinks(repoAbsolutePath(repos[2].name))
 	require.NoError(t, err)
 
-	assert.Equal(t, "Wolfi", d.Name)
-	assert.Equal(t, expectedDistroRepoDir, d.DistroRepoDir)
-	assert.Equal(t, expectedAdvisoriesRepoDir, d.AdvisoriesRepoDir)
-	assert.Equal(t, "https://packages.wolfi.dev/os", d.APKRepositoryURL)
+	assert.Equal(t, "Wolfi", d.Absolute.Name)
+	assert.Equal(t, expectedDistroRepoDir, d.Local.DistroRepoDir)
+	assert.Equal(t, expectedAdvisoriesRepoDir, d.Local.AdvisoriesRepoDir)
+	assert.Equal(t, "https://packages.wolfi.dev/os", d.Absolute.APKRepositoryURL)
 }

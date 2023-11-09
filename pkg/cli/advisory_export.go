@@ -33,7 +33,7 @@ func cmdAdvisoryExport() *cobra.Command {
 					return fmt.Errorf("no advisories repo dir specified, and distro auto-detection failed: %w", err)
 				}
 
-				p.advisoriesRepoDirs = append(p.advisoriesRepoDirs, d.AdvisoriesRepoDir)
+				p.advisoriesRepoDirs = append(p.advisoriesRepoDirs, d.Local.AdvisoriesRepoDir)
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 

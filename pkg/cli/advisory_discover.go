@@ -47,11 +47,11 @@ func cmdAdvisoryDiscover() *cobra.Command {
 					return fmt.Errorf("distro repo dir and/or advisories repo dir was left unspecified, and distro auto-detection failed: %w", err)
 				}
 
-				distroRepoDir = d.DistroRepoDir
-				advisoriesRepoDir = d.AdvisoriesRepoDir
+				distroRepoDir = d.Local.DistroRepoDir
+				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
 
 				if packageRepositoryURL == "" {
-					packageRepositoryURL = d.APKRepositoryURL
+					packageRepositoryURL = d.Absolute.APKRepositoryURL
 				}
 
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
