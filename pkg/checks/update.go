@@ -230,7 +230,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 			Build: &build.Build{
 				Configuration: *updated,
 			},
-			Package: &build.PackageContext{Package: &updated.Package},
+			Package: &updated.Package,
 		}
 
 		// get a map of variable mutations we can substitute vars in URLs

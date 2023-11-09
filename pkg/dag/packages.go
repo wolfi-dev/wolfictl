@@ -89,7 +89,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 			Build: &build.Build{
 				Configuration: *c.Configuration,
 			},
-			Package: &build.PackageContext{Package: &c.Package},
+			Package: &c.Package,
 		}
 		template, err := build.MutateWith(pctx, nil)
 		if err != nil {
@@ -199,7 +199,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 					PipelineDir:   pipelineDir,
 					Configuration: *c.Configuration,
 				},
-				Package: &build.PackageContext{Package: &c.Package},
+				Package: &c.Package,
 			}
 			for i := range c.Pipeline {
 				s := &build.PipelineContext{Pipeline: &c.Pipeline[i]}
