@@ -162,18 +162,22 @@ func renderCmpDiffOutput(diff string) string {
 			continue
 		}
 
-		if line[0] == ' ' {
+		if strings.Contains(line, "ignored field") {
+			// We're only ignoring the Events field, because we want to control the rendered
+			// diff of Events ourselves. Seeing the "ignored field" warning from cmp.Diff is
+			// sort of confusing.
 			continue
 		}
 
-		if line[0] == '+' {
+		switch line[0] {
+		case ' ':
+			fmt.Fprintf(&sb, "    %s\n", line)
+
+		case '+':
 			fmt.Fprintf(&sb, "    %s\n", styleAdded.Render(line))
-			continue
-		}
 
-		if line[0] == '-' {
+		case '-':
 			fmt.Fprintf(&sb, "    %s\n", styleRemoved.Render(line))
-			continue
 		}
 	}
 
