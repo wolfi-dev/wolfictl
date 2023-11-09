@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -19,7 +20,6 @@ import (
 )
 
 func cmdAdvisoryDiff() *cobra.Command {
-	p := &diffParams{}
 	cmd := &cobra.Command{
 		Use:           "diff",
 		Short:         "See the advisory data differences introduced by your local changes",
@@ -27,30 +27,22 @@ func cmdAdvisoryDiff() *cobra.Command {
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var advisoriesGitUpstreamRemoteURL string
-			// TODO: how will this get set if we don't auto-detect?
 
-			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
-			if advisoriesRepoDir == "" {
-				if p.doNotDetectDistro {
-					return fmt.Errorf("no advisories repo dir specified")
-				}
-
-				d, err := distro.Detect()
-				if err != nil {
-					return fmt.Errorf("no advisories repo dir specified, and distro auto-detection failed: %w", err)
-				}
-
-				// Get an HTTPS URL for the upstream Git remote
-				for _, u := range d.Absolute.AdvisoriesRemoteURLs {
-					if strings.HasPrefix(u, "https://") {
-						advisoriesGitUpstreamRemoteURL = u
-						break
-					}
-				}
-
-				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
-				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
+			d, err := distro.Detect()
+			if err != nil {
+				return fmt.Errorf("distro auto-detection failed: %w", err)
 			}
+
+			// Get an HTTPS URL for the upstream Git remote
+			for _, u := range d.Absolute.AdvisoriesRemoteURLs {
+				if strings.HasPrefix(u, "https://") {
+					advisoriesGitUpstreamRemoteURL = u
+					break
+				}
+			}
+
+			advisoriesRepoDir := d.Local.AdvisoriesRepoDir
+			_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 
 			currentAdvisoriesFsys := rwos.DirFS(advisoriesRepoDir)
 			currentAdvisoriesIndex, err := v2.NewIndex(currentAdvisoriesFsys)
@@ -64,9 +56,15 @@ func cmdAdvisoryDiff() *cobra.Command {
 			}
 			defer os.RemoveAll(dir)
 
-			auth := &http.BasicAuth{
-				Username: "username", // We don't need the user's actual GH username! (but it can't be empty)
-				Password: os.Getenv("GITHUB_TOKEN"),
+			var auth transport.AuthMethod
+			if d.Absolute.Name == "Wolfi" {
+				auth = nil
+			} else {
+				// Assume it's a private repo that needs auth.
+				auth = &http.BasicAuth{
+					Username: "username", // We don't need the user's actual GH username! (but it can't be empty)
+					Password: os.Getenv("GITHUB_TOKEN"),
+				}
 			}
 
 			_, err = git.PlainClone(dir, false, &git.CloneOptions{
@@ -93,18 +91,7 @@ func cmdAdvisoryDiff() *cobra.Command {
 		},
 	}
 
-	p.addFlagsTo(cmd)
 	return cmd
-}
-
-type diffParams struct {
-	doNotDetectDistro bool
-	advisoriesRepoDir string
-}
-
-func (p *diffParams) addFlagsTo(cmd *cobra.Command) {
-	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
-	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 }
 
 func renderDiff(result advisory.IndexDiffResult) string {
