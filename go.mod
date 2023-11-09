@@ -4,11 +4,11 @@ go 1.21.1
 
 require (
 	chainguard.dev/apko v0.11.2
-	chainguard.dev/melange v0.5.2-0.20231027223504-2bcfbe6439a5
+	chainguard.dev/melange v0.5.2
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.1
 	github.com/anchore/syft v0.96.0
-	github.com/chainguard-dev/go-apk v0.0.0-20231030174812-a5114d436c7a
+	github.com/chainguard-dev/go-apk v0.0.0-20231101222019-fa53d0b1c274
 	github.com/chainguard-dev/yam v0.0.0-20230807153807-4de7c531f3e1
 	github.com/charmbracelet/bubbles v0.16.1
 	github.com/charmbracelet/bubbletea v0.24.2
