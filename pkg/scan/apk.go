@@ -167,9 +167,15 @@ func newGrypeVulnerabilityMatcher(datastore store.Store) *grype.VulnerabilityMat
 func createMatchers() []matcher.Matcher {
 	return matcher.NewDefaultMatchers(
 		matcher.Config{
-			Dotnet:     dotnet.MatcherConfig{UseCPEs: false},
-			Golang:     golang.MatcherConfig{UseCPEs: false, AlwaysUseCPEForStdlib: true},
-			Java:       java.MatcherConfig{UseCPEs: false},
+			Dotnet: dotnet.MatcherConfig{UseCPEs: false},
+			Golang: golang.MatcherConfig{UseCPEs: false, AlwaysUseCPEForStdlib: true},
+			Java: java.MatcherConfig{
+				ExternalSearchConfig: java.ExternalSearchConfig{
+					SearchMavenUpstream: true,
+					MavenBaseURL:        mavenSearchBaseURL,
+				},
+				UseCPEs: false,
+			},
 			Javascript: javascript.MatcherConfig{UseCPEs: false},
 			Python:     python.MatcherConfig{UseCPEs: false},
 			Ruby:       ruby.MatcherConfig{UseCPEs: false},
@@ -178,3 +184,5 @@ func createMatchers() []matcher.Matcher {
 		},
 	)
 }
+
+const mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
