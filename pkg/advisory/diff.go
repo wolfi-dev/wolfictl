@@ -12,7 +12,7 @@ type IndexDiffResult struct {
 	Added   []v2.Document
 	Removed []v2.Document
 
-	Modified map[string]DocumentDiffResult
+	Modified []DocumentDiffResult
 }
 
 // IsZero returns true there is no difference between the compared advisory
@@ -23,10 +23,12 @@ func (r IndexDiffResult) IsZero() bool {
 
 // DocumentDiffResult is the result of diffing two advisory documents.
 type DocumentDiffResult struct {
+	Name string
+
 	Added   v2.Advisories
 	Removed v2.Advisories
 
-	Modified map[string]DiffResult
+	Modified []DiffResult
 }
 
 // IsZero returns true if there is no difference between the compared advisory
@@ -37,14 +39,26 @@ func (r DocumentDiffResult) IsZero() bool {
 
 // DiffResult is the result of diffing two advisories.
 type DiffResult struct {
+	ID string
+
 	Added   v2.Advisory
 	Removed v2.Advisory
+
+	AddedEvents   []v2.Event
+	RemovedEvents []v2.Event
 }
 
 // IsZero returns true if there is no difference between the compared
 // advisories.
 func (r DiffResult) IsZero() bool {
 	return r.Added.IsZero() && r.Removed.IsZero()
+}
+
+type EventDiffResult struct {
+	ID string
+
+	Added   v2.Event
+	Removed v2.Event
 }
 
 // IndexDiff takes two advisory document indexes and returns a diff of the
@@ -69,10 +83,7 @@ func IndexDiff(a, b *configs.Index[v2.Document]) IndexDiffResult {
 			b.Select().WhereName(name).Configurations()[0],
 		)
 		if !diff.IsZero() {
-			if result.Modified == nil {
-				result.Modified = make(map[string]DocumentDiffResult)
-			}
-			result.Modified[name] = diff
+			result.Modified = append(result.Modified, diff)
 		}
 	}
 
@@ -91,6 +102,7 @@ func documentDiff(a, b v2.Document) DocumentDiffResult {
 	)
 
 	result := DocumentDiffResult{
+		Name:    a.Name(),
 		Added:   added,
 		Removed: removed,
 	}
@@ -101,10 +113,7 @@ func documentDiff(a, b v2.Document) DocumentDiffResult {
 
 		diff := diff(advA, advB)
 		if !diff.IsZero() {
-			if result.Modified == nil {
-				result.Modified = make(map[string]DiffResult)
-			}
-			result.Modified[id] = diff
+			result.Modified = append(result.Modified, diff)
 		}
 	}
 
@@ -119,7 +128,30 @@ func diff(a, b v2.Advisory) DiffResult {
 		return DiffResult{}
 	}
 
-	return DiffResult{Added: b, Removed: a}
+	if reflect.DeepEqual(a.SortedEvents(), b.SortedEvents()) {
+		// No change with regard to events, so just return the advisories.
+		return DiffResult{ID: a.ID, Added: b, Removed: a}
+	}
+
+	// Otherwise, we need to diff the events.
+
+	removedEvents, addedEvents, _ := venn(
+		a.SortedEvents(),
+		b.SortedEvents(),
+		func(a, b v2.Event) bool {
+			return reflect.DeepEqual(a, b) // This means we won't diff the common events
+		},
+	)
+
+	result := DiffResult{
+		ID:            a.ID,
+		Added:         b,
+		Removed:       a,
+		AddedEvents:   addedEvents,
+		RemovedEvents: removedEvents,
+	}
+
+	return result
 }
 
 func documentNames(documents []v2.Document) []string {

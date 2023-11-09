@@ -11,9 +11,12 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
-var unixEpochTimestamp = v2.Timestamp(time.Unix(0, 0))
+var (
+	unixEpochTimestamp         = v2.Timestamp(time.Unix(0, 0))
+	unixEpochTimestampPlus1Day = v2.Timestamp(time.Unix(0, 0).AddDate(0, 0, 1))
+)
 
-func TestDiff(t *testing.T) {
+func TestIndexDiff(t *testing.T) {
 	cases := []struct {
 		name               string
 		expectedDiffResult IndexDiffResult
@@ -73,8 +76,9 @@ func TestDiff(t *testing.T) {
 		{
 			name: "added-advisory",
 			expectedDiffResult: IndexDiffResult{
-				Modified: map[string]DocumentDiffResult{
-					"ko": {
+				Modified: []DocumentDiffResult{
+					{
+						Name: "ko",
 						Added: v2.Advisories{
 							{
 								ID: "CVE-2023-11111",
@@ -93,8 +97,9 @@ func TestDiff(t *testing.T) {
 		{
 			name: "removed-advisory",
 			expectedDiffResult: IndexDiffResult{
-				Modified: map[string]DocumentDiffResult{
-					"ko": {
+				Modified: []DocumentDiffResult{
+					{
+						Name: "ko",
 						Removed: v2.Advisories{
 							{
 								ID: "CVE-2023-11111",
@@ -111,12 +116,14 @@ func TestDiff(t *testing.T) {
 			},
 		},
 		{
-			name: "modified-advisory",
+			name: "modified-advisory-outside-of-events",
 			expectedDiffResult: IndexDiffResult{
-				Modified: map[string]DocumentDiffResult{
-					"ko": {
-						Modified: map[string]DiffResult{
-							"CVE-2023-24535": {
+				Modified: []DocumentDiffResult{
+					{
+						Name: "ko",
+						Modified: []DiffResult{
+							{
+								ID: "CVE-2023-24535",
 								Added: v2.Advisory{
 									ID: "CVE-2023-24535",
 									Events: []v2.Event{
@@ -128,11 +135,100 @@ func TestDiff(t *testing.T) {
 								},
 								Removed: v2.Advisory{
 									ID: "CVE-2023-24535",
+									Aliases: []string{
+										"GHSA-2222-2222-2222",
+									},
+									Events: []v2.Event{
+										{
+											Timestamp: unixEpochTimestamp,
+											Type:      v2.EventTypeFalsePositiveDetermination,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "added-event",
+			expectedDiffResult: IndexDiffResult{
+				Modified: []DocumentDiffResult{
+					{
+						Name: "ko",
+						Modified: []DiffResult{
+							{
+								ID: "CVE-2023-11111",
+								Added: v2.Advisory{
+									ID: "CVE-2023-11111",
 									Events: []v2.Event{
 										{
 											Timestamp: unixEpochTimestamp,
 											Type:      v2.EventTypeTruePositiveDetermination,
 										},
+										{
+											Timestamp: unixEpochTimestampPlus1Day,
+											Type:      v2.EventTypeFalsePositiveDetermination,
+										},
+									},
+								},
+								Removed: v2.Advisory{
+									ID: "CVE-2023-11111",
+									Events: []v2.Event{
+										{
+											Timestamp: unixEpochTimestamp,
+											Type:      v2.EventTypeTruePositiveDetermination,
+										},
+									},
+								},
+								AddedEvents: []v2.Event{
+									{
+										Timestamp: unixEpochTimestampPlus1Day,
+										Type:      v2.EventTypeFalsePositiveDetermination,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "removed-event",
+			expectedDiffResult: IndexDiffResult{
+				Modified: []DocumentDiffResult{
+					{
+						Name: "ko",
+						Modified: []DiffResult{
+							{
+								ID: "CVE-2023-11111",
+								Added: v2.Advisory{
+									ID: "CVE-2023-11111",
+									Events: []v2.Event{
+										{
+											Timestamp: unixEpochTimestamp,
+											Type:      v2.EventTypeTruePositiveDetermination,
+										},
+									},
+								},
+								Removed: v2.Advisory{
+									ID: "CVE-2023-11111",
+									Events: []v2.Event{
+										{
+											Timestamp: unixEpochTimestamp,
+											Type:      v2.EventTypeTruePositiveDetermination,
+										},
+										{
+											Timestamp: unixEpochTimestampPlus1Day,
+											Type:      v2.EventTypeFalsePositiveDetermination,
+										},
+									},
+								},
+								RemovedEvents: []v2.Event{
+									{
+										Timestamp: unixEpochTimestampPlus1Day,
+										Type:      v2.EventTypeFalsePositiveDetermination,
 									},
 								},
 							},
