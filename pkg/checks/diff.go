@@ -234,7 +234,7 @@ func writeDiffLog(diff diffResult, filename string, newPackages map[string]NewAp
 
 		if len(diff.pkginfos) == 2 {
 			cmpdiff := cmp.Diff(diff.pkginfos[0], diff.pkginfos[1])
-			fmt.Fprintf(&builder, "\n.PKGINFO:\n%s\n", cmpdiff)
+			fmt.Fprintf(&builder, "\n`.PKGINFO` metadata:\n```\n%s\n```\n", cmpdiff)
 		}
 
 		changes := []string{}
