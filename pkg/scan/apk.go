@@ -83,16 +83,16 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 }
 
 // APKSBOM scans an SBOM of an APK for vulnerabilities.
-func APKSBOM(r io.ReadSeeker, localDBFilePath string) (*Result, error) {
+func APKSBOM(r io.ReadSeeker, localDBFilePath string, useCPEs bool) (*Result, error) {
 	s, err := sbom.FromSyftJSON(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)
 	}
 
-	return scan(s, localDBFilePath)
+	return scan(s, localDBFilePath, useCPEs)
 }
 
-func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
+func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, error) {
 	apk, err := newTargetAPK(s)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
 	}
 	defer dbCloser.Close()
 
-	vulnerabilityMatcher := newGrypeVulnerabilityMatcher(*datastore)
+	vulnerabilityMatcher := newGrypeVulnerabilityMatcher(*datastore, useCPEs)
 
 	syftPkgs := s.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})
@@ -157,29 +157,29 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string) (*Result, error) {
 	return result, nil
 }
 
-func newGrypeVulnerabilityMatcher(datastore store.Store) *grype.VulnerabilityMatcher {
+func newGrypeVulnerabilityMatcher(datastore store.Store, useCPEs bool) *grype.VulnerabilityMatcher {
 	return &grype.VulnerabilityMatcher{
 		Store:    datastore,
-		Matchers: createMatchers(),
+		Matchers: createMatchers(useCPEs),
 	}
 }
 
-func createMatchers() []matcher.Matcher {
+func createMatchers(useCPEs bool) []matcher.Matcher {
 	return matcher.NewDefaultMatchers(
 		matcher.Config{
-			Dotnet: dotnet.MatcherConfig{UseCPEs: false},
-			Golang: golang.MatcherConfig{UseCPEs: false, AlwaysUseCPEForStdlib: true},
+			Dotnet: dotnet.MatcherConfig{UseCPEs: useCPEs},
+			Golang: golang.MatcherConfig{UseCPEs: useCPEs, AlwaysUseCPEForStdlib: true},
 			Java: java.MatcherConfig{
 				ExternalSearchConfig: java.ExternalSearchConfig{
 					SearchMavenUpstream: true,
 					MavenBaseURL:        mavenSearchBaseURL,
 				},
-				UseCPEs: false,
+				UseCPEs: useCPEs,
 			},
-			Javascript: javascript.MatcherConfig{UseCPEs: false},
-			Python:     python.MatcherConfig{UseCPEs: false},
-			Ruby:       ruby.MatcherConfig{UseCPEs: false},
-			Rust:       rust.MatcherConfig{UseCPEs: false},
+			Javascript: javascript.MatcherConfig{UseCPEs: useCPEs},
+			Python:     python.MatcherConfig{UseCPEs: useCPEs},
+			Ruby:       ruby.MatcherConfig{UseCPEs: useCPEs},
+			Rust:       rust.MatcherConfig{UseCPEs: useCPEs},
 			Stock:      stock.MatcherConfig{UseCPEs: true},
 		},
 	)
