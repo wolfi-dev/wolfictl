@@ -304,6 +304,32 @@ func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
 				},
 			},
 		}, version: "v1.2.3", want: "v1.2.3", wantErr: assert.NoError},
+		{name: "tag-filter-contains", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
+					TagFilterContains: "-ga",
+					StripSuffix:       "-ga",
+				},
+			},
+		}, version: "1.2.3-ga", want: "1.2.3", wantErr: assert.NoError},
+		{name: "tag-filter-contains", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
+					TagFilterContains: "-ga",
+					TagFilterPrefix:   "v",
+					StripSuffix:       "-ga",
+					StripPrefix:       "v",
+				},
+			},
+		}, version: "v1.2.3-ga", want: "1.2.3", wantErr: assert.NoError},
+		{name: "tag-filter-prefix", melangeConfig: config.Configuration{
+			Update: config.Update{
+				GitHubMonitor: &config.GitHubMonitor{
+					TagFilterPrefix: "v1.",
+					StripSuffix:     "-ga",
+				},
+			},
+		}, version: "v1.2.3-ga", want: "v1.2.3", wantErr: assert.NoError},
 		{name: "transform-version", melangeConfig: config.Configuration{
 			Update: config.Update{
 				VersionTransform: []config.VersionTransform{

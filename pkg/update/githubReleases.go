@@ -588,8 +588,23 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 	}
 
 	// the github graphql query filter matches any occurrence, we want to make that more strict and remove any tags that do not START with the filter
+	// deprecated: todo: ajayk remove this once we have migrated over to TagFilterPrefix
 	if ghm.TagFilter != "" {
 		if !strings.HasPrefix(v, ghm.TagFilter) {
+			return "", nil
+		}
+	}
+	// TagFilterPrefix replaces TagFilter so we can be explicit about what the filter does
+	// TagFilterPrefix searches for prefix match only
+	if ghm.TagFilterPrefix != "" {
+		if !strings.HasPrefix(v, ghm.TagFilterPrefix) {
+			return "", nil
+		}
+	}
+
+	// TagFilterContains searches for substring match
+	if ghm.TagFilterContains != "" {
+		if !strings.Contains(v, ghm.TagFilterContains) {
 			return "", nil
 		}
 	}
