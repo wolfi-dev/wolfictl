@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/wolfi-dev/wolfictl/pkg/internal/errorhelpers"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 	"gopkg.in/yaml.v3"
 )
@@ -116,10 +117,10 @@ type DetectionNVDAPI struct {
 
 // Validate returns an error if the DetectionNVDAPI data is invalid.
 func (d DetectionNVDAPI) Validate() error {
-	return labelError("nvdapi detection data",
+	return errorhelpers.LabelError("nvdapi detection data",
 		errors.Join(
-			labelError("cpeSearched", vuln.ValidateCPE(d.CPESearched)),
-			labelError("cpeFound", vuln.ValidateCPE(d.CPEFound)),
+			errorhelpers.LabelError("cpeSearched", vuln.ValidateCPE(d.CPESearched)),
+			errorhelpers.LabelError("cpeFound", vuln.ValidateCPE(d.CPEFound)),
 		),
 	)
 }

@@ -10,13 +10,28 @@ type Distro struct {
 // LocalProperties describe the aspects of the distro that are specific to the
 // context of the user's local environment.
 type LocalProperties struct {
-	// DistroRepoDir is the path to the directory containing the user's clone of the
-	// distro repo, i.e. the repo containing the distro's build configurations.
-	DistroRepoDir string
+	// PackagesRepo is the context about the user's local clone of the distro's
+	// packages repo.
+	PackagesRepo LocalRepo
 
-	// AdvisoriesRepoDir is the path to the directory containing the user's clone of
-	// the advisories repo, i.e. the repo containing the distro's advisory data.
-	AdvisoriesRepoDir string
+	// AdvisoriesRepo is the context about the user's local clone of the distro's
+	// advisories repo.
+	AdvisoriesRepo LocalRepo
+}
+
+// LocalRepo stores the context about a local git repository that is needed for
+// interacting with this distro.
+type LocalRepo struct {
+	// Dir is the path to the directory containing the user's clone of the repo.
+	Dir string
+
+	// UpstreamName is the name of the locally configured git remote that the
+	// user's clone of the repo uses to reference the upstream repo.
+	UpstreamName string
+
+	// ForkPoint is the commit hash of the latest commit had in common between the
+	// local repo and the upstream repo main branch.
+	ForkPoint string
 }
 
 // AbsoluteProperties describe the aspects of the distro that are constant and

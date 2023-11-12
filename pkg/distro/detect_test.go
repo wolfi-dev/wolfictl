@@ -66,6 +66,14 @@ func TestDetect(t *testing.T) {
 			URLs: r.remoteURLs,
 		})
 		require.NoError(t, err)
+
+		// We need to create a commit so that HEAD exists.
+		w, err := repo.Worktree()
+		require.NoError(t, err)
+		_, err = w.Commit("Initial commit", &git.CommitOptions{
+			AllowEmptyCommits: true,
+		})
+		require.NoError(t, err)
 	}
 
 	originalWorkDir, err := os.Getwd()
@@ -92,7 +100,7 @@ func TestDetect(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "Wolfi", d.Absolute.Name)
-	assert.Equal(t, expectedDistroRepoDir, d.Local.DistroRepoDir)
-	assert.Equal(t, expectedAdvisoriesRepoDir, d.Local.AdvisoriesRepoDir)
+	assert.Equal(t, expectedDistroRepoDir, d.Local.PackagesRepo.Dir)
+	assert.Equal(t, expectedAdvisoriesRepoDir, d.Local.AdvisoriesRepo.Dir)
 	assert.Equal(t, "https://packages.wolfi.dev/os", d.Absolute.APKRepositoryURL)
 }

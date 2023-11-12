@@ -7,4 +7,4 @@ advisories:
   - id: CVE-2023-24535
     events:
       - timestamp: 1970-01-01T00:00:00Z
-        type: false-positive-determination
+        type: true-positive-determination

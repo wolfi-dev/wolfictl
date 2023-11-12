@@ -129,7 +129,7 @@ func TestIndexDiff(t *testing.T) {
 									Events: []v2.Event{
 										{
 											Timestamp: unixEpochTimestamp,
-											Type:      v2.EventTypeFalsePositiveDetermination,
+											Type:      v2.EventTypeTruePositiveDetermination,
 										},
 									},
 								},
@@ -141,7 +141,7 @@ func TestIndexDiff(t *testing.T) {
 									Events: []v2.Event{
 										{
 											Timestamp: unixEpochTimestamp,
-											Type:      v2.EventTypeFalsePositiveDetermination,
+											Type:      v2.EventTypeTruePositiveDetermination,
 										},
 									},
 								},
@@ -169,7 +169,7 @@ func TestIndexDiff(t *testing.T) {
 										},
 										{
 											Timestamp: unixEpochTimestampPlus1Day,
-											Type:      v2.EventTypeFalsePositiveDetermination,
+											Type:      v2.EventTypeTruePositiveDetermination,
 										},
 									},
 								},
@@ -185,7 +185,7 @@ func TestIndexDiff(t *testing.T) {
 								AddedEvents: []v2.Event{
 									{
 										Timestamp: unixEpochTimestampPlus1Day,
-										Type:      v2.EventTypeFalsePositiveDetermination,
+										Type:      v2.EventTypeTruePositiveDetermination,
 									},
 								},
 							},

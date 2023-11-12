@@ -32,7 +32,7 @@ func cmdLs() *cobra.Command {
 					return fmt.Errorf("no distro repo dir specified, and distro auto-detection failed: %w", err)
 				}
 
-				p.distroRepoDirs = append(p.distroRepoDirs, d.Local.DistroRepoDir)
+				p.distroRepoDirs = append(p.distroRepoDirs, d.Local.PackagesRepo.Dir)
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
