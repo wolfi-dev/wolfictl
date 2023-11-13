@@ -3,7 +3,7 @@ module github.com/wolfi-dev/wolfictl
 go 1.21.1
 
 require (
-	chainguard.dev/apko v0.11.2
+	chainguard.dev/apko v0.11.3-0.20231113190045-b9586cb4ad2b
 	chainguard.dev/melange v0.5.2
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.1
