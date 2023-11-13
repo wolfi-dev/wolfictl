@@ -12,7 +12,6 @@ import (
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
 	apk "github.com/chainguard-dev/go-apk/pkg/apk"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 const (
@@ -277,7 +276,7 @@ func (p Packages) PkgInfo(pkgName string) (*config.Package, error) {
 }
 
 // Packages returns a slice of every package and subpackage available in the Packages struct,
-// sorted alphabetically and then by version, with each package converted to a *repository.RepositoryPackage.
+// sorted alphabetically and then by version, with each package converted to a *apk.RepositoryPackage.
 func (p Packages) Packages() []*Configuration {
 	allPackages := make([]*Configuration, 0, len(p.packages))
 	for _, byVersion := range p.packages {
@@ -331,10 +330,10 @@ func (p Packages) Sub(names ...string) (*Packages, error) {
 	return pkgs, nil
 }
 
-// Repository provide the Packages as a repository.RepositoryWithIndex. To be used in other places that require
+// Repository provide the Packages as a apk.RepositoryWithIndex. To be used in other places that require
 // using alpine/go structs instead of ours.
 func (p Packages) Repository(arch string) apk.NamedIndex {
-	repo := repository.NewRepositoryFromComponents(Local, "latest", "", arch)
+	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
 
 	// Precompute the number of packages to avoid growslice.
 	size := 0
@@ -345,11 +344,11 @@ func (p Packages) Repository(arch string) apk.NamedIndex {
 		}
 	}
 
-	packages := make([]*repository.Package, 0, size)
+	packages := make([]*apk.Package, 0, size)
 	for _, byVersion := range p.packages {
 		for _, cfg := range byVersion {
 			cfg := cfg
-			packages = append(packages, &repository.Package{
+			packages = append(packages, &apk.Package{
 				Arch:         arch,
 				Name:         cfg.Package.Name,
 				Version:      fullVersion(&cfg.Package),
@@ -363,7 +362,7 @@ func (p Packages) Repository(arch string) apk.NamedIndex {
 			})
 			for i := range cfg.Subpackages {
 				sub := cfg.Subpackages[i]
-				packages = append(packages, &repository.Package{
+				packages = append(packages, &apk.Package{
 					Arch:         arch,
 					Name:         sub.Name,
 					Version:      fullVersion(&cfg.Package),
@@ -378,7 +377,7 @@ func (p Packages) Repository(arch string) apk.NamedIndex {
 			}
 		}
 	}
-	index := &repository.ApkIndex{
+	index := &apk.APKIndex{
 		Description: "local repository",
 		Packages:    packages,
 	}

@@ -1246,8 +1246,6 @@ github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zealic/xignore v0.3.3 h1:EpLXUgZY/JEzFkTc+Y/VYypzXtNz+MSOMVCGW5Q4CKQ=
 github.com/zealic/xignore v0.3.3/go.mod h1:lhS8V7fuSOtJOKsvKI7WfsZE276/7AYEqokv3UiqEAU=
-gitlab.alpinelinux.org/alpine/go v0.8.1-0.20230928153721-5381bfaecf9b h1:VxuNSxH3voth15SPX4nHV8DSFLP/u3Od82juHw7+pLo=
-gitlab.alpinelinux.org/alpine/go v0.8.1-0.20230928153721-5381bfaecf9b/go.mod h1:F2JLVqRezwY1mhf7X/sPkQ/u+X550PHOL4OpCFyuOVU=
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
 go.etcd.io/etcd/client/pkg/v3 v3.5.1/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.1/go.mod h1:pMEacxZW7o8pg4CrFE7pquyCJJzZvkvdD2RibOCCCGs=

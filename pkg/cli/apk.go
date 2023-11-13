@@ -8,12 +8,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 var repos = map[string]string{
@@ -29,6 +29,8 @@ func cmdApk() *cobra.Command {
 		Use:  "apk",
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+
 			// Map a friendly string like "wolfi" to its repo URL.
 			if got, found := repos[repo]; found {
 				repo = got
@@ -76,7 +78,7 @@ func cmdApk() *cobra.Command {
 				return fmt.Errorf("GET %s (%d): %s", url, resp.StatusCode, b)
 			}
 
-			pkg, err := repository.ParsePackage(resp.Body)
+			pkg, err := apk.ParsePackage(ctx, resp.Body)
 			if err != nil {
 				return err
 			}
@@ -119,7 +121,7 @@ func cmdIndex() *cobra.Command {
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type item struct {
-	p *repository.Package
+	p *apk.Package
 }
 
 func (i item) Title() string       { return i.p.Name }

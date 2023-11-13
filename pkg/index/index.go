@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"gitlab.alpinelinux.org/alpine/go/repository"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
-func Index(arch, repo string) (*repository.ApkIndex, error) {
+func Index(arch, repo string) (*apk.APKIndex, error) {
 	var rc io.ReadCloser
 	if strings.HasPrefix(repo, "http://") || strings.HasPrefix(repo, "https://") {
 		url := fmt.Sprintf("%s/%s/APKINDEX.tar.gz", repo, arch)
@@ -36,5 +36,5 @@ func Index(arch, repo string) (*repository.ApkIndex, error) {
 		rc = f
 	}
 
-	return repository.IndexFromArchive(rc)
+	return apk.IndexFromArchive(rc)
 }

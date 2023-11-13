@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -16,7 +17,6 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 func cmdAdvisoryCreate() *cobra.Command {
@@ -26,20 +26,20 @@ func cmdAdvisoryCreate() *cobra.Command {
 		Short: "Create a new advisory",
 		Long: `Create a new advisory.
 
-Use this command to create a new advisory, i.e. when the given 
-package/vulnerability combination doesn't already exist in the advisories repo. 
-If the package/vulnerability combination already exists, use the "update" 
+Use this command to create a new advisory, i.e. when the given
+package/vulnerability combination doesn't already exist in the advisories repo.
+If the package/vulnerability combination already exists, use the "update"
 command instead.
 
-This command will prompt for all required fields, and will attempt to fill in 
-as many optional fields as possible. You can abort the advisory creation at any 
+This command will prompt for all required fields, and will attempt to fill in
+as many optional fields as possible. You can abort the advisory creation at any
 point in the prompt by pressing Ctrl+C.
 
-You can specify required values on the command line using the flags relevant to 
-the advisory you are creating. If not all required values are provided on the 
+You can specify required values on the command line using the flags relevant to
+the advisory you are creating. If not all required values are provided on the
 command line, the command will prompt for the missing values.
 
-If the --no-prompt flag is specified, then the command will fail if any 
+If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.
 
 This command also performs a follow-up operation to discover aliases for the
@@ -91,7 +91,7 @@ newly created advisory and any other advisories for the same package.`,
 				return err
 			}
 
-			var apkindexes []*repository.ApkIndex
+			var apkindexes []*apk.APKIndex
 			for _, arch := range archs {
 				idx, err := index.Index(arch, packageRepositoryURL)
 				if err != nil {

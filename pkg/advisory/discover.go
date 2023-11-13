@@ -6,12 +6,12 @@ import (
 	"sort"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 type DiscoverOptions struct {
@@ -55,7 +55,7 @@ func Discover(ctx context.Context, opts DiscoverOptions) error {
 			return fmt.Errorf("package repository URL must be specified")
 		}
 
-		var apkindexes []*repository.ApkIndex
+		var apkindexes []*apk.APKIndex
 		for _, arch := range opts.Arches {
 			apkindex, err := index.Index(arch, packageRepositoryURL)
 			if err != nil {
@@ -167,7 +167,7 @@ func advisoryEventForNewDiscovery(match vuln.Match) v2.Event {
 	}
 }
 
-func uniquePackageNamesFromAPKINDEXes(apkindexes []*repository.ApkIndex) []string {
+func uniquePackageNamesFromAPKINDEXes(apkindexes []*apk.APKIndex) []string {
 	packagesFound := make(map[string]struct{})
 
 	for _, apkindex := range apkindexes {

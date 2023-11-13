@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -16,7 +17,6 @@ import (
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 const (
@@ -161,7 +161,7 @@ func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
 	cmd.Flags().BoolVar(val, "no-distro-detection", false, "do not attempt to auto-detect the distro")
 }
 
-func newAllowedFixedVersionsFunc(apkindexes []*repository.ApkIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {
+func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {
 	return func(packageName string) []string {
 		allowedVersionSet := make(map[string]struct{})
 

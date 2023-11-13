@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -15,7 +16,6 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/index"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 func cmdAdvisoryUpdate() *cobra.Command {
@@ -25,20 +25,20 @@ func cmdAdvisoryUpdate() *cobra.Command {
 		Short: "Update an existing advisory with a new event",
 		Long: `Update an existing advisory with a new event.
 
-Use this command to update an existing advisory by adding a new "event" to the 
-advisory, i.e. when the given package/vulnerability combination already exists 
-in the advisories repo. If the package/vulnerability combination doesn't yet 
+Use this command to update an existing advisory by adding a new "event" to the
+advisory, i.e. when the given package/vulnerability combination already exists
+in the advisories repo. If the package/vulnerability combination doesn't yet
 exist, use the "create" command instead.
 
-This command will prompt for all required fields, and will attempt to fill in 
-as many optional fields as possible. You can abort the advisory update at any 
+This command will prompt for all required fields, and will attempt to fill in
+as many optional fields as possible. You can abort the advisory update at any
 point in the prompt by pressing Ctrl+C.
 
-You can specify required values on the command line using the flags relevant to 
-the advisory event you are adding. If not all required values are provided on 
+You can specify required values on the command line using the flags relevant to
+the advisory event you are adding. If not all required values are provided on
 the command line, the command will prompt for the missing values.
 
-If the --no-prompt flag is specified, then the command will fail if any 
+If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
@@ -87,7 +87,7 @@ required fields are missing.`,
 				return err
 			}
 
-			var apkindexes []*repository.ApkIndex
+			var apkindexes []*apk.APKIndex
 			for _, arch := range archs {
 				idx, err := index.Index(arch, packageRepositoryURL)
 				if err != nil {

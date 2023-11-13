@@ -10,8 +10,8 @@ import (
 	"golang.org/x/exp/slices"
 
 	apko_log "chainguard.dev/apko/pkg/log"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	sign "github.com/chainguard-dev/go-apk/pkg/signature"
-	apkrepo "gitlab.alpinelinux.org/alpine/go/repository"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -47,12 +47,12 @@ func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone ma
 		Level:     logrus.InfoLevel,
 	}
 
-	index, err := apkrepo.IndexFromArchive(io.NopCloser(r))
+	index, err := apk.IndexFromArchive(io.NopCloser(r))
 	if err != nil {
 		return fmt.Errorf("failed to read apkindex from archive file: %w", err)
 	}
 
-	index.Packages = slices.DeleteFunc(index.Packages, func(pkg *apkrepo.Package) bool {
+	index.Packages = slices.DeleteFunc(index.Packages, func(pkg *apk.Package) bool {
 		pkgver := pkg.Name + "-" + pkg.Version
 		_, ok := gone[pkgver]
 		if ok {

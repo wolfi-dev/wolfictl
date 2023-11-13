@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 
 	"github.com/pkg/errors"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 type Context struct {
@@ -24,7 +24,7 @@ func New(client *http.Client, indexURL string) Context {
 	}
 }
 
-func (c Context) GetApkPackages() (map[string]*repository.Package, error) {
+func (c Context) GetApkPackages() (map[string]*apk.Package, error) {
 	req, err := http.NewRequest("GET", c.indexURL, nil)
 	if err != nil {
 		return nil, err
@@ -42,10 +42,10 @@ func (c Context) GetApkPackages() (map[string]*repository.Package, error) {
 	return ParseApkIndex(resp.Body)
 }
 
-func ParseUnpackedApkIndex(indexData io.ReadCloser) (map[string]*repository.Package, error) {
-	wolfiPackages := make(map[string]*repository.Package)
+func ParseUnpackedApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, error) {
+	wolfiPackages := make(map[string]*apk.Package)
 
-	packages, err := repository.ParsePackageIndex(indexData)
+	packages, err := apk.ParsePackageIndex(indexData)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse response %v", indexData)
 	}
@@ -53,7 +53,7 @@ func ParseUnpackedApkIndex(indexData io.ReadCloser) (map[string]*repository.Pack
 	return getLatestPackagesMap(packages, wolfiPackages)
 }
 
-func getLatestPackagesMap(apkIndexPackages []*repository.Package, wolfiPackages map[string]*repository.Package) (map[string]*repository.Package, error) {
+func getLatestPackagesMap(apkIndexPackages []*apk.Package, wolfiPackages map[string]*apk.Package) (map[string]*apk.Package, error) {
 	for _, p := range apkIndexPackages {
 		if wolfiPackages[p.Name] != nil {
 			existingPackageVersion, err := versions.NewVersion(wolfiPackages[p.Name].Version)
@@ -78,10 +78,10 @@ func getLatestPackagesMap(apkIndexPackages []*repository.Package, wolfiPackages 
 	return wolfiPackages, nil
 }
 
-func ParseApkIndex(indexData io.ReadCloser) (map[string]*repository.Package, error) {
-	wolfiPackages := make(map[string]*repository.Package)
+func ParseApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, error) {
+	wolfiPackages := make(map[string]*apk.Package)
 
-	apkIndex, err := repository.IndexFromArchive(indexData)
+	apkIndex, err := apk.IndexFromArchive(indexData)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse response %v", indexData)
 	}
