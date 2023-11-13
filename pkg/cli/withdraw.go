@@ -68,7 +68,7 @@ func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone ma
 		}
 	}
 
-	archive, err := apkrepo.ArchiveFromIndex(index)
+	archive, err := apk.ArchiveFromIndex(index)
 	if err != nil {
 		return fmt.Errorf("failed to create archive from index object: %w", err)
 	}
