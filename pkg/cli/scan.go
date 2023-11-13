@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	sbomSyft "github.com/anchore/syft/syft/sbom"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"
@@ -25,7 +26,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 	"golang.org/x/exp/slices"
 )
 
@@ -537,7 +537,7 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, e
 			return nil, fmt.Errorf("getting APKINDEX: %w", err)
 		}
 
-		nameMatches := lo.Filter(apkindex.Packages, func(pkg *repository.Package, _ int) bool {
+		nameMatches := lo.Filter(apkindex.Packages, func(pkg *apk.Package, _ int) bool {
 			return pkg != nil && pkg.Name == input
 		})
 
@@ -545,14 +545,14 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, e
 			return nil, fmt.Errorf("no Wolfi package found with name %q in arch %q", input, arch)
 		}
 
-		vers := lo.Map(nameMatches, func(pkg *repository.Package, _ int) string {
+		vers := lo.Map(nameMatches, func(pkg *apk.Package, _ int) string {
 			return pkg.Version
 		})
 
 		sort.Sort(versions.ByLatestStrings(vers))
 		latestVersion := vers[0]
 
-		var latestPkg *repository.Package
+		var latestPkg *apk.Package
 		for _, pkg := range nameMatches {
 			if pkg.Version == latestVersion {
 				latestPkg = pkg

@@ -10,16 +10,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/wolfi-dev/wolfictl/pkg/versions"
-
-	"github.com/wolfi-dev/wolfictl/pkg/tar"
-
-	"github.com/wolfi-dev/wolfictl/pkg/lint"
-
-	"github.com/wolfi-dev/wolfictl/pkg/apk"
-
+	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/pkg/errors"
-	"gitlab.alpinelinux.org/alpine/go/repository"
+	"github.com/wolfi-dev/wolfictl/pkg/apk"
+	"github.com/wolfi-dev/wolfictl/pkg/lint"
+	"github.com/wolfi-dev/wolfictl/pkg/tar"
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
 type SoNameOptions struct {
@@ -30,7 +26,7 @@ type SoNameOptions struct {
 	PackagesDir         string
 	PackageNames        []string
 	ApkIndexURL         string
-	ExistingPackages    map[string]*repository.Package
+	ExistingPackages    map[string]*goapk.Package
 }
 
 type NewApkPackage struct {

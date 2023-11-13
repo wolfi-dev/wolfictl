@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 )
 
 type DiffOptions struct {
@@ -22,7 +22,7 @@ type DiffOptions struct {
 	Dir                 string
 	PackagesDir         string
 	ApkIndexURL         string
-	ExistingPackages    map[string]*repository.Package
+	ExistingPackages    map[string]*goapk.Package
 }
 
 func NewDiff() *DiffOptions {

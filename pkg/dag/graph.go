@@ -16,7 +16,6 @@ import (
 
 	"github.com/dominikbraun/graph"
 	log "github.com/sirupsen/logrus"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 	"go.lsp.dev/uri"
 
 	apk "github.com/chainguard-dev/go-apk/pkg/apk"
@@ -308,7 +307,7 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 			if isSelf {
 				continue
 			}
-			resolvedSource := r.Repository().IndexUri()
+			resolvedSource := r.Repository().IndexURI()
 			if resolvedSource == localRepo {
 				// it's in our own packages list, so find the package that is an actual match
 				configs := g.packages.Config(r.Name, false)
@@ -326,7 +325,7 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 					return nil, fmt.Errorf("unable to find package %s-%s in local repository", r.Name, r.Version)
 				}
 			} else {
-				pkg = externalPackage{r.Name, r.Version, r.Repository().Uri}
+				pkg = externalPackage{r.Name, r.Version, r.Repository().URI}
 			}
 			if err := g.addVertex(pkg); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 				return nil, fmt.Errorf("unable to add vertex for %s dependency %s: %w", c, dep, err)
@@ -852,8 +851,8 @@ func getKeyMaterial(key string) ([]byte, error) {
 }
 
 func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
-	repo := repository.NewRepositoryFromComponents(Local, "latest", "", arch)
-	packages := []*repository.Package{
+	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
+	packages := []*apk.Package{
 		{
 			Arch:         arch,
 			Name:         pkg.Package.Name,
@@ -867,7 +866,7 @@ func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
 			RepoCommit:   pkg.Package.Commit,
 		},
 	}
-	index := &repository.ApkIndex{
+	index := &apk.APKIndex{
 		Description: pkg.String(),
 		Packages:    packages,
 	}
