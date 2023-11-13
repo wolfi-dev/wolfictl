@@ -252,6 +252,7 @@ type scanParams struct {
 	disableSBOMCache      bool
 	triageWithGoVulnCheck bool
 	remoteScanning        bool
+	useCPEMatching        bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -267,6 +268,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
 	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
 	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
+	cmd.Flags().BoolVar(&p.useCPEMatching, "use-cpes", false, "turn on all CPE matching in Grype")
 }
 
 func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]string, error) {
@@ -393,7 +395,7 @@ func (p *scanParams) scanFile(inputFile *os.File) (*inputScanResult, error) {
 	}
 
 	// Do the vulnerability scan based on the SBOM
-	result, err := scan.APKSBOM(apkSBOM, p.localDBFilePath)
+	result, err := scan.APKSBOM(apkSBOM, p.localDBFilePath, p.useCPEMatching)
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFileName, err)
 	}
