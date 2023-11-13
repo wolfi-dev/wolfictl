@@ -22,6 +22,11 @@ type Advisory struct {
 	Events []Event `yaml:"events"`
 }
 
+// IsZero returns true if the advisory has no data.
+func (adv Advisory) IsZero() bool {
+	return adv.ID == "" && len(adv.Aliases) == 0 && len(adv.Events) == 0
+}
+
 // DescribesVulnerability returns true if the advisory cites the given
 // vulnerability ID in either its ID or its aliases.
 func (adv Advisory) DescribesVulnerability(vulnID string) bool {

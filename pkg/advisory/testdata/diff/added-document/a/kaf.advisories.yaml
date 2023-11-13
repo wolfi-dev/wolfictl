@@ -1,0 +1,14 @@
+schema-version: "2"
+
+package:
+  name: kaf
+
+advisories:
+  - id: CVE-2023-39325
+    aliases:
+      - GHSA-4374-p667-p6c8
+    events:
+      - timestamp: 2023-10-25T23:52:38Z
+        type: fixed
+        data:
+          fixed-version: 0.2.6-r6

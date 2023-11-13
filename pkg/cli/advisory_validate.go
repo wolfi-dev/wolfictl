@@ -45,7 +45,7 @@ print an error message that specifies where and how the data is invalid.`,
 					return fmt.Errorf("advisories repo dir was left unspecified, and distro auto-detection failed: %w", err)
 				}
 
-				advisoriesRepoDir = d.AdvisoriesRepoDir
+				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 

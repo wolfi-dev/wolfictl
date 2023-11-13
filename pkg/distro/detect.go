@@ -18,12 +18,7 @@ func Detect() (Distro, error) {
 		return Distro{}, err
 	}
 
-	distro, err := detectDistroInRepo(cwd)
-	if err != nil {
-		return Distro{}, err
-	}
-
-	d, err := getDistroByName(distro.Name)
+	distro, err := identifyDistroFromLocalRepoDir(cwd)
 	if err != nil {
 		return Distro{}, err
 	}
@@ -32,30 +27,33 @@ func Detect() (Distro, error) {
 	// a directory that contains all the relevant repo directories.
 	dirOfRepos := filepath.Dir(cwd)
 
+	// We either have a distro (packages) repo or an advisories repo, but not both.
+	// Now we need to find the other one.
+
 	switch {
-	case distro.DistroRepoDir == "":
-		distroDir, err := findDistroDir(d, dirOfRepos)
+	case distro.Local.DistroRepoDir == "":
+		distroDir, err := findDistroDir(distro.Absolute, dirOfRepos)
 		if err != nil {
 			return Distro{}, err
 		}
-		distro.DistroRepoDir = distroDir
+		distro.Local.DistroRepoDir = distroDir
 		return distro, nil
 
-	case distro.AdvisoriesRepoDir == "":
-		advisoryDir, err := findAdvisoriesDir(d, dirOfRepos)
+	case distro.Local.AdvisoriesRepoDir == "":
+		advisoryDir, err := findAdvisoriesDir(distro.Absolute, dirOfRepos)
 		if err != nil {
 			return Distro{}, err
 		}
-		distro.AdvisoriesRepoDir = advisoryDir
+		distro.Local.AdvisoriesRepoDir = advisoryDir
 		return distro, nil
 	}
 
 	return Distro{}, fmt.Errorf("unable to detect distro")
 }
 
-var errNotDistroRepo = fmt.Errorf("current directory is not a distro or advisories repository")
+var errNotDistroRepo = fmt.Errorf("current directory is not a distro (packages) or advisories repository")
 
-func detectDistroInRepo(dir string) (Distro, error) {
+func identifyDistroFromLocalRepoDir(dir string) (Distro, error) {
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
 		return Distro{}, fmt.Errorf("unable to identify distro: couldn't open git repo: %w", err)
@@ -74,22 +72,24 @@ func detectDistroInRepo(dir string) (Distro, error) {
 
 		url := urls[0]
 
-		for _, d := range []knownDistro{wolfiDistro, chainguardDistro} {
-			if slices.Contains(d.distroRemoteURLs, url) {
+		for _, d := range []AbsoluteProperties{wolfiDistro, chainguardDistro} {
+			if slices.Contains(d.DistroRemoteURLs, url) {
 				return Distro{
-					Name:                   d.name,
-					DistroRepoDir:          dir,
-					APKRepositoryURL:       d.apkRepositoryURL,
-					SupportedArchitectures: d.supportedArchitectures,
+					Absolute: d,
+					Local: LocalProperties{
+						DistroRepoDir:     dir,
+						AdvisoriesRepoDir: "", // This gets filled in later outside of this function.
+					},
 				}, nil
 			}
 
-			if slices.Contains(d.advisoriesRemoteURLs, url) {
+			if slices.Contains(d.AdvisoriesRemoteURLs, url) {
 				return Distro{
-					Name:                   d.name,
-					AdvisoriesRepoDir:      dir,
-					APKRepositoryURL:       d.apkRepositoryURL,
-					SupportedArchitectures: d.supportedArchitectures,
+					Absolute: d,
+					Local: LocalProperties{
+						DistroRepoDir:     "", // This gets filled in later outside of this function.
+						AdvisoriesRepoDir: dir,
+					},
 				}, nil
 			}
 		}
@@ -98,29 +98,29 @@ func detectDistroInRepo(dir string) (Distro, error) {
 	return Distro{}, errNotDistroRepo
 }
 
-func getDistroByName(name string) (knownDistro, error) {
-	for _, d := range []knownDistro{wolfiDistro, chainguardDistro} {
-		if d.name == name {
-			return d, nil
-		}
-	}
-
-	return knownDistro{}, fmt.Errorf("unknown distro: %s", name)
-}
-
-func findDistroDir(targetDistro knownDistro, dirOfRepos string) (string, error) {
+// findDistroDir returns the local filesystem path to the directory for the
+// distro (packages) repo for the given targetDistro, by examining the child
+// directories within dirOfRepos.
+func findDistroDir(targetDistro AbsoluteProperties, dirOfRepos string) (string, error) {
 	return findRepoDir(targetDistro, dirOfRepos, func(d Distro) string {
-		return d.DistroRepoDir
+		return d.Local.DistroRepoDir
 	})
 }
 
-func findAdvisoriesDir(targetDistro knownDistro, dirOfRepos string) (string, error) {
+// findAdvisoriesDir returns the local filesystem path to the directory for the
+// advisories repo for the given targetDistro, by examining the child
+// directories within dirOfRepos.
+func findAdvisoriesDir(targetDistro AbsoluteProperties, dirOfRepos string) (string, error) {
 	return findRepoDir(targetDistro, dirOfRepos, func(d Distro) string {
-		return d.AdvisoriesRepoDir
+		return d.Local.AdvisoriesRepoDir
 	})
 }
 
-func findRepoDir(targetDistro knownDistro, dirOfRepos string, getRepoDir func(Distro) string) (string, error) {
+// findRepoDir looks for a repo directory (for either a distro/package repo or
+// an advisories repo) in the given directory of repos that matches the given
+// distro. It uses the given function to extract the repo directory from a
+// Distro.
+func findRepoDir(targetDistro AbsoluteProperties, dirOfRepos string, getRepoDir func(Distro) string) (string, error) {
 	files, err := os.ReadDir(dirOfRepos)
 	if err != nil {
 		return "", err
@@ -131,13 +131,13 @@ func findRepoDir(targetDistro knownDistro, dirOfRepos string, getRepoDir func(Di
 			continue
 		}
 
-		d, err := detectDistroInRepo(filepath.Join(dirOfRepos, f.Name()))
+		d, err := identifyDistroFromLocalRepoDir(filepath.Join(dirOfRepos, f.Name()))
 		if err != nil {
 			// no usable distro or advisories repo here
 			continue
 		}
-
-		if d.Name != targetDistro.name {
+		if d.Absolute.Name != targetDistro.Name {
+			// This is not the distro you're looking for... 👋
 			continue
 		}
 

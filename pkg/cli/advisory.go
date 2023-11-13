@@ -35,11 +35,12 @@ func cmdAdvisory() *cobra.Command {
 	cmd.AddCommand(
 		cmdAdvisoryAlias(),
 		cmdAdvisoryCreate(),
-		cmdAdvisorySecDB(),
+		cmdAdvisoryDiff(),
 		cmdAdvisoryDiscover(),
 		cmdAdvisoryExport(),
 		cmdAdvisoryList(),
 		cmdAdvisoryMigrate(),
+		cmdAdvisorySecDB(),
 		cmdAdvisoryUpdate(),
 		cmdAdvisoryValidate(),
 	)
@@ -68,7 +69,7 @@ func resolveAdvisoriesDirInput(cliFlagValue string) string {
 }
 
 func renderDetectedDistro(d distro.Distro) string {
-	return styles.Secondary().Render("Auto-detected distro: ") + d.Name + "\n\n"
+	return styles.Secondary().Render("Auto-detected distro: ") + d.Absolute.Name + "\n\n"
 }
 
 func resolveTimestamp(ts string) (v2.Timestamp, error) {

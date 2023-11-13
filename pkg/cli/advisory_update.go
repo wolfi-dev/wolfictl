@@ -58,15 +58,15 @@ required fields are missing.`,
 				}
 
 				if len(archs) == 0 {
-					archs = d.SupportedArchitectures
+					archs = d.Absolute.SupportedArchitectures
 				}
 
 				if packageRepositoryURL == "" {
-					packageRepositoryURL = d.APKRepositoryURL
+					packageRepositoryURL = d.Absolute.APKRepositoryURL
 				}
 
-				distroRepoDir = d.DistroRepoDir
-				advisoriesRepoDir = d.AdvisoriesRepoDir
+				distroRepoDir = d.Local.DistroRepoDir
+				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
