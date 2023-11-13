@@ -62,7 +62,7 @@ There are four ways to specify the package(s) to scan:
    contains a build log file named "packages.log"). The build log file will be
    parsed to find the APK files to scan.
 
-4. Specify the name(s) of package(s) in the Wolfi package apk. The
+4. Specify the name(s) of package(s) in the Wolfi package repository. The
    latest versions of the package(s) for all supported architectures will be
    downloaded from the Wolfi package repository and scanned.
 
@@ -73,7 +73,7 @@ to stdout. You can filter the vulnerabilities shown using existing local
 advisory data. To do this, you must first clone the advisory data from the
 advisories repository for the distro whose packages you are scanning. You
 specify the path to each local advisories repository using the
---advisories-repo-dir flag for each apk. Then, you can use the
+--advisories-repo-dir flag for each repository. Then, you can use the
 "--advisory-filter" flag to specify which set of advisories to use for
 filtering. The following sets of advisories are available:
 
@@ -81,7 +81,7 @@ filtering. The following sets of advisories are available:
   distro.
 
 - "all": Filter out all vulnerabilities that are referenced from any advisory
-  in the advisories apk.
+  in the advisories repository.
 
 ## AUTO-TRIAGING
 
