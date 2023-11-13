@@ -17,6 +17,7 @@ func New() *cobra.Command {
 		cmdAdvisory(),
 		cmdBuild(),
 		cmdBump(),
+		cmdDep(),
 		cmdGh(),
 		cmdApk(),
 		cmdIndex(),
