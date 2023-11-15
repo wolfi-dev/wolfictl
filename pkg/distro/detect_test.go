@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,7 +73,7 @@ func TestDetect(t *testing.T) {
 		// We need to create a commit so that HEAD exists.
 		w, err := repo.Worktree()
 		require.NoError(t, err)
-		_, err = w.Commit("Initial commit", &git.CommitOptions{
+		commit, err := w.Commit("Initial commit", &git.CommitOptions{
 			AllowEmptyCommits: true,
 			Author: &object.Signature{
 				Name:  "test",
@@ -80,6 +81,20 @@ func TestDetect(t *testing.T) {
 				When:  time.Unix(0, 0),
 			},
 		})
+		require.NoError(t, err)
+
+		// Create a branch named "main" and set it as the HEAD of the repository.
+		mainRef := plumbing.NewHashReference("refs/heads/main", commit)
+		err = repo.Storer.SetReference(mainRef)
+		require.NoError(t, err)
+
+		// Create a symbolic reference named "refs/remotes/origin/main" that points to the local "main" branch.
+		originMainRef := plumbing.NewSymbolicReference("refs/remotes/origin/main", mainRef.Name())
+		err = repo.Storer.SetReference(originMainRef)
+		require.NoError(t, err)
+
+		symbolicRef := plumbing.NewSymbolicReference(plumbing.HEAD, mainRef.Name())
+		err = repo.Storer.SetReference(symbolicRef)
 		require.NoError(t, err)
 	}
 
