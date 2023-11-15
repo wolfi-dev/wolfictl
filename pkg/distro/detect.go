@@ -170,8 +170,11 @@ func findRepoForkPoint(repoDir, remoteName string) (string, error) {
 		return "", fmt.Errorf("unable to find fork point for remote %q: %w", remoteName, err)
 	}
 
-	upstreamRefName := remote.Config().Name + "/main"
-	upstreamRef := plumbing.NewReferenceFromStrings(upstreamRefName, "")
+	upstreamRefName := fmt.Sprintf("refs/remotes/%s/main", remote.Config().Name)
+	upstreamRef, err := repo.Reference(plumbing.ReferenceName(upstreamRefName), true)
+	if err != nil {
+		return "", fmt.Errorf("unable to get upstream ref %q: %w", upstreamRefName, err)
+	}
 	forkPoint, err := wgit.FindForkPoint(repo, head, upstreamRef)
 	if err != nil {
 		return "", fmt.Errorf("unable to find fork point for remote %q: %w", remoteName, err)
