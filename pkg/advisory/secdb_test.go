@@ -44,7 +44,18 @@ func TestBuildSecurityDatabase(t *testing.T) {
 			},
 			pathToExpectedDatabase: "",
 			errorAssertion: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrNoPackageSecurityData)
+				return assert.Error(t, err) && assert.ErrorIs(t, err, ErrNoPackageSecurityData)
+			},
+		},
+		{
+			name: "package overlap between dirs",
+			advisoryDirs: []string{
+				"./testdata/secdb/advisories",
+				"./testdata/secdb/advisories-with-package-overlap",
+			},
+			pathToExpectedDatabase: "",
+			errorAssertion: func(t assert.TestingT, err error, i ...interface{}) bool {
+				return assert.Error(t, err) && assert.ErrorIs(t, err, ErrorPackageCollision)
 			},
 		},
 	}

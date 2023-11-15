@@ -3,6 +3,7 @@ package advisory
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
@@ -21,16 +22,30 @@ type BuildSecurityDatabaseOptions struct {
 	Repo      string
 }
 
-var ErrNoPackageSecurityData = errors.New("no package security data found")
+var (
+	ErrNoPackageSecurityData = errors.New("no package security data found")
+	ErrorPackageCollision    = errors.New("found multiple advisory documents for the same package")
+)
 
 // BuildSecurityDatabase builds an Alpine-style security database from the given options.
 func BuildSecurityDatabase(opts BuildSecurityDatabaseOptions) ([]byte, error) {
 	var packageEntries []secdb.PackageEntry
 
+	seenPackages := make(map[string]struct{})
+
 	for _, index := range opts.AdvisoryDocIndices {
 		var indexPackageEntries []secdb.PackageEntry
 
 		for _, doc := range index.Select().Configurations() {
+			if _, exists := seenPackages[doc.Package.Name]; exists {
+				return nil, fmt.Errorf(
+					"cannot process additional advisory data for package %q: %w",
+					doc.Package.Name,
+					ErrorPackageCollision,
+				)
+			}
+			seenPackages[doc.Package.Name] = struct{}{}
+
 			if len(doc.Advisories) == 0 {
 				continue
 			}
@@ -49,7 +64,7 @@ func BuildSecurityDatabase(opts BuildSecurityDatabaseOptions) ([]byte, error) {
 				sortedEvents := advisory.SortedEvents()
 
 				latest := sortedEvents[len(advisory.Events)-1]
-				vulnID := advisory.ID // TODO: should there be a .GetCVE() method on Advisory?
+				vulnID := advisory.ID
 
 				switch latest.Type {
 				case v2.EventTypeFixed:
