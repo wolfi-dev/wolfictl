@@ -66,6 +66,7 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 	count := 0
 
 	// iterate packages from the target git repo and check if a new version is available
+ReleaseMonitorPackagesLoop:
 	for packageName := range releaseMonitorPackages {
 		count++
 		p := releaseMonitorPackages[packageName]
@@ -97,9 +98,9 @@ func (m MonitorService) getLatestReleaseMonitorVersions(melangePackages map[stri
 					errorMessages[p.Config.Package.Name] = fmt.Sprintf("failed to compile regex %s", pattern)
 					continue
 				}
-
+				// if we satify any of the regex patterns, then we ignore the version
 				if regex.MatchString(latestVersion) {
-					continue
+					break ReleaseMonitorPackagesLoop
 				}
 			}
 		}
