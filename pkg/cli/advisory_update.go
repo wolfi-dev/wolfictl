@@ -65,8 +65,8 @@ required fields are missing.`,
 					packageRepositoryURL = d.Absolute.APKRepositoryURL
 				}
 
-				distroRepoDir = d.Local.DistroRepoDir
-				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
+				distroRepoDir = d.Local.PackagesRepo.Dir
+				advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 

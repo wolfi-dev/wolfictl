@@ -138,28 +138,37 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 	return req, nil
 }
 
+const (
+	flagNamePackage           = "package"
+	flagNameVuln              = "vuln"
+	flagNameDistroRepoDir     = "distro-repo-dir"
+	flagNameAdvisoriesRepoDir = "advisories-repo-dir"
+	flagNameNoPrompt          = "no-prompt"
+	flagNameNoDistroDetection = "no-distro-detection"
+)
+
 func addPackageFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "package", "p", "", "package name")
+	cmd.Flags().StringVarP(val, flagNamePackage, "p", "", "package name")
 }
 
 func addVulnFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "vuln", "V", "", "vulnerability ID for advisory")
+	cmd.Flags().StringVarP(val, flagNameVuln, "V", "", "vulnerability ID for advisory")
 }
 
 func addDistroDirFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "distro-repo-dir", "d", "", "directory containing the distro repository")
+	cmd.Flags().StringVarP(val, flagNameDistroRepoDir, "d", "", "directory containing the distro repository")
 }
 
 func addAdvisoriesDirFlag(val *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(val, "advisories-repo-dir", "a", "", "directory containing the advisories repository")
+	cmd.Flags().StringVarP(val, flagNameAdvisoriesRepoDir, "a", "", "directory containing the advisories repository")
 }
 
 func addNoPromptFlag(val *bool, cmd *cobra.Command) {
-	cmd.Flags().BoolVar(val, "no-prompt", false, "do not prompt the user for input")
+	cmd.Flags().BoolVar(val, flagNameNoPrompt, false, "do not prompt the user for input")
 }
 
 func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
-	cmd.Flags().BoolVar(val, "no-distro-detection", false, "do not attempt to auto-detect the distro")
+	cmd.Flags().BoolVar(val, flagNameNoDistroDetection, false, "do not attempt to auto-detect the distro")
 }
 
 func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {

@@ -59,7 +59,7 @@ than attempting any kind of merge of the separate advisories.
 					return fmt.Errorf("no advisories repo dir specified, and distro auto-detection failed: %w", err)
 				}
 
-				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
+				advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 

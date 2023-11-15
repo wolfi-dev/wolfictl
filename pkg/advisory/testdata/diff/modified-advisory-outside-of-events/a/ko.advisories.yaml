@@ -9,4 +9,4 @@ advisories:
       - GHSA-2222-2222-2222
     events:
       - timestamp: 1970-01-01T00:00:00Z
-        type: false-positive-determination
+        type: true-positive-determination

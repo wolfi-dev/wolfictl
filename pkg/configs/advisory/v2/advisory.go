@@ -7,6 +7,7 @@ import (
 	"sort"
 
 	"github.com/samber/lo"
+	"github.com/wolfi-dev/wolfictl/pkg/internal/errorhelpers"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
@@ -112,7 +113,7 @@ func (adv Advisory) ResolvedAtVersion(version string) bool {
 
 // Validate returns an error if the advisory is invalid.
 func (adv Advisory) Validate() error {
-	return labelError(adv.ID,
+	return errorhelpers.LabelError(adv.ID,
 		errors.Join(
 			vuln.ValidateID(adv.ID),
 			adv.validateAliases(),
@@ -135,7 +136,7 @@ func (adv Advisory) validateAliases() error {
 		)
 	}
 
-	return labelError("aliases", errors.Join(errs...))
+	return errorhelpers.LabelError("aliases", errors.Join(errs...))
 }
 
 func (adv Advisory) validateEvents() error {
@@ -143,12 +144,12 @@ func (adv Advisory) validateEvents() error {
 		return fmt.Errorf("there must be at least one event")
 	}
 
-	return labelError("events",
+	return errorhelpers.LabelError("events",
 		errors.Join(lo.Map(adv.Events, func(event Event, i int) error {
 			err := event.Validate()
 			if err != nil {
 				// show the event index as 1-based, not 0-based, just for ease of understanding
-				return labelError(fmt.Sprintf("event %d", i+1), err)
+				return errorhelpers.LabelError(fmt.Sprintf("event %d", i+1), err)
 			}
 			return nil
 		})...),
@@ -161,7 +162,7 @@ func validateAliasFormat(alias string) error {
 		vuln.RegexGO.MatchString(alias):
 		return nil
 	default:
-		return fmt.Errorf("alias %q is not a valid GHSA ID or Go vuln ID", alias)
+		return fmt.Errorf("%q is not a valid GHSA ID or Go vuln ID", alias)
 	}
 }
 

@@ -11,6 +11,7 @@ import (
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	"github.com/wolfi-dev/wolfictl/pkg/git"
 )
 
 func cmdAdvisoryValidate() *cobra.Command {
@@ -29,34 +30,101 @@ It looks for issues like:
 * Enum fields with an unrecognized value
 * Basic business logic checks
 
+It also looks for issues in the _changes_ introduced by the current state of the
+advisories repo, relative to a "base state" (such as the last known state of
+the upstream repo's main branch). For example, it will detect if an advisory
+was removed, which is not allowed.
+
+Using distro auto-detection is the easiest way to run this command. It will
+automatically detect the distro you're running, and use the correct advisory
+repo URL and base hash to compare against.
+
+
+If you want to run this command without distro auto-detection, you'll need to
+specify the following flags:
+
+* --no-distro-detection
+* --advisories-repo-dir
+* --advisories-repo-url
+* --advisories-repo-base-hash
+
+More information about these flags is shown in the documentation for each flag.
+
 If any issues are found in the advisory data, the command will exit 1, and will 
 print an error message that specifies where and how the data is invalid.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
-			if advisoriesRepoDir == "" {
-				if p.doNotDetectDistro {
-					return fmt.Errorf("advisories repo dir was left unspecified")
+			var advisoriesRepoDir string
+			var advisoriesRepoUpstreamHTTPSURL string
+			var advisoriesRepoForkPoint string
+			advisoriesRepoUpstreamUseAuth := false // since "true" means "access a user credential", default to not using it for safety
+
+			if p.doNotDetectDistro {
+				if p.advisoriesRepoDir == "" {
+					return fmt.Errorf("need --%s when --%s is specified", flagNameAdvisoriesRepoDir, flagNameNoDistroDetection)
+				}
+				advisoriesRepoDir = p.advisoriesRepoDir
+
+				if p.advisoriesRepoUpstreamHTTPSURL == "" {
+					return fmt.Errorf("need --%s when --%s is specified", flagNameAdvisoriesRepoURL, flagNameNoDistroDetection)
+				}
+				advisoriesRepoUpstreamHTTPSURL = p.advisoriesRepoUpstreamHTTPSURL
+
+				if p.advisoriesRepoBaseHash == "" {
+					return fmt.Errorf("need --%s when --%s is specified", flagNameAdvisoriesRepoBaseHash, flagNameNoDistroDetection)
+				}
+				advisoriesRepoForkPoint = p.advisoriesRepoBaseHash
+			} else {
+				// Catch any use of flags that get ignored when distro detection is enabled to avoid user confusion.
+				switch {
+				case p.advisoriesRepoDir != "":
+					return fmt.Errorf("using --%s requires --%s", flagNameAdvisoriesRepoDir, flagNameNoDistroDetection)
+				case p.advisoriesRepoUpstreamHTTPSURL != "":
+					return fmt.Errorf("using --%s requires --%s", flagNameAdvisoriesRepoURL, flagNameNoDistroDetection)
+				case p.advisoriesRepoBaseHash != "":
+					return fmt.Errorf("using --%s requires --%s", flagNameAdvisoriesRepoBaseHash, flagNameNoDistroDetection)
 				}
 
 				d, err := distro.Detect()
 				if err != nil {
-					return fmt.Errorf("advisories repo dir was left unspecified, and distro auto-detection failed: %w", err)
+					return fmt.Errorf("distro auto-detection failed: %w", err)
 				}
 
-				advisoriesRepoDir = d.Local.AdvisoriesRepoDir
-				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
+				fmt.Fprint(os.Stderr, renderDetectedDistro(d))
+
+				advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
+				advisoriesRepoUpstreamHTTPSURL, err = getAdvisoriesHTTPSRemoteURL(d)
+				if err != nil {
+					return err
+				}
+				advisoriesRepoForkPoint = d.Local.AdvisoriesRepo.ForkPoint
+				advisoriesRepoUpstreamUseAuth = d.Absolute.Name != "Wolfi"
 			}
 
-			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(advisoryFsys)
+			cloneDir, err := git.TempClone(
+				advisoriesRepoUpstreamHTTPSURL,
+				advisoriesRepoForkPoint,
+				advisoriesRepoUpstreamUseAuth,
+			)
+			defer os.RemoveAll(cloneDir)
+			if err != nil {
+				return fmt.Errorf("unable to produce a base repo state for comparison: %w", err)
+			}
+
+			baseAdvisoriesIndex, err := v2.NewIndex(rwos.DirFS(cloneDir))
+			if err != nil {
+				return err
+			}
+
+			advisoriesIndex, err := v2.NewIndex(rwos.DirFS(advisoriesRepoDir))
 			if err != nil {
 				return err
 			}
 
 			opts := advisory.ValidateOptions{
-				AdvisoryCfgs: advisoryCfgs,
+				AdvisoryDocs:     advisoriesIndex,
+				BaseAdvisoryDocs: baseAdvisoriesIndex,
 			}
 
 			validationErr := advisory.Validate(opts)
@@ -80,13 +148,22 @@ print an error message that specifies where and how the data is invalid.`,
 }
 
 type validateParams struct {
-	doNotDetectDistro bool
-	advisoriesRepoDir string
+	doNotDetectDistro              bool
+	advisoriesRepoDir              string
+	advisoriesRepoUpstreamHTTPSURL string
+	advisoriesRepoBaseHash         string
 }
+
+const (
+	flagNameAdvisoriesRepoURL      = "advisories-repo-url"
+	flagNameAdvisoriesRepoBaseHash = "advisories-repo-base-hash"
+)
 
 func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
+	cmd.Flags().StringVar(&p.advisoriesRepoUpstreamHTTPSURL, flagNameAdvisoriesRepoURL, "", "HTTPS URL of the upstream Git remote for the advisories repo")
+	cmd.Flags().StringVar(&p.advisoriesRepoBaseHash, flagNameAdvisoriesRepoBaseHash, "", "commit hash of the upstream repo to which the current state will be compared in the diff")
 }
 
 func renderValidationError(err error, depth int) string {
@@ -104,11 +181,17 @@ func renderValidationError(err error, depth int) string {
 	case interface{ Unwrap() []error }:
 		errs := e.Unwrap()
 
+		// Add an extra newline for the top-level errors
+		sep := "\n"
+		if depth == 0 {
+			sep = "\n\n"
+		}
+
 		return strings.Join(
 			lo.Map(errs, func(err error, _ int) string {
 				return renderValidationError(err, depth)
 			}),
-			"\n",
+			sep,
 		)
 	}
 
@@ -116,5 +199,5 @@ func renderValidationError(err error, depth int) string {
 }
 
 func indent(depth int) string {
-	return strings.Repeat("  ", depth)
+	return strings.Repeat("    ", depth)
 }

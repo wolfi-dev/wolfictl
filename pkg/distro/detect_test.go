@@ -4,9 +4,11 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -66,6 +68,19 @@ func TestDetect(t *testing.T) {
 			URLs: r.remoteURLs,
 		})
 		require.NoError(t, err)
+
+		// We need to create a commit so that HEAD exists.
+		w, err := repo.Worktree()
+		require.NoError(t, err)
+		_, err = w.Commit("Initial commit", &git.CommitOptions{
+			AllowEmptyCommits: true,
+			Author: &object.Signature{
+				Name:  "test",
+				Email: "test@test.com",
+				When:  time.Unix(0, 0),
+			},
+		})
+		require.NoError(t, err)
 	}
 
 	originalWorkDir, err := os.Getwd()
@@ -92,7 +107,7 @@ func TestDetect(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "Wolfi", d.Absolute.Name)
-	assert.Equal(t, expectedDistroRepoDir, d.Local.DistroRepoDir)
-	assert.Equal(t, expectedAdvisoriesRepoDir, d.Local.AdvisoriesRepoDir)
+	assert.Equal(t, expectedDistroRepoDir, d.Local.PackagesRepo.Dir)
+	assert.Equal(t, expectedAdvisoriesRepoDir, d.Local.AdvisoriesRepo.Dir)
 	assert.Equal(t, "https://packages.wolfi.dev/os", d.Absolute.APKRepositoryURL)
 }

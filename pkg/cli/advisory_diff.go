@@ -7,9 +7,6 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/transport"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/spf13/cobra"
@@ -17,6 +14,7 @@ import (
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 )
 
 func cmdAdvisoryDiff() *cobra.Command {
@@ -26,58 +24,34 @@ func cmdAdvisoryDiff() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var advisoriesGitUpstreamRemoteURL string
-
 			d, err := distro.Detect()
 			if err != nil {
 				return fmt.Errorf("distro auto-detection failed: %w", err)
 			}
 
-			// Get an HTTPS URL for the upstream Git remote
-			for _, u := range d.Absolute.AdvisoriesRemoteURLs {
-				if strings.HasPrefix(u, "https://") {
-					advisoriesGitUpstreamRemoteURL = u
-					break
-				}
-			}
+			fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 
-			advisoriesRepoDir := d.Local.AdvisoriesRepoDir
-			_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
-
-			currentAdvisoriesFsys := rwos.DirFS(advisoriesRepoDir)
-			currentAdvisoriesIndex, err := v2.NewIndex(currentAdvisoriesFsys)
+			advisoriesRepoURL, err := getAdvisoriesHTTPSRemoteURL(d)
 			if err != nil {
 				return err
 			}
 
-			dir, err := os.MkdirTemp("", "wolfictl-advisory-diff-*")
+			// Clone the upstream repo to a temp directory
+			useAuth := d.Absolute.Name != "Wolfi"
+			baseRef := d.Local.AdvisoriesRepo.ForkPoint
+			cloneDir, err := wgit.TempClone(advisoriesRepoURL, baseRef, useAuth)
+			defer os.RemoveAll(cloneDir)
 			if err != nil {
-				return fmt.Errorf("unable to create temp directory for advisories clone: %w", err)
-			}
-			defer os.RemoveAll(dir)
-
-			var auth transport.AuthMethod
-			if d.Absolute.Name == "Wolfi" {
-				auth = nil
-			} else {
-				// Assume it's a private repo that needs auth.
-				auth = &http.BasicAuth{
-					Username: "username", // We don't need the user's actual GH username! (but it can't be empty)
-					Password: os.Getenv("GITHUB_TOKEN"),
-				}
+				return fmt.Errorf("unable to produce a base repo state for comparison: %w", err)
 			}
 
-			_, err = git.PlainClone(dir, false, &git.CloneOptions{
-				Auth:  auth,
-				Depth: 1,
-				URL:   advisoriesGitUpstreamRemoteURL,
-			})
-			if err != nil {
-				return fmt.Errorf("unable to clone advisories repo to temp directory: %w", err)
-			}
-
-			baseAdvisoriesFsys := rwos.DirFS(dir)
+			baseAdvisoriesFsys := rwos.DirFS(cloneDir)
 			baseAdvisoriesIndex, err := v2.NewIndex(baseAdvisoriesFsys)
+			if err != nil {
+				return err
+			}
+
+			currentAdvisoriesIndex, err := v2.NewIndex(rwos.DirFS(d.Local.AdvisoriesRepo.Dir))
 			if err != nil {
 				return err
 			}
@@ -92,6 +66,16 @@ func cmdAdvisoryDiff() *cobra.Command {
 	}
 
 	return cmd
+}
+
+func getAdvisoriesHTTPSRemoteURL(d distro.Distro) (string, error) {
+	for _, u := range d.Absolute.AdvisoriesRemoteURLs {
+		if strings.HasPrefix(u, "https://") {
+			return u, nil
+		}
+	}
+
+	return "", fmt.Errorf("no HTTPS remote URL found for advisories repo for distro %q", d.Absolute.Name)
 }
 
 func renderDiff(result advisory.IndexDiffResult) string {
