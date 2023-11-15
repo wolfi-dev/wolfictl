@@ -58,7 +58,6 @@ print an error message that specifies where and how the data is invalid.`,
 			var advisoriesRepoDir string
 			var advisoriesRepoUpstreamHTTPSURL string
 			var advisoriesRepoForkPoint string
-			advisoriesRepoUpstreamUseAuth := false // since "true" means "access a user credential", default to not using it for safety
 
 			if p.doNotDetectDistro {
 				if p.advisoriesRepoDir == "" {
@@ -99,13 +98,12 @@ print an error message that specifies where and how the data is invalid.`,
 					return err
 				}
 				advisoriesRepoForkPoint = d.Local.AdvisoriesRepo.ForkPoint
-				advisoriesRepoUpstreamUseAuth = d.Absolute.Name != "Wolfi"
 			}
 
 			cloneDir, err := git.TempClone(
 				advisoriesRepoUpstreamHTTPSURL,
 				advisoriesRepoForkPoint,
-				advisoriesRepoUpstreamUseAuth,
+				true,
 			)
 			defer os.RemoveAll(cloneDir)
 			if err != nil {
