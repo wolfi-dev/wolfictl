@@ -99,5 +99,5 @@ func (p *aliasDiscoverParams) addFlagsTo(cmd *cobra.Command) {
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 
-	cmd.Flags().StringSliceVarP(&p.packages, "package", "p", nil, "packages to operate on")
+	cmd.Flags().StringSliceVarP(&p.packages, flagNamePackage, "p", nil, "packages to operate on")
 }
