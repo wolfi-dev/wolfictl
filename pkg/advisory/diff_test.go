@@ -14,6 +14,9 @@ import (
 var (
 	unixEpochTimestamp         = v2.Timestamp(time.Unix(0, 0))
 	unixEpochTimestampPlus1Day = v2.Timestamp(time.Unix(0, 0).AddDate(0, 0, 1))
+
+	// now establishes a fixed time for testing recency validation, for deterministic test runs.
+	now = time.Unix(1699660800, 0) // Nov 11 2023 00:00:00 UTC
 )
 
 func TestIndexDiff(t *testing.T) {

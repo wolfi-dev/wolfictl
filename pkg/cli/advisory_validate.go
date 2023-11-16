@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -121,13 +122,16 @@ print an error message that specifies where and how the data is invalid.`,
 				return err
 			}
 
+			af := advisory.NewHTTPAliasFinder(http.DefaultClient)
+
 			opts := advisory.ValidateOptions{
 				AdvisoryDocs:     advisoriesIndex,
 				BaseAdvisoryDocs: baseAdvisoriesIndex,
 				Now:              time.Now(),
+				AliasFinder:      af,
 			}
 
-			validationErr := advisory.Validate(opts)
+			validationErr := advisory.Validate(cmd.Context(), opts)
 			if validationErr != nil {
 				fmt.Fprintf(
 					os.Stderr,
