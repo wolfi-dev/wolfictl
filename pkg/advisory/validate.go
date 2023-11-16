@@ -1,8 +1,11 @@
 package advisory
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/samber/lo"
@@ -20,16 +23,31 @@ type ValidateOptions struct {
 	// validation will be performed.
 	BaseAdvisoryDocs *configs.Index[v2.Document]
 
+	// SelectedPackages is the set of packages to operate on. If empty, all packages
+	// will be operated on.
+	SelectedPackages map[string]struct{}
+
 	// Now is the time to use as the current time for recency validation.
 	Now time.Time
+
+	// AliasFinder is the alias finder to use for discovering aliases for the given
+	// vulnerabilities.
+	AliasFinder AliasFinder
 }
 
-func Validate(opts ValidateOptions) error {
+func Validate(ctx context.Context, opts ValidateOptions) error {
 	var errs []error
 
 	documentErrs := lo.Map(
 		opts.AdvisoryDocs.Select().Configurations(),
 		func(doc v2.Document, _ int) error {
+			if len(opts.SelectedPackages) > 0 {
+				if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+					// Skip this document, since it's not in the set of selected packages.
+					return nil
+				}
+			}
+
 			return doc.Validate()
 		},
 	)
@@ -40,18 +58,87 @@ func Validate(opts ValidateOptions) error {
 		errs = append(errs, opts.validateIndexDiff(diff))
 	}
 
+	if opts.AliasFinder != nil {
+		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
+	}
+
 	return errors.Join(errs...)
+}
+
+func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) error {
+	var errs []error
+
+	documents := opts.AdvisoryDocs.Select().Configurations()
+	for i := range documents {
+		doc := documents[i]
+
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				continue
+			}
+		}
+
+		var docErrs []error
+
+		for i := range doc.Advisories {
+			adv := doc.Advisories[i]
+			var advErrs []error
+
+			switch {
+			case strings.HasPrefix(adv.ID, "CVE-"):
+				ghsas, err := opts.AliasFinder.GHSAsForCVE(ctx, adv.ID)
+				if err != nil {
+					return fmt.Errorf("failed to query GHSA aliases for CVE %q: %w", adv.ID, err)
+				}
+				for _, ghsa := range ghsas {
+					if !slices.Contains(adv.Aliases, ghsa) {
+						advErrs = append(advErrs, fmt.Errorf("missing GHSA alias %q from set [%s]", ghsa, strings.Join(adv.Aliases, ", ")))
+					}
+				}
+
+			case strings.HasPrefix(adv.ID, "GHSA-"):
+				cve, err := opts.AliasFinder.CVEForGHSA(ctx, adv.ID)
+				if err != nil {
+					return fmt.Errorf("failed to query CVE alias for GHSA %q: %w", adv.ID, err)
+				}
+				if cve != "" {
+					advErrs = append(advErrs, fmt.Errorf("%q should be listed as an alias, and %q should be the advisory ID", adv.ID, cve))
+				}
+			}
+
+			docErrs = append(docErrs, errorhelpers.LabelError(adv.ID, errors.Join(advErrs...)))
+		}
+
+		errs = append(errs, errorhelpers.LabelError(doc.Name(), errors.Join(docErrs...)))
+	}
+
+	return errorhelpers.LabelError("alias set completeness validation failure(s)", errors.Join(errs...))
 }
 
 func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
 	var errs []error
 
 	docRemovedErrs := lo.Map(diff.Removed, func(doc v2.Document, _ int) error {
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				return nil
+			}
+		}
+
 		return errorhelpers.LabelError(doc.Name(), errors.New("document was removed"))
 	})
 	errs = append(errs, docRemovedErrs...)
 
 	for _, documentAdvisories := range diff.Modified {
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[documentAdvisories.Name]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				continue
+			}
+		}
+
 		var docErrs []error
 
 		advsRemovedErrs := lo.Map(documentAdvisories.Removed, func(adv v2.Advisory, _ int) error {
@@ -107,6 +194,13 @@ func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
 
 	for i := range diff.Added {
 		doc := diff.Added[i]
+
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				continue
+			}
+		}
 
 		var docErrs []error
 		for advIndex := range doc.Advisories {

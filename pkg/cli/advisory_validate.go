@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -121,13 +122,22 @@ print an error message that specifies where and how the data is invalid.`,
 				return err
 			}
 
+			af := advisory.NewHTTPAliasFinder(http.DefaultClient)
+
+			selectedPackageSet := make(map[string]struct{})
+			for _, pkg := range p.packages {
+				selectedPackageSet[pkg] = struct{}{}
+			}
+
 			opts := advisory.ValidateOptions{
 				AdvisoryDocs:     advisoriesIndex,
 				BaseAdvisoryDocs: baseAdvisoriesIndex,
+				SelectedPackages: selectedPackageSet,
 				Now:              time.Now(),
+				AliasFinder:      af,
 			}
 
-			validationErr := advisory.Validate(opts)
+			validationErr := advisory.Validate(cmd.Context(), opts)
 			if validationErr != nil {
 				fmt.Fprintf(
 					os.Stderr,
@@ -152,6 +162,7 @@ type validateParams struct {
 	advisoriesRepoDir              string
 	advisoriesRepoUpstreamHTTPSURL string
 	advisoriesRepoBaseHash         string
+	packages                       []string
 }
 
 const (
@@ -164,6 +175,7 @@ func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	cmd.Flags().StringVar(&p.advisoriesRepoUpstreamHTTPSURL, flagNameAdvisoriesRepoURL, "", "HTTPS URL of the upstream Git remote for the advisories repo")
 	cmd.Flags().StringVar(&p.advisoriesRepoBaseHash, flagNameAdvisoriesRepoBaseHash, "", "commit hash of the upstream repo to which the current state will be compared in the diff")
+	cmd.Flags().StringSliceVarP(&p.packages, flagNamePackage, "p", nil, "packages to validate")
 }
 
 func renderValidationError(err error, depth int) string {
