@@ -3,6 +3,7 @@ package advisory
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -46,6 +47,10 @@ func TestValidate(t *testing.T) {
 			name:          "modified-advisory-outside-of-events",
 			shouldBeValid: true,
 		},
+		{
+			name:          "added-event-with-non-recent-timestamp",
+			shouldBeValid: false,
+		},
 	}
 
 	for _, tt := range cases {
@@ -62,6 +67,7 @@ func TestValidate(t *testing.T) {
 			err = Validate(ValidateOptions{
 				AdvisoryDocs:     bIndex,
 				BaseAdvisoryDocs: aIndex,
+				Now:              now,
 			})
 			if tt.shouldBeValid && err != nil {
 				t.Errorf("should be valid but got error: %v", err)
@@ -72,3 +78,6 @@ func TestValidate(t *testing.T) {
 		})
 	}
 }
+
+// now establishes a fixed time for testing recency validation, for deterministic test runs.
+var now = time.Unix(1699660800, 0) // Nov 11 2023 00:00:00 UTC

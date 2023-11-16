@@ -8,5 +8,5 @@ advisories:
     events:
       - timestamp: 1970-01-01T00:00:00Z
         type: true-positive-determination
-      - timestamp: 2023-11-11T00:00:00Z
+      - timestamp: 2023-11-02T00:00:00Z # Not recent enough!
         type: true-positive-determination
