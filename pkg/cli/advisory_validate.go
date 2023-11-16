@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -123,6 +124,7 @@ print an error message that specifies where and how the data is invalid.`,
 			opts := advisory.ValidateOptions{
 				AdvisoryDocs:     advisoriesIndex,
 				BaseAdvisoryDocs: baseAdvisoriesIndex,
+				Now:              time.Now(),
 			}
 
 			validationErr := advisory.Validate(opts)

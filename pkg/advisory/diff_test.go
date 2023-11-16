@@ -39,7 +39,7 @@ func TestIndexDiff(t *testing.T) {
 								ID: "CVE-2023-24535",
 								Events: []v2.Event{
 									{
-										Timestamp: unixEpochTimestamp,
+										Timestamp: v2.Timestamp(now),
 										Type:      v2.EventTypeTruePositiveDetermination,
 									},
 								},
@@ -84,7 +84,7 @@ func TestIndexDiff(t *testing.T) {
 								ID: "CVE-2023-11111",
 								Events: []v2.Event{
 									{
-										Timestamp: unixEpochTimestamp,
+										Timestamp: v2.Timestamp(now),
 										Type:      v2.EventTypeTruePositiveDetermination,
 									},
 								},
@@ -168,7 +168,7 @@ func TestIndexDiff(t *testing.T) {
 											Type:      v2.EventTypeTruePositiveDetermination,
 										},
 										{
-											Timestamp: unixEpochTimestampPlus1Day,
+											Timestamp: v2.Timestamp(now),
 											Type:      v2.EventTypeTruePositiveDetermination,
 										},
 									},
@@ -184,7 +184,7 @@ func TestIndexDiff(t *testing.T) {
 								},
 								AddedEvents: []v2.Event{
 									{
-										Timestamp: unixEpochTimestampPlus1Day,
+										Timestamp: v2.Timestamp(now),
 										Type:      v2.EventTypeTruePositiveDetermination,
 									},
 								},
