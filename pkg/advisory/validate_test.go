@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -118,6 +119,46 @@ func TestValidate(t *testing.T) {
 				err = Validate(context.Background(), ValidateOptions{
 					AdvisoryDocs: index,
 					AliasFinder:  mockAF,
+				})
+				if tt.shouldBeValid && err != nil {
+					t.Errorf("should be valid but got error: %v", err)
+				}
+				if !tt.shouldBeValid && err == nil {
+					t.Error("shouldn't be valid but got no error")
+				}
+			})
+		}
+	})
+
+	t.Run("package existence", func(t *testing.T) {
+		cases := []struct {
+			name          string
+			packageSet    map[string]struct{}
+			shouldBeValid bool
+		}{
+			{
+				name:          "package-exists",
+				packageSet:    map[string]struct{}{"ko": {}},
+				shouldBeValid: true,
+			},
+			{
+				name:          "package-does-not-exist",
+				packageSet:    map[string]struct{}{"mo": {}},
+				shouldBeValid: false,
+			},
+		}
+
+		advIndex, err := v2.NewIndex(rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "advisories")))
+		require.NoError(t, err)
+		packageIndex, err := build.NewIndex(rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "distro")))
+		require.NoError(t, err)
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				err = Validate(context.Background(), ValidateOptions{
+					AdvisoryDocs:          advIndex,
+					SelectedPackages:      tt.packageSet,
+					PackageConfigurations: packageIndex,
 				})
 				if tt.shouldBeValid && err != nil {
 					t.Errorf("should be valid but got error: %v", err)

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"chainguard.dev/melange/pkg/config"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -33,6 +34,10 @@ type ValidateOptions struct {
 	// AliasFinder is the alias finder to use for discovering aliases for the given
 	// vulnerabilities.
 	AliasFinder AliasFinder
+
+	// PackageConfigurations is the index of distro package configurations to use
+	// for validating the advisories.
+	PackageConfigurations *configs.Index[config.Configuration]
 }
 
 func Validate(ctx context.Context, opts ValidateOptions) error {
@@ -58,11 +63,37 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 		errs = append(errs, opts.validateIndexDiff(diff))
 	}
 
+	if opts.PackageConfigurations != nil {
+		errs = append(errs, opts.validatePackageExistence())
+	}
+
 	if opts.AliasFinder != nil {
 		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
 	}
 
 	return errors.Join(errs...)
+}
+
+func (opts ValidateOptions) validatePackageExistence() error {
+	var errs []error
+
+	documents := opts.AdvisoryDocs.Select().Configurations()
+	for i := range documents {
+		doc := documents[i]
+
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				continue
+			}
+		}
+
+		if opts.PackageConfigurations.Select().WhereName(doc.Name()).Len() == 0 {
+			errs = append(errs, errorhelpers.LabelError(doc.Name(), errors.New("this package is not defined in any distro package configuration")))
+		}
+	}
+
+	return errorhelpers.LabelError("package existence validation failure(s)", errors.Join(errs...))
 }
 
 func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) error {
