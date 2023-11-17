@@ -7,10 +7,13 @@ import (
 	"strings"
 	"time"
 
+	"chainguard.dev/melange/pkg/config"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/git"
@@ -60,6 +63,7 @@ print an error message that specifies where and how the data is invalid.`,
 			var advisoriesRepoDir string
 			var advisoriesRepoUpstreamHTTPSURL string
 			var advisoriesRepoForkPoint string
+			var packagesRepoDir string
 
 			if p.doNotDetectDistro {
 				if p.advisoriesRepoDir == "" {
@@ -76,6 +80,11 @@ print an error message that specifies where and how the data is invalid.`,
 					return fmt.Errorf("need --%s when --%s is specified", flagNameAdvisoriesRepoBaseHash, flagNameNoDistroDetection)
 				}
 				advisoriesRepoForkPoint = p.advisoriesRepoBaseHash
+
+				if p.packagesRepoDir == "" {
+					return fmt.Errorf("need --%s when --%s is specified", flagNameDistroRepoDir, flagNameNoDistroDetection)
+				}
+				packagesRepoDir = p.packagesRepoDir
 			} else {
 				// Catch any use of flags that get ignored when distro detection is enabled to avoid user confusion.
 				switch {
@@ -100,6 +109,7 @@ print an error message that specifies where and how the data is invalid.`,
 					return err
 				}
 				advisoriesRepoForkPoint = d.Local.AdvisoriesRepo.ForkPoint
+				packagesRepoDir = d.Local.PackagesRepo.Dir
 			}
 
 			cloneDir, err := git.TempClone(
@@ -109,20 +119,34 @@ print an error message that specifies where and how the data is invalid.`,
 			)
 			defer os.RemoveAll(cloneDir)
 			if err != nil {
-				return fmt.Errorf("unable to produce a base repo state for comparison: %w", err)
+				return fmt.Errorf("unable to clone upstream advisories repo for comparison: %w", err)
 			}
 
-			baseAdvisoriesIndex, err := v2.NewIndex(rwos.DirFS(cloneDir))
-			if err != nil {
-				return err
+			var baseAdvisoriesIndex *configs.Index[v2.Document]
+			if !p.skipDiffValidation {
+				baseAdvisoriesIndex, err = v2.NewIndex(rwos.DirFS(cloneDir))
+				if err != nil {
+					return fmt.Errorf("unable to create index of upstream advisories for comparison: %w", err)
+				}
 			}
 
 			advisoriesIndex, err := v2.NewIndex(rwos.DirFS(advisoriesRepoDir))
 			if err != nil {
-				return err
+				return fmt.Errorf("unable to create index of advisories repo: %w", err)
 			}
 
-			af := advisory.NewHTTPAliasFinder(http.DefaultClient)
+			var packageConfigurationsIndex *configs.Index[config.Configuration]
+			if !p.skipPackageExistenceValidation {
+				packageConfigurationsIndex, err = build.NewIndex(rwos.DirFS(packagesRepoDir))
+				if err != nil {
+					return fmt.Errorf("unable to create index of distro package configurations: %w", err)
+				}
+			}
+
+			var af advisory.AliasFinder
+			if !p.skipAliasCompletenessValidation {
+				af = advisory.NewHTTPAliasFinder(http.DefaultClient)
+			}
 
 			selectedPackageSet := make(map[string]struct{})
 			for _, pkg := range p.packages {
@@ -130,11 +154,12 @@ print an error message that specifies where and how the data is invalid.`,
 			}
 
 			opts := advisory.ValidateOptions{
-				AdvisoryDocs:     advisoriesIndex,
-				BaseAdvisoryDocs: baseAdvisoriesIndex,
-				SelectedPackages: selectedPackageSet,
-				Now:              time.Now(),
-				AliasFinder:      af,
+				AdvisoryDocs:          advisoriesIndex,
+				BaseAdvisoryDocs:      baseAdvisoriesIndex,
+				SelectedPackages:      selectedPackageSet,
+				Now:                   time.Now(),
+				AliasFinder:           af,
+				PackageConfigurations: packageConfigurationsIndex,
 			}
 
 			validationErr := advisory.Validate(cmd.Context(), opts)
@@ -158,16 +183,23 @@ print an error message that specifies where and how the data is invalid.`,
 }
 
 type validateParams struct {
-	doNotDetectDistro              bool
-	advisoriesRepoDir              string
-	advisoriesRepoUpstreamHTTPSURL string
-	advisoriesRepoBaseHash         string
-	packages                       []string
+	doNotDetectDistro               bool
+	advisoriesRepoDir               string
+	advisoriesRepoUpstreamHTTPSURL  string
+	advisoriesRepoBaseHash          string
+	packagesRepoDir                 string
+	packages                        []string
+	skipDiffValidation              bool
+	skipAliasCompletenessValidation bool
+	skipPackageExistenceValidation  bool
 }
 
 const (
 	flagNameAdvisoriesRepoURL      = "advisories-repo-url"
 	flagNameAdvisoriesRepoBaseHash = "advisories-repo-base-hash"
+	flagNameSkipDiffValidation     = "skip-diff"
+	flagNameSkipAliasCompleteness  = "skip-alias"
+	flagNameSkipPackageExistence   = "skip-existence"
 )
 
 func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
@@ -175,7 +207,11 @@ func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	cmd.Flags().StringVar(&p.advisoriesRepoUpstreamHTTPSURL, flagNameAdvisoriesRepoURL, "", "HTTPS URL of the upstream Git remote for the advisories repo")
 	cmd.Flags().StringVar(&p.advisoriesRepoBaseHash, flagNameAdvisoriesRepoBaseHash, "", "commit hash of the upstream repo to which the current state will be compared in the diff")
+	addDistroDirFlag(&p.packagesRepoDir, cmd)
 	cmd.Flags().StringSliceVarP(&p.packages, flagNamePackage, "p", nil, "packages to validate")
+	cmd.Flags().BoolVar(&p.skipDiffValidation, flagNameSkipDiffValidation, false, "skip diff-based validations")
+	cmd.Flags().BoolVar(&p.skipAliasCompletenessValidation, flagNameSkipAliasCompleteness, false, "skip alias completeness validation")
+	cmd.Flags().BoolVar(&p.skipPackageExistenceValidation, flagNameSkipPackageExistence, false, "skip package configuration existence validation")
 }
 
 func renderValidationError(err error, depth int) string {
