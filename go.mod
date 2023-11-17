@@ -3,7 +3,7 @@ module github.com/wolfi-dev/wolfictl
 go 1.21.1
 
 require (
-	chainguard.dev/apko v0.11.3-0.20231113190045-b9586cb4ad2b
+	chainguard.dev/apko v0.11.3
 	chainguard.dev/melange v0.5.3-0.20231113190040-ea805cad9301
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.2
@@ -47,7 +47,7 @@ require (
 	golang.org/x/time v0.4.0
 	golang.org/x/vuln v1.0.1
 	gopkg.in/yaml.v3 v3.0.1
-	sigs.k8s.io/release-utils v0.7.6
+	sigs.k8s.io/release-utils v0.7.7
 )
 
 require (
