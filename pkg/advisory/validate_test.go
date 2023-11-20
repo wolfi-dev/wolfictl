@@ -5,13 +5,18 @@ import (
 	"path/filepath"
 	"testing"
 
+	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/stretchr/testify/require"
+	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
 func TestValidate(t *testing.T) {
+	// The diff validation tests use the test fixtures for advisory.IndexDiff.
+
 	t.Run("diff", func(t *testing.T) {
 		cases := []struct {
 			name          string
@@ -79,6 +84,110 @@ func TestValidate(t *testing.T) {
 				}
 			})
 		}
+
+		t.Run("with existence conditions", func(t *testing.T) {
+			cases := []struct {
+				name            string
+				subcase         string
+				packageCfgsFunc func(t *testing.T) *configs.Index[config.Configuration]
+				apkindex        *apk.APKIndex
+				shouldBeValid   bool
+			}{
+				{
+					name:            "added-document", // these must be in distro
+					subcase:         "package in APKINDEX but not distro",
+					packageCfgsFunc: distroWithNothing,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name: "ko",
+							},
+						},
+					},
+					shouldBeValid: false,
+				},
+				{
+					name:            "added-document",
+					subcase:         "package in distro and APKINDEX",
+					packageCfgsFunc: distroWithKo,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name: "ko",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+				{
+					name:            "added-document",
+					subcase:         "package not in distro or APKINDEX",
+					packageCfgsFunc: distroWithNothing,
+					apkindex:        &apk.APKIndex{},
+					shouldBeValid:   false,
+				},
+				{
+					name:            "added-advisory", // i.e. "modified-document", can be just in APKINDEX
+					subcase:         "package in APKINDEX but not distro",
+					packageCfgsFunc: distroWithNothing,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name: "ko",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+				{
+					name:            "added-advisory",
+					subcase:         "package in distro and APKINDEX",
+					packageCfgsFunc: distroWithKo,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name: "ko",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+				{
+					name:            "added-advisory",
+					subcase:         "package not in distro or APKINDEX",
+					packageCfgsFunc: distroWithNothing,
+					apkindex:        &apk.APKIndex{},
+					shouldBeValid:   false,
+				},
+			}
+
+			for _, tt := range cases {
+				t.Run(tt.name+" -- "+tt.subcase, func(t *testing.T) {
+					aDir := filepath.Join("testdata", "diff", tt.name, "a")
+					bDir := filepath.Join("testdata", "diff", tt.name, "b")
+					aFsys := rwos.DirFS(aDir)
+					bFsys := rwos.DirFS(bDir)
+					aIndex, err := v2.NewIndex(aFsys)
+					require.NoError(t, err)
+					bIndex, err := v2.NewIndex(bFsys)
+					require.NoError(t, err)
+
+					err = Validate(context.Background(), ValidateOptions{
+						AdvisoryDocs:          bIndex,
+						BaseAdvisoryDocs:      aIndex,
+						Now:                   now,
+						PackageConfigurations: tt.packageCfgsFunc(t),
+						APKIndex:              tt.apkindex,
+					})
+					if tt.shouldBeValid && err != nil {
+						t.Errorf("should be valid but got error: %v", err)
+					}
+					if !tt.shouldBeValid && err == nil {
+						t.Error("shouldn't be valid but got no error")
+					}
+				})
+			}
+		})
 	})
 
 	t.Run("alias completeness", func(t *testing.T) {
@@ -129,44 +238,18 @@ func TestValidate(t *testing.T) {
 			})
 		}
 	})
+}
 
-	t.Run("package existence", func(t *testing.T) {
-		cases := []struct {
-			name          string
-			packageSet    map[string]struct{}
-			shouldBeValid bool
-		}{
-			{
-				name:          "package-exists",
-				packageSet:    map[string]struct{}{"ko": {}},
-				shouldBeValid: true,
-			},
-			{
-				name:          "package-does-not-exist",
-				packageSet:    map[string]struct{}{"mo": {}},
-				shouldBeValid: false,
-			},
-		}
+func distroWithKo(t *testing.T) *configs.Index[config.Configuration] {
+	fsys := rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "distro"))
+	index, err := build.NewIndex(fsys)
+	require.NoError(t, err)
+	return index
+}
 
-		advIndex, err := v2.NewIndex(rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "advisories")))
-		require.NoError(t, err)
-		packageIndex, err := build.NewIndex(rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "distro")))
-		require.NoError(t, err)
-
-		for _, tt := range cases {
-			t.Run(tt.name, func(t *testing.T) {
-				err = Validate(context.Background(), ValidateOptions{
-					AdvisoryDocs:          advIndex,
-					SelectedPackages:      tt.packageSet,
-					PackageConfigurations: packageIndex,
-				})
-				if tt.shouldBeValid && err != nil {
-					t.Errorf("should be valid but got error: %v", err)
-				}
-				if !tt.shouldBeValid && err == nil {
-					t.Error("shouldn't be valid but got no error")
-				}
-			})
-		}
-	})
+func distroWithNothing(t *testing.T) *configs.Index[config.Configuration] {
+	fsys := rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "distro-empty"))
+	index, err := build.NewIndex(fsys)
+	require.NoError(t, err)
+	return index
 }

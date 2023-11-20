@@ -182,5 +182,5 @@ func (p *updateParams) addFlagsTo(cmd *cobra.Command) {
 	addDistroDirFlag(&p.distroRepoDir, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	cmd.Flags().StringSliceVar(&p.archs, "arch", []string{"x86_64", "aarch64"}, "package architectures to find published versions for")
-	cmd.Flags().StringVarP(&p.packageRepositoryURL, "package-repo-url", "r", "", "URL of the APK package repository")
+	addPackageRepoURLFlag(&p.packageRepositoryURL, cmd)
 }

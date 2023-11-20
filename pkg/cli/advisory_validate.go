@@ -17,6 +17,7 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/git"
+	"github.com/wolfi-dev/wolfictl/pkg/index"
 )
 
 func cmdAdvisoryValidate() *cobra.Command {
@@ -64,6 +65,7 @@ print an error message that specifies where and how the data is invalid.`,
 			var advisoriesRepoUpstreamHTTPSURL string
 			var advisoriesRepoForkPoint string
 			var packagesRepoDir string
+			var apkRepositoryURL string
 
 			if p.doNotDetectDistro {
 				if p.advisoriesRepoDir == "" {
@@ -85,6 +87,11 @@ print an error message that specifies where and how the data is invalid.`,
 					return fmt.Errorf("need --%s when --%s is specified", flagNameDistroRepoDir, flagNameNoDistroDetection)
 				}
 				packagesRepoDir = p.packagesRepoDir
+
+				if p.packageRepositoryURL == "" {
+					return fmt.Errorf("need --%s when --%s is specified", flagNamePackageRepoURL, flagNameNoDistroDetection)
+				}
+				apkRepositoryURL = p.packageRepositoryURL
 			} else {
 				// Catch any use of flags that get ignored when distro detection is enabled to avoid user confusion.
 				switch {
@@ -110,20 +117,21 @@ print an error message that specifies where and how the data is invalid.`,
 				}
 				advisoriesRepoForkPoint = d.Local.AdvisoriesRepo.ForkPoint
 				packagesRepoDir = d.Local.PackagesRepo.Dir
-			}
-
-			cloneDir, err := git.TempClone(
-				advisoriesRepoUpstreamHTTPSURL,
-				advisoriesRepoForkPoint,
-				true,
-			)
-			defer os.RemoveAll(cloneDir)
-			if err != nil {
-				return fmt.Errorf("unable to clone upstream advisories repo for comparison: %w", err)
+				apkRepositoryURL = d.Absolute.APKRepositoryURL
 			}
 
 			var baseAdvisoriesIndex *configs.Index[v2.Document]
 			if !p.skipDiffValidation {
+				cloneDir, err := git.TempClone(
+					advisoriesRepoUpstreamHTTPSURL,
+					advisoriesRepoForkPoint,
+					true,
+				)
+				defer os.RemoveAll(cloneDir)
+				if err != nil {
+					return fmt.Errorf("unable to clone upstream advisories repo for comparison: %w", err)
+				}
+
 				baseAdvisoriesIndex, err = v2.NewIndex(rwos.DirFS(cloneDir))
 				if err != nil {
 					return fmt.Errorf("unable to create index of upstream advisories for comparison: %w", err)
@@ -133,6 +141,11 @@ print an error message that specifies where and how the data is invalid.`,
 			advisoriesIndex, err := v2.NewIndex(rwos.DirFS(advisoriesRepoDir))
 			if err != nil {
 				return fmt.Errorf("unable to create index of advisories repo: %w", err)
+			}
+
+			apkIndex, err := index.Index("x86_64", apkRepositoryURL)
+			if err != nil {
+				return fmt.Errorf("unable to load APKINDEX: %w", err)
 			}
 
 			var packageConfigurationsIndex *configs.Index[config.Configuration]
@@ -160,6 +173,7 @@ print an error message that specifies where and how the data is invalid.`,
 				Now:                   time.Now(),
 				AliasFinder:           af,
 				PackageConfigurations: packageConfigurationsIndex,
+				APKIndex:              apkIndex,
 			}
 
 			validationErr := advisory.Validate(cmd.Context(), opts)
@@ -192,6 +206,7 @@ type validateParams struct {
 	skipDiffValidation              bool
 	skipAliasCompletenessValidation bool
 	skipPackageExistenceValidation  bool
+	packageRepositoryURL            string
 }
 
 const (
@@ -212,6 +227,7 @@ func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.skipDiffValidation, flagNameSkipDiffValidation, false, "skip diff-based validations")
 	cmd.Flags().BoolVar(&p.skipAliasCompletenessValidation, flagNameSkipAliasCompleteness, false, "skip alias completeness validation")
 	cmd.Flags().BoolVar(&p.skipPackageExistenceValidation, flagNameSkipPackageExistence, false, "skip package configuration existence validation")
+	addPackageRepoURLFlag(&p.packageRepositoryURL, cmd)
 }
 
 func renderValidationError(err error, depth int) string {
