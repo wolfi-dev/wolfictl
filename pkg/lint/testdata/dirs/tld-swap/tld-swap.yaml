@@ -1,0 +1,16 @@
+package:
+  name: tld-swap
+  version: 1.0.0
+  epoch: 0
+  description: "a package that uses a different TLD than others"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+
+pipeline:
+    - uses: fetch
+      with:
+        uri: https://test.org/missing-copyright/${{package.version}}.tar.gz
+        expected-sha256: ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2268

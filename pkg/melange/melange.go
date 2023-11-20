@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -93,6 +94,9 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+		if fi == nil {
+			return fmt.Errorf("%s does not exist", dir)
+		}
 		if fi.IsDir() && path != dir {
 			return filepath.SkipDir
 		}
@@ -104,6 +108,9 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 	if err != nil {
 		return p, errors.Wrapf(err, "failed walking files in cloned directory %s", dir)
 	}
+
+	// guarantee a consistent sort order for test comparisons
+	sort.Strings(fileList)
 
 	for _, fi := range fileList {
 		data, err := os.ReadFile(fi)
