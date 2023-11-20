@@ -22,6 +22,8 @@ var (
 	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
 	reValidSHA1   = regexp.MustCompile(`^[a-fA-F0-9]{40}$`)
+	// Be stricter than Go to promote consistency and avoid homograph attacks
+	reValidHostname = regexp.MustCompile(`^[a-z0-9][a-z0-9\.\-]+\.[a-z]{2,6}$`)
 
 	forbiddenRepositories = []string{
 		"https://packages.wolfi.dev/os",
@@ -137,9 +139,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						if !ok {
 							return fmt.Errorf("uri is missing in fetch pipeline")
 						}
-						if _, err := url.ParseRequestURI(uri); err != nil {
+						u, err := url.ParseRequestURI(uri)
+						if err != nil {
 							return fmt.Errorf("uri is invalid URL structure")
 						}
+						if !reValidHostname.MatchString(u.Host) {
+							return fmt.Errorf("uri hostname %q is invalid", u.Host)
+						}
+
 					}
 				}
 				return nil
