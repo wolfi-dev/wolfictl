@@ -3,6 +3,7 @@ package lint
 import (
 	"fmt"
 	"log"
+	"sort"
 
 	"golang.org/x/exp/slices"
 
@@ -52,6 +53,8 @@ func (l *Linter) Lint() (Result, error) {
 	for n := range namesToPkg {
 		sortedNames = append(sortedNames, n)
 	}
+
+	sort.Strings(sortedNames)
 
 	for _, name := range sortedNames {
 		failedRules := make(EvalRuleErrors, 0)

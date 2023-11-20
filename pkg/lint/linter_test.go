@@ -80,7 +80,7 @@ func TestLinter_Dir(t *testing.T) {
 								Description: "every config should use a consistent hostname",
 								Severity:    SeverityError,
 							},
-							Error: fmt.Errorf("[uri-mimic]: \"libssh2.org\" too similar to \"libshh2.org\" (ERROR)"),
+							Error: fmt.Errorf("[uri-mimic]: \"www.libssh2.org\" too similar to \"www.libshh2.org\" (ERROR)"),
 						},
 					},
 				},
