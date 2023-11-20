@@ -7,7 +7,7 @@ require (
 	chainguard.dev/melange v0.5.3-0.20231113190040-ea805cad9301
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.2
-	github.com/anchore/syft v0.97.0
+	github.com/anchore/syft v0.97.1
 	github.com/chainguard-dev/go-apk v0.0.0-20231113174935-f86aaf233502
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
 	github.com/charmbracelet/bubbles v0.16.1
@@ -75,7 +75,7 @@ require (
 	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
-	github.com/anchore/stereoscope v0.0.0-20231027135531-5909e353ee88 // indirect
+	github.com/anchore/stereoscope v0.0.0-20231117203853-3610f4ef3e83 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46 // indirect
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
