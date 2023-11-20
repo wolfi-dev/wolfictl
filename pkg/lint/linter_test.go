@@ -29,8 +29,8 @@ func areConcreteErrors(x, y interface{}) bool {
 }
 
 func compareErrorsByString(x, y interface{}) bool {
-	xe := x.(error)
-	ye := y.(error)
+	xe := x.(error) //nolint:errcheck // already asserted
+	ye := y.(error) //nolint:errcheck // already asserted
 	return xe.Error() == ye.Error()
 }
 
