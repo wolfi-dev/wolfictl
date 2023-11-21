@@ -53,6 +53,8 @@ specify the following flags:
 * --advisories-repo-dir
 * --advisories-repo-url
 * --advisories-repo-base-hash
+* --distro-repo-dir
+* --package-repo-url
 
 More information about these flags is shown in the documentation for each flag.
 

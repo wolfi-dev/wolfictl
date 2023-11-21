@@ -113,6 +113,14 @@ func TestValidate(t *testing.T) {
 					apkindex: &apk.APKIndex{
 						Packages: []*apk.Package{
 							{
+								Name:    "kaf",
+								Version: "0.2.6-r5",
+							},
+							{
+								Name:    "kaf",
+								Version: "0.2.6-r6",
+							},
+							{
 								Name: "ko",
 							},
 						},
@@ -123,8 +131,19 @@ func TestValidate(t *testing.T) {
 					name:            "added-document",
 					subcase:         "package not in distro or APKINDEX",
 					packageCfgsFunc: distroWithNothing,
-					apkindex:        &apk.APKIndex{},
-					shouldBeValid:   false,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "kaf",
+								Version: "0.2.6-r5",
+							},
+							{
+								Name:    "kaf",
+								Version: "0.2.6-r6",
+							},
+						},
+					},
+					shouldBeValid: false,
 				},
 				{
 					name:            "added-advisory", // i.e. "modified-document", can be just in APKINDEX
@@ -237,6 +256,84 @@ func TestValidate(t *testing.T) {
 				}
 			})
 		}
+	})
+
+	t.Run("fixed versions", func(t *testing.T) {
+		t.Run("must exist in APKINDEX", func(t *testing.T) {
+			cases := []struct {
+				name          string
+				apkindex      *apk.APKIndex
+				shouldBeValid bool
+			}{
+				{
+					name: "package-missing",
+					apkindex: &apk.APKIndex{
+						Packages: nil,
+					},
+					shouldBeValid: false,
+				},
+				{
+					name: "fixed-version-missing",
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "1.0.0-r1",
+							},
+						},
+					},
+					shouldBeValid: false,
+				},
+				{
+					name: "fixed-version-present-and-first", // which is not allowed
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "1.0.0-r2",
+							},
+						},
+					},
+					shouldBeValid: false,
+				},
+				{
+					name: "fixed-version-present-and-not-first",
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "1.0.0-r1",
+							},
+							{
+								Name:    "ko",
+								Version: "1.0.0-r2",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+			}
+
+			for _, tt := range cases {
+				t.Run(tt.name, func(t *testing.T) {
+					dir := filepath.Join("testdata", "validate", "fixed-version")
+					fsys := rwos.DirFS(dir)
+					index, err := v2.NewIndex(fsys)
+					require.NoError(t, err)
+
+					err = Validate(context.Background(), ValidateOptions{
+						AdvisoryDocs: index,
+						APKIndex:     tt.apkindex,
+					})
+					if tt.shouldBeValid && err != nil {
+						t.Errorf("should be valid but got error: %v", err)
+					}
+					if !tt.shouldBeValid && err == nil {
+						t.Error("shouldn't be valid but got no error")
+					}
+				})
+			}
+		})
 	})
 }
 
