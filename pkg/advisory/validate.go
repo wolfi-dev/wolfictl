@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -38,9 +39,25 @@ type ValidateOptions struct {
 	// PackageConfigurations is the index of distro package configurations to use
 	// for validating the advisories.
 	PackageConfigurations *configs.Index[config.Configuration]
+
+	// distroPackageMap is a map of package name to distro package configurations,
+	// used for validating the advisories. This gets computed dynamically using
+	// PackageConfigurations before validation happens.
+	distroPackageMap map[string]config.Configuration
+
+	// APKIndex is the index of APK packages to use for validating the advisories.
+	APKIndex *apk.APKIndex
+
+	// apkIndexPackageMap is a map of package name to APK packages, used for
+	// validating the advisories. This gets computed dynamically using APKIndex
+	// before validation happens.
+	apkIndexPackageMap map[string][]*apk.Package
 }
 
 func Validate(ctx context.Context, opts ValidateOptions) error {
+	opts.distroPackageMap = opts.createDistroPackageMap()
+	opts.apkIndexPackageMap = opts.createAPKIndexPackageMap()
+
 	var errs []error
 
 	documentErrs := lo.Map(
@@ -63,10 +80,6 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 		errs = append(errs, opts.validateIndexDiff(diff))
 	}
 
-	if opts.PackageConfigurations != nil {
-		errs = append(errs, opts.validatePackageExistence())
-	}
-
 	if opts.AliasFinder != nil {
 		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
 	}
@@ -74,26 +87,76 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 	return errors.Join(errs...)
 }
 
-func (opts ValidateOptions) validatePackageExistence() error {
-	var errs []error
+func (opts ValidateOptions) createDistroPackageMap() map[string]config.Configuration {
+	pkgMap := make(map[string]config.Configuration)
 
-	documents := opts.AdvisoryDocs.Select().Configurations()
-	for i := range documents {
-		doc := documents[i]
+	if opts.PackageConfigurations == nil {
+		return pkgMap
+	}
 
-		if len(opts.SelectedPackages) > 0 {
-			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
-				// Skip this document, since it's not in the set of selected packages.
-				continue
-			}
-		}
+	cfgs := opts.PackageConfigurations.Select().Configurations()
+	for i := range cfgs {
+		cfg := cfgs[i]
+		pkgMap[cfg.Package.Name] = cfg
+	}
 
-		if opts.PackageConfigurations.Select().WhereName(doc.Name()).Len() == 0 {
-			errs = append(errs, errorhelpers.LabelError(doc.Name(), errors.New("this package is not defined in any distro package configuration")))
+	return pkgMap
+}
+
+func (opts ValidateOptions) createAPKIndexPackageMap() map[string][]*apk.Package {
+	pkgMap := make(map[string][]*apk.Package)
+
+	if opts.APKIndex == nil {
+		return pkgMap
+	}
+
+	for _, pkg := range opts.APKIndex.Packages {
+		pkgMap[pkg.Name] = append(pkgMap[pkg.Name], pkg)
+	}
+
+	return pkgMap
+}
+
+func (opts ValidateOptions) validateBuildConfigurationExistence(pkgName string) error {
+	if opts.PackageConfigurations == nil {
+		// Not enough input information to drive this validation check.
+		return nil
+	}
+
+	if len(opts.SelectedPackages) > 0 {
+		if _, ok := opts.SelectedPackages[pkgName]; !ok {
+			// Skip this document, since it's not in the set of selected packages.
+			return nil
 		}
 	}
 
-	return errorhelpers.LabelError("package existence validation failure(s)", errors.Join(errs...))
+	if _, ok := opts.distroPackageMap[pkgName]; !ok {
+		return errors.New("package build configuration not found in the distro")
+	}
+
+	return nil
+}
+
+func (opts ValidateOptions) validateBuildConfigurationOrAPKIndexEntryExistence(pkgName string) error {
+	if opts.PackageConfigurations == nil || opts.APKIndex == nil {
+		// Not enough input information to drive this validation check.
+		return nil
+	}
+
+	if len(opts.SelectedPackages) > 0 {
+		if _, ok := opts.SelectedPackages[pkgName]; !ok {
+			// Skip this document, since it's not in the set of selected packages.
+			return nil
+		}
+	}
+
+	if _, ok := opts.distroPackageMap[pkgName]; !ok {
+		if _, ok := opts.apkIndexPackageMap[pkgName]; !ok {
+			return errors.New("package not found as a build configuration in the distro or as an entry in the APKINDEX")
+		}
+	}
+
+	return nil
 }
 
 func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) error {
@@ -172,6 +235,9 @@ func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
 
 		var docErrs []error
 
+		// Modified documents must be for packages that are currently defined in the repo or still exist in APKINDEX entries.
+		docErrs = append(docErrs, opts.validateBuildConfigurationOrAPKIndexEntryExistence(documentAdvisories.Name))
+
 		advsRemovedErrs := lo.Map(documentAdvisories.Removed, func(adv v2.Advisory, _ int) error {
 			return errorhelpers.LabelError(adv.ID, errors.New("advisory was removed"))
 		})
@@ -207,6 +273,13 @@ func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
 		for i := range documentAdvisories.Added {
 			adv := documentAdvisories.Added[i]
 
+			if len(opts.SelectedPackages) > 0 {
+				if _, ok := opts.SelectedPackages[documentAdvisories.Name]; !ok {
+					// Skip this document, since it's not in the set of selected packages.
+					continue
+				}
+			}
+
 			var advErrs []error
 			for i, event := range adv.Events {
 				advErrs = append(advErrs, errorhelpers.LabelError(fmt.Sprintf("event %d (just added)", i+1), opts.validateRecency(event)))
@@ -234,6 +307,10 @@ func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
 		}
 
 		var docErrs []error
+
+		// Net new documents must be for packages that are currently defined in the repo.
+		docErrs = append(docErrs, opts.validateBuildConfigurationExistence(doc.Name()))
+
 		for advIndex := range doc.Advisories {
 			adv := doc.Advisories[advIndex]
 

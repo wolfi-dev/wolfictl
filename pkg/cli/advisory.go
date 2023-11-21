@@ -145,6 +145,7 @@ const (
 	flagNameAdvisoriesRepoDir = "advisories-repo-dir"
 	flagNameNoPrompt          = "no-prompt"
 	flagNameNoDistroDetection = "no-distro-detection"
+	flagNamePackageRepoURL    = "package-repo-url"
 )
 
 func addPackageFlag(val *string, cmd *cobra.Command) {
@@ -169,6 +170,10 @@ func addNoPromptFlag(val *bool, cmd *cobra.Command) {
 
 func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
 	cmd.Flags().BoolVar(val, flagNameNoDistroDetection, false, "do not attempt to auto-detect the distro")
+}
+
+func addPackageRepoURLFlag(val *string, cmd *cobra.Command) {
+	cmd.Flags().StringVarP(val, flagNamePackageRepoURL, "r", "", "URL of the APK package repository")
 }
 
 func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {
