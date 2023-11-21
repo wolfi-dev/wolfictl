@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"chainguard.dev/melange/pkg/renovate"
+	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 
 	"github.com/dprotaso/go-yit"
@@ -31,6 +32,15 @@ var (
 
 	forbiddenKeyrings = []string{
 		"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
+	}
+
+	// Used for comparing hosts between configs
+	seenHosts = map[string]bool{}
+	// The minimum edit distance between two hostnames
+	minhostEditDistance = 2
+	// Exceptions to the above rule
+	hostEditDistanceExceptions = map[string]string{
+		"www.libssh.org": "www.libssh2.org",
 	}
 )
 
@@ -152,6 +162,48 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return nil
 			},
 		},
+		{
+			Name:        "uri-mimic",
+			Description: "every config should use a consistent hostname",
+			Severity:    SeverityError,
+			LintFunc: func(config config.Configuration) error {
+				for _, p := range config.Pipeline {
+					uri := p.With["uri"]
+					if uri == "" {
+						continue
+					}
+					u, err := url.ParseRequestURI(uri)
+					if err != nil {
+						// This condition is picked up by valid-pipeline-fetch-uri
+						return nil
+					}
+					host := u.Host
+					if seenHosts[host] {
+						continue
+					}
+					for k := range seenHosts {
+						// If this becomes a problem, we should filter out hosts that exist in >1 package
+						dist := levenshtein.DistanceForStrings([]rune(host), []rune(k), levenshtein.DefaultOptions)
+						if hostEditDistanceExceptions[host] == k || hostEditDistanceExceptions[k] == host {
+							continue
+						}
+						if dist <= minhostEditDistance {
+							return fmt.Errorf("%q too similar to %q", host, k)
+						}
+
+						// Detect TLD swaps
+						hostParts := strings.Split(host, ".")
+						kParts := strings.Split(k, ".")
+						if strings.Join(hostParts[:len(hostParts)-1], ".") == strings.Join(kParts[:len(kParts)-1], ".") {
+							return fmt.Errorf("%q shares components with %q", host, k)
+						}
+					}
+					seenHosts[host] = true
+				}
+				return nil
+			},
+		},
+
 		{
 			Name:        "valid-pipeline-fetch-digest",
 			Description: "every fetch pipeline should have a valid digest",

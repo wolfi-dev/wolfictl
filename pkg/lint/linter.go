@@ -3,6 +3,7 @@ package lint
 import (
 	"fmt"
 	"log"
+	"sort"
 
 	"golang.org/x/exp/slices"
 
@@ -37,13 +38,25 @@ func New(opts ...Option) *Linter {
 func (l *Linter) Lint() (Result, error) {
 	rules := AllRules(l)
 
-	filesToLint, err := melange.ReadAllPackagesFromRepo(l.options.Path)
+	namesToPkg, err := melange.ReadAllPackagesFromRepo(l.options.Path)
 	if err != nil {
 		return Result{}, err
 	}
 
+	// global shared between config files for rule evaluation :(
+	seenHosts = map[string]bool{}
+
 	results := make(Result, 0)
-	for name := range filesToLint {
+
+	// sort for consistent ordering
+	sortedNames := []string{}
+	for n := range namesToPkg {
+		sortedNames = append(sortedNames, n)
+	}
+
+	sort.Strings(sortedNames)
+
+	for _, name := range sortedNames {
 		failedRules := make(EvalRuleErrors, 0)
 		for _, rule := range rules {
 			// Check if we should skip this rule.
@@ -73,7 +86,7 @@ func (l *Linter) Lint() (Result, error) {
 				continue
 			}
 
-			if slices.Contains(filesToLint[name].NoLint, rule.Name) {
+			if slices.Contains(namesToPkg[name].NoLint, rule.Name) {
 				if l.options.Verbose {
 					l.logger.Printf("%s: skipping rule %s because file contains #nolint:%s\n", name, rule.Name, rule.Name)
 				}
@@ -81,7 +94,7 @@ func (l *Linter) Lint() (Result, error) {
 			}
 
 			// Evaluate the rule.
-			if err := rule.LintFunc(filesToLint[name].Config); err != nil {
+			if err := rule.LintFunc(namesToPkg[name].Config); err != nil {
 				msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity)
 				if l.options.Verbose {
 					msg += fmt.Sprintf(" - (%s)", rule.Description)
