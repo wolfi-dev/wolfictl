@@ -80,6 +80,10 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 		errs = append(errs, opts.validateIndexDiff(diff))
 	}
 
+	if opts.APKIndex != nil {
+		errs = append(errs, opts.validateFixedVersions())
+	}
+
 	if opts.AliasFinder != nil {
 		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
 	}
@@ -115,6 +119,64 @@ func (opts ValidateOptions) createAPKIndexPackageMap() map[string][]*apk.Package
 	}
 
 	return pkgMap
+}
+
+func (opts ValidateOptions) validateFixedVersions() error {
+	if opts.APKIndex == nil {
+		// Not enough input information to drive this validation check.
+		return nil
+	}
+
+	var errs []error
+
+	documents := opts.AdvisoryDocs.Select().Configurations()
+	for i := range documents {
+		doc := documents[i]
+
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				continue
+			}
+		}
+
+		var docErrs []error
+
+		for i := range doc.Advisories {
+			adv := doc.Advisories[i]
+			var advErrs []error
+
+			for i := range adv.Events {
+				event := adv.Events[i]
+
+				if event.Type != v2.EventTypeFixed {
+					continue
+				}
+
+				fixed, ok := event.Data.(v2.Fixed)
+				if !ok {
+					// This should've been caught by basic validation!
+					advErrs = append(advErrs, fmt.Errorf("event data is not of type Fixed"))
+					continue
+				}
+
+				fixedVersion := fixed.FixedVersion
+
+				eventErr := errorhelpers.LabelError(
+					fmt.Sprintf("event %d (type: %s)", i+1, event.Type),
+					opts.validatePackageVersionExistsInAPKINDEX(doc.Name(), fixedVersion),
+				)
+
+				advErrs = append(advErrs, eventErr)
+			}
+
+			docErrs = append(docErrs, errorhelpers.LabelError(adv.ID, errors.Join(advErrs...)))
+		}
+
+		errs = append(errs, errorhelpers.LabelError(doc.Name(), errors.Join(docErrs...)))
+	}
+
+	return errorhelpers.LabelError("fixed version validation failure(s)", errors.Join(errs...))
 }
 
 func (opts ValidateOptions) validateBuildConfigurationExistence(pkgName string) error {
@@ -157,6 +219,32 @@ func (opts ValidateOptions) validateBuildConfigurationOrAPKIndexEntryExistence(p
 	}
 
 	return nil
+}
+
+func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, version string) error {
+	if opts.APKIndex == nil {
+		// Not enough input information to drive this validation check.
+		return nil
+	}
+
+	if len(opts.SelectedPackages) > 0 {
+		if _, ok := opts.SelectedPackages[pkgName]; !ok {
+			// Skip this document, since it's not in the set of selected packages.
+			return nil
+		}
+	}
+
+	if _, ok := opts.apkIndexPackageMap[pkgName]; !ok {
+		return errors.New("package not found in APKINDEX")
+	}
+
+	for _, pkg := range opts.apkIndexPackageMap[pkgName] {
+		if pkg.Version == version {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("package version %q not found in APKINDEX", version)
 }
 
 func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) error {
