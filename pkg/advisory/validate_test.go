@@ -113,6 +113,14 @@ func TestValidate(t *testing.T) {
 					apkindex: &apk.APKIndex{
 						Packages: []*apk.Package{
 							{
+								Name:    "kaf",
+								Version: "0.2.6-r5",
+							},
+							{
+								Name:    "kaf",
+								Version: "0.2.6-r6",
+							},
+							{
 								Name: "ko",
 							},
 						},
@@ -123,8 +131,19 @@ func TestValidate(t *testing.T) {
 					name:            "added-document",
 					subcase:         "package not in distro or APKINDEX",
 					packageCfgsFunc: distroWithNothing,
-					apkindex:        &apk.APKIndex{},
-					shouldBeValid:   false,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "kaf",
+								Version: "0.2.6-r5",
+							},
+							{
+								Name:    "kaf",
+								Version: "0.2.6-r6",
+							},
+						},
+					},
+					shouldBeValid: false,
 				},
 				{
 					name:            "added-advisory", // i.e. "modified-document", can be just in APKINDEX
@@ -266,9 +285,25 @@ func TestValidate(t *testing.T) {
 					shouldBeValid: false,
 				},
 				{
-					name: "fixed-version-present",
+					name: "fixed-version-present-and-first", // which is not allowed
 					apkindex: &apk.APKIndex{
 						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "1.0.0-r2",
+							},
+						},
+					},
+					shouldBeValid: false,
+				},
+				{
+					name: "fixed-version-present-and-not-first",
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "1.0.0-r1",
+							},
 							{
 								Name:    "ko",
 								Version: "1.0.0-r2",

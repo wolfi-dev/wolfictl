@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"sort"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/internal/errorhelpers"
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
 type ValidateOptions struct {
@@ -162,12 +164,15 @@ func (opts ValidateOptions) validateFixedVersions() error {
 
 				fixedVersion := fixed.FixedVersion
 
-				eventErr := errorhelpers.LabelError(
-					fmt.Sprintf("event %d (type: %s)", i+1, event.Type),
+				eventErrs := []error{
 					opts.validatePackageVersionExistsInAPKINDEX(doc.Name(), fixedVersion),
-				)
+					opts.validateFixedVersionIsNotFirstVersionInAPKINDEX(doc.Name(), fixedVersion),
+				}
 
-				advErrs = append(advErrs, eventErr)
+				advErrs = append(advErrs, errorhelpers.LabelError(
+					fmt.Sprintf("event %d (type: %s)", i+1, event.Type),
+					errors.Join(eventErrs...)),
+				)
 			}
 
 			docErrs = append(docErrs, errorhelpers.LabelError(adv.ID, errors.Join(advErrs...)))
@@ -240,6 +245,54 @@ func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, vers
 
 	for _, pkg := range opts.apkIndexPackageMap[pkgName] {
 		if pkg.Version == version {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("package version %q not found in APKINDEX", version)
+}
+
+func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(pkgName, version string) error {
+	if opts.APKIndex == nil {
+		// Not enough input information to drive this validation check.
+		return nil
+	}
+
+	if len(opts.SelectedPackages) > 0 {
+		if _, ok := opts.SelectedPackages[pkgName]; !ok {
+			// Skip this document, since it's not in the set of selected packages.
+			return nil
+		}
+	}
+
+	var packageVersions []*apk.Package
+	var ok bool
+	if packageVersions, ok = opts.apkIndexPackageMap[pkgName]; !ok {
+		return errors.New("package not found in APKINDEX")
+	}
+
+	sort.Slice(packageVersions, func(i, j int) bool {
+		iVer, err := versions.NewVersion(packageVersions[i].Version)
+		if err != nil {
+			return true
+		}
+		jVer, err := versions.NewVersion(packageVersions[j].Version)
+		if err != nil {
+			return false
+		}
+		return iVer.LessThan(jVer)
+	})
+
+	for i, pkg := range packageVersions {
+		if pkg.Version == version {
+			if i == 0 {
+				return fmt.Errorf(
+					"%q is the first version of the package listed in the APKINDEX, so it cannot be used as a fixed-version (consider switching type to %q)",
+					version,
+					v2.EventTypeFalsePositiveDetermination,
+				)
+			}
+
 			return nil
 		}
 	}
