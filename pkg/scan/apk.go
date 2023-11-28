@@ -26,7 +26,10 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
 
-const grypeDBListingURL = "https://toolbox-data.anchore.io/grype/databases/listing.json"
+const (
+	grypeDBListingURL  = "https://toolbox-data.anchore.io/grype/databases/listing.json"
+	mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
+)
 
 var grypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 
@@ -39,8 +42,9 @@ var grypeDBConfig = db.Config{
 }
 
 type Result struct {
-	TargetAPK TargetAPK
-	Findings  []Finding
+	TargetAPK     TargetAPK
+	Findings      []Finding
+	GrypeDBStatus *db.Status
 }
 
 type TargetAPK struct {
@@ -113,7 +117,7 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, erro
 		updateDB = false
 	}
 
-	datastore, _, dbCloser, err := grype.LoadVulnerabilityDB(grypeDBConfig, updateDB)
+	datastore, dbStatus, dbCloser, err := grype.LoadVulnerabilityDB(grypeDBConfig, updateDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
 	}
@@ -150,8 +154,9 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, erro
 	}
 
 	result := &Result{
-		TargetAPK: apk,
-		Findings:  findings,
+		TargetAPK:     apk,
+		Findings:      findings,
+		GrypeDBStatus: dbStatus,
 	}
 
 	return result, nil
@@ -184,5 +189,3 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 		},
 	)
 }
-
-const mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
