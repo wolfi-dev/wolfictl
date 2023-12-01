@@ -4,7 +4,7 @@ go 1.21.1
 
 require (
 	chainguard.dev/apko v0.11.3-0.20231113190045-b9586cb4ad2b
-	chainguard.dev/melange v0.5.3-0.20231113190040-ea805cad9301
+	chainguard.dev/melange v0.5.3
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.4
 	github.com/anchore/syft v0.98.0
