@@ -20,6 +20,9 @@ type Strategy interface {
 	// "go.sum".  For languages which do not use a separate checksum file, returns an empty string.
 	ChecksumFileName() string
 
+	// LocalChecksumFileName returns the name of the local checksum file, such as "go.sum.local".
+	LocalChecksumFileName() string
+
 	// Rebase takes paths to two lockfiles and chooses the newest versions of every dependency possible, then outputs
 	// a new file to outputPath.
 	Rebase(pathA, pathB, outputPath string) error

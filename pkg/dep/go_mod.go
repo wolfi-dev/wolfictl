@@ -41,6 +41,11 @@ func (s GoStrategy) ChecksumFileName() string {
 	return "go.sum"
 }
 
+// LocalChecksumFileName returns the name of the local Go checksum file, "go.sum.local".
+func (s GoStrategy) LocalChecksumFileName() string {
+	return "go.sum.local"
+}
+
 func loadModFile(path string) (*modfile.File, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
