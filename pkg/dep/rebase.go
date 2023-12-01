@@ -26,6 +26,10 @@ type Strategy interface {
 	// Rebase takes paths to two lockfiles and chooses the newest versions of every dependency possible, then outputs
 	// a new file to outputPath.
 	Rebase(pathA, pathB, outputPath string) error
+
+	// UpdateChecksums updates a checksum file according to the dependencies listed in the input lockfile,
+	// then outputs a new file to outputPath.
+	UpdateChecksums(lockFile, outputFile string) error
 }
 
 // GetStrategy takes a path to checked out source code and returns a Strategy to modify the dependency
@@ -61,6 +65,28 @@ func Rebase(path string) error {
 	}
 
 	if err := os.Rename(newFile, downstreamFile); err != nil {
+		return fmt.Errorf("while renaming the rebased file: %w", err)
+	}
+
+	return nil
+}
+
+// UpdateChecksums takes a path to checked out source code and updates the local checksum file.
+func UpdateChecksums(path string) error {
+	strategy, err := GetStrategy(path)
+	if err != nil {
+		return err
+	}
+
+	downstreamFile := filepath.Join(path, strategy.LocalLockFileName())
+	downstreamChecksumFile := filepath.Join(path, strategy.LocalChecksumFileName())
+	newChecksumFile := downstreamChecksumFile + ".new"
+
+	if err := strategy.UpdateChecksums(downstreamFile, newChecksumFile); err != nil {
+		return fmt.Errorf("while updating checksums: %w", err)
+	}
+
+	if err := os.Rename(newChecksumFile, downstreamChecksumFile); err != nil {
 		return fmt.Errorf("while renaming the rebased file: %w", err)
 	}
 

@@ -2,11 +2,18 @@ package dep
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/semver"
+	"golang.org/x/mod/sumdb"
 )
 
 type GoStrategy struct {
@@ -119,4 +126,111 @@ func (s GoStrategy) Rebase(upstreamFile, downstreamFile, outputFile string) erro
 	}
 
 	return nil
+}
+
+// UpdateChecksums creates a checksum file given an input lockfile.  This is usually the
+// local lockfile.
+func (s GoStrategy) UpdateChecksums(lockFile, outputFile string) error {
+	originModFile, err := loadModFile(lockFile)
+	if err != nil {
+		return fmt.Errorf("while loading the lockfile: %w", err)
+	}
+
+	outFile, err := os.Create(outputFile)
+	if err != nil {
+		return fmt.Errorf("while opening the output file: %w", err)
+	}
+	defer outFile.Close()
+
+	sumdbClient := sumdb.NewClient(&clientOps{})
+	for _, originPkg := range originModFile.Require {
+		lines, err := sumdbClient.Lookup(originPkg.Mod.Path, originPkg.Mod.Version)
+		if err != nil {
+			return fmt.Errorf("looking up %s/%s: %w", originPkg.Mod.Path, originPkg.Mod.Version, err)
+		}
+
+		for _, line := range lines {
+			fmt.Fprintln(outFile, line)
+		}
+
+		lines, err = sumdbClient.Lookup(originPkg.Mod.Path, originPkg.Mod.Version + "/go.mod")
+		if err != nil {
+			return fmt.Errorf("looking up %s/%s/go.mod: %w", originPkg.Mod.Path, originPkg.Mod.Version, err)
+		}
+
+		for _, line := range lines {
+			fmt.Fprintln(outFile, line)
+		}
+	}
+
+	return nil
+}
+
+// From https://github.com/mkmik/getsum/blob/v0.1.0/pkg/modfetch/sumdb.go:
+// clientOps is a dummy implementation that doesn't preserve the cache and thus doesn't fully partecipate
+// in the transparency log verification.
+// See https://github.com/golang/go/blob/master/src/cmd/go/internal/modfetch/sumdb.go for a fuller implementation
+type clientOps struct{}
+
+func (*clientOps) ReadConfig(file string) ([]byte, error) {
+	if file == "key" {
+		return []byte("sum.golang.org+033de0ae+Ac4zctda0e5eza+HJyk9SxEdh+s3Ux18htTTAD8OuAn8"), nil
+	}
+	if strings.HasSuffix(file, "/latest") {
+		// Looking for cached latest tree head.
+		// Empty result means empty tree.
+		return []byte{}, nil
+	}
+	return nil, fmt.Errorf("unknown config %s", file)
+}
+
+func (*clientOps) WriteConfig(file string, old, new []byte) error {
+	// Ignore writes.
+	return nil
+}
+
+func (*clientOps) ReadCache(file string) ([]byte, error) {
+	return nil, fmt.Errorf("no cache")
+}
+
+func (*clientOps) WriteCache(file string, data []byte) {
+	// Ignore writes.
+}
+
+func (*clientOps) Log(msg string) {
+	log.Print(msg)
+}
+
+func (*clientOps) SecurityError(msg string) {
+	log.Fatal(msg)
+}
+
+func init() {
+	http.DefaultClient.Timeout = 1 * time.Minute
+}
+
+func (*clientOps) ReadRemote(path string) ([]byte, error) {
+	name := "sum.golang.org+033de0ae+Ac4zctda0e5eza+HJyk9SxEdh+s3Ux18htTTAD8OuAn8"
+	if i := strings.Index(name, "+"); i >= 0 {
+		name = name[:i]
+	}
+	target := "https://" + name + path
+	/*
+		if *url != "" {
+			target = *url + path
+		}
+	*/
+	resp, err := http.Get(target)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("GET %v: %v", target, resp.Status)
+	}
+	data, err := ioutil.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
