@@ -3,12 +3,12 @@ module github.com/wolfi-dev/wolfictl
 go 1.21.1
 
 require (
-	chainguard.dev/apko v0.11.3-0.20231113190045-b9586cb4ad2b
+	chainguard.dev/apko v0.12.0
 	chainguard.dev/melange v0.5.3-0.20231113190040-ea805cad9301
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.4
 	github.com/anchore/syft v0.98.0
-	github.com/chainguard-dev/go-apk v0.0.0-20231113174935-f86aaf233502
+	github.com/chainguard-dev/go-apk v0.0.0-20231120201550-7b08e8f3b0fc
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
 	github.com/charmbracelet/bubbles v0.16.1
 	github.com/charmbracelet/bubbletea v0.24.2
@@ -48,7 +48,7 @@ require (
 	golang.org/x/time v0.5.0
 	golang.org/x/vuln v1.0.1
 	gopkg.in/yaml.v3 v3.0.1
-	sigs.k8s.io/release-utils v0.7.6
+	sigs.k8s.io/release-utils v0.7.7
 )
 
 require (
