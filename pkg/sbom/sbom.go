@@ -23,18 +23,17 @@ import (
 )
 
 var syftCatalogersEnabled = []string{
-	"apkdb",
-	"binary",
-	"dotnet-deps",
-	"go-module-binary",
+	"apk-db-cataloger",
+	"binary-cataloger",
+	"dotnet-portable-executable-cataloger",
+	"go-module-binary-cataloger",
 	"graalvm-native-image",
-	"java",
-	"javascript-package",
-	"php-composer-installed",
-	"portage",
-	"python-package",
+	"java-archive-cataloger",
+	"javascript-package-cataloger",
+	"php-composer-installed-cataloger",
+	"python-installed-package-cataloger",
 	"r-package-cataloger",
-	"ruby-gemspec",
+	"ruby-installed-gemspec-cataloger",
 }
 
 // Generate creates an SBOM for the given APK file.
