@@ -96,7 +96,12 @@ func (e *Event) UnmarshalYAML(v *yaml.Node) error {
 		event, err = decodeTypedEventData[PendingUpstreamFix](eventData)
 
 	default:
-		return fmt.Errorf("unrecognized event type %q, must be one of [%s]", eventData.Type, strings.Join(EventTypes, ", "))
+		// TODO: log at warn level: unrecognized event type
+
+		event = Event{
+			Timestamp: pe.Timestamp,
+			Type:      pe.Type,
+		}
 	}
 
 	if err != nil {
