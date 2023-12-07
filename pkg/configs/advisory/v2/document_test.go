@@ -289,3 +289,12 @@ func TestDocument_full_coverage(t *testing.T) {
 		}
 	})
 }
+
+func TestDocument_DecodeFutureNonBreakingSchema(t *testing.T) {
+	f, err := os.Open("testdata/future.advisories.yaml")
+	require.NoError(t, err)
+
+	var doc Document
+	err = yaml.NewDecoder(f).Decode(&doc)
+	assert.NoError(t, err)
+}

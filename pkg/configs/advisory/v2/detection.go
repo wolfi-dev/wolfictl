@@ -100,7 +100,7 @@ func (d *Detection) UnmarshalYAML(v *yaml.Node) error {
 		d.Data = data
 
 	default:
-		return fmt.Errorf("invalid detection type %q, must be one of [%s]", partial.Type, strings.Join(DetectionTypes, ", "))
+		// TODO: log at warn level: unrecognized type
 	}
 
 	// Copy the data from the partial detection.

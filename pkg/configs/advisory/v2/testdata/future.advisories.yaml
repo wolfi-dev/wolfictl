@@ -1,0 +1,30 @@
+schema-version: 2.0.99999
+
+package:
+  name: future
+
+advisories:
+  - id: CVE-2000-0001
+    aliases:
+      - GHSA-xxxx-xxxx-xxx9
+      - GO-2000-0001
+      - DSA-2000-0001
+    events:
+      - timestamp: 2000-01-01T00:00:00Z
+        type: future-event-type
+        data:
+          peanut-butter: jelly
+      - timestamp: 2000-01-01T00:00:00Z
+        type: detection
+        data:
+          type: future-detection-type
+          data:
+            butterflies:
+              - unicorns
+              - rainbows
+      - timestamp: 2000-01-01T00:00:00Z
+        type: false-positive-determination
+        data:
+          type: future-false-positive-type
+          note: Something something false positive.
+
