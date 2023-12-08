@@ -1,4 +1,4 @@
-schema-version: 2.0.1
+schema-version: 2.0.2
 
 package:
   name: full
@@ -20,6 +20,18 @@ advisories:
           data:
             cpeSearched: cpe:2.3:a:*:tinyxml:*:*:*:*:*:*:*:*
             cpeFound: cpe:2.3:a:tinyxml_project:tinyxml:*:*:*:*:*:*:*:*
+      - timestamp: 2000-01-01T00:00:00Z
+        type: detection
+        data:
+          type: scan/v1
+          data:
+            subpackageName: test-sub
+            componentID: fe8053a3adedc5d0
+            componentName: github.com/docker/distribution
+            componentVersion: v2.8.1+incompatible
+            componentType: go-module
+            componentLocation: /usr/bin/crane
+            scanner: grype
       - timestamp: 2000-01-01T00:00:00Z
         type: true-positive-determination
         data:

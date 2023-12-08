@@ -33,7 +33,7 @@ func TestIndexDiff(t *testing.T) {
 			expectedDiffResult: IndexDiffResult{
 				Added: []v2.Document{
 					{
-						SchemaVersion: v2.SchemaVersion,
+						SchemaVersion: "2.0.1",
 						Package: v2.Package{
 							Name: "ko",
 						},
@@ -57,7 +57,7 @@ func TestIndexDiff(t *testing.T) {
 			expectedDiffResult: IndexDiffResult{
 				Removed: []v2.Document{
 					{
-						SchemaVersion: v2.SchemaVersion,
+						SchemaVersion: "2.0.1",
 						Package: v2.Package{
 							Name: "ko",
 						},
