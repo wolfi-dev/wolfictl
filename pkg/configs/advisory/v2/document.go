@@ -15,7 +15,7 @@ import (
 // Wolfictl can only operate on documents that use a schema version that is
 // equal to or earlier than this version and that is not earlier than this
 // version's MAJOR number.
-const SchemaVersion = "2.0.1"
+const SchemaVersion = "2.0.2"
 
 type Document struct {
 	SchemaVersion string     `yaml:"schema-version"`
@@ -159,4 +159,12 @@ func (advs Advisories) Less(i, j int) bool {
 
 func (advs Advisories) Swap(i, j int) {
 	advs[i], advs[j] = advs[j], advs[i]
+}
+
+func validateNotEmpty(s string) error {
+	if s == "" {
+		return fmt.Errorf("must not be empty")
+	}
+
+	return nil
 }

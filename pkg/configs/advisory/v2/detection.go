@@ -14,6 +14,7 @@ import (
 const (
 	DetectionTypeManual = "manual"
 	DetectionTypeNVDAPI = "nvdapi"
+	DetectionTypeScanV1 = "scan/v1"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 	DetectionTypes = []string{
 		DetectionTypeManual,
 		DetectionTypeNVDAPI,
+		DetectionTypeScanV1,
 	}
 )
 
@@ -59,6 +61,9 @@ func (d Detection) validateData() error {
 
 	case DetectionTypeNVDAPI:
 		return validateTypedDetectionData[DetectionNVDAPI](d.Data)
+
+	case DetectionTypeScanV1:
+		return validateTypedDetectionData[DetectionScanV1](d.Data)
 	}
 
 	return nil
@@ -99,6 +104,13 @@ func (d *Detection) UnmarshalYAML(v *yaml.Node) error {
 		}
 		d.Data = data
 
+	case DetectionTypeScanV1:
+		var data DetectionScanV1
+		if err := partial.Data.Decode(&data); err != nil {
+			return err
+		}
+		d.Data = data
+
 	default:
 		// TODO: log at warn level: unrecognized type
 	}
@@ -123,4 +135,49 @@ func (d DetectionNVDAPI) Validate() error {
 			errorhelpers.LabelError("cpeFound", vuln.ValidateCPE(d.CPEFound)),
 		),
 	)
+}
+
+var (
+	DetectionScannerGrype = "grype"
+)
+
+var DetectionScanners = []string{
+	DetectionScannerGrype,
+}
+
+// DetectionScanV1 is the data associated with DetectionTypeScanV1.
+type DetectionScanV1 struct {
+	SubpackageName    string `yaml:"subpackageName"`
+	ComponentID       string `yaml:"componentID"` // TODO: consider namespacing this ID using the SBOM tool+format
+	ComponentName     string `yaml:"componentName"`
+	ComponentVersion  string `yaml:"componentVersion"`
+	ComponentType     string `yaml:"componentType"`
+	ComponentLocation string `yaml:"componentLocation"`
+	Scanner           string `yaml:"scanner"` // TODO: it'd be nice for the scanner value to be automatically versioned
+}
+
+// Validate returns an error if the DetectionScanV1 data is invalid.
+func (d DetectionScanV1) Validate() error {
+	return errorhelpers.LabelError("scan/v1 detection data",
+		errors.Join(
+			errorhelpers.LabelError("subpackageName", validateNotEmpty(d.SubpackageName)),
+			errorhelpers.LabelError("componentID", validateNotEmpty(d.ComponentID)),
+			errorhelpers.LabelError("componentName", validateNotEmpty(d.ComponentName)),
+			errorhelpers.LabelError("componentVersion", validateNotEmpty(d.ComponentVersion)),
+			errorhelpers.LabelError("componentType", validateNotEmpty(d.ComponentType)),
+			errorhelpers.LabelError("componentLocation", validateNotEmpty(d.ComponentLocation)),
+			errorhelpers.LabelError("scanner", validateDetectionScanner(d.Scanner)),
+		),
+	)
+}
+
+func validateDetectionScanner(scanner string) error {
+	if !slices.Contains(DetectionScanners, scanner) {
+		return fmt.Errorf("value is %q but must be one of [%v]", scanner, strings.Join(
+			DetectionScanners,
+			", ",
+		))
+	}
+
+	return nil
 }

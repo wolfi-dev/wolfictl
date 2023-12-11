@@ -88,6 +88,9 @@ Log the new schema version in this document, at the top of the section [Version 
 `(vNext goes here)`
 - (list what was changed)
 
+`v2.0.2`
+- Added a new detection type "scan/v1", which corresponds to a new type for the detection event's "data" field. This introduces the notion of "type" values being versioned (e.g. with "/v1").
+
 `v2.0.1`
 - Added new event type "pending-upstream-fix", with a required "note" data field.
 

@@ -62,6 +62,38 @@ func TestDetection_Validate(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "scan/v1",
+			detection: Detection{
+				Type: DetectionTypeScanV1,
+				Data: DetectionScanV1{
+					SubpackageName:    "crane-docs",
+					ComponentID:       "fe8053a3adedc5d0",
+					ComponentName:     "github.com/docker/distribution",
+					ComponentVersion:  "v2.8.1+incompatible",
+					ComponentType:     "go-module",
+					ComponentLocation: "/usr/bin/crane",
+					Scanner:           "grype",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "scan/v1 missing required fields",
+			detection: Detection{
+				Type: DetectionTypeScanV1,
+				Data: DetectionScanV1{
+					SubpackageName:    "",
+					ComponentID:       "fe8053a3adedc5d0",
+					ComponentName:     "github.com/docker/distribution",
+					ComponentVersion:  "",
+					ComponentType:     "go-module",
+					ComponentLocation: "",
+					Scanner:           "",
+				},
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
