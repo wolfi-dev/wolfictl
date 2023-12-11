@@ -5,6 +5,9 @@ package:
 
 advisories:
   - id: CVE-2020-8927
+    aliases:
+      - GHSA-2222-2222-2222
+      - GHSA-3333-3333-3333
     events:
       - timestamp: 2022-09-15T02:40:18Z
         type: fixed

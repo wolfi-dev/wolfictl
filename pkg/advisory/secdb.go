@@ -62,16 +62,28 @@ func BuildSecurityDatabase(opts BuildSecurityDatabaseOptions) ([]byte, error) {
 				}
 
 				sortedEvents := advisory.SortedEvents()
-
 				latest := sortedEvents[len(advisory.Events)-1]
-				vulnID := advisory.ID
 
-				switch latest.Type {
-				case v2.EventTypeFixed:
-					version := latest.Data.(v2.Fixed).FixedVersion
-					secfixes[version] = append(secfixes[version], vulnID)
-				case v2.EventTypeFalsePositiveDetermination:
-					secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vulnID)
+				addVulnToPkgVersion := func(vulnID string) {
+					switch latest.Type {
+					case v2.EventTypeFixed:
+						version := latest.Data.(v2.Fixed).FixedVersion
+						secfixes[version] = append(secfixes[version], vulnID)
+					case v2.EventTypeFalsePositiveDetermination:
+						secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vulnID)
+					}
+				}
+
+				// Get vulnerability from advisory ID
+
+				vulnID := advisory.ID
+				addVulnToPkgVersion(vulnID)
+
+				// Get vulnerabilities from advisory aliases
+
+				for _, alias := range advisory.Aliases {
+					vulnID := alias
+					addVulnToPkgVersion(vulnID)
 				}
 			}
 
