@@ -158,12 +158,9 @@ type DetectionScanV1 struct {
 
 // Validate returns an error if the DetectionScanV1 data is invalid.
 func (d DetectionScanV1) Validate() error {
-	// TODO: Should SubpackageName be required, and it's set to the origin package
-	// 	sometimes? Or should an empty value imply this was a scan of an origin
-	// 	package?
-
 	return errorhelpers.LabelError("scan/v1 detection data",
 		errors.Join(
+			errorhelpers.LabelError("subpackageName", validateNotEmpty(d.SubpackageName)),
 			errorhelpers.LabelError("componentID", validateNotEmpty(d.ComponentID)),
 			errorhelpers.LabelError("componentName", validateNotEmpty(d.ComponentName)),
 			errorhelpers.LabelError("componentVersion", validateNotEmpty(d.ComponentVersion)),
