@@ -1,0 +1,4 @@
+package:
+  name: foo
+  version: 0.0.2
+  description: a melange config in the foo org
