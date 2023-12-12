@@ -11,7 +11,7 @@ require (
 	github.com/chainguard-dev/go-apk v0.0.0-20231201001558-56a2866e56af
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
 	github.com/charmbracelet/bubbles v0.16.1
-	github.com/charmbracelet/bubbletea v0.24.2
+	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/lipgloss v0.9.1
 	github.com/cli/go-gh/v2 v2.4.0
 	github.com/cpuguy83/go-md2man v1.0.10
