@@ -39,9 +39,16 @@ jobs:
         with:
           repository: 'wolfi-dev/os'
           path: 'wolfi-os'
-      - run: |
+      - name: Test Wolfi OS repo
+        run: |
           ./wolfictl text -d wolfi-os \
             --type=name \
             --pipeline-dir=wolfi-os/pipelines/ \
             --keyring-append=https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub \
             --repository-append=https://packages.wolfi.dev/bootstrap/stage3
+
+      - name: Test nested repo structure
+        run: |
+          ./wolfictl text -d testdata/text/ | grep foo-0.0.2-r0
+          ./wolfictl text -d testdata/text/ | grep bar-0.0.1-r0
+          ./wolfictl text -d testdata/text/ | grep root-0.0.1-r0

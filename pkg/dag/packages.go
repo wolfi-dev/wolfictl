@@ -137,76 +137,92 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 			return err
 		}
 
-		if d.IsDir() && path != "." {
+		// Skip anything in .github/ and .git/
+		if path == ".github" {
+			return fs.SkipDir
+		}
+		if path == ".git" {
 			return fs.SkipDir
 		}
 
-		if d.IsDir() && path != "." {
-			return fs.SkipDir
+		// Skip .yam.yaml and .melange.k8s.yaml
+		if d.Type().IsRegular() && path == ".yam.yaml" {
+			return nil
+		}
+		if d.Type().IsRegular() && path == ".melange.k8s.yaml" {
+			return nil
 		}
 
-		if d.Type().IsRegular() && strings.HasSuffix(path, ".yaml") && !strings.HasPrefix(d.Name(), ".") {
-			p := filepath.Join(dirPath, path)
-			buildc, err := config.ParseConfiguration(p)
-			if err != nil {
-				return err
+		// Skip any file that isn't a yaml file
+		if !d.Type().IsRegular() || !strings.HasSuffix(path, ".yaml") {
+			return nil
+		}
+
+		if filepath.Dir(path) != "." && !strings.HasSuffix(path, ".melange.yaml") {
+			log.Println("Skipping non-melange YAML file:", path)
+			return nil
+		}
+
+		p := filepath.Join(dirPath, path)
+		buildc, err := config.ParseConfiguration(p)
+		if err != nil {
+			return err
+		}
+		c := &Configuration{
+			Configuration: buildc,
+			Path:          p,
+			name:          buildc.Package.Name,
+			version:       fullVersion(&buildc.Package),
+		}
+
+		name := c.name
+		if name == "" {
+			log.Fatalf("no package name in %q", path)
+		}
+		if err := pkgs.addConfiguration(name, c); err != nil {
+			return err
+		}
+		pkgs.addPackage(name, c)
+		if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
+			return err
+		}
+
+		for i := range c.Subpackages {
+			subpkg := c.Subpackages[i]
+			name := subpkg.Name
+			if name == "" {
+				log.Fatalf("empty subpackage name at index %d for package %q", i, c.Package.Name)
 			}
 			c := &Configuration{
 				Configuration: buildc,
 				Path:          p,
-				name:          buildc.Package.Name,
-				version:       fullVersion(&buildc.Package),
-			}
-
-			name := c.name
-			if name == "" {
-				log.Fatalf("no package name in %q", path)
+				name:          name,
+				version:       fullVersion(&buildc.Package), // subpackages have same version as origin
 			}
 			if err := pkgs.addConfiguration(name, c); err != nil {
 				return err
 			}
-			pkgs.addPackage(name, c)
-			if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
+			if err := pkgs.addProvides(c, subpkg.Dependencies.Provides); err != nil {
 				return err
 			}
 
-			for i := range c.Subpackages {
-				subpkg := c.Subpackages[i]
-				name := subpkg.Name
-				if name == "" {
-					log.Fatalf("empty subpackage name at index %d for package %q", i, c.Package.Name)
-				}
-				c := &Configuration{
-					Configuration: buildc,
-					Path:          p,
-					name:          name,
-					version:       fullVersion(&buildc.Package), // subpackages have same version as origin
-				}
-				if err := pkgs.addConfiguration(name, c); err != nil {
-					return err
-				}
-				if err := pkgs.addProvides(c, subpkg.Dependencies.Provides); err != nil {
-					return err
-				}
-
-				// TODO: resolve deps via `uses` for subpackage pipelines.
+			// TODO: resolve deps via `uses` for subpackage pipelines.
+		}
+		// Resolve all `uses` used by the pipeline. This updates the set of
+		// .environment.contents.packages so the next block can include those as build deps.
+		pctx := &build.PipelineBuild{
+			Build: &build.Build{
+				PipelineDir:   pipelineDir,
+				Configuration: *c.Configuration,
+			},
+			Package: &c.Package,
+		}
+		for i := range c.Pipeline {
+			s := &build.PipelineContext{Pipeline: &c.Pipeline[i]}
+			if err := s.ApplyNeeds(pctx); err != nil {
+				return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
 			}
-			// Resolve all `uses` used by the pipeline. This updates the set of
-			// .environment.contents.packages so the next block can include those as build deps.
-			pctx := &build.PipelineBuild{
-				Build: &build.Build{
-					PipelineDir:   pipelineDir,
-					Configuration: *c.Configuration,
-				},
-				Package: &c.Package,
-			}
-			for i := range c.Pipeline {
-				s := &build.PipelineContext{Pipeline: &c.Pipeline[i]}
-				if err := s.ApplyNeeds(pctx); err != nil {
-					return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
-				}
-				c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
-			}
+			c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
 		}
 
 		return nil
