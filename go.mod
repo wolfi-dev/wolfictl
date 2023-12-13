@@ -10,7 +10,7 @@ require (
 	github.com/anchore/syft v0.98.0
 	github.com/chainguard-dev/go-apk v0.0.0-20231201001558-56a2866e56af
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
-	github.com/charmbracelet/bubbles v0.16.1
+	github.com/charmbracelet/bubbles v0.17.0
 	github.com/charmbracelet/bubbletea v0.24.2
 	github.com/charmbracelet/lipgloss v0.9.1
 	github.com/cli/go-gh/v2 v2.4.0
@@ -236,7 +236,7 @@ require (
 	github.com/saferwall/pe v1.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/sahilm/fuzzy v0.1.0 // indirect
+	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
