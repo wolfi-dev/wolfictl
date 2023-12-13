@@ -34,9 +34,10 @@ const (
 var grypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 
 var grypeDBConfig = db.Config{
-	DBRootDir:           grypeDBDir,
-	ListingURL:          grypeDBListingURL,
-	ValidateByHashOnGet: true,
+	DBRootDir:  grypeDBDir,
+	ListingURL: grypeDBListingURL,
+	// TODO(https://github.com/wolfi-dev/wolfictl/issues/520): Set this to true.
+	ValidateByHashOnGet: false,
 	ValidateAge:         true,
 	MaxAllowedBuiltAge:  24 * time.Hour,
 }
