@@ -253,6 +253,9 @@ type scanParams struct {
 	triageWithGoVulnCheck bool
 	remoteScanning        bool
 	useCPEMatching        bool
+
+	// Lazily initialized by newScanner.
+	scanner *scan.Scanner
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -366,36 +369,49 @@ func (p *scanParams) doScanCommandForSingleInput(
 	return result, nil
 }
 
+func (p *scanParams) generateSBOM(f *os.File) (*sbomSyft.SBOM, error) {
+	if p.sbomInput {
+		return sbom.FromSyftJSON(f)
+	}
+
+	if p.disableSBOMCache {
+		return sbom.Generate(f.Name(), f, p.distro)
+	}
+
+	return sbom.CachedGenerate(f.Name(), f, p.distro)
+}
+
+func (p *scanParams) newScanner() (*scan.Scanner, error) {
+	if p.scanner != nil {
+		return p.scanner, nil
+	}
+
+	scanner, err := scan.NewScanner(p.localDBFilePath, p.useCPEMatching)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create scanner: %w", err)
+	}
+
+	p.scanner = scanner
+
+	return scanner, nil
+}
+
 func (p *scanParams) scanFile(inputFile *os.File) (*inputScanResult, error) {
 	inputFileName := inputFile.Name()
 
 	// Get the SBOM of the APK
-	var apkSBOM io.ReadSeeker
-	if p.sbomInput {
-		apkSBOM = inputFile
-	} else {
-		apkFile := inputFile
-		var s *sbomSyft.SBOM
-		var err error
+	apkSBOM, err := p.generateSBOM(inputFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate SBOM: %w", err)
+	}
 
-		if p.disableSBOMCache {
-			s, err = sbom.Generate(inputFileName, apkFile, p.distro)
-		} else {
-			s, err = sbom.CachedGenerate(inputFileName, apkFile, p.distro)
-		}
-		if err != nil {
-			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
-		}
-
-		reader, err := sbom.ToSyftJSON(s)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert SBOM to Syft JSON: %w", err)
-		}
-		apkSBOM = reader
+	scanner, err := p.newScanner()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create scanner: %w", err)
 	}
 
 	// Do the vulnerability scan based on the SBOM
-	result, err := scan.APKSBOM(apkSBOM, p.localDBFilePath, p.useCPEMatching)
+	result, err := scanner.APKSBOM(apkSBOM)
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFileName, err)
 	}

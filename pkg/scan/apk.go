@@ -86,22 +86,30 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 	}, nil
 }
 
-// APKSBOM scans an SBOM of an APK for vulnerabilities.
+// APKSBOM parses and scans an SBOM of an APK for vulnerabilities.
+// Deprecated: Use Scanner.APKSBOM
 func APKSBOM(r io.ReadSeeker, localDBFilePath string, useCPEs bool) (*Result, error) {
 	s, err := sbom.FromSyftJSON(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)
 	}
 
-	return scan(s, localDBFilePath, useCPEs)
-}
-
-func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, error) {
-	apk, err := newTargetAPK(s)
+	scanner, err := NewScanner(localDBFilePath, useCPEs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create scanner: %w", err)
 	}
 
+	return scanner.APKSBOM(s)
+}
+
+type Scanner struct {
+	datastore            *store.Store
+	dbStatus             *db.Status
+	vulnerabilityMatcher *grype.VulnerabilityMatcher
+}
+
+// NewScanner initializes the grype DB for reuse across multiple scans.
+func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 	updateDB := true
 	if localDBFilePath != "" {
 		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFilePath)
@@ -125,13 +133,27 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, erro
 
 	vulnerabilityMatcher := newGrypeVulnerabilityMatcher(*datastore, useCPEs)
 
-	syftPkgs := s.Artifacts.Packages.Sorted()
+	return &Scanner{
+		datastore:            datastore,
+		dbStatus:             dbStatus,
+		vulnerabilityMatcher: vulnerabilityMatcher,
+	}, nil
+}
+
+// APKSBOM scans an SBOM of an APK for vulnerabilities.
+func (s *Scanner) APKSBOM(ssbom *sbomSyft.SBOM) (*Result, error) {
+	apk, err := newTargetAPK(ssbom)
+	if err != nil {
+		return nil, err
+	}
+
+	syftPkgs := ssbom.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})
 
 	// Find vulnerability matches
-	matchesCollection, _, err := vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{
-		Source: &s.Source,
-		Distro: s.Artifacts.LinuxDistribution,
+	matchesCollection, _, err := s.vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{
+		Source: &ssbom.Source,
+		Distro: ssbom.Artifacts.LinuxDistribution,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to find vulnerability matches: %w", err)
@@ -143,7 +165,7 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, erro
 	for i := range matches {
 		m := matches[i]
 
-		finding, err := mapMatchToFinding(m, datastore)
+		finding, err := mapMatchToFinding(m, s.datastore)
 		if err != nil {
 			return nil, fmt.Errorf("failed to map match to finding: %w", err)
 		}
@@ -156,7 +178,7 @@ func scan(s *sbomSyft.SBOM, localDBFilePath string, useCPEs bool) (*Result, erro
 	result := &Result{
 		TargetAPK:     apk,
 		Findings:      findings,
-		GrypeDBStatus: dbStatus,
+		GrypeDBStatus: s.dbStatus,
 	}
 
 	return result, nil
