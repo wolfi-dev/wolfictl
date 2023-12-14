@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"golang.org/x/exp/slices"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -35,11 +37,6 @@ const (
 )
 
 var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
-
-type inputScanResult struct {
-	InputFile string
-	Result    scan.Result
-}
 
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
@@ -142,6 +139,8 @@ wolfictl scan package1 package2 --remote
 		Args:          cobra.MinimumNArgs(1),
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+
 			if p.outputFormat == "" {
 				p.outputFormat = outputFormatOutline
 			}
@@ -198,26 +197,14 @@ wolfictl scan package1 package2 --remote
 				}
 			}
 
-			inputs, err := p.resolveInputsToScan(cmd.Context(), args)
+			inputs, err := p.resolveInputsToScan(ctx, args)
 			if err != nil {
 				return err
 			}
 
-			// Do a scan for each input
-
-			var scans []inputScanResult
-			var inputPathsFailingRequireZero []string
-			for _, input := range inputs {
-				isr, err := p.doScanCommandForSingleInput(cmd.Context(), input, advisoryDocumentIndices)
-				if err != nil {
-					return err
-				}
-				scans = append(scans, *isr)
-
-				if p.requireZeroFindings && len(isr.Result.Findings) > 0 {
-					// Accumulate the list of failures to be returned at the end, but we still want to complete all scans
-					inputPathsFailingRequireZero = append(inputPathsFailingRequireZero, input)
-				}
+			scans, inputPathsFailingRequireZero, err := scanEverything(ctx, p, inputs, advisoryDocumentIndices)
+			if err != nil {
+				return err
 			}
 
 			if p.outputFormat == outputFormatJSON {
@@ -240,6 +227,91 @@ wolfictl scan package1 package2 --remote
 	return cmd
 }
 
+func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisoryDocumentIndices []*configs.Index[v2.Document]) ([]scan.Result, []string, error) {
+	// We're going to generate the SBOMs concurrently, then scan them sequentially.
+	var g errgroup.Group
+	g.SetLimit(runtime.GOMAXPROCS(0) + 1)
+
+	// done is a slice of pseudo-promises that get closed when sboms[i] and files[i] are ready to scan.
+	// We do this to keep a deterministic scan order, which maybe we don't actually care about.
+	done := make([]chan struct{}, len(inputs))
+	for i := range inputs {
+		done[i] = make(chan struct{})
+	}
+
+	sboms := make([]*sbomSyft.SBOM, len(inputs))
+	files := make([]*os.File, len(inputs))
+	scans := make([]scan.Result, len(inputs))
+
+	var inputPathsFailingRequireZero []string
+
+	// Immediately start a goroutine so we can initialize the vulnerability database.
+	// Once that's finished, we will start to pull sboms off of done as they become ready.
+	g.Go(func() error {
+		scanner, err := scan.NewScanner(p.localDBFilePath, p.useCPEMatching)
+		if err != nil {
+			return fmt.Errorf("failed to create scanner: %w", err)
+		}
+
+		for i, ch := range done {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-ch:
+			}
+
+			input := inputs[i]
+			file := files[i]
+			apkSBOM := sboms[i]
+
+			if p.outputFormat == outputFormatOutline {
+				fmt.Printf("🔎 Scanning %q\n", input)
+			}
+
+			result, err := p.doScanCommandForSingleInput(ctx, scanner, file, apkSBOM, advisoryDocumentIndices)
+			if err != nil {
+				return fmt.Errorf("failed to scan %q: %w", input, err)
+			}
+
+			scans[i] = *result
+
+			if p.requireZeroFindings && len(result.Findings) > 0 {
+				// Accumulate the list of failures to be returned at the end, but we still want to complete all scans
+				inputPathsFailingRequireZero = append(inputPathsFailingRequireZero, inputs[i])
+			}
+		}
+
+		return nil
+	})
+
+	for i, input := range inputs {
+		i, input := i, input
+
+		g.Go(func() error {
+			inputFile, err := resolveInputFileFromArg(input)
+			if err != nil {
+				return fmt.Errorf("failed to open input file: %w", err)
+			}
+
+			// Get the SBOM of the APK
+			apkSBOM, err := p.generateSBOM(inputFile)
+			if err != nil {
+				return fmt.Errorf("failed to generate SBOM: %w", err)
+			}
+
+			sboms[i] = apkSBOM
+			files[i] = inputFile
+
+			// Signals to the other goroutine that inputs[i] is ready to scan.
+			close(done[i])
+
+			return nil
+		})
+	}
+
+	return scans, inputPathsFailingRequireZero, g.Wait()
+}
+
 type scanParams struct {
 	requireZeroFindings   bool
 	localDBFilePath       string
@@ -253,9 +325,6 @@ type scanParams struct {
 	triageWithGoVulnCheck bool
 	remoteScanning        bool
 	useCPEMatching        bool
-
-	// Lazily initialized by newScanner.
-	scanner *scan.Scanner
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -312,31 +381,24 @@ func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]
 
 func (p *scanParams) doScanCommandForSingleInput(
 	ctx context.Context,
-	input string,
+	scanner *scan.Scanner,
+	inputFile *os.File,
+	apkSBOM *sbomSyft.SBOM,
 	advisoryDocumentIndices []*configs.Index[v2.Document],
-) (*inputScanResult, error) {
-	if p.outputFormat == outputFormatOutline {
-		fmt.Printf("🔎 Scanning %q\n", input)
-	}
-
-	inputFile, err := resolveInputFileFromArg(input)
+) (*scan.Result, error) {
+	result, err := scanner.APKSBOM(apkSBOM)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open input file: %w", err)
-	}
-
-	result, err := p.scanFile(inputFile)
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to scan APK: %w", err)
 	}
 
 	// If requested, triage vulnerabilities in Go binaries using govulncheck
 
 	if p.triageWithGoVulnCheck {
-		triagedFindings, err := scan.Triage(ctx, result.Result, inputFile)
+		triagedFindings, err := scan.Triage(ctx, *result, inputFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to triage vulnerability matches: %w", err)
 		}
-		result.Result.Findings = triagedFindings
+		result.Findings = triagedFindings
 	}
 
 	inputFile.Close()
@@ -344,17 +406,17 @@ func (p *scanParams) doScanCommandForSingleInput(
 	// If requested, filter scan results using advisories
 
 	if set := p.advisoryFilterSet; set != "" {
-		findings, err := scan.FilterWithAdvisories(result.Result, advisoryDocumentIndices, set)
+		findings, err := scan.FilterWithAdvisories(*result, advisoryDocumentIndices, set)
 		if err != nil {
-			return nil, fmt.Errorf("failed to filter scan results with advisories during scan of %q: %w", input, err)
+			return nil, fmt.Errorf("failed to filter scan results with advisories: %w", err)
 		}
 
-		result.Result.Findings = findings
+		result.Findings = findings
 	}
 
 	// Handle CLI options
 
-	findings := result.Result.Findings
+	findings := result.Findings
 	if p.outputFormat == outputFormatOutline {
 		// Print output immediately
 
@@ -379,49 +441,6 @@ func (p *scanParams) generateSBOM(f *os.File) (*sbomSyft.SBOM, error) {
 	}
 
 	return sbom.CachedGenerate(f.Name(), f, p.distro)
-}
-
-func (p *scanParams) newScanner() (*scan.Scanner, error) {
-	if p.scanner != nil {
-		return p.scanner, nil
-	}
-
-	scanner, err := scan.NewScanner(p.localDBFilePath, p.useCPEMatching)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create scanner: %w", err)
-	}
-
-	p.scanner = scanner
-
-	return scanner, nil
-}
-
-func (p *scanParams) scanFile(inputFile *os.File) (*inputScanResult, error) {
-	inputFileName := inputFile.Name()
-
-	// Get the SBOM of the APK
-	apkSBOM, err := p.generateSBOM(inputFile)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate SBOM: %w", err)
-	}
-
-	scanner, err := p.newScanner()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create scanner: %w", err)
-	}
-
-	// Do the vulnerability scan based on the SBOM
-	result, err := scanner.APKSBOM(apkSBOM)
-	if err != nil {
-		return nil, fmt.Errorf("failed to scan APK using %q: %w", inputFileName, err)
-	}
-
-	isr := &inputScanResult{
-		InputFile: inputFileName,
-		Result:    *result,
-	}
-
-	return isr, nil
 }
 
 // resolveInputFilePathsFromBuildLog takes the given path to a Melange build log
