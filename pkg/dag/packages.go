@@ -218,7 +218,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 			Package: &c.Package,
 		}
 		for i := range c.Pipeline {
-			s := &build.PipelineContext{Pipeline: &c.Pipeline[i]}
+			s := &build.PipelineContext{Environment: &pctx.Build.Configuration.Environment, PipelineDirs: []string{pipelineDir}, Pipeline: &c.Pipeline[i]}
 			if err := s.ApplyNeeds(pctx); err != nil {
 				return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
 			}
