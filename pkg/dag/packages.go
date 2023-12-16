@@ -212,7 +212,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 		// .environment.contents.packages so the next block can include those as build deps.
 		pctx := &build.PipelineBuild{
 			Build: &build.Build{
-				PipelineDir:   pipelineDir,
+				PipelineDirs:  []string{pipelineDir},
 				Configuration: *c.Configuration,
 			},
 			Package: &c.Package,
