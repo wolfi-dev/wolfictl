@@ -244,10 +244,24 @@ func (o GitHubReleaseOptions) getRepoInfo(repoList map[string]string) ([]RepoInf
 			return nil, fmt.Errorf("malformed repo identifier should be in the form owner/repo, got %s", ownerName)
 		}
 
+		// if tag filter, filter-prefix or filter-contains is set then include this in the graphql query
+		// this allows us to filter out any tags that do not match the filter.
+		ghm := pc.Config.Update.GitHubMonitor
+		var filter string
+
+		switch {
+		case ghm.TagFilterPrefix != "":
+			filter = ghm.TagFilterPrefix
+		case ghm.TagFilterContains != "":
+			filter = ghm.TagFilterContains
+		default:
+			filter = ghm.TagFilter
+		}
+
 		repos = append(repos, RepoInfo{
 			Owner:       parts[0],
 			Name:        parts[1],
-			Filter:      pc.Config.Update.GitHubMonitor.TagFilter,
+			Filter:      filter,
 			PackageName: pc.Hash,
 		})
 	}
