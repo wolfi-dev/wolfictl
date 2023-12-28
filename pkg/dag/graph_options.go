@@ -4,6 +4,7 @@ type graphOptions struct {
 	allowUnresolved bool
 	repos           []string
 	keys            []string
+	arch            string
 }
 
 type GraphOptions func(*graphOptions) error
@@ -35,6 +36,14 @@ func WithRepos(repos ...string) GraphOptions {
 func WithKeys(keys ...string) GraphOptions {
 	return func(o *graphOptions) error {
 		o.keys = keys
+		return nil
+	}
+}
+
+// WithArch sets the architecture for which the graph is built.
+func WithArch(arch string) GraphOptions {
+	return func(o *graphOptions) error {
+		o.arch = arch
 		return nil
 	}
 }
