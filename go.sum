@@ -1,5 +1,5 @@
-chainguard.dev/apko v0.12.0 h1:smG4DL5HMmSsbO6/Buou+GpCWpUW4whnoEWNsoz/6To=
-chainguard.dev/apko v0.12.0/go.mod h1:KNMKxHVteLL3R4lfg0ICV5NaAFY6v/+q7/nYT7B/qug=
+chainguard.dev/apko v0.13.1 h1:gwFvvBxMZR+iCm044QlXM6SP2jCIqYAawOVeRNRwxZg=
+chainguard.dev/apko v0.13.1/go.mod h1:uor69dOrERV5MlKOtRKlxo5HeNHER+3llH7l4WDT18g=
 chainguard.dev/melange v0.5.5 h1:5w2nRu4b39iHHKiOdR4EFMTliltteDbg7FMHTGsfJDg=
 chainguard.dev/melange v0.5.5/go.mod h1:TUlU/BwGkyWHgSpRQDunNuEy6wWFjGaI+uEhikGP80w=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -303,8 +303,8 @@ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/chainguard-dev/go-apk v0.0.0-20231206041704-bec618e956a2 h1:DtH4kLTbUOnkHJyE7c5l1MY9xWkOAIaZ5JZAwiI9+SY=
-github.com/chainguard-dev/go-apk v0.0.0-20231206041704-bec618e956a2/go.mod h1:y0BbOQALsoi1T2Lt5KmFNn92G+fRFSUuogQI2171HS8=
+github.com/chainguard-dev/go-apk v0.0.0-20231218235333-2acefacd5846 h1:5IIBDHIW3qkVVYtwOK6Lsx/loxl+2lHXisPCKGrwBk8=
+github.com/chainguard-dev/go-apk v0.0.0-20231218235333-2acefacd5846/go.mod h1:y0BbOQALsoi1T2Lt5KmFNn92G+fRFSUuogQI2171HS8=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e h1:MiWG71ge3/KiR2fW9R8MFHck4NbCtuwD6NpOXcZQ1qo=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e/go.mod h1:obzGv2cx3tkRgkLQADSPaRl3OEsYmyfSv7t2Wu60tZw=
 github.com/chainguard-dev/kontext v0.1.0 h1:GFnDRZiqa+anUi7tzZMECXr0nwt4Eo/zMzTQPLRXUIs=
