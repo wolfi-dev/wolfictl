@@ -3,12 +3,12 @@ module github.com/wolfi-dev/wolfictl
 go 1.21.1
 
 require (
-	chainguard.dev/apko v0.12.0
+	chainguard.dev/apko v0.13.1
 	chainguard.dev/melange v0.5.5
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.73.5
 	github.com/anchore/syft v0.99.0
-	github.com/chainguard-dev/go-apk v0.0.0-20231206041704-bec618e956a2
+	github.com/chainguard-dev/go-apk v0.0.0-20231218235333-2acefacd5846
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
 	github.com/charmbracelet/bubbles v0.17.1
 	github.com/charmbracelet/bubbletea v0.25.0
