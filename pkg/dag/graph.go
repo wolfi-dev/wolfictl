@@ -80,8 +80,11 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	)
 
 	// TODO: should we repeat across multiple arches? Use c.Package.TargetArchitecture []string
-	var arch = "x86_64"
-	localRepo := pkgs.Repository(arch)
+	if opts.arch == "" {
+		opts.arch = "x86_64"
+	}
+
+	localRepo := pkgs.Repository(opts.arch)
 	localRepoSource := localRepo.Source()
 	localOnlyResolver := apk.NewPkgResolver(context.TODO(), []apk.NamedIndex{localRepo})
 	g.resolvers[localRepoSource] = localOnlyResolver
@@ -97,7 +100,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 			continue
 		}
 		// add the origin package as its own resolver, so that the subpackage can resolve to it
-		g.resolvers[c.String()] = singlePackageResolver(c, arch)
+		g.resolvers[c.String()] = singlePackageResolver(c, opts.arch)
 		for i := range c.Subpackages {
 			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
 			for _, subpkgVersion := range subpkg {
@@ -120,7 +123,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 	for _, c := range pkgs.Packages() {
 		// add packages from the runtime dependencies
-		resolverKey, err := g.addResolverForRepos(arch,
+		resolverKey, err := g.addResolverForRepos(opts.arch,
 			localRepo,
 			indexes,
 			keys,
@@ -140,7 +143,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 	for _, c := range pkgs.Packages() {
 		// add packages from the buildtime dependencies
-		resolverKey, err := g.addResolverForRepos(arch,
+		resolverKey, err := g.addResolverForRepos(opts.arch,
 			localRepo,
 			indexes,
 			keys,
