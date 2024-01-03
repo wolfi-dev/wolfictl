@@ -19,6 +19,7 @@ import (
 )
 
 var match string
+var all bool
 
 func Branch() *cobra.Command {
 	cmd := &cobra.Command{
@@ -34,6 +35,9 @@ wolfictl gh gc branch https://github.com/wolfi-dev/os --match "wolfictl-"
 `,
 		Args: cobra.RangeArgs(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !all && match == "" {
+				return errors.New("you must either pass --all to close all branches or provide a match pattern with --match")
+			}
 			client := &http2.RLHTTPClient{
 				Client: oauth2.NewClient(context.Background(), ghTokenSource{}),
 
@@ -46,6 +50,7 @@ wolfictl gh gc branch https://github.com/wolfi-dev/os --match "wolfictl-"
 	}
 
 	cmd.Flags().StringVar(&match, "match", "", "pattern to match branches against")
+	cmd.Flags().BoolVar(&all, "all", false, "close all branches if set")
 
 	return cmd
 }
@@ -94,7 +99,7 @@ func gcBranches(ghclient *http2.RLHTTPClient, repo, match string) error {
 
 	for _, branch := range branches {
 		// Check if branch name starts with the match pattern
-		if strings.HasPrefix(*branch.Name, match) {
+		if all || strings.HasPrefix(*branch.Name, match) {
 			// Check if there are any open pull requests for this branch
 			if _, ok := existingPRs[*branch.Name]; ok {
 				log.Printf("Skipping branch %s, there are open pull requests for it\n", *branch.Name)

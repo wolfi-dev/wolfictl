@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 	"strings"
@@ -32,6 +33,9 @@ wolfictl gc issues https://github.com/wolfi-dev/versions --match "version-stream
 `,
 		Args: cobra.RangeArgs(1, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !all && match == "" {
+				return errors.New("you must either pass --all to close all issues or provide a match pattern with --match")
+			}
 			ts := oauth2.StaticTokenSource(
 				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 			)
@@ -47,6 +51,7 @@ wolfictl gc issues https://github.com/wolfi-dev/versions --match "version-stream
 	}
 
 	cmd.Flags().StringVar(&match, "match", "", "pattern to match issues against")
+	cmd.Flags().BoolVar(&all, "all", false, "close all issues if set")
 
 	return cmd
 }
@@ -74,7 +79,7 @@ func gcIssues(ghclient *http2.RLHTTPClient, repo, match string) error {
 
 	for _, issue := range issues {
 		// Check if issue name starts with the match pattern
-		if strings.HasPrefix(*issue.Title, match) {
+		if all || strings.HasPrefix(*issue.Title, match) {
 			// Close the issue
 			err := gitOpts.CloseIssue(ctx, gitURL.Organisation, gitURL.Name, "", *issue.Number)
 			if err != nil {
