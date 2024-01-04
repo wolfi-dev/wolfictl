@@ -8,6 +8,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: read
+
     name: build
     runs-on: ubuntu-latest
 
@@ -24,6 +27,9 @@ jobs:
       - run: make test
 
   wolfictl-text:
+    permissions:
+      contents: read
+
     name: wolfictl text on wolfi-dev/os
     runs-on: ubuntu-latest
 

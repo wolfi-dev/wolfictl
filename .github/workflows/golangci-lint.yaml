@@ -5,6 +5,9 @@ on:
 
 jobs:
   golangci:
+    permissions:
+      contents: read
+
     name: lint
     runs-on: ubuntu-latest
     steps:
