@@ -1,8 +1,9 @@
 package lint
 
 import (
+	"errors"
+
 	"chainguard.dev/melange/pkg/config"
-	"github.com/hashicorp/go-multierror"
 )
 
 // Function is a function that lints a single configuration.
@@ -77,9 +78,9 @@ func (r Result) HasErrors() bool {
 
 // WrapErrors wraps multiple errors into a single error.
 func (e EvalRuleErrors) WrapErrors() error {
-	var err *multierror.Error
+	errs := []error{}
 	for _, e := range e {
-		err = multierror.Append(err, e.Error)
+		errs = append(errs, e.Error)
 	}
-	return err.ErrorOrNil()
+	return errors.Join(errs...)
 }
