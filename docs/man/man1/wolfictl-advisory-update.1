@@ -5,7 +5,7 @@
 
 .SH NAME
 .PP
-wolfictl\-advisory\-update \- append an entry to an existing package advisory
+wolfictl\-advisory\-update \- Update an existing advisory with a new event
 
 
 .SH SYNOPSIS
@@ -15,17 +15,33 @@ wolfictl\-advisory\-update \- append an entry to an existing package advisory
 
 .SH DESCRIPTION
 .PP
-append an entry to an existing package advisory
+Update an existing advisory with a new event.
+
+.PP
+Use this command to update an existing advisory by adding a new "event" to the
+advisory, i.e. when the given package/vulnerability combination already exists
+in the advisories repo. If the package/vulnerability combination doesn't yet
+exist, use the "create" command instead.
+
+.PP
+This command will prompt for all required fields, and will attempt to fill in
+as many optional fields as possible. You can abort the advisory update at any
+point in the prompt by pressing Ctrl+C.
+
+.PP
+You can specify required values on the command line using the flags relevant to
+the advisory event you are adding. If not all required values are provided on
+the command line, the command will prompt for the missing values.
+
+.PP
+If the \-\-no\-prompt flag is specified, then the command will fail if any
+required fields are missing.
 
 
 .SH OPTIONS
 .PP
-\fB\-\-action\fP=""
-    action statement for VEX statement (used only for affected status)
-
-.PP
 \fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
-    directory containing the advisories repository (can also be set with environment variable \fB\fCWOLFICTL\_ADVISORIES\_REPO\_DIR\fR)
+    directory containing the advisories repository
 
 .PP
 \fB\-\-arch\fP=[x86\_64,aarch64]
@@ -33,23 +49,23 @@ append an entry to an existing package advisory
 
 .PP
 \fB\-d\fP, \fB\-\-distro\-repo\-dir\fP=""
-    directory containing the distro repository (can also be set with environment variable \fB\fCWOLFICTL\_DISTRO\_REPO\_DIR\fR)
+    directory containing the distro repository
 
 .PP
 \fB\-\-fixed\-version\fP=""
-    package version where fix was applied (used only for fixed status)
+    package version where fix was applied (used only for 'fixed' event type)
+
+.PP
+\fB\-\-fp\-note\fP=""
+    prose explanation of the false positive (used only for false positives)
+
+.PP
+\fB\-\-fp\-type\fP=""
+    type of false positive [vulnerability\-record\-analysis\-contested, component\-vulnerability\-mismatch, vulnerable\-code\-version\-not\-used, vulnerable\-code\-not\-included\-in\-package, vulnerable\-code\-not\-in\-execution\-path, vulnerable\-code\-cannot\-be\-controlled\-by\-adversary, inline\-mitigations\-exist]
 
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
     help for update
-
-.PP
-\fB\-\-impact\fP=""
-    impact statement for VEX statement (used only for not\_affected status)
-
-.PP
-\fB\-\-justification\fP=""
-    justification for VEX statement (used only for not\_affected status)
 
 .PP
 \fB\-\-no\-distro\-detection\fP[=false]
@@ -68,12 +84,16 @@ append an entry to an existing package advisory
     URL of the APK package repository
 
 .PP
-\fB\-s\fP, \fB\-\-status\fP=""
-    status for VEX statement
+\fB\-\-timestamp\fP="now"
+    timestamp of the event (RFC3339 format)
 
 .PP
-\fB\-\-timestamp\fP="now"
-    timestamp for VEX statement
+\fB\-\-tp\-note\fP=""
+    prose explanation of the true positive (used only for true positives)
+
+.PP
+\fB\-t\fP, \fB\-\-type\fP=""
+    type of event [detection, true\-positive\-determination, fixed, false\-positive\-determination, analysis\-not\-planned, fix\-not\-planned, pending\-upstream\-fix]
 
 .PP
 \fB\-V\fP, \fB\-\-vuln\fP=""

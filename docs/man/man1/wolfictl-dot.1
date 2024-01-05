@@ -18,13 +18,25 @@ wolfictl\-dot \- Generate graphviz .dot output
 Generate .dot output and pipe it to dot to generate an SVG
 
 .PP
-wolfictl dot | dot \-Tsvg > graph.svg
+wolfictl dot zlib | dot \-Tsvg > graph.svg
 
 .PP
 Generate .dot output and pipe it to dot to generate a PNG
 
 .PP
-wolfictl dot | dot \-Tpng > graph.png
+wolfictl dot zlib | dot \-Tpng > graph.png
+
+.PP
+Open browser to explore crane
+
+.PP
+wolfictl dot \-\-web crane
+
+.PP
+Open browser to explore crane's deps recursively, only showing a minimum subgraph
+
+.PP
+wolfictl dot \-\-web \-R \-S crane
 
 
 .SH OPTIONS
@@ -37,8 +49,34 @@ wolfictl dot | dot \-Tpng > graph.png
     help for dot
 
 .PP
+\fB\-k\fP, \fB\-\-keyring\-append\fP=[
+\[la]https://packages.wolfi.dev/os/wolfi-signing.rsa.pub\[ra]]
+    path to extra keys to include in the build environment keyring
+
+.PP
+\fB\-\-pipeline\-dir\fP=""
+    directory used to extend defined built\-in pipelines
+
+.PP
+\fB\-R\fP, \fB\-\-recursive\fP[=false]
+    recurse through package dependencies
+
+.PP
+\fB\-r\fP, \fB\-\-repository\-append\fP=[
+\[la]https://packages.wolfi.dev/os\[ra]]
+    path to extra repositories to include in the build environment
+
+.PP
 \fB\-D\fP, \fB\-\-show\-dependents\fP[=false]
     show packages that depend on these packages, instead of these packages' dependencies
+
+.PP
+\fB\-S\fP, \fB\-\-spanning\-tree\fP[=false]
+    does something like a spanning tree to avoid a huge number of edges
+
+.PP
+\fB\-\-web\fP[=false]
+    do a website
 
 
 .SH SEE ALSO

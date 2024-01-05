@@ -1,23 +1,25 @@
-## wolfictl advisory db
+## wolfictl advisory secdb
 
-Build a security database from advisory data (NOTE: For now, this command uses secfixes data, but will soon use advisory data instead.)
+Build an Alpine-style security database from advisory data
+
+***Aliases**: db*
 
 ### Usage
 
 ```
-wolfictl advisory db
+wolfictl advisory secdb
 ```
 
 ### Synopsis
 
-Build a security database from advisory data (NOTE: For now, this command uses secfixes data, but will soon use advisory data instead.)
+Build an Alpine-style security database from advisory data
 
 ### Options
 
 ```
   -a, --advisories-repo-dir strings   directory containing an advisories repository
       --arch strings                  the package architectures the security database is for (default [x86_64])
-  -h, --help                          help for db
+  -h, --help                          help for secdb
       --no-distro-detection           do not attempt to auto-detect the distro
   -o, --output string                 output location (default: stdout)
       --repo string                   the name of the package repository (default "os")
@@ -26,5 +28,5 @@ Build a security database from advisory data (NOTE: For now, this command uses s
 
 ### SEE ALSO
 
-* [wolfictl advisory](wolfictl_advisory.md)	 - Utilities for viewing and modifying Wolfi advisory data
+* [wolfictl advisory](wolfictl_advisory.md)	 - Commands for consuming and maintaining security advisory data
 

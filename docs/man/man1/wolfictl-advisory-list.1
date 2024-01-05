@@ -5,7 +5,7 @@
 
 .SH NAME
 .PP
-wolfictl\-advisory\-list \- list advisories for specific packages or across all of Wolfi
+wolfictl\-advisory\-list \- List advisories for specific packages, vulnerabilities, or the entire data set
 
 
 .SH SYNOPSIS
@@ -15,13 +15,68 @@ wolfictl\-advisory\-list \- list advisories for specific packages or across all 
 
 .SH DESCRIPTION
 .PP
-list advisories for specific packages or across all of Wolfi
+List advisories for specific packages, vulnerabilities, or the entire data set.
+
+.PP
+The 'list' (or 'ls') command prints a list of advisories based on the given
+selection criteria. By default, all advisories in the current advisory data set
+will be listed.
+
+.PP
+FILTERING
+
+.PP
+You can list advisories for a single package:
+
+.PP
+.RS
+
+.nf
+wolfictl adv ls \-p glibc
+
+.fi
+.RE
+
+.PP
+You can list all advisories for a given vulnerability ID across all packages:
+
+.PP
+.RS
+
+.nf
+wolfictl adv ls \-V CVE\-2023\-38545
+
+.fi
+.RE
+
+.PP
+You can show only advisories that are considered not to be "resolved":
+
+.PP
+.RS
+
+.nf
+wolfictl adv ls \-\-unresolved
+
+.fi
+.RE
+
+.PP
+And you can combine the above flags as needed.
+
+.PP
+HISTORY
+
+.PP
+Using the \-\-history flag, you can list advisory events instead of just
+advisories' latest states. This is useful for viewing a summary of an
+investigation over time for a given package/vulnerability match.'
 
 
 .SH OPTIONS
 .PP
 \fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
-    directory containing the advisories repository (can also be set with environment variable \fB\fCWOLFICTL\_ADVISORIES\_REPO\_DIR\fR)
+    directory containing the advisories repository
 
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
@@ -41,7 +96,7 @@ list advisories for specific packages or across all of Wolfi
 
 .PP
 \fB\-\-unresolved\fP[=false]
-    only show advisories whose latest status is affected or under\_investigation
+    only show advisories considered to be unresolved
 
 .PP
 \fB\-V\fP, \fB\-\-vuln\fP=""
