@@ -40,7 +40,7 @@ func NewPipelineSectionUpdater(
 	updater configs.SectionUpdater[[]config.Pipeline, config.Configuration],
 ) configs.EntryUpdater[config.Configuration] {
 	yamlASTMutater := configs.NewTargetedYAMLASTMutater[[]config.Pipeline, config.Configuration](
-		"package",
+		"pipeline",
 		updater,
 		func(cfg config.Configuration, data []config.Pipeline) config.Configuration {
 			cfg.Pipeline = data
@@ -55,7 +55,7 @@ func NewSubpackagesSectionUpdater(
 	updater configs.SectionUpdater[[]config.Subpackage, config.Configuration],
 ) configs.EntryUpdater[config.Configuration] {
 	yamlASTMutater := configs.NewTargetedYAMLASTMutater[[]config.Subpackage, config.Configuration](
-		"package",
+		"subpackages",
 		updater,
 		func(cfg config.Configuration, data []config.Subpackage) config.Configuration {
 			cfg.Subpackages = data
