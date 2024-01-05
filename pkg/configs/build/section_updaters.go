@@ -25,7 +25,7 @@ func NewEnvironmentSectionUpdater(
 	updater configs.SectionUpdater[types.ImageConfiguration, config.Configuration],
 ) configs.EntryUpdater[config.Configuration] {
 	yamlASTMutater := configs.NewTargetedYAMLASTMutater[types.ImageConfiguration, config.Configuration](
-		"package",
+		"environment",
 		updater,
 		func(cfg config.Configuration, data types.ImageConfiguration) config.Configuration {
 			cfg.Environment = data
