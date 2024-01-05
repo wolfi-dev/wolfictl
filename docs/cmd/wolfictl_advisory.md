@@ -1,12 +1,12 @@
 ## wolfictl advisory
 
-Utilities for viewing and modifying Wolfi advisory data
+Commands for consuming and maintaining security advisory data
 
 ***Aliases**: adv*
 
 ### Synopsis
 
-Utilities for viewing and modifying Wolfi advisory data
+Commands for consuming and maintaining security advisory data
 
 ### Options
 
@@ -17,10 +17,12 @@ Utilities for viewing and modifying Wolfi advisory data
 ### SEE ALSO
 
 * [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi
-* [wolfictl advisory create](wolfictl_advisory_create.md)	 - create a new advisory for a package
-* [wolfictl advisory db](wolfictl_advisory_db.md)	 - Build a security database from advisory data (NOTE: For now, this command uses secfixes data, but will soon use advisory data instead.)
-* [wolfictl advisory discover](wolfictl_advisory_discover.md)	 - search for new potential vulnerabilities and create advisories for them
-* [wolfictl advisory list](wolfictl_advisory_list.md)	 - list advisories for specific packages or across all of Wolfi
-* [wolfictl advisory update](wolfictl_advisory_update.md)	 - append an entry to an existing package advisory
+* [wolfictl advisory alias](wolfictl_advisory_alias.md)	 - Commands for discovering vulnerability aliases
+* [wolfictl advisory create](wolfictl_advisory_create.md)	 - Create a new advisory
+* [wolfictl advisory diff](wolfictl_advisory_diff.md)	 - See the advisory data differences introduced by your local changes
+* [wolfictl advisory discover](wolfictl_advisory_discover.md)	 - Automatically create advisories by matching distro packages to vulnerabilities in NVD
+* [wolfictl advisory list](wolfictl_advisory_list.md)	 - List advisories for specific packages, vulnerabilities, or the entire data set
+* [wolfictl advisory secdb](wolfictl_advisory_secdb.md)	 - Build an Alpine-style security database from advisory data
+* [wolfictl advisory update](wolfictl_advisory_update.md)	 - Update an existing advisory with a new event
 * [wolfictl advisory validate](wolfictl_advisory_validate.md)	 - Validate the state of advisory data
 
