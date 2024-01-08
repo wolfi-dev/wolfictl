@@ -16,8 +16,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 
 	version "github.com/wolfi-dev/wolfictl/pkg/versions"
-
-	"github.com/pkg/errors"
 )
 
 type MonitorService struct {
@@ -152,19 +150,19 @@ func (m MonitorService) getLatestReleaseVersion(identifier int) (string, error) 
 	for i := 0; i < maxRetries; i++ {
 		req, err := http.NewRequest("GET", targetURL, nil)
 		if err != nil {
-			return "", errors.Wrapf(err, "failed creating GET request %s", targetURL)
+			return "", fmt.Errorf("failed creating GET request %s: %w", targetURL, err)
 		}
 
 		resp, err := m.Client.Do(req)
 		if err != nil {
-			return "", errors.Wrapf(err, "failed getting URI %s", targetURL)
+			return "", fmt.Errorf("failed getting URI %s: %w", targetURL, err)
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusOK {
 			b, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return "", errors.Wrap(err, "reading monitor service mapper data file")
+				return "", fmt.Errorf("reading monitor service mapper data file: %w", err)
 			}
 			return m.parseVersions(b)
 		}
@@ -187,11 +185,11 @@ func (m MonitorService) parseVersions(rawdata []byte) (string, error) {
 	versions := ReleaseMonitorVersions{}
 	err := json.Unmarshal(rawdata, &versions)
 	if err != nil {
-		return "", errors.Wrap(err, "unmarshalling version data")
+		return "", fmt.Errorf("unmarshalling version data: %w", err)
 	}
 
 	if len(versions.StableVersions) == 0 {
-		return "", errors.Wrap(err, "no stable version found")
+		return "", fmt.Errorf("no stable version found: %w", err)
 	}
 	return versions.StableVersions[0], nil
 }

@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
-
-	"github.com/pkg/errors"
 )
 
 // the wolfi package repo CI will write a file entry for every new .apk package that's been built
@@ -18,7 +16,7 @@ func getNewPackages(packageListFile string) (map[string]NewApkPackage, error) {
 	rs := make(map[string]NewApkPackage)
 	original, err := os.Open(packageListFile)
 	if err != nil {
-		return rs, errors.Wrapf(err, "opening file %s", packageListFile)
+		return rs, fmt.Errorf("opening file %s: %w", packageListFile, err)
 	}
 
 	scanner := bufio.NewScanner(original)
@@ -62,7 +60,7 @@ func downloadCurrentAPK(client *http.Client, apkIndexURL, newPackageName, dirCur
 	apkURL := strings.ReplaceAll(apkIndexURL, "APKINDEX.tar.gz", newPackageName)
 	resp, err := client.Get(apkURL)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get %s", apkURL)
+		return fmt.Errorf("failed to get %s: %w", apkURL, err)
 	}
 	defer resp.Body.Close()
 
@@ -72,7 +70,7 @@ func downloadCurrentAPK(client *http.Client, apkIndexURL, newPackageName, dirCur
 
 	err = tar.Untar(resp.Body, dirCurrentApk)
 	if err != nil {
-		return errors.Wrap(err, "failed to untar new apk")
+		return fmt.Errorf("failed to untar new apk: %w", err)
 	}
 	return nil
 }

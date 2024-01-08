@@ -16,7 +16,6 @@ import (
 	"github.com/google/go-github/v55/github"
 
 	"github.com/hashicorp/go-version"
-	"github.com/pkg/errors"
 	wolfigit "github.com/wolfi-dev/wolfictl/pkg/git"
 
 	"github.com/go-git/go-git/v5"
@@ -68,13 +67,13 @@ func (o ReleaseOptions) Release() error {
 	// increment
 	next, err := o.bumpReleaseVersion(current)
 	if err != nil {
-		return errors.Wrapf(err, "failed to bump current version %s", current.Original())
+		return fmt.Errorf("failed to bump current version %s: %w", current.Original(), err)
 	}
 
 	// create new tag + GitHub release
 	err = wolfigit.CreateTag(o.Dir, next.Original())
 	if err != nil {
-		return errors.Wrapf(err, "failed to create tag %s", next.Original())
+		return fmt.Errorf("failed to create tag %s: %w", next.Original(), err)
 	}
 
 	// push new tag
@@ -176,7 +175,7 @@ func (o ReleaseOptions) GetReleaseURL(owner, repoName, v string) (string, error)
 	ctx := context.Background()
 	release, _, err := o.GithubClient.Repositories.GetReleaseByTag(ctx, owner, repoName, v)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to get github release for %s/%s tag %s", owner, repoName, v)
+		return "", fmt.Errorf("failed to get github release for %s/%s tag %s: %w", owner, repoName, v, err)
 	}
 	return *release.HTMLURL, nil
 }

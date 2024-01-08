@@ -3,6 +3,7 @@ package update
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -23,7 +24,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v55/github"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
@@ -151,7 +151,7 @@ func (o *Options) Update() error {
 		if latestVersions == nil {
 			latestVersions, err = o.GetLatestVersions(tempDir, o.PackageNames)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get package updates")
+				return fmt.Errorf("failed to get package updates: %w", err)
 			}
 		}
 
@@ -159,14 +159,14 @@ func (o *Options) Update() error {
 		if packagesToUpdate == nil {
 			packagesToUpdate, err = o.getPackagesToUpdate(latestVersions)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get package updates")
+				return fmt.Errorf("failed to get package updates: %w", err)
 			}
 		}
 
 		// skip packages for which we already have an open issue or pull request
 		packagesToUpdate, err = o.removeExistingUpdates(repo, packagesToUpdate)
 		if err != nil {
-			return errors.Wrapf(err, "failed to get package updates")
+			return fmt.Errorf("failed to get package updates: %w", err)
 		}
 
 		// update melange configs in our cloned git repository with any new package versions
@@ -285,7 +285,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 	// store the HEAD ref to switch back later
 	headRef, err := repo.Head()
 	if err != nil {
-		return errors.Wrap(err, "failed to get the HEAD ref")
+		return fmt.Errorf("failed to get the HEAD ref: %w", err)
 	}
 
 	// Bump packages that need updating
@@ -296,14 +296,14 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 
 		wt, err := repo.Worktree()
 		if err != nil {
-			return errors.Wrap(err, "failed to get the worktree")
+			return fmt.Errorf("failed to get the worktree: %w", err)
 		}
 		// make sure we are on HEAD
 		err = wt.Checkout(&git.CheckoutOptions{
 			Branch: headRef.Name(),
 		})
 		if err != nil {
-			return errors.Wrap(err, "failed to check out HEAD")
+			return fmt.Errorf("failed to check out HEAD: %w", err)
 		}
 
 		// todo jr remove if this doesn't help
@@ -316,7 +316,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 		// let's work on a branch when updating package versions, so we can create a PR from that branch later
 		ref, err := o.createBranch(repo)
 		if err != nil {
-			return errors.Wrap(err, "failed to create git branch")
+			return fmt.Errorf("failed to create git branch: %w", err)
 		}
 
 		errorMessage, err := o.updateGitPackage(repo, packageName, newVersion, ref)
@@ -337,7 +337,7 @@ func debug(wt *git.Worktree) ([]byte, error) {
 	cmd.Dir = wt.Filesystem.Root()
 	rs, err := cmd.Output()
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed run git status %s", rs)
+		return nil, fmt.Errorf("failed run git status %s: %w", rs, err)
 	}
 	return rs, nil
 }
@@ -491,7 +491,7 @@ func (o *Options) createBranch(repo *git.Repository) (plumbing.ReferenceName, er
 
 	headRef, err := repo.Head()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get repository HEAD")
+		return "", fmt.Errorf("failed to get repository HEAD: %w", err)
 	}
 
 	// Create a unique branch to work from
@@ -503,19 +503,19 @@ func (o *Options) createBranch(repo *git.Repository) (plumbing.ReferenceName, er
 	// Set the new branch reference in the repository
 	err = repo.Storer.SetReference(newBranchRef)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to create temporary branch %s", branchName)
+		return "", fmt.Errorf("failed to create temporary branch %s: %w", branchName, err)
 	}
 
 	wt, err := repo.Worktree()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get the worktree")
+		return "", fmt.Errorf("failed to get the worktree: %w", err)
 	}
 	// check out the new branch
 	err = wt.Checkout(&git.CheckoutOptions{
 		Branch: newBranchRef.Name(),
 	})
 	if err != nil {
-		return "", errors.Wrap(err, "failed to check out the new branch")
+		return "", fmt.Errorf("failed to check out the new branch: %w", err)
 	}
 
 	return newBranchRef.Name(), nil
@@ -551,7 +551,7 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	// todo jr remove if this doesn't help
 	wt, err := repo.Worktree()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get the worktree")
+		return "", fmt.Errorf("failed to get the worktree: %w", err)
 	}
 	rs, err := debug(wt)
 	if err != nil {
@@ -569,7 +569,7 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	// push the version update changes to our working branch
 	if err := repo.Push(pushOpts); err != nil {
 		if err.Error() == "authorization failed" {
-			return "", errors.Wrapf(err, "failed to auth with git provider, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo")
+			return "", fmt.Errorf("failed to auth with git provider, does your personal access token have the repo scope? https://github.com/settings/tokens/new?scopes=repo: %w", err)
 		}
 		return "", fmt.Errorf("failed to git push: %w", err)
 	}
@@ -604,14 +604,14 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	if newVersion.ReplaceExistingPRNumber != 0 {
 		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
-			return "", errors.Wrapf(err, "failed to close pull request: %d", newVersion.ReplaceExistingPRNumber)
+			return "", fmt.Errorf("failed to close pull request: %d: %w", newVersion.ReplaceExistingPRNumber, err)
 		}
 
 		// comment on the closed PR the new pull request link which supersedes it
 		comment := fmt.Sprintf("superceded by %s", prLink)
 		_, err = gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, comment, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
-			return "", errors.Wrapf(err, "failed to comment pull request: %d", newVersion.ReplaceExistingPRNumber)
+			return "", fmt.Errorf("failed to comment pull request: %d: %w", newVersion.ReplaceExistingPRNumber, err)
 		}
 	}
 	return prLink, nil
@@ -644,7 +644,7 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 		cmd.Dir = worktree.Filesystem.Root()
 		rs, err := cmd.Output()
 		if err != nil {
-			return errors.Wrapf(err, "failed to git sign commit %s", rs)
+			return fmt.Errorf("failed to git sign commit %s: %w", rs, err)
 		}
 	} else {
 		if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {
@@ -756,12 +756,12 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 		c := pc.Config
 		currentVersionSemver, err := wolfiversions.NewVersion(c.Package.Version)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create a version from package %s: %s", c.Package.Name, c.Package.Version)
+			return nil, fmt.Errorf("failed to create a version from package %s: %s: %w", c.Package.Name, c.Package.Version, err)
 		}
 
 		latestVersionSemver, err := wolfiversions.NewVersion(v.Version)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create a latest version from package %s: %s", c.Package.Name, c.Package.Version)
+			return nil, fmt.Errorf("failed to create a latest version from package %s: %s: %w", c.Package.Name, c.Package.Version, err)
 		}
 
 		if currentVersionSemver.Equal(latestVersionSemver) {
@@ -822,14 +822,14 @@ func (o *Options) removeExistingUpdates(repo *git.Repository, updates map[string
 
 	openPRs, err := gitOpts.ListPullRequests(context.Background(), gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
-		return updates, errors.Wrapf(err, "failed to list open pull requests for %s/%s", gitURL.Organisation, gitURL.Name)
+		return updates, fmt.Errorf("failed to list open pull requests for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
 	}
 
 	o.processPullRequests(updates, openPRs)
 
 	openIssues, err := gitOpts.ListIssues(context.Background(), gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
-		return updates, errors.Wrapf(err, "failed to list open issues for %s/%s", gitURL.Organisation, gitURL.Name)
+		return updates, fmt.Errorf("failed to list open issues for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
 	}
 
 	o.processIssues(updates, openIssues)

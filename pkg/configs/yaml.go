@@ -1,11 +1,11 @@
 package configs
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/dprotaso/go-yit"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 

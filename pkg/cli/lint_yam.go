@@ -1,13 +1,13 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/chainguard-dev/yam/pkg/yam"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
-	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 )

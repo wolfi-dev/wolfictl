@@ -10,7 +10,6 @@ import (
 
 	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/google/go-cmp/cmp"
-	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
@@ -39,13 +38,13 @@ func (o *DiffOptions) Diff() error {
 	// create two temp folders we can use to explode the apks and compare their contents
 	dirExistingApk, err := os.MkdirTemp("", "wolfictl-apk-*")
 	if err != nil {
-		return errors.Wrapf(err, "failed to create temporary dir")
+		return fmt.Errorf("failed to create temporary dir: %w", err)
 	}
 	defer os.RemoveAll(dirExistingApk)
 
 	dirNewApk, err := os.MkdirTemp("", "wolfictl-apk-*")
 	if err != nil {
-		return errors.Wrapf(err, "failed to create temporary dir")
+		return fmt.Errorf("failed to create temporary dir: %w", err)
 	}
 	defer os.RemoveAll(dirNewApk)
 
@@ -53,13 +52,13 @@ func (o *DiffOptions) Diff() error {
 	apkContext := apk.New(o.Client, o.ApkIndexURL)
 	o.ExistingPackages, err = apkContext.GetApkPackages()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get APK packages from URL %s", o.ApkIndexURL)
+		return fmt.Errorf("failed to get APK packages from URL %s: %w", o.ApkIndexURL, err)
 	}
 
 	// get a list of new package names that have recently been built
 	newPackages, err := getNewPackages(o.PackageListFilename)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get new packages from file %s", o.PackageListFilename)
+		return fmt.Errorf("failed to get new packages from file %s: %w", o.PackageListFilename, err)
 	}
 
 	// for each new package being built grab the latest existing one
@@ -69,12 +68,12 @@ func (o *DiffOptions) Diff() error {
 		filename := filepath.Join(o.PackagesDir, newAPK.Arch, fmt.Sprintf("%s-%s-r%s.apk", newPackageName, newAPK.Version, newAPK.Epoch))
 		newFile, err := os.Open(filename)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read %s", filename)
+			return fmt.Errorf("failed to read %s: %w", filename, err)
 		}
 
 		err = tar.Untar(newFile, filepath.Join(dirNewApk, newPackageName))
 		if err != nil {
-			return errors.Wrapf(err, "failed to untar new apk")
+			return fmt.Errorf("failed to untar new apk: %w", err)
 		}
 
 		// fetch current latest apk
@@ -90,7 +89,7 @@ func (o *DiffOptions) Diff() error {
 		existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
 		err = downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, filepath.Join(dirExistingApk, newPackageName))
 		if err != nil {
-			return errors.Wrapf(err, "failed to download %s using base URL %s", newPackageName, existingFilename)
+			return fmt.Errorf("failed to download %s using base URL %s: %w", newPackageName, existingFilename, err)
 		}
 	}
 
@@ -102,7 +101,7 @@ func (o *DiffOptions) Diff() error {
 	diffFile := filepath.Join(o.Dir, "diff.log")
 	err = writeDiffLog(rs, diffFile, newPackages)
 	if err != nil {
-		return errors.Wrap(err, "failed writing to file")
+		return fmt.Errorf("failed writing to file: %w", err)
 	}
 
 	fmt.Printf("diff written to %s\n", diffFile)

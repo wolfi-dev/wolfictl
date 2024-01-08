@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
-	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
@@ -54,13 +53,13 @@ func (o *SoNameOptions) CheckSoName() error {
 	apkContext := apk.New(o.Client, o.ApkIndexURL)
 	o.ExistingPackages, err = apkContext.GetApkPackages()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get APK packages from URL %s", o.ApkIndexURL)
+		return fmt.Errorf("failed to get APK packages from URL %s: %w", o.ApkIndexURL, err)
 	}
 
 	// get a list of new package names that have recently been built
 	newPackages, err := getNewPackages(o.PackageListFilename)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get new packages")
+		return fmt.Errorf("failed to get new packages: %w", err)
 	}
 
 	soNameErrors := make(lint.EvalRuleErrors, 0)
@@ -83,13 +82,13 @@ func (o *SoNameOptions) CheckSoName() error {
 func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error {
 	dirExistingApk, err := os.MkdirTemp("", "wolfictl-apk-*")
 	if err != nil {
-		return errors.Wrapf(err, "failed to create temporary dir")
+		return fmt.Errorf("failed to create temporary dir: %w", err)
 	}
 	defer os.RemoveAll(dirExistingApk)
 
 	dirNewApk, err := os.MkdirTemp("", "wolfictl-apk-*")
 	if err != nil {
-		return errors.Wrapf(err, "failed to create temporary dir")
+		return fmt.Errorf("failed to create temporary dir: %w", err)
 	}
 	defer os.RemoveAll(dirNewApk)
 
@@ -97,17 +96,17 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 	filename := filepath.Join(o.PackagesDir, newAPK.Arch, fmt.Sprintf("%s-%s-r%s.apk", newPackageName, newAPK.Version, newAPK.Epoch))
 	newFile, err := os.Open(filename)
 	if err != nil {
-		return errors.Wrapf(err, "failed to read %s", filename)
+		return fmt.Errorf("failed to read %s: %w", filename, err)
 	}
 
 	err = tar.Untar(newFile, dirNewApk)
 	if err != nil {
-		return errors.Wrapf(err, "failed to untar new apk")
+		return fmt.Errorf("failed to untar new apk: %w", err)
 	}
 
 	newSonameFiles, err := o.getSonameFiles(dirNewApk)
 	if err != nil {
-		return errors.Wrapf(err, "error when looking for soname files in new apk")
+		return fmt.Errorf("error when looking for soname files in new apk: %w", err)
 	}
 	// if no .so name files, skip
 	if len(newSonameFiles) == 0 {
@@ -124,18 +123,18 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 	existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
 	err = downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, dirExistingApk)
 	if err != nil {
-		return errors.Wrapf(err, "failed to download %s using base URL %s", newPackageName, o.ApkIndexURL)
+		return fmt.Errorf("failed to download %s using base URL %s: %w", newPackageName, o.ApkIndexURL, err)
 	}
 
 	// get any existing so names
 	existingSonameFiles, err := o.getSonameFiles(dirExistingApk)
 	if err != nil {
-		return errors.Wrapf(err, "error when looking for soname files in existing apk")
+		return fmt.Errorf("error when looking for soname files in existing apk: %w", err)
 	}
 
 	err = o.checkSonamesMatch(existingSonameFiles, newSonameFiles)
 	if err != nil {
-		return errors.Wrapf(err, "soname files differ, this can cause an ABI break.  Existing soname files %s, New soname files %s", strings.Join(existingSonameFiles, ","), strings.Join(newSonameFiles, ","))
+		return fmt.Errorf("soname files differ, this can cause an ABI break.  Existing soname files %s, New soname files %s: %w", strings.Join(existingSonameFiles, ","), strings.Join(newSonameFiles, ","), err)
 	}
 
 	return nil
@@ -218,7 +217,7 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		// turning the string version into proper version will give us major.minor.patch segments
 		existingVersion, err := versions.NewVersion(existingVersionStr)
 		if err != nil {
-			return errors.Wrapf(err, "failed to parse existing version %s", existingVersionStr)
+			return fmt.Errorf("failed to parse existing version %s: %w", existingVersionStr, err)
 		}
 
 		matches := r.FindStringSubmatch(versionStr)
@@ -228,7 +227,7 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 
 		version, err := versions.NewVersion(versionStr)
 		if err != nil {
-			return errors.Wrapf(err, "failed to parse new version %s", existingVersionStr)
+			return fmt.Errorf("failed to parse new version %s: %w", existingVersionStr, err)
 		}
 
 		// let's now compare the major segments as only major version increments indicate a break ABI compatibility
