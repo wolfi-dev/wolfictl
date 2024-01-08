@@ -8,8 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-git/go-git/v5"
-
-	"github.com/go-git/go-git/config"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/pkg/errors"
 
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
