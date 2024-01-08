@@ -2,10 +2,9 @@ package gh
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/go-github/v55/github"
-
-	"github.com/pkg/errors"
 )
 
 type NewPullRequest struct {
@@ -38,7 +37,7 @@ func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (*github.PullRequest, er
 	})
 
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed opening pull request")
+		return nil, fmt.Errorf("failed opening pull request: %w", err)
 	}
 
 	return githubPR, nil

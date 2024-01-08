@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -17,8 +18,6 @@ import (
 	"github.com/google/go-github/v55/github"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-
-	"github.com/pkg/errors"
 
 	"github.com/hashicorp/go-version"
 
@@ -178,7 +177,7 @@ func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
 	// get list of commits between the previous tag and current tag
 	cveFixes, err := o.getFixesCVEList(tempDir, previous)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get CVE list from commits between tags %s and %s", previous, o.Version)
+		return fmt.Errorf("failed to get CVE list from commits between tags %s and %s: %w", previous, o.Version, err)
 	}
 
 	if len(cveFixes) == 0 {
@@ -190,7 +189,7 @@ func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
 		o.Logger.Printf("adding advisory for %s\n", fixComment)
 		err = o.createAdvisories(fixComment)
 		if err != nil {
-			return errors.Wrapf(err, "failed to create advisory for CVE list from commits between previous tag, %s", strings.Join(cveFixes, " "))
+			return fmt.Errorf("failed to create advisory for CVE list from commits between previous tag, %s: %w", strings.Join(cveFixes, " "), err)
 		}
 	}
 
@@ -212,7 +211,7 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 	cmd.Dir = dir
 	rs, err := cmd.Output()
 	if err != nil {
-		return fixedCVEs, errors.Wrapf(err, "failed to get output from git log %s", tagRamge)
+		return fixedCVEs, fmt.Errorf("failed to get output from git log %s: %w", tagRamge, err)
 	}
 
 	// convert to string as dealing with bytes results in a 3 dimensional array, hard to debug
@@ -247,7 +246,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 	fsys := rwfsOS.DirFS("/")
 	advisoryCfgs, err := v2.NewIndexFromPaths(fsys, fullFilePath)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get new index for package %s config file %s", o.PackageName, p.Filename)
+		return fmt.Errorf("failed to get new index for package %s config file %s: %w", o.PackageName, p.Filename, err)
 	}
 
 	req := o.request(vuln)
@@ -343,7 +342,7 @@ func (o *PackageOptions) addCommit(repo *git.Repository, fixes []string) error {
 		cmd.Dir = p.Dir
 		rs, err := cmd.Output()
 		if err != nil {
-			return errors.Wrapf(err, "failed to git sign commit %s", rs)
+			return fmt.Errorf("failed to git sign commit %s: %w", rs, err)
 		}
 	} else {
 		if _, err = worktree.Commit(commitMessage, commitOpts); err != nil {

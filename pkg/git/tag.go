@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
-	"github.com/pkg/errors"
 )
 
 func CreateTag(dir, tag string) error {
@@ -65,7 +64,7 @@ func PushTag(dir, tagName string) error {
 		if err == git.NoErrAlreadyUpToDate {
 			return nil
 		}
-		return errors.Wrapf(err, "failed to push tag")
+		return fmt.Errorf("failed to push tag: %w", err)
 	}
 
 	return nil
@@ -89,7 +88,7 @@ func GetVersionFromTag(dir string, index int) (*version.Version, error) {
 	err = tagRefs.ForEach(func(t *plumbing.Reference) error {
 		releaseVersionSemver, err := version.NewVersion(t.Name().Short())
 		if err != nil {
-			return errors.Wrapf(err, "failed to create new version from tag %s", t.Name().Short())
+			return fmt.Errorf("failed to create new version from tag %q: %w", t.Name().Short(), err)
 		}
 		versions = append(versions, releaseVersionSemver)
 		return nil

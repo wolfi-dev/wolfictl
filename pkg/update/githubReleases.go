@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -19,8 +20,6 @@ import (
 	"golang.org/x/exp/maps"
 
 	"chainguard.dev/melange/pkg/config"
-
-	"github.com/pkg/errors"
 
 	"github.com/hashicorp/go-version"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
@@ -415,7 +414,7 @@ func (o GitHubReleaseOptions) parseGitHubTags(repos *QueryTagsResponse) (results
 			var commitSha string
 			commitSha, err = getCommit(node.Target.CommitURL)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to get commit sha from commit URL %s", node.Target.CommitURL)
+				return nil, fmt.Errorf("failed to get commit sha from commit URL %s: %w", node.Target.CommitURL, err)
 			}
 
 			v, err := o.prepareVersion(packageNameHash, node.TagName, repo.NameWithOwner)
@@ -465,7 +464,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos *QueryReleasesResponse) 
 			var commitSha string
 			commitSha, err = getCommit(release.Tag.Target.CommitURL)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to get commit sha from commit URL %s", release.Tag.Target.CommitURL)
+				return nil, fmt.Errorf("failed to get commit sha from commit URL %s: %w", release.Tag.Target.CommitURL, err)
 			}
 
 			tag := release.Tag.Name
@@ -522,7 +521,7 @@ func createSemverSlice(versionResults map[string]string) ([]*version.Version, er
 	for k := range versionResults {
 		releaseVersionSemver, err := wolfiversions.NewVersion(k)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create a version from %s", k)
+			return nil, fmt.Errorf("failed to create a version from %s: %w", k, err)
 		}
 		versions = append(versions, releaseVersionSemver)
 	}
@@ -538,7 +537,7 @@ func findLatestVersion(versions []*version.Version) *version.Version {
 func (o GitHubReleaseOptions) getLatestVersion(packageNameHash string, versionResults map[string]string, ownerName string, results map[string]NewVersionResults) error {
 	versions, err := createSemverSlice(versionResults)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create a version slice for %s", ownerName)
+		return fmt.Errorf("failed to create a version slice for %s: %w", ownerName, err)
 	}
 
 	if len(versions) == 0 {
@@ -636,7 +635,7 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		for _, pattern := range c.Update.IgnoreRegexPatterns {
 			regex, err := regexp.Compile(pattern)
 			if err != nil {
-				return "", errors.Wrapf(err, "failed to compile regex %s", pattern)
+				return "", fmt.Errorf("failed to compile regex %s: %w", pattern, err)
 			}
 
 			if regex.MatchString(v) {
@@ -655,7 +654,7 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 
 	v, err := transformVersion(c.Update, v)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to transform version %s", v)
+		return "", fmt.Errorf("failed to transform version %s: %w", v, err)
 	}
 
 	return v, nil

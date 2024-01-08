@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
-	"github.com/pkg/errors"
 
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 )
@@ -19,7 +18,7 @@ func Update(dir, owner, repo, version string, wt *git.Worktree) error {
 	// update the .gitmodule config file
 	submodules, err := updateConfigFile(dir, owner, repo, version)
 	if err != nil {
-		return errors.Wrap(err, "failed to update gitmodules file")
+		return fmt.Errorf("failed to update gitmodules file: %w", err)
 	}
 
 	if _, err = wt.Add(".gitmodules"); err != nil {
@@ -30,7 +29,7 @@ func Update(dir, owner, repo, version string, wt *git.Worktree) error {
 	for _, submodule := range submodules {
 		err := updateSubmodules(submodule.Name, wt)
 		if err != nil {
-			return errors.Wrapf(err, "failed to update gitmodules")
+			return fmt.Errorf("failed to update gitmodules: %w", err)
 		}
 
 		// need to fall back to using git CLI as go-git hasn't implemented adding submodules
@@ -53,7 +52,7 @@ func updateConfigFile(dir, owner, repo, version string) (map[string]*config.Subm
 	filename := filepath.Join(dir, ".gitmodules")
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read gitmodules file %s", filename)
+		return nil, fmt.Errorf("failed to read gitmodules file %s: %w", filename, err)
 	}
 
 	cfg := config.NewModules()

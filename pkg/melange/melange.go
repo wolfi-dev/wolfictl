@@ -14,7 +14,6 @@ import (
 	"chainguard.dev/melange/pkg/renovate/bump"
 
 	"chainguard.dev/melange/pkg/config"
-	"github.com/pkg/errors"
 )
 
 type Packages struct {
@@ -106,7 +105,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 		return nil
 	})
 	if err != nil {
-		return p, errors.Wrapf(err, "failed walking files in cloned directory %s", dir)
+		return p, fmt.Errorf("failed walking files in cloned directory %s: %w", dir, err)
 	}
 
 	// guarantee a consistent sort order for test comparisons
@@ -115,7 +114,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 	for _, fi := range fileList {
 		data, err := os.ReadFile(fi)
 		if err != nil {
-			return p, errors.Wrapf(err, "failed to read file %s", fi)
+			return p, fmt.Errorf("failed to read file %s: %w", fi, err)
 		}
 		check := &ConfigCheck{}
 		err = yaml.Unmarshal(data, check)
@@ -131,11 +130,11 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 
 		packageConfig, err := ReadMelangeConfig(fi)
 		if err != nil {
-			return p, errors.Wrapf(err, "failed to read package config %s", fi)
+			return p, fmt.Errorf("failed to read package config %s: %w", fi, err)
 		}
 		relativeFilename, err := filepath.Rel(dir, fi)
 		if err != nil {
-			return p, errors.Wrapf(err, "failed to get relative path from dir %s and file %s package config %s", dir, fi, packageConfig.Package.Name)
+			return p, fmt.Errorf("failed to get relative path from dir %s and file %s package config %s: %w", dir, fi, packageConfig.Package.Name, err)
 		}
 
 		nolint, err := findNoLint(fi)

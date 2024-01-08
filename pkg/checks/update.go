@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -19,7 +20,6 @@ import (
 	"chainguard.dev/melange/pkg/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/pkg/errors"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/wolfi-dev/wolfictl/pkg/update"
@@ -89,14 +89,14 @@ func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 		}
 		yamlData, err := os.ReadFile(file)
 		if err != nil {
-			addCheckError(checkErrors, errors.Wrapf(err, "failed to read %s", file))
+			addCheckError(checkErrors, fmt.Errorf("failed to read %s: %w", file, err))
 			continue
 		}
 
 		var node yaml.Node
 		err = yaml.Unmarshal(yamlData, &node)
 		if err != nil {
-			addCheckError(checkErrors, errors.Wrapf(err, "failed to unmarshal %s", file))
+			addCheckError(checkErrors, fmt.Errorf("failed to unmarshal %s: %w", file, err))
 			continue
 		}
 
@@ -114,7 +114,7 @@ func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 		// now make sure update config is configured
 		c, err := config.ParseConfiguration(file)
 		if err != nil {
-			addCheckError(checkErrors, errors.Wrapf(err, "failed to parse %s", file))
+			addCheckError(checkErrors, fmt.Errorf("failed to parse %s: %w", file, err))
 			continue
 		}
 
@@ -217,7 +217,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		// melange bump will modify the modified copy of the melange config
 		err = melange.Bump(tmpConfigFile, newVersion.Version, newVersion.Commit)
 		if err != nil {
-			addCheckError(checkErrors, errors.Wrapf(err, "package %s: failed to validate update config, melange bump", packageName))
+			addCheckError(checkErrors, fmt.Errorf("package %s: failed to validate update config, melange bump: %w", packageName, err))
 			continue
 		}
 
@@ -290,7 +290,7 @@ func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string)
 
 	filename, err := util.DownloadFile(context.TODO(), evaluatedURI)
 	if err != nil {
-		return errors.Wrapf(err, "failed to verify fetch %s", evaluatedURI)
+		return fmt.Errorf("failed to verify fetch %s: %w", evaluatedURI, err)
 	}
 
 	o.Logger.Println(color.GreenString("fetch was successful"))
@@ -334,7 +334,7 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 
 	r, err := git.PlainClone(tempDir, false, cloneOpts)
 	if err != nil {
-		return errors.Wrapf(err, "failed to clone %s ref %s", repoValue, evaluatedTag)
+		return fmt.Errorf("failed to clone %s ref %s: %w", repoValue, evaluatedTag, err)
 	}
 	if r == nil {
 		return fmt.Errorf("clone is empty %s ref %s", repoValue, evaluatedTag)

@@ -8,8 +8,6 @@ import (
 
 	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
-
-	"github.com/pkg/errors"
 )
 
 type Context struct {
@@ -31,7 +29,7 @@ func (c Context) GetApkPackages() (map[string]*apk.Package, error) {
 	}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed getting URI %s", c.indexURL)
+		return nil, fmt.Errorf("failed getting URI %s: %w", c.indexURL, err)
 	}
 	defer resp.Body.Close()
 
@@ -47,7 +45,7 @@ func ParseUnpackedApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, er
 
 	packages, err := apk.ParsePackageIndex(indexData)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse response %v", indexData)
+		return nil, fmt.Errorf("failed to parse response %v: %w", indexData, err)
 	}
 
 	return getLatestPackagesMap(packages, wolfiPackages)
@@ -58,12 +56,12 @@ func getLatestPackagesMap(apkIndexPackages []*apk.Package, wolfiPackages map[str
 		if wolfiPackages[p.Name] != nil {
 			existingPackageVersion, err := versions.NewVersion(wolfiPackages[p.Name].Version)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to create a version for package %s from %s", p.Name, wolfiPackages[p.Name].Version)
+				return nil, fmt.Errorf("failed to create a version for package %s from %s: %w", p.Name, wolfiPackages[p.Name].Version, err)
 			}
 
 			apkPackageVersion, err := versions.NewVersion(p.Version)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to create a new version for package %s from %s", p.Name, p.Version)
+				return nil, fmt.Errorf("failed to create a new version for package %s from %s: %w", p.Name, p.Version, err)
 			}
 
 			// replace in our map if we find a newer version in the APKINDEX
@@ -83,7 +81,7 @@ func ParseApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, error) {
 
 	apkIndex, err := apk.IndexFromArchive(indexData)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse response %v", indexData)
+		return nil, fmt.Errorf("failed to parse response %v: %w", indexData, err)
 	}
 
 	return getLatestPackagesMap(apkIndex.Packages, wolfiPackages)

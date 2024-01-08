@@ -12,7 +12,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/storer"
 	"github.com/go-git/go-git/v5/plumbing/transport"
-	"github.com/pkg/errors"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/wolfi-dev/wolfictl/pkg/stringhelpers"
@@ -115,21 +114,21 @@ func SetGitSignOptions(repoPath string) error {
 	cmd.Dir = repoPath
 	rs, err := cmd.Output()
 	if err != nil {
-		return errors.Wrapf(err, "failed to set git config gpgsign: %s", rs)
+		return fmt.Errorf("failed to set git config gpgsign %q: %w", rs, err)
 	}
 
 	cmd = exec.Command("git", "config", "--local", "gpg.x509.program", "gitsign")
 	cmd.Dir = repoPath
 	rs, err = cmd.Output()
 	if err != nil {
-		return errors.Wrapf(err, "failed to set git config gpg.x509.program: %s", rs)
+		return fmt.Errorf("failed to set git config gpg.x509.program %q: %w", rs, err)
 	}
 
 	cmd = exec.Command("git", "config", "--local", "gpg.format", "x509")
 	cmd.Dir = repoPath
 	rs, err = cmd.Output()
 	if err != nil {
-		return errors.Wrapf(err, "failed to set git config gpg.format: %s", rs)
+		return fmt.Errorf("failed to set git config gpg.format %q: %w", rs, err)
 	}
 
 	gitAuthorName := os.Getenv("GIT_AUTHOR_NAME")
@@ -142,14 +141,14 @@ func SetGitSignOptions(repoPath string) error {
 	cmd.Dir = repoPath
 	rs, err = cmd.Output()
 	if err != nil {
-		return errors.Wrapf(err, "failed to set git config user.name: %s", rs)
+		return fmt.Errorf("failed to set git config user.name %q: %w", rs, err)
 	}
 
 	cmd = exec.Command("git", "config", "--local", "user.email", gitAuthorEmail)
 	cmd.Dir = repoPath
 	rs, err = cmd.Output()
 	if err != nil {
-		return errors.Wrapf(err, "failed to set git config user.email: %s", rs)
+		return fmt.Errorf("failed to set git config user.email %q: %w", rs, err)
 	}
 
 	return nil
