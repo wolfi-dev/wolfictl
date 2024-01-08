@@ -89,7 +89,7 @@ require (
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e // indirect
 	github.com/chainguard-dev/kontext v0.1.0 // indirect
 	github.com/cli/safeexec v1.0.0 // indirect
-	github.com/cloudflare/circl v1.3.6 // indirect
+	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/containerd/cgroups v1.1.0 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
