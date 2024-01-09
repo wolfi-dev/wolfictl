@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"slices"
 	"sort"
 	"strings"
@@ -54,6 +55,10 @@ type ValidateOptions struct {
 	// validating the advisories. This gets computed dynamically using APKIndex
 	// before validation happens.
 	apkIndexPackageMap map[string][]*apk.Package
+
+	// Logger is the logger to use during validation. A logger must always be
+	// provided.
+	Logger *slog.Logger
 }
 
 func Validate(ctx context.Context, opts ValidateOptions) error {
@@ -80,14 +85,20 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 	if opts.BaseAdvisoryDocs != nil {
 		diff := IndexDiff(opts.BaseAdvisoryDocs, opts.AdvisoryDocs)
 		errs = append(errs, opts.validateIndexDiff(diff))
+	} else {
+		opts.Logger.Info("skipping validation of index diff, no comparison basis provided")
 	}
 
 	if opts.APKIndex != nil {
 		errs = append(errs, opts.validateFixedVersions())
+	} else {
+		opts.Logger.Info("skipping validation of fixed versions, no APKINDEX provided")
 	}
 
 	if opts.AliasFinder != nil {
 		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
+	} else {
+		opts.Logger.Info("skipping validation of alias set completeness, no alias finder provided")
 	}
 
 	return errors.Join(errs...)
@@ -124,8 +135,11 @@ func (opts ValidateOptions) createAPKIndexPackageMap() map[string][]*apk.Package
 }
 
 func (opts ValidateOptions) validateFixedVersions() error {
+	opts.Logger.Info("validating fixed versions", "indexPackageCount", len(opts.APKIndex.Packages))
+
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
+		opts.Logger.Warn("not validating fixed versions, no APKINDEX provided")
 		return nil
 	}
 
@@ -158,6 +172,7 @@ func (opts ValidateOptions) validateFixedVersions() error {
 				fixed, ok := event.Data.(v2.Fixed)
 				if !ok {
 					// This should've been caught by basic validation!
+					opts.Logger.Warn("event data is not of type Fixed", "event", event)
 					advErrs = append(advErrs, fmt.Errorf("event data is not of type Fixed"))
 					continue
 				}
@@ -229,6 +244,7 @@ func (opts ValidateOptions) validateBuildConfigurationOrAPKIndexEntryExistence(p
 func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, version string) error {
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
+		opts.Logger.Warn("not validating package version existence, no APKINDEX provided")
 		return nil
 	}
 
@@ -255,6 +271,7 @@ func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, vers
 func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(pkgName, version string) error {
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
+		opts.Logger.Warn("not validating fixed version is not first version, no APKINDEX provided")
 		return nil
 	}
 
@@ -301,6 +318,8 @@ func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(pkgN
 }
 
 func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) error {
+	opts.Logger.Info("validating alias set completeness")
+
 	var errs []error
 
 	documents := opts.AdvisoryDocs.Select().Configurations()
@@ -352,6 +371,8 @@ func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) er
 }
 
 func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
+	opts.Logger.Info("validating index diff", "diffIsZero", diff.IsZero())
+
 	var errs []error
 
 	docRemovedErrs := lo.Map(diff.Removed, func(doc v2.Document, _ int) error {

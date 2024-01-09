@@ -69,7 +69,11 @@ print an error message that specifies where and how the data is invalid.`,
 			var packagesRepoDir string
 			var apkRepositoryURL string
 
+			logger := newLogger(p.verbosity)
+
 			if p.doNotDetectDistro {
+				logger.Debug("distro auto-detection disabled")
+
 				if p.advisoriesRepoDir == "" {
 					return fmt.Errorf("need --%s when --%s is specified", flagNameAdvisoriesRepoDir, flagNameNoDistroDetection)
 				}
@@ -95,6 +99,8 @@ print an error message that specifies where and how the data is invalid.`,
 				}
 				apkRepositoryURL = p.packageRepositoryURL
 			} else {
+				logger.Debug("distro auto-detection enabled")
+
 				// Catch any use of flags that get ignored when distro detection is enabled to avoid user confusion.
 				switch {
 				case p.advisoriesRepoDir != "":
@@ -110,7 +116,7 @@ print an error message that specifies where and how the data is invalid.`,
 					return fmt.Errorf("distro auto-detection failed: %w", err)
 				}
 
-				fmt.Fprint(os.Stderr, renderDetectedDistro(d))
+				logger.Info("detected distro", "name", d.Absolute.Name)
 
 				advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
 				advisoriesRepoUpstreamHTTPSURL, err = getAdvisoriesHTTPSRemoteURL(d)
@@ -121,6 +127,16 @@ print an error message that specifies where and how the data is invalid.`,
 				packagesRepoDir = d.Local.PackagesRepo.Dir
 				apkRepositoryURL = d.Absolute.APKRepositoryURL
 			}
+
+			logger.Debug(
+				"local distro properties",
+				"packagesRepoDir",
+				packagesRepoDir,
+				"advisoriesRepoDir",
+				advisoriesRepoDir,
+				"advisoriesRepoForkPoint",
+				advisoriesRepoForkPoint,
+			)
 
 			var baseAdvisoriesIndex *configs.Index[v2.Document]
 			if !p.skipDiffValidation {
@@ -133,6 +149,8 @@ print an error message that specifies where and how the data is invalid.`,
 				if err != nil {
 					return fmt.Errorf("unable to clone upstream advisories repo for comparison: %w", err)
 				}
+
+				logger.Debug("cloned upstream advisories repo for comparison", "dir", cloneDir)
 
 				baseAdvisoriesIndex, err = v2.NewIndex(rwos.DirFS(cloneDir))
 				if err != nil {
@@ -176,6 +194,7 @@ print an error message that specifies where and how the data is invalid.`,
 				AliasFinder:           af,
 				PackageConfigurations: packageConfigurationsIndex,
 				APKIndex:              apkIndex,
+				Logger:                logger,
 			}
 
 			validationErr := advisory.Validate(cmd.Context(), opts)
@@ -209,6 +228,7 @@ type validateParams struct {
 	skipAliasCompletenessValidation bool
 	skipPackageExistenceValidation  bool
 	packageRepositoryURL            string
+	verbosity                       int
 }
 
 const (
@@ -222,6 +242,7 @@ const (
 func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
+	addVerboseFlag(&p.verbosity, cmd)
 	cmd.Flags().StringVar(&p.advisoriesRepoUpstreamHTTPSURL, flagNameAdvisoriesRepoURL, "", "HTTPS URL of the upstream Git remote for the advisories repo")
 	cmd.Flags().StringVar(&p.advisoriesRepoBaseHash, flagNameAdvisoriesRepoBaseHash, "", "commit hash of the upstream repo to which the current state will be compared in the diff")
 	addDistroDirFlag(&p.packagesRepoDir, cmd)
