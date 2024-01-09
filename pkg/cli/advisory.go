@@ -2,6 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"io"
+	"log/slog"
 	"os"
 	"sort"
 	"strings"
@@ -174,6 +176,24 @@ func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
 
 func addPackageRepoURLFlag(val *string, cmd *cobra.Command) {
 	cmd.Flags().StringVarP(val, flagNamePackageRepoURL, "r", "", "URL of the APK package repository")
+}
+
+func addVerboseFlag(val *int, cmd *cobra.Command) {
+	cmd.Flags().CountVarP(val, "verbose", "v", "logging verbosity (v = info, vv = debug, default is none)")
+}
+
+func newLogger(verbosity int) *slog.Logger {
+	var h slog.Handler
+	switch {
+	case verbosity == 1:
+		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})
+	case verbosity >= 2:
+		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})
+	default:
+		h = slog.NewTextHandler(io.Discard, nil)
+	}
+
+	return slog.New(h)
 }
 
 func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {

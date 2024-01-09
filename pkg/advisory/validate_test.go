@@ -2,6 +2,8 @@ package advisory
 
 import (
 	"context"
+	"log/slog"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -13,6 +15,8 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
+
+var testLogger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 func TestValidate(t *testing.T) {
 	// The diff validation tests use the test fixtures for advisory.IndexDiff.
@@ -75,6 +79,7 @@ func TestValidate(t *testing.T) {
 					AdvisoryDocs:     bIndex,
 					BaseAdvisoryDocs: aIndex,
 					Now:              now,
+					Logger:           testLogger,
 				})
 				if tt.shouldBeValid && err != nil {
 					t.Errorf("should be valid but got error: %v", err)
@@ -197,6 +202,7 @@ func TestValidate(t *testing.T) {
 						Now:                   now,
 						PackageConfigurations: tt.packageCfgsFunc(t),
 						APKIndex:              tt.apkindex,
+						Logger:                testLogger,
 					})
 					if tt.shouldBeValid && err != nil {
 						t.Errorf("should be valid but got error: %v", err)
@@ -247,6 +253,7 @@ func TestValidate(t *testing.T) {
 				err = Validate(context.Background(), ValidateOptions{
 					AdvisoryDocs: index,
 					AliasFinder:  mockAF,
+					Logger:       testLogger,
 				})
 				if tt.shouldBeValid && err != nil {
 					t.Errorf("should be valid but got error: %v", err)
@@ -324,6 +331,7 @@ func TestValidate(t *testing.T) {
 					err = Validate(context.Background(), ValidateOptions{
 						AdvisoryDocs: index,
 						APKIndex:     tt.apkindex,
+						Logger:       testLogger,
 					})
 					if tt.shouldBeValid && err != nil {
 						t.Errorf("should be valid but got error: %v", err)
