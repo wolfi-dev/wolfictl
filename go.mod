@@ -6,7 +6,7 @@ require (
 	chainguard.dev/apko v0.13.2
 	chainguard.dev/melange v0.5.5
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.73.5
+	github.com/anchore/grype v0.74.0
 	github.com/anchore/syft v0.100.0
 	github.com/chainguard-dev/go-apk v0.0.0-20231218235333-2acefacd5846
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
