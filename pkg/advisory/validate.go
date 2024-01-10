@@ -135,8 +135,6 @@ func (opts ValidateOptions) createAPKIndexPackageMap() map[string][]*apk.Package
 }
 
 func (opts ValidateOptions) validateFixedVersions() error {
-	opts.Logger.Info("validating fixed versions", "indexPackageCount", len(opts.APKIndex.Packages))
-
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
 		opts.Logger.Warn("not validating fixed versions, no APKINDEX provided")
@@ -146,6 +144,14 @@ func (opts ValidateOptions) validateFixedVersions() error {
 	var errs []error
 
 	documents := opts.AdvisoryDocs.Select().Configurations()
+	opts.Logger.Debug(
+		"validating fixed versions",
+		"indexPackageCount",
+		len(opts.APKIndex.Packages),
+		"documentCount",
+		len(documents),
+	)
+	opts.Logger.Info("validating fixed versions")
 	for i := range documents {
 		doc := documents[i]
 
@@ -158,10 +164,18 @@ func (opts ValidateOptions) validateFixedVersions() error {
 
 		var docErrs []error
 
+		opts.Logger.Debug(
+			"checking advisories",
+			"documentName",
+			doc.Name(),
+			"advisoryCount",
+			len(doc.Advisories),
+		)
 		for i := range doc.Advisories {
 			adv := doc.Advisories[i]
 			var advErrs []error
 
+			opts.Logger.Debug("checking events", "advisory", adv.ID, "eventCount", len(adv.Events))
 			for i := range adv.Events {
 				event := adv.Events[i]
 
@@ -172,7 +186,6 @@ func (opts ValidateOptions) validateFixedVersions() error {
 				fixed, ok := event.Data.(v2.Fixed)
 				if !ok {
 					// This should've been caught by basic validation!
-					opts.Logger.Warn("event data is not of type Fixed", "event", event)
 					advErrs = append(advErrs, fmt.Errorf("event data is not of type Fixed"))
 					continue
 				}
@@ -242,6 +255,7 @@ func (opts ValidateOptions) validateBuildConfigurationOrAPKIndexEntryExistence(p
 }
 
 func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, version string) error {
+	opts.Logger.Debug("validating package version existence in APKINDEX", "package", pkgName, "version", version)
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
 		opts.Logger.Warn("not validating package version existence, no APKINDEX provided")
@@ -261,6 +275,13 @@ func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, vers
 
 	for _, pkg := range opts.apkIndexPackageMap[pkgName] {
 		if pkg.Version == version {
+			opts.Logger.Debug(
+				"package version found in APKINDEX",
+				"package",
+				pkgName,
+				"version",
+				version,
+			)
 			return nil
 		}
 	}
