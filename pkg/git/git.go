@@ -22,6 +22,13 @@ import (
 func GetGitAuth() *gitHttp.BasicAuth {
 	gitToken := os.Getenv("GITHUB_TOKEN")
 
+	if gitToken == "" {
+		// If the token is empty, there's no way we can return a usable authentication
+		// anyway. Whereas if we return nil, and don't auth, we have a chance at
+		// succeeding with access of a public repo.
+		return nil
+	}
+
 	return &gitHttp.BasicAuth{
 		Username: "abc123",
 		Password: gitToken,
