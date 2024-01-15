@@ -28,11 +28,15 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 
+	melangebuild "chainguard.dev/melange/pkg/build"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
+	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
+	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
 )
 
 type Options struct {
@@ -382,10 +386,6 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	if o.PkgPath != "" {
 		fileRelPath = filepath.Join(o.PkgPath, pc.Filename)
 	}
-	_, err = worktree.Add(fileRelPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
-	}
 
 	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
 	err = o.updateMakefile(pc.Dir, packageName, newVersion.Version, worktree)
@@ -405,6 +405,52 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	err = o.updateGitModules(pc.Dir, packageName, latestVersionWithPrefix, worktree)
 	if err != nil {
 		return fmt.Sprintf("failed to update git modules: %s", err.Error()), nil
+	}
+
+	// now make sure update config is configured
+	updated, err := config.ParseConfiguration(filepath.Join(pc.Dir, packageName+".yaml"))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse %v", err)
+	}
+	pctx := &melangebuild.PipelineBuild{
+		Build: &melangebuild.Build{
+			Configuration: *updated,
+		},
+		Package: &updated.Package,
+	}
+
+	// get a map of variable mutations we can substitute vars in URLs
+	mutations, err := melangebuild.MutateWith(pctx, map[string]string{})
+	if err != nil {
+		return "", err
+	}
+
+	fsys := rwfsOS.DirFS(pc.Dir)
+	index, err := build.NewIndexFromPaths(fsys, []string{packageName + ".yaml"}...)
+	if err != nil {
+		return "", err
+	}
+	s := index.Select().WhereName(packageName)
+	pipelineSectionUpdater := build.NewPipelineSectionUpdater(func(cfg config.Configuration) ([]config.Pipeline, error) {
+		tidy := false
+		err := deps.CleanupGoBumpDeps(updated, tidy, mutations)
+		if err != nil {
+			return updated.Pipeline, err
+		}
+
+		return updated.Pipeline, nil
+	})
+	if err != nil {
+		return "", err
+	}
+	err = s.Update(pipelineSectionUpdater)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = worktree.Add(fileRelPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
 	}
 
 	// if we're not running in batch mode, lets commit and PR each change

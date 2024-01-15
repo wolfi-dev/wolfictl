@@ -20,9 +20,12 @@ import (
 	"chainguard.dev/melange/pkg/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	wolfibuild "github.com/wolfi-dev/wolfictl/pkg/configs/build"
+	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/wolfi-dev/wolfictl/pkg/update"
+	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
 	"gopkg.in/yaml.v3"
 )
 
@@ -235,6 +238,28 @@ func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions m
 
 		// get a map of variable mutations we can substitute vars in URLs
 		mutations, err := build.MutateWith(pctx, map[string]string{})
+		if err != nil {
+			return err
+		}
+
+		fsys := rwfsOS.DirFS(tempDir)
+		index, err := wolfibuild.NewIndexFromPaths(fsys, []string{packageName + yamlExtension}...)
+		if err != nil {
+			return err
+		}
+		s := index.Select().WhereName(packageName)
+		pipelineSectionUpdater := wolfibuild.NewPipelineSectionUpdater(func(cfg config.Configuration) ([]config.Pipeline, error) {
+			tidy := false
+			err := deps.CleanupGoBumpDeps(updated, tidy, mutations)
+			if err != nil {
+				return updated.Pipeline, err
+			}
+			return updated.Pipeline, nil
+		})
+		if err != nil {
+			return err
+		}
+		err = s.Update(pipelineSectionUpdater)
 		if err != nil {
 			return err
 		}
