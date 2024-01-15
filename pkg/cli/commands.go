@@ -27,6 +27,7 @@ func New() *cobra.Command {
 		cmdLs(),
 		cmdSBOM(),
 		cmdScan(),
+		cmdScanSource(),
 		cmdUpdate(),
 		cmdVEX(),
 		cmdWithdraw(),

@@ -205,6 +205,65 @@ func TempClone(gitURL, hash string, useAuth bool) (repoDir string, err error) {
 	return dir, nil
 }
 
+// TempCloneTag is like TempClone, but clones the repo at the provided tag.
+func TempCloneTag(gitURL, tag string, useAuth bool) (repoDir string, err error) {
+	if tag == "" {
+		return "", fmt.Errorf("tag must be provided")
+	}
+
+	dir, err := os.MkdirTemp("", "wolfictl-git-clone-*")
+	if err != nil {
+		return dir, fmt.Errorf("unable to create temp directory for git clone: %w", err)
+	}
+
+	var auth transport.AuthMethod
+	if useAuth {
+		auth = GetGitAuth()
+	}
+
+	repo, err := git.PlainClone(dir, false, &git.CloneOptions{
+		Auth: auth,
+		URL:  gitURL,
+	})
+	if err != nil {
+		return dir, fmt.Errorf("unable to clone repo %q to temp directory: %w", gitURL, err)
+	}
+
+	tags, err := repo.Tags()
+	if err != nil {
+		return "", fmt.Errorf("failed to get tags: %w", err)
+	}
+
+	var tagRef *plumbing.Reference
+	err = tags.ForEach(func(ref *plumbing.Reference) error {
+		if ref.Name().Short() == tag { // replace with your tag
+			tagRef = ref
+			return storer.ErrStop
+		}
+		return nil
+	})
+	if err != nil {
+		return "", fmt.Errorf("unable to find tag %q for repo %q: %w", tag, gitURL, err)
+	}
+
+	if tagRef == nil {
+		return "", fmt.Errorf("tag %q not found", tag)
+	}
+
+	w, err := repo.Worktree()
+	if err != nil {
+		return "", fmt.Errorf("unable to get worktree for repo %q: %w", gitURL, err)
+	}
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: tagRef.Name(),
+	})
+	if err != nil {
+		return "", fmt.Errorf("unable to checkout tag %q for repo %q: %w", tag, gitURL, err)
+	}
+
+	return dir, nil
+}
+
 // FindForkPoint finds the fork point between the local branch and the upstream
 // branch.
 //

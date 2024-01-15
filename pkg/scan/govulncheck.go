@@ -8,8 +8,10 @@ import (
 	"net/http"
 	"time"
 
+	"golang.org/x/tools/go/packages"
 	"golang.org/x/vuln/pkg/client"
 	"golang.org/x/vuln/pkg/govulncheck"
+	"golang.org/x/vuln/pkg/osv"
 	vulnscan "golang.org/x/vuln/pkg/scan"
 	"golang.org/x/vuln/pkg/vulncheck"
 )
@@ -39,6 +41,61 @@ func runGovulncheck(ctx context.Context, exe io.ReaderAt) (*vulncheck.Result, er
 	result.Vulns = vulnscan.UniqueVulns(result.Vulns)
 
 	return result, nil
+}
+
+func runGovulncheckSource(ctx context.Context, dir string) (*vulncheck.Result, error) {
+	c, err := client.NewClient(govulncheckDB, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating DB client: %w", err)
+	}
+
+	cfg := &govulncheck.Config{
+		ScanLevel: "symbol",
+	}
+
+	patterns := []string{"./..."}
+
+	graph := vulncheck.NewPackageGraph("")
+	pkgConfig := &packages.Config{
+		Dir:   dir,
+		Tests: false, // Don't scan tests. We can revisit this later if needed.
+		Env:   nil,   // TODO: This will use the current environment, but we should probably make sure to use the build environment.
+	}
+
+	var pkgs []*packages.Package
+	pkgs, err = graph.LoadPackages(pkgConfig, nil, patterns)
+	if err != nil {
+		return nil, fmt.Errorf("govulncheck: loading packages: %w", err)
+	}
+
+	result, err := vulncheck.Source(ctx, nopVulncheckHandler{}, pkgs, cfg, c, graph)
+	if err != nil {
+		return nil, err
+	}
+
+	result.Vulns = vulnscan.UniqueVulns(result.Vulns)
+
+	return result, nil
+}
+
+var _ govulncheck.Handler = (*nopVulncheckHandler)(nil)
+
+type nopVulncheckHandler struct{}
+
+func (g nopVulncheckHandler) Config(_ *govulncheck.Config) error {
+	return nil
+}
+
+func (g nopVulncheckHandler) Progress(_ *govulncheck.Progress) error {
+	return nil
+}
+
+func (g nopVulncheckHandler) OSV(_ *osv.Entry) error {
+	return nil
+}
+
+func (g nopVulncheckHandler) Finding(_ *govulncheck.Finding) error {
+	return nil
 }
 
 type GoVulnDBIndex struct {
