@@ -16,3 +16,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "github.com/anchore/syft" # Syft is particularly unstable right now as they work toward locking in Syft 1.0. Let's bump this manually, ensuring that we're familiar with the release notes of any version we're upgrading to.
+      - dependency-name: "github.com/anchore/grype" # It's usually best to update Grype in step with Syft updates.
