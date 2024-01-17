@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -307,8 +308,9 @@ func TestLinter_Rules(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.file, func(t *testing.T) {
+			ctx := context.Background()
 			l := newTestLinterWithFile(tt.file)
-			got, err := l.Lint()
+			got, err := l.Lint(ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Lint() error = %v, wantErr %v", err, tt.wantErr)
 				return

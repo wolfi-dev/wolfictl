@@ -14,7 +14,6 @@ import (
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 
@@ -37,6 +36,7 @@ func cmdBuild() *cobra.Command {
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+			log := clog.FromContext(ctx)
 
 			if jobs == 0 {
 				jobs = runtime.GOMAXPROCS(0)
@@ -66,7 +66,7 @@ func cmdBuild() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs,
+			g, err := dag.NewGraph(ctx, pkgs,
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...))
 			if err != nil {
@@ -154,6 +154,7 @@ type task struct {
 }
 
 func (t *task) start(ctx context.Context) {
+	log := clog.FromContext(ctx).With("pkg", t.pkg)
 	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 
 	defer close(t.done) // signal that we're done, one way or another.

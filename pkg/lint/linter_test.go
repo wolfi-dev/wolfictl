@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -89,8 +90,9 @@ func TestLinter_Dir(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			l := newTestLinterWithDir(tt.path)
-			got, err := l.Lint()
+			got, err := l.Lint(ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Lint() error = %v, wantErr %v", err, tt.wantErr)
 			}

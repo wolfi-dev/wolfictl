@@ -56,7 +56,7 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 				return fmt.Errorf("NewPackages: %w", err)
 			}
 
-			g, err := dag.NewGraph(pkgs,
+			g, err := dag.NewGraph(ctx, pkgs,
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...),
 			)

@@ -10,6 +10,7 @@ require (
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.0
 	github.com/anchore/syft v0.100.0
+	github.com/chainguard-dev/clog v1.2.3-0.20240116182827-04bee692f7a8
 	github.com/chainguard-dev/go-apk v0.0.0-20240116193855-4c76fbe27ad7
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
 	github.com/charmbracelet/bubbles v0.17.1
@@ -32,7 +33,6 @@ require (
 	github.com/package-url/packageurl-go v0.1.2
 	github.com/samber/lo v1.39.0
 	github.com/savioxavier/termlink v1.3.0
-	github.com/sirupsen/logrus v1.9.3
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -86,7 +86,6 @@ require (
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bmatcuk/doublestar/v2 v2.0.4 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
-	github.com/chainguard-dev/clog v1.2.3-0.20240116182827-04bee692f7a8 // indirect
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e // indirect
 	github.com/chainguard-dev/kontext v0.1.0 // indirect
 	github.com/cli/safeexec v1.0.0 // indirect
@@ -248,6 +247,7 @@ require (
 	github.com/sigstore/cosign/v2 v2.2.1 // indirect
 	github.com/sigstore/rekor v1.3.3 // indirect
 	github.com/sigstore/sigstore v1.7.5 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spdx/tools-golang v0.5.3 // indirect

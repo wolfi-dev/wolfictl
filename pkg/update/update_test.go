@@ -1,6 +1,7 @@
 package update
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -53,13 +54,14 @@ func TestMonitorService_updatePackagesGitRepository(t *testing.T) {
 		DefaultBranch: "master",
 	}
 
-	o.PackageConfigs, err = melange.ReadAllPackagesFromRepo(filepath.Join(dir, "melange"))
+	ctx := context.Background()
+	o.PackageConfigs, err = melange.ReadAllPackagesFromRepo(ctx, filepath.Join(dir, "melange"))
 	assert.NoError(t, err)
 
 	// fake a new version available
 	newVersion := map[string]NewVersionResults{"cheese": {Version: "1.5.10"}}
 	errorMessages := make(map[string]string)
-	err = o.updatePackagesGitRepository(r, newVersion)
+	err = o.updatePackagesGitRepository(ctx, r, newVersion)
 	assert.NoError(t, err)
 	assert.Empty(t, errorMessages)
 

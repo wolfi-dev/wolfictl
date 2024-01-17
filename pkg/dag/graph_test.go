@@ -1,6 +1,7 @@
 package dag
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,13 +17,14 @@ const (
 
 func TestNewGraph(t *testing.T) {
 	t.Run("basic", func(t *testing.T) {
+		ctx := context.Background()
 		var (
 			testDir = "testdata/basic"
 		)
 		t.Run("allowed dangling", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
-			graph, err := NewGraph(pkgs, WithAllowUnresolved())
+			graph, err := NewGraph(ctx, pkgs, WithAllowUnresolved())
 			require.NoError(t, err)
 			amap, err := graph.Graph.AdjacencyMap()
 			require.NoError(t, err)
@@ -51,9 +53,9 @@ func TestNewGraph(t *testing.T) {
 			}
 		})
 		t.Run("has expected tree", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
-			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
+			graph, err := NewGraph(ctx, pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
 			amap, err := graph.Graph.AdjacencyMap()
 			require.NoError(t, err)
@@ -87,17 +89,18 @@ func TestNewGraph(t *testing.T) {
 		})
 	})
 	t.Run("complex", func(t *testing.T) {
+		ctx := context.Background()
 		var testDir = "testdata/complex"
 		t.Run("allowed dangling", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
-			_, err = NewGraph(pkgs, WithAllowUnresolved())
+			_, err = NewGraph(ctx, pkgs, WithAllowUnresolved())
 			require.NoError(t, err)
 		})
 		t.Run("external dependencies only", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
-			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
+			graph, err := NewGraph(ctx, pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
 			amap, err := graph.Graph.AdjacencyMap()
 			require.NoError(t, err)
@@ -130,9 +133,9 @@ func TestNewGraph(t *testing.T) {
 			}
 		})
 		t.Run("internal and external dependencies", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
-			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
+			graph, err := NewGraph(ctx, pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
 			amap, err := graph.Graph.AdjacencyMap()
 			require.NoError(t, err)
@@ -176,9 +179,9 @@ func TestNewGraph(t *testing.T) {
 		})
 
 		t.Run("internal dependencies numbered", func(t *testing.T) {
-			pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
-			graph, err := NewGraph(pkgs, WithRepos(packageRepo), WithKeys(key))
+			graph, err := NewGraph(ctx, pkgs, WithRepos(packageRepo), WithKeys(key))
 			require.NoError(t, err)
 			amap, err := graph.Graph.AdjacencyMap()
 			require.NoError(t, err)
@@ -226,6 +229,7 @@ func TestNewGraph(t *testing.T) {
 		})
 	})
 	t.Run("resolve cycle", func(t *testing.T) {
+		ctx := context.Background()
 		var (
 			testDir          = "testdata/cycle"
 			cyclePackageRepo = filepath.Join(testDir, "packages")
@@ -237,9 +241,9 @@ func TestNewGraph(t *testing.T) {
 				"d": {"a:1.3.5-r1@local"},
 			}
 		)
-		pkgs, err := NewPackages(os.DirFS(testDir), testDir, "")
+		pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 		require.NoError(t, err)
-		graph, err := NewGraph(pkgs, WithRepos(cyclePackageRepo), WithKeys(cycleKey))
+		graph, err := NewGraph(ctx, pkgs, WithRepos(cyclePackageRepo), WithKeys(cycleKey))
 		require.NoError(t, err)
 		amap, err := graph.Graph.AdjacencyMap()
 		require.NoError(t, err)

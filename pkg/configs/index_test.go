@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"context"
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
@@ -10,10 +11,11 @@ import (
 )
 
 func TestNewIndex(t *testing.T) {
+	ctx := context.Background()
 	fsys := rwos.DirFS("testdata/index-1")
 
 	index, err := NewIndex[config.Configuration](fsys, func(path string) (*config.Configuration, error) {
-		return config.ParseConfiguration(path, config.WithFS(fsys))
+		return config.ParseConfiguration(ctx, path, config.WithFS(fsys))
 	})
 	require.NoError(t, err)
 

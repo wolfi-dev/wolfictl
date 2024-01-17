@@ -12,7 +12,6 @@ import (
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
 	"github.com/chainguard-dev/go-apk/pkg/apk"
-	"github.com/saferwall/pe/log"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -82,7 +81,7 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 
 	if opts.BaseAdvisoryDocs != nil {
 		diff := IndexDiff(opts.BaseAdvisoryDocs, opts.AdvisoryDocs)
-		errs = append(errs, opts.validateIndexDiff(diff))
+		errs = append(errs, opts.validateIndexDiff(ctx, diff))
 	} else {
 		log.Info("skipping validation of index diff, no comparison basis provided")
 	}
@@ -192,8 +191,8 @@ func (opts ValidateOptions) validateFixedVersions(ctx context.Context) error {
 				fixedVersion := fixed.FixedVersion
 
 				eventErrs := []error{
-					opts.validatePackageVersionExistsInAPKINDEX(doc.Name(), fixedVersion),
-					opts.validateFixedVersionIsNotFirstVersionInAPKINDEX(doc.Name(), fixedVersion),
+					opts.validatePackageVersionExistsInAPKINDEX(ctx, doc.Name(), fixedVersion),
+					opts.validateFixedVersionIsNotFirstVersionInAPKINDEX(ctx, doc.Name(), fixedVersion),
 				}
 
 				advErrs = append(advErrs, errorhelpers.LabelError(
@@ -253,7 +252,8 @@ func (opts ValidateOptions) validateBuildConfigurationOrAPKIndexEntryExistence(p
 	return nil
 }
 
-func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, version string) error {
+func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(ctx context.Context, pkgName, version string) error {
+	log := clog.FromContext(ctx)
 	log.Debug("validating package version existence in APKINDEX", "package", pkgName, "version", version)
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
@@ -288,7 +288,8 @@ func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(pkgName, vers
 	return fmt.Errorf("package version %q not found in APKINDEX", version)
 }
 
-func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(pkgName, version string) error {
+func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(ctx context.Context, pkgName, version string) error {
+	log := clog.FromContext(ctx)
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
 		log.Warn("not validating fixed version is not first version, no APKINDEX provided")
@@ -338,6 +339,7 @@ func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(pkgN
 }
 
 func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) error {
+	log := clog.FromContext(ctx)
 	log.Info("validating alias set completeness")
 
 	var errs []error
@@ -390,7 +392,8 @@ func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) er
 	return errorhelpers.LabelError("alias set completeness validation failure(s)", errors.Join(errs...))
 }
 
-func (opts ValidateOptions) validateIndexDiff(diff IndexDiffResult) error {
+func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDiffResult) error {
+	log := clog.FromContext(ctx)
 	log.Info("validating index diff", "diffIsZero", diff.IsZero())
 
 	var errs []error
