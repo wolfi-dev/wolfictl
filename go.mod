@@ -1,14 +1,17 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.21.1
+go 1.21.2
+
+toolchain go1.21.5
 
 require (
-	chainguard.dev/apko v0.13.3
-	chainguard.dev/melange v0.5.5
+	chainguard.dev/apko v0.13.4-0.20240116200834-c10dc551b827
+	chainguard.dev/melange v0.5.6-0.20240116222011-34a2130156b4
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.0
 	github.com/anchore/syft v0.100.0
-	github.com/chainguard-dev/go-apk v0.0.0-20231218235333-2acefacd5846
+	github.com/chainguard-dev/clog v1.2.3-0.20240116182827-04bee692f7a8
+	github.com/chainguard-dev/go-apk v0.0.0-20240116193855-4c76fbe27ad7
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
 	github.com/charmbracelet/bubbles v0.17.1
 	github.com/charmbracelet/bubbletea v0.25.0
@@ -30,7 +33,6 @@ require (
 	github.com/package-url/packageurl-go v0.1.2
 	github.com/samber/lo v1.39.0
 	github.com/savioxavier/termlink v1.3.0
-	github.com/sirupsen/logrus v1.9.3
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -159,6 +161,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-getter v1.7.3 // indirect
+	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.5 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
@@ -182,7 +185,6 @@ require (
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.0.0-20230301153543-ba94b245509b // indirect
-	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/letsencrypt/boulder v0.0.0-20231130210859-6445feb96b98 // indirect
 	github.com/lima-vm/go-qcow2reader v0.1.1 // indirect
 	github.com/lima-vm/lima v0.19.1 // indirect
@@ -245,6 +247,7 @@ require (
 	github.com/sigstore/cosign/v2 v2.2.1 // indirect
 	github.com/sigstore/rekor v1.3.3 // indirect
 	github.com/sigstore/sigstore v1.7.5 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spdx/tools-golang v0.5.3 // indirect
@@ -276,7 +279,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/build v0.0.0-20231201193718-2d1c9af824e6 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.20.0 // indirect

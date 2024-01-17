@@ -115,7 +115,7 @@ func New() Options {
 	return options
 }
 
-func (o *Options) Update() error {
+func (o *Options) Update(ctx context.Context) error {
 	var err error
 	var repo *git.Repository
 	var latestVersions map[string]NewVersionResults
@@ -149,7 +149,7 @@ func (o *Options) Update() error {
 
 		// get the latest upstream versions available
 		if latestVersions == nil {
-			latestVersions, err = o.GetLatestVersions(tempDir, o.PackageNames)
+			latestVersions, err = o.GetLatestVersions(ctx, tempDir, o.PackageNames)
 			if err != nil {
 				return fmt.Errorf("failed to get package updates: %w", err)
 			}
@@ -170,7 +170,7 @@ func (o *Options) Update() error {
 		}
 
 		// update melange configs in our cloned git repository with any new package versions
-		err = o.updatePackagesGitRepository(repo, packagesToUpdate)
+		err = o.updatePackagesGitRepository(ctx, repo, packagesToUpdate)
 		if err != nil {
 			// we occasionally get errors when pushing to git and creating issues, so we should retry using a clean clone
 			o.Logger.Printf("attempt %d: failed to update packages in git repository: %s", i+1, err)
@@ -209,12 +209,12 @@ func (o *Options) Update() error {
 	return nil
 }
 
-func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[string]NewVersionResults, error) {
+func (o *Options) GetLatestVersions(ctx context.Context, dir string, packageNames []string) (map[string]NewVersionResults, error) {
 	var err error
 	latestVersions := make(map[string]NewVersionResults)
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
-	o.PackageConfigs, err = melange.ReadPackageConfigs(packageNames, filepath.Join(dir, o.PkgPath))
+	o.PackageConfigs, err = melange.ReadPackageConfigs(ctx, packageNames, filepath.Join(dir, o.PkgPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get package configs: %w", err)
 	}
@@ -281,7 +281,7 @@ func transformVersion(c config.Update, v string) (string, error) {
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
+func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
 	// store the HEAD ref to switch back later
 	headRef, err := repo.Head()
 	if err != nil {
@@ -319,7 +319,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return fmt.Errorf("failed to create git branch: %w", err)
 		}
 
-		errorMessage, err := o.updateGitPackage(repo, packageName, newVersion, ref)
+		errorMessage, err := o.updateGitPackage(ctx, repo, packageName, newVersion, ref)
 		if err != nil {
 			return err
 		}
@@ -342,7 +342,7 @@ func debug(wt *git.Worktree) ([]byte, error) {
 	return rs, nil
 }
 
-func (o *Options) updateGitPackage(repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
+func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
 	// get the filename from the map of melange configs we loaded at the start
 	pc, ok := o.PackageConfigs[packageName]
 	if !ok {
@@ -360,7 +360,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	}
 
 	// if new versions are available lets bump the packages in the target melange git repo
-	err := melange.Bump(configFile, newVersion.Version, newVersion.Commit)
+	err := melange.Bump(ctx, configFile, newVersion.Version, newVersion.Commit)
 	if err != nil {
 		// add this to the list of messages to print at the end of the update
 		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, newVersion.Version, err.Error()), nil

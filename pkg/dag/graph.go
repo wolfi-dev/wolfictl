@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	stdlog "log"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,9 +16,9 @@ import (
 	"strings"
 
 	"github.com/dominikbraun/graph"
-	log "github.com/sirupsen/logrus"
 	"go.lsp.dev/uri"
 
+	"github.com/chainguard-dev/clog"
 	apk "github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
@@ -57,7 +58,7 @@ type cycle struct {
 // It parses the packages to create the dependency graph.
 // If the list of packages creates a cycle, an error is returned.
 // If a package cannot be resolved, an error is returned, unless WithAllowUnresolved is set.
-func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
+func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 	var opts = &graphOptions{}
 	for _, option := range options {
 		if err := option(opts); err != nil {
@@ -135,7 +136,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 		}
 
 		// For runtime packages, it is allowed to resolve itself.
-		addErrs := g.resolvePackages(c, "runtime", localRepoSource, resolverKey, c.Package.Dependencies.Runtime, true)
+		addErrs := g.resolvePackages(ctx, c, "runtime", localRepoSource, resolverKey, c.Package.Dependencies.Runtime, true)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
@@ -156,7 +157,7 @@ func NewGraph(pkgs *Packages, options ...GraphOptions) (*Graph, error) {
 
 		// wolfi-dev has a policy for environment packages not to use a package to fulfull a dependency, if that package is myself.
 		// if I depend on something, and the dependency is the same name as me, it must have a lower version than myself
-		addErrs := g.resolvePackages(c, "environment", localRepoSource, resolverKey, c.Environment.Contents.Packages, false)
+		addErrs := g.resolvePackages(ctx, c, "environment", localRepoSource, resolverKey, c.Environment.Contents.Packages, false)
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
@@ -244,7 +245,8 @@ func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, index
 // Optionally, can allow self to resolve dependencies or not. This is policy driven/
 // In general, wolfi/os does *not* allow self to resolve for build environment,
 // and *does* allow self to resolve for runtime environment.
-func (g *Graph) resolvePackages(parent *Configuration, source, localRepoSource, resolverKey string, pkgs []string, allowSelf bool) (errs []error) {
+func (g *Graph) resolvePackages(ctx context.Context, parent *Configuration, source, localRepoSource, resolverKey string, pkgs []string, allowSelf bool) (errs []error) {
+	log := clog.FromContext(ctx)
 	for _, buildDep := range pkgs {
 		if buildDep == "" {
 			errs = append(errs, fmt.Errorf("empty package name in %s packages for %q", source, parent.Package.Name))
@@ -552,13 +554,13 @@ func (g Graph) ReverseSorted() ([]Package, error) {
 //
 // In other words, the new subgraph will contain all dependencies (transitively)
 // of all packages whose names were given as the `roots` argument.
-func (g Graph) SubgraphWithRoots(roots []string) (*Graph, error) {
+func (g Graph) SubgraphWithRoots(ctx context.Context, roots []string) (*Graph, error) {
 	// subgraph needs to create a new graph, but it also has a subset of Packages
 	subPkgs, err := g.packages.Sub(roots...)
 	if err != nil {
 		return nil, err
 	}
-	return NewGraph(subPkgs)
+	return NewGraph(ctx, subPkgs)
 }
 
 // SubgraphWithLeaves returns a new Graph that's a subgraph of g, where the set of
@@ -673,7 +675,7 @@ func OnlyMainPackages(pkgs *Packages) Filter {
 	return func(pkg Package) bool {
 		p, err := pkgs.PkgInfo(pkg.Name())
 		if err != nil {
-			log.Fatalf("error getting package info for %q: %v", pkg.Name(), err)
+			stdlog.Fatalf("error getting package info for %q: %v", pkg.Name(), err)
 			return false
 		}
 		return p != nil && p.Name != ""

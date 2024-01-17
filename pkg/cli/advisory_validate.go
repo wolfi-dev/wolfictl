@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -27,7 +28,7 @@ func cmdAdvisoryValidate() *cobra.Command {
 		Short: "Validate the state of advisory data",
 		Long: `Validate the state of the advisory data.
 
-This command examines all advisory documents to check the validity of the data. 
+This command examines all advisory documents to check the validity of the data.
 
 It looks for issues like:
 
@@ -58,7 +59,7 @@ specify the following flags:
 
 More information about these flags is shown in the documentation for each flag.
 
-If any issues are found in the advisory data, the command will exit 1, and will 
+If any issues are found in the advisory data, the command will exit 1, and will
 print an error message that specifies where and how the data is invalid.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
@@ -69,7 +70,8 @@ print an error message that specifies where and how the data is invalid.`,
 			var packagesRepoDir string
 			var apkRepositoryURL string
 
-			logger := newLogger(p.verbosity)
+			logger := clog.NewLogger(newLogger(p.verbosity))
+			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if p.doNotDetectDistro {
 				logger.Debug("distro auto-detection disabled")
@@ -194,10 +196,9 @@ print an error message that specifies where and how the data is invalid.`,
 				AliasFinder:           af,
 				PackageConfigurations: packageConfigurationsIndex,
 				APKIndex:              apkIndex,
-				Logger:                logger,
 			}
 
-			validationErr := advisory.Validate(cmd.Context(), opts)
+			validationErr := advisory.Validate(ctx, opts)
 			if validationErr != nil {
 				fmt.Fprintf(
 					os.Stderr,

@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -12,7 +13,7 @@ import (
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
-	log "github.com/sirupsen/logrus"
+	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 
@@ -35,6 +36,7 @@ func cmdBuild() *cobra.Command {
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+			log := clog.FromContext(ctx)
 
 			if jobs == 0 {
 				jobs = runtime.GOMAXPROCS(0)
@@ -60,11 +62,11 @@ func cmdBuild() *cobra.Command {
 				}
 			}
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(pkgs,
+			g, err := dag.NewGraph(ctx, pkgs,
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...))
 			if err != nil {
@@ -123,7 +125,7 @@ func cmdBuild() *cobra.Command {
 					return fmt.Errorf("failed to build %s: %w", t.pkg, err)
 				}
 				delete(tasks, t.pkg)
-				log.Printf("Finished building %s (%d/%d)", t.pkg, count-len(tasks), count)
+				log.Infof("Finished building %s (%d/%d)", t.pkg, count-len(tasks), count)
 			}
 			return nil
 		},
@@ -152,7 +154,8 @@ type task struct {
 }
 
 func (t *task) start(ctx context.Context) {
-	log.Printf("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+	log := clog.FromContext(ctx).With("pkg", t.pkg)
+	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 
 	defer close(t.done) // signal that we're done, one way or another.
 	tick := time.NewTicker(30 * time.Second)
@@ -160,7 +163,7 @@ func (t *task) start(ctx context.Context) {
 	for depname, dep := range t.deps {
 		select {
 		case <-tick.C:
-			log.Printf("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+			log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 		case <-dep:
 			delete(t.deps, depname)
 			// this dep is done.
@@ -178,18 +181,21 @@ func (t *task) start(ctx context.Context) {
 }
 
 func (t *task) do(ctx context.Context) error {
-	cfg, err := config.ParseConfiguration(fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
+	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
 	var bcs []*build.Build
 	for _, arch := range t.archs {
+		log := clog.New(slog.Default().Handler()).With("arch", arch)
+		ctx := clog.WithLogger(ctx, log)
+
 		// See if we already have the package built.
 		apk := fmt.Sprintf("%s-%s-r%d.apk", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
 		apkPath := filepath.Join(t.dir, "packages", arch, apk)
 		if _, err := os.Stat(apkPath); err == nil {
-			log.Printf("skipping %s, already built", apkPath)
+			log.Infof("skipping %s, already built", apkPath)
 			continue
 		}
 
@@ -213,10 +219,10 @@ func (t *task) do(ctx context.Context) error {
 
 		fn := fmt.Sprintf("%s.yaml", t.pkg)
 		if t.dryrun {
-			log.Printf("DRYRUN: would have built %s", apkPath)
+			log.Infof("DRYRUN: would have built %s", apkPath)
 			continue
 		}
-		log.Println("will build:", apkPath)
+		log.Infof("will build: %s", apkPath)
 		bc, err := build.New(ctx,
 			build.WithArch(types.ParseArchitecture(arch)),
 			build.WithConfig(filepath.Join(t.dir, fn)),
