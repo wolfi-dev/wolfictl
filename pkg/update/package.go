@@ -66,7 +66,7 @@ func NewPackageOptions() PackageOptions {
 	return options
 }
 
-func (o *PackageOptions) UpdatePackageCmd() error {
+func (o *PackageOptions) UpdatePackageCmd(ctx context.Context) error {
 	// clone the melange config git repo into a temp folder so we can work with it
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
@@ -92,7 +92,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	}
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
-	o.PackageConfig, err = melange.ReadPackageConfigs([]string{o.PackageName}, tempDir)
+	o.PackageConfig, err = melange.ReadPackageConfigs(ctx, []string{o.PackageName}, tempDir)
 	if err != nil {
 		return fmt.Errorf("failed to get package config for package name %s: %w", o.PackageName, err)
 	}
@@ -124,7 +124,7 @@ func (o *PackageOptions) UpdatePackageCmd() error {
 	nvr := NewVersionResults{
 		Version: v,
 	}
-	errorMessage, err := uo.updateGitPackage(repo, o.PackageName, nvr, ref)
+	errorMessage, err := uo.updateGitPackage(ctx, repo, o.PackageName, nvr, ref)
 	if err != nil {
 		return fmt.Errorf("failed to update package in git repository: %w", err)
 	}

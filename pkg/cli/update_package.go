@@ -22,7 +22,7 @@ func Package() *cobra.Command {
 			}
 
 			o.PackageName = args[0]
-			return o.UpdatePackageCmd()
+			return o.UpdatePackageCmd(cmd.Context())
 		},
 	}
 

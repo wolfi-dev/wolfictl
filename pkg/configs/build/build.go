@@ -1,6 +1,7 @@
 package build
 
 import (
+	"context"
 	"io/fs"
 
 	"chainguard.dev/melange/pkg/config"
@@ -18,6 +19,7 @@ func NewIndexFromPaths(fsys rwfs.FS, paths ...string) (*configs.Index[config.Con
 
 func newConfigurationDecodeFunc(fsys fs.FS) func(string) (*config.Configuration, error) {
 	return func(path string) (*config.Configuration, error) {
-		return config.ParseConfiguration(path, config.WithFS(fsys))
+		ctx := context.Background()
+		return config.ParseConfiguration(ctx, path, config.WithFS(fsys))
 	}
 }

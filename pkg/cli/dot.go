@@ -46,11 +46,12 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
   wolfictl dot --web -R -S crane
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			if pipelineDir == "" {
 				pipelineDir = filepath.Join(dir, "pipelines")
 			}
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return fmt.Errorf("NewPackages: %w", err)
 			}

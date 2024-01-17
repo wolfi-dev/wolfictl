@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 
 	"github.com/spf13/cobra"
@@ -26,7 +27,7 @@ func cmdLint() *cobra.Command {
 			// args[0] can be used to get the path to the file to lint or `.` to lint the current directory
 			// what if given yaml is not Melange yaml?
 			o.args = args
-			return o.LintCmd()
+			return o.LintCmd(cmd.Context())
 		},
 	}
 	cmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbose output")
@@ -38,7 +39,7 @@ func cmdLint() *cobra.Command {
 	return cmd
 }
 
-func (o lintOptions) LintCmd() error {
+func (o lintOptions) LintCmd(ctx context.Context) error {
 	linter := lint.New(o.makeLintOptions()...)
 
 	// If the list flag is set, print the list of available rules and exit.
@@ -48,7 +49,7 @@ func (o lintOptions) LintCmd() error {
 	}
 
 	// Run the linter.
-	result, err := linter.Lint()
+	result, err := linter.Lint(ctx)
 	if err != nil {
 		return err
 	}

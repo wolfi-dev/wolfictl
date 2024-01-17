@@ -20,13 +20,14 @@ func cmdText() *cobra.Command {
 		Short: "Print a sorted list of downstream dependent packages",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ctx := cmd.Context()
 			if pipelineDir == "" {
 				pipelineDir = filepath.Join(dir, "pipelines")
 			}
 
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			pkgs, err := dag.NewPackages(os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
