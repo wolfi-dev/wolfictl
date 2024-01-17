@@ -24,6 +24,7 @@ func New() *cobra.Command {
 		cmdText(),
 		cmdCheck(),
 		cmdLint(),
+		cmdRuby(),
 		cmdLs(),
 		cmdSBOM(),
 		cmdScan(),
