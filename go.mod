@@ -8,8 +8,8 @@ require (
 	chainguard.dev/apko v0.13.4-0.20240116200834-c10dc551b827
 	chainguard.dev/melange v0.5.6-0.20240118190540-d50de70a95bd
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.74.0
-	github.com/anchore/syft v0.100.0
+	github.com/anchore/grype v0.74.1
+	github.com/anchore/syft v0.101.0
 	github.com/chainguard-dev/clog v1.2.3-0.20240116182827-04bee692f7a8
 	github.com/chainguard-dev/go-apk v0.0.0-20240116193855-4c76fbe27ad7
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
