@@ -40,8 +40,9 @@ type RubyPackage struct {
 }
 
 type RubyRepoContext struct {
-	Pkg    RubyPackage
-	Client *http2.RLHTTPClient
+	Pkg               RubyPackage
+	Client            *http2.RLHTTPClient
+	VersionConstraint string
 }
 
 type ghTokenSource struct{}
@@ -68,24 +69,25 @@ func Operate(opts RubyOptions) ([]string, error) {
 	}
 
 	for _, pkg := range rubyPackages {
-		fmt.Printf("%s\n", pkg)
+		fmt.Printf("%+v\n", pkg)
 		// TODO(@found-it): remove
-		if pkg.Name != "ruby3.2-fluentd-1.16" && pkg.Name != "ruby3.2-redis-client" {
-			continue
+		// if pkg.Name != "ruby3.2-fluentd-1.16" && pkg.Name != "ruby3.2-redis-client" {
+		// 	continue
+		// }
+		rctx := RubyRepoContext{
+			Pkg:    pkg,
+			Client: client,
 		}
-        rctx := RubyRepoContext{
-            Pkg: pkg,
-            Client: client,
-        }
 
 		// Check gemspec for version constraints
-        _, err := rctx.Gemspec()
+		_, err := rctx.Gemspec()
 		if err != nil {
 			return []string{}, fmt.Errorf("finding gemspec: %w", err)
 		}
 
 		// Search for standard library deprecations
 		// TODO
+		fmt.Printf("\n")
 	}
 
 	return []string{}, nil

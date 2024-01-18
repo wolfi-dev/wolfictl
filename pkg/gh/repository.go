@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/go-github/v55/github"
 )
+
 func (o GitOptions) ListRepositoryFiles(ctx context.Context, owner, repo, path, ref string) ([]*github.RepositoryContent, error) {
 	opts := github.RepositoryContentGetOptions{
 		Ref: ref,
