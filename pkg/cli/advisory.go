@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"sort"
@@ -18,6 +17,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	"github.com/wolfi-dev/wolfictl/pkg/internal"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
@@ -190,7 +190,7 @@ func newLogger(verbosity int) *slog.Logger {
 	case verbosity >= 2:
 		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})
 	default:
-		h = slog.NewTextHandler(io.Discard, nil)
+		return internal.NopLogger()
 	}
 
 	return slog.New(h)
