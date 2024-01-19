@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -130,6 +131,11 @@ func (o *RubyOptions) isRubyPackage(conf config.Configuration) (bool, error) {
 			return true, nil
 		}
 	}
+	for _, pkg := range conf.Package.Dependencies.Runtime {
+		if strings.Contains(pkg, rubyKey+o.RubyVersion) {
+			return true, nil
+		}
+	}
 	return false, nil
 }
 
@@ -153,6 +159,15 @@ func discoverRef(pkg *melange.Packages) string {
 			}
 			if val, ok := step.With["branch"]; ok {
 				return strings.Replace(val, "${{package.version}}", pkg.Config.Package.Version, -1)
+			}
+		}
+		if step.Uses == "fetch" {
+			uri := step.With["uri"]
+			pattern := `.*\/(v?\$\{{2}package.version\}{2})`
+			re := regexp.MustCompile(pattern)
+			matches := re.FindStringSubmatch(string(uri))
+			if len(matches) > 1 {
+				return strings.Replace(matches[1], "${{package.version}}", pkg.Config.Package.Version, -1)
 			}
 		}
 	}

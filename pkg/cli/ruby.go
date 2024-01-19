@@ -70,7 +70,6 @@ func (p *rubyParams) addFlagsTo(cmd *cobra.Command) {
 }
 
 func resolvePath(args []string) (string, error) {
-	fmt.Printf("%s\n", args)
 	if _, err := os.Stat(args[0]); err == nil {
 		return args[0], nil
 	}
