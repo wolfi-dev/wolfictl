@@ -23,6 +23,9 @@ type RubyOptions struct {
 	// directory. Used to search for packages importing ruby-${RubyVersion}
 	RubyVersion string
 
+	// RubyUpdateVersion is the version of Ruby to update to
+	RubyUpdateVersion string
+
 	// Path is the path to the wolfi directory or a single package to check
 	Path string
 }
@@ -40,9 +43,9 @@ type RubyPackage struct {
 }
 
 type RubyRepoContext struct {
-	Pkg               RubyPackage
-	Client            *http2.RLHTTPClient
-	VersionConstraint string
+	Pkg           RubyPackage
+	Client        *http2.RLHTTPClient
+	UpdateVersion string
 }
 
 type ghTokenSource struct{}
@@ -71,12 +74,17 @@ func Operate(opts RubyOptions) ([]string, error) {
 	for _, pkg := range rubyPackages {
 		fmt.Printf("%+v\n", pkg)
 		// TODO(@found-it): remove
-		// if pkg.Name != "ruby3.2-fluentd-1.16" && pkg.Name != "ruby3.2-redis-client" {
+		// if pkg.Name != "ruby3.2-fluentd-1.16" &&
+		//          pkg.Name != "ruby3.2-redis-client" &&
+		//          pkg.Name != "ruby3.2-minitar" &&
+		//          pkg.Name != "ruby3.2-faraday-follow_redirects" &&
+		//          pkg.Name != "ruby3.2-msgpack" {
 		// 	continue
 		// }
 		rctx := RubyRepoContext{
-			Pkg:    pkg,
-			Client: client,
+			Pkg:           pkg,
+			Client:        client,
+			UpdateVersion: opts.RubyUpdateVersion,
 		}
 
 		// Check gemspec for version constraints

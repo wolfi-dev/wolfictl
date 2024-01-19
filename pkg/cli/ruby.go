@@ -26,15 +26,20 @@ wolfictl ruby --ruby-version 3.2 .
 				return fmt.Errorf("No ruby version specified")
 			}
 
+			if p.updateVersion == "" {
+				return fmt.Errorf("No ruby update version specified")
+			}
+
 			path, err := resolvePath(args)
 			if err != nil {
 				return fmt.Errorf("Could not resolve path: %w", err)
 			}
 
 			opts := ruby.RubyOptions{
-				All:         p.all,
-				RubyVersion: p.version,
-				Path:        path,
+				All:               p.all,
+				RubyVersion:       p.version,
+				RubyUpdateVersion: p.updateVersion,
+				Path:              path,
 			}
 
 			results, err := ruby.Operate(opts)
@@ -53,13 +58,15 @@ wolfictl ruby --ruby-version 3.2 .
 }
 
 type rubyParams struct {
-	all     bool
-	version string
+	all           bool
+	version       string
+	updateVersion string
 }
 
 func (p *rubyParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.all, "all", true, "capture all packages")
 	cmd.Flags().StringVarP(&p.version, "ruby-version", "r", "", "ruby version to search for")
+	cmd.Flags().StringVarP(&p.updateVersion, "ruby-update-version", "u", "", "ruby version to check for updates")
 }
 
 func resolvePath(args []string) (string, error) {

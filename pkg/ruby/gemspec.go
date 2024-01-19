@@ -1,19 +1,26 @@
 package ruby
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"regexp"
 	"strings"
 
 	"github.com/adrg/xdg"
 	"github.com/google/go-github/v55/github"
+	"github.com/hashicorp/go-version"
 
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
+)
+
+const (
+	requiredRubyVersionKey = "required_ruby_version"
 )
 
 func (rc *RubyRepoContext) Gemspec() (string, error) {
@@ -108,23 +115,75 @@ func (rc *RubyRepoContext) fetchFile(file string) error {
 	}
 	defer cached.Close()
 
-	// Define a regular expression pattern to match the required_ruby_version line
-	pattern := `.*required_ruby_version\s*=\s*["']([^"']+)["']`
-
-	content, err := os.ReadFile(cached.Name())
-	if err != nil {
-		return fmt.Errorf("reading cached gemspec: %w", err)
+	versionLine := ""
+	scanner := bufio.NewScanner(cached)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), requiredRubyVersionKey) {
+			versionLine = scanner.Text()
+			break
+		}
+	}
+	if versionLine == "" {
+		fmt.Printf("Could not find %s, assuming no constraint\n", requiredRubyVersionKey)
+		return nil
 	}
 
-	// Find the required_ruby_version using the regular expression
+	pattern := `["']([^"']+)["']`
 	re := regexp.MustCompile(pattern)
-	matches := re.FindStringSubmatch(string(content))
+	groups := re.FindAllStringSubmatch(string(versionLine), -1)
 
-	if len(matches) >= 2 {
-		requiredRubyVersion := matches[1]
-		fmt.Printf("Required Ruby Version : %s\n", requiredRubyVersion)
-	} else {
-		fmt.Println("Required Ruby Version not found in the gemspec.")
+	versionConstraints := []string{}
+	for _, group := range groups {
+		versionConstraints = append(versionConstraints, group[1])
+	}
+	return rc.checkVersionConstraint(versionConstraints)
+}
+
+func (rc *RubyRepoContext) checkVersionConstraint(versionConstraints []string) error {
+	if len(versionConstraints) < 1 {
+		fmt.Printf("Required Ruby Version not found in the gemspec.\n")
+		return nil
+		// return fmt.Errorf("Required Ruby Version not found in the gemspec.")
+	}
+
+	rubyPath, err := exec.LookPath("ruby")
+	if err == nil { // Call ruby to do the comparison
+		// Need to construct a list of version constraints to pass
+		// to the ruby call. It should end up like this: ['>= 2.6', '< 4']
+		constraint := "["
+		for i, c := range versionConstraints {
+			constraint += fmt.Sprintf("'%s'", c)
+			if i != len(versionConstraints)-1 {
+				constraint += ", "
+			}
+		}
+		constraint += "]"
+
+		cmdArr := []string{
+			"-e",
+			fmt.Sprintf("Gem::Dependency.new('', %s).match?('', '%s') ? exit : abort('')", constraint, rc.UpdateVersion),
+		}
+		cmd := exec.Command(rubyPath, cmdArr...)
+		_, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("ruby version comparison failed")
+		}
+	} else { // If ruby doesn't exist on the system do the version comparison ourselves
+		// Terraform has the same version comparison operators as ruby so we
+		// just use the terraform library to do the comparison
+		v1, err := version.NewVersion(rc.UpdateVersion)
+		if err != nil {
+			return fmt.Errorf("converting ruby update version: %w", err)
+		}
+
+		constraints, err := version.NewConstraint(strings.Join(versionConstraints, ", "))
+		if err != nil {
+			return fmt.Errorf("converting ruby version constraint: %w", err)
+		}
+
+		if !constraints.Check(v1) {
+			return fmt.Errorf("ruby version comparison failed")
+		}
 	}
 	return nil
 }
