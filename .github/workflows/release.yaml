@@ -15,7 +15,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Check if any changes since last tag
+        id: check
+        run: |
+          git fetch --tags
+          if [ -z "$(git tag --points-at HEAD)" ]; then
+            echo "Nothing points at HEAD, bump a new tag"
+            echo "bump=yes" >> $GITHUB_OUTPUT
+          else
+            echo "A tag already points to head, don't bump"
+            echo "bump=no" >> $GITHUB_OUTPUT
+          fi
       - name: Bump patch version and push tag
         uses: mathieudutour/github-tag-action@fcfbdceb3093f6d85a3b194740f8c6cec632f4e2 # v6.1
+        if: steps.check.outputs.bump == 'yes'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
