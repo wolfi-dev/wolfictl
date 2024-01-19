@@ -61,6 +61,8 @@ func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, e
 	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
 		pkgcataloging.NewSelectionRequest().WithDefaults(
 			pkgcataloging.ImageTag,
+		).WithRemovals(
+			"sbom",
 		),
 	)
 
