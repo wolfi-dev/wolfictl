@@ -162,11 +162,6 @@ func (r *syftResults) apksOwningPackageWithName(name string) ([]pkg.Package, err
 func (r *syftResults) indexPackageOwnerships() error {
 	index := make(map[string][]ownership)
 
-	// Syft has a bug where it's duplicating relationships for some reason, so we
-	// need to detect when we've already accounted for a relationship here.
-	// Ref: https://github.com/anchore/syft/issues/2509
-	seen := make(map[string]struct{})
-
 	for _, rel := range r.sbom.Relationships {
 		if rel.Type != artifact.OwnershipByFileOverlapRelationship {
 			continue
@@ -174,13 +169,6 @@ func (r *syftResults) indexPackageOwnerships() error {
 
 		apkPkgID := rel.From.ID()
 		ownedPkgID := rel.To.ID()
-
-		// Skip relationships we've already accounted for
-		relID := fmt.Sprintf("%s:%s", apkPkgID, ownedPkgID)
-		if _, ok := seen[relID]; ok {
-			continue
-		}
-		seen[relID] = struct{}{}
 
 		apkPkg := r.sbom.Artifacts.Packages.Package(apkPkgID)
 		if apkPkg == nil {
