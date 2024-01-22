@@ -10,12 +10,22 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/util"
+	osAdapter "github.com/chainguard-dev/yam/pkg/rwfs/os"
+	"github.com/chainguard-dev/yam/pkg/yam"
+	"github.com/chainguard-dev/yam/pkg/yam/formatted"
+	"github.com/dprotaso/go-yit"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"golang.org/x/exp/slices"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/semver"
+	"gopkg.in/yaml.v3"
 	versionutil "k8s.io/apimachinery/pkg/util/version"
+)
+
+var (
+	sortExpressions = []string{".package.dependencies.runtime", ".environment.contents.packages"}
+	gapExpressions  = []string{".", ".subpackages", ".data", ".pipeline"}
 )
 
 func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) error {
@@ -160,13 +170,23 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 	return nil
 }
 
-func CleanupGoBumpDeps(updated *config.Configuration, tidy bool, mutations map[string]string) error {
+func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool, mutations map[string]string) error {
 	tempDir, err := os.MkdirTemp("", "wolfibump")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
 	}
+
+	pipelineNode := findPipelineNode(doc)
+	if pipelineNode == nil {
+		return fmt.Errorf("pipeline node not found in the Wolfi definition: %v", err)
+	}
+
 	checkedOut := false
 	for i := range updated.Pipeline {
+		// Exit whenever we deleted items
+		if i == len(updated.Pipeline) {
+			continue
+		}
 		// TODO(hectorj2f): add support for fetch pipelines
 		if updated.Pipeline[i].Uses == "git-checkout" {
 			err := gitCheckout(&updated.Pipeline[i], tempDir, mutations)
@@ -183,10 +203,101 @@ func CleanupGoBumpDeps(updated *config.Configuration, tidy bool, mutations map[s
 			if updated.Pipeline[i].With["deps"] == "" && updated.Pipeline[i].With["replaces"] == "" {
 				log.Printf("deleting the pipeline: %v", updated.Pipeline[i])
 				updated.Pipeline = slices.Delete(updated.Pipeline, i, (i + 1))
+				// Remove node from the yaml root node
+				if err := removeNodeAtIndex(pipelineNode, i); err != nil {
+					return err
+				}
+			} else {
+				if err := updateGoBumpStep(pipelineNode.Content[i], &updated.Pipeline[i]); err != nil {
+					return err
+				}
 			}
 		}
 	}
 
+	return nil
+}
+
+// findPipelineNode finds the pipeline node in the YAML document
+func findPipelineNode(doc *yaml.Node) *yaml.Node {
+	it := yit.FromNode(doc).RecurseNodes()
+	// Search for the pipeline node
+	for node, ok := it(); ok; node, ok = it() {
+		if node.Kind == yaml.MappingNode {
+			// Search for the pipeline node
+			for i := 0; i < len(node.Content); i += 2 {
+				if node.Content[i].Value == "pipeline" {
+					return node.Content[i+1]
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// removeNodeAtIndex removes a node from a sequence node at the specified index
+func removeNodeAtIndex(parentNode *yaml.Node, index int) error {
+	if parentNode.Kind != yaml.SequenceNode {
+		return fmt.Errorf("parentNode %v is not a SequenceNode", parentNode.Kind)
+	}
+
+	// Check if index is within the range of the slice
+	if index < 0 || index >= len(parentNode.Content) {
+		return fmt.Errorf("index out of range: %d", index)
+	}
+
+	// Remove the node at the specified index
+	parentNode.Content = append(parentNode.Content[:index], parentNode.Content[index+1:]...)
+	return nil
+}
+
+func updateGoBumpStep(stepNode *yaml.Node, p *config.Pipeline) error {
+	updated := false
+	for i := 0; i < len(stepNode.Content); i += 2 {
+		if stepNode.Content[i].Value == "with" {
+			withNode := stepNode.Content[i+1]
+			for j := 0; j < len(withNode.Content); j += 2 {
+				if withNode.Content[j].Value == "deps" {
+					if p.With["deps"] == "" {
+						withNode.Content = slices.Delete(withNode.Content, j, (j + 2))
+						updated = true
+					} else {
+						depsNode := withNode.Content[j+1]
+						if depsNode.Kind != yaml.ScalarNode {
+							return fmt.Errorf("deps field is not a scalar")
+						}
+						depsNode.Value = p.With["deps"]
+						updated = true
+					}
+				}
+				if withNode.Content[j].Value == "replaces" {
+					if p.With["replaces"] == "" {
+						withNode.Content = slices.Delete(withNode.Content, j, (j + 2))
+						updated = true
+					} else {
+						replacesNode := withNode.Content[j+1]
+						if replacesNode.Kind != yaml.ScalarNode {
+							return fmt.Errorf("replaces field is not a scalar")
+						}
+						replacesNode.Value = p.With["replaces"]
+						updated = true
+					}
+				}
+
+				if p.With["modroot"] != "" && withNode.Content[j].Value == "modroot" {
+					modrootNode := withNode.Content[j+1]
+					if modrootNode.Kind != yaml.ScalarNode {
+						return fmt.Errorf("modroot field is not a scalar")
+					}
+					modrootNode.Value = p.With["modroot"]
+					updated = true
+				}
+			}
+		}
+	}
+	if !updated {
+		return fmt.Errorf("go/bump step deps or replaces field not found")
+	}
 	return nil
 }
 
@@ -225,4 +336,22 @@ func goModTidy(modroot, goVersion string) (string, error) {
 		return strings.TrimSpace(string(bytes)), err
 	}
 	return "", nil
+}
+
+func formatConfigurationFile(dir, filename string) error {
+	fsys := osAdapter.DirFS(dir)
+	// Format file following the wolfi format
+	err := yam.Format(fsys, []string{strings.ReplaceAll(filename, "/", "")}, yam.FormatOptions{
+		EncodeOptions: formatted.EncodeOptions{
+			Indent:          2,
+			GapExpressions:  gapExpressions,
+			SortExpressions: sortExpressions,
+		},
+		FinalNewline:           true,
+		TrimTrailingWhitespace: true,
+	})
+	if err != nil {
+		return fmt.Errorf("error formatting the file %s: %v", filename, err)
+	}
+	return nil
 }

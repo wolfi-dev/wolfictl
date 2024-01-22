@@ -20,8 +20,6 @@ import (
 	"chainguard.dev/melange/pkg/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	wolfibuild "github.com/wolfi-dev/wolfictl/pkg/configs/build"
-	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/wolfi-dev/wolfictl/pkg/update"
@@ -242,26 +240,11 @@ func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions m
 			return err
 		}
 
-		fsys := rwfsOS.DirFS(tempDir)
-		index, err := wolfibuild.NewIndexFromPaths(fsys, []string{packageName + yamlExtension}...)
-		if err != nil {
-			return err
-		}
-		s := index.Select().WhereName(packageName)
-		pipelineSectionUpdater := wolfibuild.NewPipelineSectionUpdater(func(cfg config.Configuration) ([]config.Pipeline, error) {
-			tidy := false
-			err := deps.CleanupGoBumpDeps(updated, tidy, mutations)
-			if err != nil {
-				return updated.Pipeline, err
+		// Skip any processing for definitions with a single pipeline
+		if len(updated.Pipeline) > 1 {
+			if err := o.updateGoBumpDeps(updated, o.Dir, packageName, mutations); err != nil {
+				return fmt.Errorf("error cleaning up go/bump deps: %v", err)
 			}
-			return updated.Pipeline, nil
-		})
-		if err != nil {
-			return err
-		}
-		err = s.Update(pipelineSectionUpdater)
-		if err != nil {
-			return err
 		}
 
 		// if manual update is expected then let's not try to validate pipelines
@@ -321,6 +304,34 @@ func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string)
 	o.Logger.Println(color.GreenString("fetch was successful"))
 
 	return os.RemoveAll(filename)
+}
+
+func (o *CheckUpdateOptions) updateGoBumpDeps(updated *config.Configuration, dir, packageName string, mutations map[string]string) error {
+	filename := fmt.Sprintf("%s.yaml", packageName)
+	yamlContent, err := os.ReadFile(filepath.Join(dir, filename))
+	if err != nil {
+		return err
+	}
+	var doc yaml.Node
+	err = yaml.Unmarshal(yamlContent, &doc)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling YAML: %v", err)
+	}
+	tidy := false
+	if err := deps.CleanupGoBumpDeps(&doc, updated, tidy, mutations); err != nil {
+		return err
+	}
+
+	modifiedYAML, err := yaml.Marshal(&doc)
+	if err != nil {
+		return fmt.Errorf("error marshaling YAML: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, filename), modifiedYAML, 0o600); err != nil {
+		return fmt.Errorf("failed to write configuration file: %v", err)
+	}
+
+	return nil
 }
 
 func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]string) error {

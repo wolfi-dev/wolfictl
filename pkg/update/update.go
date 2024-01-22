@@ -14,29 +14,24 @@ import (
 	"strings"
 	"time"
 
+	melangebuild "chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
-
-	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
-
 	"github.com/fatih/color"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v55/github"
 	"github.com/google/uuid"
-	"golang.org/x/exp/maps"
-	"golang.org/x/oauth2"
-	"golang.org/x/time/rate"
-
-	melangebuild "chainguard.dev/melange/pkg/build"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
-	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
+	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
+	"golang.org/x/exp/maps"
+	"golang.org/x/oauth2"
+	"golang.org/x/time/rate"
+	"gopkg.in/yaml.v3"
 )
 
 type Options struct {
@@ -408,7 +403,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	}
 
 	// now make sure update config is configured
-	updated, err := config.ParseConfiguration(filepath.Join(pc.Dir, packageName+".yaml"))
+	updated, err := config.ParseConfiguration(ctx, filepath.Join(pc.Dir, packageName+".yaml"))
 	if err != nil {
 		return "", fmt.Errorf("failed to parse %v", err)
 	}
@@ -425,27 +420,11 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		return "", err
 	}
 
-	fsys := rwfsOS.DirFS(pc.Dir)
-	index, err := build.NewIndexFromPaths(fsys, []string{packageName + ".yaml"}...)
-	if err != nil {
-		return "", err
-	}
-	s := index.Select().WhereName(packageName)
-	pipelineSectionUpdater := build.NewPipelineSectionUpdater(func(cfg config.Configuration) ([]config.Pipeline, error) {
-		tidy := false
-		err := deps.CleanupGoBumpDeps(updated, tidy, mutations)
-		if err != nil {
-			return updated.Pipeline, err
+	// Skip any processing for definitions with a single pipeline
+	if len(updated.Pipeline) > 1 {
+		if err := o.updateGoBumpDeps(updated, pc.Dir, packageName, mutations); err != nil {
+			return "", fmt.Errorf("error cleaning up go/bump deps: %v", err)
 		}
-
-		return updated.Pipeline, nil
-	})
-	if err != nil {
-		return "", err
-	}
-	err = s.Update(pipelineSectionUpdater)
-	if err != nil {
-		return "", err
 	}
 
 	_, err = worktree.Add(fileRelPath)
@@ -464,6 +443,34 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		}
 	}
 	return "", nil
+}
+
+func (o *Options) updateGoBumpDeps(updated *config.Configuration, dir, packageName string, mutations map[string]string) error {
+	filename := fmt.Sprintf("%s.yaml", packageName)
+	yamlContent, err := os.ReadFile(filepath.Join(dir, filename))
+	if err != nil {
+		return err
+	}
+	var doc yaml.Node
+	err = yaml.Unmarshal(yamlContent, &doc)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling YAML: %v", err)
+	}
+	tidy := false
+	if err := deps.CleanupGoBumpDeps(&doc, updated, tidy, mutations); err != nil {
+		return err
+	}
+
+	modifiedYAML, err := yaml.Marshal(&doc)
+	if err != nil {
+		return fmt.Errorf("error marshaling YAML: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, filename), modifiedYAML, 0o600); err != nil {
+		return fmt.Errorf("failed to write configuration file: %v", err)
+	}
+
+	return nil
 }
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
