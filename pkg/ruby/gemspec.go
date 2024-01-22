@@ -27,9 +27,7 @@ func (rc *RubyRepoContext) Gemspec() (string, error) {
 	// find the Gemspec
 	gemspec, err := rc.findGemspec()
 	if err != nil {
-		fmt.Printf("finding gemspec: %s\n", err)
-		return "", nil
-		// return "", fmt.Errorf("finding gemspec: %w", err)
+		return "", fmt.Errorf("finding gemspec: %w", err)
 	}
 
 	// download the Gemspec
@@ -65,7 +63,7 @@ func (rc *RubyRepoContext) findGemspec() (string, error) {
 			return file.GetName(), nil
 		}
 	}
-	return "", fmt.Errorf("Could not find gemspec")
+	return "", fmt.Errorf("Could not find gemspec file in repo")
 }
 
 func (rc *RubyRepoContext) fetchFile(file string) error {
@@ -141,9 +139,7 @@ func (rc *RubyRepoContext) fetchFile(file string) error {
 
 func (rc *RubyRepoContext) checkVersionConstraint(versionConstraints []string) error {
 	if len(versionConstraints) < 1 {
-		fmt.Printf("Required Ruby Version not found in the gemspec.\n")
-		return nil
-		// return fmt.Errorf("Required Ruby Version not found in the gemspec.")
+		return fmt.Errorf("Could not extract %s from gemspec.", requiredRubyVersionKey)
 	}
 
 	rubyPath, err := exec.LookPath("ruby")

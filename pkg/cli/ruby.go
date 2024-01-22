@@ -39,6 +39,7 @@ wolfictl ruby --ruby-version 3.2 .
 				All:               p.all,
 				RubyVersion:       p.version,
 				RubyUpdateVersion: p.updateVersion,
+				SearchTerm:        p.searchTerm,
 				Path:              path,
 			}
 
@@ -61,12 +62,14 @@ type rubyParams struct {
 	all           bool
 	version       string
 	updateVersion string
+	searchTerm    string
 }
 
 func (p *rubyParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.all, "all", true, "capture all packages")
 	cmd.Flags().StringVarP(&p.version, "ruby-version", "r", "", "ruby version to search for")
 	cmd.Flags().StringVarP(&p.updateVersion, "ruby-update-version", "u", "", "ruby version to check for updates")
+	cmd.Flags().StringVarP(&p.searchTerm, "search-term", "s", "", "GitHub code search string")
 }
 
 func resolvePath(args []string) (string, error) {

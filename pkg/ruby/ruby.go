@@ -27,6 +27,9 @@ type RubyOptions struct {
 	// RubyUpdateVersion is the version of Ruby to update to
 	RubyUpdateVersion string
 
+	// Github code search string
+	SearchTerm string
+
 	// Path is the path to the wolfi directory or a single package to check
 	Path string
 }
@@ -63,7 +66,8 @@ func Operate(opts RubyOptions) ([]string, error) {
 	client := &http2.RLHTTPClient{
 		Client: oauth2.NewClient(context.Background(), ghTokenSource{}),
 
-		// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
+		// 1 request every (n) second(s) to avoid DOS'ing server.
+		// https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 		Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
 	}
 
@@ -72,16 +76,10 @@ func Operate(opts RubyOptions) ([]string, error) {
 		return []string{}, fmt.Errorf("discovering packages: %w", err)
 	}
 
+	errors := map[string][]RubyPackage{}
+	success := []RubyPackage{}
 	for _, pkg := range rubyPackages {
 		fmt.Printf("%+v\n", pkg)
-		// TODO(@found-it): remove
-		// if pkg.Name != "ruby3.2-fluentd-1.16" &&
-		//          pkg.Name != "ruby3.2-redis-client" &&
-		//          pkg.Name != "ruby3.2-minitar" &&
-		//          pkg.Name != "ruby3.2-faraday-follow_redirects" &&
-		//          pkg.Name != "ruby3.2-msgpack" {
-		// 	continue
-		// }
 		rctx := RubyRepoContext{
 			Pkg:           pkg,
 			Client:        client,
@@ -91,14 +89,51 @@ func Operate(opts RubyOptions) ([]string, error) {
 		// Check gemspec for version constraints
 		_, err := rctx.Gemspec()
 		if err != nil {
-			return []string{}, fmt.Errorf("finding gemspec: %w", err)
+			if _, ok := errors[err.Error()]; !ok {
+				errors[err.Error()] = []RubyPackage{}
+			}
+			errors[err.Error()] = append(errors[err.Error()], pkg)
+		} else {
+			success = append(success, pkg)
 		}
 
-		// Search for standard library deprecations
-		// TODO
+		if opts.SearchTerm != "" {
+			// Search for standard library deprecations
+			fmt.Printf("Searching with: %s\n", opts.SearchTerm)
+			err = rctx.CodeSearch(opts.SearchTerm)
+			if err != nil {
+				if _, ok := errors[err.Error()]; !ok {
+					errors[err.Error()] = []RubyPackage{}
+				}
+				errors[err.Error()] = append(errors[err.Error()], pkg)
+			} else {
+				success = append(success, pkg)
+			}
+		}
 		fmt.Printf("\n")
 	}
 
+	fmt.Print("----------\n")
+	fmt.Print("- FAILED -\n")
+	fmt.Print("----------\n")
+	for key, val := range errors {
+		fmt.Printf("%s\n", key)
+		for _, v := range val {
+			fmt.Printf("  %s\n", v.Name)
+		}
+		fmt.Printf("\n")
+	}
+
+	fmt.Print("-----------\n")
+	fmt.Print("- SUCCESS -\n")
+	fmt.Print("-----------\n")
+	for _, val := range success {
+		fmt.Printf("%s\n", val.Name)
+	}
+
+	if len(errors) > 0 {
+		return []string{}, fmt.Errorf("Upgrade checks failed")
+	}
 	return []string{}, nil
 }
 
