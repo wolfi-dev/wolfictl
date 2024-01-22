@@ -35,6 +35,9 @@ func TestCleanupDeps(t *testing.T) {
 	}, {
 		name:     "cleanup gobump, empty replaces",
 		filename: "config-5",
+	}, {
+		name:     "cleanup gobump and update another go/bump",
+		filename: "config-6",
 	}}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -89,7 +92,7 @@ func TestCleanupDeps(t *testing.T) {
 			require.NoError(t, err)
 
 			if diff := cmp.Diff(string(modifiedYAMLContent), string(expectedYAMLContent)); diff != "" {
-				t.Errorf("unexpected file modification results (-want, +got):\n%s\n GOTL %s", diff, string(modifiedYAMLContent))
+				t.Errorf("unexpected file modification results (-want, +got):\n%s", diff)
 			}
 		})
 	}
