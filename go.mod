@@ -48,7 +48,7 @@ require (
 	golang.org/x/time v0.5.0
 	golang.org/x/vuln v1.0.1
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.28.4
+	k8s.io/apimachinery v0.29.1
 	sigs.k8s.io/release-utils v0.7.7
 )
 
@@ -217,6 +217,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
@@ -285,7 +286,7 @@ require (
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/term v0.16.0 // indirect
-	golang.org/x/tools v0.16.0 // indirect
+	golang.org/x/tools v0.16.1 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/api v0.154.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
