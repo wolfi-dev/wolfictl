@@ -9,7 +9,7 @@ require (
 	chainguard.dev/melange v0.5.6-0.20240118190540-d50de70a95bd
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.1
-	github.com/anchore/syft v0.101.0
+	github.com/anchore/syft v0.101.1
 	github.com/chainguard-dev/clog v1.2.3-0.20240116182827-04bee692f7a8
 	github.com/chainguard-dev/go-apk v0.0.0-20240116193855-4c76fbe27ad7
 	github.com/chainguard-dev/yam v0.0.0-20231106172656-25546e2ce3e3
@@ -31,7 +31,6 @@ require (
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/openvex/go-vex v0.2.5
 	github.com/package-url/packageurl-go v0.1.2
-	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.39.0
 	github.com/savioxavier/termlink v1.3.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
@@ -77,7 +76,7 @@ require (
 	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
-	github.com/anchore/stereoscope v0.0.0-20231220161148-590920dabc54 // indirect
+	github.com/anchore/stereoscope v0.0.0-20240118133533-eb656fc71793 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46 // indirect
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
@@ -110,7 +109,7 @@ require (
 	github.com/distribution/reference v0.5.0 // indirect
 	github.com/docker/cli v24.0.7+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v24.0.7+incompatible // indirect
+	github.com/docker/docker v25.0.0+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
@@ -150,7 +149,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/gnostic-models v0.6.9-0.20230804172637-c7be7c783f49 // indirect
-	github.com/google/go-containerregistry v0.17.0 // indirect
+	github.com/google/go-containerregistry v0.18.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/licensecheck v0.3.1 // indirect
@@ -231,6 +230,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/psanford/memfs v0.0.0-20230130182539-4dbf7e3e865e // indirect
