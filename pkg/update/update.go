@@ -14,25 +14,24 @@ import (
 	"strings"
 	"time"
 
+	melangebuild "chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
-
-	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
-
 	"github.com/fatih/color"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v55/github"
 	"github.com/google/uuid"
-	"golang.org/x/exp/maps"
-	"golang.org/x/oauth2"
-	"golang.org/x/time/rate"
-
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
+	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
+	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
+	"golang.org/x/exp/maps"
+	"golang.org/x/oauth2"
+	"golang.org/x/time/rate"
+	"gopkg.in/yaml.v3"
 )
 
 type Options struct {
@@ -382,10 +381,6 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	if o.PkgPath != "" {
 		fileRelPath = filepath.Join(o.PkgPath, pc.Filename)
 	}
-	_, err = worktree.Add(fileRelPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
-	}
 
 	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
 	err = o.updateMakefile(pc.Dir, packageName, newVersion.Version, worktree)
@@ -407,6 +402,36 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		return fmt.Sprintf("failed to update git modules: %s", err.Error()), nil
 	}
 
+	// now make sure update config is configured
+	updated, err := config.ParseConfiguration(ctx, filepath.Join(pc.Dir, packageName+".yaml"))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse %v", err)
+	}
+	pctx := &melangebuild.PipelineBuild{
+		Build: &melangebuild.Build{
+			Configuration: *updated,
+		},
+		Package: &updated.Package,
+	}
+
+	// get a map of variable mutations we can substitute vars in URLs
+	mutations, err := melangebuild.MutateWith(pctx, map[string]string{})
+	if err != nil {
+		return "", err
+	}
+
+	// Skip any processing for definitions with a single pipeline
+	if len(updated.Pipeline) > 1 {
+		if err := o.updateGoBumpDeps(updated, pc.Dir, packageName, mutations); err != nil {
+			return "", fmt.Errorf("error cleaning up go/bump deps: %v", err)
+		}
+	}
+
+	_, err = worktree.Add(fileRelPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
+	}
+
 	// if we're not running in batch mode, lets commit and PR each change
 	if !o.DryRun {
 		pr, err := o.proposeChanges(repo, ref, packageName, newVersion)
@@ -418,6 +443,34 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		}
 	}
 	return "", nil
+}
+
+func (o *Options) updateGoBumpDeps(updated *config.Configuration, dir, packageName string, mutations map[string]string) error {
+	filename := fmt.Sprintf("%s.yaml", packageName)
+	yamlContent, err := os.ReadFile(filepath.Join(dir, filename))
+	if err != nil {
+		return err
+	}
+	var doc yaml.Node
+	err = yaml.Unmarshal(yamlContent, &doc)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling YAML: %v", err)
+	}
+	tidy := false
+	if err := deps.CleanupGoBumpDeps(&doc, updated, tidy, mutations); err != nil {
+		return err
+	}
+
+	modifiedYAML, err := yaml.Marshal(&doc)
+	if err != nil {
+		return fmt.Errorf("error marshaling YAML: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, filename), modifiedYAML, 0o600); err != nil {
+		return fmt.Errorf("failed to write configuration file: %v", err)
+	}
+
+	return nil
 }
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
