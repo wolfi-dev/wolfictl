@@ -15,9 +15,6 @@ type RubyOptions struct {
 	// RubyUpdateVersion is the version of Ruby to update to
 	RubyUpdateVersion string
 
-	// Github code search string
-	SearchTerm string
-
 	// Path is the path to the wolfi directory or a single package to check
 	Path string
 

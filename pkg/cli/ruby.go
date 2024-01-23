@@ -57,7 +57,7 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 
 func cmdCodeSearch() *cobra.Command {
 	p := &rubyParams{}
-	var searchTerm string
+	var searchTerms []string
 	cmd := &cobra.Command{
 		Use:   "code-search",
 		Short: "Run Github search queries for ruby packages.",
@@ -82,13 +82,13 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 `,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if p.version == "" {
-				return fmt.Errorf("No ruby version specified")
-			}
-
-			path, err := resolvePath(args)
+			path, isDir, err := resolvePath(args)
 			if err != nil {
 				return fmt.Errorf("Could not resolve path: %w", err)
+			}
+
+			if p.version == "" && isDir {
+				return fmt.Errorf("Directory specified, but no --ruby-version to search for")
 			}
 
 			client := &http2.RLHTTPClient{
@@ -101,7 +101,6 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 
 			opts := ruby.RubyOptions{
 				RubyVersion: p.version,
-				SearchTerm:  searchTerm,
 				Path:        path,
 				Client:      client,
 				NoCache:     p.noCache,
@@ -115,9 +114,15 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 			codeSearchError := false
 			for _, pkg := range pkgs {
 				// Check gemspec for version constraints
-				err = opts.CodeSearch(&pkg, searchTerm)
-				if err != nil {
-					fmt.Printf("⚠️ %s: %s\n", pkg.Name, err.Error())
+				var localErr string
+				for _, term := range searchTerms {
+					err = opts.CodeSearch(&pkg, term)
+					if err != nil {
+						localErr += fmt.Sprintf(" |query='%s': %v", term, err)
+					}
+				}
+				if localErr != "" {
+					fmt.Printf("⚠️ %s: %s\n", pkg.Name, localErr)
 					codeSearchError = true
 				} else {
 					fmt.Printf("✅ %s\n", pkg.Name)
@@ -132,7 +137,7 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 	}
 
 	p.addFlagsTo(cmd)
-	cmd.Flags().StringVarP(&searchTerm, "search-term", "s", "", "GitHub code search term")
+	cmd.Flags().StringArrayVarP(&searchTerms, "search-terms", "s", []string{}, "GitHub code search term")
 	return cmd
 }
 
@@ -155,17 +160,17 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 `,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if p.version == "" {
-				return fmt.Errorf("No ruby version specified (--ruby-version, -r)")
+			path, isDir, err := resolvePath(args)
+			if err != nil {
+				return fmt.Errorf("Could not resolve path: %w", err)
+			}
+
+			if p.version == "" && isDir {
+				return fmt.Errorf("Directory specified, but no --ruby-version to search for")
 			}
 
 			if upgradeVersion == "" {
 				return fmt.Errorf("No ruby upgrade version specified (--ruby-upgrade-version, -u)")
-			}
-
-			path, err := resolvePath(args)
-			if err != nil {
-				return fmt.Errorf("Could not resolve path: %w", err)
 			}
 
 			client := &http2.RLHTTPClient{
@@ -223,9 +228,9 @@ func (p *rubyParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.noCache, "no-cache", false, "do not use cached results")
 }
 
-func resolvePath(args []string) (string, error) {
-	if _, err := os.Stat(args[0]); err == nil {
-		return args[0], nil
+func resolvePath(args []string) (string, bool, error) {
+	if f, err := os.Stat(args[0]); err == nil {
+		return args[0], f.IsDir(), nil
 	}
-	return "", fmt.Errorf("%s does not exist", args[0])
+	return "", false, fmt.Errorf("%s does not exist", args[0])
 }

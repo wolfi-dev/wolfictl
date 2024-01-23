@@ -30,12 +30,12 @@ func (o *RubyOptions) CodeSearch(pkg *RubyPackage, query string) error {
 	if err != nil {
 		return fmt.Errorf("Searching code: %w", err)
 	}
-	fmt.Printf("Found %d matches\n", len(results))
-	for _, result := range results {
-		fmt.Printf("%s\n", result.URL)
-		for i, fragment := range result.Fragments {
-			fmt.Printf(" %d. %s\n\n", i, fragment)
-		}
+
+	md, err := generateMarkdown(results, query)
+	fmt.Printf("%s", md)
+
+	if len(results) > 0 {
+		return fmt.Errorf("Found %d potential matches", len(results))
 	}
 	return nil
 }
@@ -162,9 +162,19 @@ func (o *RubyOptions) runQuery(pkg *RubyPackage, query string) ([]SearchResult, 
 	return results, nil
 }
 
-func generateMessage(results []SearchResult) (string, error) {
+func generateMarkdown(results []SearchResult, query string) (string, error) {
+	message := fmt.Sprintf("query='%s'\n", query)
 	if len(results) < 1 {
-		return "Search did not flag any results", nil
+		message += "Search did not flag any results\n"
 	}
-	return "", nil
+	for _, result := range results {
+		message += fmt.Sprintf("* %s\n", result.URL)
+		for _, fragment := range result.Fragments {
+			message += fmt.Sprintf("```ruby\n")
+			message += fmt.Sprintf("%s\n", fragment)
+			message += fmt.Sprintf("```\n")
+		}
+		message += fmt.Sprintf("\n")
+	}
+	return message, nil
 }
