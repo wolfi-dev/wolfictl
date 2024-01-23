@@ -8,6 +8,9 @@ import (
 	"github.com/google/go-github/v55/github"
 )
 
+// SearchCode does a rate-limited search using the Github Code Search API. It
+// does not currently do paginated search, that would be a good feature to add,
+// but is not needed for it's immediate use case.
 func (o GitOptions) SearchCode(ctx context.Context, query string) (*github.CodeSearchResult, error) {
 	options := &github.SearchOptions{
 		TextMatch: true,
@@ -28,7 +31,7 @@ func (o GitOptions) SearchCode(ctx context.Context, query string) (*github.CodeS
 		if githubErr != nil {
 			rateLimited, delay := o.checkRateLimiting(githubErr)
 			if rateLimited {
-				fmt.Printf("retrying after %v second delay due to rate limiting", delay.Seconds())
+				fmt.Printf("retrying after %v second delay due to rate limiting\n", delay.Seconds())
 				time.Sleep(delay)
 			} else {
 				return nil, githubErr
