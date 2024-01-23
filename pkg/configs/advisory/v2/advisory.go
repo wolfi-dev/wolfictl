@@ -111,6 +111,42 @@ func (adv Advisory) ResolvedAtVersion(version string) bool {
 	}
 }
 
+// PendingAtVersion returns true if the advisory indicates that the
+// vulnerability affects the distro package at the given package
+// version, or that a change to the package has not brought in a fix to a CVE.
+func (adv Advisory) PendingAtVersion(version string) bool {
+	if len(adv.Events) == 0 {
+		return true
+	}
+
+	switch latest := adv.Latest(); latest.Type {
+	case EventTypeFalsePositiveDetermination,
+		EventTypeFixNotPlanned,
+		EventTypeAnalysisNotPlanned:
+		return false
+
+	case EventTypeFixed:
+		givenVersion, err := versions.NewVersion(version)
+		if err != nil {
+			return true
+		}
+		fixedData, ok := latest.Data.(Fixed)
+		if !ok {
+			return true
+		}
+		fixedVersion, err := versions.NewVersion(fixedData.FixedVersion)
+		if err != nil {
+			return true
+		}
+
+		fixedInLatest := givenVersion.GreaterThanOrEqual(fixedVersion)
+		return !fixedInLatest
+
+	default:
+		return true
+	}
+}
+
 // Validate returns an error if the advisory is invalid.
 func (adv Advisory) Validate() error {
 	return errorhelpers.LabelError(adv.ID,
