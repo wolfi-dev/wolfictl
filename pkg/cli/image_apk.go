@@ -110,7 +110,7 @@ func (p *imageAPKParams) addFlags(cmd *cobra.Command) {
 
 type syftResults struct {
 	sbom                                *sbom.SBOM
-	packageOwnershipsByOwnedPackageName map[string][]ownership
+	packageOwnershipsByOwnedPackageName ownershipsByOwnedName
 }
 
 type ownership struct {
@@ -118,12 +118,15 @@ type ownership struct {
 	owned pkg.Package
 }
 
+// ownershipsByOwnedName is a map of package name to a list of ownerships that
+// describe the APK packages that own packages with that name.
+type ownershipsByOwnedName map[string][]ownership
+
 func (r *syftResults) apks() []pkg.Package {
 	var apks []pkg.Package
 
 	pkgs := r.sbom.Artifacts.Packages.Sorted(pkg.ApkPkg)
-	for i := range pkgs {
-		p := pkgs[i]
+	for _, p := range pkgs { //nolint:gocritic // prefer this copy syntax
 		// Skip findings from SBOMs
 		if p.FoundBy == "sbom-cataloger" {
 			continue
@@ -136,31 +139,32 @@ func (r *syftResults) apks() []pkg.Package {
 }
 
 func (r *syftResults) apksOwningPackageWithName(name string) ([]pkg.Package, error) {
-	// Lazily create the index of owned package (by name) to APK package
-	if r.packageOwnershipsByOwnedPackageName == nil {
-		err := r.indexPackageOwnerships()
-		if err != nil {
-			return nil, fmt.Errorf("unable to index APK package ownerships: %w", err)
-		}
+	ownershipIndex, err := r.indexPackageOwnerships()
+	if err != nil {
+		return nil, fmt.Errorf("unable to get index of APK package ownerships: %w", err)
 	}
 
 	// Lookup the APK package that owns the given package name
-	ownerships, ok := r.packageOwnershipsByOwnedPackageName[name]
+	ownerships, ok := ownershipIndex[name]
 	if !ok || len(ownerships) == 0 {
 		return nil, fmt.Errorf("no APK package owns %q", name)
 	}
 
 	var apks []pkg.Package
-	for i := range ownerships {
-		o := ownerships[i]
+	for _, o := range ownerships { //nolint:gocritic // prefer this copy syntax
 		apks = append(apks, o.owner)
 	}
 
 	return apks, nil
 }
 
-func (r *syftResults) indexPackageOwnerships() error {
-	index := make(map[string][]ownership)
+func (r *syftResults) indexPackageOwnerships() (ownershipsByOwnedName, error) {
+	// Lazily create the index of owned package (by name) to APK package
+	if r.packageOwnershipsByOwnedPackageName != nil {
+		return r.packageOwnershipsByOwnedPackageName, nil
+	}
+
+	index := make(ownershipsByOwnedName)
 
 	for _, rel := range r.sbom.Relationships {
 		if rel.Type != artifact.OwnershipByFileOverlapRelationship {
@@ -172,11 +176,11 @@ func (r *syftResults) indexPackageOwnerships() error {
 
 		apkPkg := r.sbom.Artifacts.Packages.Package(apkPkgID)
 		if apkPkg == nil {
-			return fmt.Errorf("unable to find owner package %q", apkPkgID)
+			return nil, fmt.Errorf("unable to find owner package %q", apkPkgID)
 		}
 		if apkPkg.Type != pkg.ApkPkg {
-			return fmt.Errorf(
-				"expected APK package as owner in relatioship, got %s (for package %q)",
+			return nil, fmt.Errorf(
+				"expected APK package as owner in relationship, got %s (for package %q)",
 				apkPkg.Type,
 				apkPkg.Name,
 			)
@@ -184,7 +188,7 @@ func (r *syftResults) indexPackageOwnerships() error {
 
 		ownedPkg := r.sbom.Artifacts.Packages.Package(ownedPkgID)
 		if ownedPkg == nil {
-			return fmt.Errorf("unable to find owned package %q", ownedPkgID)
+			return nil, fmt.Errorf("unable to find owned package %q", ownedPkgID)
 		}
 
 		o := ownership{
@@ -195,8 +199,10 @@ func (r *syftResults) indexPackageOwnerships() error {
 		index[ownedPkg.Name] = append(index[ownedPkg.Name], o)
 	}
 
+	// Cache the index for future use
 	r.packageOwnershipsByOwnedPackageName = index
-	return nil
+
+	return index, nil
 }
 
 func apkConfigPaths(apks []pkg.Package, distroDirPaths []string) ([]string, error) {
@@ -214,8 +220,7 @@ func apkConfigPaths(apks []pkg.Package, distroDirPaths []string) ([]string, erro
 
 	configPaths := make([]string, 0, len(apks))
 
-	for i := range apks {
-		apk := apks[i]
+	for _, apk := range apks { //nolint:gocritic // prefer this copy syntax
 		pathFound := false
 
 		var origin string
