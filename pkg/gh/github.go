@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 )
 
 const SecondsToSleepWhenRateLimited = 30

@@ -13,7 +13,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 
 	"github.com/hashicorp/go-version"
 	wolfigit "github.com/wolfi-dev/wolfictl/pkg/git"
