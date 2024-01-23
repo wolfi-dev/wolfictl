@@ -91,60 +91,48 @@ func (adv Advisory) ResolvedAtVersion(version string) bool {
 		return true
 
 	case EventTypeFixed:
-		givenVersion, err := versions.NewVersion(version)
-		if err != nil {
-			return false
-		}
-		fixedData, ok := latest.Data.(Fixed)
-		if !ok {
-			return false
-		}
-		fixedVersion, err := versions.NewVersion(fixedData.FixedVersion)
-		if err != nil {
-			return false
-		}
-
-		return givenVersion.GreaterThanOrEqual(fixedVersion)
+		return adv.isFixedVersion(version, latest)
 
 	default:
 		return false
 	}
 }
 
-// PendingAtVersion returns true if the advisory indicates that the
-// vulnerability affects the distro package at the given package
-// version, or that a change to the package has not brought in a fix to a CVE.
-func (adv Advisory) PendingAtVersion(version string) bool {
+// ConcludedAtVersion returns true if the advisory indicates that the
+// vulnerability has been solved, or those where no change is
+// expected to fix the CVE in the upstream code.
+func (adv Advisory) ConcludedAtVersion(version string) bool {
 	if len(adv.Events) == 0 {
-		return true
-	}
-
-	switch latest := adv.Latest(); latest.Type {
-	case EventTypeFalsePositiveDetermination,
-		EventTypeFixNotPlanned,
-		EventTypeAnalysisNotPlanned:
 		return false
-
-	case EventTypeFixed:
-		givenVersion, err := versions.NewVersion(version)
-		if err != nil {
-			return true
-		}
-		fixedData, ok := latest.Data.(Fixed)
-		if !ok {
-			return true
-		}
-		fixedVersion, err := versions.NewVersion(fixedData.FixedVersion)
-		if err != nil {
-			return true
-		}
-
-		fixedInLatest := givenVersion.GreaterThanOrEqual(fixedVersion)
-		return !fixedInLatest
-
-	default:
-		return true
 	}
+
+	latest := adv.Latest()
+	if latest.Type == EventTypePendingUpstreamFix {
+		return false
+	}
+	// NOTE: The resolved set is part of the concluded one
+	// with the exception of the pending-upstream-fix event type.
+	return adv.ResolvedAtVersion(version)
+}
+
+// isFixedVersion determines whether the vulnerability discovered for the provided
+// version has been fixed.
+func (adv Advisory) isFixedVersion(version string, latest Event) bool {
+	givenVersion, err := versions.NewVersion(version)
+	if err != nil {
+		return false
+	}
+	fixedData, ok := latest.Data.(Fixed)
+	if !ok {
+		return false
+	}
+	fixedVersion, err := versions.NewVersion(fixedData.FixedVersion)
+	if err != nil {
+		return false
+	}
+
+	fixedInLatest := givenVersion.GreaterThanOrEqual(fixedVersion)
+	return fixedInLatest
 }
 
 // Validate returns an error if the advisory is invalid.

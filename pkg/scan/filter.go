@@ -10,12 +10,12 @@ import (
 )
 
 const (
-	AdvisoriesSetResolved = "resolved"
-	AdvisoriesSetAll      = "all"
-	AdvisoriesSetPending  = "pending"
+	AdvisoriesSetResolved  = "resolved"
+	AdvisoriesSetAll       = "all"
+	AdvisoriesSetConcluded = "concluded"
 )
 
-var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetPending}
+var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetConcluded}
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
 func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
@@ -49,8 +49,8 @@ func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.
 		case AdvisoriesSetResolved:
 			filteredFindings = filterFindingsWithResolvedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
-		case AdvisoriesSetPending:
-			filteredFindings = filterFindingsWithPendingAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+		case AdvisoriesSetConcluded:
+			filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
 		default:
 			return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
@@ -107,10 +107,10 @@ func filterFindingsWithResolvedAdvisories(findings []Finding, packageAdvisories 
 	})
 }
 
-func filterFindingsWithPendingAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
+func filterFindingsWithConcludedAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
 	return lo.Filter(findings, func(finding Finding, _ int) bool {
 		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
-		if ok && adv.PendingAtVersion(currentPackageVersion) {
+		if ok && adv.ConcludedAtVersion(currentPackageVersion) {
 			return false
 		}
 
@@ -121,7 +121,7 @@ func filterFindingsWithPendingAdvisories(findings []Finding, packageAdvisories v
 				continue
 			}
 
-			if adv.PendingAtVersion(currentPackageVersion) {
+			if adv.ConcludedAtVersion(currentPackageVersion) {
 				return false
 			}
 		}
