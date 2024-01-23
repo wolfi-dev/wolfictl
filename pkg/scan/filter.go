@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	AdvisoriesSetResolved = "resolved"
-	AdvisoriesSetAll      = "all"
+	AdvisoriesSetResolved  = "resolved"
+	AdvisoriesSetAll       = "all"
+	AdvisoriesSetConcluded = "concluded"
 )
 
-var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll}
+var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetConcluded}
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
 func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
@@ -47,6 +48,9 @@ func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.
 
 		case AdvisoriesSetResolved:
 			filteredFindings = filterFindingsWithResolvedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+
+		case AdvisoriesSetConcluded:
+			filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
 		default:
 			return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
@@ -95,6 +99,29 @@ func filterFindingsWithResolvedAdvisories(findings []Finding, packageAdvisories 
 			}
 
 			if adv.ResolvedAtVersion(currentPackageVersion) {
+				return false
+			}
+		}
+
+		return true
+	})
+}
+
+func filterFindingsWithConcludedAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
+	return lo.Filter(findings, func(finding Finding, _ int) bool {
+		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
+		if ok && adv.ConcludedAtVersion(currentPackageVersion) {
+			return false
+		}
+
+		// Also check any listed aliases
+		for _, alias := range finding.Vulnerability.Aliases {
+			adv, ok := packageAdvisories.GetByVulnerability(alias)
+			if !ok {
+				continue
+			}
+
+			if adv.ConcludedAtVersion(currentPackageVersion) {
 				return false
 			}
 		}
