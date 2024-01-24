@@ -268,6 +268,87 @@ func TestFilterWithAdvisories(t *testing.T) {
 				},
 			},
 			errAssertion: assert.NoError,
+		}, {
+			name: "use concluded advisory filter",
+			result: &Result{
+				TargetAPK: TargetAPK{
+					Name:    "ko",
+					Version: "0.13.0-r2",
+				},
+				Findings: []Finding{
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-2023-1234",
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-1999-11111",
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-2000-22222",
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-2003-55555",
+						},
+					},
+				},
+			},
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "concluded",
+			expectedFindings: []Finding{
+				{
+					Vulnerability: Vulnerability{
+						ID: "CVE-2023-1234",
+					},
+				},
+				{
+					Vulnerability: Vulnerability{
+						ID: "CVE-1999-11111",
+					},
+				},
+				{
+					Vulnerability: Vulnerability{
+						ID: "CVE-2003-55555",
+					},
+				},
+			},
+			errAssertion: assert.NoError,
+		},
+		{
+			name: "use concluded advisory filter with a newer version",
+			result: &Result{
+				TargetAPK: TargetAPK{
+					Name:    "ko",
+					Version: "0.13.0-r30",
+				},
+				Findings: []Finding{
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-2h5h-59f5-c5x9",
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-1999-11111",
+						},
+					},
+				},
+			},
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "concluded",
+			expectedFindings: []Finding{
+				{
+					Vulnerability: Vulnerability{
+						ID: "CVE-1999-11111",
+					},
+				},
+			},
+			errAssertion: assert.NoError,
 		},
 	}
 

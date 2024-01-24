@@ -8,7 +8,7 @@ import (
 	"time"
 
 	ghauth "github.com/cli/go-gh/v2/pkg/auth"
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 	"golang.org/x/time/rate"

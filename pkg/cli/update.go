@@ -55,7 +55,7 @@ func cmdUpdate() *cobra.Command {
 	return cmd
 }
 
-func (o options) UpdateCmd(_ context.Context, repoURI string) error {
+func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
 	updateContext := update.New()
 
 	if !o.dryRun {
@@ -79,7 +79,7 @@ func (o options) UpdateCmd(_ context.Context, repoURI string) error {
 	updateContext.IssueLabels = o.issueLabels
 	updateContext.MaxRetries = o.maxRetries
 	updateContext.PkgPath = o.pkgPath
-	if err := updateContext.Update(); err != nil {
+	if err := updateContext.Update(ctx); err != nil {
 		return fmt.Errorf("creating updates: %w", err)
 	}
 

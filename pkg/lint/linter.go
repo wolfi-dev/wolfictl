@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sort"
@@ -35,10 +36,10 @@ func New(opts ...Option) *Linter {
 }
 
 // Lint evaluates all rules and returns the result.
-func (l *Linter) Lint() (Result, error) {
+func (l *Linter) Lint(ctx context.Context) (Result, error) {
 	rules := AllRules(l)
 
-	namesToPkg, err := melange.ReadAllPackagesFromRepo(l.options.Path)
+	namesToPkg, err := melange.ReadAllPackagesFromRepo(ctx, l.options.Path)
 	if err != nil {
 		return Result{}, err
 	}

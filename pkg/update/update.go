@@ -14,25 +14,24 @@ import (
 	"strings"
 	"time"
 
+	melangebuild "chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
-
-	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
-
 	"github.com/fatih/color"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/google/uuid"
-	"golang.org/x/exp/maps"
-	"golang.org/x/oauth2"
-	"golang.org/x/time/rate"
-
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
+	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
+	wolfiversions "github.com/wolfi-dev/wolfictl/pkg/versions"
+	"golang.org/x/exp/maps"
+	"golang.org/x/oauth2"
+	"golang.org/x/time/rate"
+	"gopkg.in/yaml.v3"
 )
 
 type Options struct {
@@ -115,7 +114,7 @@ func New() Options {
 	return options
 }
 
-func (o *Options) Update() error {
+func (o *Options) Update(ctx context.Context) error {
 	var err error
 	var repo *git.Repository
 	var latestVersions map[string]NewVersionResults
@@ -149,7 +148,7 @@ func (o *Options) Update() error {
 
 		// get the latest upstream versions available
 		if latestVersions == nil {
-			latestVersions, err = o.GetLatestVersions(tempDir, o.PackageNames)
+			latestVersions, err = o.GetLatestVersions(ctx, tempDir, o.PackageNames)
 			if err != nil {
 				return fmt.Errorf("failed to get package updates: %w", err)
 			}
@@ -170,7 +169,7 @@ func (o *Options) Update() error {
 		}
 
 		// update melange configs in our cloned git repository with any new package versions
-		err = o.updatePackagesGitRepository(repo, packagesToUpdate)
+		err = o.updatePackagesGitRepository(ctx, repo, packagesToUpdate)
 		if err != nil {
 			// we occasionally get errors when pushing to git and creating issues, so we should retry using a clean clone
 			o.Logger.Printf("attempt %d: failed to update packages in git repository: %s", i+1, err)
@@ -209,12 +208,12 @@ func (o *Options) Update() error {
 	return nil
 }
 
-func (o *Options) GetLatestVersions(dir string, packageNames []string) (map[string]NewVersionResults, error) {
+func (o *Options) GetLatestVersions(ctx context.Context, dir string, packageNames []string) (map[string]NewVersionResults, error) {
 	var err error
 	latestVersions := make(map[string]NewVersionResults)
 
 	// first, let's get the melange package(s) from the target git repo, that we want to check for updates
-	o.PackageConfigs, err = melange.ReadPackageConfigs(packageNames, filepath.Join(dir, o.PkgPath))
+	o.PackageConfigs, err = melange.ReadPackageConfigs(ctx, packageNames, filepath.Join(dir, o.PkgPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get package configs: %w", err)
 	}
@@ -281,7 +280,7 @@ func transformVersion(c config.Update, v string) (string, error) {
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
+func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
 	// store the HEAD ref to switch back later
 	headRef, err := repo.Head()
 	if err != nil {
@@ -319,7 +318,7 @@ func (o *Options) updatePackagesGitRepository(repo *git.Repository, packagesToUp
 			return fmt.Errorf("failed to create git branch: %w", err)
 		}
 
-		errorMessage, err := o.updateGitPackage(repo, packageName, newVersion, ref)
+		errorMessage, err := o.updateGitPackage(ctx, repo, packageName, newVersion, ref)
 		if err != nil {
 			return err
 		}
@@ -342,7 +341,7 @@ func debug(wt *git.Worktree) ([]byte, error) {
 	return rs, nil
 }
 
-func (o *Options) updateGitPackage(repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
+func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, packageName string, newVersion NewVersionResults, ref plumbing.ReferenceName) (string, error) {
 	// get the filename from the map of melange configs we loaded at the start
 	pc, ok := o.PackageConfigs[packageName]
 	if !ok {
@@ -360,7 +359,7 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	}
 
 	// if new versions are available lets bump the packages in the target melange git repo
-	err := melange.Bump(configFile, newVersion.Version, newVersion.Commit)
+	err := melange.Bump(ctx, configFile, newVersion.Version, newVersion.Commit)
 	if err != nil {
 		// add this to the list of messages to print at the end of the update
 		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, newVersion.Version, err.Error()), nil
@@ -381,10 +380,6 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 	fileRelPath := pc.Filename
 	if o.PkgPath != "" {
 		fileRelPath = filepath.Join(o.PkgPath, pc.Filename)
-	}
-	_, err = worktree.Add(fileRelPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
 	}
 
 	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
@@ -407,6 +402,36 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 		return fmt.Sprintf("failed to update git modules: %s", err.Error()), nil
 	}
 
+	// now make sure update config is configured
+	updated, err := config.ParseConfiguration(ctx, filepath.Join(pc.Dir, packageName+".yaml"))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse %v", err)
+	}
+	pctx := &melangebuild.PipelineBuild{
+		Build: &melangebuild.Build{
+			Configuration: *updated,
+		},
+		Package: &updated.Package,
+	}
+
+	// get a map of variable mutations we can substitute vars in URLs
+	mutations, err := melangebuild.MutateWith(pctx, map[string]string{})
+	if err != nil {
+		return "", err
+	}
+
+	// Skip any processing for definitions with a single pipeline
+	if len(updated.Pipeline) > 1 {
+		if err := o.updateGoBumpDeps(updated, pc.Dir, packageName, mutations); err != nil {
+			return "", fmt.Errorf("error cleaning up go/bump deps: %v", err)
+		}
+	}
+
+	_, err = worktree.Add(fileRelPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
+	}
+
 	// if we're not running in batch mode, lets commit and PR each change
 	if !o.DryRun {
 		pr, err := o.proposeChanges(repo, ref, packageName, newVersion)
@@ -418,6 +443,34 @@ func (o *Options) updateGitPackage(repo *git.Repository, packageName string, new
 		}
 	}
 	return "", nil
+}
+
+func (o *Options) updateGoBumpDeps(updated *config.Configuration, dir, packageName string, mutations map[string]string) error {
+	filename := fmt.Sprintf("%s.yaml", packageName)
+	yamlContent, err := os.ReadFile(filepath.Join(dir, filename))
+	if err != nil {
+		return err
+	}
+	var doc yaml.Node
+	err = yaml.Unmarshal(yamlContent, &doc)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling YAML: %v", err)
+	}
+	tidy := false
+	if err := deps.CleanupGoBumpDeps(&doc, updated, tidy, mutations); err != nil {
+		return err
+	}
+
+	modifiedYAML, err := yaml.Marshal(&doc)
+	if err != nil {
+		return fmt.Errorf("error marshaling YAML: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, filename), modifiedYAML, 0o600); err != nil {
+		return fmt.Errorf("failed to write configuration file: %v", err)
+	}
+
+	return nil
 }
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon

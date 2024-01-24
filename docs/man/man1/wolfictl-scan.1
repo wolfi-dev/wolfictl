@@ -69,6 +69,11 @@ distro.
 .PP
 "all": Filter out all vulnerabilities that are referenced from any advisory
 in the advisories repository.
+.IP \(bu 2
+
+.PP
+"concluded": Only filter out all vulnerabilities that have been fixed, or those
+where no change is planned to fix the vulnerability.
 
 .RE
 
@@ -130,7 +135,7 @@ found and the \-\-require\-zero flag is specified.
 
 .PP
 \fB\-f\fP, \fB\-\-advisory\-filter\fP=""
-    exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all)
+    exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all|concluded)
 
 .PP
 \fB\-\-build\-log\fP[=false]

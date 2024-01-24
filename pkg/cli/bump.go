@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -78,6 +79,7 @@ modifying anything in the filesystem.
 
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			if len(args) == 0 {
 				cmd.Help() //nolint:errcheck
 				return fmt.Errorf("not enough arguments")
@@ -107,7 +109,7 @@ modifying anything in the filesystem.
 			}
 
 			for _, f := range files {
-				if err := bumpEpoch(opts, f); err != nil {
+				if err := bumpEpoch(ctx, opts, f); err != nil {
 					return err
 				}
 			}
@@ -122,8 +124,8 @@ modifying anything in the filesystem.
 	return cmd
 }
 
-func bumpEpoch(opts bumpOptions, path string) error {
-	cfg, err := config.ParseConfiguration(path)
+func bumpEpoch(ctx context.Context, opts bumpOptions, path string) error {
+	cfg, err := config.ParseConfiguration(ctx, path)
 	if err != nil {
 		return fmt.Errorf("unable to parse configuration at %q: %w", path, err)
 	}

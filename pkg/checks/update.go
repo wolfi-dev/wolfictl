@@ -23,6 +23,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/wolfi-dev/wolfictl/pkg/update"
+	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
 	"gopkg.in/yaml.v3"
 )
 
@@ -45,14 +46,14 @@ func SetupUpdate() (*update.Options, lint.EvalRuleErrors) {
 }
 
 // CheckUpdates will use the melange update config to get the latest versions and validate fetch and git-checkout pipelines
-func (o CheckUpdateOptions) CheckUpdates(files []string) error {
+func (o CheckUpdateOptions) CheckUpdates(ctx context.Context, files []string) error {
 	updateOpts, checkErrors := SetupUpdate()
 
 	changedPackages := GetPackagesToUpdate(files)
 
-	validateUpdateConfig(changedPackages, &checkErrors)
+	validateUpdateConfig(ctx, changedPackages, &checkErrors)
 
-	latestVersions, err := updateOpts.GetLatestVersions(o.Dir, changedPackages)
+	latestVersions, err := updateOpts.GetLatestVersions(ctx, o.Dir, changedPackages)
 	if err != nil {
 		addCheckError(&checkErrors, err)
 	}
@@ -60,11 +61,11 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 	handleErrorMessages(updateOpts, &checkErrors)
 
 	if o.OverrideVersion == "" {
-		o.checkForLatestVersions(latestVersions, &checkErrors)
+		o.checkForLatestVersions(ctx, latestVersions, &checkErrors)
 	}
 
 	if len(checkErrors) == 0 {
-		err := o.processUpdates(latestVersions, &checkErrors)
+		err := o.processUpdates(ctx, latestVersions, &checkErrors)
 		if err != nil {
 			addCheckError(&checkErrors, err)
 		}
@@ -76,7 +77,7 @@ func (o CheckUpdateOptions) CheckUpdates(files []string) error {
 const yamlExtension = ".yaml"
 
 // validates update configuration
-func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
+func validateUpdateConfig(ctx context.Context, files []string, checkErrors *lint.EvalRuleErrors) {
 	for _, file := range files {
 		// skip hidden files
 		if strings.HasPrefix(file, ".") {
@@ -112,7 +113,7 @@ func validateUpdateConfig(files []string, checkErrors *lint.EvalRuleErrors) {
 		}
 
 		// now make sure update config is configured
-		c, err := config.ParseConfiguration(file)
+		c, err := config.ParseConfiguration(ctx, file)
 		if err != nil {
 			addCheckError(checkErrors, fmt.Errorf("failed to parse %s: %w", file, err))
 			continue
@@ -161,9 +162,9 @@ func handleErrorMessages(updateOpts *update.Options, checkErrors *lint.EvalRuleE
 }
 
 // check if the current package.version is the latest according to the update config
-func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) {
+func (o CheckUpdateOptions) checkForLatestVersions(ctx context.Context, latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) {
 	for k, v := range latestVersions {
-		c, err := config.ParseConfiguration(filepath.Join(o.Dir, k+yamlExtension))
+		c, err := config.ParseConfiguration(ctx, filepath.Join(o.Dir, k+yamlExtension))
 		if err != nil {
 			addCheckError(checkErrors, err)
 			continue
@@ -186,7 +187,7 @@ func (o CheckUpdateOptions) checkForLatestVersions(latestVersions map[string]upd
 }
 
 // iterate over slice of packages, optionally override the package.version and verify fetch + git-checkout work with latest versions
-func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) error {
+func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions map[string]update.NewVersionResults, checkErrors *lint.EvalRuleErrors) error {
 	tempDir, err := os.MkdirTemp("", "wolfictl")
 	if err != nil {
 		return err
@@ -197,7 +198,7 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 	for packageName, newVersion := range latestVersions {
 		srcConfigFile := filepath.Join(o.Dir, packageName+yamlExtension)
 
-		dryRunConfig, err := config.ParseConfiguration(srcConfigFile)
+		dryRunConfig, err := config.ParseConfiguration(ctx, srcConfigFile)
 		if err != nil {
 			return err
 		}
@@ -215,13 +216,13 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		}
 
 		// melange bump will modify the modified copy of the melange config
-		err = melange.Bump(tmpConfigFile, newVersion.Version, newVersion.Commit)
+		err = melange.Bump(ctx, tmpConfigFile, newVersion.Version, newVersion.Commit)
 		if err != nil {
 			addCheckError(checkErrors, fmt.Errorf("package %s: failed to validate update config, melange bump: %w", packageName, err))
 			continue
 		}
 
-		updated, err := config.ParseConfiguration(tmpConfigFile)
+		updated, err := config.ParseConfiguration(ctx, tmpConfigFile)
 		if err != nil {
 			return err
 		}
@@ -237,6 +238,13 @@ func (o CheckUpdateOptions) processUpdates(latestVersions map[string]update.NewV
 		mutations, err := build.MutateWith(pctx, map[string]string{})
 		if err != nil {
 			return err
+		}
+
+		// Skip any processing for definitions with a single pipeline
+		if len(updated.Pipeline) > 1 {
+			if err := o.updateGoBumpDeps(updated, o.Dir, packageName, mutations); err != nil {
+				return fmt.Errorf("error cleaning up go/bump deps: %v", err)
+			}
 		}
 
 		// if manual update is expected then let's not try to validate pipelines
@@ -296,6 +304,34 @@ func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string)
 	o.Logger.Println(color.GreenString("fetch was successful"))
 
 	return os.RemoveAll(filename)
+}
+
+func (o *CheckUpdateOptions) updateGoBumpDeps(updated *config.Configuration, dir, packageName string, mutations map[string]string) error {
+	filename := fmt.Sprintf("%s.yaml", packageName)
+	yamlContent, err := os.ReadFile(filepath.Join(dir, filename))
+	if err != nil {
+		return err
+	}
+	var doc yaml.Node
+	err = yaml.Unmarshal(yamlContent, &doc)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling YAML: %v", err)
+	}
+	tidy := false
+	if err := deps.CleanupGoBumpDeps(&doc, updated, tidy, mutations); err != nil {
+		return err
+	}
+
+	modifiedYAML, err := yaml.Marshal(&doc)
+	if err != nil {
+		return fmt.Errorf("error marshaling YAML: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, filename), modifiedYAML, 0o600); err != nil {
+		return fmt.Errorf("failed to write configuration file: %v", err)
+	}
+
+	return nil
 }
 
 func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]string) error {

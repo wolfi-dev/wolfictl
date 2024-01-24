@@ -2,6 +2,7 @@ package sbom
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,32 +10,18 @@ import (
 	"path"
 
 	"github.com/anchore/syft/syft"
+	"github.com/anchore/syft/syft/cataloging/pkgcataloging"
 	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/format/syftjson"
 	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg"
-	"github.com/anchore/syft/syft/pkg/cataloger"
 	cpegen "github.com/anchore/syft/syft/pkg/cataloger/common/cpe"
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
 	"github.com/package-url/packageurl-go"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
-
-var syftCatalogersEnabled = []string{
-	"apk-db-cataloger",
-	"binary-cataloger",
-	"dotnet-portable-executable-cataloger",
-	"go-module-binary-cataloger",
-	"graalvm-native-image",
-	"java-archive-cataloger",
-	"javascript-package-cataloger",
-	"php-composer-installed-cataloger",
-	"python-installed-package-cataloger",
-	"r-package-cataloger",
-	"ruby-installed-gemspec-cataloger",
-}
 
 // Generate creates an SBOM for the given APK file.
 func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
@@ -71,14 +58,20 @@ func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, e
 		return nil, fmt.Errorf("failed to create source from directory: %w", err)
 	}
 
-	cfg := cataloger.DefaultConfig()
-	cfg.Catalogers = syftCatalogersEnabled
+	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
+		pkgcataloging.NewSelectionRequest().WithDefaults(
+			pkgcataloging.ImageTag,
+		).WithRemovals(
+			"sbom",
+		),
+	)
 
-	packageCollection, _, _, err := syft.CatalogPackages(src, cfg)
+	createdSBOM, err := syft.CreateSBOM(context.Background(), src, cfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to catalog packages: %w", err)
+		return nil, fmt.Errorf("failed to create SBOM: %w", err)
 	}
 
+	packageCollection := createdSBOM.Artifacts.Packages
 	packageCollection.Add(*apkPackage)
 
 	s := sbom.SBOM{

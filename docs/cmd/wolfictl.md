@@ -21,6 +21,7 @@ A CLI helper for developing Wolfi
 * [wolfictl check](wolfictl_check.md)	 - Subcommands used for CI checks in Wolfi
 * [wolfictl dot](wolfictl_dot.md)	 - Generate graphviz .dot output
 * [wolfictl gh](wolfictl_gh.md)	 - Commands used to interact with GitHub
+* [wolfictl image](wolfictl_image.md)	 - (Experimental) Commands for working with container images that use Wolfi
 * [wolfictl index](wolfictl_index.md)	 - 
 * [wolfictl lint](wolfictl_lint.md)	 - Lint the code
 * [wolfictl scan](wolfictl_scan.md)	 - Scan a package for vulnerabilities

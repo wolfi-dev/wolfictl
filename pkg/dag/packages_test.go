@@ -1,6 +1,7 @@
 package dag
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,8 +13,9 @@ import (
 
 func TestNewPackages(t *testing.T) {
 	// for now, just a simple test that the loaded info is correct
+	ctx := context.Background()
 	testdir := "testdata/complex"
-	pkgs, err := NewPackages(os.DirFS(testdir), testdir, "")
+	pkgs, err := NewPackages(ctx, os.DirFS(testdir), testdir, "")
 	require.NoError(t, err)
 
 	// should have named packages that match what is in the files and *not* the filenames

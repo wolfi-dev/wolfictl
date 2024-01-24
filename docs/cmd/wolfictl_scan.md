@@ -47,6 +47,9 @@ filtering. The following sets of advisories are available:
 - "all": Filter out all vulnerabilities that are referenced from any advisory
   in the advisories repository.
 
+- "concluded": Only filter out all vulnerabilities that have been fixed, or those
+  where no change is planned to fix the vulnerability.
+
 ## AUTO-TRIAGING
 
 Wolfictl now supports auto-triaging vulnerabilities found in Go binaries using
@@ -111,7 +114,7 @@ wolfictl scan package1 package2 --remote
 
 ```
   -a, --advisories-repo-dir strings   local directory for advisory data
-  -f, --advisory-filter string        exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all)
+  -f, --advisory-filter string        exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all|concluded)
       --build-log                     treat input as a package build log file (or a directory that contains a packages.log file)
       --disable-sbom-cache            don't use the SBOM cache
       --distro string                 distro to use during vulnerability matching (default "wolfi")

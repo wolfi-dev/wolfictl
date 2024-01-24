@@ -1,6 +1,7 @@
 package dag
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"log"
@@ -126,7 +127,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 //
 // The repetition of the path is necessary because of how the upstream parser in melange
 // requires the full path to the directory to be passed in.
-func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
+func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		packages: make(map[string][]*Configuration),
@@ -164,7 +165,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 		}
 
 		p := filepath.Join(dirPath, path)
-		buildc, err := config.ParseConfiguration(p)
+		buildc, err := config.ParseConfiguration(ctx, p)
 		if err != nil {
 			return err
 		}
@@ -219,7 +220,7 @@ func NewPackages(fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 		}
 		for i := range c.Pipeline {
 			s := &build.PipelineContext{Environment: &pctx.Build.Configuration.Environment, PipelineDirs: []string{pipelineDir}, Pipeline: &c.Pipeline[i]}
-			if err := s.ApplyNeeds(pctx); err != nil {
+			if err := s.ApplyNeeds(ctx, pctx); err != nil {
 				return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
 			}
 			c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages

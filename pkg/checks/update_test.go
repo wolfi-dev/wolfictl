@@ -2,6 +2,7 @@ package checks
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -24,6 +25,7 @@ import (
 )
 
 func TestProcessUpdatesGitCheckout(t *testing.T) {
+	ctx := context.Background()
 	checkErrors := make(lint.EvalRuleErrors, 0)
 
 	newVersion := "9.8.7"
@@ -51,12 +53,13 @@ func TestProcessUpdatesGitCheckout(t *testing.T) {
 		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
-	err = o.processUpdates(latestVersions, &checkErrors)
+	err = o.processUpdates(ctx, latestVersions, &checkErrors)
 	assert.NoError(t, err)
 	assert.Len(t, checkErrors, 0)
 }
 
 func TestProcessUpdatesFetch(t *testing.T) {
+	ctx := context.Background()
 	checkErrors := make(lint.EvalRuleErrors, 0)
 
 	newVersion := "9.8.7"
@@ -90,7 +93,7 @@ func TestProcessUpdatesFetch(t *testing.T) {
 		Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
-	err = o.processUpdates(latestVersions, &checkErrors)
+	err = o.processUpdates(ctx, latestVersions, &checkErrors)
 	assert.NoError(t, err)
 	assert.Len(t, checkErrors, 0)
 }
@@ -138,6 +141,7 @@ func createTestRepo(t *testing.T, dir, tag string) string {
 }
 
 func TestUpdateKeyExists(t *testing.T) {
+	ctx := context.Background()
 	dir := t.TempDir()
 	// create a temporary file with an update key
 	yamlData := []byte("package:\n  name: cheese\n  version: 1\nupdate:\n  manual: true\n")
@@ -149,7 +153,7 @@ func TestUpdateKeyExists(t *testing.T) {
 
 	checkErrors := make(lint.EvalRuleErrors, 0)
 	// check update key exists
-	validateUpdateConfig([]string{fileContainsUpdate}, &checkErrors)
+	validateUpdateConfig(ctx, []string{fileContainsUpdate}, &checkErrors)
 
 	assert.Empty(t, checkErrors)
 
@@ -165,6 +169,6 @@ func TestUpdateKeyExists(t *testing.T) {
 	}
 
 	// check the update key does not exist
-	validateUpdateConfig([]string{fileNoContainsUpdate}, &checkErrors)
+	validateUpdateConfig(ctx, []string{fileNoContainsUpdate}, &checkErrors)
 	assert.NotEmpty(t, checkErrors)
 }

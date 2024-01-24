@@ -3,7 +3,7 @@ package gh
 import (
 	"context"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 )
 
 func (o GitOptions) ListBranches(ctx context.Context, owner, repo string) ([]*github.Branch, error) {

@@ -9,11 +9,10 @@ import (
 
 	"golang.org/x/exp/slices"
 
-	apko_log "chainguard.dev/apko/pkg/log"
+	"github.com/chainguard-dev/clog"
 	"github.com/chainguard-dev/go-apk/pkg/apk"
 	sign "github.com/chainguard-dev/go-apk/pkg/signature"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -40,12 +39,7 @@ func cmdWithdraw() *cobra.Command {
 }
 
 func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone map[string]bool) error {
-	logger := &logrus.Logger{
-		Out:       os.Stderr,
-		Formatter: &apko_log.Formatter{},
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.InfoLevel,
-	}
+	log := clog.FromContext(ctx)
 
 	index, err := apk.IndexFromArchive(io.NopCloser(r))
 	if err != nil {
@@ -56,7 +50,7 @@ func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone ma
 		pkgver := pkg.Name + "-" + pkg.Version
 		_, ok := gone[pkgver]
 		if ok {
-			logger.Infof("withdrawing %q", pkgver)
+			log.Infof("withdrawing %q", pkgver)
 			gone[pkgver] = true
 		}
 		return ok
@@ -64,7 +58,7 @@ func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone ma
 
 	for pkg, ok := range gone {
 		if !ok {
-			logger.Warnf("did not withdraw %q", pkg)
+			log.Warnf("did not withdraw %q", pkg)
 		}
 	}
 
@@ -86,7 +80,7 @@ func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone ma
 		return fmt.Errorf("close temp: %w", err)
 	}
 
-	if err := sign.SignIndex(ctx, logger, key, tmp.Name()); err != nil {
+	if err := sign.SignIndex(ctx, key, tmp.Name()); err != nil {
 		return fmt.Errorf("signing index: %w", err)
 	}
 

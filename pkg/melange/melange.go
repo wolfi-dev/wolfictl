@@ -42,7 +42,7 @@ func (c ConfigCheck) isMelangeConfig() bool {
 }
 
 // ReadPackageConfigs read the melange package config(s) from the target git repository so we can check if new versions exist
-func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages, error) {
+func ReadPackageConfigs(ctx context.Context, packageNames []string, dir string) (map[string]*Packages, error) {
 	p := make(map[string]*Packages)
 
 	// if package names were passed as CLI parameters load those packages
@@ -51,7 +51,7 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages
 		for _, packageName := range packageNames {
 			filename := packageName + ".yaml"
 			fullPath := filepath.Join(dir, filename)
-			loadedCfg, err := ReadMelangeConfig(fullPath)
+			loadedCfg, err := config.ParseConfiguration(ctx, filename)
 			if err != nil {
 				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
@@ -62,7 +62,7 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages
 			}
 
 			p[loadedCfg.Package.Name] = &Packages{
-				Config:   loadedCfg,
+				Config:   *loadedCfg,
 				Filename: filename,
 				Dir:      dir,
 				NoLint:   nolint,
@@ -71,7 +71,7 @@ func ReadPackageConfigs(packageNames []string, dir string) (map[string]*Packages
 		return p, nil
 	}
 	// get all packages in the provided git repo
-	return ReadAllPackagesFromRepo(dir)
+	return ReadAllPackagesFromRepo(ctx, dir)
 }
 
 func findNoLint(filename string) ([]string, error) {
@@ -88,7 +88,7 @@ func findNoLint(filename string) ([]string, error) {
 	return nil, nil
 }
 
-func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
+func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packages, error) {
 	p := make(map[string]*Packages)
 
 	var fileList []string
@@ -128,7 +128,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 			continue
 		}
 
-		packageConfig, err := ReadMelangeConfig(fi)
+		packageConfig, err := config.ParseConfiguration(ctx, fi)
 		if err != nil {
 			return p, fmt.Errorf("failed to read package config %s: %w", fi, err)
 		}
@@ -143,7 +143,7 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 		}
 
 		p[packageConfig.Package.Name] = &Packages{
-			Config:   packageConfig,
+			Config:   *packageConfig,
 			Filename: relativeFilename,
 			Dir:      dir,
 			NoLint:   nolint,
@@ -153,25 +153,16 @@ func ReadAllPackagesFromRepo(dir string) (map[string]*Packages, error) {
 	return p, nil
 }
 
-// ReadMelangeConfig reads a single melange config from the provided filename.
-func ReadMelangeConfig(filename string) (config.Configuration, error) {
-	packageConfig, err := config.ParseConfiguration(filename)
-	if err != nil {
-		return config.Configuration{}, err
-	}
-	return *packageConfig, err
-}
-
-func Bump(configFile, version, expectedCommit string) error {
-	ctx, err := renovate.New(renovate.WithConfig(configFile))
+func Bump(ctx context.Context, configFile, version, expectedCommit string) error {
+	rctx, err := renovate.New(renovate.WithConfig(configFile))
 	if err != nil {
 		return err
 	}
 
-	bumpRenovator := bump.New(
+	bumpRenovator := bump.New(ctx,
 		bump.WithTargetVersion(version),
 		bump.WithExpectedCommit(expectedCommit),
 	)
 
-	return ctx.Renovate(context.TODO(), bumpRenovator)
+	return rctx.Renovate(ctx, bumpRenovator)
 }
