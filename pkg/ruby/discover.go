@@ -55,13 +55,15 @@ func (o *RubyOptions) DiscoverRubyPackages() ([]RubyPackage, error) {
 
 // isRubyPackage looks for ruby-${RubyVersion} in the melange yaml package list
 func (o *RubyOptions) isRubyPackage(conf config.Configuration) bool {
+    rubyPkg := fmt.Sprintf("%s%s", rubyKey, o.RubyVersion)
+    rubyDevPkg := fmt.Sprintf("%s-dev", rubyPkg)
 	for _, pkg := range conf.Environment.Contents.Packages {
-		if strings.Contains(pkg, rubyKey+o.RubyVersion) {
+		if pkg == rubyPkg || pkg == rubyDevPkg {
 			return true
 		}
 	}
 	for _, pkg := range conf.Package.Dependencies.Runtime {
-		if strings.Contains(pkg, rubyKey+o.RubyVersion) {
+		if pkg == rubyPkg || pkg == rubyDevPkg {
 			return true
 		}
 	}
