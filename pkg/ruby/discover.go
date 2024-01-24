@@ -1,10 +1,10 @@
 package ruby
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
-	"context"
 
 	"chainguard.dev/melange/pkg/config"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
