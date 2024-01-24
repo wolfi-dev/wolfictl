@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 )
 
 // SearchCode does a rate-limited search using the Github Code Search API. It

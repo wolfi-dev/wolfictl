@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"context"
 
 	"chainguard.dev/melange/pkg/config"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
@@ -25,7 +26,8 @@ type RubyPackage struct {
 // packages named ruby-${RubyVersion}. It takes a path to a directory or an
 // individual file. A list of RubyPackages will be returned to the caller.
 func (o *RubyOptions) DiscoverRubyPackages() ([]RubyPackage, error) {
-	pkgs, err := melange.ReadAllPackagesFromRepo(o.Path)
+	ctx := context.Background()
+	pkgs, err := melange.ReadAllPackagesFromRepo(ctx, o.Path)
 	if err != nil {
 		return nil, fmt.Errorf("Error discovering ruby packages, %w", err)
 	}

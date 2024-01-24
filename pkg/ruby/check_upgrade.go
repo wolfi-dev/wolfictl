@@ -12,7 +12,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/hashicorp/go-version"
 
 	"github.com/wolfi-dev/wolfictl/pkg/gh"

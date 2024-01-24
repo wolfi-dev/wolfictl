@@ -10,7 +10,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 )
