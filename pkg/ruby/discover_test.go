@@ -50,10 +50,10 @@ func TestParseRepo(t *testing.T) {
 	testConfig := melange.Packages{
 		Config: config.Configuration{
 			Pipeline: []config.Pipeline{
-                {
-                    // intentionally empty, overwrite for each test
-                },
-            },
+				{
+					// intentionally empty, overwrite for each test
+				},
+			},
 		},
 	}
 
@@ -87,17 +87,17 @@ func TestParseRepo(t *testing.T) {
 func TestParseRef(t *testing.T) {
 	testConfig := melange.Packages{
 		Config: config.Configuration{
-            Package: config.Package{
-                Version: "0.0.0",
-            },
+			Package: config.Package{
+				Version: "0.0.0",
+			},
 			Pipeline: []config.Pipeline{
-                {
-                    // intentionally empty, overwrite for each test
-                },
-            },
+				{
+					// intentionally empty, overwrite for each test
+				},
+			},
 		},
 	}
-    want := "v0.0.0"
+	want := "v0.0.0"
 
 	uri := "https://github.com/brianmario/charlock_holmes/archive/refs/tags/v${{package.version}}.tar.gz"
 	testConfig.Config.Pipeline[0] = config.Pipeline{
