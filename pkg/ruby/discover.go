@@ -11,7 +11,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
-type RubyPackage struct {
+type Package struct {
 	// Name is the name of the package, package.name in the melange yaml
 	Name string
 
@@ -25,14 +25,14 @@ type RubyPackage struct {
 // DiscoverRubyPackages searches a given path for melange yaml files using
 // packages named ruby-${RubyVersion}. It takes a path to a directory or an
 // individual file. A list of RubyPackages will be returned to the caller.
-func (o *RubyOptions) DiscoverRubyPackages() ([]RubyPackage, error) {
+func (o *Options) DiscoverRubyPackages() ([]Package, error) {
 	ctx := context.Background()
 	pkgs, err := melange.ReadAllPackagesFromRepo(ctx, o.Path)
 	if err != nil {
-		return nil, fmt.Errorf("Error discovering ruby packages, %w", err)
+		return nil, fmt.Errorf("error discovering ruby packages, %w", err)
 	}
 
-	var rubyFiles []RubyPackage
+	var rubyFiles []Package
 	for _, pkg := range pkgs {
 		if o.isRubyPackage(pkg.Config) {
 			gitURL, err := wgit.ParseGitURL(parseRepo(pkg))
@@ -40,7 +40,7 @@ func (o *RubyOptions) DiscoverRubyPackages() ([]RubyPackage, error) {
 				// fmt.Printf("
 				continue
 			}
-			rubyFiles = append(rubyFiles, RubyPackage{
+			rubyFiles = append(rubyFiles, Package{
 				Name: pkg.Config.Name(),
 				Repo: gitURL,
 				Ref:  parseRef(pkg),
@@ -49,14 +49,14 @@ func (o *RubyOptions) DiscoverRubyPackages() ([]RubyPackage, error) {
 	}
 
 	if len(rubyFiles) < 1 {
-		return nil, fmt.Errorf("Did not find any ruby references [%s]", o.Path)
+		return nil, fmt.Errorf("did not find any ruby references [%s]", o.Path)
 	}
 
 	return rubyFiles, nil
 }
 
 // isRubyPackage looks for ruby-${RubyVersion} in the melange yaml package list
-func (o *RubyOptions) isRubyPackage(conf config.Configuration) bool {
+func (o *Options) isRubyPackage(conf config.Configuration) bool {
 	rubyPkg := fmt.Sprintf("%s%s", rubyKey, o.RubyVersion)
 	rubyDevPkg := fmt.Sprintf("%s-dev", rubyPkg)
 	for _, pkg := range conf.Environment.Contents.Packages {
@@ -77,7 +77,8 @@ func (o *RubyOptions) isRubyPackage(conf config.Configuration) bool {
 //
 // TODO: Extract from runs: if neither pipeline is found
 func parseRepo(pkg *melange.Packages) string {
-	for _, step := range pkg.Config.Pipeline {
+	for i := range pkg.Config.Pipeline {
+		step := &pkg.Config.Pipeline[i]
 		switch step.Uses {
 		case "fetch":
 			return step.With["uri"]
@@ -92,13 +93,14 @@ func parseRepo(pkg *melange.Packages) string {
 // the fetch or git-checkout pipelines.
 func parseRef(pkg *melange.Packages) string {
 	ref := ""
-	for _, step := range pkg.Config.Pipeline {
+	for i := range pkg.Config.Pipeline {
+		step := &pkg.Config.Pipeline[i]
 		switch step.Uses {
 		case "fetch":
 			uri := step.With["uri"]
 			pattern := `.*\/(v?\$\{{2}package.version\}{2})`
 			re := regexp.MustCompile(pattern)
-			matches := re.FindStringSubmatch(string(uri))
+			matches := re.FindStringSubmatch(uri)
 			if len(matches) > 1 {
 				ref = matches[1]
 				break
@@ -114,5 +116,5 @@ func parseRef(pkg *melange.Packages) string {
 			}
 		}
 	}
-	return strings.Replace(ref, "${{package.version}}", pkg.Config.Package.Version, -1)
+	return strings.ReplaceAll(ref, "${{package.version}}", pkg.Config.Package.Version)
 }

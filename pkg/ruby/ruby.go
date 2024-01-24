@@ -7,7 +7,7 @@ import (
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 )
 
-type RubyOptions struct {
+type Options struct {
 	// RubyVersion is the version of Ruby to search for within the wolfi
 	// directory. Used to search for packages importing ruby-${RubyVersion}
 	RubyVersion string
@@ -33,9 +33,3 @@ const (
 )
 
 var rubyCacheDirectory = path.Join(xdg.CacheHome, "wolfictl", "ruby")
-
-type RubyContext struct {
-	Pkg           RubyPackage
-	UpdateVersion string
-	Client        *http2.RLHTTPClient
-}

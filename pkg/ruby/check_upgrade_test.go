@@ -21,7 +21,7 @@ func TestVersionConstraints(t *testing.T) {
 		"no version specified should not fail either",
 	}
 
-	o := RubyOptions{
+	o := Options{
 		RubyUpdateVersion: "3.3",
 	}
 
@@ -30,6 +30,7 @@ func TestVersionConstraints(t *testing.T) {
 		assert.NoError(t, err)
 		defer os.Remove(file.Name())
 		_, err = file.Write([]byte(vs))
+		assert.NoError(t, err)
 		err = o.checkVersionConstraint(file.Name())
 		assert.NoErrorf(t, err, "%v: %s", err, vs)
 	}
@@ -44,6 +45,7 @@ func TestVersionConstraints(t *testing.T) {
 		assert.NoError(t, err)
 		defer os.Remove(file.Name())
 		_, err = file.Write([]byte(vs))
+		assert.NoError(t, err)
 		err = o.checkVersionConstraint(file.Name())
 		assert.Errorf(t, err, "%v: %s", err, vs)
 	}

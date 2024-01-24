@@ -25,24 +25,24 @@ type SearchResult struct {
 
 // CodeSearch is the main search function which uses Github Code Search to run
 // the specified query for a particular package.
-func (o *RubyOptions) CodeSearch(pkg *RubyPackage, query string) error {
+func (o *Options) CodeSearch(pkg *Package, query string) error {
 	results, err := o.runQuery(pkg, query)
 	if err != nil {
-		return fmt.Errorf("Searching code: %w", err)
+		return fmt.Errorf("searching code: %w", err)
 	}
 
-	md, err := generateMarkdown(results, query)
+	md := generateMarkdown(results, query)
 	fmt.Printf("%s", md)
 
 	if len(results) > 0 {
-		return fmt.Errorf("Found %d potential matches", len(results))
+		return fmt.Errorf("found %d potential matches", len(results))
 	}
 	return nil
 }
 
 // defaultSHA returns the latest SHA for the default branch of a given repo. It
 // is used to calculate the corresponding cache file.
-func (o *RubyOptions) defaultSHA(pkg *RubyPackage) (string, error) {
+func (o *Options) defaultSHA(pkg *Package) (string, error) {
 	ctx := context.Background()
 	client := github.NewClient(o.Client.Client)
 
@@ -63,8 +63,8 @@ func (o *RubyOptions) defaultSHA(pkg *RubyPackage) (string, error) {
 }
 
 // cachedSearchResult returns the path for a cache file
-func (o *RubyOptions) cachedSearchResult(pkg *RubyPackage, sha, query string) (string, error) {
-	return path.Join(rubyCacheDirectory, pkg.Name, fmt.Sprintf("%s-%s.json", sha, url.QueryEscape(query))), nil
+func (o *Options) cachedSearchResult(pkg *Package, sha, query string) string {
+	return path.Join(rubyCacheDirectory, pkg.Name, fmt.Sprintf("%s-%s.json", sha, url.QueryEscape(query)))
 }
 
 // runQuery performs a code search using the Github API given a particular
@@ -79,18 +79,14 @@ func (o *RubyOptions) cachedSearchResult(pkg *RubyPackage, sha, query string) (s
 // Because Github Code Search limits searching to the default branch only, the
 // cached file is named with the latest commit sha on the default branch. That
 // way the cache does not get stale if new changes are made to the repository.
-func (o *RubyOptions) runQuery(pkg *RubyPackage, query string) ([]SearchResult, error) {
+func (o *Options) runQuery(pkg *Package, query string) ([]SearchResult, error) {
 	logger := log.New(log.Writer(), "wolfictl ruby code-search: ", log.LstdFlags|log.Lmsgprefix)
 	sha, err := o.defaultSHA(pkg)
 	if err != nil {
-		return nil, fmt.Errorf("Getting default branch sha: %w", err)
+		return nil, fmt.Errorf("getting default branch sha: %w", err)
 	}
 
-	cachedPath, err := o.cachedSearchResult(pkg, sha, query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get gemspec cache path")
-	}
-
+	cachedPath := o.cachedSearchResult(pkg, sha, query)
 	cached, err := os.Open(cachedPath)
 	if err != nil || o.NoCache {
 		ctx := context.Background()
@@ -128,8 +124,11 @@ func (o *RubyOptions) runQuery(pkg *RubyPackage, query string) ([]SearchResult, 
 		if err != nil {
 			return nil, fmt.Errorf("failed to write cache file: %w", err)
 		}
-		cached.Seek(0, io.SeekStart)
 
+		_, err = cached.Seek(0, io.SeekStart)
+		if err != nil {
+			return nil, fmt.Errorf("failed to seek file: %w", err)
+		}
 	}
 	defer cached.Close()
 
@@ -162,7 +161,7 @@ func (o *RubyOptions) runQuery(pkg *RubyPackage, query string) ([]SearchResult, 
 	return results, nil
 }
 
-func generateMarkdown(results []SearchResult, query string) (string, error) {
+func generateMarkdown(results []SearchResult, query string) string {
 	message := fmt.Sprintf("query='%s'\n", query)
 	if len(results) < 1 {
 		message += "Search did not flag any results\n"
@@ -170,11 +169,11 @@ func generateMarkdown(results []SearchResult, query string) (string, error) {
 	for _, result := range results {
 		message += fmt.Sprintf("* %s\n", result.URL)
 		for _, fragment := range result.Fragments {
-			message += fmt.Sprintf("```ruby\n")
+			message += "```ruby\n"
 			message += fmt.Sprintf("%s\n", fragment)
-			message += fmt.Sprintf("```\n")
+			message += "```\n"
 		}
-		message += fmt.Sprintf("\n")
+		message += "\n"
 	}
-	return message, nil
+	return message
 }

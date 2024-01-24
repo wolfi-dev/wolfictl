@@ -23,7 +23,7 @@ import (
 // should provide a set of constraints restricting the version of ruby a gem
 // can run on. CheckUpgrade simply tries to make sure the given RubyUpdateVersion
 // is within those constraints.
-func (o *RubyOptions) CheckUpgrade(pkg *RubyPackage) error {
+func (o *Options) CheckUpgrade(pkg *Package) error {
 	// find the gemspec in the repository
 	gemspec, err := o.findGemspec(pkg)
 	if err != nil {
@@ -42,7 +42,7 @@ func (o *RubyOptions) CheckUpgrade(pkg *RubyPackage) error {
 
 // findGemspec searches a given Github repository for a file named *.gemspec. It
 // searches for the file from the branch or tag specified in the melange yaml.
-func (o *RubyOptions) findGemspec(pkg *RubyPackage) (string, error) {
+func (o *Options) findGemspec(pkg *Package) (string, error) {
 	ctx := context.Background()
 	client := github.NewClient(o.Client.Client)
 	gitOpts := gh.GitOptions{
@@ -59,24 +59,21 @@ func (o *RubyOptions) findGemspec(pkg *RubyPackage) (string, error) {
 			return file.GetName(), nil
 		}
 	}
-	return "", fmt.Errorf("Could not find gemspec file in repo")
+	return "", fmt.Errorf("could not find gemspec file in repo")
 }
 
 // cachedGemspecPath returns the path to a cached gemspec file
-func (o *RubyOptions) cachedGemspecPath(pkg *RubyPackage, gemspec string) (string, error) {
-	return path.Join(rubyCacheDirectory, pkg.Name, fmt.Sprintf("%s-%s", pkg.Ref, gemspec)), nil
+func (o *Options) cachedGemspecPath(pkg *Package, gemspec string) string {
+	return path.Join(rubyCacheDirectory, pkg.Name, fmt.Sprintf("%s-%s", pkg.Ref, gemspec))
 }
 
 // fetchFile downloads a given file (in this case a gemspec) from a given
 // Github repository. It downloads the file from the branch or tag specified
 // in the melange yaml. It will cache the file using the name of the file and
 // the branch or tag specified in the melange yaml.
-func (o *RubyOptions) fetchFile(pkg *RubyPackage, file string) (string, error) {
+func (o *Options) fetchFile(pkg *Package, file string) (string, error) {
 	logger := log.New(log.Writer(), "wolfictl ruby check-upgrade: ", log.LstdFlags|log.Lmsgprefix)
-	cachedPath, err := o.cachedGemspecPath(pkg, file)
-	if err != nil {
-		return "", fmt.Errorf("failed to get gemspec cache path")
-	}
+	cachedPath := o.cachedGemspecPath(pkg, file)
 	cached, err := os.Open(cachedPath)
 	if err != nil || o.NoCache {
 		ctx := context.Background()
@@ -86,6 +83,7 @@ func (o *RubyOptions) fetchFile(pkg *RubyPackage, file string) (string, error) {
 			GithubClient: client,
 			Logger:       logger,
 		}
+
 		fileContent, err := gitOpts.RepositoryFilesContents(ctx, pkg.Repo.Organisation, pkg.Repo.Name, file, pkg.Ref)
 		if err != nil {
 			return "", err
@@ -94,7 +92,7 @@ func (o *RubyOptions) fetchFile(pkg *RubyPackage, file string) (string, error) {
 		// Decode the base64-encoded content
 		decodedContent, err := base64.StdEncoding.DecodeString(*fileContent.Content)
 		if err != nil {
-			return "", fmt.Errorf("Error decoding file content: %w", err)
+			return "", fmt.Errorf("error decoding file content: %w", err)
 		}
 
 		err = os.MkdirAll(path.Dir(cachedPath), 0o755)
@@ -111,7 +109,6 @@ func (o *RubyOptions) fetchFile(pkg *RubyPackage, file string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("failed to write cache file: %w", err)
 		}
-
 	}
 	defer cached.Close()
 	return cachedPath, nil
@@ -127,8 +124,11 @@ func (o *RubyOptions) fetchFile(pkg *RubyPackage, file string) (string, error) {
 // NOTE: If there is no required_ruby_version found in the gemspec then we
 //
 //	assume there is no limit.
-func (o *RubyOptions) checkVersionConstraint(gemspecFile string) error {
+func (o *Options) checkVersionConstraint(gemspecFile string) error {
 	cached, err := os.Open(gemspecFile)
+	if err != nil {
+		return fmt.Errorf("opening gemspec file: %w", err)
+	}
 	versionLine := ""
 	scanner := bufio.NewScanner(cached)
 	for scanner.Scan() {
@@ -145,7 +145,7 @@ func (o *RubyOptions) checkVersionConstraint(gemspecFile string) error {
 
 	pattern := `["']([^"']+)["']`
 	re := regexp.MustCompile(pattern)
-	groups := re.FindAllStringSubmatch(string(versionLine), -1)
+	groups := re.FindAllStringSubmatch(versionLine, -1)
 
 	versionConstraints := []string{}
 	for _, group := range groups {
@@ -153,7 +153,7 @@ func (o *RubyOptions) checkVersionConstraint(gemspecFile string) error {
 	}
 
 	if len(versionConstraints) < 1 {
-		return fmt.Errorf("Could not extract %s from gemspec.", requiredRubyVersionKey)
+		return fmt.Errorf("could not extract %s from gemspec", requiredRubyVersionKey)
 	}
 
 	rubyPath, err := exec.LookPath("ruby")

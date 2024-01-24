@@ -19,7 +19,7 @@ func TestIsRubyPackage(t *testing.T) {
 			},
 		},
 	}
-	o := RubyOptions{
+	o := Options{
 		RubyVersion: "3.2",
 	}
 
