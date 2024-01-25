@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"chainguard.dev/melange/pkg/renovate"
+	"github.com/github/go-spdx/v2/spdxexp"
 	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 
@@ -386,6 +387,25 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						if config.Update.Enabled && config.Update.GitHubMonitor == nil {
 							return fmt.Errorf("configure update.github when using git-checkout")
 						}
+					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "valid-spdx-license",
+			Description: "every package should have a valid SPDX license",
+			Severity:    SeverityWarning,
+			LintFunc: func(config config.Configuration) error {
+				if len(config.Package.Copyright) == 0 {
+					return fmt.Errorf("copyright section is missing")
+				}
+				for _, c := range config.Package.Copyright {
+					if c.License == "" {
+						return fmt.Errorf("license is missing")
+					}
+					if valid, _ := spdxexp.ValidateLicenses([]string{c.License}); !valid {
+						return fmt.Errorf("license %q is not valid SPDX license", c.License)
 					}
 				}
 				return nil

@@ -3,7 +3,6 @@ package lint
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 
 	"golang.org/x/exp/slices"
@@ -11,6 +10,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
@@ -18,9 +18,6 @@ import (
 type Linter struct {
 	// options are the options to configure the linter.
 	options Options
-
-	// logger is the logger to use.
-	logger *log.Logger
 }
 
 // New initializes a new instance of Linter.
@@ -29,14 +26,12 @@ func New(opts ...Option) *Linter {
 	for _, opt := range opts {
 		opt(&o)
 	}
-	return &Linter{
-		options: o,
-		logger:  log.New(log.Writer(), "", log.LstdFlags|log.Lmsgprefix),
-	}
+	return &Linter{options: o}
 }
 
 // Lint evaluates all rules and returns the result.
 func (l *Linter) Lint(ctx context.Context) (Result, error) {
+	log := clog.FromContext(ctx)
 	rules := AllRules(l)
 
 	namesToPkg, err := melange.ReadAllPackagesFromRepo(ctx, l.options.Path)
@@ -73,33 +68,24 @@ func (l *Linter) Lint(ctx context.Context) (Result, error) {
 
 			// If one of the conditions is not met we skip the evaluation process.
 			if !shouldEvaluate {
-				if l.options.Verbose {
-					l.logger.Printf("%s: skipping rule %s because condition is not met\n", name, rule.Name)
-				}
+				log.Debugf("%s: skipping rule %s because condition is not met\n", name, rule.Name)
 				continue
 			}
 
 			// Allow users to override rules when running lint command
 			if slices.Contains(l.options.SkipRules, rule.Name) {
-				if l.options.Verbose {
-					l.logger.Printf("%s: skipping rule %s because --skip-rule flag set\n", name, rule.Name)
-				}
+				log.Debugf("%s: skipping rule %s because --skip-rule flag set\n", name, rule.Name)
 				continue
 			}
 
 			if slices.Contains(namesToPkg[name].NoLint, rule.Name) {
-				if l.options.Verbose {
-					l.logger.Printf("%s: skipping rule %s because file contains #nolint:%s\n", name, rule.Name, rule.Name)
-				}
+				log.Debugf("%s: skipping rule %s because file contains #nolint:%s\n", name, rule.Name, rule.Name)
 				continue
 			}
 
 			// Evaluate the rule.
 			if err := rule.LintFunc(namesToPkg[name].Config); err != nil {
 				msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity)
-				if l.options.Verbose {
-					msg += fmt.Sprintf(" - (%s)", rule.Description)
-				}
 
 				failedRules = append(failedRules, EvalRuleError{
 					Rule:  rule,
@@ -120,23 +106,25 @@ func (l *Linter) Lint(ctx context.Context) (Result, error) {
 }
 
 // Print prints the result to stdout.
-func (l *Linter) Print(result Result) {
+func (l *Linter) Print(ctx context.Context, result Result) {
+	log := clog.FromContext(ctx)
 	foundAny := false
 	for _, res := range result {
 		if res.Errors.WrapErrors() != nil {
 			foundAny = true
-			l.logger.Printf("Package: %s: %s\n", res.File, res.Errors.WrapErrors())
+			log.Infof("Package: %s: %s", res.File, res.Errors.WrapErrors())
 		}
 	}
 	if !foundAny {
-		l.logger.Println("No linting issues found!")
+		log.Infof("No linting issues found!")
 	}
 }
 
 // PrintRules prints the rules to stdout.
-func (l *Linter) PrintRules() {
-	l.logger.Println("Available rules:")
+func (l *Linter) PrintRules(ctx context.Context) {
+	log := clog.FromContext(ctx)
+	log.Info("Available rules:")
 	for _, rule := range AllRules(l) {
-		l.logger.Printf("* %s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
+		log.Infof("* %s: %s\n", rule.Name, cases.Title(language.Und).String(rule.Description))
 	}
 }

@@ -22,6 +22,7 @@ require (
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/facebookincubator/nvdtools v0.1.5
 	github.com/fatih/color v1.16.0
+	github.com/github/go-spdx/v2 v2.2.0
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/google/go-cmp v0.6.0
@@ -31,7 +32,6 @@ require (
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/openvex/go-vex v0.2.5
 	github.com/package-url/packageurl-go v0.1.2
-	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.39.0
 	github.com/savioxavier/termlink v1.3.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
@@ -126,7 +126,6 @@ require (
 	github.com/frankban/quicktest v1.14.5 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
-	github.com/github/go-spdx/v2 v2.2.0 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/glebarez/sqlite v1.10.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
@@ -231,6 +230,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/psanford/memfs v0.0.0-20230130182539-4dbf7e3e865e // indirect
