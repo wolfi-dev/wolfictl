@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -23,18 +22,19 @@ import (
 
 func cmdBuild() *cobra.Command {
 	var archs []string
-	var dir, pipelineDir, runner, logDir string
+	var dir, pipelineDir, runner string
 	var jobs int
 	var dryrun bool
 	var extraKeys, extraRepos []string
 
+	// TODO: allow building only named packages, taking deps into account.
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
 	cmd := &cobra.Command{
 		Use:           "build",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
 			log := clog.FromContext(ctx)
 
@@ -47,7 +47,7 @@ func cmdBuild() *cobra.Command {
 				pipelineDir = filepath.Join(dir, "pipelines")
 			}
 
-			newTask := func(pkg string) *task {
+			newTask := func(ctx context.Context, pkg string) *task {
 				return &task{
 					pkg:         pkg,
 					dir:         dir,
@@ -55,10 +55,9 @@ func cmdBuild() *cobra.Command {
 					runner:      runner,
 					archs:       archs,
 					dryrun:      dryrun,
-					done:        make(chan struct{}),
-					deps:        map[string]chan struct{}{},
+					ctx:         ctx,
+					deps:        map[string]<-chan struct{}{},
 					jobch:       jobch,
-					logDir:      logDir,
 				}
 			}
 
@@ -92,8 +91,11 @@ func cmdBuild() *cobra.Command {
 
 			tasks := map[string]*task{}
 			for _, pkg := range g.Packages() {
+				log := clog.New(log.Handler()).With("package", pkg)
+				ctx := clog.WithLogger(ctx, log)
+
 				if tasks[pkg] == nil {
-					tasks[pkg] = newTask(pkg)
+					tasks[pkg] = newTask(ctx, pkg)
 				}
 				for k, v := range m {
 					// The package list is in the form of "pkg:version",
@@ -103,9 +105,9 @@ func cmdBuild() *cobra.Command {
 							d, _, _ := strings.Cut(dep.Target, ":")
 
 							if tasks[d] == nil {
-								tasks[d] = newTask(d)
+								tasks[d] = newTask(ctx, d)
 							}
-							tasks[pkg].deps[d] = tasks[d].done
+							tasks[pkg].deps[d] = tasks[d].ctx.Done()
 						}
 					}
 				}
@@ -139,31 +141,33 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
 	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
 	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
-	cmd.Flags().StringVar(&logDir, "log-dir", "buildlogs", "subdirectory where buildlogs will be written when specified (packages/$arch/buildlogs/$apk.log)")
 	return cmd
 }
 
 type task struct {
-	pkg, dir, pipelineDir, runner, logDir string
-	archs                                 []string
-	dryrun                                bool
+	pkg, dir, pipelineDir, runner string
+	archs                         []string
+	dryrun                        bool
 
-	err         error
-	deps        map[string]chan struct{}
-	done, jobch chan struct{}
+	err   error
+	deps  map[string]<-chan struct{}
+	ctx   context.Context
+	jobch chan struct{}
 }
 
 func (t *task) start(ctx context.Context) {
 	log := clog.FromContext(ctx).With("pkg", t.pkg)
 	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 
-	defer close(t.done) // signal that we're done, one way or another.
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel() // signal that we're done, one way or another.
+
 	tick := time.NewTicker(30 * time.Second)
 	defer tick.Stop()
 	for depname, dep := range t.deps {
 		select {
 		case <-tick.C:
-			log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+			log.Debugf("task %q waiting on: %s", t.pkg, maps.Keys(t.deps))
 		case <-dep:
 			delete(t.deps, depname)
 			// this dep is done.
@@ -181,6 +185,7 @@ func (t *task) start(ctx context.Context) {
 }
 
 func (t *task) do(ctx context.Context) error {
+	log := clog.FromContext(ctx)
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
@@ -188,7 +193,8 @@ func (t *task) do(ctx context.Context) error {
 
 	var bcs []*build.Build
 	for _, arch := range t.archs {
-		log := clog.New(slog.Default().Handler()).With("arch", arch)
+		arch := types.ParseArchitecture(arch).ToAPK()
+		log := clog.New(log.Handler()).With("arch", arch)
 		ctx := clog.WithLogger(ctx, log)
 
 		// See if we already have the package built.
@@ -208,15 +214,6 @@ func (t *task) do(ctx context.Context) error {
 			return fmt.Errorf("creating source directory: %v", err)
 		}
 
-		logPolicy := []string{"builtin:stderr"}
-		if t.logDir != "" {
-			// mirror wolfi/os Makefile semantics of: ./packages/$arch/buildlogs/$apk.log
-			logPolicy = append(logPolicy, fmt.Sprintf("%s/%s.log",
-				filepath.Join(t.dir, "packages", string(types.ParseArchitecture(arch)), t.logDir),
-				apk,
-			))
-		}
-
 		fn := fmt.Sprintf("%s.yaml", t.pkg)
 		if t.dryrun {
 			log.Infof("DRYRUN: would have built %s", apkPath)
@@ -227,16 +224,15 @@ func (t *task) do(ctx context.Context) error {
 			build.WithArch(types.ParseArchitecture(arch)),
 			build.WithConfig(filepath.Join(t.dir, fn)),
 			build.WithPipelineDir(t.pipelineDir),
-			build.WithExtraKeys([]string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}),
-			build.WithExtraRepos([]string{"https://packages.wolfi.dev/os"}),
+			build.WithExtraKeys([]string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}), // TODO: flag
+			build.WithExtraRepos([]string{"https://packages.wolfi.dev/os"}),                      // TODO: flag
 			build.WithSigningKey(filepath.Join(t.dir, "local-melange.rsa")),
 			build.WithRunner(t.runner),
 			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
-			build.WithNamespace("wolfi"),
-			build.WithLogPolicy(logPolicy),
+			build.WithNamespace("wolfi"), // TODO: flag
 			build.WithSourceDir(sdir),
-			build.WithCacheSource("gs://wolfi-sources/"),
-			build.WithCacheDir("./melange-cache/"), // TODO: flag
+			build.WithCacheSource("gs://wolfi-sources/"), // TODO: flag
+			build.WithCacheDir("./melange-cache/"),       // TODO: flag
 			build.WithOutDir(filepath.Join(t.dir, "packages")),
 		)
 		if err != nil {
@@ -256,9 +252,9 @@ func (t *task) do(ctx context.Context) error {
 
 func (t *task) wait(ctx context.Context) error {
 	select {
-	case <-t.done:
+	case <-t.ctx.Done(): // This task completed.
 		return t.err
-	case <-ctx.Done():
+	case <-ctx.Done(): // The parent context was cancelled.
 		return ctx.Err()
 	}
 }
