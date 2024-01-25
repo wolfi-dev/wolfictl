@@ -395,11 +395,8 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 		{
 			Name:        "valid-spdx-license",
 			Description: "every package should have a valid SPDX license",
-			Severity:    SeverityWarning,
+			Severity:    SeverityWarning, // TODO(jason): Make this an error.
 			LintFunc: func(config config.Configuration) error {
-				if len(config.Package.Copyright) == 0 {
-					return fmt.Errorf("copyright section is missing")
-				}
 				for _, c := range config.Package.Copyright {
 					if c.License == "" {
 						return fmt.Errorf("license is missing")
