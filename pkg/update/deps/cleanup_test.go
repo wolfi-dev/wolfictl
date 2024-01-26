@@ -38,6 +38,12 @@ func TestCleanupDeps(t *testing.T) {
 	}, {
 		name:     "cleanup gobump and update another go/bump",
 		filename: "config-6",
+	}, {
+		name:     "go.mod require and replace conflicting to different version of the same grpc version",
+		filename: "config-7",
+	}, {
+		name:     "upgrade gorm version in replaces with a newer version in go.mod in a replace block",
+		filename: "config-8",
 	}}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
