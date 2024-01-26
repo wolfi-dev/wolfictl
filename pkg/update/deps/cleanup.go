@@ -120,15 +120,18 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 					if semver.Compare(replace.New.Version, pkgRequireVersions[replace.New.Path]) >= 0 {
 						idx := slices.Index(deps, fmt.Sprintf("%s=%s@%s", replace.New.Path, replace.New.Path, pkgRequireVersions[replace.New.Path]))
 						deps = append(deps[:idx], deps[idx+1:]...)
+						delete(pkgRequireVersions, replace.New.Path)
 					}
 				}
 			}
 			if _, ok := pkgReplaceVersions[replace.New.Path]; ok {
 				if semver.IsValid(pkgReplaceVersions[replace.New.Path]) {
-					if semver.Compare(replace.New.Version, pkgReplaceVersions[replace.New.Path]) >= 0 {
+					// If the replace block in the upstream go.mod contains a newer version then remove the existing dep from replaces
+					if semver.Compare(replace.New.Version, pkgReplaceVersions[replace.New.Path]) > 0 {
 						// TODO(hectorj2f): Assume that the source is the same
 						idx := slices.Index(replaces, fmt.Sprintf("%s=%s@%s", replace.New.Path, replace.New.Path, pkgReplaceVersions[replace.New.Path]))
 						replaces = append(replaces[:idx], replaces[idx+1:]...)
+						delete(pkgReplaceVersions, replace.New.Path)
 					}
 				}
 			}
@@ -142,25 +145,29 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 					if semver.Compare(require.Mod.Version, pkgRequireVersions[require.Mod.Path]) >= 0 {
 						idx := slices.Index(deps, fmt.Sprintf("%s@%s", require.Mod.Path, pkgRequireVersions[require.Mod.Path]))
 						deps = append(deps[:idx], deps[idx+1:]...)
+						delete(pkgRequireVersions, require.Mod.Path)
 					}
 				}
 			}
 			if _, ok := pkgReplaceVersions[require.Mod.Path]; ok {
 				if semver.IsValid(pkgReplaceVersions[require.Mod.Path]) {
-					if semver.Compare(require.Mod.Version, pkgReplaceVersions[require.Mod.Path]) >= 0 {
+					// If the require block in the upstream go.mod contains a newer version then remove the existing dep from replaces
+					if semver.Compare(require.Mod.Version, pkgReplaceVersions[require.Mod.Path]) > 0 {
 						// TODO(hectorj2f): Assume that the source is the same
 						idx := slices.Index(replaces, fmt.Sprintf("%s=%s@%s", require.Mod.Path, require.Mod.Path, pkgReplaceVersions[require.Mod.Path]))
 						replaces = append(replaces[:idx], replaces[idx+1:]...)
+						delete(pkgReplaceVersions, require.Mod.Path)
 					}
 				}
 			}
 		}
 	}
-	if len(pkgRequireVersions) > 0 {
+
+	if len(p.With["deps"]) > 0 {
 		p.With["deps"] = strings.TrimSpace(strings.Join(deps, " "))
 	}
 
-	if len(pkgReplaceVersions) > 0 {
+	if len(p.With["replaces"]) > 0 {
 		p.With["replaces"] = strings.TrimSpace(strings.Join(replaces, " "))
 	}
 

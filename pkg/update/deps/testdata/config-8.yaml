@@ -1,0 +1,43 @@
+# Source is on gitlab so we can't use github for updates
+#nolint:git-checkout-must-use-github-updates
+package:
+  name: kubescape
+  version: 3.0.3
+  epoch: 3
+  description: Kubescape is an open-source Kubernetes security platform for your IDE, CI/CD pipelines, and clusters. It includes risk analysis, security, compliance, and misconfiguration scanning, saving Kubernetes users and administrators precious time, effort, and resources.
+  copyright:
+    - license: Apache-2.0 AND MIT
+  dependencies:
+    runtime:
+      - build-base
+      - go
+
+environment:
+  contents:
+    packages:
+      - gitlab-cng-base
+      - go
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/kubescape/kubescape.git
+      tag: v${{package.version}}
+      expected-commit: 4e4a642673b49c26b615c14ae88c7aaf2d5f51c6
+
+  - runs: |
+      make gitlab-pages "LAST_TAG=v${{package.version}}" "VERSION=v${{package.version}}"
+
+  - uses: go/bump
+    with:
+      deps: github.com/containerd/containerd@v1.7.11 golang.org/x/crypto@v0.17.0 github.com/go-jose/go-jose/v3@v3.0.1 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.46.0 go.opentelemetry.io/otel@v1.21.0 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc@v1.21.0 go.opentelemetry.io/otel/sdk@v1.21.0 github.com/docker/docker@v24.0.7 github.com/cloudflare/circl@v1.3.7 github.com/sigstore/cosign/v2@v2.2.1 github.com/lestrrat-go/jwx/v2@v2.0.19
+      replaces: google.golang.org/grpc=google.golang.org/grpc@v1.58.4 gorm.io/gorm=gorm.io/gorm@v1.1.1
+      go-version: "1.21"
+
+  - uses: strip
+
+update:
+  enabled: true
+  github:
+    identifier: kubescape/kubescape
+    strip-prefix: v
