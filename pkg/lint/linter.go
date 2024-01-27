@@ -79,6 +79,14 @@ func (l *Linter) Lint(ctx context.Context) (Result, error) {
 			}
 
 			if slices.Contains(namesToPkg[name].NoLint, rule.Name) {
+				// Some rules are not allowed to be disabled.
+				if rule.ForbidNolint {
+					failedRules = append(failedRules, EvalRuleError{
+						Rule:  rule,
+						Error: fmt.Errorf("[%s]: use of #nolint: directive is forbidden for this rule", rule.Name),
+					})
+					continue
+				}
 				log.Debugf("%s: skipping rule %s because file contains #nolint:%s\n", name, rule.Name, rule.Name)
 				continue
 			}
