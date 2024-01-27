@@ -168,10 +168,27 @@ func TestLinter_Rules(t *testing.T) {
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{
-							Name:     "bad-version",
-							Severity: SeverityError,
+							Name:         "bad-version",
+							Severity:     SeverityError,
+							ForbidNolint: true,
 						},
 						Error: fmt.Errorf("[bad-version]: invalid version 1.0.0rc1, could not parse (ERROR)"),
+					},
+				},
+			},
+		},
+		{
+			file: "bad-version-nolint-forbid.yaml",
+			want: EvalResult{
+				File: "bad-version",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:         "bad-version",
+							Severity:     SeverityError,
+							ForbidNolint: true,
+						},
+						Error: fmt.Errorf("[bad-version]: use of #nolint: directive is forbidden for this rule"),
 					},
 				},
 			},
@@ -330,6 +347,7 @@ func TestLinter_Rules(t *testing.T) {
 				assert.Equal(t, e.Error, tt.want.Errors[i].Error, "Lint(): Error: got = %v, want %v", e.Error, tt.want.Errors[i].Error)
 				assert.Equal(t, e.Rule.Name, tt.want.Errors[i].Rule.Name, "Lint(): Rule.Name: got = %v, want %v", e.Rule.Name, tt.want.Errors[i].Rule.Name)
 				assert.Equal(t, e.Rule.Severity, tt.want.Errors[i].Rule.Severity, "Lint(): Rule.Severity: got = %v, want %v", e.Rule.Severity, tt.want.Errors[i].Rule.Severity)
+				assert.Equal(t, e.Rule.ForbidNolint, tt.want.Errors[i].Rule.ForbidNolint, "Lint(): Rule.ForbidNolint: got = %v, want %v", e.Rule.ForbidNolint, tt.want.Errors[i].Rule.ForbidNolint)
 			}
 		})
 	}
