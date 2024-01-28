@@ -12,6 +12,7 @@ import (
 	"chainguard.dev/melange/pkg/config"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
+	"github.com/wolfi-dev/wolfictl/pkg/yam"
 	"gopkg.in/yaml.v3"
 )
 
@@ -52,6 +53,7 @@ func TestCleanupDeps(t *testing.T) {
 			filename := fmt.Sprintf("%s.yaml", tc.filename)
 
 			copyFile(t, filepath.Join(dir, filename), tempDir)
+			copyFile(t, filepath.Join(dir, ".yam.yaml"), tempDir)
 
 			yamlContent, err := os.ReadFile(filepath.Join(tempDir, filename))
 			require.NoError(t, err)
@@ -91,7 +93,7 @@ func TestCleanupDeps(t *testing.T) {
 				t.Errorf("failed to write file: %v", err)
 			}
 
-			err = formatConfigurationFile(tempDir, filename)
+			err = yam.FormatConfigurationFile(tempDir, filename)
 			require.NoError(t, err)
 
 			modifiedYAMLContent, err := os.ReadFile(filepath.Join(tempDir, filename))

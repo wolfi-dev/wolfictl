@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wolfi-dev/wolfictl/pkg/yam"
+
 	melangebuild "chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/fatih/color"
@@ -425,6 +427,12 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		if err := o.updateGoBumpDeps(updated, pc.Dir, packageName, mutations); err != nil {
 			return "", fmt.Errorf("error cleaning up go/bump deps: %v", err)
 		}
+	}
+
+	// Run yam formatter
+	err = yam.FormatConfigurationFile(pc.Dir, pc.Filename)
+	if err != nil {
+		return "", fmt.Errorf("failed to format configuration file: %v", err)
 	}
 
 	_, err = worktree.Add(fileRelPath)
