@@ -82,6 +82,9 @@ func setupTestWolfiRepo(t *testing.T, dir, testURL string) *git.Repository {
 	data, err := os.ReadFile(filepath.Join("testdata", "cheese.yaml"))
 	assert.NoError(t, err)
 
+	yamConfig, err := os.ReadFile(filepath.Join("testdata", ".yam.yaml"))
+	assert.NoError(t, err)
+
 	// replace the URL melange bump uses to fetch the tarball from
 	melangConfig := strings.Replace(string(data), "REPLACE_ME", testURL, 1)
 
@@ -98,7 +101,12 @@ func setupTestWolfiRepo(t *testing.T, dir, testURL string) *git.Repository {
 	err = util.WriteFile(w.Filesystem, "cheese.yaml", []byte(melangConfig), 0o644)
 	assert.NoError(t, err)
 
+	err = util.WriteFile(w.Filesystem, ".yam.yaml", yamConfig, 0o644)
+	assert.NoError(t, err)
+
 	_, err = w.Add("cheese.yaml")
+	assert.NoError(t, err)
+	_, err = w.Add(".yam.yaml")
 	assert.NoError(t, err)
 
 	_, err = w.Commit("initial test checkin", &git.CommitOptions{

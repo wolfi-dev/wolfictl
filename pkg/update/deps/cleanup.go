@@ -10,9 +10,6 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/util"
-	osAdapter "github.com/chainguard-dev/yam/pkg/rwfs/os"
-	"github.com/chainguard-dev/yam/pkg/yam"
-	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/dprotaso/go-yit"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -21,11 +18,6 @@ import (
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	versionutil "k8s.io/apimachinery/pkg/util/version"
-)
-
-var (
-	sortExpressions = []string{".package.dependencies.runtime", ".environment.contents.packages"}
-	gapExpressions  = []string{".", ".subpackages", ".data", ".pipeline"}
 )
 
 func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) error {
@@ -185,7 +177,7 @@ func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool,
 
 	pipelineNode := findPipelineNode(doc)
 	if pipelineNode == nil {
-		return fmt.Errorf("pipeline node not found in the Wolfi definition: %v", err)
+		return fmt.Errorf("pipeline node not found in the Wolfi definition")
 	}
 
 	checkedOut := false
@@ -343,22 +335,4 @@ func goModTidy(modroot, goVersion string) (string, error) {
 		return strings.TrimSpace(string(bytes)), err
 	}
 	return "", nil
-}
-
-func formatConfigurationFile(dir, filename string) error {
-	fsys := osAdapter.DirFS(dir)
-	// Format file following the wolfi format
-	err := yam.Format(fsys, []string{strings.ReplaceAll(filename, "/", "")}, yam.FormatOptions{
-		EncodeOptions: formatted.EncodeOptions{
-			Indent:          2,
-			GapExpressions:  gapExpressions,
-			SortExpressions: sortExpressions,
-		},
-		FinalNewline:           true,
-		TrimTrailingWhitespace: true,
-	})
-	if err != nil {
-		return fmt.Errorf("error formatting the file %s: %v", filename, err)
-	}
-	return nil
 }
