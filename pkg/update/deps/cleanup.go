@@ -10,9 +10,6 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/util"
-	osAdapter "github.com/chainguard-dev/yam/pkg/rwfs/os"
-	"github.com/chainguard-dev/yam/pkg/yam"
-	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/dprotaso/go-yit"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -21,11 +18,6 @@ import (
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	versionutil "k8s.io/apimachinery/pkg/util/version"
-)
-
-var (
-	sortExpressions = []string{".package.dependencies.runtime", ".environment.contents.packages"}
-	gapExpressions  = []string{".", ".subpackages", ".data", ".pipeline"}
 )
 
 func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) error {
@@ -120,15 +112,18 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 					if semver.Compare(replace.New.Version, pkgRequireVersions[replace.New.Path]) >= 0 {
 						idx := slices.Index(deps, fmt.Sprintf("%s=%s@%s", replace.New.Path, replace.New.Path, pkgRequireVersions[replace.New.Path]))
 						deps = append(deps[:idx], deps[idx+1:]...)
+						delete(pkgRequireVersions, replace.New.Path)
 					}
 				}
 			}
 			if _, ok := pkgReplaceVersions[replace.New.Path]; ok {
 				if semver.IsValid(pkgReplaceVersions[replace.New.Path]) {
-					if semver.Compare(replace.New.Version, pkgReplaceVersions[replace.New.Path]) >= 0 {
+					// If the replace block in the upstream go.mod contains a newer version then remove the existing dep from replaces
+					if semver.Compare(replace.New.Version, pkgReplaceVersions[replace.New.Path]) > 0 {
 						// TODO(hectorj2f): Assume that the source is the same
 						idx := slices.Index(replaces, fmt.Sprintf("%s=%s@%s", replace.New.Path, replace.New.Path, pkgReplaceVersions[replace.New.Path]))
 						replaces = append(replaces[:idx], replaces[idx+1:]...)
+						delete(pkgReplaceVersions, replace.New.Path)
 					}
 				}
 			}
@@ -142,25 +137,29 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 					if semver.Compare(require.Mod.Version, pkgRequireVersions[require.Mod.Path]) >= 0 {
 						idx := slices.Index(deps, fmt.Sprintf("%s@%s", require.Mod.Path, pkgRequireVersions[require.Mod.Path]))
 						deps = append(deps[:idx], deps[idx+1:]...)
+						delete(pkgRequireVersions, require.Mod.Path)
 					}
 				}
 			}
 			if _, ok := pkgReplaceVersions[require.Mod.Path]; ok {
 				if semver.IsValid(pkgReplaceVersions[require.Mod.Path]) {
-					if semver.Compare(require.Mod.Version, pkgReplaceVersions[require.Mod.Path]) >= 0 {
+					// If the require block in the upstream go.mod contains a newer version then remove the existing dep from replaces
+					if semver.Compare(require.Mod.Version, pkgReplaceVersions[require.Mod.Path]) > 0 {
 						// TODO(hectorj2f): Assume that the source is the same
 						idx := slices.Index(replaces, fmt.Sprintf("%s=%s@%s", require.Mod.Path, require.Mod.Path, pkgReplaceVersions[require.Mod.Path]))
 						replaces = append(replaces[:idx], replaces[idx+1:]...)
+						delete(pkgReplaceVersions, require.Mod.Path)
 					}
 				}
 			}
 		}
 	}
-	if len(pkgRequireVersions) > 0 {
+
+	if len(p.With["deps"]) > 0 {
 		p.With["deps"] = strings.TrimSpace(strings.Join(deps, " "))
 	}
 
-	if len(pkgReplaceVersions) > 0 {
+	if len(p.With["replaces"]) > 0 {
 		p.With["replaces"] = strings.TrimSpace(strings.Join(replaces, " "))
 	}
 
@@ -178,7 +177,7 @@ func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool,
 
 	pipelineNode := findPipelineNode(doc)
 	if pipelineNode == nil {
-		return fmt.Errorf("pipeline node not found in the Wolfi definition: %v", err)
+		return fmt.Errorf("pipeline node not found in the Wolfi definition")
 	}
 
 	checkedOut := false
@@ -336,22 +335,4 @@ func goModTidy(modroot, goVersion string) (string, error) {
 		return strings.TrimSpace(string(bytes)), err
 	}
 	return "", nil
-}
-
-func formatConfigurationFile(dir, filename string) error {
-	fsys := osAdapter.DirFS(dir)
-	// Format file following the wolfi format
-	err := yam.Format(fsys, []string{strings.ReplaceAll(filename, "/", "")}, yam.FormatOptions{
-		EncodeOptions: formatted.EncodeOptions{
-			Indent:          2,
-			GapExpressions:  gapExpressions,
-			SortExpressions: sortExpressions,
-		},
-		FinalNewline:           true,
-		TrimTrailingWhitespace: true,
-	})
-	if err != nil {
-		return fmt.Errorf("error formatting the file %s: %v", filename, err)
-	}
-	return nil
 }

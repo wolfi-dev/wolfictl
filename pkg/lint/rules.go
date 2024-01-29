@@ -2,12 +2,14 @@ package lint
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"regexp"
 	"strings"
 
 	"chainguard.dev/melange/pkg/renovate"
+	"github.com/github/go-spdx/v2/spdxexp"
 	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 
@@ -288,6 +290,8 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "bad-version",
 			Description: "version is malformed",
 			Severity:    SeverityError,
+			// Bad versioning results in `package file format error` while attempting to install with `apk add`
+			ForbidNolint: true,
 			LintFunc: func(config config.Configuration) error {
 				version := config.Package.Version
 				if err := versions.ValidateWithoutEpoch(version); err != nil {
@@ -386,6 +390,25 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						if config.Update.Enabled && config.Update.GitHubMonitor == nil {
 							return fmt.Errorf("configure update.github when using git-checkout")
 						}
+					}
+				}
+				return nil
+			},
+		},
+		{
+			Name:        "valid-spdx-license",
+			Description: "every package should have a valid SPDX license",
+			Severity:    SeverityError,
+			LintFunc: func(config config.Configuration) error {
+				for _, c := range config.Package.Copyright {
+					// TODO(jason): make these errors
+					if c.License == "" {
+						log.Println("license is missing")
+						return nil
+					}
+					if valid, _ := spdxexp.ValidateLicenses([]string{c.License}); !valid {
+						log.Printf("license %q is not valid SPDX license", c.License)
+						return nil
 					}
 				}
 				return nil

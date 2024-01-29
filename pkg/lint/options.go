@@ -5,9 +5,6 @@ type Options struct {
 	// Path is the path to the file or directory to lint
 	Path string
 
-	// Verbose prints the details of the linting errors.
-	Verbose bool
-
 	// Skip rules removes the given slice of rules to be checked
 	SkipRules []string
 }
@@ -19,13 +16,6 @@ type Option func(*Options)
 func WithPath(path string) Option {
 	return func(o *Options) {
 		o.Path = path
-	}
-}
-
-// WithVerbose sets the verbose option.
-func WithVerbose(verbose bool) Option {
-	return func(o *Options) {
-		o.Verbose = verbose
 	}
 }
 

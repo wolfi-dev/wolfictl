@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wolfi-dev/wolfictl/pkg/yam"
+
 	melangebuild "chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/fatih/color"
@@ -427,6 +429,12 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		}
 	}
 
+	// Run yam formatter
+	err = yam.FormatConfigurationFile(pc.Dir, pc.Filename)
+	if err != nil {
+		return "", fmt.Errorf("failed to format configuration file: %v", err)
+	}
+
 	_, err = worktree.Add(fileRelPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
@@ -661,7 +669,7 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 		}
 
 		// comment on the closed PR the new pull request link which supersedes it
-		comment := fmt.Sprintf("superceded by %s", prLink)
+		comment := fmt.Sprintf("superseded by %s", prLink)
 		_, err = gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, comment, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
 			return "", fmt.Errorf("failed to comment pull request: %d: %w", newVersion.ReplaceExistingPRNumber, err)

@@ -16,6 +16,8 @@ import (
 	"chainguard.dev/melange/pkg/config"
 )
 
+const yamlExtension = ".yaml"
+
 type Packages struct {
 	Config   config.Configuration
 	Filename string
@@ -49,9 +51,9 @@ func ReadPackageConfigs(ctx context.Context, packageNames []string, dir string) 
 	if len(packageNames) > 0 {
 		// get package by name
 		for _, packageName := range packageNames {
-			filename := packageName + ".yaml"
+			filename := packageName + yamlExtension
 			fullPath := filepath.Join(dir, filename)
-			loadedCfg, err := config.ParseConfiguration(ctx, filename)
+			loadedCfg, err := config.ParseConfiguration(ctx, fullPath)
 			if err != nil {
 				return p, fmt.Errorf("failed to read package config %s: %w", fullPath, err)
 			}
@@ -99,7 +101,7 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 		if fi.IsDir() && path != dir {
 			return filepath.SkipDir
 		}
-		if filepath.Ext(path) == ".yaml" {
+		if filepath.Ext(path) == yamlExtension {
 			fileList = append(fileList, path)
 		}
 		return nil

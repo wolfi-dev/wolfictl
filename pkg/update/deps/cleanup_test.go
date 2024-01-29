@@ -12,6 +12,7 @@ import (
 	"chainguard.dev/melange/pkg/config"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
+	"github.com/wolfi-dev/wolfictl/pkg/yam"
 	"gopkg.in/yaml.v3"
 )
 
@@ -38,6 +39,12 @@ func TestCleanupDeps(t *testing.T) {
 	}, {
 		name:     "cleanup gobump and update another go/bump",
 		filename: "config-6",
+	}, {
+		name:     "go.mod require and replace conflicting to different version of the same grpc version",
+		filename: "config-7",
+	}, {
+		name:     "upgrade gorm version in replaces with a newer version in go.mod in a replace block",
+		filename: "config-8",
 	}}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -46,6 +53,7 @@ func TestCleanupDeps(t *testing.T) {
 			filename := fmt.Sprintf("%s.yaml", tc.filename)
 
 			copyFile(t, filepath.Join(dir, filename), tempDir)
+			copyFile(t, filepath.Join(dir, ".yam.yaml"), tempDir)
 
 			yamlContent, err := os.ReadFile(filepath.Join(tempDir, filename))
 			require.NoError(t, err)
@@ -85,7 +93,7 @@ func TestCleanupDeps(t *testing.T) {
 				t.Errorf("failed to write file: %v", err)
 			}
 
-			err = formatConfigurationFile(tempDir, filename)
+			err = yam.FormatConfigurationFile(tempDir, filename)
 			require.NoError(t, err)
 
 			modifiedYAMLContent, err := os.ReadFile(filepath.Join(tempDir, filename))
