@@ -7,6 +7,9 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
+
+	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
 
 	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/util"
@@ -41,17 +44,44 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 		URL:               repoValue,
 		ReferenceName:     plumbing.ReferenceName(fmt.Sprintf("refs/tags/%s", evaluatedTag)),
 		Progress:          os.Stdout,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		RecurseSubmodules: 1,
 		RemoteName:        "origin",
 		Depth:             1,
+		Auth:              wgit.GetGitAuth(),
 	}
 
 	log.Printf("cloning sources from %s tag %s into a temporary directory '%s', this may take a while", repoValue, dir, evaluatedTag)
 
-	r, err := git.PlainClone(dir, false, cloneOpts)
-	if err != nil {
-		return fmt.Errorf("failed to clone %s ref %s with error: %v", repoValue, evaluatedTag, err)
+	maxRetries := 3
+	r := &git.Repository{}
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		r, err = git.PlainClone(dir, false, cloneOpts)
+		if err == nil {
+			break
+		}
+		log.Printf("Attempt %d failed to clone %s ref %s with error: %v", attempt+1, repoValue, evaluatedTag, err)
+		if attempt < maxRetries-1 {
+			log.Println("Retrying...")
+			time.Sleep(time.Second * 2)
+			// delete the temporary directory
+			err = os.RemoveAll(dir)
+			if err != nil {
+				return fmt.Errorf("failed to remove temporary directory %s: %w", dir, err)
+			}
+			// recreate the directory
+			err = os.MkdirAll(dir, 0o755)
+
+			if err != nil {
+				return fmt.Errorf("failed to remove temporary directory %s: %w", dir, err)
+			}
+			if err != nil {
+				return fmt.Errorf("failed to remove temporary directory %s: %w", dir, err)
+			}
+		} else {
+			return fmt.Errorf("failed to clone %s ref %s after %d attempts", repoValue, evaluatedTag, maxRetries)
+		}
 	}
+
 	if r == nil {
 		return fmt.Errorf("clone is empty %s ref %s", repoValue, evaluatedTag)
 	}
@@ -174,6 +204,7 @@ func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool,
 	if err != nil {
 		return fmt.Errorf("failed to create temporary folder to clone package configs into: %w", err)
 	}
+	defer os.RemoveAll(tempDir)
 
 	pipelineNode := findPipelineNode(doc)
 	if pipelineNode == nil {
