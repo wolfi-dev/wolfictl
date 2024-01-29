@@ -25,8 +25,7 @@ type Package struct {
 // DiscoverRubyPackages searches a given path for melange yaml files using
 // packages named ruby-${RubyVersion}. It takes a path to a directory or an
 // individual file. A list of RubyPackages will be returned to the caller.
-func (o *Options) DiscoverRubyPackages() ([]Package, error) {
-	ctx := context.Background()
+func (o *Options) DiscoverRubyPackages(ctx context.Context) ([]Package, error) {
 	pkgs, err := melange.ReadAllPackagesFromRepo(ctx, o.Path)
 	if err != nil {
 		return nil, fmt.Errorf("error discovering ruby packages, %w", err)

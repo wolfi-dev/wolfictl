@@ -30,12 +30,11 @@ func (o GitOptions) SearchCode(ctx context.Context, query string) (*github.CodeS
 		githubErr := github.CheckResponse(resp.Response)
 		if githubErr != nil {
 			rateLimited, delay := o.checkRateLimiting(githubErr)
-			if rateLimited {
-				fmt.Printf("retrying after %v second delay due to rate limiting\n", delay.Seconds())
-				time.Sleep(delay)
-			} else {
+			if !rateLimited {
 				return nil, githubErr
 			}
+			fmt.Printf("retrying after %v second delay due to rate limiting\n", delay.Seconds())
+			time.Sleep(delay)
 		} else {
 			// if err is not rate limit, return err
 			return nil, err

@@ -82,6 +82,7 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 `,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			path, isDir, err := resolvePath(args)
 			if err != nil {
 				return fmt.Errorf("could not resolve path: %w", err)
@@ -106,7 +107,7 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 				NoCache:     p.noCache,
 			}
 
-			pkgs, err := opts.DiscoverRubyPackages()
+			pkgs, err := opts.DiscoverRubyPackages(ctx)
 			if err != nil {
 				return fmt.Errorf("could not discover ruby packages: %w", err)
 			}
@@ -116,7 +117,7 @@ wolfictl ruby code-search . --ruby-version 3.2 --search-term 'language:ruby racc
 				// Check gemspec for version constraints
 				var localErr string
 				for _, term := range searchTerms {
-					err = opts.CodeSearch(&pkgs[i], term)
+					err = opts.CodeSearch(ctx, &pkgs[i], term)
 					if err != nil {
 						localErr += fmt.Sprintf(" |query='%s': %v", term, err)
 					}
@@ -160,6 +161,7 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 `,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			path, isDir, err := resolvePath(args)
 			if err != nil {
 				return fmt.Errorf("could not resolve path: %w", err)
@@ -189,7 +191,7 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 				NoCache:           p.noCache,
 			}
 
-			pkgs, err := opts.DiscoverRubyPackages()
+			pkgs, err := opts.DiscoverRubyPackages(ctx)
 			if err != nil {
 				return fmt.Errorf("could not discover ruby packages: %w", err)
 			}
@@ -197,7 +199,7 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 			checkUpdateError := false
 			for i := range pkgs {
 				// Check gemspec for version constraints
-				err = opts.CheckUpgrade(&pkgs[i])
+				err = opts.CheckUpgrade(ctx, &pkgs[i])
 				if err != nil {
 					fmt.Printf("❌ %s: %s\n", pkgs[i].Name, err.Error())
 					checkUpdateError = true

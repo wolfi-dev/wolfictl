@@ -23,15 +23,15 @@ import (
 // should provide a set of constraints restricting the version of ruby a gem
 // can run on. CheckUpgrade simply tries to make sure the given RubyUpdateVersion
 // is within those constraints.
-func (o *Options) CheckUpgrade(pkg *Package) error {
+func (o *Options) CheckUpgrade(ctx context.Context, pkg *Package) error {
 	// find the gemspec in the repository
-	gemspec, err := o.findGemspec(pkg)
+	gemspec, err := o.findGemspec(ctx, pkg)
 	if err != nil {
 		return fmt.Errorf("finding gemspec in repository: %w", err)
 	}
 
 	// download (and cache) the gemspec file
-	gemspecFile, err := o.fetchFile(pkg, gemspec)
+	gemspecFile, err := o.fetchFile(ctx, pkg, gemspec)
 	if err != nil {
 		return fmt.Errorf("downloading gemspec: %w", err)
 	}
@@ -42,8 +42,7 @@ func (o *Options) CheckUpgrade(pkg *Package) error {
 
 // findGemspec searches a given Github repository for a file named *.gemspec. It
 // searches for the file from the branch or tag specified in the melange yaml.
-func (o *Options) findGemspec(pkg *Package) (string, error) {
-	ctx := context.Background()
+func (o *Options) findGemspec(ctx context.Context, pkg *Package) (string, error) {
 	client := github.NewClient(o.Client.Client)
 	gitOpts := gh.GitOptions{
 		GithubClient: client,
@@ -71,13 +70,11 @@ func (o *Options) cachedGemspecPath(pkg *Package, gemspec string) string {
 // Github repository. It downloads the file from the branch or tag specified
 // in the melange yaml. It will cache the file using the name of the file and
 // the branch or tag specified in the melange yaml.
-func (o *Options) fetchFile(pkg *Package, file string) (string, error) {
+func (o *Options) fetchFile(ctx context.Context, pkg *Package, file string) (string, error) {
 	logger := log.New(log.Writer(), "wolfictl ruby check-upgrade: ", log.LstdFlags|log.Lmsgprefix)
 	cachedPath := o.cachedGemspecPath(pkg, file)
 	cached, err := os.Open(cachedPath)
 	if err != nil || o.NoCache {
-		ctx := context.Background()
-
 		client := github.NewClient(o.Client.Client)
 		gitOpts := gh.GitOptions{
 			GithubClient: client,
@@ -160,14 +157,7 @@ func (o *Options) checkVersionConstraint(gemspecFile string) error {
 	if err == nil { // Call ruby to do the comparison
 		// Need to construct a list of version constraints to pass
 		// to the ruby call. It should end up like this: ['>= 2.6', '< 4']
-		constraint := "["
-		for i, c := range versionConstraints {
-			constraint += fmt.Sprintf("'%s'", c)
-			if i != len(versionConstraints)-1 {
-				constraint += ", "
-			}
-		}
-		constraint += "]"
+		constraint := fmt.Sprintf("['%s']", strings.Join(versionConstraints, "', '"))
 
 		cmdArr := []string{
 			"-e",

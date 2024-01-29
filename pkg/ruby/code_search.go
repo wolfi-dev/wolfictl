@@ -25,8 +25,8 @@ type SearchResult struct {
 
 // CodeSearch is the main search function which uses Github Code Search to run
 // the specified query for a particular package.
-func (o *Options) CodeSearch(pkg *Package, query string) error {
-	results, err := o.runQuery(pkg, query)
+func (o *Options) CodeSearch(ctx context.Context, pkg *Package, query string) error {
+	results, err := o.runQuery(ctx, pkg, query)
 	if err != nil {
 		return fmt.Errorf("searching code: %w", err)
 	}
@@ -42,8 +42,7 @@ func (o *Options) CodeSearch(pkg *Package, query string) error {
 
 // defaultSHA returns the latest SHA for the default branch of a given repo. It
 // is used to calculate the corresponding cache file.
-func (o *Options) defaultSHA(pkg *Package) (string, error) {
-	ctx := context.Background()
+func (o *Options) defaultSHA(ctx context.Context, pkg *Package) (string, error) {
 	client := github.NewClient(o.Client.Client)
 
 	// Get the repository
@@ -79,9 +78,9 @@ func (o *Options) cachedSearchResult(pkg *Package, sha, query string) string {
 // Because Github Code Search limits searching to the default branch only, the
 // cached file is named with the latest commit sha on the default branch. That
 // way the cache does not get stale if new changes are made to the repository.
-func (o *Options) runQuery(pkg *Package, query string) ([]SearchResult, error) {
+func (o *Options) runQuery(ctx context.Context, pkg *Package, query string) ([]SearchResult, error) {
 	logger := log.New(log.Writer(), "wolfictl ruby code-search: ", log.LstdFlags|log.Lmsgprefix)
-	sha, err := o.defaultSHA(pkg)
+	sha, err := o.defaultSHA(ctx, pkg)
 	if err != nil {
 		return nil, fmt.Errorf("getting default branch sha: %w", err)
 	}
@@ -89,8 +88,6 @@ func (o *Options) runQuery(pkg *Package, query string) ([]SearchResult, error) {
 	cachedPath := o.cachedSearchResult(pkg, sha, query)
 	cached, err := os.Open(cachedPath)
 	if err != nil || o.NoCache {
-		ctx := context.Background()
-
 		client := github.NewClient(o.Client.Client)
 		query = fmt.Sprintf("%s repo:%s/%s", query, pkg.Repo.Organisation, pkg.Repo.Name)
 		gitOpts := gh.GitOptions{
