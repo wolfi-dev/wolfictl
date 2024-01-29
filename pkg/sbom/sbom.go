@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/cataloging/pkgcataloging"
@@ -155,6 +156,23 @@ func generateCPEs(p pkg.Package) []cpe.CPE {
 	dictionaryCPE, ok := cpegen.DictionaryFind(p)
 	if ok {
 		return []cpe.CPE{dictionaryCPE}
+	}
+
+	// TODO: This is a workaround for Syft not coming up with this CPE for OpenJDK
+	// 	packages. Some thought would be needed on the "right" way to implement this
+	// 	upstream, but it's more obvious how we can address this in wolfictl for our
+	// 	purposes.
+	//
+	//  Potentially related: https://github.com/anchore/syft/issues/2422
+	if strings.HasPrefix(p.Name, "openjdk-") {
+		return []cpe.CPE{
+			{
+				Part:    "a",
+				Vendor:  "oracle",
+				Product: "jdk",
+				Version: p.Version,
+			},
+		}
 	}
 
 	return cpegen.Generate(p)
