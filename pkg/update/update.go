@@ -669,7 +669,7 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 		}
 
 		// comment on the closed PR the new pull request link which supersedes it
-		comment := fmt.Sprintf("superceded by %s", prLink)
+		comment := fmt.Sprintf("superseded by %s", prLink)
 		_, err = gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, comment, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
 			return "", fmt.Errorf("failed to comment pull request: %d: %w", newVersion.ReplaceExistingPRNumber, err)
