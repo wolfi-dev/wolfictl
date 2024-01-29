@@ -425,14 +425,14 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	// Skip any processing for definitions with a single pipeline
 	if len(updated.Pipeline) > 1 {
 		if err := o.updateGoBumpDeps(updated, pc.Dir, packageName, mutations); err != nil {
-			return "", fmt.Errorf("error cleaning up go/bump deps: %v", err)
+			return fmt.Sprintf("error cleaning up go/bump deps: %v", err), nil
 		}
 	}
 
 	// Run yam formatter
 	err = yam.FormatConfigurationFile(pc.Dir, pc.Filename)
 	if err != nil {
-		return "", fmt.Errorf("failed to format configuration file: %v", err)
+		return fmt.Sprintf("failed to format configuration file: %v", err), nil
 	}
 
 	_, err = worktree.Add(fileRelPath)
