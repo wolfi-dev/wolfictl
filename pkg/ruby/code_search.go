@@ -3,6 +3,7 @@ package ruby
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -79,53 +80,27 @@ func (o *Options) cachedSearchResult(pkg *Package, sha, query string) string {
 // cached file is named with the latest commit sha on the default branch. That
 // way the cache does not get stale if new changes are made to the repository.
 func (o *Options) runQuery(ctx context.Context, pkg *Package, query string) ([]SearchResult, error) {
-	logger := log.New(log.Writer(), "wolfictl ruby code-search: ", log.LstdFlags|log.Lmsgprefix)
 	sha, err := o.defaultSHA(ctx, pkg)
 	if err != nil {
 		return nil, fmt.Errorf("getting default branch sha: %w", err)
 	}
 
 	cachedPath := o.cachedSearchResult(pkg, sha, query)
+	_, err = os.Stat(cachedPath)
+	if (err != nil && errors.Is(err, os.ErrNotExist)) || o.NoCache {
+		// file does not exist OR we want to run the query without considering the cache
+		err := o.runQueryAndCache(ctx, pkg, query, cachedPath)
+		if err != nil {
+			return nil, fmt.Errorf("running query: %w", err)
+		}
+	} else if err != nil {
+		// error checking the file info
+		return nil, fmt.Errorf("checking cache file: %w", err)
+	}
+
 	cached, err := os.Open(cachedPath)
-	if err != nil || o.NoCache {
-		client := github.NewClient(o.Client.Client)
-		query = fmt.Sprintf("%s repo:%s/%s", query, pkg.Repo.Organisation, pkg.Repo.Name)
-		gitOpts := gh.GitOptions{
-			GithubClient: client,
-			Logger:       logger,
-		}
-
-		result, err := gitOpts.SearchCode(ctx, query)
-		if err != nil {
-			fmt.Printf("Error: %+v\n", err)
-			return nil, err
-		}
-
-		err = os.MkdirAll(path.Dir(cachedPath), 0o755)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create cache directory: %w", err)
-		}
-
-		cached, err = os.Create(cachedPath)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create cache file: %w", err)
-		}
-
-		// Convert the struct to JSON
-		jsonData, err := json.Marshal(result)
-		if err != nil {
-			return nil, fmt.Errorf("marshaling json: %w", err)
-		}
-
-		_, err = cached.Write(jsonData)
-		if err != nil {
-			return nil, fmt.Errorf("failed to write cache file: %w", err)
-		}
-
-		_, err = cached.Seek(0, io.SeekStart)
-		if err != nil {
-			return nil, fmt.Errorf("failed to seek file: %w", err)
-		}
+	if err != nil {
+		return nil, fmt.Errorf("opening cached file: %w", err)
 	}
 	defer cached.Close()
 
@@ -156,6 +131,49 @@ func (o *Options) runQuery(ctx context.Context, pkg *Package, query string) ([]S
 	}
 
 	return results, nil
+}
+
+// runQueryAndCache actually runs the Github code search. It will cache the
+// result on disk for the next run.
+func (o *Options) runQueryAndCache(ctx context.Context, pkg *Package, query, cachedPath string) error {
+	logger := log.New(log.Writer(), "wolfictl ruby code-search: ", log.LstdFlags|log.Lmsgprefix)
+
+	client := github.NewClient(o.Client.Client)
+	gitOpts := gh.GitOptions{
+		GithubClient: client,
+		Logger:       logger,
+	}
+
+	query = fmt.Sprintf("%s repo:%s/%s", query, pkg.Repo.Organisation, pkg.Repo.Name)
+	result, err := gitOpts.SearchCode(ctx, query)
+	if err != nil {
+		fmt.Printf("Error: %+v\n", err)
+		return err
+	}
+
+	err = os.MkdirAll(path.Dir(cachedPath), 0o755)
+	if err != nil {
+		return fmt.Errorf("failed to create cache directory: %w", err)
+	}
+
+	cached, err := os.Create(cachedPath)
+	if err != nil {
+		return fmt.Errorf("failed to create cache file: %w", err)
+	}
+
+	// Convert the struct to JSON
+	jsonData, err := json.Marshal(result)
+	if err != nil {
+		return fmt.Errorf("marshaling json: %w", err)
+	}
+
+	_, err = cached.Write(jsonData)
+	if err != nil {
+		return fmt.Errorf("failed to write cache file: %w", err)
+	}
+
+	defer cached.Close()
+	return nil
 }
 
 func generateMarkdown(results []SearchResult, query string) string {
