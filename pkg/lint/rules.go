@@ -2,6 +2,7 @@ package lint
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"regexp"
@@ -9,7 +10,6 @@ import (
 
 	"chainguard.dev/melange/pkg/renovate"
 	"github.com/github/go-spdx/v2/spdxexp"
-	"github.com/golang/gddo/log"
 	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 
@@ -403,11 +403,11 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				for _, c := range config.Package.Copyright {
 					// TODO(jason): make these errors
 					if c.License == "" {
-						log.Info("license is missing")
+						log.Println("license is missing")
 						return nil
 					}
 					if valid, _ := spdxexp.ValidateLicenses([]string{c.License}); !valid {
-						log.Infof("license %q is not valid SPDX license", c.License)
+						log.Printf("license %q is not valid SPDX license", c.License)
 						return nil
 					}
 				}
