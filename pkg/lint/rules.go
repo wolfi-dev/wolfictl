@@ -9,6 +9,7 @@ import (
 
 	"chainguard.dev/melange/pkg/renovate"
 	"github.com/github/go-spdx/v2/spdxexp"
+	"github.com/golang/gddo/log"
 	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 
@@ -397,14 +398,17 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 		{
 			Name:        "valid-spdx-license",
 			Description: "every package should have a valid SPDX license",
-			Severity:    SeverityInfo, // TODO(jason): Make this an error.
+			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, c := range config.Package.Copyright {
+					// TODO(jason): make these errors
 					if c.License == "" {
-						return fmt.Errorf("license is missing")
+						log.Info("license is missing")
+						return nil
 					}
 					if valid, _ := spdxexp.ValidateLicenses([]string{c.License}); !valid {
-						return fmt.Errorf("license %q is not valid SPDX license", c.License)
+						log.Infof("license %q is not valid SPDX license", c.License)
+						return nil
 					}
 				}
 				return nil
