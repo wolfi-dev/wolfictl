@@ -160,6 +160,7 @@ func (o *Options) runQueryAndCache(ctx context.Context, pkg *Package, query, cac
 	if err != nil {
 		return fmt.Errorf("failed to create cache file: %w", err)
 	}
+	defer cached.Close()
 
 	// Convert the struct to JSON
 	jsonData, err := json.Marshal(result)
@@ -167,12 +168,9 @@ func (o *Options) runQueryAndCache(ctx context.Context, pkg *Package, query, cac
 		return fmt.Errorf("marshaling json: %w", err)
 	}
 
-	_, err = cached.Write(jsonData)
-	if err != nil {
+	if _, err := cached.Write(jsonData); err != nil {
 		return fmt.Errorf("failed to write cache file: %w", err)
 	}
-
-	defer cached.Close()
 	return nil
 }
 
