@@ -139,6 +139,7 @@ func (o *Options) Update(ctx context.Context) error {
 			URL:               o.RepoURI,
 			Progress:          os.Stdout,
 			RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+			ShallowSubmodules: true,
 			Auth:              wgit.GetGitAuth(),
 			Depth:             1,
 		}
