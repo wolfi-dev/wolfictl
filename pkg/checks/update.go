@@ -362,7 +362,6 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		ShallowSubmodules: true,
-		RemoteName:        "origin",
 		Depth:             1,
 		NoCheckout:        true,
 	}
