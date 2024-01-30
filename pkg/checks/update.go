@@ -28,9 +28,10 @@ import (
 )
 
 type CheckUpdateOptions struct {
-	Dir             string
-	OverrideVersion string
-	Logger          *log.Logger
+	Dir                     string
+	OverrideVersion         string
+	Logger                  *log.Logger
+	EnableDependencyCleanup bool
 }
 
 // SetupUpdate will create the options needed to call wolfictl update functions
@@ -240,11 +241,19 @@ func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions m
 			return err
 		}
 
-		// Skip any processing for definitions with a single pipeline
-		if len(updated.Pipeline) > 1 {
-			if err := o.updateGoBumpDeps(updated, o.Dir, packageName, mutations); err != nil {
-				return fmt.Errorf("error cleaning up go/bump deps: %v", err)
+		if o.EnableDependencyCleanup {
+			msg := fmt.Sprintf("cleaning up go/bump dependencies for %s.  To disable, run command with --enable-dependency-cleanup=false", packageName)
+			log.Print(color.YellowString(msg))
+
+			// Skip any processing for definitions with a single pipeline
+			if len(updated.Pipeline) > 1 {
+				if err := o.updateGoBumpDeps(updated, tempDir, packageName, mutations); err != nil {
+					return fmt.Errorf("error cleaning up go/bump deps: %v", err)
+				}
 			}
+		} else {
+			msg := fmt.Sprintf("skip cleaning up go/bump dependencies for %s.  To enable, run command with --enable-dependency-cleanup=true", packageName)
+			log.Print(color.YellowString(msg))
 		}
 
 		// if manual update is expected then let's not try to validate pipelines
