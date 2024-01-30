@@ -56,6 +56,7 @@ type Options struct {
 	IssueLabels            []string
 	MaxRetries             int
 	PkgPath                string
+	PackagesToUpdate       map[string]NewVersionResults
 }
 
 type NewVersionResults struct {
@@ -120,7 +121,6 @@ func (o *Options) Update(ctx context.Context) error {
 	var err error
 	var repo *git.Repository
 	var latestVersions map[string]NewVersionResults
-	var packagesToUpdate map[string]NewVersionResults
 
 	// retry the whole process a few times in case of issues with the git repo
 	for i := 0; i < o.MaxRetries; i++ {
@@ -157,21 +157,21 @@ func (o *Options) Update(ctx context.Context) error {
 		}
 
 		// compare latest upstream versions with melange package versions and return a map of packages to update
-		if packagesToUpdate == nil {
-			packagesToUpdate, err = o.getPackagesToUpdate(latestVersions)
+		if o.PackagesToUpdate == nil {
+			o.PackagesToUpdate, err = o.getPackagesToUpdate(latestVersions)
+			if err != nil {
+				return fmt.Errorf("failed to get package updates: %w", err)
+			}
+
+			// skip packages for which we already have an open issue or pull request
+			err = o.removeExistingUpdates(repo)
 			if err != nil {
 				return fmt.Errorf("failed to get package updates: %w", err)
 			}
 		}
 
-		// skip packages for which we already have an open issue or pull request
-		packagesToUpdate, err = o.removeExistingUpdates(repo, packagesToUpdate)
-		if err != nil {
-			return fmt.Errorf("failed to get package updates: %w", err)
-		}
-
 		// update melange configs in our cloned git repository with any new package versions
-		err = o.updatePackagesGitRepository(ctx, repo, packagesToUpdate)
+		err = o.updatePackagesGitRepository(ctx, repo)
 		if err != nil {
 			// we occasionally get errors when pushing to git and creating issues, so we should retry using a clean clone
 			o.Logger.Printf("attempt %d: failed to update packages in git repository: %s", i+1, err)
@@ -282,7 +282,7 @@ func transformVersion(c config.Update, v string) (string, error) {
 }
 
 // function will iterate over all packages that need to be updated and create a pull request for each change by default unless batch mode which creates a single pull request
-func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Repository, packagesToUpdate map[string]NewVersionResults) error {
+func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Repository) error {
 	// store the HEAD ref to switch back later
 	headRef, err := repo.Head()
 	if err != nil {
@@ -290,15 +290,18 @@ func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Rep
 	}
 
 	// Bump packages that need updating
-	for packageName, newVersion := range packagesToUpdate {
-		// todo jr remove if this doesn't help
-		// add sleep to see if it helps intermittent "object not found" when pushing
-		time.Sleep(1 * time.Second)
-
+	for packageName, newVersion := range o.PackagesToUpdate {
 		wt, err := repo.Worktree()
 		if err != nil {
 			return fmt.Errorf("failed to get the worktree: %w", err)
 		}
+
+		// Perform a hard reset to HEAD
+		err = wt.Reset(&git.ResetOptions{Mode: git.HardReset})
+		if err != nil {
+			return fmt.Errorf("failed to reset git repo: %w", err)
+		}
+
 		// make sure we are on HEAD
 		err = wt.Checkout(&git.CheckoutOptions{
 			Branch: headRef.Name(),
@@ -307,7 +310,7 @@ func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Rep
 			return fmt.Errorf("failed to check out HEAD: %w", err)
 		}
 
-		// todo jr remove if this doesn't help
+		// log the git status before we start to make sure we're in a clean state
 		rs, err := debug(wt)
 		if err != nil {
 			return err
@@ -325,6 +328,8 @@ func (o *Options) updatePackagesGitRepository(ctx context.Context, repo *git.Rep
 			return err
 		}
 		if errorMessage != "" {
+			// delete the package from the map so we don't try to update it again if we get a failure for another package and retry the whole process
+			delete(o.PackagesToUpdate, packageName)
 			o.ErrorMessages[packageName] = errorMessage
 		}
 	}
@@ -355,13 +360,23 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		return o.createNewVersionIssue(repo, packageName, newVersion)
 	}
 
-	configFile := filepath.Join(pc.Dir, pc.Filename)
+	worktree, err := repo.Worktree()
+	if err != nil {
+		return "", fmt.Errorf("failed to get git worktree: %w", err)
+	}
+
+	root := worktree.Filesystem.Root()
+	log.Printf("working directory: %s", root)
+
+	configFile := filepath.Join(root, pc.Filename)
 	if configFile == "" {
 		return "", fmt.Errorf("no config filename found for package %s", packageName)
 	}
 
+	log.Printf("updating %s to version %s commit %s", packageName, newVersion.Version, newVersion.Commit)
+
 	// if new versions are available lets bump the packages in the target melange git repo
-	err := melange.Bump(ctx, configFile, newVersion.Version, newVersion.Commit)
+	err = melange.Bump(ctx, configFile, newVersion.Version, newVersion.Commit)
 	if err != nil {
 		// add this to the list of messages to print at the end of the update
 		return fmt.Sprintf("failed to bump package %s to version %s: %s", packageName, newVersion.Version, err.Error()), nil
@@ -373,19 +388,14 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		pc.Config.Package.Epoch++
 	}
 
-	worktree, err := repo.Worktree()
+	rs, err := debug(worktree)
 	if err != nil {
-		return "", fmt.Errorf("failed to get git worktree: %w", err)
+		return "", err
 	}
-
-	// this needs to be the relative path set when reading the files initially
-	fileRelPath := pc.Filename
-	if o.PkgPath != "" {
-		fileRelPath = filepath.Join(o.PkgPath, pc.Filename)
-	}
+	o.Logger.Printf("after bump: %s git status: %s", packageName, string(rs))
 
 	// for now wolfi is using a Makefile, if it exists check if the package is listed and update the version + epoch if it is
-	err = o.updateMakefile(pc.Dir, packageName, newVersion.Version, worktree)
+	err = o.updateMakefile(root, packageName, newVersion.Version, worktree)
 	if err != nil {
 		return fmt.Sprintf("failed to update Makefile: %s", err.Error()), nil
 	}
@@ -399,13 +409,13 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		}
 	}
 	// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
-	err = o.updateGitModules(pc.Dir, packageName, latestVersionWithPrefix, worktree)
+	err = o.updateGitModules(root, packageName, latestVersionWithPrefix, worktree)
 	if err != nil {
 		return fmt.Sprintf("failed to update git modules: %s", err.Error()), nil
 	}
 
 	// now make sure update config is configured
-	updated, err := config.ParseConfiguration(ctx, filepath.Join(pc.Dir, packageName+".yaml"))
+	updated, err := config.ParseConfiguration(ctx, filepath.Join(root, pc.Filename))
 	if err != nil {
 		return "", fmt.Errorf("failed to parse %v", err)
 	}
@@ -424,18 +434,24 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 
 	// Skip any processing for definitions with a single pipeline
 	if len(updated.Pipeline) > 1 {
-		if err := o.updateGoBumpDeps(updated, pc.Dir, packageName, mutations); err != nil {
+		if err := o.updateGoBumpDeps(updated, root, pc.Filename, mutations); err != nil {
 			return fmt.Sprintf("error cleaning up go/bump deps: %v", err), nil
 		}
 	}
 
+	rs, err = debug(worktree)
+	if err != nil {
+		return "", err
+	}
+	o.Logger.Printf("after clean go bumps: %s git status: %s", packageName, string(rs))
+
 	// Run yam formatter
-	err = yam.FormatConfigurationFile(pc.Dir, pc.Filename)
+	err = yam.FormatConfigurationFile(root, pc.Filename)
 	if err != nil {
 		return fmt.Sprintf("failed to format configuration file: %v", err), nil
 	}
 
-	_, err = worktree.Add(fileRelPath)
+	_, err = worktree.Add(pc.Filename)
 	if err != nil {
 		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
 	}
@@ -453,8 +469,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	return "", nil
 }
 
-func (o *Options) updateGoBumpDeps(updated *config.Configuration, dir, packageName string, mutations map[string]string) error {
-	filename := fmt.Sprintf("%s.yaml", packageName)
+func (o *Options) updateGoBumpDeps(updated *config.Configuration, dir, filename string, mutations map[string]string) error {
 	yamlContent, err := os.ReadFile(filepath.Join(dir, filename))
 	if err != nil {
 		return err
@@ -868,10 +883,10 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 
 // return updated map if an existing issue or pr for an older version should be closed
 // will also remove an update if we already have an open matching pull request or issue
-func (o *Options) removeExistingUpdates(repo *git.Repository, updates map[string]NewVersionResults) (map[string]NewVersionResults, error) {
+func (o *Options) removeExistingUpdates(repo *git.Repository) error {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
-		return updates, fmt.Errorf("failed to find git origin URL: %w", err)
+		return fmt.Errorf("failed to find git origin URL: %w", err)
 	}
 
 	client := github.NewClient(o.GitHubHTTPClient.Client)
@@ -883,22 +898,22 @@ func (o *Options) removeExistingUpdates(repo *git.Repository, updates map[string
 
 	openPRs, err := gitOpts.ListPullRequests(context.Background(), gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
-		return updates, fmt.Errorf("failed to list open pull requests for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
+		return fmt.Errorf("failed to list open pull requests for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
 	}
 
-	o.processPullRequests(updates, openPRs)
+	o.removeExistingPullRequests(openPRs)
 
 	openIssues, err := gitOpts.ListIssues(context.Background(), gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
-		return updates, fmt.Errorf("failed to list open issues for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
+		return fmt.Errorf("failed to list open issues for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
 	}
 
-	o.processIssues(updates, openIssues)
+	o.removeExistingIssues(openIssues)
 
-	return updates, nil
+	return nil
 }
 
-func (o *Options) processPullRequests(updates map[string]NewVersionResults, prs []*github.PullRequest) {
+func (o *Options) removeExistingPullRequests(prs []*github.PullRequest) {
 	for _, pr := range prs {
 		prTitle := *pr.Title
 
@@ -908,25 +923,25 @@ func (o *Options) processPullRequests(updates map[string]NewVersionResults, prs 
 			continue
 		}
 
-		v, ok := updates[packageName]
+		v, ok := o.PackagesToUpdate[packageName]
 		if !ok {
 			continue
 		}
 
 		if o.isSameVersion(packageName, v.Version, prTitle) {
 			o.Logger.Printf("pull request %s already exists for %s\n", *pr.HTMLURL, prTitle)
-			delete(updates, packageName)
+			delete(o.PackagesToUpdate, packageName)
 			continue
 		}
 
 		if o.containsOldVersion(packageName, v.Version, titleVersion, prTitle) {
 			v.ReplaceExistingPRNumber = *pr.Number
-			updates[packageName] = v
+			o.PackagesToUpdate[packageName] = v
 		}
 	}
 }
 
-func (o *Options) processIssues(updates map[string]NewVersionResults, issues []*github.Issue) {
+func (o *Options) removeExistingIssues(issues []*github.Issue) {
 	for _, issue := range issues {
 		issueTitle := *issue.Title
 
@@ -936,19 +951,19 @@ func (o *Options) processIssues(updates map[string]NewVersionResults, issues []*
 			continue
 		}
 
-		v, ok := updates[packageName]
+		v, ok := o.PackagesToUpdate[packageName]
 		if !ok {
 			continue
 		}
 
 		if o.isSameVersion(packageName, v.Version, issueTitle) {
-			delete(updates, packageName)
+			delete(o.PackagesToUpdate, packageName)
 			continue
 		}
 
 		if o.containsOldVersion(packageName, v.Version, titleVersion, issueTitle) {
 			v.ReplaceExistingPRNumber = *issue.Number
-			updates[packageName] = v
+			o.PackagesToUpdate[packageName] = v
 		}
 	}
 }
