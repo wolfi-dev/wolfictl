@@ -33,7 +33,7 @@ func (o *Options) CodeSearch(ctx context.Context, pkg *Package, query string) er
 	}
 
 	md := generateMarkdown(results, query)
-	fmt.Printf("%s", md)
+	fmt.Println(md)
 
 	if len(results) > 0 {
 		return fmt.Errorf("found %d potential matches", len(results))
