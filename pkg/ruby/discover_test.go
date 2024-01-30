@@ -41,9 +41,11 @@ func TestIsRubyPackage(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		testConfig.Environment.Contents.Packages[0] = tc.input
-		got := o.isRubyPackage(testConfig)
-		assert.Equalf(t, tc.want, got, "%s wanted: %s got: %s", name, tc.want, got)
+		t.Run(name, func(t *testing.T) {
+			testConfig.Environment.Contents.Packages[0] = tc.input
+			got := o.isRubyPackage(testConfig)
+			assert.Equalf(t, tc.want, got, "%s wanted: %s got: %s", name, tc.want, got)
+		})
 	}
 }
 
@@ -71,12 +73,14 @@ func TestParseRepo(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		testConfig.Config.Pipeline[0] = config.Pipeline{
-			Uses: tc.uses,
-			With: tc.with,
-		}
-		got := parseRepo(&testConfig)
-		assert.Equalf(t, tc.want, got, "%s wanted: %s got %s", name, tc.want, got)
+		t.Run(name, func(t *testing.T) {
+			testConfig.Config.Pipeline[0] = config.Pipeline{
+				Uses: tc.uses,
+				With: tc.with,
+			}
+			got := parseRepo(&testConfig)
+			assert.Equalf(t, tc.want, got, "%s wanted: %s got %s", name, tc.want, got)
+		})
 	}
 }
 
@@ -108,11 +112,13 @@ func TestParseRef(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		testConfig.Config.Pipeline[0] = config.Pipeline{
-			Uses: tc.uses,
-			With: tc.with,
-		}
-		got := parseRef(&testConfig)
-		assert.Equalf(t, tc.want, got, "%s wanted: %s got %s", name, tc.want, got)
+		t.Run(name, func(t *testing.T) {
+			testConfig.Config.Pipeline[0] = config.Pipeline{
+				Uses: tc.uses,
+				With: tc.with,
+			}
+			got := parseRef(&testConfig)
+			assert.Equalf(t, tc.want, got, "%s wanted: %s got %s", name, tc.want, got)
+		})
 	}
 }
