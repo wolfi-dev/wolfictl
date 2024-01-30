@@ -34,4 +34,5 @@ func checkUpdateFlags(cmd *cobra.Command, o *checks.CheckUpdateOptions) {
 
 	cmd.Flags().StringVarP(&o.Dir, "directory", "d", cwd, "directory containing melange configs")
 	cmd.Flags().StringVarP(&o.OverrideVersion, "override-version", "", "", "override the local melange config version to test an update works as expected")
+	cmd.Flags().BoolVarP(&o.EnableDependencyCleanup, "enable-dependency-cleanup", "", false, "cleanup of dependencies after testing an update")
 }
