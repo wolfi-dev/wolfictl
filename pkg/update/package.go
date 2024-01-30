@@ -148,6 +148,7 @@ func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
 	cloneOpts := &git.CloneOptions{
 		URL:               gitURL.RawURL,
 		RecurseSubmodules: git.NoRecurseSubmodules,
+		ShallowSubmodules: true,
 		Auth:              wolfigit.GetGitAuth(),
 		Tags:              git.AllTags,
 		Depth:             20,

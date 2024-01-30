@@ -361,6 +361,7 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 		ReferenceName:     plumbing.ReferenceName(fmt.Sprintf("refs/tags/%s", evaluatedTag)),
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.NoRecurseSubmodules,
+		ShallowSubmodules: true,
 		RemoteName:        "origin",
 		Depth:             1,
 		NoCheckout:        true,

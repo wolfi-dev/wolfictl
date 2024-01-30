@@ -45,6 +45,7 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 		ReferenceName:     plumbing.ReferenceName(fmt.Sprintf("refs/tags/%s", evaluatedTag)),
 		Progress:          os.Stdout,
 		RecurseSubmodules: 1,
+		ShallowSubmodules: true,
 		RemoteName:        "origin",
 		Depth:             1,
 		Auth:              wgit.GetGitAuth(),
