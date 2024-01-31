@@ -22,9 +22,15 @@ func FormatConfigurationFile(dir, filename string) error {
 		return fmt.Errorf("failed to read yam config file: %v", err)
 	}
 
+	// remove root dir from filename
+	relativeFilename, err := filepath.Rel(dir, filename)
+	if err != nil {
+		return fmt.Errorf("failed to get relative path from dir %s and file %s: %v", dir, filename, err)
+	}
+
 	fsys := osAdapter.DirFS(dir)
 	// Format file following the repo level format
-	err = yam.Format(fsys, []string{filename}, yam.FormatOptions{EncodeOptions: *encodeOptions})
+	err = yam.Format(fsys, []string{relativeFilename}, yam.FormatOptions{EncodeOptions: *encodeOptions})
 	if err != nil {
 		return fmt.Errorf("error formatting the file %s: %v", filename, err)
 	}
