@@ -112,3 +112,61 @@ func copyFile(t *testing.T, src, dst string) {
 		t.Fatal(err)
 	}
 }
+
+func TestContainsGoBump(t *testing.T) {
+	testcases := []struct {
+		name           string
+		filename       string
+		containsGoBump bool
+	}{{
+		name:           "update existing go/bump",
+		filename:       "config-1",
+		containsGoBump: true,
+	}, {
+		name:           "add go/bump",
+		filename:       "config-2",
+		containsGoBump: true,
+	}, {
+		name:           "add go/bump before go mod tidy",
+		filename:       "config-3",
+		containsGoBump: true,
+	}, {
+		name:           "cleanup gobump, empty deps",
+		filename:       "config-4",
+		containsGoBump: true,
+	}, {
+		name:           "cleanup gobump, empty replaces",
+		filename:       "config-5",
+		containsGoBump: true,
+	}, {
+		name:           "cleanup gobump and update another go/bump",
+		filename:       "config-6",
+		containsGoBump: true,
+	}, {
+		name:           "go.mod require and replace conflicting to different version of the same grpc version",
+		filename:       "config-7",
+		containsGoBump: true,
+	}, {
+		name:           "upgrade gorm version in replaces with a newer version in go.mod in a replace block",
+		filename:       "config-8",
+		containsGoBump: true,
+	}, {
+		name:           "no go/bump in the pipelines",
+		filename:       "config-9",
+		containsGoBump: false,
+	}}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := "testdata"
+			filename := fmt.Sprintf("%s.yaml", tc.filename)
+
+			// now make sure update config is configured
+			updated, err := config.ParseConfiguration(context.Background(), filepath.Join(dir, filename))
+			require.NoError(t, err)
+			exists := ContainsGoBumpPipeline(updated)
+			if tc.containsGoBump != exists {
+				t.Errorf("unexpected value for contains go/bump: got %v and expected %v", exists, tc.containsGoBump)
+			}
+		})
+	}
+}

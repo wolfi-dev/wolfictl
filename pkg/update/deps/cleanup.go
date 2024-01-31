@@ -198,6 +198,17 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 	return nil
 }
 
+// ContainsGoBumpPipeline checks whether there is a gobump in the wolfi package definition.
+// If so, we will attempt to clean the unnecessary dependencies.
+func ContainsGoBumpPipeline(updated *config.Configuration) bool {
+	for i := range updated.Pipeline {
+		if updated.Pipeline[i].Uses == "go/bump" {
+			return true
+		}
+	}
+	return false
+}
+
 func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool, mutations map[string]string) error {
 	tempDir, err := os.MkdirTemp("", "wolfibump")
 	if err != nil {
