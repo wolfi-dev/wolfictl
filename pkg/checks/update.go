@@ -317,6 +317,7 @@ func (o *CheckUpdateOptions) updateGoBumpDeps(updated *config.Configuration, dir
 	if err != nil {
 		return fmt.Errorf("error unmarshalling YAML: %v", err)
 	}
+	// NOTE: By default, we set tidy to false because we don´t want to compile the go project during updates.
 	tidy := false
 	if err := deps.CleanupGoBumpDeps(&doc, updated, tidy, mutations); err != nil {
 		return err

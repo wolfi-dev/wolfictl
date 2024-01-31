@@ -80,7 +80,7 @@ func TestCleanupDeps(t *testing.T) {
 			err = yaml.Unmarshal(yamlContent, &doc)
 			require.NoError(t, err)
 
-			err = CleanupGoBumpDeps(&doc, updated, true, mutations)
+			err = CleanupGoBumpDeps(&doc, updated, false, mutations)
 			if tc.expectedErr && err == nil {
 				t.Errorf("expected error")
 			} else if err != nil && !tc.expectedErr {
