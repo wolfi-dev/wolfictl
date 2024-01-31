@@ -434,7 +434,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	}
 
 	// Skip any processing for definitions with a single pipeline
-	if len(updated.Pipeline) > 1 {
+	if len(updated.Pipeline) > 1 && deps.ContainsGoBumpPipeline(updated) {
 		if err := o.updateGoBumpDeps(updated, root, pc.Filename, mutations); err != nil {
 			return fmt.Sprintf("error cleaning up go/bump deps: %v", err), nil
 		}

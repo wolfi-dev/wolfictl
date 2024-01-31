@@ -241,7 +241,7 @@ func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions m
 		}
 
 		// Skip any processing for definitions with a single pipeline
-		if len(updated.Pipeline) > 1 {
+		if len(updated.Pipeline) > 1 && deps.ContainsGoBumpPipeline(updated) {
 			if err := o.updateGoBumpDeps(updated, o.Dir, packageName, mutations); err != nil {
 				return fmt.Errorf("error cleaning up go/bump deps: %v", err)
 			}
