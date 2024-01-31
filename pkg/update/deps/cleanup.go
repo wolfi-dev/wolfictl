@@ -222,11 +222,8 @@ func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool,
 	}
 
 	checkedOut := false
-	for i := range updated.Pipeline {
-		// Exit whenever we deleted items
-		if i == len(updated.Pipeline) {
-			continue
-		}
+	i := 0
+	for i < len(updated.Pipeline) {
 		// TODO(hectorj2f): add support for fetch pipelines
 		if updated.Pipeline[i].Uses == "git-checkout" {
 			err := gitCheckout(&updated.Pipeline[i], tempDir, mutations)
@@ -236,23 +233,27 @@ func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool,
 			checkedOut = true
 		}
 		if checkedOut && updated.Pipeline[i].Uses == "go/bump" {
+			log.Printf("checking the pipeline: %v", updated.Pipeline[i])
+
 			// get the go/bump pipeline
 			if err := cleanupGoBumpPipelineDeps(&updated.Pipeline[i], tempDir, tidy); err != nil {
 				return err
 			}
 			if updated.Pipeline[i].With["deps"] == "" && updated.Pipeline[i].With["replaces"] == "" {
-				log.Printf("deleting the pipeline: %v", updated.Pipeline[i])
 				updated.Pipeline = slices.Delete(updated.Pipeline, i, (i + 1))
 				// Remove node from the yaml root node
 				if err := removeNodeAtIndex(pipelineNode, i); err != nil {
 					return err
 				}
-			} else {
-				if err := updateGoBumpStep(pipelineNode.Content[i], &updated.Pipeline[i]); err != nil {
-					return err
-				}
+				// deleted element in the pipeline array
+				continue
+			}
+			if err := updateGoBumpStep(pipelineNode.Content[i], &updated.Pipeline[i]); err != nil {
+				return err
 			}
 		}
+		// Increase the position in array of pipelines
+		i++
 	}
 
 	return nil
