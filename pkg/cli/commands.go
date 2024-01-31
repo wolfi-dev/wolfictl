@@ -50,6 +50,7 @@ func New() *cobra.Command {
 		cmdImage(),
 		cmdIndex(),
 		cmdLint(),
+		cmdRuby(),
 		cmdLs(),
 		cmdSVG(),
 		cmdText(),

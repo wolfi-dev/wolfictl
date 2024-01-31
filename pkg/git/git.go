@@ -66,6 +66,10 @@ func GetRemoteURL(repo *git.Repository) (*URL, error) {
 
 // ParseGitURL returns owner, repo name, errors
 func ParseGitURL(rawURL string) (*URL, error) {
+	if rawURL == "" {
+		return nil, fmt.Errorf("no URL provided")
+	}
+
 	gitURL := &URL{}
 
 	rawURL = strings.TrimSuffix(rawURL, ".git")
