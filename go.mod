@@ -8,9 +8,9 @@ require (
 	chainguard.dev/apko v0.13.4-0.20240116200834-c10dc551b827
 	chainguard.dev/melange v0.5.6
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.74.3
+	github.com/anchore/grype v0.74.4
 	github.com/anchore/stereoscope v0.0.1
-	github.com/anchore/syft v0.102.0
+	github.com/anchore/syft v0.103.1
 	github.com/chainguard-dev/clog v1.3.0
 	github.com/chainguard-dev/go-apk v0.0.0-20240116193855-4c76fbe27ad7
 	github.com/chainguard-dev/yam v0.0.1
@@ -64,7 +64,7 @@ require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20230306123547-8075edf89bb0 // indirect
 	github.com/CycloneDX/cyclonedx-go v0.8.0 // indirect
-	github.com/DataDog/zstd v1.4.5 // indirect
+	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/MakeNowJust/heredoc/v2 v2.0.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
@@ -152,7 +152,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/gnostic-models v0.6.9-0.20230804172637-c7be7c783f49 // indirect
-	github.com/google/go-containerregistry v0.18.0 // indirect
+	github.com/google/go-containerregistry v0.19.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/licensecheck v0.3.1 // indirect
@@ -249,7 +249,7 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
-	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
+	github.com/sassoftware/go-rpmutils v0.3.0 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.7.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
@@ -307,7 +307,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/gorm v1.25.5 // indirect
+	gorm.io/gorm v1.25.6 // indirect
 	k8s.io/api v0.28.4 // indirect
 	k8s.io/client-go v0.28.4 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
