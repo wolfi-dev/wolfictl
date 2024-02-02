@@ -32,9 +32,6 @@ type Rule struct {
 	// Severity is the severity of the rule.
 	Severity Severity
 
-	// ForbidNolint forbids the use of nolint directives for this rule.
-	ForbidNolint bool
-
 	// LintFunc is the function that lints a single configuration.
 	LintFunc Function
 
