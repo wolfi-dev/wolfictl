@@ -290,8 +290,6 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Name:        "bad-version",
 			Description: "version is malformed",
 			Severity:    SeverityError,
-			// Bad versioning results in `package file format error` while attempting to install with `apk add`
-			ForbidNolint: true,
 			LintFunc: func(config config.Configuration) error {
 				version := config.Package.Version
 				if err := versions.ValidateWithoutEpoch(version); err != nil {
