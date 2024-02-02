@@ -249,7 +249,7 @@ func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addDistroDirFlag(&p.packagesRepoDir, cmd)
 	cmd.Flags().StringSliceVarP(&p.packages, flagNamePackage, "p", nil, "packages to validate")
 	cmd.Flags().BoolVar(&p.skipDiffValidation, flagNameSkipDiffValidation, false, "skip diff-based validations")
-	cmd.Flags().BoolVar(&p.skipAliasCompletenessValidation, flagNameSkipAliasCompleteness, false, "skip alias completeness validation")
+	cmd.Flags().BoolVar(&p.skipAliasCompletenessValidation, flagNameSkipAliasCompleteness, true, "skip alias completeness validation")
 	cmd.Flags().BoolVar(&p.skipPackageExistenceValidation, flagNameSkipPackageExistence, false, "skip package configuration existence validation")
 	addPackageRepoURLFlag(&p.packageRepositoryURL, cmd)
 }
