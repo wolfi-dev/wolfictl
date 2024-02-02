@@ -287,7 +287,10 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 	if !ok {
 		return nil, fmt.Errorf("unable to find resolver for %s", resolverKey)
 	}
-	resolved, err := resolver.ResolvePackage(dep)
+
+	// disqualified packages
+	dq := map[*apk.RepositoryPackage]string{}
+	resolved, err := resolver.ResolvePackage(dep, dq)
 	switch {
 	case (err != nil || len(resolved) == 0) && g.opts.allowUnresolved:
 		if err := g.addDanglingPackage(dep, c); err != nil {
