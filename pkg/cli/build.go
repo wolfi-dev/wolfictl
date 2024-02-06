@@ -48,6 +48,7 @@ func cmdBuild() *cobra.Command {
 			}
 
 			newTask := func(ctx context.Context, pkg string) *task {
+				ctx, cancel := context.WithCancel(ctx)
 				return &task{
 					pkg:         pkg,
 					dir:         dir,
@@ -56,6 +57,7 @@ func cmdBuild() *cobra.Command {
 					archs:       archs,
 					dryrun:      dryrun,
 					ctx:         ctx,
+					cancel:      cancel,
 					deps:        map[string]<-chan struct{}{},
 					jobch:       jobch,
 				}
@@ -149,18 +151,18 @@ type task struct {
 	archs                         []string
 	dryrun                        bool
 
-	err   error
-	deps  map[string]<-chan struct{}
-	ctx   context.Context
-	jobch chan struct{}
+	err    error
+	deps   map[string]<-chan struct{}
+	ctx    context.Context
+	cancel context.CancelFunc
+	jobch  chan struct{}
 }
 
 func (t *task) start(ctx context.Context) {
 	log := clog.FromContext(ctx).With("pkg", t.pkg)
 	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel() // signal that we're done, one way or another.
+	defer t.cancel() // signal that we're done, one way or another.
 
 	tick := time.NewTicker(30 * time.Second)
 	defer tick.Stop()
