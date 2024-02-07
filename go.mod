@@ -11,7 +11,7 @@ require (
 	github.com/anchore/grype v0.74.4
 	github.com/anchore/stereoscope v0.0.1
 	github.com/anchore/syft v0.103.1
-	github.com/chainguard-dev/clog v1.3.0
+	github.com/chainguard-dev/clog v1.3.1
 	github.com/chainguard-dev/go-apk v0.0.0-20240131184508-79426d58f590
 	github.com/chainguard-dev/yam v0.0.1
 	github.com/charmbracelet/bubbles v0.18.0
