@@ -245,6 +245,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 	sboms := make([]*sbomSyft.SBOM, len(inputs))
 	files := make([]*os.File, len(inputs))
 	scans := make([]scan.Result, len(inputs))
+	errs := make([]error, len(inputs))
 
 	var inputPathsFailingRequireZero []string
 
@@ -264,6 +265,13 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 			}
 
 			input := inputs[i]
+
+			if err := errs[i]; err != nil {
+				if p.outputFormat == outputFormatOutline {
+					fmt.Printf("❌ Skipping scan because SBOM generation failed for %q: %v\n", input, err)
+				}
+			}
+
 			file := files[i]
 			apkSBOM := sboms[i]
 
@@ -291,19 +299,25 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 		i, input := i, input
 
 		g.Go(func() error {
-			inputFile, err := resolveInputFileFromArg(input)
-			if err != nil {
-				return fmt.Errorf("failed to open input file: %w", err)
+			f := func() error {
+				inputFile, err := resolveInputFileFromArg(input)
+				if err != nil {
+					return fmt.Errorf("failed to open input file: %w", err)
+				}
+
+				// Get the SBOM of the APK
+				apkSBOM, err := p.generateSBOM(inputFile)
+				if err != nil {
+					return fmt.Errorf("failed to generate SBOM: %w", err)
+				}
+
+				sboms[i] = apkSBOM
+				files[i] = inputFile
+
+				return nil
 			}
 
-			// Get the SBOM of the APK
-			apkSBOM, err := p.generateSBOM(inputFile)
-			if err != nil {
-				return fmt.Errorf("failed to generate SBOM: %w", err)
-			}
-
-			sboms[i] = apkSBOM
-			files[i] = inputFile
+			errs[i] = f()
 
 			// Signals to the other goroutine that inputs[i] is ready to scan.
 			close(done[i])
@@ -312,7 +326,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 		})
 	}
 
-	return scans, inputPathsFailingRequireZero, g.Wait()
+	return scans, inputPathsFailingRequireZero, errors.Join(g.Wait(), errors.Join(errs...))
 }
 
 type scanParams struct {
