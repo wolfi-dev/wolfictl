@@ -1,8 +1,10 @@
 package scan
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path"
 	"time"
@@ -138,6 +140,21 @@ func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 		dbStatus:             dbStatus,
 		vulnerabilityMatcher: vulnerabilityMatcher,
 	}, nil
+}
+
+// ScanAPK scans an APK file for vulnerabilities.
+func (s *Scanner) ScanAPK(ctx context.Context, apk fs.File, distroID string) (*Result, error) {
+	stat, err := apk.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat APK file: %w", err)
+	}
+
+	ssbom, err := sbom.CachedGenerate(ctx, stat.Name(), apk, distroID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate SBOM from APK: %w", err)
+	}
+
+	return s.APKSBOM(ssbom)
 }
 
 // APKSBOM scans an SBOM of an APK for vulnerabilities.

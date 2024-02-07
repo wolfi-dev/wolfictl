@@ -98,12 +98,12 @@ func DetectFromDir(dir string) (Distro, error) {
 	return Distro{}, fmt.Errorf("unable to detect distro")
 }
 
-var errNotDistroRepo = fmt.Errorf("directory is not a distro (packages) or advisories repository")
+var ErrNotDistroRepo = fmt.Errorf("directory is not a distro (packages) or advisories repository")
 
 func identifyDistroFromLocalRepoDir(dir string) (Distro, error) {
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
-		return Distro{}, fmt.Errorf("unable to identify distro: couldn't open git repo: %w", err)
+		return Distro{}, fmt.Errorf("unable to identify distro: couldn't open git repo: %v: %w", err, ErrNotDistroRepo)
 	}
 
 	config, err := repo.Config()
@@ -151,7 +151,7 @@ func identifyDistroFromLocalRepoDir(dir string) (Distro, error) {
 		}
 	}
 
-	return Distro{}, errNotDistroRepo
+	return Distro{}, ErrNotDistroRepo
 }
 
 func findRepoForkPoint(repoDir, remoteName string) (string, error) {
