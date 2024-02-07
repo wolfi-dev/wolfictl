@@ -19,7 +19,7 @@ import (
 	"go.lsp.dev/uri"
 
 	"github.com/chainguard-dev/clog"
-	apk "github.com/chainguard-dev/go-apk/pkg/apk"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
 const (
