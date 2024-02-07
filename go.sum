@@ -1,7 +1,7 @@
 chainguard.dev/apko v0.14.1-0.20240206202751-84eea7366c4f h1:nlGj63CO5Znr45zOhDYgpT+S2sTcOdEcfvIhyCtT9DI=
 chainguard.dev/apko v0.14.1-0.20240206202751-84eea7366c4f/go.mod h1:HRIjc83QXHjusopq8ZmBxFfPrBA+ZjBZZXNs3v+ydAo=
-chainguard.dev/melange v0.5.7-0.20240202152117-9e4bb5babe85 h1:GojCjxW0L4qoj4Hq9RnidYgpNR+BINhnkM6riwBWcMI=
-chainguard.dev/melange v0.5.7-0.20240202152117-9e4bb5babe85/go.mod h1:91jKRvrWkSoaHHW4G9m0oE0AFla65AhjjGpNnlWKHm0=
+chainguard.dev/melange v0.5.9 h1:yNGxYQFNv2U4Cmi8ebEPytFufnZL6s+nuBiwYqUo7ec=
+chainguard.dev/melange v0.5.9/go.mod h1:NUHL3Mx78PttIbwrpL4bcfKYoM+9F+LuCucO1Bv+q2Y=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=
@@ -177,8 +177,8 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 cloud.google.com/go/storage v1.22.1/go.mod h1:S8N1cAStu7BOeFfE8KAQzmyyLkK8p/vmRq6kuBTW58Y=
 cloud.google.com/go/storage v1.23.0/go.mod h1:vOEEDNFnciUMhBeT6hsJIn3ieU5cFRmzeLgDvXzfIXc=
 cloud.google.com/go/storage v1.27.0/go.mod h1:x9DOL8TK/ygDUMieqwfhdpQryTeEkhGKMi80i/iqR2s=
-cloud.google.com/go/storage v1.36.0 h1:P0mOkAcaJxhCTvAkMhxMfrTKiNcub4YmmPBtlhAyTr8=
-cloud.google.com/go/storage v1.36.0/go.mod h1:M6M/3V/D3KpzMTJyPOR/HU6n2Si5QdaXYEsng2xgOs8=
+cloud.google.com/go/storage v1.37.0 h1:WI8CsaFO8Q9KjPVtsZ5Cmi0dXV25zMoX0FklT7c3Jm4=
+cloud.google.com/go/storage v1.37.0/go.mod h1:i34TiT2IhiNDmcj65PqwCjcoUX7Z5pLzS8DEmoiFq1k=
 cloud.google.com/go/talent v1.1.0/go.mod h1:Vl4pt9jiHKvOgF9KoZo6Kob9oV4lwd/ZD5Cto54zDRw=
 cloud.google.com/go/talent v1.2.0/go.mod h1:MoNF9bhFQbiJ6eFD3uSsg0uBALw4n4gaCaEjBw9zo8g=
 cloud.google.com/go/videointelligence v1.6.0/go.mod h1:w0DIDlVRKtwPCn/C4iwZIJdvC69yInhW0cfi+p546uU=

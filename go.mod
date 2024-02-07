@@ -6,7 +6,7 @@ toolchain go1.21.5
 
 require (
 	chainguard.dev/apko v0.14.1-0.20240206202751-84eea7366c4f
-	chainguard.dev/melange v0.5.7-0.20240202152117-9e4bb5babe85
+	chainguard.dev/melange v0.5.9
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.4
 	github.com/anchore/stereoscope v0.0.1
@@ -60,7 +60,7 @@ require (
 	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.5 // indirect
-	cloud.google.com/go/storage v1.36.0 // indirect
+	cloud.google.com/go/storage v1.37.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20230306123547-8075edf89bb0 // indirect
