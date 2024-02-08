@@ -335,6 +335,45 @@ func TestValidate(t *testing.T) {
 			}
 		})
 	})
+
+	t.Run("duplicate advisories", func(t *testing.T) {
+		cases := []struct {
+			name          string
+			shouldBeValid bool
+		}{
+			{
+				name:          "duplicate-advisory-by-id",
+				shouldBeValid: false,
+			},
+			{
+				name:          "duplicate-advisory-by-id-and-alias",
+				shouldBeValid: false,
+			},
+			{
+				name:          "no-duplicates",
+				shouldBeValid: true,
+			},
+		}
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				dir := filepath.Join("testdata", "validate", tt.name)
+				fsys := rwos.DirFS(dir)
+				index, err := v2.NewIndex(fsys)
+				require.NoError(t, err)
+
+				err = Validate(context.Background(), ValidateOptions{
+					AdvisoryDocs: index,
+				})
+				if tt.shouldBeValid && err != nil {
+					t.Errorf("should be valid but got error: %v", err)
+				}
+				if !tt.shouldBeValid && err == nil {
+					t.Error("shouldn't be valid but got no error")
+				}
+			})
+		}
+	})
 }
 
 func distroWithKo(t *testing.T) *configs.Index[config.Configuration] {
