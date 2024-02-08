@@ -1,7 +1,7 @@
-chainguard.dev/apko v0.14.1-0.20240206202751-84eea7366c4f h1:nlGj63CO5Znr45zOhDYgpT+S2sTcOdEcfvIhyCtT9DI=
-chainguard.dev/apko v0.14.1-0.20240206202751-84eea7366c4f/go.mod h1:HRIjc83QXHjusopq8ZmBxFfPrBA+ZjBZZXNs3v+ydAo=
-chainguard.dev/melange v0.5.9 h1:yNGxYQFNv2U4Cmi8ebEPytFufnZL6s+nuBiwYqUo7ec=
-chainguard.dev/melange v0.5.9/go.mod h1:NUHL3Mx78PttIbwrpL4bcfKYoM+9F+LuCucO1Bv+q2Y=
+chainguard.dev/apko v0.14.1-0.20240207151428-faf3e41d1a71 h1:vXOlwhpJIpa0nUABrkqp026pcsW84AhMC3CtshOZYeE=
+chainguard.dev/apko v0.14.1-0.20240207151428-faf3e41d1a71/go.mod h1:fEYr33zuMtpalgyPGEjOT43WdKYYRn8Y80Y/BApyINw=
+chainguard.dev/melange v0.5.10 h1:BIxnu6Rx69a2GhCYYVST6rI3Z5+4I9dEpvp6oI8wHhs=
+chainguard.dev/melange v0.5.10/go.mod h1:TwZEvEFerDeAL5OmPOQ43NqA/95v/G1XXCCh/2lyFA8=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=
@@ -311,8 +311,8 @@ github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/chainguard-dev/clog v1.3.1 h1:CDNCty5WKQhJzoOPubk0GdXt+bPQyargmfClqebrpaQ=
 github.com/chainguard-dev/clog v1.3.1/go.mod h1:cV516KZWqYc/phZsCNwF36u/KMGS+Gj5Uqeb8Hlp95Y=
-github.com/chainguard-dev/go-apk v0.0.0-20240131184508-79426d58f590 h1:JrEDEsQm7KqVApLL//o9JvSqESe7pn+L3oXCHQuvPl0=
-github.com/chainguard-dev/go-apk v0.0.0-20240131184508-79426d58f590/go.mod h1:OdsmvVJb8RNVcTVQ7x07L319LLeiRaRnnsmj8qBBgb4=
+github.com/chainguard-dev/go-apk v0.0.0-20240207141231-4a3a18e598d6 h1:EV1GSw01XEbGAUElsHbVzG2N1+pGuewP2wmzcy+9MbM=
+github.com/chainguard-dev/go-apk v0.0.0-20240207141231-4a3a18e598d6/go.mod h1:OdsmvVJb8RNVcTVQ7x07L319LLeiRaRnnsmj8qBBgb4=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e h1:MiWG71ge3/KiR2fW9R8MFHck4NbCtuwD6NpOXcZQ1qo=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e/go.mod h1:obzGv2cx3tkRgkLQADSPaRl3OEsYmyfSv7t2Wu60tZw=
 github.com/chainguard-dev/kontext v0.1.0 h1:GFnDRZiqa+anUi7tzZMECXr0nwt4Eo/zMzTQPLRXUIs=
