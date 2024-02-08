@@ -98,18 +98,23 @@ func (advs Advisories) Validate() error {
 	}
 
 	seenIDs := make(map[string]bool)
+	var duplicateErrs []error
 	for _, adv := range advs {
 		if _, ok := seenIDs[adv.ID]; ok {
-			return fmt.Errorf("%s: %w", adv.ID, ErrAdvisoryIDDuplicated)
+			duplicateErrs = append(duplicateErrs, fmt.Errorf("%s: %w", adv.ID, ErrAdvisoryIDDuplicated))
 		}
 		seenIDs[adv.ID] = true
 
 		for _, alias := range adv.Aliases {
 			if _, ok := seenIDs[alias]; ok {
-				return fmt.Errorf("%s: %w", alias, ErrAdvisoryIDDuplicatedAsAlias)
+				duplicateErrs = append(duplicateErrs, fmt.Errorf("%s: %w", alias, ErrAdvisoryAliasDuplicated))
 			}
 			seenIDs[alias] = true
 		}
+	}
+
+	if len(duplicateErrs) > 0 {
+		return errorhelpers.LabelError("advisories", errors.Join(duplicateErrs...))
 	}
 
 	return errorhelpers.LabelError("advisories",
@@ -120,8 +125,8 @@ func (advs Advisories) Validate() error {
 }
 
 var (
-	ErrAdvisoryIDDuplicated        = errors.New("advisory ID is not unique")
-	ErrAdvisoryIDDuplicatedAsAlias = errors.New("advisory ID duplicates an alias ID in the same document")
+	ErrAdvisoryIDDuplicated    = errors.New("advisory ID is not unique")
+	ErrAdvisoryAliasDuplicated = errors.New("advisory alias is not unique")
 )
 
 // Get returns the advisory with the given ID. If such an advisory does not
