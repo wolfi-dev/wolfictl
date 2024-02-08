@@ -97,12 +97,37 @@ func (advs Advisories) Validate() error {
 		return fmt.Errorf("this file should not exist if there are no advisories recorded")
 	}
 
+	seenIDs := make(map[string]bool)
+	var duplicateErrs []error
+	for _, adv := range advs {
+		if _, ok := seenIDs[adv.ID]; ok {
+			duplicateErrs = append(duplicateErrs, fmt.Errorf("%s: %w", adv.ID, ErrAdvisoryIDDuplicated))
+		}
+		seenIDs[adv.ID] = true
+
+		for _, alias := range adv.Aliases {
+			if _, ok := seenIDs[alias]; ok {
+				duplicateErrs = append(duplicateErrs, fmt.Errorf("%s: %w", alias, ErrAdvisoryAliasDuplicated))
+			}
+			seenIDs[alias] = true
+		}
+	}
+
+	if len(duplicateErrs) > 0 {
+		return errorhelpers.LabelError("advisories", errors.Join(duplicateErrs...))
+	}
+
 	return errorhelpers.LabelError("advisories",
 		errors.Join(lo.Map(advs, func(adv Advisory, _ int) error {
 			return adv.Validate()
 		})...),
 	)
 }
+
+var (
+	ErrAdvisoryIDDuplicated    = errors.New("advisory ID is not unique")
+	ErrAdvisoryAliasDuplicated = errors.New("advisory alias is not unique")
+)
 
 // Get returns the advisory with the given ID. If such an advisory does not
 // exist, the second return value will be false; otherwise it will be true.
