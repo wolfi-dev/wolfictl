@@ -111,7 +111,7 @@ func documentDiff(a, b v2.Document) DocumentDiffResult {
 		advA, _ := a.Advisories.Get(id)
 		advB, _ := b.Advisories.Get(id)
 
-		diff := diff(advA, advB)
+		diff := advisoryDiff(advA, advB)
 		if !diff.IsZero() {
 			result.Modified = append(result.Modified, diff)
 		}
@@ -120,10 +120,10 @@ func documentDiff(a, b v2.Document) DocumentDiffResult {
 	return result
 }
 
-// diff takes two advisories and if they are different, returns a DiffResult
+// advisoryDiff takes two advisories and if they are different, returns a DiffResult
 // wrapping the two advisories; otherwise if they are the same, it returns a
 // zero-value DiffResult.
-func diff(a, b v2.Advisory) DiffResult {
+func advisoryDiff(a, b v2.Advisory) DiffResult {
 	if reflect.DeepEqual(a, b) {
 		return DiffResult{}
 	}
