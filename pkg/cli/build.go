@@ -12,6 +12,8 @@ import (
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
+	"chainguard.dev/melange/pkg/container"
+	"chainguard.dev/melange/pkg/container/docker"
 	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
@@ -221,6 +223,12 @@ func (t *task) do(ctx context.Context) error {
 			log.Infof("DRYRUN: would have built %s", apkPath)
 			continue
 		}
+
+		runner, err := newRunner(ctx, t.runner)
+		if err != nil {
+			return fmt.Errorf("creating runner: %w", err)
+		}
+
 		log.Infof("will build: %s", apkPath)
 		bc, err := build.New(ctx,
 			build.WithArch(types.ParseArchitecture(arch)),
@@ -229,7 +237,7 @@ func (t *task) do(ctx context.Context) error {
 			build.WithExtraKeys([]string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}), // TODO: flag
 			build.WithExtraRepos([]string{"https://packages.wolfi.dev/os"}),                      // TODO: flag
 			build.WithSigningKey(filepath.Join(t.dir, "local-melange.rsa")),
-			build.WithRunner(t.runner),
+			build.WithRunner(runner),
 			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
 			build.WithNamespace("wolfi"), // TODO: flag
 			build.WithSourceDir(sdir),
@@ -259,4 +267,15 @@ func (t *task) wait(ctx context.Context) error {
 	case <-ctx.Done(): // The parent context was cancelled.
 		return ctx.Err()
 	}
+}
+
+func newRunner(ctx context.Context, runner string) (container.Runner, error) {
+	switch runner {
+	case "docker":
+		return docker.NewRunner(ctx)
+	case "bubblewrap":
+		return container.BubblewrapRunner(), nil
+	}
+
+	return nil, fmt.Errorf("runner %q not supported", runner)
 }
