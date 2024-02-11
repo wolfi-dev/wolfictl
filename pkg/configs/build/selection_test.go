@@ -1,6 +1,7 @@
 package build
 
 import (
+	"context"
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
@@ -13,7 +14,7 @@ import (
 func TestSelection(t *testing.T) {
 	fsys := rwos.DirFS("testdata/index-1")
 
-	index, err := configs.NewIndex[config.Configuration](fsys, newConfigurationDecodeFunc(fsys))
+	index, err := configs.NewIndex[config.Configuration](context.Background(), fsys, newConfigurationDecodeFunc(fsys))
 	require.NoError(t, err)
 
 	s := index.Select()

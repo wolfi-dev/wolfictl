@@ -64,7 +64,7 @@ than attempting any kind of merge of the separate advisories.
 			}
 
 			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryDocs, err := v2.NewIndex(advisoriesFsys)
+			advisoryDocs, err := v2.NewIndex(cmd.Context(), advisoriesFsys)
 			if err != nil {
 				return err
 			}

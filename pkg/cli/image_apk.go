@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"slices"
@@ -81,7 +82,7 @@ func cmdImageAPK() *cobra.Command {
 				return nil
 			}
 
-			configPaths, err := apkConfigPaths(apks, p.distroDirPaths)
+			configPaths, err := apkConfigPaths(cmd.Context(), apks, p.distroDirPaths)
 			if err != nil {
 				return fmt.Errorf("unable to find configuration files for APK packages: %w", err)
 			}
@@ -205,12 +206,12 @@ func (r *syftResults) indexPackageOwnerships() (ownershipsByOwnedName, error) {
 	return index, nil
 }
 
-func apkConfigPaths(apks []pkg.Package, distroDirPaths []string) ([]string, error) {
+func apkConfigPaths(ctx context.Context, apks []pkg.Package, distroDirPaths []string) ([]string, error) {
 	configIndexes := make([]*configs.Index[config.Configuration], 0, len(distroDirPaths))
 	indexRootPaths := make([]string, 0, len(distroDirPaths))
 
 	for _, p := range distroDirPaths {
-		index, err := build.NewIndex(rwos.DirFS(p))
+		index, err := build.NewIndex(ctx, rwos.DirFS(p))
 		if err != nil {
 			return nil, fmt.Errorf("unable to index configuration files from %q: %w", p, err)
 		}

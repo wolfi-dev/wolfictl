@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -16,7 +17,7 @@ type CreateOptions struct {
 
 // Create creates a new advisory in the `advisories` section of the document at
 // the provided path.
-func Create(req Request, opts CreateOptions) error {
+func Create(ctx context.Context, req Request, opts CreateOptions) error {
 	err := req.Validate()
 	if err != nil {
 		return err
@@ -28,7 +29,7 @@ func Create(req Request, opts CreateOptions) error {
 	switch count {
 	case 0:
 		// i.e. no advisories file for this package yet
-		return createAdvisoryConfig(opts.AdvisoryDocs, req)
+		return createAdvisoryConfig(ctx, opts.AdvisoryDocs, req)
 
 	case 1:
 		newAdvisoryID := req.VulnerabilityID
@@ -52,13 +53,13 @@ func Create(req Request, opts CreateOptions) error {
 
 			return advisories, nil
 		})
-		err := documents.Update(u)
+		err := documents.Update(ctx, u)
 		if err != nil {
 			return fmt.Errorf("unable to create advisory %q for %q: %w", newAdvisoryID, req.Package, err)
 		}
 
 		// Update the schema version to the latest version.
-		err = documents.Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+		err = documents.Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 		if err != nil {
 			return fmt.Errorf("unable to update schema version for %q: %w", req.Package, err)
 		}
@@ -69,7 +70,7 @@ func Create(req Request, opts CreateOptions) error {
 	return fmt.Errorf("cannot create advisory: found %d advisory documents for package %q", count, req.Package)
 }
 
-func createAdvisoryConfig(documents *configs.Index[v2.Document], req Request) error {
+func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Document], req Request) error {
 	newAdvisoryID := req.VulnerabilityID
 	newAdvisory := v2.Advisory{
 		ID:      newAdvisoryID,
@@ -77,7 +78,7 @@ func createAdvisoryConfig(documents *configs.Index[v2.Document], req Request) er
 		Events:  []v2.Event{req.Event},
 	}
 
-	err := documents.Create(fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
+	err := documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
 		SchemaVersion: v2.SchemaVersion,
 		Package: v2.Package{
 			Name: req.Package,

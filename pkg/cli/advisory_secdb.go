@@ -38,7 +38,7 @@ func cmdAdvisorySecDB() *cobra.Command {
 			indices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
 			for _, dir := range p.advisoriesRepoDirs {
 				advisoryFsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(advisoryFsys)
+				index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
 				if err != nil {
 					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
 				}

@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -16,7 +17,7 @@ type UpdateOptions struct {
 
 // Update adds a new event to an existing advisory (named by the vuln parameter)
 // in the document at the provided path.
-func Update(req Request, opts UpdateOptions) error {
+func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	vulnID := req.VulnerabilityID
 
 	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
@@ -40,13 +41,13 @@ func Update(req Request, opts UpdateOptions) error {
 
 		return advisories, nil
 	})
-	err := documents.Update(u)
+	err := documents.Update(ctx, u)
 	if err != nil {
 		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vulnID, req.Package, err)
 	}
 
 	// Update the schema version to the latest version.
-	err = documents.Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	err = documents.Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 	if err != nil {
 		return fmt.Errorf("unable to update schema version for %q: %w", req.Package, err)
 	}

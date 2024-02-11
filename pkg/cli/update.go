@@ -56,7 +56,7 @@ func cmdUpdate() *cobra.Command {
 }
 
 func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
-	updateContext := update.New()
+	updateContext := update.New(ctx)
 
 	if !o.dryRun {
 		if _, err := (ghTokenSource{}).Token(); err != nil {

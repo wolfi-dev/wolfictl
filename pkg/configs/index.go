@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -29,7 +30,7 @@ type Index[T Configuration] struct {
 	paths         []string
 	yamlRoots     []*yaml.Node
 	cfgs          []T
-	cfgDecodeFunc func(string) (*T, error)
+	cfgDecodeFunc func(context.Context, string) (*T, error)
 	byID          map[string]int
 	byName        map[string]int
 	byPath        map[string]int
@@ -39,7 +40,7 @@ type Index[T Configuration] struct {
 // filesystem. The provided cfgDecodeFunc should take a path to a YAML file in a
 // fs.FS, decode the file to type T, and return a reference the "type T" data,
 // or an error if there was a problem.
-func NewIndex[T Configuration](fsys rwfs.FS, cfgDecodeFunc func(string) (*T, error)) (*Index[T], error) {
+func NewIndex[T Configuration](ctx context.Context, fsys rwfs.FS, cfgDecodeFunc func(context.Context, string) (*T, error)) (*Index[T], error) {
 	if cfgDecodeFunc == nil {
 		return nil, errors.New("must supply a cfgDecodeFunc")
 	}
@@ -68,7 +69,7 @@ func NewIndex[T Configuration](fsys rwfs.FS, cfgDecodeFunc func(string) (*T, err
 			return nil
 		}
 
-		err = index.processAndAdd(path)
+		err = index.processAndAdd(ctx, path)
 		if err != nil {
 			return err
 		}
@@ -86,12 +87,12 @@ func NewIndex[T Configuration](fsys rwfs.FS, cfgDecodeFunc func(string) (*T, err
 // paths. The provided cfgDecodeFunc should take a path to a YAML file in a
 // fs.FS, decode the file to type T, and return a reference the "type T" data,
 // or an error if there was a problem.
-func NewIndexFromPaths[T Configuration](fsys rwfs.FS, cfgDecodeFunc func(string) (*T, error), paths ...string) (*Index[T], error) {
+func NewIndexFromPaths[T Configuration](ctx context.Context, fsys rwfs.FS, cfgDecodeFunc func(context.Context, string) (*T, error), paths ...string) (*Index[T], error) {
 	index := newIndex(cfgDecodeFunc)
 	index.fsys = fsys
 
 	for _, filepath := range paths {
-		err := index.processAndAdd(filepath)
+		err := index.processAndAdd(ctx, filepath)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +104,7 @@ func NewIndexFromPaths[T Configuration](fsys rwfs.FS, cfgDecodeFunc func(string)
 	return &index, nil
 }
 
-func newIndex[T Configuration](cfgDecodeFunc func(string) (*T, error)) Index[T] {
+func newIndex[T Configuration](cfgDecodeFunc func(context.Context, string) (*T, error)) Index[T] {
 	index := Index[T]{}
 	index.cfgDecodeFunc = cfgDecodeFunc
 	index.byID = make(map[string]int)
@@ -131,7 +132,7 @@ func (i *Index[T]) Select() Selection[T] {
 
 // Create creates a new configuration file at the given path, with the given
 // cfg. The new configuration is automatically added to the Index.
-func (i *Index[T]) Create(filepath string, cfg T) error {
+func (i *Index[T]) Create(ctx context.Context, filepath string, cfg T) error {
 	file, err := i.fsys.Create(filepath)
 	if err != nil {
 		return err
@@ -148,7 +149,7 @@ func (i *Index[T]) Create(filepath string, cfg T) error {
 		return err
 	}
 
-	err = i.processAndAdd(filepath)
+	err = i.processAndAdd(ctx, filepath)
 	if err != nil {
 		return err
 	}
@@ -195,14 +196,14 @@ func (i *Index[T]) format(filepath string) error {
 }
 
 // update updates the given entry in the index using the provided EntryUpdater.
-func (i *Index[T]) update(entry Entry[T], entryUpdater EntryUpdater[T]) error {
+func (i *Index[T]) update(ctx context.Context, entry Entry[T], entryUpdater EntryUpdater[T]) error {
 	err := entryUpdater(i, entry)
 	if err != nil {
 		return err
 	}
 
 	id := entry.id()
-	err = i.processAndUpdate(entry.getPath(), i.byID[id])
+	err = i.processAndUpdate(ctx, entry.getPath(), i.byID[id])
 	if err != nil {
 		return fmt.Errorf("unable to process and update index entry for %q: %w", id, err)
 	}
@@ -213,8 +214,8 @@ func (i *Index[T]) update(entry Entry[T], entryUpdater EntryUpdater[T]) error {
 // processAndAdd decodes the configuration file at the given path into both a
 // YAML AST and a configuration (type T), and it then adds a new entry to the
 // Index.
-func (i *Index[T]) processAndAdd(filepath string) error {
-	entry, err := i.process(filepath)
+func (i *Index[T]) processAndAdd(ctx context.Context, filepath string) error {
+	entry, err := i.process(ctx, filepath)
 	if err != nil {
 		return err
 	}
@@ -226,8 +227,8 @@ func (i *Index[T]) processAndAdd(filepath string) error {
 	return nil
 }
 
-func (i *Index[T]) processAndUpdate(filepath string, entryIndex int) error {
-	entry, err := i.process(filepath)
+func (i *Index[T]) processAndUpdate(ctx context.Context, filepath string, entryIndex int) error {
+	entry, err := i.process(ctx, filepath)
 	if err != nil {
 		return err
 	}
@@ -242,7 +243,7 @@ func (i *Index[T]) processAndUpdate(filepath string, entryIndex int) error {
 	return nil
 }
 
-func (i *Index[T]) process(filepath string) (*entry[T], error) {
+func (i *Index[T]) process(ctx context.Context, filepath string) (*entry[T], error) {
 	// TODO: for the follow operations, consider noting the error and moving on, rather than stopping the indexing.
 
 	f, err := i.fsys.Open(filepath)
@@ -256,7 +257,7 @@ func (i *Index[T]) process(filepath string) (*entry[T], error) {
 		return nil, fmt.Errorf("unable to decode YAML at %q: %w", filepath, err)
 	}
 
-	cfg, err := i.cfgDecodeFunc(filepath)
+	cfg, err := i.cfgDecodeFunc(ctx, filepath)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse configuration at %q: %w", filepath, err)
 	}

@@ -78,7 +78,7 @@ const (
 )
 
 // New initialise including a map of existing wolfios packages
-func New() Options {
+func New(ctx context.Context) Options {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
@@ -105,7 +105,7 @@ func New() Options {
 		},
 
 		GitHubHTTPClient: &http2.RLHTTPClient{
-			Client: oauth2.NewClient(context.Background(), ts),
+			Client: oauth2.NewClient(ctx, ts),
 
 			// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 			Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
@@ -165,7 +165,7 @@ func (o *Options) Update(ctx context.Context) error {
 			}
 
 			// skip packages for which we already have an open issue or pull request
-			err = o.removeExistingUpdates(repo)
+			err = o.removeExistingUpdates(ctx, repo)
 			if err != nil {
 				return fmt.Errorf("failed to get package updates: %w", err)
 			}
@@ -198,7 +198,7 @@ func (o *Options) Update(ctx context.Context) error {
 			continue
 		}
 		if o.CreateIssues {
-			issueURL, err := o.createErrorMessageIssue(repo, k, message)
+			issueURL, err := o.createErrorMessageIssue(ctx, repo, k, message)
 			if err != nil {
 				return err
 			}
@@ -358,7 +358,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 
 	// if manual update create an issue rather than a pull request
 	if pc.Config.Update.Manual {
-		return o.createNewVersionIssue(repo, packageName, newVersion)
+		return o.createNewVersionIssue(ctx, repo, packageName, newVersion)
 	}
 
 	worktree, err := repo.Worktree()
@@ -459,7 +459,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 
 	// if we're not running in batch mode, lets commit and PR each change
 	if !o.DryRun {
-		pr, err := o.proposeChanges(repo, ref, packageName, newVersion)
+		pr, err := o.proposeChanges(ctx, repo, ref, packageName, newVersion)
 		if err != nil {
 			return fmt.Sprintf("failed to propose changes: %s", err.Error()), nil
 		}
@@ -600,7 +600,7 @@ func (o *Options) createBranch(repo *git.Repository) (plumbing.ReferenceName, er
 }
 
 // commits package update changes and creates a pull request
-func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceName, packageName string, newVersion NewVersionResults) (string, error) {
+func (o *Options) proposeChanges(ctx context.Context, repo *git.Repository, ref plumbing.ReferenceName, packageName string, newVersion NewVersionResults) (string, error) {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return "", fmt.Errorf("failed to find git origin URL: %w", err)
@@ -670,24 +670,24 @@ func (o *Options) proposeChanges(repo *git.Repository, ref plumbing.ReferenceNam
 	}
 
 	// create the pull request
-	pr, err := gitOpts.OpenPullRequest(newPR)
+	pr, err := gitOpts.OpenPullRequest(ctx, newPR)
 	prLink := pr.GetHTMLURL()
 	if err != nil {
 		return "", fmt.Errorf("failed to create pull request: %w", err)
 	}
-	err = gitOpts.LabelIssue(context.Background(), newPR.Owner, newPR.RepoName, *pr.Number, &o.IssueLabels)
+	err = gitOpts.LabelIssue(ctx, newPR.Owner, newPR.RepoName, *pr.Number, &o.IssueLabels)
 	if err != nil {
 		log.Printf("Failed to apply labels [%s] to PR #%d", strings.Join(o.IssueLabels, ","), pr.Number)
 	}
 	if newVersion.ReplaceExistingPRNumber != 0 {
-		err = gitOpts.ClosePullRequest(context.Background(), gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)
+		err = gitOpts.ClosePullRequest(ctx, gitURL.Organisation, gitURL.Name, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
 			return "", fmt.Errorf("failed to close pull request: %d: %w", newVersion.ReplaceExistingPRNumber, err)
 		}
 
 		// comment on the closed PR the new pull request link which supersedes it
 		comment := fmt.Sprintf("superseded by %s", prLink)
-		_, err = gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, comment, newVersion.ReplaceExistingPRNumber)
+		_, err = gitOpts.CommentIssue(ctx, gitURL.Organisation, gitURL.Name, comment, newVersion.ReplaceExistingPRNumber)
 		if err != nil {
 			return "", fmt.Errorf("failed to comment pull request: %d: %w", newVersion.ReplaceExistingPRNumber, err)
 		}
@@ -732,7 +732,7 @@ func (o *Options) commitChanges(repo *git.Repository, packageName, latestVersion
 	return nil
 }
 
-func (o *Options) createErrorMessageIssue(repo *git.Repository, packageName, message string) (string, error) {
+func (o *Options) createErrorMessageIssue(ctx context.Context, repo *git.Repository, packageName, message string) (string, error) {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return "", fmt.Errorf("failed to find git origin URL: %w", err)
@@ -753,24 +753,24 @@ func (o *Options) createErrorMessageIssue(repo *git.Repository, packageName, mes
 		Title:       gh.GetErrorIssueTitle(bot, packageName),
 		Labels:      o.IssueLabels,
 	}
-	existingIssue, err := gitOpts.CheckExistingIssue(context.Background(), i)
+	existingIssue, err := gitOpts.CheckExistingIssue(ctx, i)
 	if err != nil {
 		return "", err
 	}
 
 	if existingIssue > 0 {
-		exists, err := gitOpts.HasExistingComment(context.Background(), i, existingIssue, message)
+		exists, err := gitOpts.HasExistingComment(ctx, i, existingIssue, message)
 		if exists {
 			return fmt.Sprintf("existing issue %d already exists for error message: %s", existingIssue, message), err
 		}
 		// if this is a new error add a new comment
-		return gitOpts.CommentIssue(context.Background(), gitURL.Organisation, gitURL.Name, message, existingIssue)
+		return gitOpts.CommentIssue(ctx, gitURL.Organisation, gitURL.Name, message, existingIssue)
 	}
 
-	return gitOpts.OpenIssue(context.Background(), i)
+	return gitOpts.OpenIssue(ctx, i)
 }
 
-func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string, version NewVersionResults) (string, error) {
+func (o *Options) createNewVersionIssue(ctx context.Context, repo *git.Repository, packageName string, version NewVersionResults) (string, error) {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return "", fmt.Errorf("failed to find git origin URL: %w", err)
@@ -791,7 +791,7 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 		Labels:      o.IssueLabels,
 	}
 
-	existingIssues, err := gitOpts.ListIssues(context.Background(), gitURL.Organisation, gitURL.Name, "open")
+	existingIssues, err := gitOpts.ListIssues(ctx, gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
 		return "", err
 	}
@@ -804,7 +804,7 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 	}
 
 	// create a new issue
-	issueLink, err := gitOpts.OpenIssue(context.Background(), i)
+	issueLink, err := gitOpts.OpenIssue(ctx, i)
 	if err != nil {
 		return "", err
 	}
@@ -813,7 +813,7 @@ func (o *Options) createNewVersionIssue(repo *git.Repository, packageName string
 	// if there's an existing issue with the same package but older version then close it
 	for _, issue := range existingIssues {
 		if strings.HasPrefix(*issue.Title, packageName+"/") {
-			err = gitOpts.CloseIssue(context.Background(), gitURL.Organisation, gitURL.Name, fmt.Sprintf("superseded by %s", issueLink), *issue.Number)
+			err = gitOpts.CloseIssue(ctx, gitURL.Organisation, gitURL.Name, fmt.Sprintf("superseded by %s", issueLink), *issue.Number)
 			if err != nil {
 				return "", err
 			}
@@ -885,7 +885,7 @@ func (o *Options) getPackagesToUpdate(latestVersions map[string]NewVersionResult
 
 // return updated map if an existing issue or pr for an older version should be closed
 // will also remove an update if we already have an open matching pull request or issue
-func (o *Options) removeExistingUpdates(repo *git.Repository) error {
+func (o *Options) removeExistingUpdates(ctx context.Context, repo *git.Repository) error {
 	gitURL, err := wgit.GetRemoteURL(repo)
 	if err != nil {
 		return fmt.Errorf("failed to find git origin URL: %w", err)
@@ -898,14 +898,14 @@ func (o *Options) removeExistingUpdates(repo *git.Repository) error {
 		Logger:       o.Logger,
 	}
 
-	openPRs, err := gitOpts.ListPullRequests(context.Background(), gitURL.Organisation, gitURL.Name, "open")
+	openPRs, err := gitOpts.ListPullRequests(ctx, gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
 		return fmt.Errorf("failed to list open pull requests for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
 	}
 
 	o.removeExistingPullRequests(openPRs)
 
-	openIssues, err := gitOpts.ListIssues(context.Background(), gitURL.Organisation, gitURL.Name, "open")
+	openIssues, err := gitOpts.ListIssues(ctx, gitURL.Organisation, gitURL.Name, "open")
 	if err != nil {
 		return fmt.Errorf("failed to list open issues for %s/%s: %w", gitURL.Organisation, gitURL.Name, err)
 	}

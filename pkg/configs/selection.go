@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"context"
 	"errors"
 
 	"github.com/samber/lo"
@@ -59,9 +60,9 @@ func (s Selection[T]) Len() int {
 
 // Update applies the given entryUpdater to all entries currently in the
 // Selection.
-func (s Selection[T]) Update(entryUpdater EntryUpdater[T]) error {
+func (s Selection[T]) Update(ctx context.Context, entryUpdater EntryUpdater[T]) error {
 	for _, e := range s.entries {
-		err := e.Update(entryUpdater)
+		err := e.Update(ctx, entryUpdater)
 		if err != nil {
 			if errors.Is(err, ErrSkip) {
 				continue

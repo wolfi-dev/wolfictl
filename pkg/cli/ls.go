@@ -39,7 +39,7 @@ func cmdLs() *cobra.Command {
 			indices := make([]*configs.Index[config.Configuration], 0, len(p.distroRepoDirs))
 			for _, dir := range p.distroRepoDirs {
 				distroFsys := rwos.DirFS(dir)
-				index, err := buildconfigs.NewIndex(distroFsys)
+				index, err := buildconfigs.NewIndex(cmd.Context(), distroFsys)
 				if err != nil {
 					return fmt.Errorf("unable to index build configs for directory %q: %w", dir, err)
 				}

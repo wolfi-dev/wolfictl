@@ -48,9 +48,9 @@ func cmdSBOM() *cobra.Command {
 
 			var s *sbomSyft.SBOM
 			if p.disableSBOMCache {
-				s, err = sbom.Generate(apkFilePath, apkFile, p.distro)
+				s, err = sbom.Generate(cmd.Context(), apkFilePath, apkFile, p.distro)
 			} else {
-				s, err = sbom.CachedGenerate(apkFilePath, apkFile, p.distro)
+				s, err = sbom.CachedGenerate(cmd.Context(), apkFilePath, apkFile, p.distro)
 			}
 			if err != nil {
 				return fmt.Errorf("failed to generate SBOM: %w", err)

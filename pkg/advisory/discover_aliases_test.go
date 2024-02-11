@@ -140,7 +140,7 @@ func TestDiscoverAliases(t *testing.T) {
 			// back to disk.
 			fsys := memfs.New(os.DirFS("testdata/discover_aliases/advisories"))
 
-			advisoryDocs, err := v2.NewIndex(fsys)
+			advisoryDocs, err := v2.NewIndex(context.Background(), fsys)
 			if err != nil {
 				t.Fatalf("unable to create advisory docs index: %v", err)
 			}

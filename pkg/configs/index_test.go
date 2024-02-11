@@ -14,7 +14,7 @@ func TestNewIndex(t *testing.T) {
 	ctx := context.Background()
 	fsys := rwos.DirFS("testdata/index-1")
 
-	index, err := NewIndex[config.Configuration](fsys, func(path string) (*config.Configuration, error) {
+	index, err := NewIndex[config.Configuration](ctx, fsys, func(ctx context.Context, path string) (*config.Configuration, error) {
 		return config.ParseConfiguration(ctx, path, config.WithFS(fsys))
 	})
 	require.NoError(t, err)

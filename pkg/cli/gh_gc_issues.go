@@ -40,13 +40,13 @@ wolfictl gc issues https://github.com/wolfi-dev/versions --match "version-stream
 				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 			)
 			client := &http2.RLHTTPClient{
-				Client: oauth2.NewClient(context.Background(), ts),
+				Client: oauth2.NewClient(cmd.Context(), ts),
 
 				// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 				Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
 			}
 
-			return gcIssues(client, args[0], match)
+			return gcIssues(cmd.Context(), client, args[0], match)
 		},
 	}
 
@@ -56,9 +56,8 @@ wolfictl gc issues https://github.com/wolfi-dev/versions --match "version-stream
 	return cmd
 }
 
-func gcIssues(ghclient *http2.RLHTTPClient, repo, match string) error {
+func gcIssues(ctx context.Context, ghclient *http2.RLHTTPClient, repo, match string) error {
 	logger := log.New(log.Writer(), "wolfictl gh gc issues: ", log.LstdFlags|log.Lmsgprefix)
-	ctx := context.Background()
 
 	gitURL, err := wgit.ParseGitURL(repo)
 	if err != nil {

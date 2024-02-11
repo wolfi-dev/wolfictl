@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"os"
 	"testing"
 	"time"
@@ -122,10 +123,10 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want a fresh memfs for each test case.
 			memFS := memfs.New(dirFS)
-			advisoryDocs, err := v2.NewIndex(memFS)
+			advisoryDocs, err := v2.NewIndex(context.Background(), memFS)
 			require.NoError(t, err)
 
-			err = Update(tt.req, UpdateOptions{
+			err = Update(context.Background(), tt.req, UpdateOptions{
 				AdvisoryDocs: advisoryDocs,
 			})
 

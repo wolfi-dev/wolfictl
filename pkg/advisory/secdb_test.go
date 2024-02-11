@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -65,7 +66,7 @@ func TestBuildSecurityDatabase(t *testing.T) {
 			indices := make([]*configs.Index[v2.Document], 0, len(tt.advisoryDirs))
 			for _, dir := range tt.advisoryDirs {
 				advisoryFsys := rwos.DirFS(dir)
-				advisoryCfgs, err := v2.NewIndex(advisoryFsys)
+				advisoryCfgs, err := v2.NewIndex(context.Background(), advisoryFsys)
 				require.NoError(t, err)
 				indices = append(indices, advisoryCfgs)
 			}

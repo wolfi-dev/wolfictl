@@ -39,13 +39,13 @@ wolfictl gh gc branch https://github.com/wolfi-dev/os --match "wolfictl-"
 				return errors.New("you must either pass --all to close all branches or provide a match pattern with --match")
 			}
 			client := &http2.RLHTTPClient{
-				Client: oauth2.NewClient(context.Background(), ghTokenSource{}),
+				Client: oauth2.NewClient(cmd.Context(), ghTokenSource{}),
 
 				// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
 				Ratelimiter: rate.NewLimiter(rate.Every(5*time.Second), 1),
 			}
 
-			return gcBranches(client, args[0], match)
+			return gcBranches(cmd.Context(), client, args[0], match)
 		},
 	}
 
@@ -64,9 +64,8 @@ func (ghTokenSource) Token() (*oauth2.Token, error) {
 	return nil, errors.New("could not find github token")
 }
 
-func gcBranches(ghclient *http2.RLHTTPClient, repo, match string) error {
+func gcBranches(ctx context.Context, ghclient *http2.RLHTTPClient, repo, match string) error {
 	logger := log.New(log.Writer(), "wolfictl gh gc branch: ", log.LstdFlags|log.Lmsgprefix)
-	ctx := context.Background()
 
 	gitURL, err := wgit.ParseGitURL(repo)
 	if err != nil {

@@ -1,6 +1,7 @@
 package sbom
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -32,7 +33,7 @@ func cachedSBOMPath(inputFilePath string, f io.Reader) (string, error) {
 // if a generated SBOM is already available in the cache for the given APK,
 // CachedGenerate will return the cached SBOM immediately instead of generating
 // a new SBOM.
-func CachedGenerate(inputFilePath string, f io.ReadSeeker, distroID string) (*sbom.SBOM, error) {
+func CachedGenerate(ctx context.Context, inputFilePath string, f io.ReadSeeker, distroID string) (*sbom.SBOM, error) {
 	// Check cache first
 
 	cachedPath, err := cachedSBOMPath(inputFilePath, f)
@@ -53,7 +54,7 @@ func CachedGenerate(inputFilePath string, f io.ReadSeeker, distroID string) (*sb
 			return nil, fmt.Errorf("failed to seek to start of input file: %w", err)
 		}
 
-		s, err := Generate(inputFilePath, f, distroID)
+		s, err := Generate(ctx, inputFilePath, f, distroID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
 		}

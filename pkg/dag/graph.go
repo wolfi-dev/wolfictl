@@ -87,7 +87,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 
 	localRepo := pkgs.Repository(opts.arch)
 	localRepoSource := localRepo.Source()
-	localOnlyResolver := apk.NewPkgResolver(context.TODO(), []apk.NamedIndex{localRepo})
+	localOnlyResolver := apk.NewPkgResolver(ctx, []apk.NamedIndex{localRepo})
 	g.resolvers[localRepoSource] = localOnlyResolver
 
 	// the order of adding packages is quite important:
@@ -101,7 +101,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 			continue
 		}
 		// add the origin package as its own resolver, so that the subpackage can resolve to it
-		g.resolvers[c.String()] = singlePackageResolver(c, opts.arch)
+		g.resolvers[c.String()] = singlePackageResolver(ctx, c, opts.arch)
 		for i := range c.Subpackages {
 			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
 			for _, subpkgVersion := range subpkg {
@@ -124,7 +124,8 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 
 	for _, c := range pkgs.Packages() {
 		// add packages from the runtime dependencies
-		resolverKey, err := g.addResolverForRepos(opts.arch,
+		resolverKey, err := g.addResolverForRepos(ctx,
+			opts.arch,
 			localRepo,
 			indexes,
 			keys,
@@ -144,7 +145,8 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 
 	for _, c := range pkgs.Packages() {
 		// add packages from the buildtime dependencies
-		resolverKey, err := g.addResolverForRepos(opts.arch,
+		resolverKey, err := g.addResolverForRepos(ctx,
+			opts.arch,
 			localRepo,
 			indexes,
 			keys,
@@ -172,7 +174,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 // addResolverForRepos adds a resolver for a specific set of repositories,
 // returning the resolverKey to look it up.
 // Adds the local repository if provided.
-func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, indexes map[string]apk.NamedIndex, allKeys map[string][]byte, addRepos, addKeys []string) (resolverKey string, err error) {
+func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo apk.NamedIndex, indexes map[string]apk.NamedIndex, allKeys map[string][]byte, addRepos, addKeys []string) (resolverKey string, err error) {
 	var (
 		repos       []string
 		lookupRepos = []apk.NamedIndex{}
@@ -205,7 +207,7 @@ func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, index
 		}
 	}
 	if len(repos) > 0 {
-		loadedRepos, err := apk.GetRepositoryIndexes(context.TODO(), repos, allKeys, arch)
+		loadedRepos, err := apk.GetRepositoryIndexes(ctx, repos, allKeys, arch)
 		if err != nil {
 			return "", err
 		}
@@ -234,7 +236,7 @@ func (g *Graph) addResolverForRepos(arch string, localRepo apk.NamedIndex, index
 
 	// add packages from build-time, as they could be local only, or might have upstream
 	if _, ok := g.resolvers[resolverKey]; !ok {
-		g.resolvers[resolverKey] = apk.NewPkgResolver(context.TODO(), lookupRepos)
+		g.resolvers[resolverKey] = apk.NewPkgResolver(ctx, lookupRepos)
 	}
 	return resolverKey, nil
 }
@@ -858,7 +860,7 @@ func getKeyMaterial(key string) ([]byte, error) {
 	return b, nil
 }
 
-func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
+func singlePackageResolver(ctx context.Context, pkg *Configuration, arch string) *apk.PkgResolver {
 	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
 	packages := []*apk.Package{
 		{
@@ -879,5 +881,5 @@ func singlePackageResolver(pkg *Configuration, arch string) *apk.PkgResolver {
 		Packages:    packages,
 	}
 	idx := apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
-	return apk.NewPkgResolver(context.TODO(), []apk.NamedIndex{idx})
+	return apk.NewPkgResolver(ctx, []apk.NamedIndex{idx})
 }

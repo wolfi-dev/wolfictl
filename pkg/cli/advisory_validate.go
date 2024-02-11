@@ -154,13 +154,13 @@ print an error message that specifies where and how the data is invalid.`,
 
 				logger.Debug("cloned upstream advisories repo for comparison", "dir", cloneDir)
 
-				baseAdvisoriesIndex, err = v2.NewIndex(rwos.DirFS(cloneDir))
+				baseAdvisoriesIndex, err = v2.NewIndex(cmd.Context(), rwos.DirFS(cloneDir))
 				if err != nil {
 					return fmt.Errorf("unable to create index of upstream advisories for comparison: %w", err)
 				}
 			}
 
-			advisoriesIndex, err := v2.NewIndex(rwos.DirFS(advisoriesRepoDir))
+			advisoriesIndex, err := v2.NewIndex(cmd.Context(), rwos.DirFS(advisoriesRepoDir))
 			if err != nil {
 				return fmt.Errorf("unable to create index of advisories repo: %w", err)
 			}
@@ -172,7 +172,7 @@ print an error message that specifies where and how the data is invalid.`,
 
 			var packageConfigurationsIndex *configs.Index[config.Configuration]
 			if !p.skipPackageExistenceValidation {
-				packageConfigurationsIndex, err = build.NewIndex(rwos.DirFS(packagesRepoDir))
+				packageConfigurationsIndex, err = build.NewIndex(cmd.Context(), rwos.DirFS(packagesRepoDir))
 				if err != nil {
 					return fmt.Errorf("unable to create index of distro package configurations: %w", err)
 				}

@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -58,13 +57,13 @@ func cmdAdvisoryDiscover() *cobra.Command {
 			}
 
 			advisoriesFsys := rwfsOS.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(advisoriesFsys)
+			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoriesFsys)
 			if err != nil {
 				return err
 			}
 
 			fsys := rwfsOS.DirFS(distroRepoDir)
-			buildCfgs, err := buildconfigs.NewIndex(fsys)
+			buildCfgs, err := buildconfigs.NewIndex(cmd.Context(), fsys)
 			if err != nil {
 				return fmt.Errorf("unable to select packages: %w", err)
 			}
@@ -72,7 +71,7 @@ func cmdAdvisoryDiscover() *cobra.Command {
 			selectedPackages := getSelectedOrDistroPackages(p.packageName, buildCfgs)
 			apiKey := p.resolveNVDAPIKey()
 
-			ctx := context.Background()
+			ctx := cmd.Context()
 			g, ctx := errgroup.WithContext(ctx)
 			events := make(chan interface{})
 

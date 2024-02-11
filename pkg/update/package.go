@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -24,10 +23,7 @@ import (
 	wolfigit "github.com/wolfi-dev/wolfictl/pkg/git"
 
 	"github.com/go-git/go-git/v5"
-	"golang.org/x/oauth2"
-	"golang.org/x/time/rate"
 
-	wolfihttp "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 )
 
@@ -43,27 +39,6 @@ type PackageOptions struct {
 	UseGitSign            bool
 	Logger                *log.Logger
 	GithubClient          *github.Client
-}
-
-// NewPackageOptions initialise clients
-func NewPackageOptions() PackageOptions {
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-	)
-
-	ratelimit := &wolfihttp.RLHTTPClient{
-		Client: oauth2.NewClient(context.Background(), ts),
-
-		// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
-		Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
-	}
-
-	options := PackageOptions{
-		GithubClient: github.NewClient(ratelimit.Client),
-		Logger:       log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
-	}
-
-	return options
 }
 
 func (o *PackageOptions) UpdatePackageCmd(ctx context.Context) error {
@@ -97,7 +72,7 @@ func (o *PackageOptions) UpdatePackageCmd(ctx context.Context) error {
 		return fmt.Errorf("failed to get package config for package name %s: %w", o.PackageName, err)
 	}
 
-	uo := New()
+	uo := New(ctx)
 	uo.PackageConfigs = o.PackageConfig
 	uo.DryRun = o.DryRun
 	uo.PullRequestBaseBranch = o.PullRequestBaseBranch
@@ -112,7 +87,7 @@ func (o *PackageOptions) UpdatePackageCmd(ctx context.Context) error {
 
 	// optionally update advisories based on commit since the previous release
 	if o.Advisories {
-		err := o.updateAdvisories(repo)
+		err := o.updateAdvisories(ctx, repo)
 		if err != nil {
 			return fmt.Errorf("failed to update advisories: %w", err)
 		}
@@ -135,7 +110,7 @@ func (o *PackageOptions) UpdatePackageCmd(ctx context.Context) error {
 }
 
 // if we are executing the update command in a git repository then check for CVE fixes
-func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
+func (o *PackageOptions) updateAdvisories(ctx context.Context, repo *git.Repository) error {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -188,7 +163,7 @@ func (o *PackageOptions) updateAdvisories(repo *git.Repository) error {
 	// run the equivalent of `wolfictl advisory create ./foo.melange.yaml --vuln 'CVE-2022-31130' --status 'fixed' --fixed-version '7.5.17-r1'`
 	for _, fixComment := range cveFixes {
 		o.Logger.Printf("adding advisory for %s\n", fixComment)
-		err = o.createAdvisories(fixComment)
+		err = o.createAdvisories(ctx, fixComment)
 		if err != nil {
 			return fmt.Errorf("failed to create advisory for CVE list from commits between previous tag, %s: %w", strings.Join(cveFixes, " "), err)
 		}
@@ -240,12 +215,12 @@ func (o *PackageOptions) getFixesCVEList(dir string, previous *version.Version) 
 	return fixedCVEs, nil
 }
 
-func (o *PackageOptions) createAdvisories(vuln string) error {
+func (o *PackageOptions) createAdvisories(ctx context.Context, vuln string) error {
 	p := o.PackageConfig[o.PackageName]
 	fullFilePath := filepath.Join(p.Dir, p.Filename)
 
 	fsys := rwfsOS.DirFS("/")
-	advisoryCfgs, err := v2.NewIndexFromPaths(fsys, fullFilePath)
+	advisoryCfgs, err := v2.NewIndexFromPaths(ctx, fsys, fullFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to get new index for package %s config file %s: %w", o.PackageName, p.Filename, err)
 	}
@@ -255,7 +230,7 @@ func (o *PackageOptions) createAdvisories(vuln string) error {
 		return err
 	}
 
-	err = advisory.Create(req, advisory.CreateOptions{
+	err = advisory.Create(ctx, req, advisory.CreateOptions{
 		AdvisoryDocs: advisoryCfgs,
 	})
 	if err != nil {
