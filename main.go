@@ -16,7 +16,7 @@ func main() {
 }
 
 func mainE(ctx context.Context) error {
-	ctx, done := signal.NotifyContext(context.Background(), os.Interrupt)
+	ctx, done := signal.NotifyContext(ctx, os.Interrupt)
 	defer done()
 
 	return cli.New().ExecuteContext(ctx)
