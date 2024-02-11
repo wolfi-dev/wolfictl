@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"io"
 	"os"
 	"testing"
@@ -36,7 +37,7 @@ func Test_ExportFuncs(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			advisoryFsys := rwos.DirFS(testdataDir)
-			advisoryDocs, err := v2.NewIndex(advisoryFsys)
+			advisoryDocs, err := v2.NewIndex(context.Background(), advisoryFsys)
 			require.NoError(t, err)
 			indices := []*configs.Index[v2.Document]{advisoryDocs}
 

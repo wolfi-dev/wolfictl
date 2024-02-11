@@ -71,13 +71,13 @@ required fields are missing.`,
 			}
 
 			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(advisoryFsys)
+			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoryFsys)
 			if err != nil {
 				return err
 			}
 
 			fsys := rwos.DirFS(distroRepoDir)
-			buildCfgs, err := buildconfigs.NewIndex(fsys)
+			buildCfgs, err := buildconfigs.NewIndex(cmd.Context(), fsys)
 			if err != nil {
 				return fmt.Errorf("unable to select packages: %w", err)
 			}
@@ -151,7 +151,7 @@ required fields are missing.`,
 				AdvisoryDocs: advisoryCfgs,
 			}
 
-			err = advisory.Update(req, opts)
+			err = advisory.Update(cmd.Context(), req, opts)
 			if err != nil {
 				return err
 			}

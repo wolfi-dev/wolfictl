@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -47,7 +46,7 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 			}
 
 			client := &http2.RLHTTPClient{
-				Client: oauth2.NewClient(context.Background(), ghTokenSource{}),
+				Client: oauth2.NewClient(ctx, ghTokenSource{}),
 
 				// 1 request every (n) second(s) to avoid DOS'ing server.
 				// https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits

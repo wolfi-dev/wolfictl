@@ -4,14 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
-	"time"
-
-	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
-	"golang.org/x/oauth2"
-	"golang.org/x/time/rate"
 
 	"github.com/google/go-github/v58/github"
 
@@ -31,28 +25,10 @@ type ReleaseOptions struct {
 	Dir                      string
 }
 
-func NewReleaseOptions() ReleaseOptions {
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-	)
-
-	ratelimit := &http2.RLHTTPClient{
-		Client: oauth2.NewClient(context.Background(), ts),
-
-		// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
-		Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
-	}
-
-	return ReleaseOptions{
-		GithubClient: github.NewClient(ratelimit.Client),
-		Logger:       log.New(log.Writer(), "wolfictl gh release: ", log.LstdFlags|log.Lmsgprefix),
-	}
-}
-
 const defaultStartVersion = "v0.0.0"
 
 // Release will create a new GitHub release
-func (o ReleaseOptions) Release() error {
+func (o ReleaseOptions) Release(ctx context.Context) error {
 	// get the latest git tag
 	current, err := wolfigit.GetVersionFromTag(o.Dir, 1)
 	if current == nil || err != nil {
@@ -83,7 +59,7 @@ func (o ReleaseOptions) Release() error {
 	}
 
 	// create the GitHub release
-	err = o.createGitHubRelease(next.Original())
+	err = o.createGitHubRelease(ctx, next.Original())
 	if err != nil {
 		return err
 	}
@@ -145,7 +121,7 @@ func (o ReleaseOptions) bumpReleaseVersion(current *version.Version) (*version.V
 }
 
 // createGitHubRelease creates a new release on GitHub
-func (o ReleaseOptions) createGitHubRelease(v string) error {
+func (o ReleaseOptions) createGitHubRelease(ctx context.Context, v string) error {
 	repo, err := git.PlainOpen(o.Dir)
 	if err != nil {
 		return err
@@ -161,7 +137,6 @@ func (o ReleaseOptions) createGitHubRelease(v string) error {
 		TagName: github.String(v),
 	}
 
-	ctx := context.Background()
 	release, _, err := o.GithubClient.Repositories.CreateRelease(ctx, gitURL.Organisation, gitURL.Name, input)
 	if err != nil {
 		return err
@@ -171,8 +146,7 @@ func (o ReleaseOptions) createGitHubRelease(v string) error {
 	return nil
 }
 
-func (o ReleaseOptions) GetReleaseURL(owner, repoName, v string) (string, error) {
-	ctx := context.Background()
+func (o ReleaseOptions) GetReleaseURL(ctx context.Context, owner, repoName, v string) (string, error) {
 	release, _, err := o.GithubClient.Repositories.GetReleaseByTag(ctx, owner, repoName, v)
 	if err != nil {
 		return "", fmt.Errorf("failed to get github release for %s/%s tag %s: %w", owner, repoName, v, err)

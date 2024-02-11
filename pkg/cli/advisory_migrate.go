@@ -82,7 +82,7 @@ func cmdAdvisoryMigrate() *cobra.Command {
 			advisoriesRepoDir := "."
 
 			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
-			v1Index, err := v1.NewIndex(advisoriesFsys)
+			v1Index, err := v1.NewIndex(cmd.Context(), advisoriesFsys)
 			if err != nil {
 				return err
 			}

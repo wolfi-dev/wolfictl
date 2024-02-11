@@ -25,7 +25,7 @@ import (
 )
 
 // Generate creates an SBOM for the given APK file.
-func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
+func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
 	// Create a temp directory to house the unpacked APK file
 	tempDir, err := os.MkdirTemp("", "wolfictl-sbom-*")
 	if err != nil {
@@ -67,7 +67,7 @@ func Generate(inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, e
 		),
 	)
 
-	createdSBOM, err := syft.CreateSBOM(context.Background(), src, cfg)
+	createdSBOM, err := syft.CreateSBOM(ctx, src, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SBOM: %w", err)
 	}

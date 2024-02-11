@@ -64,7 +64,7 @@ investigation over time for a given package/vulnerability match.'
 			}
 
 			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(advisoriesFsys)
+			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoriesFsys)
 			if err != nil {
 				return err
 			}

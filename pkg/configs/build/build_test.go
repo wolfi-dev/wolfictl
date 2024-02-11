@@ -1,6 +1,7 @@
 package build
 
 import (
+	"context"
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
@@ -20,7 +21,7 @@ func TestBuildConfigsIndex(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	index, err := NewIndexFromPaths(fsys, testfiles...)
+	index, err := NewIndexFromPaths(context.Background(), fsys, testfiles...)
 	require.NoError(t, err)
 
 	const modifiedPackageName = "foobar"
@@ -32,7 +33,7 @@ func TestBuildConfigsIndex(t *testing.T) {
 	})
 
 	s := index.Select().WhereName("cheese")
-	err = s.Update(packageSectionUpdater)
+	err = s.Update(context.Background(), packageSectionUpdater)
 	require.NoError(t, err)
 
 	if diff := fsys.DiffAll(); diff != "" {
@@ -52,7 +53,7 @@ func TestBuildConfigsIndexUpdatePipelines(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	index, err := NewIndexFromPaths(fsys, testfiles...)
+	index, err := NewIndexFromPaths(context.Background(), fsys, testfiles...)
 	require.NoError(t, err)
 
 	pipelineSectionUpdater := NewPipelineSectionUpdater(func(cfg config.Configuration) ([]config.Pipeline, error) {
@@ -62,7 +63,7 @@ func TestBuildConfigsIndexUpdatePipelines(t *testing.T) {
 	})
 
 	s := index.Select().WhereName("blah")
-	err = s.Update(pipelineSectionUpdater)
+	err = s.Update(context.Background(), pipelineSectionUpdater)
 	require.NoError(t, err)
 
 	if diff := fsys.DiffAll(); diff != "" {
@@ -81,7 +82,7 @@ func TestBuildConfigsIndexUpdateSubpackages(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	index, err := NewIndexFromPaths(fsys, testfiles...)
+	index, err := NewIndexFromPaths(context.Background(), fsys, testfiles...)
 	require.NoError(t, err)
 
 	const modifiedSubPackageName = "foobar"
@@ -92,7 +93,7 @@ func TestBuildConfigsIndexUpdateSubpackages(t *testing.T) {
 	})
 
 	s := index.Select().WhereName("blah")
-	err = s.Update(subpackagesSectionUpdater)
+	err = s.Update(context.Background(), subpackagesSectionUpdater)
 	require.NoError(t, err)
 
 	if diff := fsys.DiffAll(); diff != "" {

@@ -34,8 +34,8 @@ type CheckUpdateOptions struct {
 }
 
 // SetupUpdate will create the options needed to call wolfictl update functions
-func SetupUpdate() (*update.Options, lint.EvalRuleErrors) {
-	o := update.New()
+func SetupUpdate(ctx context.Context) (*update.Options, lint.EvalRuleErrors) {
+	o := update.New(ctx)
 	o.GithubReleaseQuery = true
 	o.ReleaseMonitoringQuery = true
 	o.ErrorMessages = make(map[string]string)
@@ -47,7 +47,7 @@ func SetupUpdate() (*update.Options, lint.EvalRuleErrors) {
 
 // CheckUpdates will use the melange update config to get the latest versions and validate fetch and git-checkout pipelines
 func (o CheckUpdateOptions) CheckUpdates(ctx context.Context, files []string) error {
-	updateOpts, checkErrors := SetupUpdate()
+	updateOpts, checkErrors := SetupUpdate(ctx)
 
 	changedPackages := GetPackagesToUpdate(files)
 
@@ -254,7 +254,7 @@ func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions m
 		}
 
 		// download or git clone sources into a temp folder to validate the update config
-		verifyPipelines(o, updated, mutations, checkErrors)
+		verifyPipelines(ctx, o, updated, mutations, checkErrors)
 	}
 	return nil
 }
@@ -265,13 +265,13 @@ func applyOverrides(options *CheckUpdateOptions, dryRunConfig *config.Configurat
 	}
 }
 
-func verifyPipelines(o CheckUpdateOptions, updated *config.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
+func verifyPipelines(ctx context.Context, o CheckUpdateOptions, updated *config.Configuration, mutations map[string]string, checkErrors *lint.EvalRuleErrors) {
 	for i := range updated.Pipeline {
 		var err error
 		pipeline := updated.Pipeline[i]
 
 		if pipeline.Uses == "fetch" {
-			err = o.verifyFetch(&pipeline, mutations)
+			err = o.verifyFetch(ctx, &pipeline, mutations)
 		}
 		if pipeline.Uses == "git-checkout" {
 			err = o.verifyGitCheckout(&pipeline, mutations)
@@ -282,7 +282,7 @@ func verifyPipelines(o CheckUpdateOptions, updated *config.Configuration, mutati
 	}
 }
 
-func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string) error {
+func (o CheckUpdateOptions) verifyFetch(ctx context.Context, p *config.Pipeline, m map[string]string) error {
 	uriValue := p.With["uri"]
 	if uriValue == "" {
 		return fmt.Errorf("no uri to fetch")
@@ -296,7 +296,7 @@ func (o CheckUpdateOptions) verifyFetch(p *config.Pipeline, m map[string]string)
 
 	o.Logger.Printf("downloading sources from %s into a temporary directory, this may take a while", evaluatedURI)
 
-	filename, err := util.DownloadFile(context.TODO(), evaluatedURI)
+	filename, err := util.DownloadFile(ctx, evaluatedURI)
 	if err != nil {
 		return fmt.Errorf("failed to verify fetch %s: %w", evaluatedURI, err)
 	}

@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"context"
 	"fmt"
 
 	"gopkg.in/yaml.v3"
@@ -21,7 +22,7 @@ type Entry[T Configuration] interface {
 	getPath() string
 
 	// Update applies the given entryUpdater to the entry.
-	Update(updater EntryUpdater[T]) error
+	Update(ctx context.Context, updater EntryUpdater[T]) error
 
 	// Configuration returns the entry as a decoded configuration.
 	Configuration() *T
@@ -51,8 +52,8 @@ func (e entry[T]) getPath() string {
 	return e.path
 }
 
-func (e entry[T]) Update(updater EntryUpdater[T]) error {
-	err := e.getIndex().update(e, updater)
+func (e entry[T]) Update(ctx context.Context, updater EntryUpdater[T]) error {
+	err := e.getIndex().update(ctx, e, updater)
 	if err != nil {
 		return fmt.Errorf("unable to update %q: %w", e.id(), err)
 	}

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"net/http"
 
 	"golang.org/x/time/rate"
@@ -16,8 +15,7 @@ type RLHTTPClient struct {
 // Do dispatches the HTTP request to the network
 func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	// Comment out the below 5 lines to turn off ratelimiting
-	ctx := context.Background()
-	err := c.Ratelimiter.Wait(ctx) // This is a blocking call. Honors the rate limit
+	err := c.Ratelimiter.Wait(req.Context()) // This is a blocking call. Honors the rate limit
 	if err != nil {
 		return nil, err
 	}

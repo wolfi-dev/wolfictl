@@ -1,12 +1,22 @@
 package cli
 
 import (
+	"log"
+	"os"
+	"time"
+
+	"github.com/google/go-github/v58/github"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/update"
+	"golang.org/x/oauth2"
+	"golang.org/x/time/rate"
 )
 
 func Package() *cobra.Command {
-	o := update.NewPackageOptions()
+	o := update.PackageOptions{
+		Logger: log.New(log.Writer(), "wolfictl update: ", log.LstdFlags|log.Lmsgprefix),
+	}
 
 	cmd := &cobra.Command{
 		Use:     "package",
@@ -20,6 +30,19 @@ func Package() *cobra.Command {
 					return err
 				}
 			}
+
+			ts := oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+			)
+
+			ratelimit := &http.RLHTTPClient{
+				Client: oauth2.NewClient(cmd.Context(), ts),
+
+				// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
+				Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
+			}
+
+			o.GithubClient = github.NewClient(ratelimit.Client)
 
 			o.PackageName = args[0]
 			return o.UpdatePackageCmd(cmd.Context())

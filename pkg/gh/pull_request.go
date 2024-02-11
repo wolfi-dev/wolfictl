@@ -20,7 +20,7 @@ type GetPullRequest struct {
 }
 
 // OpenPullRequest opens a pull request on GitHub
-func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (*github.PullRequest, error) {
+func (o GitOptions) OpenPullRequest(ctx context.Context, pr *NewPullRequest) (*github.PullRequest, error) {
 	// Configure pull request options that the GitHub client accepts when making calls to open new pull requests
 	newPR := &github.NewPullRequest{
 		Title: github.String(pr.Title),
@@ -31,7 +31,7 @@ func (o GitOptions) OpenPullRequest(pr *NewPullRequest) (*github.PullRequest, er
 
 	var githubPR *github.PullRequest
 	err := o.handleRateLimit(func() (*github.Response, error) {
-		createdPR, resp, err := o.GithubClient.PullRequests.Create(context.Background(), pr.Owner, pr.RepoName, newPR)
+		createdPR, resp, err := o.GithubClient.PullRequests.Create(ctx, pr.Owner, pr.RepoName, newPR)
 		githubPR = createdPR
 		return resp, err
 	})

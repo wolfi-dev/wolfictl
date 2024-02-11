@@ -2,13 +2,22 @@ package cli
 
 import (
 	"errors"
+	"log"
+	"os"
+	"time"
 
+	"github.com/google/go-github/v58/github"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
+	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
+	"golang.org/x/oauth2"
+	"golang.org/x/time/rate"
 )
 
 func Release() *cobra.Command {
-	releaseOpts := gh.NewReleaseOptions()
+	releaseOpts := gh.ReleaseOptions{
+		Logger: log.New(log.Writer(), "wolfictl gh release: ", log.LstdFlags|log.Lmsgprefix),
+	}
 
 	cmd := &cobra.Command{
 		Use:               "release",
@@ -26,6 +35,19 @@ wolfictl gh release --bump-prerelease-with-prefix rc
 `,
 		Args: cobra.RangeArgs(0, 0),
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ts := oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+			)
+
+			ratelimit := &http2.RLHTTPClient{
+				Client: oauth2.NewClient(cmd.Context(), ts),
+
+				// 1 request every (n) second(s) to avoid DOS'ing server. https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
+				Ratelimiter: rate.NewLimiter(rate.Every(3*time.Second), 1),
+			}
+
+			releaseOpts.GithubClient = github.NewClient(ratelimit.Client)
+
 			if !releaseOpts.BumpMajor &&
 				!releaseOpts.BumpMinor &&
 				!releaseOpts.BumpPatch &&
@@ -33,7 +55,7 @@ wolfictl gh release --bump-prerelease-with-prefix rc
 				return errors.New("missing flag to bump release version")
 			}
 
-			return releaseOpts.Release()
+			return releaseOpts.Release(cmd.Context())
 		},
 	}
 

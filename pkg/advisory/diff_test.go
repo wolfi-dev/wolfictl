@@ -1,6 +1,7 @@
 package advisory
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 	"time"
@@ -248,9 +249,9 @@ func TestIndexDiff(t *testing.T) {
 			bDir := filepath.Join("testdata", "diff", tt.name, "b")
 			aFsys := rwos.DirFS(aDir)
 			bFsys := rwos.DirFS(bDir)
-			aIndex, err := v2.NewIndex(aFsys)
+			aIndex, err := v2.NewIndex(context.Background(), aFsys)
 			require.NoError(t, err)
-			bIndex, err := v2.NewIndex(bFsys)
+			bIndex, err := v2.NewIndex(context.Background(), bFsys)
 			require.NoError(t, err)
 
 			diff := IndexDiff(aIndex, bIndex)

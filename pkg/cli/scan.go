@@ -191,7 +191,7 @@ wolfictl scan package1 package2 --remote
 
 				for _, dir := range p.advisoriesRepoDirs {
 					advisoryFsys := rwos.DirFS(dir)
-					index, err := v2.NewIndex(advisoryFsys)
+					index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
 					if err != nil {
 						return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
 					}
@@ -306,7 +306,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 				}
 
 				// Get the SBOM of the APK
-				apkSBOM, err := p.generateSBOM(inputFile)
+				apkSBOM, err := p.generateSBOM(ctx, inputFile)
 				if err != nil {
 					return fmt.Errorf("failed to generate SBOM: %w", err)
 				}
@@ -448,16 +448,16 @@ func (p *scanParams) doScanCommandForSingleInput(
 	return result, nil
 }
 
-func (p *scanParams) generateSBOM(f *os.File) (*sbomSyft.SBOM, error) {
+func (p *scanParams) generateSBOM(ctx context.Context, f *os.File) (*sbomSyft.SBOM, error) {
 	if p.sbomInput {
 		return sbom.FromSyftJSON(f)
 	}
 
 	if p.disableSBOMCache {
-		return sbom.Generate(f.Name(), f, p.distro)
+		return sbom.Generate(ctx, f.Name(), f, p.distro)
 	}
 
-	return sbom.CachedGenerate(f.Name(), f, p.distro)
+	return sbom.CachedGenerate(ctx, f.Name(), f, p.distro)
 }
 
 // resolveInputFilePathsFromBuildLog takes the given path to a Melange build log

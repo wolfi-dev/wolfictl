@@ -1,6 +1,7 @@
 package ls
 
 import (
+	"context"
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
@@ -101,7 +102,7 @@ func TestList(t *testing.T) {
 			indices := make([]*configs.Index[config.Configuration], 0, len(tt.distroDirs))
 			for _, dir := range tt.distroDirs {
 				distroFsys := rwos.DirFS(dir)
-				buildCfgs, err := buildconfigs.NewIndex(distroFsys)
+				buildCfgs, err := buildconfigs.NewIndex(context.Background(), distroFsys)
 				require.NoError(t, err)
 				indices = append(indices, buildCfgs)
 			}

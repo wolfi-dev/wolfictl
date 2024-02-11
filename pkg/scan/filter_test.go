@@ -1,6 +1,7 @@
 package scan
 
 import (
+	"context"
 	"path"
 	"testing"
 
@@ -371,7 +372,7 @@ func getSingleAdvisoriesIndex(t *testing.T) []*configs.Index[v2.Document] {
 	t.Helper()
 
 	advFS := rwos.DirFS(path.Join("testdata", "advisories"))
-	index, err := v2.NewIndex(advFS)
+	index, err := v2.NewIndex(context.Background(), advFS)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -389,7 +390,7 @@ func getMultipleAdvisoriesIndices(t *testing.T) []*configs.Index[v2.Document] {
 		"advisories-additional",
 	} {
 		advFS := rwos.DirFS(path.Join("testdata", dir))
-		index, err := v2.NewIndex(advFS)
+		index, err := v2.NewIndex(context.Background(), advFS)
 		if err != nil {
 			t.Fatal(err)
 		}

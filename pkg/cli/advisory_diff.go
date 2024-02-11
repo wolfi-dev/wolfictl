@@ -46,12 +46,12 @@ func cmdAdvisoryDiff() *cobra.Command {
 			}
 
 			baseAdvisoriesFsys := rwos.DirFS(cloneDir)
-			baseAdvisoriesIndex, err := v2.NewIndex(baseAdvisoriesFsys)
+			baseAdvisoriesIndex, err := v2.NewIndex(cmd.Context(), baseAdvisoriesFsys)
 			if err != nil {
 				return err
 			}
 
-			currentAdvisoriesIndex, err := v2.NewIndex(rwos.DirFS(d.Local.AdvisoriesRepo.Dir))
+			currentAdvisoriesIndex, err := v2.NewIndex(cmd.Context(), rwos.DirFS(d.Local.AdvisoriesRepo.Dir))
 			if err != nil {
 				return err
 			}

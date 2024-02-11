@@ -54,13 +54,13 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 
 		return advisories, nil
 	})
-	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(u)
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, u)
 	if err != nil {
 		return err
 	}
 
 	// Update the schema version to the latest version.
-	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 	if err != nil {
 		return fmt.Errorf("unable to update schema version for %q: %w", doc.Name(), err)
 	}
@@ -120,13 +120,13 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 
 		return advisories, nil
 	})
-	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(u)
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, u)
 	if err != nil {
 		return err
 	}
 
 	// Update the schema version to the latest version.
-	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 	if err != nil {
 		return fmt.Errorf("unable to update schema version for %q: %w", doc.Name(), err)
 	}

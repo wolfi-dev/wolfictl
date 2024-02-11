@@ -66,9 +66,9 @@ func TestValidate(t *testing.T) {
 				bDir := filepath.Join("testdata", "diff", tt.name, "b")
 				aFsys := rwos.DirFS(aDir)
 				bFsys := rwos.DirFS(bDir)
-				aIndex, err := v2.NewIndex(aFsys)
+				aIndex, err := v2.NewIndex(context.Background(), aFsys)
 				require.NoError(t, err)
-				bIndex, err := v2.NewIndex(bFsys)
+				bIndex, err := v2.NewIndex(context.Background(), bFsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{
@@ -186,9 +186,9 @@ func TestValidate(t *testing.T) {
 					bDir := filepath.Join("testdata", "diff", tt.name, "b")
 					aFsys := rwos.DirFS(aDir)
 					bFsys := rwos.DirFS(bDir)
-					aIndex, err := v2.NewIndex(aFsys)
+					aIndex, err := v2.NewIndex(context.Background(), aFsys)
 					require.NoError(t, err)
-					bIndex, err := v2.NewIndex(bFsys)
+					bIndex, err := v2.NewIndex(context.Background(), bFsys)
 					require.NoError(t, err)
 
 					err = Validate(context.Background(), ValidateOptions{
@@ -241,7 +241,7 @@ func TestValidate(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				dir := filepath.Join("testdata", "validate", tt.name)
 				fsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(fsys)
+				index, err := v2.NewIndex(context.Background(), fsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{
@@ -318,7 +318,7 @@ func TestValidate(t *testing.T) {
 				t.Run(tt.name, func(t *testing.T) {
 					dir := filepath.Join("testdata", "validate", "fixed-version")
 					fsys := rwos.DirFS(dir)
-					index, err := v2.NewIndex(fsys)
+					index, err := v2.NewIndex(context.Background(), fsys)
 					require.NoError(t, err)
 
 					err = Validate(context.Background(), ValidateOptions{
@@ -359,7 +359,7 @@ func TestValidate(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				dir := filepath.Join("testdata", "validate", tt.name)
 				fsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(fsys)
+				index, err := v2.NewIndex(context.Background(), fsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{
@@ -378,14 +378,14 @@ func TestValidate(t *testing.T) {
 
 func distroWithKo(t *testing.T) *configs.Index[config.Configuration] {
 	fsys := rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "distro"))
-	index, err := build.NewIndex(fsys)
+	index, err := build.NewIndex(context.Background(), fsys)
 	require.NoError(t, err)
 	return index
 }
 
 func distroWithNothing(t *testing.T) *configs.Index[config.Configuration] {
 	fsys := rwos.DirFS(filepath.Join("testdata", "validate", "package-existence", "distro-empty"))
-	index, err := build.NewIndex(fsys)
+	index, err := build.NewIndex(context.Background(), fsys)
 	require.NoError(t, err)
 	return index
 }
