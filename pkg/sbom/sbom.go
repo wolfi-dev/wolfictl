@@ -82,7 +82,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 				ID: distroID,
 			},
 		},
-		Source: getDeterministicSourceDescription(src, inputFilePath),
+		Source: getDeterministicSourceDescription(src, inputFilePath, apkPackage.Name, apkPackage.Version),
 		Descriptor: sbom.Descriptor{
 			Name: "wolfictl",
 		},
@@ -91,11 +91,12 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	return &s, nil
 }
 
-func getDeterministicSourceDescription(src *source.DirectorySource, inputFilePath string) source.Description {
+func getDeterministicSourceDescription(src *source.DirectorySource, inputFilePath, apkName, apkVersion string) source.Description {
 	description := src.Describe()
 
 	description.ID = "(redacted for determinism)"
-	description.Name = inputFilePath
+	description.Name = apkName
+	description.Version = apkVersion
 	metadata := source.DirectorySourceMetadata{
 		Path: inputFilePath,
 	}
