@@ -20,16 +20,22 @@ type AliasFinder interface {
 
 type HTTPAliasFinder struct {
 	client          *http.Client
+	ghToken         string
 	cacheGHSAsByCVE map[string][]string
 	cacheCVEByGHSA  map[string]string
 }
 
-func NewHTTPAliasFinder(client *http.Client) *HTTPAliasFinder {
+func NewHTTPAliasFinderWithToken(client *http.Client, ghToken string) *HTTPAliasFinder {
 	return &HTTPAliasFinder{
+		ghToken:         ghToken,
 		client:          client,
 		cacheGHSAsByCVE: make(map[string][]string),
 		cacheCVEByGHSA:  make(map[string]string),
 	}
+}
+
+func NewHTTPAliasFinder(client *http.Client) *HTTPAliasFinder {
+	return NewHTTPAliasFinderWithToken(client, "")
 }
 
 func (f *HTTPAliasFinder) CVEForGHSA(ctx context.Context, ghsaID string) (string, error) {
@@ -111,8 +117,12 @@ func (f *HTTPAliasFinder) gitHubAPIGet(ctx context.Context, requestPath string, 
 		"X-GitHub-Api-Version": []string{"2022-11-28"},
 	}
 
-	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	if f.ghToken == "" {
+		if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+		}
+	} else {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", f.ghToken))
 	}
 
 	resp, err := f.client.Do(req)
