@@ -8,9 +8,9 @@ require (
 	chainguard.dev/apko v0.14.1-0.20240210120952-623f9b1c1ae1
 	chainguard.dev/melange v0.6.1-0.20240213193433-485f9d64667f
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.74.4
-	github.com/anchore/stereoscope v0.0.1
-	github.com/anchore/syft v0.103.1
+	github.com/anchore/grype v0.74.5
+	github.com/anchore/stereoscope v0.0.2-0.20240202153536-bfa15e446f06
+	github.com/anchore/syft v0.104.0
 	github.com/chainguard-dev/clog v1.3.1
 	github.com/chainguard-dev/go-apk v0.0.0-20240207141231-4a3a18e598d6
 	github.com/chainguard-dev/yam v0.0.1
@@ -76,13 +76,13 @@ require (
 	github.com/Microsoft/hcsshim v0.11.4 // indirect
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
-	github.com/anchore/clio v0.0.0-20231016125544-c98a83e1c7fc // indirect
+	github.com/anchore/clio v0.0.0-20240131202212-9eba61247448 // indirect
 	github.com/anchore/fangs v0.0.0-20231201140849-5075d28d6d8b // indirect
 	github.com/anchore/go-logger v0.0.0-20230725134548-c21dafa1ec5a // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
 	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
-	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
+	github.com/anchore/packageurl-go v0.1.1-0.20240202171727-877e1747d426 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46 // indirect
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
@@ -296,7 +296,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gorm.io/gorm v1.25.6 // indirect
+	gorm.io/gorm v1.25.7 // indirect
 	k8s.io/kube-openapi v0.0.0-20240209001042-7a0d5b415232 // indirect
 	modernc.org/libc v1.29.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
