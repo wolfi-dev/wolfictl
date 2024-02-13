@@ -244,10 +244,16 @@ func (t *task) do(ctx context.Context) error {
 			build.WithCacheSource("gs://wolfi-sources/"), // TODO: flag
 			build.WithCacheDir("./melange-cache/"),       // TODO: flag
 			build.WithOutDir(filepath.Join(t.dir, "packages")),
+			build.WithRemove(true),
 		)
 		if err != nil {
 			return err
 		}
+		defer func() {
+			if err := bc.Close(ctx); err != nil {
+				log.Errorf("closing build %q: %v", t.pkg, err)
+			}
+		}()
 		bcs = append(bcs, bc)
 	}
 	var errg errgroup.Group
