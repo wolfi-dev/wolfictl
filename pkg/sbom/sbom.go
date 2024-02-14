@@ -24,6 +24,8 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
+const cpeSourceWolfictl cpe.Source = "wolfictl"
+
 // Generate creates an SBOM for the given APK file.
 func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
 	// Create a temp directory to house the unpacked APK file
@@ -168,10 +170,13 @@ func generateCPEs(p pkg.Package) []cpe.CPE {
 	if strings.HasPrefix(p.Name, "openjdk-") {
 		return []cpe.CPE{
 			{
-				Part:    "a",
-				Vendor:  "oracle",
-				Product: "jdk",
-				Version: p.Version,
+				Attributes: cpe.Attributes{
+					Part:    "a",
+					Vendor:  "oracle",
+					Product: "jdk",
+					Version: p.Version,
+				},
+				Source: cpeSourceWolfictl,
 			},
 		}
 	}
