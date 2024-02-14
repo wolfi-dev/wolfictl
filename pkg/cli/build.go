@@ -3,11 +3,12 @@ package cli
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
+	"sync"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
@@ -16,10 +17,8 @@ import (
 	"chainguard.dev/melange/pkg/container/docker"
 	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/maps"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"golang.org/x/sync/errgroup"
 )
 
 func cmdBuild() *cobra.Command {
@@ -49,8 +48,8 @@ func cmdBuild() *cobra.Command {
 				pipelineDir = filepath.Join(dir, "pipelines")
 			}
 
-			newTask := func(ctx context.Context, pkg string) *task {
-				ctx, cancel := context.WithCancel(ctx)
+			newTask := func(_ context.Context, pkg string) *task {
+				// TODO: Something with ctx.
 				return &task{
 					pkg:         pkg,
 					dir:         dir,
@@ -58,10 +57,9 @@ func cmdBuild() *cobra.Command {
 					runner:      runner,
 					archs:       archs,
 					dryrun:      dryrun,
-					ctx:         ctx,
-					cancel:      cancel,
-					deps:        map[string]<-chan struct{}{},
 					jobch:       jobch,
+					cond:        sync.NewCond(&sync.Mutex{}),
+					deps:        map[string]*task{},
 				}
 			}
 
@@ -111,7 +109,7 @@ func cmdBuild() *cobra.Command {
 							if tasks[d] == nil {
 								tasks[d] = newTask(ctx, d)
 							}
-							tasks[pkg].deps[d] = tasks[d].ctx.Done()
+							tasks[pkg].deps[d] = tasks[d]
 						}
 					}
 				}
@@ -121,13 +119,26 @@ func cmdBuild() *cobra.Command {
 				return fmt.Errorf("no packages to build")
 			}
 
-			for _, t := range tasks {
+			sorted, err := g.ReverseSorted()
+			if err != nil {
+				return err
+			}
+
+			if got, want := len(tasks), len(sorted); got != want {
+				return fmt.Errorf("tasks(%d) != sorted(%d)", got, want)
+			}
+
+			for _, todo := range sorted {
+				t := tasks[todo.Name()]
 				go t.start(ctx)
 			}
+
 			count := len(tasks)
 
-			for _, t := range tasks {
-				if err := t.wait(ctx); err != nil {
+			for _, todo := range sorted {
+				t := tasks[todo.Name()]
+				log.Infof("%s status: %q", t.pkg, t.status)
+				if err := t.wait(); err != nil {
 					return fmt.Errorf("failed to build %s: %w", t.pkg, err)
 				}
 				delete(tasks, t.pkg)
@@ -153,52 +164,63 @@ type task struct {
 	archs                         []string
 	dryrun                        bool
 
-	err    error
-	deps   map[string]<-chan struct{}
-	ctx    context.Context
-	cancel context.CancelFunc
+	err  error
+	deps map[string]*task
+
 	jobch  chan struct{}
+	status string
+
+	done bool
+	cond *sync.Cond
 }
 
 func (t *task) start(ctx context.Context) {
-	log := clog.FromContext(ctx).With("pkg", t.pkg)
-	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+	defer func() {
+		t.cond.L.Lock()
+		clog.FromContext(ctx).Infof("finished %q, err=%v", t.pkg, t.err)
+		t.status = "done"
+		t.done = true
+		t.cond.Broadcast()
+		t.cond.L.Unlock()
+	}()
 
-	defer t.cancel() // signal that we're done, one way or another.
-
-	tick := time.NewTicker(30 * time.Second)
-	defer tick.Stop()
 	for depname, dep := range t.deps {
-		select {
-		case <-tick.C:
-			log.Debugf("task %q waiting on: %s", t.pkg, maps.Keys(t.deps))
-		case <-dep:
-			delete(t.deps, depname)
-			// this dep is done.
-		case <-ctx.Done():
-			return // cancelled or failed
+		t.status = "waiting on " + depname
+		if err := dep.wait(); err != nil {
+			t.err = err
+			return
 		}
 	}
+
+	t.status = "waiting on jobch"
 
 	// Block on jobch, to limit concurrency. Remove from jobch when done.
 	t.jobch <- struct{}{}
 	defer func() { <-t.jobch }()
+
+	clog.FromContext(ctx).Infof("starting %q", t.pkg)
+	t.status = "running"
 
 	// all deps are done and we're clear to launch.
 	t.err = t.do(ctx)
 }
 
 func (t *task) do(ctx context.Context) error {
-	log := clog.FromContext(ctx)
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	var bcs []*build.Build
 	for _, arch := range t.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
-		log := clog.New(log.Handler()).With("arch", arch)
+
+		// TODO: Handle these logs in an interesting way instead of discarding them.
+		log := clog.New(discard).With("arch", arch)
+
 		ctx := clog.WithLogger(ctx, log)
 
 		// See if we already have the package built.
@@ -254,25 +276,22 @@ func (t *task) do(ctx context.Context) error {
 				log.Errorf("closing build %q: %v", t.pkg, err)
 			}
 		}()
-		bcs = append(bcs, bc)
+		if err := bc.BuildPackage(ctx); err != nil {
+			return err
+		}
 	}
-	var errg errgroup.Group
-	for _, bc := range bcs {
-		bc := bc
-		errg.Go(func() error {
-			return bc.BuildPackage(ctx)
-		})
-	}
-	return errg.Wait()
+
+	return nil
 }
 
-func (t *task) wait(ctx context.Context) error {
-	select {
-	case <-t.ctx.Done(): // This task completed.
-		return t.err
-	case <-ctx.Done(): // The parent context was cancelled.
-		return ctx.Err()
+func (t *task) wait() error {
+	t.cond.L.Lock()
+	for !t.done {
+		t.cond.Wait()
 	}
+	t.cond.L.Unlock()
+
+	return t.err
 }
 
 func newRunner(ctx context.Context, runner string) (container.Runner, error) {
@@ -285,3 +304,13 @@ func newRunner(ctx context.Context, runner string) (container.Runner, error) {
 
 	return nil, fmt.Errorf("runner %q not supported", runner)
 }
+
+// https://go-review.googlesource.com/c/go/+/547956
+var discard slog.Handler = discardHandler{}
+
+type discardHandler struct{}
+
+func (discardHandler) Enabled(context.Context, slog.Level) bool  { return false }
+func (discardHandler) Handle(context.Context, slog.Record) error { return nil }
+func (d discardHandler) WithAttrs([]slog.Attr) slog.Handler      { return d }
+func (d discardHandler) WithGroup(string) slog.Handler           { return d }
