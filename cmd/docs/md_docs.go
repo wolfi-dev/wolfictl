@@ -77,7 +77,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 
 	buf.WriteString(long + "\n\n")
 
-	if len(cmd.Example) > 0 {
+	if cmd.Example != "" {
 		buf.WriteString("### Examples\n\n")
 		buf.WriteString(fmt.Sprintf("%s\n\n", cmd.Example))
 	}
@@ -129,7 +129,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 // help output will be in the file `cmd-sub-third.1`.
 func GenMarkdownTree(cmd *cobra.Command, dir string) error {
 	identity := func(s string) string { return s }
-	emptyStr := func(s string) string { return "" }
+	emptyStr := func(_ string) string { return "" }
 	return GenMarkdownTreeCustom(cmd, dir, emptyStr, identity)
 }
 

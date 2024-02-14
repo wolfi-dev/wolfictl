@@ -31,7 +31,7 @@ func cmdAdvisoryDiscover() *cobra.Command {
 		Short:         "Automatically create advisories by matching distro packages to vulnerabilities in NVD",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			packageRepositoryURL := p.packageRepositoryURL
 
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)

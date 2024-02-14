@@ -18,7 +18,7 @@ func New() *cobra.Command {
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		Short:             "A CLI helper for developing Wolfi",
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 			out, err := log.Writer(logPolicy)
 			if err != nil {
 				return fmt.Errorf("failed to create log writer: %w", err)

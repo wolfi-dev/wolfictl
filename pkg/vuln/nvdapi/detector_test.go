@@ -39,7 +39,7 @@ func TestDetector_VulnerabilitiesForPackages(t *testing.T) {
 		t.Run(tt.pkg, func(t *testing.T) {
 			// "Arrange"
 
-			ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				f, err := os.Open(fmt.Sprintf("testdata/%s.json", tt.pkg))
 				require.NoError(t, err)
 

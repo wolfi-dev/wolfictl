@@ -45,7 +45,7 @@ func addPackage(parent *cobra.Command) {
 		Example:       "wolfictl vex package --author=joe@doe.com config1.yaml config2.yaml",
 		Short:         "Generate a VEX document from package configuration files",
 		SilenceErrors: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			log.Print("Did nothing!")
 			return nil
 		},
@@ -76,7 +76,7 @@ wolfictl will read the melange config files from an existing wolfi-dev/os clone
 or, if not specified, it will clone the repo for you.
 `,
 		SilenceErrors: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			log.Print("Did nothing!")
 			return nil
 		},

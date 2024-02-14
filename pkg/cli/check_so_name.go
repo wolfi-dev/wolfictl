@@ -15,7 +15,7 @@ func SoName() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 		Short:             "Check so name files have not changed in upgrade",
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return o.CheckSoName()
 		},
 	}

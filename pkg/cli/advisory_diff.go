@@ -23,7 +23,7 @@ func cmdAdvisoryDiff() *cobra.Command {
 		Short:         "See the advisory data differences introduced by your local changes",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			d, err := distro.Detect()
 			if err != nil {
 				return fmt.Errorf("distro auto-detection failed: %w", err)

@@ -14,7 +14,7 @@ import (
 
 func TestCheckExistingIssue(t *testing.T) {
 	// Create a test server that simulates the GitHub API
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		// Respond with a JSON array of issues
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -63,7 +63,7 @@ func TestCheckExistingIssue(t *testing.T) {
 
 func TestOpenIssue(t *testing.T) {
 	// Create a test server that simulates the GitHub API
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		// Respond with the created issue JSON
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
@@ -108,7 +108,7 @@ func TestOpenIssue(t *testing.T) {
 }
 
 func TestGitOptions_CloseIssue(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		fmt.Fprintln(w, `{"number":1,"state":"closed","body":"test comment"}`)
 	}))
 	defer testServer.Close()

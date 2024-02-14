@@ -46,7 +46,7 @@ This command also performs a follow-up operation to discover aliases for the
 newly created advisory and any other advisories for the same package.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			archs := p.archs
 			packageRepositoryURL := p.packageRepositoryURL
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)
@@ -113,7 +113,7 @@ newly created advisory and any other advisories for the same package.`,
 					})
 				}
 
-				allowedVulnerabilities := func(packageName string) []string {
+				allowedVulnerabilities := func(_ string) []string {
 					return nil
 				}
 
