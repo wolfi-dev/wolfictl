@@ -97,7 +97,7 @@ func cmdIndex() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "index",
 		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			// Map a friendly string like "wolfi" to its repo URL.
 			if got, found := repos[repo]; found {
 				repo = got

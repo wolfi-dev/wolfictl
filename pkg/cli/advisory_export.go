@@ -22,7 +22,7 @@ func cmdAdvisoryExport() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		Hidden:        true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")

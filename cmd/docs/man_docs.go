@@ -143,16 +143,16 @@ func manPreamble(buf *bytes.Buffer, header *GenManHeader, cmd *cobra.Command, da
 
 func manPrintFlags(buf *bytes.Buffer, flags *pflag.FlagSet) {
 	flags.VisitAll(func(flag *pflag.Flag) {
-		if len(flag.Deprecated) > 0 || flag.Hidden {
+		if flag.Deprecated != "" || flag.Hidden {
 			return
 		}
 		format := ""
-		if len(flag.Shorthand) > 0 && flag.ShorthandDeprecated == "" {
+		if flag.Shorthand != "" && flag.ShorthandDeprecated == "" {
 			format = fmt.Sprintf("**-%s**, **--%s**", flag.Shorthand, flag.Name)
 		} else {
 			format = fmt.Sprintf("**--%s**", flag.Name)
 		}
-		if len(flag.NoOptDefVal) > 0 {
+		if flag.NoOptDefVal != "" {
 			format += "["
 		}
 		if flag.Value.Type() == "string" {
@@ -161,7 +161,7 @@ func manPrintFlags(buf *bytes.Buffer, flags *pflag.FlagSet) {
 		} else {
 			format += "=%s"
 		}
-		if len(flag.NoOptDefVal) > 0 {
+		if flag.NoOptDefVal != "" {
 			format += "]"
 		}
 		format += "\n\t%s\n\n"
@@ -195,7 +195,7 @@ func genMan(cmd *cobra.Command, header *GenManHeader) []byte {
 
 	manPreamble(buf, header, cmd, dashCommandName)
 	manPrintOptions(buf, cmd)
-	if len(cmd.Example) > 0 {
+	if cmd.Example != "" {
 		buf.WriteString("# EXAMPLE\n")
 		buf.WriteString(fmt.Sprintf("\n%s\n\n", cmd.Example))
 	}

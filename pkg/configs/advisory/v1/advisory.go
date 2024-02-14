@@ -21,7 +21,7 @@ func NewIndexFromPaths(ctx context.Context, fsys rwfs.FS, paths ...string) (*con
 }
 
 func newConfigurationDecodeFunc(fsys fs.FS) func(context.Context, string) (*Document, error) {
-	return func(ctx context.Context, path string) (*Document, error) {
+	return func(_ context.Context, path string) (*Document, error) {
 		file, err := fsys.Open(path)
 		if err != nil {
 			return nil, err

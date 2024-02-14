@@ -16,7 +16,7 @@ func cmdLintYam() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "yam [file]...",
 		SilenceErrors: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			fsys := os.DirFS(".")
 			paths := lo.Map(args, toCleanPath)
 

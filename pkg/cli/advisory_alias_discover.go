@@ -47,7 +47,7 @@ than attempting any kind of merge of the separate advisories.
 `,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
 			if advisoriesRepoDir == "" {
 				if p.doNotDetectDistro {

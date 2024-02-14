@@ -20,7 +20,7 @@ func cmdAdvisorySecDB() *cobra.Command {
 		Short:         "Build an Alpine-style security database from advisory data",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")

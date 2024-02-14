@@ -94,7 +94,7 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 	p := make(map[string]*Packages)
 
 	var fileList []string
-	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+	err := filepath.Walk(dir, func(path string, fi os.FileInfo, _ error) error {
 		if fi == nil {
 			return fmt.Errorf("%s does not exist", dir)
 		}

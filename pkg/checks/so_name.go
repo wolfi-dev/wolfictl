@@ -144,7 +144,7 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 	reg := regexp.MustCompile(`\.so.(\d+\.)?(\d+\.)?(\*|\d+)`)
 
 	var fileList []string
-	err := filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+	err := filepath.Walk(dir, func(path string, _ os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

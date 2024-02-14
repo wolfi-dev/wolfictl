@@ -113,7 +113,7 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 
 	replaces := []string{}
 	deps := []string{}
-	if len(p.With["replaces"]) > 0 {
+	if p.With["replaces"] != "" {
 		replaces = strings.Split(p.With["replaces"], " ")
 	}
 	pkgReplaceVersions := map[string]string{}
@@ -123,7 +123,7 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 		pkgReplaceVersions[parts[0]] = parts[1]
 	}
 
-	if len(p.With["deps"]) > 0 {
+	if p.With["deps"] != "" {
 		deps = strings.Split(p.With["deps"], " ")
 	}
 
@@ -184,11 +184,11 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 		}
 	}
 
-	if len(p.With["deps"]) > 0 {
+	if p.With["deps"] != "" {
 		p.With["deps"] = strings.TrimSpace(strings.Join(deps, " "))
 	}
 
-	if len(p.With["replaces"]) > 0 {
+	if p.With["replaces"] != "" {
 		p.With["replaces"] = strings.TrimSpace(strings.Join(replaces, " "))
 	}
 

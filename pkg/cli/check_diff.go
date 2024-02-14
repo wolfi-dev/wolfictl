@@ -18,7 +18,7 @@ func Diff() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 		Short:             "Create a diff comparing proposed apk changes following a melange build, to the latest available in an APKINDEX",
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			arch := ""
 			switch runtime.GOARCH {
 			case "amd64":

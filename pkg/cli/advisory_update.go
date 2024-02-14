@@ -42,7 +42,7 @@ If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			archs := p.archs
 			packageRepositoryURL := p.packageRepositoryURL
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)
