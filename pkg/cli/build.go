@@ -198,8 +198,11 @@ func (t *task) do(ctx context.Context) error {
 	var bcs []*build.Build
 	for _, arch := range t.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
-		log := clog.New(log.Handler()).With("arch", arch)
-		ctx := clog.WithLogger(ctx, log)
+
+		if len(t.archs) > 1 {
+			log := clog.New(log.Handler()).With("arch", arch)
+			ctx = clog.WithLogger(ctx, log)
+		}
 
 		// See if we already have the package built.
 		apk := fmt.Sprintf("%s-%s-r%d.apk", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
