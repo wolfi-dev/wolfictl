@@ -22,7 +22,7 @@ flowchart TD
 
     anyUnaddressedFindings -- Yes --> selectFinding{Select a vulnerability finding to resolve}
 
-    selectFinding --> hasTriageRecommendation{"Is a triaging recommendation available immediately?\n(see [Triaging recommendations])"}
+    selectFinding --> hasTriageRecommendation{"(NOT IN MVP) Is a triaging recommendation available immediately?\n(see [Triaging recommendations])"}
 
     hasTriageRecommendation -- Yes --> triageRecommendationPrompt{Does this recommendation look right?}
 
@@ -50,7 +50,7 @@ flowchart TD
 
     notSupportedIndication -- No --> fixAttempted{"Have you tried to fix the vulnerability yet?"}
 
-    fixAttempted -- "No, I need help" --> ecosystemSpecificGuidance
+    fixAttempted -- "No, I need help" --> wikiGuidanceOnHowToAttemptCVERemediation
 
     fixAttempted -- "Yes, please do the scan over again" --> scan
 
@@ -76,7 +76,7 @@ We could identify cases where the user shouldn't have to make any decisions, suc
 ## FP reasons
 
 - The maintainers of the component disagree that this is a security problem.
-    - Criteria: a web link for evidence
+    - (NOT FOR MVP) Criteria: a web link for evidence
 - This vulnerability is specific to another distro and not ours.
     - Don't offer FP reason if: no distro name found in CVE description
     - Criteria: select distro name that appears in the CVE description; otherwise don't allow this FP reason
@@ -92,3 +92,10 @@ We could identify cases where the user shouldn't have to make any decisions, suc
         - provide a relevant excerpt of the error message
 - A step I inserted or modified isn't having the effect I expected on the scanner results
     - Criteria: ?
+
+# notes from review session:
+
+- add literal "I DON'T KNOW!!!!!" options
+- maybe try a different approach w/ "is this package unsupported?"
+    - first, is there an explicit support policy that shows that this package is unsupported?
+    -
