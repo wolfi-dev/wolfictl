@@ -1,0 +1,42 @@
+package:
+  name: one
+  version: "1.2.8"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+        - "*"
+      attestation:
+      license: Apache-2.0
+environment:
+  contents:
+    packages:
+      - wolfi-baselayout
+      - busybox
+      - ca-certificates-bundle
+      - build-base
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://example.com/abc-${{package.version}}.tar.gz
+      expected-sha256: b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30
+  - uses: autoconf/make
+  - uses: strip
+
+subpackages:
+  - name: one-sub1
+    dependencies:
+      runtime:
+        - gettext-static
+    description: one static
+  - name: one-sub2
+    pipeline:
+      - uses: one
+    dependencies:
+      runtime:
+        - bzip2-dev
+      provides:
+        - one-subp-provides-implicit
+        - one-subp-provides-explicit=10.10.11
