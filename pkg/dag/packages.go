@@ -124,6 +124,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 // melange requires the full path to the directory to be passed in.
 func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 	log := clog.FromContext(ctx)
+
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		packages: make(map[string][]*Configuration),
@@ -156,7 +157,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		}
 
 		if filepath.Dir(path) != "." && !strings.HasSuffix(path, ".melange.yaml") {
-			log.Infof("Skipping non-melange YAML file: %s", path)
+			log.With("path", path).Debug("skipping non-melange YAML file")
 			return nil
 		}
 
