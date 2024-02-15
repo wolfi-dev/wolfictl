@@ -88,9 +88,9 @@ func TestNewGraph(t *testing.T) {
 			}
 		})
 	})
-	t.Run("complex", func(t *testing.T) {
+	t.Run("multiple", func(t *testing.T) {
 		ctx := context.Background()
-		var testDir = "testdata/complex"
+		var testDir = "testdata/multiple"
 		t.Run("allowed dangling", func(t *testing.T) {
 			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
