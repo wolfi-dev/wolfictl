@@ -65,13 +65,6 @@ type Packages struct {
 	index    map[string]*Configuration
 }
 
-func (p Packages) Name() string {
-	return Local
-}
-func (p Packages) Source() string {
-	return Local
-}
-
 func (p *Packages) addPackage(name string, configuration *Configuration) {
 	p.packages[name] = append(p.packages[name], configuration)
 }
@@ -115,18 +108,20 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 	return nil
 }
 
-// NewPackages reads an fs.FS to get all of the Melange configuration yamls in the given directory,
-// and then parses them, including their subpackages and 'provides' parameters, to create a Packages struct
-// with all of the information, as well as the list of original packages, and, for each
-// such package, the source path (yaml) from which it came.
-// The result is a Packages struct.
+// NewPackages reads an fs.FS to get all of the Melange configuration yamls in
+// the given directory, and then parses them, including their subpackages and
+// 'provides' parameters, to create a Packages struct with all of the
+// information, as well as the list of original packages, and, for each such
+// package, the source path (yaml) from which it came. The result is a Packages
+// struct.
 //
-// The input is any fs.FS filesystem implementation. Given a directory path, you can call NewPackages like this:
+// The input is any fs.FS filesystem implementation. Given a directory path, you
+// can call NewPackages like this:
 //
-//	NewPackages(os.DirFS("/path/to/dir"), "/path/to/dir")
+// NewPackages(ctx, os.DirFS("/path/to/dir"), "/path/to/dir", "./pipelines")
 //
-// The repetition of the path is necessary because of how the upstream parser in melange
-// requires the full path to the directory to be passed in.
+// The repetition of the path is necessary because of how the upstream parser in
+// melange requires the full path to the directory to be passed in.
 func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 	log := clog.FromContext(ctx)
 	pkgs := &Packages{
@@ -236,9 +231,10 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 	return pkgs, nil
 }
 
-// Config returns the Melange configuration for the package, provides or subpackage with the given name,
-// if the package is present in the Graph. If it's not present, Config returns
-// an empty list.
+// Config returns the Melange configuration for the package, provides or
+// subpackage with the given name, if the package is present in the Graph. If
+// it's not present, Config returns an empty list.
+//
 // Pass packageOnly=true to restruct it just to origin package names.
 func (p Packages) Config(name string, packageOnly bool) []*Configuration {
 	if p.configs == nil {
@@ -311,7 +307,7 @@ func (p Packages) Packages() []*Configuration {
 	return allPackages
 }
 
-// Packages returns a slice of the names of all packages, sorted alphabetically.
+// PackageNames returns a slice of the names of all packages, sorted alphabetically.
 func (p Packages) PackageNames() []string {
 	allPackages := make([]string, 0, len(p.packages))
 	for name := range p.packages {
