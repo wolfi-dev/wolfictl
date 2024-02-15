@@ -1,6 +1,7 @@
 package sbom
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"fmt"
@@ -33,10 +34,16 @@ func cachedSBOMPath(inputFilePath string, f io.Reader) (string, error) {
 // if a generated SBOM is already available in the cache for the given APK,
 // CachedGenerate will return the cached SBOM immediately instead of generating
 // a new SBOM.
-func CachedGenerate(ctx context.Context, inputFilePath string, f io.ReadSeeker, distroID string) (*sbom.SBOM, error) {
+func CachedGenerate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
 	// Check cache first
 
-	cachedPath, err := cachedSBOMPath(inputFilePath, f)
+	// The cache check needs to read the input file, so we need to tee the input to
+	// provide ourselves with a buffered copy that we'll use in the event of a cache
+	// miss.
+	buf := new(bytes.Buffer)
+	tee := io.TeeReader(f, buf)
+
+	cachedPath, err := cachedSBOMPath(inputFilePath, tee)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute cached SBOM path: %w", err)
 	}
@@ -49,12 +56,7 @@ func CachedGenerate(ctx context.Context, inputFilePath string, f io.ReadSeeker, 
 
 		// Cache miss. Generate the SBOM.
 
-		_, err := f.Seek(0, io.SeekStart)
-		if err != nil {
-			return nil, fmt.Errorf("failed to seek to start of input file: %w", err)
-		}
-
-		s, err := Generate(ctx, inputFilePath, f, distroID)
+		s, err := Generate(ctx, inputFilePath, buf, distroID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate SBOM: %w", err)
 		}
