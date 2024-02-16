@@ -65,8 +65,16 @@ type Packages struct {
 	index    map[string]*Configuration
 }
 
-func (p *Packages) addPackage(name string, configuration *Configuration) {
+var ErrMultipleConfigurations = fmt.Errorf("multiple configurations using the same package name")
+
+func (p *Packages) addPackage(name string, configuration *Configuration) error {
+	if _, exists := p.packages[name]; exists {
+		return fmt.Errorf("%s: %w", name, ErrMultipleConfigurations)
+	}
+
 	p.packages[name] = append(p.packages[name], configuration)
+
+	return nil
 }
 
 func (p *Packages) addConfiguration(name string, configuration *Configuration) error {
@@ -180,7 +188,9 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		if err := pkgs.addConfiguration(name, c); err != nil {
 			return err
 		}
-		pkgs.addPackage(name, c)
+		if err := pkgs.addPackage(name, c); err != nil {
+			return err
+		}
 		if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
 			return err
 		}
@@ -336,7 +346,9 @@ func (p Packages) Sub(names ...string) (*Packages, error) {
 				if err := pkgs.addConfiguration(name, config); err != nil {
 					return nil, err
 				}
-				pkgs.addPackage(name, config)
+				if err := pkgs.addPackage(name, config); err != nil {
+					return nil, err
+				}
 			}
 		} else {
 			return nil, fmt.Errorf("package %q not found", name)
