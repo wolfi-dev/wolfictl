@@ -5,14 +5,14 @@ go 1.21.2
 toolchain go1.21.5
 
 require (
-	chainguard.dev/apko v0.14.1-0.20240210120952-623f9b1c1ae1
-	chainguard.dev/melange v0.6.1
+	chainguard.dev/apko v0.14.1-0.20240216215915-bbbb05796192
+	chainguard.dev/melange v0.6.2-0.20240216173531-01ef71fff319
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.6
 	github.com/anchore/stereoscope v0.0.2-0.20240208195325-681f6715b0e3
 	github.com/anchore/syft v0.105.0
 	github.com/chainguard-dev/clog v1.3.1
-	github.com/chainguard-dev/go-apk v0.0.0-20240207141231-4a3a18e598d6
+	github.com/chainguard-dev/go-apk v0.0.0-20240214182314-0557134e5e22
 	github.com/chainguard-dev/yam v0.0.1
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
@@ -56,7 +56,7 @@ require (
 	golang.org/x/time v0.5.0
 	golang.org/x/vuln v1.0.1
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.29.1
+	k8s.io/apimachinery v0.29.2
 	sigs.k8s.io/release-utils v0.7.7
 )
 
@@ -157,7 +157,7 @@ require (
 	github.com/google/go-containerregistry v0.19.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/licensecheck v0.3.1 // indirect
-	github.com/google/pprof v0.0.0-20231023181126-ff6d637d2a7b // indirect
+	github.com/google/pprof v0.0.0-20231101202521-4ca4178f5c7a // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
@@ -190,7 +190,7 @@ require (
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.0.0-20230301153543-ba94b245509b // indirect
-	github.com/letsencrypt/boulder v0.0.0-20240213171336-ad699af3d4a2 // indirect
+	github.com/letsencrypt/boulder v0.0.0-20240216200101-4eb5e3caa228 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/masahiro331/go-mvn-version v0.0.0-20210429150710-d3157d602a08 // indirect
@@ -220,7 +220,7 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc6 // indirect
+	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/opencontainers/runc v1.1.12 // indirect
 	github.com/opencontainers/runtime-spec v1.1.0-rc.1 // indirect
 	github.com/opencontainers/selinux v1.11.0 // indirect
@@ -273,7 +273,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yookoala/realpath v1.0.0 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
-	go.mongodb.org/mongo-driver v1.13.1 // indirect
+	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.48.0 // indirect
@@ -287,12 +287,12 @@ require (
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/tools v0.18.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/api v0.164.0 // indirect
+	google.golang.org/api v0.165.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240213162025-012b6fc9bca9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240213162025-012b6fc9bca9 // indirect
-	google.golang.org/grpc v1.61.0 // indirect
+	google.golang.org/grpc v1.61.1 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/go-jose/go-jose.v2 v2.6.2 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
