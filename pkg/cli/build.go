@@ -2,13 +2,14 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
+	"sync"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
@@ -58,8 +59,7 @@ func cmdBuild() *cobra.Command {
 				}
 			}
 
-			newTask := func(ctx context.Context, pkg string) *task {
-				ctx, cancel := context.WithCancel(ctx)
+			newTask := func(pkg string) *task {
 				return &task{
 					pkg:         pkg,
 					dir:         dir,
@@ -67,9 +67,8 @@ func cmdBuild() *cobra.Command {
 					runner:      runner,
 					archs:       archs,
 					dryrun:      dryrun,
-					ctx:         ctx,
-					cancel:      cancel,
-					deps:        map[string]<-chan struct{}{},
+					cond:        sync.NewCond(&sync.Mutex{}),
+					deps:        map[string]*task{},
 					jobch:       jobch,
 				}
 			}
@@ -108,7 +107,7 @@ func cmdBuild() *cobra.Command {
 			tasks := map[string]*task{}
 			for _, pkg := range g.Packages() {
 				if tasks[pkg] == nil {
-					tasks[pkg] = newTask(ctx, pkg)
+					tasks[pkg] = newTask(pkg)
 				}
 				for k, v := range m {
 					// The package list is in the form of "pkg:version",
@@ -118,9 +117,9 @@ func cmdBuild() *cobra.Command {
 							d, _, _ := strings.Cut(dep.Target, ":")
 
 							if tasks[d] == nil {
-								tasks[d] = newTask(ctx, d)
+								tasks[d] = newTask(d)
 							}
-							tasks[pkg].deps[d] = tasks[d].ctx.Done()
+							tasks[pkg].deps[d] = tasks[d]
 						}
 					}
 				}
@@ -131,21 +130,30 @@ func cmdBuild() *cobra.Command {
 			}
 
 			for _, t := range tasks {
-				go t.start(ctx)
+				t.maybeStart(ctx)
 			}
 			count := len(tasks)
 
 			// We're ok with Info level from here on.
 			log = clog.FromContext(ctx)
 
+			errs := []error{}
 			for _, t := range tasks {
-				if err := t.wait(ctx); err != nil {
-					return fmt.Errorf("failed to build %s: %w", t.pkg, err)
+				if err := t.wait(); err != nil {
+					errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
+					continue
 				}
+
 				delete(tasks, t.pkg)
 				log.Infof("Finished building %s (%d/%d)", t.pkg, count-len(tasks), count)
 			}
-			return nil
+
+			// If the context is cancelled, it's not useful to print everything, just summarize the count.
+			if err := ctx.Err(); err != nil {
+				return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
+			}
+
+			return errors.Join(errs...)
 		},
 	}
 
@@ -165,30 +173,36 @@ type task struct {
 	archs                         []string
 	dryrun                        bool
 
-	err    error
-	deps   map[string]<-chan struct{}
-	ctx    context.Context
-	cancel context.CancelFunc
-	jobch  chan struct{}
+	err  error
+	deps map[string]*task
+
+	cond    *sync.Cond
+	started bool
+	done    bool
+
+	jobch chan struct{}
 }
 
 func (t *task) start(ctx context.Context) {
+	defer func() {
+		// When we finish, wake up any goroutines that are waiting on us.
+		t.cond.L.Lock()
+		t.done = true
+		t.cond.Broadcast()
+		t.cond.L.Unlock()
+	}()
+
+	for _, dep := range t.deps {
+		dep.maybeStart(ctx)
+	}
+
 	log := clog.FromContext(ctx).With("pkg", t.pkg)
 	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 
-	defer t.cancel() // signal that we're done, one way or another.
-
-	tick := time.NewTicker(30 * time.Second)
-	defer tick.Stop()
-	for depname, dep := range t.deps {
-		select {
-		case <-tick.C:
-			log.Debugf("task %q waiting on: %s", t.pkg, maps.Keys(t.deps))
-		case <-dep:
-			delete(t.deps, depname)
-			// this dep is done.
-		case <-ctx.Done():
-			return // cancelled or failed
+	for _, dep := range t.deps {
+		if err := dep.wait(); err != nil {
+			t.err = err
+			return
 		}
 	}
 
@@ -197,10 +211,14 @@ func (t *task) start(ctx context.Context) {
 	defer func() { <-t.jobch }()
 
 	// all deps are done and we're clear to launch.
-	t.err = t.do(ctx)
+	t.err = t.build(ctx)
 }
 
-func (t *task) do(ctx context.Context) error {
+func (t *task) build(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	log := clog.FromContext(ctx)
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
 	if err != nil {
@@ -230,11 +248,11 @@ func (t *task) do(ctx context.Context) error {
 		defer f.Close()
 
 		log := clog.New(slog.NewTextHandler(f, nil)).With("package", t.pkg)
-		ctx := clog.WithLogger(ctx, log)
+		fctx := clog.WithLogger(ctx, log)
 
 		if len(t.archs) > 1 {
 			log = clog.New(log.Handler()).With("arch", arch)
-			ctx = clog.WithLogger(ctx, log)
+			fctx = clog.WithLogger(fctx, log)
 		}
 
 		sdir := filepath.Join(t.dir, t.pkg)
@@ -252,13 +270,13 @@ func (t *task) do(ctx context.Context) error {
 			continue
 		}
 
-		runner, err := newRunner(ctx, t.runner)
+		runner, err := newRunner(fctx, t.runner)
 		if err != nil {
 			return fmt.Errorf("creating runner: %w", err)
 		}
 
 		log.Infof("will build: %s", apkPath)
-		bc, err := build.New(ctx,
+		bc, err := build.New(fctx,
 			build.WithArch(types.ParseArchitecture(arch)),
 			build.WithConfig(filepath.Join(t.dir, fn)),
 			build.WithPipelineDir(t.pipelineDir),
@@ -278,24 +296,44 @@ func (t *task) do(ctx context.Context) error {
 			return err
 		}
 		defer func() {
+			// We Close() with the original context if we're cancelled so we get cleanup logs to stderr.
+			ctx := ctx
+			if ctx.Err() == nil {
+				// On happy path, we don't care about cleanup logs.
+				ctx = fctx
+			}
+
 			if err := bc.Close(ctx); err != nil {
 				log.Errorf("closing build %q: %v", t.pkg, err)
 			}
 		}()
 		errg.Go(func() error {
-			return bc.BuildPackage(ctx)
+			return bc.BuildPackage(fctx)
 		})
 	}
 	return errg.Wait()
 }
 
-func (t *task) wait(ctx context.Context) error {
-	select {
-	case <-t.ctx.Done(): // This task completed.
-		return t.err
-	case <-ctx.Done(): // The parent context was cancelled.
-		return ctx.Err()
+// If this task hasn't already been started, start it.
+func (t *task) maybeStart(ctx context.Context) {
+	t.cond.L.Lock()
+	defer t.cond.L.Unlock()
+
+	if !t.started {
+		t.started = true
+		go t.start(ctx)
 	}
+}
+
+// Park the calling goroutine until this task finishes.
+func (t *task) wait() error {
+	t.cond.L.Lock()
+	for !t.done {
+		t.cond.Wait()
+	}
+	t.cond.L.Unlock()
+
+	return t.err
 }
 
 func newRunner(ctx context.Context, runner string) (container.Runner, error) {
