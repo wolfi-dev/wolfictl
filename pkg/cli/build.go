@@ -22,7 +22,6 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"golang.org/x/sync/errgroup"
 )
 
 func cmdBuild() *cobra.Command {
@@ -32,14 +31,12 @@ func cmdBuild() *cobra.Command {
 	var dryrun bool
 	var extraKeys, extraRepos []string
 
-	// TODO: allow building only named packages, taking deps into account.
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
 	cmd := &cobra.Command{
 		Use:           "build",
 		SilenceErrors: true,
-		Args:          cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
 			if jobs == 0 {
@@ -129,23 +126,32 @@ func cmdBuild() *cobra.Command {
 				return fmt.Errorf("no packages to build")
 			}
 
-			for _, t := range tasks {
+			todos := tasks
+			if len(args) != 0 {
+				todos = make(map[string]*task, len(args))
+
+				for _, arg := range args {
+					todos[arg] = tasks[arg]
+				}
+			}
+
+			for _, t := range todos {
 				t.maybeStart(ctx)
 			}
-			count := len(tasks)
+			count := len(todos)
 
 			// We're ok with Info level from here on.
 			log = clog.FromContext(ctx)
 
 			errs := []error{}
-			for _, t := range tasks {
+			for _, t := range todos {
 				if err := t.wait(); err != nil {
 					errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
 					continue
 				}
 
-				delete(tasks, t.pkg)
-				log.Infof("Finished building %s (%d/%d)", t.pkg, count-len(tasks), count)
+				delete(todos, t.pkg)
+				log.Infof("Finished building %s (%d/%d)", t.pkg, count-len(todos), count)
 			}
 
 			// If the context is cancelled, it's not useful to print everything, just summarize the count.
@@ -196,8 +202,9 @@ func (t *task) start(ctx context.Context) {
 		dep.maybeStart(ctx)
 	}
 
-	log := clog.FromContext(ctx).With("pkg", t.pkg)
-	log.Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+	if len(t.deps) != 0 {
+		clog.FromContext(ctx).Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+	}
 
 	for _, dep := range t.deps {
 		if err := dep.wait(); err != nil {
@@ -225,7 +232,6 @@ func (t *task) build(ctx context.Context) error {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	var errg errgroup.Group
 	for _, arch := range t.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
@@ -247,7 +253,7 @@ func (t *task) build(ctx context.Context) error {
 		}
 		defer f.Close()
 
-		log := clog.New(slog.NewTextHandler(f, nil)).With("package", t.pkg)
+		log := clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
 		fctx := clog.WithLogger(ctx, log)
 
 		if len(t.archs) > 1 {
@@ -307,11 +313,13 @@ func (t *task) build(ctx context.Context) error {
 				log.Errorf("closing build %q: %v", t.pkg, err)
 			}
 		}()
-		errg.Go(func() error {
-			return bc.BuildPackage(fctx)
-		})
+
+		if err := bc.BuildPackage(fctx); err != nil {
+			return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
+		}
 	}
-	return errg.Wait()
+
+	return nil
 }
 
 // If this task hasn't already been started, start it.
