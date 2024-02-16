@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -15,6 +16,7 @@ import (
 	"chainguard.dev/melange/pkg/container"
 	"chainguard.dev/melange/pkg/container/docker"
 	"github.com/chainguard-dev/clog"
+	charmlog "github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 
@@ -38,7 +40,6 @@ func cmdBuild() *cobra.Command {
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
-			log := clog.FromContext(ctx)
 
 			if jobs == 0 {
 				jobs = runtime.GOMAXPROCS(0)
@@ -47,6 +48,14 @@ func cmdBuild() *cobra.Command {
 
 			if pipelineDir == "" {
 				pipelineDir = filepath.Join(dir, "pipelines")
+			}
+
+			// Logs will go here to mimic the wolfi Makefile.
+			for _, arch := range archs {
+				archDir := logdir(dir, arch)
+				if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
+					return fmt.Errorf("creating buildlogs directory: %w", err)
+				}
 			}
 
 			newTask := func(ctx context.Context, pkg string) *task {
@@ -65,11 +74,14 @@ func cmdBuild() *cobra.Command {
 				}
 			}
 
-			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
+			// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
+			log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
+			setupCtx := clog.WithLogger(ctx, log)
+			pkgs, err := dag.NewPackages(setupCtx, os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(ctx, pkgs,
+			g, err := dag.NewGraph(setupCtx, pkgs,
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...))
 			if err != nil {
@@ -95,9 +107,6 @@ func cmdBuild() *cobra.Command {
 
 			tasks := map[string]*task{}
 			for _, pkg := range g.Packages() {
-				log := clog.New(log.Handler()).With("package", pkg)
-				ctx := clog.WithLogger(ctx, log)
-
 				if tasks[pkg] == nil {
 					tasks[pkg] = newTask(ctx, pkg)
 				}
@@ -125,6 +134,9 @@ func cmdBuild() *cobra.Command {
 				go t.start(ctx)
 			}
 			count := len(tasks)
+
+			// We're ok with Info level from here on.
+			log = clog.FromContext(ctx)
 
 			for _, t := range tasks {
 				if err := t.wait(ctx); err != nil {
@@ -195,21 +207,34 @@ func (t *task) do(ctx context.Context) error {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	var bcs []*build.Build
+	var errg errgroup.Group
 	for _, arch := range t.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
-		if len(t.archs) > 1 {
-			log := clog.New(log.Handler()).With("arch", arch)
-			ctx = clog.WithLogger(ctx, log)
-		}
+		pkgver := fmt.Sprintf("%s-%s-r%d", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
+		logDir := logdir(t.dir, arch)
+		logfile := filepath.Join(logDir, pkgver) + ".log"
 
 		// See if we already have the package built.
-		apk := fmt.Sprintf("%s-%s-r%d.apk", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
+		apk := pkgver + ".apk"
 		apkPath := filepath.Join(t.dir, "packages", arch, apk)
 		if _, err := os.Stat(apkPath); err == nil {
 			log.Infof("skipping %s, already built", apkPath)
 			continue
+		}
+
+		f, err := os.Create(logfile)
+		if err != nil {
+			return fmt.Errorf("creating logfile: :%w", err)
+		}
+		defer f.Close()
+
+		log := clog.New(slog.NewTextHandler(f, nil)).With("package", t.pkg)
+		ctx := clog.WithLogger(ctx, log)
+
+		if len(t.archs) > 1 {
+			log = clog.New(log.Handler()).With("arch", arch)
+			ctx = clog.WithLogger(ctx, log)
 		}
 
 		sdir := filepath.Join(t.dir, t.pkg)
@@ -257,11 +282,6 @@ func (t *task) do(ctx context.Context) error {
 				log.Errorf("closing build %q: %v", t.pkg, err)
 			}
 		}()
-		bcs = append(bcs, bc)
-	}
-	var errg errgroup.Group
-	for _, bc := range bcs {
-		bc := bc
 		errg.Go(func() error {
 			return bc.BuildPackage(ctx)
 		})
@@ -287,4 +307,8 @@ func newRunner(ctx context.Context, runner string) (container.Runner, error) {
 	}
 
 	return nil, fmt.Errorf("runner %q not supported", runner)
+}
+
+func logdir(dir, arch string) string {
+	return filepath.Join(dir, "packages", arch, "buildlogs")
 }
