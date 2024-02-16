@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"log"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/clog"
 	apk "github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
@@ -128,6 +128,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 // The repetition of the path is necessary because of how the upstream parser in melange
 // requires the full path to the directory to be passed in.
 func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
+	log := clog.FromContext(ctx)
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		packages: make(map[string][]*Configuration),
@@ -160,7 +161,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		}
 
 		if filepath.Dir(path) != "." && !strings.HasSuffix(path, ".melange.yaml") {
-			log.Println("Skipping non-melange YAML file:", path)
+			log.Infof("Skipping non-melange YAML file: %s", path)
 			return nil
 		}
 
@@ -178,7 +179,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 
 		name := c.name
 		if name == "" {
-			log.Fatalf("no package name in %q", path)
+			return fmt.Errorf("no package name in %q", path)
 		}
 		if err := pkgs.addConfiguration(name, c); err != nil {
 			return err
@@ -192,7 +193,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			subpkg := c.Subpackages[i]
 			name := subpkg.Name
 			if name == "" {
-				log.Fatalf("empty subpackage name at index %d for package %q", i, c.Package.Name)
+				return fmt.Errorf("empty subpackage name at index %d for package %q", i, c.Package.Name)
 			}
 			c := &Configuration{
 				Configuration: buildc,
