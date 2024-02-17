@@ -19,6 +19,9 @@ import (
 	"github.com/chainguard-dev/clog"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/exp/maps"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
@@ -30,6 +33,7 @@ func cmdBuild() *cobra.Command {
 	var jobs int
 	var dryrun bool
 	var extraKeys, extraRepos []string
+	var traceFile string
 
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
@@ -38,6 +42,30 @@ func cmdBuild() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+
+			if traceFile != "" {
+				w, err := os.Create(traceFile)
+				if err != nil {
+					return fmt.Errorf("creating trace file: %w", err)
+				}
+				defer w.Close()
+				exporter, err := stdouttrace.New(stdouttrace.WithWriter(w))
+				if err != nil {
+					return fmt.Errorf("creating stdout exporter: %w", err)
+				}
+				tp := trace.NewTracerProvider(trace.WithBatcher(exporter))
+				otel.SetTracerProvider(tp)
+
+				defer func() {
+					if err := tp.Shutdown(context.WithoutCancel(ctx)); err != nil {
+						clog.FromContext(ctx).Errorf("Shutting down trace provider: %v", err)
+					}
+				}()
+
+				tctx, span := otel.Tracer("wolfictl").Start(ctx, "build")
+				defer span.End()
+				ctx = tctx
+			}
 
 			if jobs == 0 {
 				jobs = runtime.GOMAXPROCS(0)
@@ -171,6 +199,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
 	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
 	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
 	return cmd
 }
 
