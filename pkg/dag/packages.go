@@ -65,15 +65,16 @@ type Packages struct {
 	index    map[string]*Configuration
 }
 
-func (p Packages) Name() string {
-	return Local
-}
-func (p Packages) Source() string {
-	return Local
-}
+var ErrMultipleConfigurations = fmt.Errorf("multiple configurations using the same package name")
 
-func (p *Packages) addPackage(name string, configuration *Configuration) {
+func (p *Packages) addPackage(name string, configuration *Configuration) error {
+	if _, exists := p.packages[name]; exists {
+		return fmt.Errorf("%s: %w", name, ErrMultipleConfigurations)
+	}
+
 	p.packages[name] = append(p.packages[name], configuration)
+
+	return nil
 }
 
 func (p *Packages) addConfiguration(name string, configuration *Configuration) error {
@@ -115,20 +116,23 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 	return nil
 }
 
-// NewPackages reads an fs.FS to get all of the Melange configuration yamls in the given directory,
-// and then parses them, including their subpackages and 'provides' parameters, to create a Packages struct
-// with all of the information, as well as the list of original packages, and, for each
-// such package, the source path (yaml) from which it came.
-// The result is a Packages struct.
+// NewPackages reads an fs.FS to get all of the Melange configuration yamls in
+// the given directory, and then parses them, including their subpackages and
+// 'provides' parameters, to create a Packages struct with all of the
+// information, as well as the list of original packages, and, for each such
+// package, the source path (yaml) from which it came. The result is a Packages
+// struct.
 //
-// The input is any fs.FS filesystem implementation. Given a directory path, you can call NewPackages like this:
+// The input is any fs.FS filesystem implementation. Given a directory path, you
+// can call NewPackages like this:
 //
-//	NewPackages(os.DirFS("/path/to/dir"), "/path/to/dir")
+// NewPackages(ctx, os.DirFS("/path/to/dir"), "/path/to/dir", "./pipelines")
 //
-// The repetition of the path is necessary because of how the upstream parser in melange
-// requires the full path to the directory to be passed in.
+// The repetition of the path is necessary because of how the upstream parser in
+// melange requires the full path to the directory to be passed in.
 func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
 	log := clog.FromContext(ctx)
+
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		packages: make(map[string][]*Configuration),
@@ -161,7 +165,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		}
 
 		if filepath.Dir(path) != "." && !strings.HasSuffix(path, ".melange.yaml") {
-			log.Infof("Skipping non-melange YAML file: %s", path)
+			log.With("path", path).Debug("skipping non-melange YAML file")
 			return nil
 		}
 
@@ -184,7 +188,9 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		if err := pkgs.addConfiguration(name, c); err != nil {
 			return err
 		}
-		pkgs.addPackage(name, c)
+		if err := pkgs.addPackage(name, c); err != nil {
+			return err
+		}
 		if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
 			return err
 		}
@@ -236,9 +242,10 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 	return pkgs, nil
 }
 
-// Config returns the Melange configuration for the package, provides or subpackage with the given name,
-// if the package is present in the Graph. If it's not present, Config returns
-// an empty list.
+// Config returns the Melange configuration for the package, provides or
+// subpackage with the given name, if the package is present in the Graph. If
+// it's not present, Config returns an empty list.
+//
 // Pass packageOnly=true to restruct it just to origin package names.
 func (p Packages) Config(name string, packageOnly bool) []*Configuration {
 	if p.configs == nil {
@@ -311,7 +318,7 @@ func (p Packages) Packages() []*Configuration {
 	return allPackages
 }
 
-// Packages returns a slice of the names of all packages, sorted alphabetically.
+// PackageNames returns a slice of the names of all packages, sorted alphabetically.
 func (p Packages) PackageNames() []string {
 	allPackages := make([]string, 0, len(p.packages))
 	for name := range p.packages {
@@ -339,7 +346,9 @@ func (p Packages) Sub(names ...string) (*Packages, error) {
 				if err := pkgs.addConfiguration(name, config); err != nil {
 					return nil, err
 				}
-				pkgs.addPackage(name, config)
+				if err := pkgs.addPackage(name, config); err != nil {
+					return nil, err
+				}
 			}
 		} else {
 			return nil, fmt.Errorf("package %q not found", name)

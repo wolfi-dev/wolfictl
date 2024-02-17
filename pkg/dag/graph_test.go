@@ -88,9 +88,9 @@ func TestNewGraph(t *testing.T) {
 			}
 		})
 	})
-	t.Run("complex", func(t *testing.T) {
+	t.Run("multiple", func(t *testing.T) {
 		ctx := context.Background()
-		var testDir = "testdata/complex"
+		var testDir = "testdata/multiple"
 		t.Run("allowed dangling", func(t *testing.T) {
 			pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
 			require.NoError(t, err)
@@ -105,8 +105,8 @@ func TestNewGraph(t *testing.T) {
 			amap, err := graph.Graph.AdjacencyMap()
 			require.NoError(t, err)
 			configs := pkgs.Config("one", true)
-			require.Len(t, configs, 2) // there is both one and one-dupl; same package name, same config, different versions
-			// one and one-dupl files are identical, except for version, so their graphs should look the same
+			require.Len(t, configs, 1)
+
 			for _, conf := range configs {
 				require.Contains(t, amap, PackageHash(conf))
 				deps := amap[PackageHash(conf)]
@@ -153,7 +153,7 @@ func TestNewGraph(t *testing.T) {
 			// internal dependencies, therefore resolved
 			// we have two "one", so it takes the highest value
 			internalDeps := []string{
-				"one:1.2.8-r1@local",
+				"one:1.2.3-r1@local",
 				"two:4.5.6-r1@local",
 			}
 			assert.Len(t, deps, len(externalDeps)+len(internalDeps))
