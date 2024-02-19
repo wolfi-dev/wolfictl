@@ -315,8 +315,8 @@ github.com/chainguard-dev/go-apk v0.0.0-20240214182314-0557134e5e22 h1:QvVDC+ffM
 github.com/chainguard-dev/go-apk v0.0.0-20240214182314-0557134e5e22/go.mod h1:OdsmvVJb8RNVcTVQ7x07L319LLeiRaRnnsmj8qBBgb4=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e h1:MiWG71ge3/KiR2fW9R8MFHck4NbCtuwD6NpOXcZQ1qo=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20230905070237-e8c268e1732e/go.mod h1:obzGv2cx3tkRgkLQADSPaRl3OEsYmyfSv7t2Wu60tZw=
-github.com/chainguard-dev/yam v0.0.1 h1:c1hPfBc8aI/lm/iTc3/DNaTEE/HIOEovDObc7X1hNxs=
-github.com/chainguard-dev/yam v0.0.1/go.mod h1:CU1XgPmRuuFNq7q/INjrlAHgAMiDMhECboDQREn6rMo=
+github.com/chainguard-dev/yam v0.0.2 h1:nyNdg1nqwbbspENLNN64xIbEKh7NXz/CHlWaphR4lu4=
+github.com/chainguard-dev/yam v0.0.2/go.mod h1:CU1XgPmRuuFNq7q/INjrlAHgAMiDMhECboDQREn6rMo=
 github.com/charmbracelet/bubbles v0.18.0 h1:PYv1A036luoBGroX6VWjQIE9Syf2Wby2oOl/39KLfy0=
 github.com/charmbracelet/bubbles v0.18.0/go.mod h1:08qhZhtIwzgrtBjAcJnij1t1H0ZRjwHyGsy6AL11PSw=
 github.com/charmbracelet/bubbletea v0.25.0 h1:bAfwk7jRz7FKFl9RzlIULPkStffg5k6pNt5dywy4TcM=
