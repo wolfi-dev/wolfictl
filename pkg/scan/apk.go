@@ -133,7 +133,7 @@ func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 	}
 	defer dbCloser.Close()
 
-	vulnerabilityMatcher := newGrypeVulnerabilityMatcher(*datastore, useCPEs)
+	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(*datastore, useCPEs)
 
 	return &Scanner{
 		datastore:            datastore,
@@ -201,7 +201,7 @@ func (s *Scanner) APKSBOM(ssbom *sbomSyft.SBOM) (*Result, error) {
 	return result, nil
 }
 
-func newGrypeVulnerabilityMatcher(datastore store.Store, useCPEs bool) *grype.VulnerabilityMatcher {
+func NewGrypeVulnerabilityMatcher(datastore store.Store, useCPEs bool) *grype.VulnerabilityMatcher {
 	return &grype.VulnerabilityMatcher{
 		Store:    datastore,
 		Matchers: createMatchers(useCPEs),
