@@ -28,12 +28,10 @@ import (
 )
 
 func cmdBuild() *cobra.Command {
-	var archs []string
-	var dir, pipelineDir, runner string
 	var jobs int
-	var dryrun bool
-	var extraKeys, extraRepos []string
 	var traceFile string
+
+	cfg := global{}
 
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
@@ -72,13 +70,19 @@ func cmdBuild() *cobra.Command {
 			}
 			jobch := make(chan struct{}, jobs)
 
-			if pipelineDir == "" {
-				pipelineDir = filepath.Join(dir, "pipelines")
+			if cfg.signingKey == "" {
+				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
+			}
+			if cfg.pipelineDir == "" {
+				cfg.pipelineDir = filepath.Join(cfg.dir, "pipelines")
+			}
+			if cfg.outDir == "" {
+				cfg.outDir = filepath.Join(cfg.dir, "packages")
 			}
 
 			// Logs will go here to mimic the wolfi Makefile.
-			for _, arch := range archs {
-				archDir := logdir(dir, arch)
+			for _, arch := range cfg.archs {
+				archDir := cfg.logdir(arch)
 				if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
 					return fmt.Errorf("creating buildlogs directory: %w", err)
 				}
@@ -86,28 +90,24 @@ func cmdBuild() *cobra.Command {
 
 			newTask := func(pkg string) *task {
 				return &task{
-					pkg:         pkg,
-					dir:         dir,
-					pipelineDir: pipelineDir,
-					runner:      runner,
-					archs:       archs,
-					dryrun:      dryrun,
-					cond:        sync.NewCond(&sync.Mutex{}),
-					deps:        map[string]*task{},
-					jobch:       jobch,
+					cfg:   &cfg,
+					pkg:   pkg,
+					cond:  sync.NewCond(&sync.Mutex{}),
+					deps:  map[string]*task{},
+					jobch: jobch,
 				}
 			}
 
 			// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
 			log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
 			setupCtx := clog.WithLogger(ctx, log)
-			pkgs, err := dag.NewPackages(setupCtx, os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
 			if err != nil {
 				return err
 			}
 			g, err := dag.NewGraph(setupCtx, pkgs,
-				dag.WithKeys(extraKeys...),
-				dag.WithRepos(extraRepos...))
+				dag.WithKeys(cfg.extraKeys...),
+				dag.WithRepos(cfg.extraRepos...))
 			if err != nil {
 				return err
 			}
@@ -191,23 +191,49 @@ func cmdBuild() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
-	cmd.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
-	cmd.Flags().StringVar(&runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
+	cmd.Flags().StringVarP(&cfg.dir, "dir", "d", ".", "directory to search for melange configs")
+	cmd.Flags().StringVar(&cfg.pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	cmd.Flags().StringVar(&cfg.runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
+	cmd.Flags().StringSliceVar(&cfg.archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
+	cmd.Flags().BoolVar(&cfg.dryrun, "dry-run", false, "print commands instead of executing them")
+	cmd.Flags().StringSliceVarP(&cfg.extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
+	cmd.Flags().StringSliceVarP(&cfg.extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
+	cmd.Flags().StringVar(&cfg.namespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
+	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
+
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
-	cmd.Flags().StringSliceVar(&archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
-	cmd.Flags().BoolVar(&dryrun, "dry-run", false, "print commands instead of executing them")
-	cmd.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
-	cmd.Flags().StringSliceVarP(&extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
+
 	return cmd
 }
 
-type task struct {
-	pkg, dir, pipelineDir, runner string
-	archs                         []string
-	dryrun                        bool
+type global struct {
+	dryrun bool
 
+	dir         string
+	pipelineDir string
+	runner      string
+
+	archs      []string
+	extraKeys  []string
+	extraRepos []string
+
+	signingKey  string
+	namespace   string
+	cacheSource string
+	cacheDir    string
+	outDir      string
+}
+
+func (g *global) logdir(arch string) string {
+	return filepath.Join(g.outDir, arch, "buildlogs")
+}
+
+type task struct {
+	cfg *global
+
+	pkg  string
 	err  error
 	deps map[string]*task
 
@@ -256,21 +282,21 @@ func (t *task) build(ctx context.Context) error {
 	}
 
 	log := clog.FromContext(ctx)
-	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.dir)))
+	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.cfg.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	for _, arch := range t.archs {
+	for _, arch := range t.cfg.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
 		pkgver := fmt.Sprintf("%s-%s-r%d", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
-		logDir := logdir(t.dir, arch)
+		logDir := t.cfg.logdir(arch)
 		logfile := filepath.Join(logDir, pkgver) + ".log"
 
 		// See if we already have the package built.
 		apk := pkgver + ".apk"
-		apkPath := filepath.Join(t.dir, "packages", arch, apk)
+		apkPath := filepath.Join(t.cfg.outDir, arch, apk)
 		if _, err := os.Stat(apkPath); err == nil {
 			log.Infof("skipping %s, already built", apkPath)
 			continue
@@ -285,12 +311,12 @@ func (t *task) build(ctx context.Context) error {
 		log := clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
 		fctx := clog.WithLogger(ctx, log)
 
-		if len(t.archs) > 1 {
+		if len(t.cfg.archs) > 1 {
 			log = clog.New(log.Handler()).With("arch", arch)
 			fctx = clog.WithLogger(fctx, log)
 		}
 
-		sdir := filepath.Join(t.dir, t.pkg)
+		sdir := filepath.Join(t.cfg.dir, t.pkg)
 		if _, err := os.Stat(sdir); os.IsNotExist(err) {
 			if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
 				return fmt.Errorf("creating source directory %s: %v", sdir, err)
@@ -300,12 +326,12 @@ func (t *task) build(ctx context.Context) error {
 		}
 
 		fn := fmt.Sprintf("%s.yaml", t.pkg)
-		if t.dryrun {
+		if t.cfg.dryrun {
 			log.Infof("DRYRUN: would have built %s", apkPath)
 			continue
 		}
 
-		runner, err := newRunner(fctx, t.runner)
+		runner, err := newRunner(fctx, t.cfg.runner)
 		if err != nil {
 			return fmt.Errorf("creating runner: %w", err)
 		}
@@ -313,18 +339,18 @@ func (t *task) build(ctx context.Context) error {
 		log.Infof("will build: %s", apkPath)
 		bc, err := build.New(fctx,
 			build.WithArch(types.ParseArchitecture(arch)),
-			build.WithConfig(filepath.Join(t.dir, fn)),
-			build.WithPipelineDir(t.pipelineDir),
-			build.WithExtraKeys([]string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}), // TODO: flag
-			build.WithExtraRepos([]string{"https://packages.wolfi.dev/os"}),                      // TODO: flag
-			build.WithSigningKey(filepath.Join(t.dir, "local-melange.rsa")),
+			build.WithConfig(filepath.Join(t.cfg.dir, fn)),
+			build.WithPipelineDir(t.cfg.pipelineDir),
+			build.WithExtraKeys(t.cfg.extraKeys),
+			build.WithExtraRepos(t.cfg.extraRepos),
+			build.WithSigningKey(t.cfg.signingKey),
 			build.WithRunner(runner),
-			build.WithEnvFile(filepath.Join(t.dir, fmt.Sprintf("build-%s.env", arch))),
-			build.WithNamespace("wolfi"), // TODO: flag
+			build.WithEnvFile(filepath.Join(t.cfg.dir, fmt.Sprintf("build-%s.env", arch))),
+			build.WithNamespace(t.cfg.namespace),
 			build.WithSourceDir(sdir),
-			build.WithCacheSource("gs://wolfi-sources/"), // TODO: flag
-			build.WithCacheDir("./melange-cache/"),       // TODO: flag
-			build.WithOutDir(filepath.Join(t.dir, "packages")),
+			build.WithCacheSource(t.cfg.cacheSource),
+			build.WithCacheDir(t.cfg.cacheDir),
+			build.WithOutDir(t.cfg.outDir),
 			build.WithRemove(true),
 		)
 		if err != nil {
@@ -382,8 +408,4 @@ func newRunner(ctx context.Context, runner string) (container.Runner, error) {
 	}
 
 	return nil, fmt.Errorf("runner %q not supported", runner)
-}
-
-func logdir(dir, arch string) string {
-	return filepath.Join(dir, "packages", arch, "buildlogs")
 }
