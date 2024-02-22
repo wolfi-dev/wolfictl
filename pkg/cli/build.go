@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
@@ -244,6 +247,23 @@ type task struct {
 	jobch chan struct{}
 }
 
+func (t *task) gitSDE(ctx context.Context, origin string) (string, error) {
+	// TODO: Support nested yaml files.
+	yamlfile := filepath.Join(t.cfg.dir, origin) + ".yaml"
+	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%ct", "--follow", yamlfile)
+	b, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	sde, err := strconv.ParseInt(strings.TrimSpace(string(b)), 10, 64)
+	if err != nil {
+		return "", err
+	}
+
+	return time.Unix(sde, 0).Format(time.RFC3339), nil
+}
+
 func (t *task) start(ctx context.Context) {
 	defer func() {
 		// When we finish, wake up any goroutines that are waiting on us.
@@ -285,6 +305,11 @@ func (t *task) build(ctx context.Context) error {
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.cfg.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
+	}
+
+	sde, err := t.gitSDE(ctx, cfg.Package.Name)
+	if err != nil {
+		return fmt.Errorf("finding source date epoch: %w", err)
 	}
 
 	for _, arch := range t.cfg.archs {
@@ -351,6 +376,7 @@ func (t *task) build(ctx context.Context) error {
 			build.WithCacheSource(t.cfg.cacheSource),
 			build.WithCacheDir(t.cfg.cacheDir),
 			build.WithOutDir(t.cfg.outDir),
+			build.WithBuildDate(sde),
 			build.WithRemove(true),
 		)
 		if err != nil {
