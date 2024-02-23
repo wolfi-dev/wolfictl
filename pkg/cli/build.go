@@ -73,6 +73,8 @@ func cmdBuild() *cobra.Command {
 			}
 			jobch := make(chan struct{}, jobs)
 
+			donech := make(chan *task, jobs)
+
 			if cfg.signingKey == "" {
 				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
 			}
@@ -93,11 +95,12 @@ func cmdBuild() *cobra.Command {
 
 			newTask := func(pkg string) *task {
 				return &task{
-					cfg:   &cfg,
-					pkg:   pkg,
-					cond:  sync.NewCond(&sync.Mutex{}),
-					deps:  map[string]*task{},
-					jobch: jobch,
+					cfg:    &cfg,
+					pkg:    pkg,
+					cond:   sync.NewCond(&sync.Mutex{}),
+					deps:   map[string]*task{},
+					jobch:  jobch,
+					donech: donech,
 				}
 			}
 
@@ -175,13 +178,16 @@ func cmdBuild() *cobra.Command {
 			log = clog.FromContext(ctx)
 
 			errs := []error{}
-			for _, t := range todos {
-				if err := t.wait(); err != nil {
+			for len(todos) != 0 {
+				t := <-donech
+				delete(todos, t.pkg)
+
+				if err := t.err; err != nil {
 					errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
+					log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
 					continue
 				}
 
-				delete(todos, t.pkg)
 				log.Infof("Finished building %s (%d/%d)", t.pkg, count-len(todos), count)
 			}
 
@@ -244,7 +250,8 @@ type task struct {
 	started bool
 	done    bool
 
-	jobch chan struct{}
+	jobch  chan struct{}
+	donech chan *task
 }
 
 func (t *task) gitSDE(ctx context.Context, origin string) (string, error) {
@@ -271,6 +278,7 @@ func (t *task) start(ctx context.Context) {
 		t.done = true
 		t.cond.Broadcast()
 		t.cond.L.Unlock()
+		t.donech <- t
 	}()
 
 	for _, dep := range t.deps {
