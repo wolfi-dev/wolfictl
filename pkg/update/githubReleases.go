@@ -630,18 +630,9 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		v = strings.TrimSuffix(v, ghm.StripSuffix)
 	}
 
-	// ignore versions that match a regex pattern in the melange update config
-	if len(c.Update.IgnoreRegexPatterns) > 0 {
-		for _, pattern := range c.Update.IgnoreRegexPatterns {
-			regex, err := regexp.Compile(pattern)
-			if err != nil {
-				return "", fmt.Errorf("failed to compile regex %s: %w", pattern, err)
-			}
-
-			if regex.MatchString(v) {
-				return "", nil
-			}
-		}
+	ignore, err := ignoreVersions(c.Update.IgnoreRegexPatterns, v)
+	if ignore {
+		return "", err
 	}
 
 	if c.Update.VersionSeparator != "" {
@@ -652,12 +643,29 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		return "", nil
 	}
 
-	v, err := transformVersion(c.Update, v)
+	v, err = transformVersion(c.Update, v)
 	if err != nil {
 		return "", fmt.Errorf("failed to transform version %s: %w", v, err)
 	}
 
 	return v, nil
+}
+
+func ignoreVersions(patterns []string, v string) (bool, error) {
+	// ignore versions that match a regex pattern in the melange update config
+	if len(patterns) > 0 {
+		for _, pattern := range patterns {
+			regex, err := regexp.Compile(pattern)
+			if err != nil {
+				return true, fmt.Errorf("failed to compile regex %s: %w", pattern, err)
+			}
+
+			if regex.MatchString(v) {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 func template(tmpl string, data interface{}) string {

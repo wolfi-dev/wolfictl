@@ -362,3 +362,23 @@ func TestGitHubReleaseOptions_prepareVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestGitHubReleaseOptions_shouldIgnoreVersion(t *testing.T) {
+	tests := []struct {
+		name                string
+		melangeConfig       config.Configuration
+		version             string
+		ignore              bool
+		ignoreRegexPatterns []string
+	}{
+		{name: "ignore_odd_minor", ignoreRegexPatterns: []string{`(\d+)\.(\d*[13579])\.(\d+)$`}, version: "1.79.0", ignore: true},
+		{name: "allow_even_minor", ignoreRegexPatterns: []string{`(\d+)\.(\d*[13579])\.(\d+)$`}, version: "1.80.0", ignore: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ignoreVersions(tt.ignoreRegexPatterns, tt.version)
+			assert.NoError(t, err)
+			assert.Equalf(t, tt.ignore, got, "shouldIgnoreVersion %s", tt.version)
+		})
+	}
+}
