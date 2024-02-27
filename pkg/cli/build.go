@@ -19,6 +19,7 @@ import (
 	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/container"
 	"chainguard.dev/melange/pkg/container/docker"
+	"chainguard.dev/melange/pkg/index"
 	"github.com/chainguard-dev/clog"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
@@ -107,24 +108,25 @@ func cmdBuild() *cobra.Command {
 			// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
 			log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
 			setupCtx := clog.WithLogger(ctx, log)
+
+			// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
 			pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
 			if err != nil {
 				return err
 			}
-			g, err := dag.NewGraph(setupCtx, pkgs,
-				dag.WithKeys(cfg.extraKeys...),
-				dag.WithRepos(cfg.extraRepos...))
+			g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...))
 			if err != nil {
 				return err
 			}
 
-			// Only return local packages
+			// This drops any edges to non-local packages. This is a problem for bootstrap because things that depend
+			// on bootstrap stages need to be run early.
 			g, err = g.Filter(dag.FilterLocal())
 			if err != nil {
 				return err
 			}
 
-			// Only return main packages (configs)
+			// Only return main packages (configs) because we can't build just subpackages.
 			g, err = g.Filter(dag.OnlyMainPackages(pkgs))
 			if err != nil {
 				return err
@@ -165,7 +167,11 @@ func cmdBuild() *cobra.Command {
 				todos = make(map[string]*task, len(args))
 
 				for _, arg := range args {
-					todos[arg] = tasks[arg]
+					t, ok := tasks[arg]
+					if !ok {
+						return fmt.Errorf("constraint %q does not exist", arg)
+					}
+					todos[arg] = t
 				}
 			}
 
@@ -188,7 +194,7 @@ func cmdBuild() *cobra.Command {
 					continue
 				}
 
-				log.Infof("Finished building %s (%d/%d)", t.pkg, count-len(todos), count)
+				log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
 			}
 
 			// If the context is cancelled, it's not useful to print everything, just summarize the count.
@@ -233,6 +239,8 @@ type global struct {
 	cacheSource string
 	cacheDir    string
 	outDir      string
+
+	mu sync.Mutex
 }
 
 func (g *global) logdir(arch string) string {
@@ -310,6 +318,7 @@ func (t *task) build(ctx context.Context) error {
 	}
 
 	log := clog.FromContext(ctx)
+	log.Infof("Starting to build %s", t.pkg)
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.cfg.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
@@ -405,6 +414,51 @@ func (t *task) build(ctx context.Context) error {
 
 		if err := bc.BuildPackage(fctx); err != nil {
 			return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
+		}
+
+		if err := func() error {
+			// TODO: We only really need one lock per arch. See if this is a bottleneck.
+			t.cfg.mu.Lock()
+			defer t.cfg.mu.Unlock()
+			packageDir := filepath.Join(t.cfg.outDir, arch)
+			log.Infof("generating apk index from packages in %s", packageDir)
+
+			var apkFiles []string
+			apkFiles = append(apkFiles, apkPath)
+
+			for i := range cfg.Subpackages {
+				// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
+				subName := cfg.Subpackages[i].Name
+
+				subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
+				subpkgFileName := filepath.Join(packageDir, subpkgApk)
+				if _, err := os.Stat(subpkgFileName); err != nil {
+					// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
+					log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
+					continue
+				}
+				apkFiles = append(apkFiles, subpkgFileName)
+			}
+
+			opts := []index.Option{
+				index.WithPackageFiles(apkFiles),
+				index.WithSigningKey(t.cfg.signingKey),
+				index.WithMergeIndexFileFlag(true),
+				index.WithIndexFile(filepath.Join(packageDir, "APKINDEX.tar.gz")),
+			}
+
+			idx, err := index.New(opts...)
+			if err != nil {
+				return fmt.Errorf("unable to create index: %w", err)
+			}
+
+			if err := idx.GenerateIndex(fctx); err != nil {
+				return fmt.Errorf("unable to generate index: %w", err)
+			}
+
+			return nil
+		}(); err != nil {
+			return err
 		}
 	}
 
