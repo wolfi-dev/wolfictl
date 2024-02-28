@@ -9,8 +9,8 @@ require (
 	chainguard.dev/melange v0.6.5-0.20240227180909-b3fcd2462a5d
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.6
-	github.com/anchore/stereoscope v0.0.2-0.20240208195325-681f6715b0e3
-	github.com/anchore/syft v0.105.0
+	github.com/anchore/stereoscope v0.0.2-0.20240216182029-6171ee21e1d5
+	github.com/anchore/syft v0.105.1
 	github.com/chainguard-dev/clog v1.3.1
 	github.com/chainguard-dev/go-apk v0.0.0-20240226195449-7ea5a3036268
 	github.com/chainguard-dev/yam v0.0.2
@@ -305,7 +305,7 @@ require (
 	modernc.org/libc v1.41.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
-	modernc.org/sqlite v1.29.1 // indirect
+	modernc.org/sqlite v1.29.2 // indirect
 )
 
 replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
