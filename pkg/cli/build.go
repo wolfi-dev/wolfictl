@@ -27,6 +27,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/exp/maps"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
 )
@@ -86,123 +87,130 @@ func cmdBuild() *cobra.Command {
 				cfg.outDir = filepath.Join(cfg.dir, "packages")
 			}
 
+			var eg errgroup.Group
+
 			// Logs will go here to mimic the wolfi Makefile.
 			for _, arch := range cfg.archs {
 				archDir := cfg.logdir(arch)
 				if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
 					return fmt.Errorf("creating buildlogs directory: %w", err)
 				}
-			}
 
-			newTask := func(pkg string) *task {
-				return &task{
-					cfg:    &cfg,
-					pkg:    pkg,
-					cond:   sync.NewCond(&sync.Mutex{}),
-					deps:   map[string]*task{},
-					jobch:  jobch,
-					donech: donech,
+				newTask := func(pkg string) *task {
+					return &task{
+						cfg:    &cfg,
+						pkg:    pkg,
+						arch:   arch,
+						cond:   sync.NewCond(&sync.Mutex{}),
+						deps:   map[string]*task{},
+						jobch:  jobch,
+						donech: donech,
+					}
 				}
-			}
 
-			// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
-			log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
-			setupCtx := clog.WithLogger(ctx, log)
+				// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
+				log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
+				setupCtx := clog.WithLogger(ctx, log)
 
-			// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
-			pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
-			if err != nil {
-				return err
-			}
-			g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...))
-			if err != nil {
-				return err
-			}
-
-			// This drops any edges to non-local packages. This is a problem for bootstrap because things that depend
-			// on bootstrap stages need to be run early.
-			g, err = g.Filter(dag.FilterLocal())
-			if err != nil {
-				return err
-			}
-
-			// Only return main packages (configs) because we can't build just subpackages.
-			g, err = g.Filter(dag.OnlyMainPackages(pkgs))
-			if err != nil {
-				return err
-			}
-
-			m, err := g.Graph.AdjacencyMap()
-			if err != nil {
-				return err
-			}
-
-			tasks := map[string]*task{}
-			for _, pkg := range g.Packages() {
-				if tasks[pkg] == nil {
-					tasks[pkg] = newTask(pkg)
+				// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
+				pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
+				if err != nil {
+					return err
 				}
-				for k, v := range m {
-					// The package list is in the form of "pkg:version",
-					// but we only care about the package name.
-					if strings.HasPrefix(k, pkg+":") {
-						for _, dep := range v {
-							d, _, _ := strings.Cut(dep.Target, ":")
+				g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
+				if err != nil {
+					return err
+				}
 
-							if tasks[d] == nil {
-								tasks[d] = newTask(d)
+				// This drops any edges to non-local packages. This is a problem for bootstrap because things that depend
+				// on bootstrap stages need to be run early.
+				g, err = g.Filter(dag.FilterLocal())
+				if err != nil {
+					return err
+				}
+
+				// Only return main packages (configs) because we can't build just subpackages.
+				g, err = g.Filter(dag.OnlyMainPackages(pkgs))
+				if err != nil {
+					return err
+				}
+
+				m, err := g.Graph.AdjacencyMap()
+				if err != nil {
+					return err
+				}
+
+				tasks := map[string]*task{}
+				for _, pkg := range g.Packages() {
+					if tasks[pkg] == nil {
+						tasks[pkg] = newTask(pkg)
+					}
+					for k, v := range m {
+						// The package list is in the form of "pkg:version",
+						// but we only care about the package name.
+						if strings.HasPrefix(k, pkg+":") {
+							for _, dep := range v {
+								d, _, _ := strings.Cut(dep.Target, ":")
+
+								if tasks[d] == nil {
+									tasks[d] = newTask(d)
+								}
+								tasks[pkg].deps[d] = tasks[d]
 							}
-							tasks[pkg].deps[d] = tasks[d]
 						}
 					}
 				}
-			}
 
-			if len(tasks) == 0 {
-				return fmt.Errorf("no packages to build")
-			}
+				if len(tasks) == 0 {
+					return fmt.Errorf("no packages to build")
+				}
 
-			todos := tasks
-			if len(args) != 0 {
-				todos = make(map[string]*task, len(args))
+				todos := tasks
+				if len(args) != 0 {
+					todos = make(map[string]*task, len(args))
 
-				for _, arg := range args {
-					t, ok := tasks[arg]
-					if !ok {
-						return fmt.Errorf("constraint %q does not exist", arg)
+					for _, arg := range args {
+						t, ok := tasks[arg]
+						if !ok {
+							return fmt.Errorf("constraint %q does not exist", arg)
+						}
+						todos[arg] = t
 					}
-					todos[arg] = t
-				}
-			}
-
-			for _, t := range todos {
-				t.maybeStart(ctx)
-			}
-			count := len(todos)
-
-			// We're ok with Info level from here on.
-			log = clog.FromContext(ctx)
-
-			errs := []error{}
-			for len(todos) != 0 {
-				t := <-donech
-				delete(todos, t.pkg)
-
-				if err := t.err; err != nil {
-					errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
-					log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
-					continue
 				}
 
-				log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
+				for _, t := range todos {
+					t.maybeStart(ctx)
+				}
+				count := len(todos)
+
+				// We're ok with Info level from here on.
+				log = clog.FromContext(ctx)
+
+				eg.Go(func() error {
+					errs := []error{}
+					for len(todos) != 0 {
+						t := <-donech
+						delete(todos, t.pkg)
+
+						if err := t.err; err != nil {
+							errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
+							log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
+							continue
+						}
+
+						log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
+					}
+
+					// If the context is cancelled, it's not useful to print everything, just summarize the count.
+					if err := ctx.Err(); err != nil {
+						return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
+					}
+
+					return errors.Join(errs...)
+				})
 			}
 
-			// If the context is cancelled, it's not useful to print everything, just summarize the count.
-			if err := ctx.Err(); err != nil {
-				return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
-			}
-
-			return errors.Join(errs...)
+			return eg.Wait()
 		},
 	}
 
@@ -251,6 +259,8 @@ type task struct {
 	cfg *global
 
 	pkg  string
+	arch string
+
 	err  error
 	deps map[string]*task
 
@@ -329,137 +339,130 @@ func (t *task) build(ctx context.Context) error {
 		return fmt.Errorf("finding source date epoch: %w", err)
 	}
 
-	for _, arch := range t.cfg.archs {
-		arch := types.ParseArchitecture(arch).ToAPK()
+	arch := types.ParseArchitecture(t.arch).ToAPK()
 
-		pkgver := fmt.Sprintf("%s-%s-r%d", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
-		logDir := t.cfg.logdir(arch)
-		logfile := filepath.Join(logDir, pkgver) + ".log"
+	pkgver := fmt.Sprintf("%s-%s-r%d", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
+	logDir := t.cfg.logdir(arch)
+	logfile := filepath.Join(logDir, pkgver) + ".log"
 
-		// See if we already have the package built.
-		apk := pkgver + ".apk"
-		apkPath := filepath.Join(t.cfg.outDir, arch, apk)
-		if _, err := os.Stat(apkPath); err == nil {
-			log.Infof("skipping %s, already built", apkPath)
+	// See if we already have the package built.
+	apk := pkgver + ".apk"
+	apkPath := filepath.Join(t.cfg.outDir, arch, apk)
+	if _, err := os.Stat(apkPath); err == nil {
+		// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
+		log.Infof("skipping %s, already built", apkPath)
+		return nil
+	}
+
+	f, err := os.Create(logfile)
+	if err != nil {
+		return fmt.Errorf("creating logfile: :%w", err)
+	}
+	defer f.Close()
+
+	log = clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
+	fctx := clog.WithLogger(ctx, log)
+
+	if len(t.cfg.archs) > 1 {
+		log = clog.New(log.Handler()).With("arch", arch)
+		fctx = clog.WithLogger(fctx, log)
+	}
+
+	sdir := filepath.Join(t.cfg.dir, t.pkg)
+	if _, err := os.Stat(sdir); os.IsNotExist(err) {
+		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
+			return fmt.Errorf("creating source directory %s: %v", sdir, err)
+		}
+	} else if err != nil {
+		return fmt.Errorf("creating source directory: %v", err)
+	}
+
+	fn := fmt.Sprintf("%s.yaml", t.pkg)
+	if t.cfg.dryrun {
+		log.Infof("DRYRUN: would have built %s", apkPath)
+		return nil
+	}
+
+	runner, err := newRunner(fctx, t.cfg.runner)
+	if err != nil {
+		return fmt.Errorf("creating runner: %w", err)
+	}
+
+	log.Infof("will build: %s", apkPath)
+	bc, err := build.New(fctx,
+		build.WithArch(types.ParseArchitecture(arch)),
+		build.WithConfig(filepath.Join(t.cfg.dir, fn)),
+		build.WithPipelineDir(t.cfg.pipelineDir),
+		build.WithExtraKeys(t.cfg.extraKeys),
+		build.WithExtraRepos(t.cfg.extraRepos),
+		build.WithSigningKey(t.cfg.signingKey),
+		build.WithRunner(runner),
+		build.WithEnvFile(filepath.Join(t.cfg.dir, fmt.Sprintf("build-%s.env", arch))),
+		build.WithNamespace(t.cfg.namespace),
+		build.WithSourceDir(sdir),
+		build.WithCacheSource(t.cfg.cacheSource),
+		build.WithCacheDir(t.cfg.cacheDir),
+		build.WithOutDir(t.cfg.outDir),
+		build.WithBuildDate(sde),
+		build.WithRemove(true),
+	)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		// We Close() with the original context if we're cancelled so we get cleanup logs to stderr.
+		ctx := ctx
+		if ctx.Err() == nil {
+			// On happy path, we don't care about cleanup logs.
+			ctx = fctx
+		}
+
+		if err := bc.Close(ctx); err != nil {
+			log.Errorf("closing build %q: %v", t.pkg, err)
+		}
+	}()
+
+	if err := bc.BuildPackage(fctx); err != nil {
+		return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
+	}
+
+	// TODO: We only really need one lock per arch. See if this is a bottleneck.
+	t.cfg.mu.Lock()
+	defer t.cfg.mu.Unlock()
+
+	packageDir := filepath.Join(t.cfg.outDir, arch)
+	log.Infof("generating apk index from packages in %s", packageDir)
+
+	var apkFiles []string
+	apkFiles = append(apkFiles, apkPath)
+
+	for i := range cfg.Subpackages {
+		// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
+		subName := cfg.Subpackages[i].Name
+
+		subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
+		subpkgFileName := filepath.Join(packageDir, subpkgApk)
+		if _, err := os.Stat(subpkgFileName); err != nil {
+			log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
 			continue
 		}
+		apkFiles = append(apkFiles, subpkgFileName)
+	}
 
-		f, err := os.Create(logfile)
-		if err != nil {
-			return fmt.Errorf("creating logfile: :%w", err)
-		}
-		defer f.Close()
+	opts := []index.Option{
+		index.WithPackageFiles(apkFiles),
+		index.WithSigningKey(t.cfg.signingKey),
+		index.WithMergeIndexFileFlag(true),
+		index.WithIndexFile(filepath.Join(packageDir, "APKINDEX.tar.gz")),
+	}
 
-		log := clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
-		fctx := clog.WithLogger(ctx, log)
+	idx, err := index.New(opts...)
+	if err != nil {
+		return fmt.Errorf("unable to create index: %w", err)
+	}
 
-		if len(t.cfg.archs) > 1 {
-			log = clog.New(log.Handler()).With("arch", arch)
-			fctx = clog.WithLogger(fctx, log)
-		}
-
-		sdir := filepath.Join(t.cfg.dir, t.pkg)
-		if _, err := os.Stat(sdir); os.IsNotExist(err) {
-			if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
-				return fmt.Errorf("creating source directory %s: %v", sdir, err)
-			}
-		} else if err != nil {
-			return fmt.Errorf("creating source directory: %v", err)
-		}
-
-		fn := fmt.Sprintf("%s.yaml", t.pkg)
-		if t.cfg.dryrun {
-			log.Infof("DRYRUN: would have built %s", apkPath)
-			continue
-		}
-
-		runner, err := newRunner(fctx, t.cfg.runner)
-		if err != nil {
-			return fmt.Errorf("creating runner: %w", err)
-		}
-
-		log.Infof("will build: %s", apkPath)
-		bc, err := build.New(fctx,
-			build.WithArch(types.ParseArchitecture(arch)),
-			build.WithConfig(filepath.Join(t.cfg.dir, fn)),
-			build.WithPipelineDir(t.cfg.pipelineDir),
-			build.WithExtraKeys(t.cfg.extraKeys),
-			build.WithExtraRepos(t.cfg.extraRepos),
-			build.WithSigningKey(t.cfg.signingKey),
-			build.WithRunner(runner),
-			build.WithEnvFile(filepath.Join(t.cfg.dir, fmt.Sprintf("build-%s.env", arch))),
-			build.WithNamespace(t.cfg.namespace),
-			build.WithSourceDir(sdir),
-			build.WithCacheSource(t.cfg.cacheSource),
-			build.WithCacheDir(t.cfg.cacheDir),
-			build.WithOutDir(t.cfg.outDir),
-			build.WithBuildDate(sde),
-			build.WithRemove(true),
-		)
-		if err != nil {
-			return err
-		}
-		defer func() {
-			// We Close() with the original context if we're cancelled so we get cleanup logs to stderr.
-			ctx := ctx
-			if ctx.Err() == nil {
-				// On happy path, we don't care about cleanup logs.
-				ctx = fctx
-			}
-
-			if err := bc.Close(ctx); err != nil {
-				log.Errorf("closing build %q: %v", t.pkg, err)
-			}
-		}()
-
-		if err := bc.BuildPackage(fctx); err != nil {
-			return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
-		}
-
-		if err := func() error {
-			// TODO: We only really need one lock per arch. See if this is a bottleneck.
-			t.cfg.mu.Lock()
-			defer t.cfg.mu.Unlock()
-			packageDir := filepath.Join(t.cfg.outDir, arch)
-			log.Infof("generating apk index from packages in %s", packageDir)
-
-			var apkFiles []string
-			apkFiles = append(apkFiles, apkPath)
-
-			for i := range cfg.Subpackages {
-				// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
-				subName := cfg.Subpackages[i].Name
-
-				subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
-				subpkgFileName := filepath.Join(packageDir, subpkgApk)
-				if _, err := os.Stat(subpkgFileName); err != nil {
-					// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
-					log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
-					continue
-				}
-				apkFiles = append(apkFiles, subpkgFileName)
-			}
-
-			opts := []index.Option{
-				index.WithPackageFiles(apkFiles),
-				index.WithSigningKey(t.cfg.signingKey),
-				index.WithMergeIndexFileFlag(true),
-				index.WithIndexFile(filepath.Join(packageDir, "APKINDEX.tar.gz")),
-			}
-
-			idx, err := index.New(opts...)
-			if err != nil {
-				return fmt.Errorf("unable to create index: %w", err)
-			}
-
-			if err := idx.GenerateIndex(fctx); err != nil {
-				return fmt.Errorf("unable to generate index: %w", err)
-			}
-
-			return nil
-		}(); err != nil {
-			return err
-		}
+	if err := idx.GenerateIndex(fctx); err != nil {
+		return fmt.Errorf("unable to generate index: %w", err)
 	}
 
 	return nil
