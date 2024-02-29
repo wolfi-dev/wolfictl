@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,7 +22,9 @@ import (
 	"chainguard.dev/melange/pkg/container/docker"
 	"chainguard.dev/melange/pkg/index"
 	"github.com/chainguard-dev/clog"
+	"github.com/chainguard-dev/go-apk/pkg/apk"
 	charmlog "github.com/charmbracelet/log"
+	"github.com/dominikbraun/graph"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -113,6 +116,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
+	cmd.Flags().StringVar(&cfg.dst, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
 
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
@@ -120,53 +124,131 @@ func cmdBuild() *cobra.Command {
 	return cmd
 }
 
-func buildArch(ctx context.Context, cfg *global, arch string, args []string) error {
-	archDir := cfg.logdir(arch)
-	if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
-		return fmt.Errorf("creating buildlogs directory: %w", err)
-	}
+type configStuff struct {
+	g    *dag.Graph
+	m    map[string]map[string]graph.Edge[string]
+	pkgs *dag.Packages
+}
+
+func walkConfigs(ctx context.Context, cfg *global, arch string) (*configStuff, error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "walkConfigs")
+	defer span.End()
 
 	// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
 	log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
-	setupCtx := clog.WithLogger(ctx, log)
+	ctx = clog.WithLogger(ctx, log)
 
 	// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
-	pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
+	pkgs, err := dag.NewPackages(ctx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	pkgs, err = pkgs.WithArch(arch)
 	if err != nil {
-		return fmt.Errorf("arch: %w", err)
+		return nil, fmt.Errorf("arch: %w", err)
 	}
 
-	g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
+	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// This drops any edges to non-local packages. This is a problem for bootstrap because things that depend
 	// on bootstrap stages need to be run early.
 	g, err = g.Filter(dag.FilterLocal())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Only return main packages (configs) because we can't build just subpackages.
 	g, err = g.Filter(dag.OnlyMainPackages(pkgs))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	m, err := g.Graph.AdjacencyMap()
 	if err != nil {
+		return nil, err
+	}
+
+	return &configStuff{
+		g:    g,
+		m:    m,
+		pkgs: pkgs,
+	}, nil
+}
+
+func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchIndex")
+	defer span.End()
+
+	exist := map[string]struct{}{}
+	if dst == "" {
+		return exist, nil
+	}
+
+	// TODO: Support file paths. This is janky but we assume http for now because we need a better interface from go-apk.
+	repo := apk.Repository{
+		URI: fmt.Sprintf("%s/%s/%s", dst, arch, "APKINDEX.tar.gz"),
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, repo.URI, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	idx, err := apk.IndexFromArchive(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("parsing index %s: %w", repo.URI, err)
+	}
+
+	for _, pkg := range idx.Packages {
+		exist[pkg.Filename()] = struct{}{}
+	}
+
+	return exist, nil
+}
+
+func buildArch(ctx context.Context, cfg *global, arch string, args []string) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "build "+arch)
+	defer span.End()
+
+	archDir := cfg.logdir(arch)
+	if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
+		return fmt.Errorf("creating buildlogs directory: %w", err)
+	}
+
+	// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
+	var eg errgroup.Group
+
+	exist := map[string]struct{}{}
+	eg.Go(func() error {
+		var err error
+		exist, err = fetchIndex(ctx, cfg.dst, arch)
+		return err
+	})
+
+	var stuff *configStuff
+	eg.Go(func() error {
+		var err error
+		stuff, err = walkConfigs(ctx, cfg, arch)
+		return err
+	})
+
+	if err := eg.Wait(); err != nil {
 		return err
 	}
 
 	newTask := func(pkg string) *task {
 		// We should only hit these errors if dag.NewPackages is wrong.
-		loadedCfg := pkgs.Config(pkg, true)
+		loadedCfg := stuff.pkgs.Config(pkg, true)
 		if len(loadedCfg) == 0 {
 			panic(fmt.Sprintf("package does not seem to exist: %s", pkg))
 		}
@@ -176,21 +258,22 @@ func buildArch(ctx context.Context, cfg *global, arch string, args []string) err
 		}
 
 		return &task{
-			cfg:  cfg,
-			pkg:  pkg,
-			path: c.Path,
-			arch: arch,
-			cond: sync.NewCond(&sync.Mutex{}),
-			deps: map[string]*task{},
+			cfg:   cfg,
+			pkg:   pkg,
+			path:  c.Path,
+			exist: exist,
+			arch:  arch,
+			cond:  sync.NewCond(&sync.Mutex{}),
+			deps:  map[string]*task{},
 		}
 	}
 
 	tasks := map[string]*task{}
-	for _, pkg := range g.Packages() {
+	for _, pkg := range stuff.g.Packages() {
 		if tasks[pkg] == nil {
 			tasks[pkg] = newTask(pkg)
 		}
-		for k, v := range m {
+		for k, v := range stuff.m {
 			// The package list is in the form of "pkg:version",
 			// but we only care about the package name.
 			if strings.HasPrefix(k, pkg+":") {
@@ -229,7 +312,7 @@ func buildArch(ctx context.Context, cfg *global, arch string, args []string) err
 	count := len(todos)
 
 	// We're ok with Info level from here on.
-	log = clog.FromContext(ctx)
+	log := clog.FromContext(ctx)
 
 	errs := []error{}
 	skipped := 0
@@ -257,6 +340,10 @@ func buildArch(ctx context.Context, cfg *global, arch string, args []string) err
 		log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
 	}
 
+	if skipped != 0 {
+		log.Infof("Skipped building %d packages", skipped)
+	}
+
 	// If the context is cancelled, it's not useful to print everything, just summarize the count.
 	if err := ctx.Err(); err != nil {
 		return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
@@ -272,6 +359,7 @@ type global struct {
 	donech chan *task
 
 	dir         string
+	dst         string
 	pipelineDir string
 	runner      string
 
@@ -300,6 +388,8 @@ type task struct {
 	pkg  string
 	arch string
 	path string
+
+	exist map[string]struct{}
 
 	err  error
 	deps map[string]*task
@@ -376,10 +466,16 @@ func (t *task) build(ctx context.Context) error {
 	logfile := filepath.Join(logDir, pkgver) + ".log"
 
 	// See if we already have the package built.
-	apk := pkgver + ".apk"
-	apkPath := filepath.Join(t.cfg.outDir, arch, apk)
+	apkFile := pkgver + ".apk"
+
+	if _, ok := t.exist[apkFile]; ok {
+		log.Debugf("Skipping %s, already indexed", apkFile)
+		t.skipped = true
+		return nil
+	}
+
+	apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
 	if _, err := os.Stat(apkPath); err == nil {
-		// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
 		log.Debugf("Skipping %s, already built", apkPath)
 		t.skipped = true
 		return nil
