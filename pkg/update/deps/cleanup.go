@@ -138,26 +138,13 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 		if replace != nil {
 			if _, ok := pkgRequireVersions[replace.New.Path]; ok {
 				if semver.IsValid(pkgRequireVersions[replace.New.Path]) {
-					if semver.Compare(replace.New.Version, pkgRequireVersions[replace.New.Path]) >= 0 {
-						idx := slices.Index(deps, fmt.Sprintf("%s=%s@%s", replace.New.Path, replace.New.Path, pkgRequireVersions[replace.New.Path]))
-						if idx != -1 { // Check if the index is valid before attempting to slice
-							deps = append(deps[:idx], deps[idx+1:]...)
-							delete(pkgRequireVersions, replace.New.Path)
-						}
-					}
+					updateDependencyLists(replace.New.Path, replace.New.Version, pkgRequireVersions, &deps, "{pkg}={pkg}@{ver}")
 				}
 			}
 			if _, ok := pkgReplaceVersions[replace.New.Path]; ok {
 				if semver.IsValid(pkgReplaceVersions[replace.New.Path]) {
 					// If the replace block in the upstream go.mod contains a newer version then remove the existing dep from replaces
-					if semver.Compare(replace.New.Version, pkgReplaceVersions[replace.New.Path]) > 0 {
-						// TODO(hectorj2f): Assume that the source is the same
-						idx := slices.Index(replaces, fmt.Sprintf("%s=%s@%s", replace.New.Path, replace.New.Path, pkgReplaceVersions[replace.New.Path]))
-						if idx != -1 { // Check if the index is valid before attempting to slice
-							replaces = append(replaces[:idx], replaces[idx+1:]...)
-							delete(pkgReplaceVersions, replace.New.Path)
-						}
-					}
+					updateDependencyLists(replace.New.Path, replace.New.Version, pkgReplaceVersions, &replaces, "{pkg}={pkg}@{ver}")
 				}
 			}
 		}
@@ -167,26 +154,13 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 		if require != nil {
 			if _, ok := pkgRequireVersions[require.Mod.Path]; ok {
 				if semver.IsValid(pkgRequireVersions[require.Mod.Path]) {
-					if semver.Compare(require.Mod.Version, pkgRequireVersions[require.Mod.Path]) >= 0 {
-						idx := slices.Index(deps, fmt.Sprintf("%s@%s", require.Mod.Path, pkgRequireVersions[require.Mod.Path]))
-						if idx != -1 { // Check if the index is valid before attempting to slice
-							deps = append(deps[:idx], deps[idx+1:]...)
-							delete(pkgRequireVersions, require.Mod.Path)
-						}
-					}
+					updateDependencyLists(require.Mod.Path, require.Mod.Version, pkgRequireVersions, &deps, "{pkg}@{ver}")
 				}
 			}
 			if _, ok := pkgReplaceVersions[require.Mod.Path]; ok {
 				if semver.IsValid(pkgReplaceVersions[require.Mod.Path]) {
 					// If the require block in the upstream go.mod contains a newer version then remove the existing dep from replaces
-					if semver.Compare(require.Mod.Version, pkgReplaceVersions[require.Mod.Path]) > 0 {
-						// TODO(hectorj2f): Assume that the source is the same
-						idx := slices.Index(replaces, fmt.Sprintf("%s=%s@%s", require.Mod.Path, require.Mod.Path, pkgReplaceVersions[require.Mod.Path]))
-						if idx != -1 { // Check if the index is valid before attempting to slice
-							replaces = append(replaces[:idx], replaces[idx+1:]...)
-							delete(pkgReplaceVersions, require.Mod.Path)
-						}
-					}
+					updateDependencyLists(require.Mod.Path, require.Mod.Version, pkgReplaceVersions, &replaces, "{pkg}={pkg}@{ver}")
 				}
 			}
 		}
@@ -204,6 +178,26 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 	log.Printf("New [replaces]: %v\n", p.With["replaces"])
 
 	return nil
+}
+
+// optionally remove the package from the list if the version is greater or equal to the target version
+func updateDependencyLists(pkgPath, version string, versionsMap map[string]string, list *[]string, format string) {
+	if targetVersion, ok := versionsMap[pkgPath]; ok && semver.IsValid(targetVersion) {
+		// Determine comparison based on the presence of "=" in the format, which indicates a replacement.
+		isReplace := strings.Contains(format, "=")
+		compareResult := semver.Compare(version, targetVersion)
+
+		// For requires, we check for >= 0; for replaces, > 0.
+		if (!isReplace && compareResult >= 0) || (isReplace && compareResult > 0) {
+			formattedString := strings.ReplaceAll(format, "{pkg}", pkgPath)
+			formattedString = strings.ReplaceAll(formattedString, "{ver}", targetVersion)
+			idx := slices.Index(*list, formattedString)
+			if idx != -1 {
+				*list = append((*list)[:idx], (*list)[idx+1:]...)
+				delete(versionsMap, pkgPath)
+			}
+		}
+	}
 }
 
 // ContainsGoBumpPipeline checks whether there is a gobump in the wolfi package definition.
