@@ -1,8 +1,6 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.21.3
-
-toolchain go1.21.5
+go 1.21.7
 
 require (
 	chainguard.dev/apko v0.14.1-0.20240227175428-53cb29ff83c9
