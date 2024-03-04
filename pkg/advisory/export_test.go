@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -59,6 +60,28 @@ func Test_ExportFuncs(t *testing.T) {
 					t.Errorf("ExportCSV() produced unexpected data (-want +got):\n%s", diff)
 				}
 			}
+		})
+	}
+}
+
+func TestImportAdvisoriesYAML(t *testing.T) {
+	cases := []struct {
+		name            string
+		pathToInputData string
+	}{
+		{
+			name:            "test-yaml",
+			pathToInputData: "./testdata/export/expected.yaml",
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			tempDir, importedDocuments, err := ImporAdvisoriesYAML(tt.pathToInputData)
+			require.NoError(t, err)
+			require.Equal(t, 3, importedDocuments.Select().Len())
+
+			defer os.RemoveAll(tempDir)
 		})
 	}
 }
