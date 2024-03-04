@@ -6,7 +6,7 @@ toolchain go1.21.5
 
 require (
 	chainguard.dev/apko v0.14.1-0.20240227175428-53cb29ff83c9
-	chainguard.dev/melange v0.6.5
+	chainguard.dev/melange v0.6.6
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.7
 	github.com/anchore/stereoscope v0.0.2-0.20240216182029-6171ee21e1d5
