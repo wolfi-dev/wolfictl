@@ -7,9 +7,10 @@ import (
 	"io"
 
 	"github.com/samber/lo"
+	"gopkg.in/yaml.v3"
+
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	"gopkg.in/yaml.v3"
 )
 
 type ExportOptions struct {
