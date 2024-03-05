@@ -14,7 +14,7 @@ require (
 	github.com/chainguard-dev/yam v0.0.2
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
-	github.com/charmbracelet/lipgloss v0.9.1
+	github.com/charmbracelet/lipgloss v0.10.0
 	github.com/charmbracelet/log v0.3.2-0.20240205220859-7a3834f9b367
 	github.com/cli/go-gh/v2 v2.6.0
 	github.com/cpuguy83/go-md2man v1.0.10
