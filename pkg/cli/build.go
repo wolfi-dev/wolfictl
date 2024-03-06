@@ -224,6 +224,8 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
 	cmd.Flags().StringVar(&cfg.namespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
 	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
+	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
+	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
@@ -406,7 +408,10 @@ func (t *task) build(ctx context.Context) error {
 		build.WithBuildDate(sde),
 		build.WithRemove(true),
 	)
-	if err != nil {
+	if errors.Is(err, build.ErrSkipThisArch) {
+		log.Warnf("skipping arch %s", arch)
+		return nil
+	} else if err != nil {
 		return err
 	}
 	defer func() {
