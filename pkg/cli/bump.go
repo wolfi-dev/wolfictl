@@ -15,9 +15,10 @@ import (
 const epochPattern = `epoch: %d`
 
 type bumpOptions struct {
-	repoDir string
-	epoch   bool
-	dryRun  bool
+	repoDir   string
+	epoch     bool
+	dryRun    bool
+	increment bool
 }
 
 // this feels very hacky but the Makefile is going away with help from Dag so plan to delete this func soon
@@ -72,6 +73,14 @@ the version in each matching configuration file:
     wolfictl bump openssl
     wolfictl bump lib*.yaml
 
+wolfictl bump can take a filename, a package or a file glob,
+and extra flag increment set to false , decreasing the version in each
+matching configuration file:
+
+    wolfictl bump --increment=false zlib.yaml
+    wolfictl bump --increment=false openssl
+    wolfictl bump --increment=false lib*.yaml
+
 The command assumes it is being run from the top of the wolfi/os
 repository. To look for files in another location use the --repo flag.
 You can use --dry-run to see which versions will be bumped without
@@ -120,6 +129,7 @@ modifying anything in the filesystem.
 	cmd.Flags().BoolVar(&opts.epoch, "epoch", true, "bump the package epoch")
 	cmd.Flags().BoolVar(&opts.dryRun, "dry-run", false, "don't change anything, just print what would be done")
 	cmd.Flags().StringVar(&opts.repoDir, "repo", ".", "path to the wolfi/os repository")
+	cmd.Flags().BoolVar(&opts.increment, "increment", true, "increments/decrements the package epoch")
 
 	return cmd
 }
@@ -130,9 +140,14 @@ func bumpEpoch(ctx context.Context, opts bumpOptions, path string) error {
 		return fmt.Errorf("unable to parse configuration at %q: %w", path, err)
 	}
 
+	newEpoch := cfg.Package.Epoch + 1
+	if !opts.increment {
+		newEpoch = cfg.Package.Epoch - 1
+	}
+
 	fmt.Fprintf(
 		os.Stderr, "bumping %s-%s-%d in %s to epoch %d\n", cfg.Package.Name,
-		cfg.Package.Version, cfg.Package.Epoch, path, cfg.Package.Epoch+1,
+		cfg.Package.Version, cfg.Package.Epoch, path, newEpoch,
 	)
 
 	if opts.dryRun {
@@ -154,7 +169,7 @@ func bumpEpoch(ctx context.Context, opts bumpOptions, path string) error {
 			found = true
 			newFile = append(
 				newFile, strings.ReplaceAll(
-					scanner.Text(), old, fmt.Sprintf(epochPattern, cfg.Package.Epoch+1),
+					scanner.Text(), old, fmt.Sprintf(epochPattern, newEpoch),
 				),
 			)
 		} else {
@@ -173,7 +188,7 @@ func bumpEpoch(ctx context.Context, opts bumpOptions, path string) error {
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
 
-	if err := updateMakefile(opts.repoDir, cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch+1); err != nil {
+	if err := updateMakefile(opts.repoDir, cfg.Package.Name, cfg.Package.Version, newEpoch); err != nil {
 		return fmt.Errorf("updating makefile: %w", err)
 	}
 
