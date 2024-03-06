@@ -2,6 +2,7 @@ package advisory
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -29,7 +30,10 @@ func Test_ImportAdvisoriesYAML(t *testing.T) {
 			advisoryDocs, err := v2.NewIndex(context.Background(), advisoryFsys)
 			require.NoError(t, err)
 
-			_, importedDocuments, err := ImporAdvisoriesYAML(tt.pathToInputData)
+			b, err := os.ReadFile(tt.pathToInputData)
+			require.NoError(t, err)
+
+			_, importedDocuments, err := ImporAdvisoriesYAML(b)
 			require.NoError(t, err)
 			require.Equal(t, advisoryDocs.Select().Len(), importedDocuments.Select().Len())
 		})

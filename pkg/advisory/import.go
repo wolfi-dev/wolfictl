@@ -15,13 +15,8 @@ import (
 )
 
 // ImporAdvisoriesYAML import and yaml Advisories data and present as a config index struct
-func ImporAdvisoriesYAML(inputData string) (tempDir string, documents *configs.Index[v2.Document], err error) {
-	inputAdv, err := os.ReadFile(inputData)
-	if err != nil {
-		return "", nil, fmt.Errorf("unable to create output file: %v", err)
-	}
-
-	yamlDocs := bytes.Split(inputAdv, []byte("\n---\n"))
+func ImporAdvisoriesYAML(inputData []byte) (tempDir string, documents *configs.Index[v2.Document], err error) {
+	yamlDocs := bytes.Split(inputData, []byte("\n---\n"))
 	// Unmarshal YAML documents
 	var docs []v2.Document
 	for _, doc := range yamlDocs {
