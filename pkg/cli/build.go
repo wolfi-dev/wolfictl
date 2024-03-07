@@ -188,6 +188,8 @@ func cmdBuild() *cobra.Command {
 
 				eg.Go(func() error {
 					errs := []error{}
+					skipped := 0
+
 					for len(todos) != 0 {
 						t := <-donech
 						delete(todos, t.pkg)
@@ -196,6 +198,16 @@ func cmdBuild() *cobra.Command {
 							errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
 							log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
 							continue
+						}
+
+						// Logging every skipped package is too noisy, so we just print a summary
+						// of the number of packages we skipped between actual builds.
+						if t.skipped {
+							skipped++
+							continue
+						} else if skipped != 0 {
+							log.Infof("Skipped building %d packages", skipped)
+							skipped = 0
 						}
 
 						log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
@@ -272,6 +284,7 @@ type task struct {
 	cond    *sync.Cond
 	started bool
 	done    bool
+	skipped bool
 
 	jobch  chan struct{}
 	donech chan *task
@@ -309,7 +322,7 @@ func (t *task) start(ctx context.Context) {
 	}
 
 	if len(t.deps) != 0 {
-		clog.FromContext(ctx).Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+		clog.FromContext(ctx).Debugf("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 	}
 
 	for _, dep := range t.deps {
@@ -333,15 +346,9 @@ func (t *task) build(ctx context.Context) error {
 	}
 
 	log := clog.FromContext(ctx)
-	log.Infof("Starting to build %s", t.pkg)
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.cfg.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
-	}
-
-	sde, err := t.gitSDE(ctx, cfg.Package.Name)
-	if err != nil {
-		return fmt.Errorf("finding source date epoch: %w", err)
 	}
 
 	arch := types.ParseArchitecture(t.arch).ToAPK()
@@ -355,7 +362,8 @@ func (t *task) build(ctx context.Context) error {
 	apkPath := filepath.Join(t.cfg.outDir, arch, apk)
 	if _, err := os.Stat(apkPath); err == nil {
 		// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
-		log.Infof("skipping %s, already built", apkPath)
+		log.Debugf("Skipping %s, already built", apkPath)
+		t.skipped = true
 		return nil
 	}
 
@@ -393,7 +401,12 @@ func (t *task) build(ctx context.Context) error {
 		return fmt.Errorf("creating runner: %w", err)
 	}
 
-	log.Infof("will build: %s", apkPath)
+	sde, err := t.gitSDE(ctx, cfg.Package.Name)
+	if err != nil {
+		return fmt.Errorf("finding source date epoch: %w", err)
+	}
+
+	log.Infof("Building %s", t.pkg)
 	bc, err := build.New(fctx,
 		build.WithArch(types.ParseArchitecture(arch)),
 		build.WithConfig(filepath.Join(t.cfg.dir, fn)),
@@ -412,7 +425,7 @@ func (t *task) build(ctx context.Context) error {
 		build.WithRemove(true),
 	)
 	if errors.Is(err, build.ErrSkipThisArch) {
-		log.Warnf("skipping arch %s", arch)
+		log.Warnf("Skipping arch %s", arch)
 		return nil
 	} else if err != nil {
 		return err
@@ -426,7 +439,7 @@ func (t *task) build(ctx context.Context) error {
 		}
 
 		if err := bc.Close(ctx); err != nil {
-			log.Errorf("closing build %q: %v", t.pkg, err)
+			log.Errorf("Closing build %q: %v", t.pkg, err)
 		}
 	}()
 
@@ -442,7 +455,7 @@ func (t *task) build(ctx context.Context) error {
 		defer t.cfg.mu.Unlock()
 
 		packageDir := filepath.Join(t.cfg.outDir, arch)
-		log.Infof("generating apk index from packages in %s", packageDir)
+		log.Infof("Generating apk index from packages in %s", packageDir)
 
 		var apkFiles []string
 		apkFiles = append(apkFiles, apkPath)
@@ -454,7 +467,7 @@ func (t *task) build(ctx context.Context) error {
 			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
 			subpkgFileName := filepath.Join(packageDir, subpkgApk)
 			if _, err := os.Stat(subpkgFileName); err != nil {
-				log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
+				log.Warnf("Skipping subpackage %s (was not built): %v", subpkgFileName, err)
 				continue
 			}
 			apkFiles = append(apkFiles, subpkgFileName)
