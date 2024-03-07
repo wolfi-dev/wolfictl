@@ -1,0 +1,64 @@
+{
+  "Signature": null,
+  "Description": "",
+  "Packages": [
+    {
+      "Name": "7zip",
+      "Version": "22.01-r0",
+      "Arch": "x86_64",
+      "Description": "File archiver with a high compression ratio",
+      "License": "LGPL-2.0-only",
+      "Origin": "7zip",
+      "Maintainer": "",
+      "URL": "",
+      "Checksum": "WmGnNqREp8L34t7rILbINU9sMts=",
+      "Dependencies": [
+        "so:ld-linux-x86-64.so.2",
+        "so:libc.so.6",
+        "so:libgcc_s.so.1",
+        "so:libstdc++.so.6"
+      ],
+      "Provides": [
+        "cmd:7zz=22.01-r0"
+      ],
+      "InstallIf": null,
+      "Size": 1212953,
+      "InstalledSize": 2621828,
+      "ProviderPriority": 0,
+      "BuildTime": "2023-06-16T19:14:10Z",
+      "BuildDate": 1686942850,
+      "RepoCommit": "3034d595991a3a7cabd72895c1a6a723e337e478",
+      "Replaces": null,
+      "DataHash": ""
+    },
+    {
+      "Name": "7zip",
+      "Version": "2201-r0",
+      "Arch": "x86_64",
+      "Description": "File archiver with a high compression ratio",
+      "License": "LGPL-2.0-only",
+      "Origin": "7zip",
+      "Maintainer": "",
+      "URL": "",
+      "Checksum": "CQiy+5tJ5+Oe2hcjaV9iybZ2hgM=",
+      "Dependencies": [
+        "so:ld-linux-x86-64.so.2",
+        "so:libc.so.6",
+        "so:libgcc_s.so.1",
+        "so:libstdc++.so.6"
+      ],
+      "Provides": [
+        "cmd:7zz=2201-r0"
+      ],
+      "InstallIf": null,
+      "Size": 1257476,
+      "InstalledSize": 2617725,
+      "ProviderPriority": 0,
+      "BuildTime": "2023-08-02T01:38:07Z",
+      "BuildDate": 1690940287,
+      "RepoCommit": "7bfb77ab31d2a4d04c0dfa60dd9036d06e267679",
+      "Replaces": null,
+      "DataHash": ""
+    }
+  ]
+}
