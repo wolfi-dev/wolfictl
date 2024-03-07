@@ -3,6 +3,7 @@ package apk
 import (
 	"archive/tar"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -41,6 +42,18 @@ func (c Context) GetApkPackages() (map[string]*apk.Package, error) {
 	}
 
 	return ParseApkIndex(resp.Body)
+}
+
+func ParsePackageIndexFromJSON(jsonAPKLIndex []byte) (map[string]*apk.Package, error) {
+	var idx apk.APKIndex
+	wolfiPackages := make(map[string]*apk.Package)
+
+	err := json.Unmarshal(jsonAPKLIndex, &idx)
+	if err != nil {
+		return nil, err
+	}
+
+	return getLatestPackagesMap(idx.Packages, wolfiPackages)
 }
 
 func ParseUnpackedApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, error) {
