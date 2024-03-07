@@ -428,6 +428,7 @@ func (t *task) build(ctx context.Context) error {
 	)
 	if errors.Is(err, build.ErrSkipThisArch) {
 		log.Warnf("Skipping arch %s", arch)
+		t.skipped = true
 		return nil
 	} else if err != nil {
 		return err
