@@ -73,9 +73,8 @@ func cmdBuild() *cobra.Command {
 			if jobs == 0 {
 				jobs = runtime.GOMAXPROCS(0)
 			}
-			jobch := make(chan struct{}, jobs)
-
-			donech := make(chan *task, jobs)
+			cfg.jobch = make(chan struct{}, jobs)
+			cfg.donech = make(chan *task, jobs)
 
 			if cfg.signingKey == "" {
 				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
@@ -91,122 +90,9 @@ func cmdBuild() *cobra.Command {
 
 			// Logs will go here to mimic the wolfi Makefile.
 			for _, arch := range cfg.archs {
-				archDir := cfg.logdir(arch)
-				if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
-					return fmt.Errorf("creating buildlogs directory: %w", err)
-				}
-
-				newTask := func(pkg string) *task {
-					return &task{
-						cfg:    &cfg,
-						pkg:    pkg,
-						arch:   arch,
-						cond:   sync.NewCond(&sync.Mutex{}),
-						deps:   map[string]*task{},
-						jobch:  jobch,
-						donech: donech,
-					}
-				}
-
-				// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
-				log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
-				setupCtx := clog.WithLogger(ctx, log)
-
-				// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
-				pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
-				if err != nil {
-					return err
-				}
-				g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
-				if err != nil {
-					return err
-				}
-
-				// This drops any edges to non-local packages. This is a problem for bootstrap because things that depend
-				// on bootstrap stages need to be run early.
-				g, err = g.Filter(dag.FilterLocal())
-				if err != nil {
-					return err
-				}
-
-				// Only return main packages (configs) because we can't build just subpackages.
-				g, err = g.Filter(dag.OnlyMainPackages(pkgs))
-				if err != nil {
-					return err
-				}
-
-				m, err := g.Graph.AdjacencyMap()
-				if err != nil {
-					return err
-				}
-
-				tasks := map[string]*task{}
-				for _, pkg := range g.Packages() {
-					if tasks[pkg] == nil {
-						tasks[pkg] = newTask(pkg)
-					}
-					for k, v := range m {
-						// The package list is in the form of "pkg:version",
-						// but we only care about the package name.
-						if strings.HasPrefix(k, pkg+":") {
-							for _, dep := range v {
-								d, _, _ := strings.Cut(dep.Target, ":")
-
-								if tasks[d] == nil {
-									tasks[d] = newTask(d)
-								}
-								tasks[pkg].deps[d] = tasks[d]
-							}
-						}
-					}
-				}
-
-				if len(tasks) == 0 {
-					return fmt.Errorf("no packages to build")
-				}
-
-				todos := tasks
-				if len(args) != 0 {
-					todos = make(map[string]*task, len(args))
-
-					for _, arg := range args {
-						t, ok := tasks[arg]
-						if !ok {
-							return fmt.Errorf("constraint %q does not exist", arg)
-						}
-						todos[arg] = t
-					}
-				}
-
-				for _, t := range todos {
-					t.maybeStart(ctx)
-				}
-				count := len(todos)
-
-				// We're ok with Info level from here on.
-				log = clog.FromContext(ctx)
-
+				arch := arch
 				eg.Go(func() error {
-					errs := []error{}
-					for len(todos) != 0 {
-						t := <-donech
-						delete(todos, t.pkg)
-
-						if err := t.err; err != nil {
-							errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
-							log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
-							continue
-						}
-
-						log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
-					}
-
-					// If the context is cancelled, it's not useful to print everything, just summarize the count.
-					if err := ctx.Err(); err != nil {
-						return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
-					}
-
-					return errors.Join(errs...)
+					return buildArch(ctx, &cfg, arch, args)
 				})
 			}
 
@@ -234,8 +120,139 @@ func cmdBuild() *cobra.Command {
 	return cmd
 }
 
+func buildArch(ctx context.Context, cfg *global, arch string, args []string) error {
+	archDir := cfg.logdir(arch)
+	if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
+		return fmt.Errorf("creating buildlogs directory: %w", err)
+	}
+
+	newTask := func(pkg string) *task {
+		return &task{
+			cfg:  cfg,
+			pkg:  pkg,
+			arch: arch,
+			cond: sync.NewCond(&sync.Mutex{}),
+			deps: map[string]*task{},
+		}
+	}
+
+	// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
+	log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
+	setupCtx := clog.WithLogger(ctx, log)
+
+	// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
+	pkgs, err := dag.NewPackages(setupCtx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
+	if err != nil {
+		return err
+	}
+	g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
+	if err != nil {
+		return err
+	}
+
+	// This drops any edges to non-local packages. This is a problem for bootstrap because things that depend
+	// on bootstrap stages need to be run early.
+	g, err = g.Filter(dag.FilterLocal())
+	if err != nil {
+		return err
+	}
+
+	// Only return main packages (configs) because we can't build just subpackages.
+	g, err = g.Filter(dag.OnlyMainPackages(pkgs))
+	if err != nil {
+		return err
+	}
+
+	m, err := g.Graph.AdjacencyMap()
+	if err != nil {
+		return err
+	}
+
+	tasks := map[string]*task{}
+	for _, pkg := range g.Packages() {
+		if tasks[pkg] == nil {
+			tasks[pkg] = newTask(pkg)
+		}
+		for k, v := range m {
+			// The package list is in the form of "pkg:version",
+			// but we only care about the package name.
+			if strings.HasPrefix(k, pkg+":") {
+				for _, dep := range v {
+					d, _, _ := strings.Cut(dep.Target, ":")
+
+					if tasks[d] == nil {
+						tasks[d] = newTask(d)
+					}
+					tasks[pkg].deps[d] = tasks[d]
+				}
+			}
+		}
+	}
+
+	if len(tasks) == 0 {
+		return fmt.Errorf("no packages to build")
+	}
+
+	todos := tasks
+	if len(args) != 0 {
+		todos = make(map[string]*task, len(args))
+
+		for _, arg := range args {
+			t, ok := tasks[arg]
+			if !ok {
+				return fmt.Errorf("constraint %q does not exist", arg)
+			}
+			todos[arg] = t
+		}
+	}
+
+	for _, t := range todos {
+		t.maybeStart(ctx)
+	}
+	count := len(todos)
+
+	// We're ok with Info level from here on.
+	log = clog.FromContext(ctx)
+
+	errs := []error{}
+	skipped := 0
+
+	for len(todos) != 0 {
+		t := <-cfg.donech
+		delete(todos, t.pkg)
+
+		if err := t.err; err != nil {
+			errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
+			log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
+			continue
+		}
+
+		// Logging every skipped package is too noisy, so we just print a summary
+		// of the number of packages we skipped between actual builds.
+		if t.skipped {
+			skipped++
+			continue
+		} else if skipped != 0 {
+			log.Infof("Skipped building %d packages", skipped)
+			skipped = 0
+		}
+
+		log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
+	}
+
+	// If the context is cancelled, it's not useful to print everything, just summarize the count.
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
+	}
+
+	return errors.Join(errs...)
+}
+
 type global struct {
 	dryrun bool
+
+	jobch  chan struct{}
+	donech chan *task
 
 	dir         string
 	pipelineDir string
@@ -272,9 +289,7 @@ type task struct {
 	cond    *sync.Cond
 	started bool
 	done    bool
-
-	jobch  chan struct{}
-	donech chan *task
+	skipped bool
 }
 
 func (t *task) gitSDE(ctx context.Context, origin string) (string, error) {
@@ -301,7 +316,7 @@ func (t *task) start(ctx context.Context) {
 		t.done = true
 		t.cond.Broadcast()
 		t.cond.L.Unlock()
-		t.donech <- t
+		t.cfg.donech <- t
 	}()
 
 	for _, dep := range t.deps {
@@ -309,7 +324,7 @@ func (t *task) start(ctx context.Context) {
 	}
 
 	if len(t.deps) != 0 {
-		clog.FromContext(ctx).Infof("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+		clog.FromContext(ctx).Debugf("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
 	}
 
 	for _, dep := range t.deps {
@@ -320,8 +335,8 @@ func (t *task) start(ctx context.Context) {
 	}
 
 	// Block on jobch, to limit concurrency. Remove from jobch when done.
-	t.jobch <- struct{}{}
-	defer func() { <-t.jobch }()
+	t.cfg.jobch <- struct{}{}
+	defer func() { <-t.cfg.jobch }()
 
 	// all deps are done and we're clear to launch.
 	t.err = t.build(ctx)
@@ -333,15 +348,9 @@ func (t *task) build(ctx context.Context) error {
 	}
 
 	log := clog.FromContext(ctx)
-	log.Infof("Starting to build %s", t.pkg)
 	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.cfg.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
-	}
-
-	sde, err := t.gitSDE(ctx, cfg.Package.Name)
-	if err != nil {
-		return fmt.Errorf("finding source date epoch: %w", err)
 	}
 
 	arch := types.ParseArchitecture(t.arch).ToAPK()
@@ -355,7 +364,8 @@ func (t *task) build(ctx context.Context) error {
 	apkPath := filepath.Join(t.cfg.outDir, arch, apk)
 	if _, err := os.Stat(apkPath); err == nil {
 		// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
-		log.Infof("skipping %s, already built", apkPath)
+		log.Debugf("Skipping %s, already built", apkPath)
+		t.skipped = true
 		return nil
 	}
 
@@ -393,7 +403,12 @@ func (t *task) build(ctx context.Context) error {
 		return fmt.Errorf("creating runner: %w", err)
 	}
 
-	log.Infof("will build: %s", apkPath)
+	sde, err := t.gitSDE(ctx, cfg.Package.Name)
+	if err != nil {
+		return fmt.Errorf("finding source date epoch: %w", err)
+	}
+
+	log.Infof("Building %s", t.pkg)
 	bc, err := build.New(fctx,
 		build.WithArch(types.ParseArchitecture(arch)),
 		build.WithConfig(filepath.Join(t.cfg.dir, fn)),
@@ -412,7 +427,7 @@ func (t *task) build(ctx context.Context) error {
 		build.WithRemove(true),
 	)
 	if errors.Is(err, build.ErrSkipThisArch) {
-		log.Warnf("skipping arch %s", arch)
+		log.Warnf("Skipping arch %s", arch)
 		return nil
 	} else if err != nil {
 		return err
@@ -426,7 +441,7 @@ func (t *task) build(ctx context.Context) error {
 		}
 
 		if err := bc.Close(ctx); err != nil {
-			log.Errorf("closing build %q: %v", t.pkg, err)
+			log.Errorf("Closing build %q: %v", t.pkg, err)
 		}
 	}()
 
@@ -442,7 +457,7 @@ func (t *task) build(ctx context.Context) error {
 		defer t.cfg.mu.Unlock()
 
 		packageDir := filepath.Join(t.cfg.outDir, arch)
-		log.Infof("generating apk index from packages in %s", packageDir)
+		log.Infof("Generating apk index from packages in %s", packageDir)
 
 		var apkFiles []string
 		apkFiles = append(apkFiles, apkPath)
@@ -454,7 +469,7 @@ func (t *task) build(ctx context.Context) error {
 			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
 			subpkgFileName := filepath.Join(packageDir, subpkgApk)
 			if _, err := os.Stat(subpkgFileName); err != nil {
-				log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
+				log.Warnf("Skipping subpackage %s (was not built): %v", subpkgFileName, err)
 				continue
 			}
 			apkFiles = append(apkFiles, subpkgFileName)
