@@ -430,6 +430,8 @@ func (t *task) build(ctx context.Context) error {
 		}
 	}()
 
+	fctx, span := otel.Tracer("wolfictl").Start(fctx, t.pkg)
+	defer span.End()
 	if err := bc.BuildPackage(fctx); err != nil {
 		return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
 	}
