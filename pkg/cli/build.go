@@ -226,6 +226,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
+	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
 
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
@@ -243,6 +244,8 @@ type global struct {
 	archs      []string
 	extraKeys  []string
 	extraRepos []string
+
+	generateIndex bool
 
 	signingKey  string
 	namespace   string
@@ -431,43 +434,45 @@ func (t *task) build(ctx context.Context) error {
 		return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
 	}
 
-	// TODO: We only really need one lock per arch. See if this is a bottleneck.
-	t.cfg.mu.Lock()
-	defer t.cfg.mu.Unlock()
+	if t.cfg.generateIndex {
+		// TODO: We only really need one lock per arch. See if this is a bottleneck.
+		t.cfg.mu.Lock()
+		defer t.cfg.mu.Unlock()
 
-	packageDir := filepath.Join(t.cfg.outDir, arch)
-	log.Infof("generating apk index from packages in %s", packageDir)
+		packageDir := filepath.Join(t.cfg.outDir, arch)
+		log.Infof("generating apk index from packages in %s", packageDir)
 
-	var apkFiles []string
-	apkFiles = append(apkFiles, apkPath)
+		var apkFiles []string
+		apkFiles = append(apkFiles, apkPath)
 
-	for i := range cfg.Subpackages {
-		// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
-		subName := cfg.Subpackages[i].Name
+		for i := range cfg.Subpackages {
+			// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
+			subName := cfg.Subpackages[i].Name
 
-		subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
-		subpkgFileName := filepath.Join(packageDir, subpkgApk)
-		if _, err := os.Stat(subpkgFileName); err != nil {
-			log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
-			continue
+			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
+			subpkgFileName := filepath.Join(packageDir, subpkgApk)
+			if _, err := os.Stat(subpkgFileName); err != nil {
+				log.Warnf("skipping %s (was not built): %v", subpkgFileName, err)
+				continue
+			}
+			apkFiles = append(apkFiles, subpkgFileName)
 		}
-		apkFiles = append(apkFiles, subpkgFileName)
-	}
 
-	opts := []index.Option{
-		index.WithPackageFiles(apkFiles),
-		index.WithSigningKey(t.cfg.signingKey),
-		index.WithMergeIndexFileFlag(true),
-		index.WithIndexFile(filepath.Join(packageDir, "APKINDEX.tar.gz")),
-	}
+		opts := []index.Option{
+			index.WithPackageFiles(apkFiles),
+			index.WithSigningKey(t.cfg.signingKey),
+			index.WithMergeIndexFileFlag(true),
+			index.WithIndexFile(filepath.Join(packageDir, "APKINDEX.tar.gz")),
+		}
 
-	idx, err := index.New(opts...)
-	if err != nil {
-		return fmt.Errorf("unable to create index: %w", err)
-	}
+		idx, err := index.New(opts...)
+		if err != nil {
+			return fmt.Errorf("unable to create index: %w", err)
+		}
 
-	if err := idx.GenerateIndex(fctx); err != nil {
-		return fmt.Errorf("unable to generate index: %w", err)
+		if err := idx.GenerateIndex(fctx); err != nil {
+			return fmt.Errorf("unable to generate index: %w", err)
+		}
 	}
 
 	return nil
