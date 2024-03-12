@@ -228,7 +228,12 @@ func CleanupGoBumpDeps(doc *yaml.Node, updated *config.Configuration, tidy bool,
 	for i < len(updated.Pipeline) {
 		// TODO(hectorj2f): add support for fetch pipelines
 		if updated.Pipeline[i].Uses == "git-checkout" {
-			err := gitCheckout(&updated.Pipeline[i], tempDir, mutations)
+			destinationDir := tempDir
+			dest := updated.Pipeline[i].With["destination"]
+			if dest != "" {
+				destinationDir = path.Join(tempDir, dest)
+			}
+			err := gitCheckout(&updated.Pipeline[i], destinationDir, mutations)
 			if err != nil {
 				return fmt.Errorf("failed to git checkout the repository: %v", err)
 			}
