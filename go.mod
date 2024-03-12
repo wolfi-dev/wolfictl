@@ -309,3 +309,5 @@ require (
 )
 
 replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
+
+replace chainguard.dev/melange => github.com/smoser/melange v0.0.0-20240312132843-ec4906396e26

@@ -600,6 +600,13 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		return "", fmt.Errorf("no github update config found for package %s", id)
 	}
 
+	if c.Update.FilterPrefix != "" {
+		// if the version did not match the prefix then ignore it.
+		if !strings.HasPrefix(v, c.Update.FilterPrefix) {
+			return "", nil
+		}
+	}
+
 	// the github graphql query filter matches any occurrence, we want to make that more strict and remove any tags that do not START with the filter
 	// deprecated: todo: ajayk remove this once we have migrated over to TagFilterPrefix
 	if ghm.TagFilter != "" {
