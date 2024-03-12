@@ -126,16 +126,6 @@ func buildArch(ctx context.Context, cfg *global, arch string, args []string) err
 		return fmt.Errorf("creating buildlogs directory: %w", err)
 	}
 
-	newTask := func(pkg string) *task {
-		return &task{
-			cfg:  cfg,
-			pkg:  pkg,
-			arch: arch,
-			cond: sync.NewCond(&sync.Mutex{}),
-			deps: map[string]*task{},
-		}
-	}
-
 	// We want to ignore info level here during setup, but further down below we pull whatever was passed to use via ctx.
 	log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
 	setupCtx := clog.WithLogger(ctx, log)
@@ -145,6 +135,12 @@ func buildArch(ctx context.Context, cfg *global, arch string, args []string) err
 	if err != nil {
 		return err
 	}
+
+	pkgs, err = pkgs.WithArch(arch)
+	if err != nil {
+		return fmt.Errorf("arch: %w", err)
+	}
+
 	g, err := dag.NewGraph(setupCtx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
 	if err != nil {
 		return err
@@ -166,6 +162,27 @@ func buildArch(ctx context.Context, cfg *global, arch string, args []string) err
 	m, err := g.Graph.AdjacencyMap()
 	if err != nil {
 		return err
+	}
+
+	newTask := func(pkg string) *task {
+		// We should only hit these errors if dag.NewPackages is wrong.
+		loadedCfg := pkgs.Config(pkg, true)
+		if len(loadedCfg) == 0 {
+			panic(fmt.Sprintf("package does not seem to exist: %s", pkg))
+		}
+		c := loadedCfg[0]
+		if pkg != c.Package.Name {
+			panic(fmt.Sprintf("mismatched package, got %q, want %q", c.Package.Name, pkg))
+		}
+
+		return &task{
+			cfg:  cfg,
+			pkg:  pkg,
+			path: c.Path,
+			arch: arch,
+			cond: sync.NewCond(&sync.Mutex{}),
+			deps: map[string]*task{},
+		}
 	}
 
 	tasks := map[string]*task{}
@@ -282,6 +299,7 @@ type task struct {
 
 	pkg  string
 	arch string
+	path string
 
 	err  error
 	deps map[string]*task
@@ -292,10 +310,8 @@ type task struct {
 	skipped bool
 }
 
-func (t *task) gitSDE(ctx context.Context, origin string) (string, error) {
-	// TODO: Support nested yaml files.
-	yamlfile := filepath.Join(t.cfg.dir, origin) + ".yaml"
-	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%ct", "--follow", yamlfile)
+func (t *task) gitSDE(ctx context.Context) (string, error) {
+	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%ct", "--follow", t.path) // #nosec G204
 	b, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -348,7 +364,7 @@ func (t *task) build(ctx context.Context) error {
 	}
 
 	log := clog.FromContext(ctx)
-	cfg, err := config.ParseConfiguration(ctx, fmt.Sprintf("%s.yaml", t.pkg), config.WithFS(os.DirFS(t.cfg.dir)))
+	cfg, err := config.ParseConfiguration(ctx, t.path, config.WithFS(os.DirFS(t.cfg.dir)))
 	if err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
@@ -366,6 +382,11 @@ func (t *task) build(ctx context.Context) error {
 		// TODO: Consider the ability to check an APKINDEX instead of requiring gcsfuse to make targets local.
 		log.Debugf("Skipping %s, already built", apkPath)
 		t.skipped = true
+		return nil
+	}
+
+	if t.cfg.dryrun {
+		log.Infof("DRYRUN: would have built %s", apkPath)
 		return nil
 	}
 
@@ -392,18 +413,12 @@ func (t *task) build(ctx context.Context) error {
 		return fmt.Errorf("creating source directory: %v", err)
 	}
 
-	fn := fmt.Sprintf("%s.yaml", t.pkg)
-	if t.cfg.dryrun {
-		log.Infof("DRYRUN: would have built %s", apkPath)
-		return nil
-	}
-
 	runner, err := newRunner(fctx, t.cfg.runner)
 	if err != nil {
 		return fmt.Errorf("creating runner: %w", err)
 	}
 
-	sde, err := t.gitSDE(ctx, cfg.Package.Name)
+	sde, err := t.gitSDE(ctx)
 	if err != nil {
 		return fmt.Errorf("finding source date epoch: %w", err)
 	}
@@ -411,7 +426,7 @@ func (t *task) build(ctx context.Context) error {
 	log.Infof("Building %s", t.pkg)
 	bc, err := build.New(fctx,
 		build.WithArch(types.ParseArchitecture(arch)),
-		build.WithConfig(filepath.Join(t.cfg.dir, fn)),
+		build.WithConfig(t.path),
 		build.WithPipelineDir(t.cfg.pipelineDir),
 		build.WithExtraKeys(t.cfg.extraKeys),
 		build.WithExtraRepos(t.cfg.extraRepos),

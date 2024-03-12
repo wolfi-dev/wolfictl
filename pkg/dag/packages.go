@@ -357,6 +357,52 @@ func (p Packages) Sub(names ...string) (*Packages, error) {
 	return pkgs, nil
 }
 
+func wantArch(have string, want []string) bool {
+	if len(want) == 0 {
+		return true
+	}
+
+	for _, a := range want {
+		if a == have {
+			return true
+		}
+	}
+
+	return false
+}
+
+// WithArch returns a new Packages whose members are valid for the given arch.
+func (p Packages) WithArch(arch string) (*Packages, error) {
+	pkgs := &Packages{
+		configs:  make(map[string][]*Configuration),
+		index:    p.index,
+		packages: make(map[string][]*Configuration),
+	}
+
+	for name, c := range p.configs {
+		for _, config := range c {
+			if !wantArch(arch, config.Package.TargetArchitecture) {
+				continue
+			}
+			if err := pkgs.addConfiguration(name, config); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	for name, c := range p.packages {
+		for _, config := range c {
+			if !wantArch(arch, config.Package.TargetArchitecture) {
+				continue
+			}
+			if err := pkgs.addPackage(name, config); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return pkgs, nil
+}
+
 // Repository provide the Packages as a apk.RepositoryWithIndex. To be used in other places that require
 // using alpine/go structs instead of ours.
 func (p Packages) Repository(arch string) apk.NamedIndex {
