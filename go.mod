@@ -308,4 +308,4 @@ require (
 	modernc.org/sqlite v1.29.2 // indirect
 )
 
-replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
+replace golang.org/x/vuln v1.0.1 => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
