@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -560,6 +561,14 @@ func (t *task) build(ctx context.Context) error {
 	fctx, span := otel.Tracer("wolfictl").Start(fctx, t.pkg)
 	defer span.End()
 	if err := bc.BuildPackage(fctx); err != nil {
+		// We don't want interleaved logs.
+		t.cfg.mu.Lock()
+		defer t.cfg.mu.Unlock()
+
+		if err := logs(logfile); err != nil {
+			clog.FromContext(ctx).Errorf("failed to read logs %q: %v", logfile, err)
+		}
+
 		return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
 	}
 
@@ -638,4 +647,18 @@ func newRunner(ctx context.Context, runner string) (container.Runner, error) {
 	}
 
 	return nil, fmt.Errorf("runner %q not supported", runner)
+}
+
+func logs(fname string) error {
+	fmt.Printf("::group::%s\n", fname)
+	f, err := os.Open(fname)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := io.Copy(os.Stdout, f); err != nil {
+		return err
+	}
+	fmt.Printf("::endgroup::\n")
+	return nil
 }
