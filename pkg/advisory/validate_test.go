@@ -308,6 +308,46 @@ func TestValidate(t *testing.T) {
 								Name:    "ko",
 								Version: "1.0.0-r2",
 							},
+							{
+								Name:    "mo",
+								Version: "1.0.0-r8",
+							},
+							{
+								Name:    "mo",
+								Version: "1.0.0-r9",
+							},
+							{
+								Name:    "mo",
+								Version: "1.0.0-r10",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+				{
+					name: "fixed-version-present-and-not-first-missing-rs",
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "1.0.0-r1",
+							},
+							{
+								Name:    "ko",
+								Version: "1.0.0-r2",
+							},
+							{
+								Name:    "mo",
+								Version: "1.0.0-r8",
+							},
+							{
+								Name:    "mo",
+								Version: "1.0.0-r9",
+							},
+							{
+								Name:    "mo",
+								Version: "1.0.0-r10",
+							},
 						},
 					},
 					shouldBeValid: true,

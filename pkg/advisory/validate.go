@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	goapkversion "github.com/knqyf263/go-apk-version"
+
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
 	"github.com/chainguard-dev/go-apk/pkg/apk"
@@ -16,7 +18,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/internal/errorhelpers"
-	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
 type ValidateOptions struct {
@@ -310,11 +311,11 @@ func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(ctx 
 	}
 
 	sort.Slice(packageVersions, func(i, j int) bool {
-		iVer, err := versions.NewVersion(packageVersions[i].Version)
+		iVer, err := goapkversion.NewVersion(packageVersions[i].Version)
 		if err != nil {
 			return true
 		}
-		jVer, err := versions.NewVersion(packageVersions[j].Version)
+		jVer, err := goapkversion.NewVersion(packageVersions[j].Version)
 		if err != nil {
 			return false
 		}
