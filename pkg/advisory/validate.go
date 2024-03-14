@@ -225,6 +225,11 @@ func (opts ValidateOptions) validateBuildConfigurationExistence(pkgName string) 
 	}
 
 	if _, ok := opts.distroPackageMap[pkgName]; !ok {
+		// Double check if the package is in index and move on
+		if _, ok := opts.apkIndexPackageMap[pkgName]; ok {
+			// the package build configuration has moved out but not removed from the index or apks
+			return nil
+		}
 		return errors.New("package build configuration not found in the distro")
 	}
 
@@ -495,6 +500,8 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 		var docErrs []error
 
 		// Net new documents must be for packages that are currently defined in the repo.
+		// This would change from March 13,2024 as package yamls would be deleted for EOL and non latest versions
+		// Only the package (apk) versions would exists in wolfi and wolfi index but no build config
 		docErrs = append(docErrs, opts.validateBuildConfigurationExistence(doc.Name()))
 
 		for advIndex := range doc.Advisories {

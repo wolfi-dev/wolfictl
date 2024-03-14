@@ -1,11 +1,12 @@
 package advisory
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"sort"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -28,7 +29,8 @@ var (
 )
 
 // BuildSecurityDatabase builds an Alpine-style security database from the given options.
-func BuildSecurityDatabase(opts BuildSecurityDatabaseOptions) ([]byte, error) {
+func BuildSecurityDatabase(ctx context.Context, opts BuildSecurityDatabaseOptions) ([]byte, error) {
+	log := clog.FromContext(ctx)
 	var packageEntries []secdb.PackageEntry
 
 	seenPackages := make(map[string]struct{})
@@ -38,11 +40,8 @@ func BuildSecurityDatabase(opts BuildSecurityDatabaseOptions) ([]byte, error) {
 
 		for _, doc := range index.Select().Configurations() {
 			if _, exists := seenPackages[doc.Package.Name]; exists {
-				return nil, fmt.Errorf(
-					"cannot process additional advisory data for package %q: %w",
-					doc.Package.Name,
-					ErrorPackageCollision,
-				)
+				// TODO Merge the events between multiple advisories
+				log.InfoContextf(ctx, "cannot process additional advisory data for package %q: %v", doc.Package.Name, ErrorPackageCollision)
 			}
 			seenPackages[doc.Package.Name] = struct{}{}
 
