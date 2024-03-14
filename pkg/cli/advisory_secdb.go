@@ -2,8 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -21,6 +23,8 @@ func cmdAdvisorySecDB() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			logger := clog.NewLogger(slog.Default())
+			ctx := clog.WithLogger(cmd.Context(), logger)
 			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")
@@ -53,7 +57,7 @@ func cmdAdvisorySecDB() *cobra.Command {
 				Repo:               p.repo,
 			}
 
-			database, err := advisory.BuildSecurityDatabase(opts)
+			database, err := advisory.BuildSecurityDatabase(ctx, opts)
 			if err != nil {
 				return err
 			}

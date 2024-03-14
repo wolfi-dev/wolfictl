@@ -55,9 +55,7 @@ func TestBuildSecurityDatabase(t *testing.T) {
 				"./testdata/secdb/advisories-with-package-overlap",
 			},
 			pathToExpectedDatabase: "",
-			errorAssertion: func(t assert.TestingT, err error, _ ...interface{}) bool {
-				return assert.Error(t, err) && assert.ErrorIs(t, err, ErrorPackageCollision)
-			},
+			errorAssertion:         assert.NoError,
 		},
 	}
 
@@ -78,7 +76,7 @@ func TestBuildSecurityDatabase(t *testing.T) {
 				Repo:               "os",
 			}
 
-			database, err := BuildSecurityDatabase(opts)
+			database, err := BuildSecurityDatabase(context.Background(), opts)
 			tt.errorAssertion(t, err)
 
 			if p := tt.pathToExpectedDatabase; p != "" {
