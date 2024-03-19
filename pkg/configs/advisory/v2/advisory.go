@@ -78,7 +78,7 @@ func (adv Advisory) Resolved() bool {
 // ResolvedAtVersion returns true if the advisory indicates that the
 // vulnerability does not affect the distro package at the given package
 // version, or that no further investigation is planned.
-func (adv Advisory) ResolvedAtVersion(version string) bool {
+func (adv Advisory) ResolvedAtVersion(version string, packageType string) bool {
 	if len(adv.Events) == 0 {
 		return false
 	}
@@ -91,7 +91,7 @@ func (adv Advisory) ResolvedAtVersion(version string) bool {
 		return true
 
 	case EventTypeFixed:
-		return adv.isFixedVersion(version, latest)
+		return adv.isFixedVersion(version, packageType, latest)
 
 	default:
 		return false
@@ -101,7 +101,7 @@ func (adv Advisory) ResolvedAtVersion(version string) bool {
 // ConcludedAtVersion returns true if the advisory indicates that the
 // vulnerability has been solved, or those where no change is
 // expected to fix the CVE in the upstream code.
-func (adv Advisory) ConcludedAtVersion(version string) bool {
+func (adv Advisory) ConcludedAtVersion(version string, packageType string) bool {
 	if len(adv.Events) == 0 {
 		return false
 	}
@@ -112,12 +112,16 @@ func (adv Advisory) ConcludedAtVersion(version string) bool {
 	}
 	// NOTE: The resolved set is part of the concluded one
 	// with the exception of the pending-upstream-fix event type.
-	return adv.ResolvedAtVersion(version)
+	return adv.ResolvedAtVersion(version, packageType)
 }
 
 // isFixedVersion determines whether the vulnerability discovered for the provided
 // version has been fixed.
-func (adv Advisory) isFixedVersion(version string, latest Event) bool {
+func (adv Advisory) isFixedVersion(version string, packageType string, latest Event) bool {
+	if packageType != "apk" {
+		return false
+	}
+
 	givenVersion, err := versions.NewVersion(version)
 	if err != nil {
 		return false
