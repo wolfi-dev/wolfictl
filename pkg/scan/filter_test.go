@@ -147,6 +147,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 						Vulnerability: Vulnerability{
 							ID: "GHSA-2h5h-59f5-c5x9",
 						},
+						// Fixed advisories only work for type "apk"
+						Package: Package{
+							Type: "apk",
+						},
 					},
 				},
 			},
@@ -199,6 +203,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 					{
 						Vulnerability: Vulnerability{
 							ID: "GHSA-2h5h-59f5-c5x9",
+						},
+						// Fixed advisories only work for type "apk"
+						Package: Package{
+							Type: "apk",
 						},
 					},
 				},
@@ -332,6 +340,10 @@ func TestFilterWithAdvisories(t *testing.T) {
 						Vulnerability: Vulnerability{
 							ID: "GHSA-2h5h-59f5-c5x9",
 						},
+						// Fixed advisories only work for type "apk"
+						Package: Package{
+							Type: "apk",
+						},
 					},
 					{
 						Vulnerability: Vulnerability{
@@ -343,6 +355,48 @@ func TestFilterWithAdvisories(t *testing.T) {
 			advisoryIndicesGetter: getSingleAdvisoriesIndex,
 			advisoryFilterSet:     "concluded",
 			expectedFindings: []Finding{
+				{
+					Vulnerability: Vulnerability{
+						ID: "CVE-1999-11111",
+					},
+				},
+			},
+			errAssertion: assert.NoError,
+		},
+		{
+			name: "resolved advisory filter only filters type apk",
+			result: &Result{
+				TargetAPK: TargetAPK{
+					Name:    "ko",
+					Version: "0.13.0-r30",
+				},
+				Findings: []Finding{
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-2h5h-59f5-c5x9",
+						},
+						Package: Package{
+							Type: "go-module",
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-1999-11111",
+						},
+					},
+				},
+			},
+			advisoryIndicesGetter: getSingleAdvisoriesIndex,
+			advisoryFilterSet:     "concluded",
+			expectedFindings: []Finding{
+				{
+					Vulnerability: Vulnerability{
+						ID: "GHSA-2h5h-59f5-c5x9",
+					},
+					Package: Package{
+						Type: "go-module",
+					},
+				},
 				{
 					Vulnerability: Vulnerability{
 						ID: "CVE-1999-11111",

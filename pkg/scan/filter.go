@@ -87,7 +87,7 @@ func filterFindingsWithAllAdvisories(findings []Finding, packageAdvisories v2.Ad
 func filterFindingsWithResolvedAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
 	return lo.Filter(findings, func(finding Finding, _ int) bool {
 		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
-		if ok && adv.ResolvedAtVersion(currentPackageVersion) {
+		if ok && adv.ResolvedAtVersion(currentPackageVersion, finding.Package.Type) {
 			return false
 		}
 
@@ -98,7 +98,7 @@ func filterFindingsWithResolvedAdvisories(findings []Finding, packageAdvisories 
 				continue
 			}
 
-			if adv.ResolvedAtVersion(currentPackageVersion) {
+			if adv.ResolvedAtVersion(currentPackageVersion, finding.Package.Type) {
 				return false
 			}
 		}
@@ -110,7 +110,7 @@ func filterFindingsWithResolvedAdvisories(findings []Finding, packageAdvisories 
 func filterFindingsWithConcludedAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
 	return lo.Filter(findings, func(finding Finding, _ int) bool {
 		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
-		if ok && adv.ConcludedAtVersion(currentPackageVersion) {
+		if ok && adv.ConcludedAtVersion(currentPackageVersion, finding.Package.Type) {
 			return false
 		}
 
@@ -121,7 +121,7 @@ func filterFindingsWithConcludedAdvisories(findings []Finding, packageAdvisories
 				continue
 			}
 
-			if adv.ConcludedAtVersion(currentPackageVersion) {
+			if adv.ConcludedAtVersion(currentPackageVersion, finding.Package.Type) {
 				return false
 			}
 		}
