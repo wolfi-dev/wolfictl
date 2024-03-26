@@ -212,6 +212,7 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 		return err
 	})
 
+	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
 	for _, arch := range cfg.archs {
@@ -228,13 +229,18 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 		})
 
 		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
-		exist := map[string]struct{}{}
-		cfg.exists[types.ParseArchitecture(arch).ToAPK()] = exist
-
 		eg.Go(func() error {
-			var err error
-			exist, err = fetchIndex(ctx, cfg.dst, arch)
-			return err
+			exist, err := fetchIndex(ctx, cfg.dst, arch)
+			if err != nil {
+				return err
+			}
+
+			mu.Lock()
+			defer mu.Unlock()
+
+			cfg.exists[types.ParseArchitecture(arch).ToAPK()] = exist
+
+			return nil
 		})
 	}
 
