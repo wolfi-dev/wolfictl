@@ -4,9 +4,11 @@ import (
 	"context"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/osv-scanner/pkg/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -32,6 +34,11 @@ func Test_ExportFuncs(t *testing.T) {
 			exportFuncUnderTest: ExportYAML,
 			pathToExpectedData:  "./testdata/export/expected.yaml",
 		},
+		{
+			name:                "osv",
+			exportFuncUnderTest: ExportOSV,
+			pathToExpectedData:  "./testdata/export/expected-osv.yaml",
+		},
 	}
 
 	for _, tt := range cases {
@@ -43,6 +50,7 @@ func Test_ExportFuncs(t *testing.T) {
 
 			opts := ExportOptions{
 				AdvisoryDocIndices: indices,
+				Ecosystem:          models.Ecosystem("wolfi"),
 			}
 
 			exported, err := tt.exportFuncUnderTest(opts)
@@ -56,7 +64,7 @@ func Test_ExportFuncs(t *testing.T) {
 				require.NoError(t, err)
 
 				if diff := cmp.Diff(string(expectedBytes), string(exportedBytes)); diff != "" {
-					t.Errorf("ExportCSV() produced unexpected data (-want +got):\n%s", diff)
+					t.Errorf("Export%s() produced unexpected data (-want +got):\n%s", strings.ToUpper(tt.name), diff)
 				}
 			}
 		})
