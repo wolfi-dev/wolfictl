@@ -444,12 +444,13 @@ func (t *task) start(ctx context.Context) {
 
 // return intersection of global archs flag and explicit target architectures
 func (t *task) filterArchs() []string {
+	cloned := slices.Clone(t.cfg.archs)
 	targets := t.config.Package.TargetArchitecture
-	if len(targets) == 0 {
-		return t.cfg.archs
+
+	if len(targets) == 0 || targets[0] == "all" {
+		return cloned
 	}
 
-	cloned := slices.Clone(t.cfg.archs)
 	filtered := slices.DeleteFunc(cloned, func(arch string) bool {
 		for _, want := range targets {
 			if arch == want {
@@ -496,7 +497,7 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 
 	f, err := os.Create(logfile)
 	if err != nil {
-		return false, fmt.Errorf("creating logfile: :%w", err)
+		return false, fmt.Errorf("creating logfile: %w", err)
 	}
 	defer f.Close()
 
