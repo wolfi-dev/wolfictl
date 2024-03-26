@@ -507,13 +507,8 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 	}
 	defer f.Close()
 
-	log = clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
-	fctx := clog.WithLogger(ctx, log)
-
-	if len(t.cfg.archs) > 1 {
-		log = clog.New(log.Handler()).With("arch", arch)
-		fctx = clog.WithLogger(fctx, log)
-	}
+	flog := clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
+	fctx := clog.WithLogger(ctx, flog)
 
 	sdir := filepath.Join(t.cfg.dir, t.pkg)
 	if _, err := os.Stat(sdir); os.IsNotExist(err) {
@@ -579,7 +574,7 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 		defer t.cfg.mu.Unlock()
 
 		if err := logs(logfile); err != nil {
-			clog.FromContext(ctx).Errorf("failed to read logs %q: %v", logfile, err)
+			log.Errorf("failed to read logs %q: %v", logfile, err)
 		}
 
 		return false, fmt.Errorf("building package (see %q for logs): %w", logfile, err)
