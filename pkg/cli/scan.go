@@ -269,6 +269,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 			if err := errs[i]; err != nil {
 				if p.outputFormat == outputFormatOutline {
 					fmt.Printf("❌ Skipping scan because SBOM generation failed for %q: %v\n", input, err)
+					continue
 				}
 			}
 
