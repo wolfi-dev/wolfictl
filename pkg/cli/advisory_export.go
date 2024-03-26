@@ -6,7 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/google/osv-scanner/pkg/models"
 	"github.com/spf13/cobra"
+
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -50,6 +52,7 @@ func cmdAdvisoryExport() *cobra.Command {
 
 			opts := advisory.ExportOptions{
 				AdvisoryDocIndices: indices,
+				Ecosystem:          models.Ecosystem(p.ecosystem),
 			}
 
 			var export io.Reader
@@ -59,8 +62,10 @@ func cmdAdvisoryExport() *cobra.Command {
 				export, err = advisory.ExportYAML(opts)
 			case OutputCSV:
 				export, err = advisory.ExportCSV(opts)
+			case OutputOSV:
+				export, err = advisory.ExportOSV(opts)
 			default:
-				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV}, ", "))
+				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", "))
 			}
 
 			if err != nil {
@@ -92,14 +97,12 @@ func cmdAdvisoryExport() *cobra.Command {
 }
 
 type exportParams struct {
-	doNotDetectDistro bool
-
+	doNotDetectDistro  bool
 	advisoriesRepoDirs []string
-
-	outputLocation string
-
+	outputLocation     string
 	// format controls how commands will produce their output.
-	format string
+	format    string
+	ecosystem string
 }
 
 const (
@@ -107,14 +110,15 @@ const (
 	OutputYAML = "yaml"
 	// OutputCSV CSV output.
 	OutputCSV = "csv"
+	// OutputOSV OSV output.
+	OutputOSV = "osv"
 )
 
 func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "directory containing an advisories repository")
-
 	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout)")
-
-	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV}, ", ")))
+	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", ")))
+	cmd.Flags().StringVarP(&p.ecosystem, "ecosystem", "e", "wolfi", fmt.Sprintf("Ecosystem format. One of: [%s]", strings.Join([]string{"wolfi", "chainguard"}, ", ")))
 }
