@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -19,6 +18,7 @@ import (
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/container"
 	"chainguard.dev/melange/pkg/container/docker"
 	"chainguard.dev/melange/pkg/index"
@@ -90,7 +90,17 @@ func cmdBuild() *cobra.Command {
 				cfg.outDir = filepath.Join(cfg.dir, "packages")
 			}
 
-			return buildAll(ctx, &cfg, args)
+			var eg errgroup.Group
+
+			// Logs will go here to mimic the wolfi Makefile.
+			for _, arch := range cfg.archs {
+				arch := arch
+				eg.Go(func() error {
+					return buildArch(ctx, &cfg, arch, args)
+				})
+			}
+
+			return eg.Wait()
 		},
 	}
 
@@ -121,7 +131,7 @@ type configStuff struct {
 	pkgs *dag.Packages
 }
 
-func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
+func walkConfigs(ctx context.Context, cfg *global, arch string) (*configStuff, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "walkConfigs")
 	defer span.End()
 
@@ -135,7 +145,12 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 		return nil, err
 	}
 
-	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...))
+	pkgs, err = pkgs.WithArch(arch)
+	if err != nil {
+		return nil, fmt.Errorf("arch: %w", err)
+	}
+
+	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...), dag.WithArch(arch))
 	if err != nil {
 		return nil, err
 	}
@@ -202,41 +217,31 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 	return exist, nil
 }
 
-func buildAll(ctx context.Context, cfg *global, args []string) error {
+func buildArch(ctx context.Context, cfg *global, arch string, args []string) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "build "+arch)
+	defer span.End()
+
+	archDir := cfg.logdir(arch)
+	if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
+		return fmt.Errorf("creating buildlogs directory: %w", err)
+	}
+
+	// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
 	var eg errgroup.Group
+
+	exist := map[string]struct{}{}
+	eg.Go(func() error {
+		var err error
+		exist, err = fetchIndex(ctx, cfg.dst, arch)
+		return err
+	})
 
 	var stuff *configStuff
 	eg.Go(func() error {
 		var err error
-		stuff, err = walkConfigs(ctx, cfg)
+		stuff, err = walkConfigs(ctx, cfg, arch)
 		return err
 	})
-
-	cfg.exists = map[string]map[string]struct{}{}
-
-	for _, arch := range cfg.archs {
-		arch := arch
-
-		eg.Go(func() error {
-			// Logs will go here to mimic the wolfi Makefile.
-			archDir := cfg.logdir(arch)
-			if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
-				return fmt.Errorf("creating buildlogs directory: %w", err)
-			}
-
-			return nil
-		})
-
-		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
-		exist := map[string]struct{}{}
-		cfg.exists[types.ParseArchitecture(arch).ToAPK()] = exist
-
-		eg.Go(func() error {
-			var err error
-			exist, err = fetchIndex(ctx, cfg.dst, arch)
-			return err
-		})
-	}
 
 	if err := eg.Wait(); err != nil {
 		return err
@@ -254,11 +259,13 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 		}
 
 		return &task{
-			cfg:    cfg,
-			pkg:    pkg,
-			config: c,
-			cond:   sync.NewCond(&sync.Mutex{}),
-			deps:   map[string]*task{},
+			cfg:   cfg,
+			pkg:   pkg,
+			path:  c.Path,
+			exist: exist,
+			arch:  arch,
+			cond:  sync.NewCond(&sync.Mutex{}),
+			deps:  map[string]*task{},
 		}
 	}
 
@@ -369,9 +376,6 @@ type global struct {
 	cacheDir    string
 	outDir      string
 
-	// arch -> foo.apk -> exists in APKINDEX
-	exists map[string]map[string]struct{}
-
 	mu sync.Mutex
 }
 
@@ -382,8 +386,11 @@ func (g *global) logdir(arch string) string {
 type task struct {
 	cfg *global
 
-	pkg    string
-	config *dag.Configuration
+	pkg  string
+	arch string
+	path string
+
+	exist map[string]struct{}
 
 	err  error
 	deps map[string]*task
@@ -395,7 +402,7 @@ type task struct {
 }
 
 func (t *task) gitSDE(ctx context.Context) (string, error) {
-	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%ct", "--follow", t.config.Path) // #nosec G204
+	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%ct", "--follow", t.path) // #nosec G204
 	b, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -442,34 +449,18 @@ func (t *task) start(ctx context.Context) {
 	t.err = t.build(ctx)
 }
 
-// return intersection of global archs flag and explicit target architectures
-func (t *task) filterArchs() []string {
-	targets := t.config.Package.TargetArchitecture
-	if len(targets) == 0 {
-		return t.cfg.archs
-	}
-
-	cloned := slices.Clone(t.cfg.archs)
-	filtered := slices.DeleteFunc(cloned, func(arch string) bool {
-		for _, want := range targets {
-			if arch == want {
-				return false
-			}
-		}
-
-		return true
-	})
-
-	return filtered
-}
-
-func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err error) {
+func (t *task) build(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
-		return false, err
+		return err
 	}
 
 	log := clog.FromContext(ctx)
-	cfg := t.config.Configuration
+	cfg, err := config.ParseConfiguration(ctx, t.path, config.WithFS(os.DirFS(t.cfg.dir)))
+	if err != nil {
+		return fmt.Errorf("failed to parse config: %w", err)
+	}
+
+	arch := types.ParseArchitecture(t.arch).ToAPK()
 
 	pkgver := fmt.Sprintf("%s-%s-r%d", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
 	logDir := t.cfg.logdir(arch)
@@ -478,25 +469,27 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 	// See if we already have the package built.
 	apkFile := pkgver + ".apk"
 
-	if _, ok := t.cfg.exists[arch][apkFile]; ok {
+	if _, ok := t.exist[apkFile]; ok {
 		log.Debugf("Skipping %s, already indexed", apkFile)
-		return true, nil
+		t.skipped = true
+		return nil
 	}
 
 	apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
 	if _, err := os.Stat(apkPath); err == nil {
 		log.Debugf("Skipping %s, already built", apkPath)
-		return true, nil
+		t.skipped = true
+		return nil
 	}
 
 	if t.cfg.dryrun {
 		log.Infof("DRYRUN: would have built %s", apkPath)
-		return false, nil
+		return nil
 	}
 
 	f, err := os.Create(logfile)
 	if err != nil {
-		return false, fmt.Errorf("creating logfile: :%w", err)
+		return fmt.Errorf("creating logfile: :%w", err)
 	}
 	defer f.Close()
 
@@ -511,26 +504,26 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 	sdir := filepath.Join(t.cfg.dir, t.pkg)
 	if _, err := os.Stat(sdir); os.IsNotExist(err) {
 		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
-			return false, fmt.Errorf("creating source directory %s: %v", sdir, err)
+			return fmt.Errorf("creating source directory %s: %v", sdir, err)
 		}
 	} else if err != nil {
-		return false, fmt.Errorf("creating source directory: %v", err)
+		return fmt.Errorf("creating source directory: %v", err)
 	}
 
 	runner, err := newRunner(fctx, t.cfg.runner)
 	if err != nil {
-		return false, fmt.Errorf("creating runner: %w", err)
+		return fmt.Errorf("creating runner: %w", err)
 	}
 
 	sde, err := t.gitSDE(ctx)
 	if err != nil {
-		return false, fmt.Errorf("finding source date epoch: %w", err)
+		return fmt.Errorf("finding source date epoch: %w", err)
 	}
 
 	log.Infof("Building %s", t.pkg)
 	bc, err := build.New(fctx,
 		build.WithArch(types.ParseArchitecture(arch)),
-		build.WithConfig(t.config.Path),
+		build.WithConfig(t.path),
 		build.WithPipelineDir(t.cfg.pipelineDir),
 		build.WithExtraKeys(t.cfg.extraKeys),
 		build.WithExtraRepos(t.cfg.extraRepos),
@@ -547,9 +540,10 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 	)
 	if errors.Is(err, build.ErrSkipThisArch) {
 		log.Warnf("Skipping arch %s", arch)
-		return true, nil
+		t.skipped = true
+		return nil
 	} else if err != nil {
-		return false, err
+		return err
 	}
 	defer func() {
 		// We Close() with the original context if we're cancelled so we get cleanup logs to stderr.
@@ -575,58 +569,16 @@ func (t *task) buildArch(ctx context.Context, arch string) (skipped bool, err er
 			clog.FromContext(ctx).Errorf("failed to read logs %q: %v", logfile, err)
 		}
 
-		return false, fmt.Errorf("building package (see %q for logs): %w", logfile, err)
+		return fmt.Errorf("building package (see %q for logs): %w", logfile, err)
 	}
 
-	return false, nil
-}
+	if t.cfg.generateIndex {
+		// TODO: We only really need one lock per arch. See if this is a bottleneck.
+		t.cfg.mu.Lock()
+		defer t.cfg.mu.Unlock()
 
-func (t *task) build(ctx context.Context) error {
-	log := clog.FromContext(ctx)
-
-	archs := t.filterArchs()
-
-	skippedByArch := map[string]bool{}
-	for _, arch := range archs {
-		arch := types.ParseArchitecture(arch).ToAPK()
-
-		skipped, err := t.buildArch(ctx, arch)
-		if err != nil {
-			return err
-		}
-
-		skippedByArch[arch] = skipped
-	}
-
-	// Note that this intentionally mutates archs to avoid unecessary index generation below.
-	archs = slices.DeleteFunc(archs, func(arch string) bool {
-		return skippedByArch[arch]
-	})
-
-	if len(archs) == 0 {
-		t.skipped = true
-		return nil
-	}
-
-	if t.cfg.dryrun {
-		return nil
-	}
-
-	if !t.cfg.generateIndex {
-		return nil
-	}
-
-	t.cfg.mu.Lock()
-	defer t.cfg.mu.Unlock()
-
-	for _, arch := range archs {
 		packageDir := filepath.Join(t.cfg.outDir, arch)
 		log.Infof("Generating apk index from packages in %s", packageDir)
-
-		cfg := t.config.Configuration
-		pkgver := fmt.Sprintf("%s-%s-r%d", cfg.Package.Name, cfg.Package.Version, cfg.Package.Epoch)
-		apkFile := pkgver + ".apk"
-		apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
 
 		var apkFiles []string
 		apkFiles = append(apkFiles, apkPath)
@@ -656,12 +608,10 @@ func (t *task) build(ctx context.Context) error {
 			return fmt.Errorf("unable to create index: %w", err)
 		}
 
-		if err := idx.GenerateIndex(ctx); err != nil {
+		if err := idx.GenerateIndex(fctx); err != nil {
 			return fmt.Errorf("unable to generate index: %w", err)
 		}
 	}
-
-	// TODO: This is where we would update the index.
 
 	return nil
 }
