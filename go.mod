@@ -4,7 +4,7 @@ go 1.21.8
 
 require (
 	chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa
-	chainguard.dev/melange v0.6.10-0.20240326184736-dac40c70fcc5
+	chainguard.dev/melange v0.6.10
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.74.7
 	github.com/anchore/stereoscope v0.0.2-0.20240216182029-6171ee21e1d5
