@@ -3,6 +3,7 @@ package advisory
 import (
 	"bytes"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -220,7 +221,10 @@ func ExportOSV(opts ExportOptions, output string) error {
 	}
 	sort.Strings(keys)
 
+	all := []models.Vulnerability{}
 	for _, k := range keys {
+		all = append(all, osvExport[k])
+
 		e, err := osvExport[k].MarshalJSON()
 		if err != nil {
 			log.Fatal(err)
@@ -231,6 +235,17 @@ func ExportOSV(opts ExportOptions, output string) error {
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+
+	allData, err := json.Marshal(all)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filepath := path.Join(output, "all.json")
+	err = os.WriteFile(filepath, allData, 0o644) //nolint: gosec
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return nil
