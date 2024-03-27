@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"path"
 	"strings"
 	"testing"
 
@@ -34,11 +35,6 @@ func Test_ExportFuncs(t *testing.T) {
 			exportFuncUnderTest: ExportYAML,
 			pathToExpectedData:  "./testdata/export/expected.yaml",
 		},
-		{
-			name:                "osv",
-			exportFuncUnderTest: ExportOSV,
-			pathToExpectedData:  "./testdata/export/expected-osv.yaml",
-		},
 	}
 
 	for _, tt := range cases {
@@ -68,5 +64,49 @@ func Test_ExportFuncs(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func Test_ExportOSV(t *testing.T) {
+	const testdataDir = "./testdata/export/advisories"
+	const expectedOSVDir = "./testdata/export/osv"
+
+	advisoryFsys := rwos.DirFS(testdataDir)
+	advisoryDocs, err := v2.NewIndex(context.Background(), advisoryFsys)
+	require.NoError(t, err)
+	indices := []*configs.Index[v2.Document]{advisoryDocs}
+
+	opts := ExportOptions{
+		AdvisoryDocIndices: indices,
+		Ecosystem:          models.Ecosystem("wolfi"),
+	}
+
+	tempOSVDir, err := os.MkdirTemp("", "test-osv")
+	assert.NoError(t, err)
+	defer os.RemoveAll(tempOSVDir)
+
+	err = ExportOSV(opts, tempOSVDir)
+	assert.NoError(t, err)
+
+	expectedOSVFiles, err := os.ReadDir(expectedOSVDir)
+	assert.NoError(t, err)
+
+	actualOSVFiles, err := os.ReadDir(tempOSVDir)
+	assert.NoError(t, err)
+
+	if len(expectedOSVFiles) != len(actualOSVFiles) {
+		t.Error("missing OSV files")
+	}
+
+	for i, expectedCVEFile := range expectedOSVFiles {
+		expectedBytes, err := os.ReadFile(path.Join(expectedOSVDir, expectedCVEFile.Name()))
+		require.NoError(t, err)
+
+		actualBytes, err := os.ReadFile(path.Join(tempOSVDir, actualOSVFiles[i].Name()))
+		require.NoError(t, err)
+
+		if diff := cmp.Diff(string(expectedBytes), string(actualBytes)); diff != "" {
+			t.Errorf("ExportOSV() produced unexpected data (-want +got):\n%s", diff)
+		}
 	}
 }

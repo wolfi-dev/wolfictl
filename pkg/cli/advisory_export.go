@@ -9,6 +9,8 @@ import (
 	"github.com/google/osv-scanner/pkg/models"
 	"github.com/spf13/cobra"
 
+	"github.com/chainguard-dev/clog"
+
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -24,6 +26,20 @@ func cmdAdvisoryExport() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		Hidden:        true,
+
+		PreRunE: func(cmd *cobra.Command, _ []string) error {
+			ctx := cmd.Context()
+
+			if p.format == OutputOSV {
+				if _, err := os.Stat(p.outputLocation); os.IsNotExist(err) {
+					clog.FromContext(ctx).Errorf("directory %s does not exist, please create that first", p.outputLocation)
+					return err
+				}
+			}
+
+			return nil
+		},
+
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
@@ -63,29 +79,30 @@ func cmdAdvisoryExport() *cobra.Command {
 			case OutputCSV:
 				export, err = advisory.ExportCSV(opts)
 			case OutputOSV:
-				export, err = advisory.ExportOSV(opts)
+				err = advisory.ExportOSV(opts, p.outputLocation)
 			default:
 				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", "))
 			}
-
 			if err != nil {
 				return fmt.Errorf("unable to export advisory data: %w", err)
 			}
 
-			var outputFile *os.File
-			if p.outputLocation == "" {
-				outputFile = os.Stdout
-			} else {
-				outputFile, err = os.Create(p.outputLocation)
-				if err != nil {
-					return fmt.Errorf("unable to create output file: %w", err)
+			if p.format != OutputOSV {
+				var outputFile *os.File
+				if p.outputLocation == "" {
+					outputFile = os.Stdout
+				} else {
+					outputFile, err = os.Create(p.outputLocation)
+					if err != nil {
+						return fmt.Errorf("unable to create output file: %w", err)
+					}
+					defer outputFile.Close()
 				}
-				defer outputFile.Close()
-			}
 
-			_, err = io.Copy(outputFile, export)
-			if err != nil {
-				return fmt.Errorf("unable to export data to specified location: %w", err)
+				_, err = io.Copy(outputFile, export)
+				if err != nil {
+					return fmt.Errorf("unable to export data to specified location: %w", err)
+				}
 			}
 
 			return nil
@@ -118,7 +135,7 @@ func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "directory containing an advisories repository")
-	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout)")
+	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout). In case using OSV format this will be the output directory.")
 	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", ")))
 	cmd.Flags().StringVarP(&p.ecosystem, "ecosystem", "e", "wolfi", fmt.Sprintf("Ecosystem format. One of: [%s]", strings.Join([]string{"wolfi", "chainguard"}, ", ")))
 }

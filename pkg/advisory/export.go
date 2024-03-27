@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"path"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/google/osv-scanner/pkg/models"
@@ -119,9 +122,7 @@ func ExportYAML(opts ExportOptions) (io.Reader, error) {
 	return buf, nil
 }
 
-func ExportOSV(opts ExportOptions) (io.Reader, error) {
-	buf := new(bytes.Buffer)
-
+func ExportOSV(opts ExportOptions, output string) error {
 	osvExport := make(map[string]models.Vulnerability)
 
 	for _, index := range opts.AdvisoryDocIndices {
@@ -130,8 +131,10 @@ func ExportOSV(opts ExportOptions) (io.Reader, error) {
 		for _, doc := range documents {
 			for _, adv := range doc.Advisories {
 				sortedEvents := adv.SortedEvents()
+
 				var updatedTime time.Time
 				tempAffected := models.Affected{}
+
 				for _, event := range sortedEvents {
 					switch event.Type {
 					case v2.EventTypeFixed:
@@ -142,10 +145,11 @@ func ExportOSV(opts ExportOptions) (io.Reader, error) {
 						}
 						tempAffected.Ranges = []models.Range{
 							{
-								Type: v2.EventTypeFixed,
+								Type: models.RangeEcosystem,
 								Events: []models.Event{
 									{
-										Fixed: event.Data.(v2.Fixed).FixedVersion,
+										Introduced: "0",
+										Fixed:      event.Data.(v2.Fixed).FixedVersion,
 									},
 								},
 							},
@@ -159,11 +163,9 @@ func ExportOSV(opts ExportOptions) (io.Reader, error) {
 						}
 						tempAffected.Ranges = []models.Range{
 							{
-								Type: v2.EventTypeFixed,
-								Events: []models.Event{
-									{
-										Fixed: "0",
-									},
+								Type: models.RangeEcosystem,
+								DatabaseSpecific: map[string]interface{}{
+									"false_positive": true,
 								},
 							},
 						}
@@ -187,7 +189,7 @@ func ExportOSV(opts ExportOptions) (io.Reader, error) {
 						osvExport[adv.ID] = entry
 					} else {
 						temp := models.Vulnerability{
-							ID:       adv.ID,
+							ID:       fmt.Sprintf("%s-%s", strings.ToUpper(string(opts.Ecosystem)), adv.ID),
 							Aliases:  adv.Aliases,
 							Affected: []models.Affected{tempAffected},
 						}
@@ -209,21 +211,14 @@ func ExportOSV(opts ExportOptions) (io.Reader, error) {
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		if len(buf.Bytes()) != 0 {
-			buf.WriteString("---\n")
-		}
-
-		e, err := osvExport[k].MarshalYAML()
+		e, err := osvExport[k].MarshalJSON()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		d, err := yaml.Marshal(e)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal package %q: %v", osvExport[k].ID, err)
-		}
-		buf.Write(d)
+		filepath := path.Join(output, fmt.Sprintf("%s-%s.json", strings.ToUpper(string(opts.Ecosystem)), k))
+		err = os.WriteFile(filepath, e, 0644)
 	}
 
-	return buf, nil
+	return nil
 }
