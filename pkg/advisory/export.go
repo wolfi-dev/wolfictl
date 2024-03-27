@@ -13,6 +13,9 @@ import (
 	"strings"
 	"time"
 
+	jsonschema "github.com/santhosh-tekuri/jsonschema/v5"
+	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader" // to be able to download the schema from the URL
+
 	"github.com/google/osv-scanner/pkg/models"
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v3"
@@ -20,6 +23,8 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
+
+const OSVSchema = "https://raw.githubusercontent.com/ossf/osv-schema/main/validation/schema.json"
 
 type ExportOptions struct {
 	AdvisoryDocIndices []*configs.Index[v2.Document]
@@ -221,6 +226,14 @@ func ExportOSV(opts ExportOptions, output string) error {
 	}
 	sort.Strings(keys)
 
+	// get the OSV schema to validate
+	compiler := jsonschema.NewCompiler()
+	compiler.Draft = jsonschema.Draft2020
+	schema, err := compiler.Compile(OSVSchema)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	all := []models.Vulnerability{}
 	for _, k := range keys {
 		all = append(all, osvExport[k])
@@ -228,6 +241,17 @@ func ExportOSV(opts ExportOptions, output string) error {
 		e, err := osvExport[k].MarshalJSON()
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		// to run the validate schema
+		var result any
+		err = json.Unmarshal(e, &result)
+		if err != nil {
+			log.Fatalf("failed to unmarshall:%v", err)
+		}
+		err = schema.Validate(result)
+		if err != nil {
+			log.Fatalf("failed to validate OSV JSON Schema for %s: %v", k, err)
 		}
 
 		filepath := path.Join(output, fmt.Sprintf("%s-%s.json", strings.ToUpper(string(opts.Ecosystem)), k))
