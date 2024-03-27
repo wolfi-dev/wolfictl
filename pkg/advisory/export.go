@@ -149,7 +149,9 @@ func ExportOSV(opts ExportOptions, output string) error {
 								Events: []models.Event{
 									{
 										Introduced: "0",
-										Fixed:      event.Data.(v2.Fixed).FixedVersion,
+									},
+									{
+										Fixed: event.Data.(v2.Fixed).FixedVersion,
 									},
 								},
 							},
@@ -164,6 +166,14 @@ func ExportOSV(opts ExportOptions, output string) error {
 						tempAffected.Ranges = []models.Range{
 							{
 								Type: models.RangeEcosystem,
+								Events: []models.Event{
+									{
+										Introduced: "0",
+									},
+									{
+										Fixed: "0",
+									},
+								},
 								DatabaseSpecific: map[string]interface{}{
 									"false_positive": true,
 								},
