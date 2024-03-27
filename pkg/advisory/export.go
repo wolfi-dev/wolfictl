@@ -218,6 +218,9 @@ func ExportOSV(opts ExportOptions, output string) error {
 
 		filepath := path.Join(output, fmt.Sprintf("%s-%s.json", strings.ToUpper(string(opts.Ecosystem)), k))
 		err = os.WriteFile(filepath, e, 0o600)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	return nil
