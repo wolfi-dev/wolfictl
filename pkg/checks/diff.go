@@ -152,6 +152,14 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 		info2, err := os.Stat(path2)
 
 		if os.IsNotExist(err) {
+			if filepath.Base(path1) == ".PKGINFO" {
+				content, err := readFileContents(path1)
+				if err != nil {
+					return err
+				}
+				result.pkginfos = append(result.pkginfos, content)
+			}
+
 			result.added = append(result.added, relPath)
 		} else if !info2.IsDir() {
 			content1, err := readFileContents(path1)
@@ -231,7 +239,9 @@ func writeDiffLog(diff diffResult, filename string, newPackages map[string]NewAp
 
 		builder.WriteString("Package " + packageName + ":\n")
 
-		if len(diff.pkginfos) == 2 {
+		if len(diff.pkginfos) == 1 {
+			fmt.Fprintf(&builder, "\n`.PKGINFO` metadata:\n```\n%s\n```\n", diff.pkginfos[0])
+		} else if len(diff.pkginfos) == 2 {
 			cmpdiff := cmp.Diff(diff.pkginfos[0], diff.pkginfos[1])
 			fmt.Fprintf(&builder, "\n`.PKGINFO` metadata:\n```\n%s\n```\n", cmpdiff)
 		}
