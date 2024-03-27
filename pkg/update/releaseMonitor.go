@@ -103,6 +103,13 @@ ReleaseMonitorPackagesLoop:
 			}
 		}
 
+		if p.Config.Update.FilterPrefix != "" {
+			// if the version did not match the prefix then ignore it.
+			if !strings.HasPrefix(latestVersion, p.Config.Update.FilterPrefix) {
+				break ReleaseMonitorPackagesLoop
+			}
+		}
+
 		// replace any nonstandard version separators
 		if p.Config.Update.VersionSeparator != "" {
 			latestVersion = strings.ReplaceAll(latestVersion, p.Config.Update.VersionSeparator, ".")
