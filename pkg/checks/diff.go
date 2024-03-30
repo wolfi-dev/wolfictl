@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -98,8 +99,18 @@ func (o *DiffOptions) Diff() error {
 		return err
 	}
 
+	// If bincapz is on the path, then run it to get a capability diff.
+	var result []byte
+	if path, err := exec.LookPath("bincapz"); err == nil {
+		cmd := exec.Command(path, "-diff", "-format=markdown", dirNewApk, dirExistingApk)
+		result, err = cmd.CombinedOutput()
+		if err != nil {
+			return err
+		}
+	}
+
 	diffFile := filepath.Join(o.Dir, "diff.log")
-	err = writeDiffLog(rs, diffFile, newPackages)
+	err = writeDiffLog(rs, result, diffFile, newPackages)
 	if err != nil {
 		return fmt.Errorf("failed writing to file: %w", err)
 	}
@@ -229,7 +240,7 @@ func shouldSkipFile(path string) bool {
 		strings.HasSuffix(path, ".spdx.json")
 }
 
-func writeDiffLog(diff diffResult, filename string, newPackages map[string]NewApkPackage) error {
+func writeDiffLog(diff diffResult, bcz []byte, filename string, newPackages map[string]NewApkPackage) error {
 	var builder strings.Builder
 
 	for packageName := range newPackages {
@@ -272,6 +283,13 @@ func writeDiffLog(diff diffResult, filename string, newPackages map[string]NewAp
 				builder.WriteString(change + "\n")
 			}
 		}
+		builder.WriteString("\n</details>\n\n")
+	}
+
+	if len(bcz) > 0 {
+		builder.WriteString("<details>\n")
+		builder.WriteString("  <summary>bincapz found differences: Click to expand/collapse</summary>\n\n")
+		builder.Write(bcz)
 		builder.WriteString("\n</details>\n\n")
 	}
 
