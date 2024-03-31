@@ -102,7 +102,7 @@ func (o *DiffOptions) Diff() error {
 	// If bincapz is on the path, then run it to get a capability diff.
 	var result []byte
 	if path, err := exec.LookPath("bincapz"); err == nil {
-		cmd := exec.Command(path, "-diff", "-format=markdown", dirNewApk, dirExistingApk)
+		cmd := exec.Command(path, "-diff", "-format=markdown", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
 			return err
