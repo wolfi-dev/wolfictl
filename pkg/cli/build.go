@@ -548,6 +548,9 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 	fctx, span := otel.Tracer("wolfictl").Start(fctx, t.pkg)
 	defer span.End()
 	if err := bc.BuildPackage(fctx); err != nil {
+		// We want the error included in the log file.
+		flog.Errorf("building package: %v", err)
+
 		// We don't want interleaved logs.
 		t.cfg.mu.Lock()
 		defer t.cfg.mu.Unlock()
