@@ -83,6 +83,9 @@ filtering. The following sets of advisories are available:
 - "concluded": Only filter out all vulnerabilities that have been fixed, or those
   where no change is planned to fix the vulnerability.
 
+- "concluded-or-pending": Only filter out all vulnerabilities that have been fixed, or those
+  where upstream changes are pending to fix the vulnerability.
+
 ## AUTO-TRIAGING
 
 Wolfictl now supports auto-triaging vulnerabilities found in Go binaries using

@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	AdvisoriesSetResolved  = "resolved"
-	AdvisoriesSetAll       = "all"
-	AdvisoriesSetConcluded = "concluded"
+	AdvisoriesSetResolved           = "resolved"
+	AdvisoriesSetAll                = "all"
+	AdvisoriesSetConcluded          = "concluded"
+	AdvisoriesSetConcludedOrPending = "concluded-or-pending"
 )
 
-var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetConcluded}
+var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetConcluded, AdvisoriesSetConcludedOrPending}
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
 func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
@@ -51,6 +52,9 @@ func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.
 
 		case AdvisoriesSetConcluded:
 			filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+
+		case AdvisoriesSetConcludedOrPending:
+			filteredFindings = filterFindingsWithConcludedOrPendingAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
 		default:
 			return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
@@ -122,6 +126,29 @@ func filterFindingsWithConcludedAdvisories(findings []Finding, packageAdvisories
 			}
 
 			if adv.ConcludedAtVersion(currentPackageVersion, finding.Package.Type) {
+				return false
+			}
+		}
+
+		return true
+	})
+}
+
+func filterFindingsWithConcludedOrPendingAdvisories(findings []Finding, packageAdvisories v2.Advisories, currentPackageVersion string) []Finding {
+	return lo.Filter(findings, func(finding Finding, _ int) bool {
+		adv, ok := packageAdvisories.GetByVulnerability(finding.Vulnerability.ID)
+		if ok && adv.ConcludedOrPendingAtVersion(currentPackageVersion, finding.Package.Type) {
+			return false
+		}
+
+		// Also check any listed aliases
+		for _, alias := range finding.Vulnerability.Aliases {
+			adv, ok := packageAdvisories.GetByVulnerability(alias)
+			if !ok {
+				continue
+			}
+
+			if adv.ConcludedOrPendingAtVersion(currentPackageVersion, finding.Package.Type) {
 				return false
 			}
 		}

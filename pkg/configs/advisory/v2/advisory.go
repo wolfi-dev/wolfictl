@@ -115,6 +115,23 @@ func (adv Advisory) ConcludedAtVersion(version, packageType string) bool {
 	return adv.ResolvedAtVersion(version, packageType)
 }
 
+// ConcludedOrPendingAtVersion returns true if the advisory indicates that the
+// vulnerability has been solved, or those where upstream changes are
+// expected to fix the CVE in the upstream code.
+func (adv Advisory) ConcludedOrPendingAtVersion(version, packageType string) bool {
+	if len(adv.Events) == 0 {
+		return false
+	}
+
+	latest := adv.Latest()
+	if latest.Type == EventTypePendingUpstreamFix {
+		return true
+	}
+	// NOTE: The resolved set is part of the concluded one
+	// with the exception of the pending-upstream-fix event type.
+	return adv.ConcludedAtVersion(version, packageType)
+}
+
 // isFixedVersion determines whether the vulnerability discovered for the provided
 // version has been fixed.
 func (adv Advisory) isFixedVersion(version, packageType string, latest Event) bool {
