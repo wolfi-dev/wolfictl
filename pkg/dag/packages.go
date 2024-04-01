@@ -32,6 +32,10 @@ type Configuration struct {
 	Path    string
 	name    string
 	version string
+
+	// the actual package or subpackage name providing this configuration
+	// this allows us to distinguish between a subpackge that is providing a virtual and providing itself
+	pkg string
 }
 
 func (c Configuration) String() string {
@@ -108,6 +112,7 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 			Path:          c.Path,
 			name:          name,
 			version:       version, // provides can have own version or inherit package's version
+			pkg:           c.pkg,
 		}
 		if err := p.addConfiguration(name, providesc); err != nil {
 			return err
@@ -179,6 +184,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			Path:          p,
 			name:          buildc.Package.Name,
 			version:       fullVersion(&buildc.Package),
+			pkg:           buildc.Package.Name,
 		}
 
 		name := c.name
@@ -206,6 +212,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 				Path:          p,
 				name:          name,
 				version:       fullVersion(&buildc.Package), // subpackages have same version as origin
+				pkg:           name,
 			}
 			if err := pkgs.addConfiguration(name, c); err != nil {
 				return err
@@ -286,18 +293,23 @@ func (p Packages) ConfigByKey(key string) *Configuration {
 	return c
 }
 
+// PkgConfig returns the melange Configuration for a given package name.
+func (p Packages) PkgConfig(pkgName string) *Configuration {
+	for _, cfg := range p.packages[pkgName] {
+		if pkgName == cfg.Package.Name {
+			return cfg
+		}
+	}
+	return nil
+}
+
 // PkgInfo returns the build.Package struct for a given package name.
 // If no such package name is found in the packages, return nil package and nil error.
-func (p Packages) PkgInfo(pkgName string) (*config.Package, error) {
-	loadedCfg := p.Config(pkgName, true)
-	if len(loadedCfg) == 0 {
-		return nil, nil
+func (p Packages) PkgInfo(pkgName string) *config.Package {
+	if cfg := p.PkgConfig(pkgName); cfg != nil {
+		return &cfg.Package
 	}
-	c := loadedCfg[0]
-	if pkgName != c.Package.Name {
-		return nil, nil
-	}
-	return &c.Package, nil
+	return nil
 }
 
 // Packages returns a slice of every package and subpackage available in the Packages struct,

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	stdlog "log"
 	"net/http"
 	"net/url"
 	"os"
@@ -678,11 +677,7 @@ func FilterNotLocal() Filter {
 // Filter out non-main packages -- we only care about config file names, not each subpackage.
 func OnlyMainPackages(pkgs *Packages) Filter {
 	return func(pkg Package) bool {
-		p, err := pkgs.PkgInfo(pkg.Name())
-		if err != nil {
-			stdlog.Fatalf("error getting package info for %q: %v", pkg.Name(), err)
-			return false
-		}
+		p := pkgs.PkgInfo(pkg.Name())
 		return p != nil && p.Name != ""
 	}
 }
@@ -882,4 +877,122 @@ func singlePackageResolver(ctx context.Context, pkg *Configuration, arch string)
 	}
 	idx := apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
 	return apk.NewPkgResolver(ctx, []apk.NamedIndex{idx})
+}
+
+// Targets returns a subgraph that flattens subpackages into their origins.
+func (g Graph) Targets() (*Graph, error) {
+	subgraph := &Graph{
+		Graph:    newGraph(),
+		packages: g.packages,
+		opts:     g.opts,
+		byName:   map[string][]string{},
+	}
+
+	pathByName := map[string]string{}
+	for name, configs := range g.packages.configs {
+		for _, cfg := range configs {
+			if cfg.pkg == name {
+				pathByName[name] = cfg.Path
+			}
+		}
+	}
+	originByPath := map[string]string{}
+	for pkg, configs := range g.packages.packages {
+		for _, cfg := range configs {
+			if cfg.Name() == pkg {
+				originByPath[cfg.Path] = pkg
+			}
+		}
+	}
+
+	originByName := map[string]string{}
+	for name, p := range pathByName {
+		origin, ok := originByPath[p]
+		if !ok {
+			return nil, fmt.Errorf("unexpected path %q for name %q", p, name)
+		}
+
+		originByName[name] = origin
+	}
+
+	adjacencyMap, err := g.Graph.AdjacencyMap()
+	if err != nil {
+		return nil, err
+	}
+
+	// do this in 2 passes
+	// first pass, add all origin vertices
+	// second pass, add all edges between origins
+	for node := range adjacencyMap {
+		vertex, err := g.Graph.Vertex(node)
+		if err != nil {
+			return nil, err
+		}
+
+		origin, ok := originByName[vertex.Name()]
+		if !ok {
+			return nil, fmt.Errorf("unexpected node: %q", node)
+		}
+
+		if vertex.Name() != origin {
+			vertex, err = g.Graph.Vertex(PackageHash(g.packages.PkgConfig(origin)))
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if err := subgraph.addVertex(vertex); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+			return nil, err
+		}
+	}
+
+	// rewrite any edges between subpackages to be between their origins
+	for _, deps := range adjacencyMap {
+		for _, edge := range deps {
+			source, err := g.Graph.Vertex(edge.Source)
+			if err != nil {
+				return nil, err
+			}
+
+			target, err := g.Graph.Vertex(edge.Target)
+			if err != nil {
+				return nil, err
+			}
+
+			sourceOrigin, ok := originByName[source.Name()]
+			if !ok {
+				return nil, fmt.Errorf("unexpected source: %q", edge.Source)
+			}
+
+			targetOrigin, ok := originByName[target.Name()]
+			if !ok {
+				return nil, fmt.Errorf("unexpected target: %q", edge.Target)
+			}
+
+			// Packages within the same origin don't have any dependency order.
+			if sourceOrigin == targetOrigin {
+				continue
+			}
+
+			if sourceOrigin != source.Name() {
+				source, err = g.Graph.Vertex(PackageHash(g.packages.PkgConfig(sourceOrigin)))
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			if targetOrigin != target.Name() {
+				target, err = g.Graph.Vertex(PackageHash(g.packages.PkgConfig(targetOrigin)))
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			if err := subgraph.Graph.AddEdge(PackageHash(source), PackageHash(target)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+				return nil, fmt.Errorf("%q (%q) -> %q (%q): %w", source, edge.Source, target, edge.Target, err)
+			}
+		}
+	}
+
+	return subgraph, nil
 }

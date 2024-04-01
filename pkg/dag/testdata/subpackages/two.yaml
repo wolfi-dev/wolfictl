@@ -1,0 +1,21 @@
+package:
+  name: two
+  version: "4.5.6"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+        - "*"
+      attestation:
+      license: Apache-2.0
+environment:
+  contents:
+    packages:
+      - wolfi-baselayout
+      - busybox
+      - one-dev
+pipeline:
+  - runs: |
+      echo "pretending to build two"

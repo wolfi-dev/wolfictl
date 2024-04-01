@@ -1,0 +1,21 @@
+package:
+  name: three
+  version: "4.5.6"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+        - "*"
+      attestation:
+      license: Apache-2.0
+environment:
+  contents:
+    packages:
+      - wolfi-baselayout
+      - busybox
+      - two
+pipeline:
+  - runs: |
+      echo "pretending to build three"
