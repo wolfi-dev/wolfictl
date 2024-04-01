@@ -148,9 +148,9 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 	}
 
 	// Only return main packages (configs) because we can't build just subpackages.
-	g, err = g.Filter(dag.OnlyMainPackages(pkgs))
+	g, err = g.Targets()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("targets: %w", err)
 	}
 
 	m, err := g.Graph.AdjacencyMap()

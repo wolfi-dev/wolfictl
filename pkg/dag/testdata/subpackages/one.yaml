@@ -1,0 +1,23 @@
+package:
+  name: one
+  version: "1.2.3"
+  epoch: 1
+  description:
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+        - "*"
+      attestation:
+      license: Apache-2.0
+environment:
+  contents:
+    packages:
+      - wolfi-baselayout
+      - busybox
+pipeline:
+  - runs: |
+      echo "pretending to build one"
+
+subpackages:
+  - name: one-dev

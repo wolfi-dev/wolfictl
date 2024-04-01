@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/maps"
 )
 
 const (
@@ -259,4 +260,38 @@ func TestNewGraph(t *testing.T) {
 			assert.ElementsMatch(t, v, deps, "unexpected dependencies for %s", k)
 		}
 	})
+}
+
+func TestTargets(t *testing.T) {
+	ctx := context.Background()
+	testDir := "testdata/subpackages"
+
+	pkgs, err := NewPackages(ctx, os.DirFS(testDir), testDir, "")
+	require.NoError(t, err)
+	graph, err := NewGraph(ctx, pkgs, WithAllowUnresolved())
+	require.NoError(t, err)
+	graph, err = graph.Filter(FilterLocal())
+	require.NoError(t, err)
+	graph, err = graph.Targets()
+	require.NoError(t, err)
+	amap, err := graph.Graph.AdjacencyMap()
+	require.NoError(t, err)
+	expectedDeps := map[string][]string{
+		"one:1.2.3-r1@local":   {},
+		"two:4.5.6-r1@local":   {"one:1.2.3-r1@local"},
+		"three:4.5.6-r1@local": {"two:4.5.6-r1@local"},
+	}
+	// the direct dependencies from environment.contents.packages should be dangling, i.e. unresolved
+	for k, want := range expectedDeps {
+		got, ok := amap[k]
+		if !ok {
+			for k := range amap {
+				t.Errorf("found %q", k)
+			}
+			t.Fatalf("did not find %q", k)
+		}
+
+		keys := maps.Keys(got)
+		assert.ElementsMatch(t, want, keys)
+	}
 }

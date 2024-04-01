@@ -99,10 +99,7 @@ func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer)
 
 	for _, node := range all {
 		name := node.Name()
-		pkg, err := pkgs.PkgInfo(name)
-		if err != nil {
-			return err
-		}
+		pkg := pkgs.PkgInfo(name)
 
 		if pkg == nil {
 			// Expected for subpackages.
