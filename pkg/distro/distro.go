@@ -96,4 +96,25 @@ var (
 			"aarch64",
 		},
 	}
+
+	extraPackagesDistro = AbsoluteProperties{
+		Name: "Extra Packages",
+		DistroRemoteURLs: []string{
+			"git@github.com:chainguard-dev/extra-packages.git",
+			"git@github.com:chainguard-dev/extra-packages",
+			"https://github.com/chainguard-dev/extra-packages.git",
+			"https://github.com/chainguard-dev/extra-packages",
+		},
+		AdvisoriesRemoteURLs: []string{
+			"git@github.com:chainguard-dev/extra-advisories.git",
+			"git@github.com:chainguard-dev/extra-advisories",
+			"https://github.com/chainguard-dev/extra-advisories.git",
+			"https://github.com/chainguard-dev/extra-advisories",
+		},
+		APKRepositoryURL: "https://packages.cgr.dev/extras",
+		SupportedArchitectures: []string{
+			"x86_64",
+			"aarch64",
+		},
+	}
 )

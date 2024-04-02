@@ -119,7 +119,7 @@ func identifyDistroFromLocalRepoDir(dir string) (Distro, error) {
 
 		url := urls[0]
 
-		for _, d := range []AbsoluteProperties{wolfiDistro, chainguardDistro} {
+		for _, d := range []AbsoluteProperties{wolfiDistro, chainguardDistro, extraPackagesDistro} {
 			// Fill in the local properties that we can cheaply here. We'll fill in the rest
 			// later, outside of this function call.
 
