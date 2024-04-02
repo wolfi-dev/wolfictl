@@ -16,7 +16,6 @@ import (
 
 func TestDetect(t *testing.T) {
 	// Create a test directory with a few git repos, some of which are distro-related
-
 	tempDir, err := os.MkdirTemp("", "test-distro-detect-")
 	require.NoError(t, err)
 	t.Cleanup(func() {
