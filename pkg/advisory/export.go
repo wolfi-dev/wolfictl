@@ -147,7 +147,7 @@ func ExportOSV(opts ExportOptions, output string) error {
 						tempAffected.Package = models.Package{
 							Name:      doc.Package.Name,
 							Ecosystem: opts.Ecosystem,
-							Purl:      fmt.Sprintf("pkg:apk/%s/%s", opts.Ecosystem, doc.Package.Name),
+							Purl:      fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(opts.Ecosystem)), doc.Package.Name),
 						}
 						tempAffected.Ranges = []models.Range{
 							{
@@ -167,7 +167,7 @@ func ExportOSV(opts ExportOptions, output string) error {
 						tempAffected.Package = models.Package{
 							Name:      doc.Package.Name,
 							Ecosystem: opts.Ecosystem,
-							Purl:      fmt.Sprintf("pkg:apk/%s/%s", opts.Ecosystem, doc.Package.Name),
+							Purl:      fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(opts.Ecosystem)), doc.Package.Name),
 						}
 						tempAffected.Ranges = []models.Range{
 							{
@@ -204,9 +204,12 @@ func ExportOSV(opts ExportOptions, output string) error {
 
 						osvExport[adv.ID] = entry
 					} else {
+						// new entry
+						aliases := []string{adv.ID}
+						aliases = append(aliases, adv.Aliases...)
 						temp := models.Vulnerability{
 							ID:       fmt.Sprintf("%s-%s", strings.ToUpper(string(opts.Ecosystem)), adv.ID),
-							Aliases:  adv.Aliases,
+							Aliases:  aliases,
 							Affected: []models.Affected{tempAffected},
 						}
 						if updatedTime.After(entry.Modified) {
