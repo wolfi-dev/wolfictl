@@ -1,1 +1,1 @@
-{"modified":"2023-05-04T14:34:34Z","id":"WOLFI-GHSA-33pg-m6jh-5237","affected":[{"package":{"ecosystem":"wolfi","name":"ko","purl":"pkg:apk/wolfi/ko"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"0.13.0-r3"}]}]}]}
+{"modified":"2023-05-04T14:34:34Z","id":"WOLFI-GHSA-33pg-m6jh-5237","aliases":["GHSA-33pg-m6jh-5237"],"affected":[{"package":{"ecosystem":"wolfi","name":"ko","purl":"pkg:apk/wolfi/ko"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"0.13.0-r3"}]}]}]}

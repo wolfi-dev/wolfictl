@@ -137,5 +137,5 @@ func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "directory containing an advisories repository")
 	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout). In case using OSV format this will be the output directory.")
 	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", ")))
-	cmd.Flags().StringVarP(&p.ecosystem, "ecosystem", "e", "wolfi", fmt.Sprintf("Ecosystem format. One of: [%s]", strings.Join([]string{"wolfi", "chainguard"}, ", ")))
+	cmd.Flags().StringVarP(&p.ecosystem, "ecosystem", "e", "Wolfi", fmt.Sprintf("Ecosystem format. One of: [%s]", strings.Join([]string{"Wolfi", "Chainguard"}, ", ")))
 }
