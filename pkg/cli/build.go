@@ -19,6 +19,7 @@ import (
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/container"
 	"chainguard.dev/melange/pkg/container/docker"
 	"chainguard.dev/melange/pkg/index"
@@ -115,13 +116,13 @@ func cmdBuild() *cobra.Command {
 	return cmd
 }
 
-type configStuff struct {
+type dagConfig struct {
 	g    *dag.Graph
 	m    map[string]map[string]graph.Edge[string]
 	pkgs *dag.Packages
 }
 
-func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
+func walkConfigs(ctx context.Context, dir, pipelineDir string, extraKeys, extraRepos []string) (*dagConfig, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "walkConfigs")
 	defer span.End()
 
@@ -130,12 +131,12 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 	ctx = clog.WithLogger(ctx, log)
 
 	// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
-	pkgs, err := dag.NewPackages(ctx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
+	pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 	if err != nil {
 		return nil, err
 	}
 
-	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...))
+	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(extraKeys...), dag.WithRepos(extraRepos...))
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +159,7 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 		return nil, err
 	}
 
-	return &configStuff{
+	return &dagConfig{
 		g:    g,
 		m:    m,
 		pkgs: pkgs,
@@ -205,10 +206,10 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 func buildAll(ctx context.Context, cfg *global, args []string) error {
 	var eg errgroup.Group
 
-	var stuff *configStuff
+	var dagCfg *dagConfig
 	eg.Go(func() error {
 		var err error
-		stuff, err = walkConfigs(ctx, cfg)
+		dagCfg, err = walkConfigs(ctx, cfg.dir, cfg.pipelineDir, cfg.extraKeys, cfg.extraRepos)
 		return err
 	})
 
@@ -220,7 +221,7 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 
 		eg.Go(func() error {
 			// Logs will go here to mimic the wolfi Makefile.
-			archDir := cfg.logdir(arch)
+			archDir := logdir(cfg.outDir, arch)
 			if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
 				return fmt.Errorf("creating buildlogs directory: %w", err)
 			}
@@ -250,7 +251,7 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 
 	newTask := func(pkg string) *task {
 		// We should only hit these errors if dag.NewPackages is wrong.
-		loadedCfg := stuff.pkgs.Config(pkg, true)
+		loadedCfg := dagCfg.pkgs.Config(pkg, true)
 		if len(loadedCfg) == 0 {
 			panic(fmt.Sprintf("package does not seem to exist: %s", pkg))
 		}
@@ -269,11 +270,11 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 	}
 
 	tasks := map[string]*task{}
-	for _, pkg := range stuff.g.Packages() {
+	for _, pkg := range dagCfg.g.Packages() {
 		if tasks[pkg] == nil {
 			tasks[pkg] = newTask(pkg)
 		}
-		for k, v := range stuff.m {
+		for k, v := range dagCfg.m {
 			// The package list is in the form of "pkg:version",
 			// but we only care about the package name.
 			if strings.HasPrefix(k, pkg+":") {
@@ -381,10 +382,6 @@ type global struct {
 	mu sync.Mutex
 }
 
-func (g *global) logdir(arch string) string {
-	return filepath.Join(g.outDir, arch, "buildlogs")
-}
-
 type task struct {
 	cfg *global
 
@@ -448,40 +445,14 @@ func (t *task) start(ctx context.Context) {
 	t.err = t.build(ctx)
 }
 
-// return intersection of global archs flag and explicit target architectures
-func (t *task) filterArchs() []string {
-	cloned := slices.Clone(t.cfg.archs)
-	targets := t.config.Package.TargetArchitecture
-
-	if len(targets) == 0 || targets[0] == "all" {
-		return cloned
-	}
-
-	filtered := slices.DeleteFunc(cloned, func(arch string) bool {
-		for _, want := range targets {
-			if arch == want {
-				return false
-			}
-		}
-
-		return true
-	})
-
-	return filtered
-}
-
-func (t *task) pkgver() string {
-	return fmt.Sprintf("%s-%s-r%d", t.config.Package.Name, t.config.Package.Version, t.config.Package.Epoch)
-}
-
 func (t *task) buildArch(ctx context.Context, arch string) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
 
 	log := clog.FromContext(ctx)
-	logDir := t.cfg.logdir(arch)
-	logfile := filepath.Join(logDir, t.pkgver()) + ".log"
+	logDir := logdir(t.cfg.outDir, arch)
+	logfile := filepath.Join(logDir, pkgver(t.config.Package)) + ".log"
 
 	f, err := os.Create(logfile)
 	if err != nil {
@@ -492,13 +463,9 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 	flog := clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
 	fctx := clog.WithLogger(ctx, flog)
 
-	sdir := filepath.Join(t.cfg.dir, t.pkg)
-	if _, err := os.Stat(sdir); os.IsNotExist(err) {
-		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
-			return fmt.Errorf("creating source directory %s: %v", sdir, err)
-		}
-	} else if err != nil {
-		return fmt.Errorf("creating source directory: %v", err)
+	sdir, err := pkgSourceDir(t.cfg.dir, t.pkg)
+	if err != nil {
+		return err
 	}
 
 	runner, err := newRunner(fctx, t.cfg.runner)
@@ -568,13 +535,13 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 func (t *task) build(ctx context.Context) error {
 	log := clog.FromContext(ctx)
 
-	archs := t.filterArchs()
+	archs := filterArchs(t.cfg.archs, t.config.Package.TargetArchitecture)
 
 	needsBuild := map[string]bool{}
 	needsIndex := map[string]bool{}
 
 	for _, arch := range archs {
-		apkFile := t.pkgver() + ".apk"
+		apkFile := pkgver(t.config.Package) + ".apk"
 		apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
 
 		// See if we already have the package indexed.
@@ -603,7 +570,7 @@ func (t *task) build(ctx context.Context) error {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
 		if t.cfg.dryrun {
-			log.Infof("DRYRUN: would have built %s/%s/%s.apk", t.cfg.outDir, arch, t.pkgver())
+			log.Infof("DRYRUN: would have built %s/%s/%s.apk", t.cfg.outDir, arch, pkgver(t.config.Package))
 			continue
 		}
 
@@ -624,7 +591,7 @@ func (t *task) build(ctx context.Context) error {
 		log.Infof("Generating apk index from packages in %s", packageDir)
 
 		cfg := t.config.Configuration
-		apkFile := t.pkgver() + ".apk"
+		apkFile := pkgver(t.config.Package) + ".apk"
 		apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
 
 		if t.cfg.dryrun {
@@ -715,4 +682,46 @@ func logs(fname string) error {
 	}
 	fmt.Printf("::endgroup::\n")
 	return nil
+}
+
+// return intersection of global archs flag and explicit target architectures
+func filterArchs(archs, targets []string) []string {
+	cloned := slices.Clone(archs)
+
+	if len(targets) == 0 || targets[0] == "all" {
+		return cloned
+	}
+
+	filtered := slices.DeleteFunc(cloned, func(arch string) bool {
+		for _, want := range targets {
+			if arch == want {
+				return false
+			}
+		}
+
+		return true
+	})
+
+	return filtered
+}
+
+func pkgSourceDir(workspaceDir, pkgName string) (string, error) {
+	sdir := filepath.Join(workspaceDir, pkgName)
+	if _, err := os.Stat(sdir); os.IsNotExist(err) {
+		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
+			return "", fmt.Errorf("creating source directory %s: %v", sdir, err)
+		}
+	} else if err != nil {
+		return "", fmt.Errorf("creating source directory: %v", err)
+	}
+
+	return sdir, nil
+}
+
+func pkgver(pkgCfg config.Package) string {
+	return fmt.Sprintf("%s-%s-r%d", pkgCfg.Name, pkgCfg.Version, pkgCfg.Epoch)
+}
+
+func logdir(path, arch string) string {
+	return filepath.Join(path, arch, "buildlogs")
 }
