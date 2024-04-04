@@ -7,12 +7,13 @@ import (
 	"slices"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/anchore/stereoscope"
 	"github.com/anchore/stereoscope/pkg/image"
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/artifact"
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/anchore/syft/syft/sbom"
-	"github.com/anchore/syft/syft/source"
+	"github.com/anchore/syft/syft/source/stereoscopesource"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
@@ -40,13 +41,14 @@ func cmdImageAPK() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			imageRef := args[0]
 
-			imgSource, err := source.NewFromStereoscopeImage(source.StereoscopeImageConfig{
-				Reference: imageRef,
-				From:      image.OciRegistrySource,
-			})
+			img, err := stereoscope.GetImageFromSource(cmd.Context(), imageRef, image.OciRegistrySource)
 			if err != nil {
 				return fmt.Errorf("unable to construct scan source for image %q: %w", imageRef, err)
 			}
+			imgSource := stereoscopesource.New(img, stereoscopesource.ImageConfig{
+				Reference: imageRef,
+			})
+
 			defer imgSource.Close()
 
 			cfg := syft.DefaultCreateSBOMConfig()

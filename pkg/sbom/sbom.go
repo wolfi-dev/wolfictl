@@ -20,6 +20,7 @@ import (
 	cpegen "github.com/anchore/syft/syft/pkg/cataloger/common/cpe"
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
+	"github.com/anchore/syft/syft/source/directorysource"
 	"github.com/package-url/packageurl-go"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
@@ -52,8 +53,8 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		return nil, fmt.Errorf("failed to create APK package: %w", err)
 	}
 
-	src, err := source.NewFromDirectory(
-		source.DirectoryConfig{
+	src, err := directorysource.New(
+		directorysource.Config{
 			Path: tempDir,
 		},
 	)
@@ -93,13 +94,13 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	return &s, nil
 }
 
-func getDeterministicSourceDescription(src *source.DirectorySource, inputFilePath, apkName, apkVersion string) source.Description {
+func getDeterministicSourceDescription(src source.Source, inputFilePath, apkName, apkVersion string) source.Description {
 	description := src.Describe()
 
 	description.ID = "(redacted for determinism)"
 	description.Name = apkName
 	description.Version = apkVersion
-	metadata := source.DirectorySourceMetadata{
+	metadata := source.DirectoryMetadata{
 		Path: inputFilePath,
 	}
 	description.Metadata = metadata
