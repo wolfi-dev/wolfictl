@@ -41,15 +41,23 @@ type Configuration struct {
 func (c Configuration) String() string {
 	return fmt.Sprintf("%s-%s", c.name, c.version)
 }
+
 func (c Configuration) Name() string {
 	return c.name
 }
+
 func (c Configuration) Version() string {
 	return c.version
 }
+
 func (c Configuration) Source() string {
 	return Local
 }
+
+func (c Configuration) FullName() string {
+	return fmt.Sprintf("%s-%s-r%d", c.name, c.version, c.Package.Epoch)
+}
+
 func (c Configuration) Resolved() bool {
 	return true
 }
