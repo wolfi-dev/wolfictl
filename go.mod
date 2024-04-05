@@ -48,7 +48,7 @@ require (
 	github.com/tmc/dot v0.0.0-20210901225022-f9bc17da75c0
 	go.lsp.dev/uri v0.3.0
 	go.opentelemetry.io/otel v1.25.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.24.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.25.0
 	go.opentelemetry.io/otel/sdk v1.25.0
 	golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f
 	golang.org/x/mod v0.17.0
