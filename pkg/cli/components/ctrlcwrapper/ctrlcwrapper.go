@@ -73,6 +73,9 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			m.inner = inner
+
+			// We'll give the inner model a second to clean up before we exit. This is like
+			// a SIGINT.
 			delayedExitCmd := tea.Tick(1*time.Second, func(time.Time) tea.Msg {
 				return tickExpiredMsg{}
 			})
@@ -82,6 +85,7 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case innerIsReadyMsg, tickExpiredMsg:
 		// The inner has finished its cleanup and is ready to exit.
+		// Or, the "SIGINT" delay has expired, so we're going to exit anyway!
 		return m, tea.Quit
 	}
 

@@ -43,6 +43,11 @@ func (m Model) View() string {
 	return m.style.Foreground(color).Render(m.Text)
 }
 
+// ViewStatic returns the view without any animations.
+func (m Model) ViewStatic() string {
+	return m.style.Render(m.Text)
+}
+
 type TickMsg time.Time
 
 func (t TickMsg) sineValue() float64 {

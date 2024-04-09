@@ -125,3 +125,92 @@ func TestDetect(t *testing.T) {
 	assert.Equal(t, expectedAdvisoriesRepoDir, d.Local.AdvisoriesRepo.Dir)
 	assert.Equal(t, "https://packages.wolfi.dev/os", d.Absolute.APKRepositoryURL)
 }
+
+func TestDetectV2(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "test-distro-detect-")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := os.RemoveAll(tempDir)
+		require.NoError(t, err)
+	})
+
+	r := struct {
+		name       string
+		remoteURLs []string
+	}{
+		name: "my-wolfi",
+		remoteURLs: []string{
+			"https://github.com/wolfi-dev/os.git",
+			"https://foo.git",
+		},
+	}
+
+	repoDir := filepath.Join(tempDir, r.name)
+	err = os.Mkdir(repoDir, 0o755)
+	require.NoError(t, err)
+
+	_, err = git.PlainInit(repoDir, false)
+	require.NoError(t, err)
+
+	repo, err := git.PlainOpen(repoDir)
+	require.NoError(t, err)
+
+	_, err = repo.CreateRemote(&config.RemoteConfig{
+		Name: "origin",
+		URLs: r.remoteURLs,
+	})
+	require.NoError(t, err)
+
+	// We need to create a commit so that HEAD exists.
+	w, err := repo.Worktree()
+	require.NoError(t, err)
+	commit, err := w.Commit("Initial commit", &git.CommitOptions{
+		AllowEmptyCommits: true,
+		Author: &object.Signature{
+			Name:  "test",
+			Email: "test@test.com",
+			When:  time.Unix(0, 0),
+		},
+	})
+	require.NoError(t, err)
+
+	// Create a branch named "main" and set it as the HEAD of the repository.
+	mainRef := plumbing.NewHashReference("refs/heads/main", commit)
+	err = repo.Storer.SetReference(mainRef)
+	require.NoError(t, err)
+
+	// Create a symbolic reference named "refs/remotes/origin/main" that points to the local "main" branch.
+	originMainRef := plumbing.NewSymbolicReference("refs/remotes/origin/main", mainRef.Name())
+	err = repo.Storer.SetReference(originMainRef)
+	require.NoError(t, err)
+
+	symbolicRef := plumbing.NewSymbolicReference(plumbing.HEAD, mainRef.Name())
+	err = repo.Storer.SetReference(symbolicRef)
+	require.NoError(t, err)
+
+	originalWorkDir, err := os.Getwd()
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = os.Chdir(originalWorkDir) //nolint:errCheck
+	})
+
+	err = os.Chdir(repoDir)
+	require.NoError(t, err)
+
+	// Run the function under test
+
+	d, err := DetectV2()
+	require.NoError(t, err)
+
+	// Check the results
+
+	// (We need to resolve the symlinks because this test uses temp dirs, which are symlinked on some operating systems.)
+	expectedDistroRepoDir, err := filepath.EvalSymlinks(func(repoName string) string {
+		return filepath.Join(tempDir, repoName)
+	}(r.name))
+	require.NoError(t, err)
+
+	assert.Equal(t, "Wolfi", d.Absolute.Name)
+	assert.Equal(t, expectedDistroRepoDir, d.Local.PackagesRepo.Dir)
+	assert.Equal(t, "https://packages.wolfi.dev/os", d.Absolute.APKRepositoryURL)
+}
