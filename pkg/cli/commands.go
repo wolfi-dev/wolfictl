@@ -43,6 +43,7 @@ func New() *cobra.Command {
 		cmdRuby(),
 		cmdLs(),
 		cmdSVG(),
+		cmdTest(),
 		cmdText(),
 		cmdSBOM(),
 		cmdScan(),
