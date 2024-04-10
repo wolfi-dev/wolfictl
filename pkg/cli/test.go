@@ -107,7 +107,6 @@ func cmdTest() *cobra.Command {
 	cmd.Flags().StringSliceVar(&cfg.extraPackages, "test-package-append", []string{"wolfi-base"}, "extra packages to install for each of the test environments")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
-	cmd.Flags().StringVar(&cfg.dst, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
 	cmd.Flags().BoolVar(&cfg.debug, "debug", true, "enable test debug logging")
 
 	cmd.Flags().IntVarP(&cfg.jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
@@ -124,7 +123,6 @@ type testConfig struct {
 
 	outDir      string // used for keeping logs consistent with build
 	dir         string
-	dst         string
 	pipelineDir string
 	runner      string
 	debug       bool
@@ -143,11 +141,6 @@ func testAll(ctx context.Context, cfg *testConfig, packages []string) error {
 		return fmt.Errorf("getting packages: %w", err)
 	}
 
-	todoPkgs := make(map[string]struct{}, len(packages))
-	for _, pkg := range packages {
-		todoPkgs[pkg] = struct{}{}
-	}
-
 	archs := make([]types.Architecture, 0, len(cfg.archs))
 	for _, arch := range cfg.archs {
 		archs = append(archs, types.ParseArchitecture(arch))
@@ -164,18 +157,23 @@ func testAll(ctx context.Context, cfg *testConfig, packages []string) error {
 		eg.SetLimit(cfg.jobs)
 	}
 
-	// If only one package or sequential tests, log to stdout, otherwise log to files
-	logStdout := len(packages) == 1 || cfg.jobs == 1
+	// If we're only testing one package or restricting to 1 job, we log to
+	// stdout, otherwise we to log to a file
+	sequential := len(packages) == 1 || cfg.jobs == 1
 
 	failures := testFailures{}
 
-	// We don't care about the actual dag deps, so we use a simple fan-out
-	for _, pkg := range pkgs.Packages() {
-		if _, ok := todoPkgs[pkg.Name()]; len(todoPkgs) > 0 && !ok {
-			log.Debugf("Skipping package %q", pkg)
-			continue
+	testPkgs := pkgs.Packages()
+	if len(packages) > 0 {
+		sub, err := pkgs.Sub(packages...)
+		if err != nil {
+			return fmt.Errorf("getting packages to test: %w", err)
 		}
+		testPkgs = sub.Packages()
+	}
 
+	// We don't care about the actual dag deps, so we use a simple fan-out
+	for _, pkg := range testPkgs {
 		pkg := pkg
 
 		for _, arch := range archs {
@@ -185,7 +183,7 @@ func testAll(ctx context.Context, cfg *testConfig, packages []string) error {
 				log.Infof("Testing %s", pkg.Name())
 
 				pctx := ctx
-				if !logStdout {
+				if !sequential {
 					logf, err := cfg.packageLogFile(pkg, arch.ToAPK())
 					if err != nil {
 						return fmt.Errorf("creating log file: %w", err)
