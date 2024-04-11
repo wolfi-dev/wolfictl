@@ -51,6 +51,11 @@ func (t Timestamp) Before(u Timestamp) bool {
 	return time.Time(t).Before(time.Time(u))
 }
 
+// After returns true if t is after u.
+func (t Timestamp) After(u Timestamp) bool {
+	return time.Time(t).After(time.Time(u))
+}
+
 // String returns the timestamp as an RFC3339 string.
 func (t Timestamp) String() string {
 	return time.Time(t).UTC().Format(time.RFC3339)

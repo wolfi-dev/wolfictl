@@ -145,6 +145,10 @@ func (e Event) validateTimestamp() error {
 		return fmt.Errorf("timestamp must not be zero")
 	}
 
+	if e.Timestamp.After(Now()) {
+		return fmt.Errorf("timestamp must not be in the future")
+	}
+
 	return nil
 }
 

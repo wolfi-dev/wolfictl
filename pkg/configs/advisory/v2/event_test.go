@@ -62,6 +62,17 @@ func TestEvent_Validate(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "timestamp in the future",
+			event: Event{
+				Timestamp: Timestamp(time.Now().Add(time.Hour)),
+				Type:      EventTypeDetection,
+				Data: Detection{
+					Type: DetectionTypeManual,
+				},
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
