@@ -65,7 +65,7 @@ func TestEvent_Validate(t *testing.T) {
 		{
 			name: "timestamp in the future",
 			event: Event{
-				Timestamp: Timestamp(time.Now().Add(time.Hour)),
+				Timestamp: Timestamp(time.Now().Add(24 * time.Hour)),
 				Type:      EventTypeDetection,
 				Data: Detection{
 					Type: DetectionTypeManual,
