@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -145,7 +146,8 @@ func (e Event) validateTimestamp() error {
 		return fmt.Errorf("timestamp must not be zero")
 	}
 
-	if e.Timestamp.After(Now()) {
+	futureCutoff := time.Now().Add(2 * time.Hour)
+	if e.Timestamp.After(Timestamp(futureCutoff)) {
 		return fmt.Errorf("timestamp must not be in the future")
 	}
 
