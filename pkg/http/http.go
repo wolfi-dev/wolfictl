@@ -6,31 +6,24 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// RLHTTPClient Rate Limited HTTP Client
+// RLHTTPClient is a rate limited HTTP client.
 type RLHTTPClient struct {
 	Client      *http.Client
 	Ratelimiter *rate.Limiter
 }
 
-// Do dispatches the HTTP request to the network
+// Do sends an HTTP request.
 func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	// Comment out the below 5 lines to turn off ratelimiting
-	err := c.Ratelimiter.Wait(req.Context()) // This is a blocking call. Honors the rate limit
-	if err != nil {
+	if err := c.Ratelimiter.Wait(req.Context()); err != nil {
 		return nil, err
 	}
-	resp, err := c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return c.Client.Do(req)
 }
 
-// NewClient return rate_limitted_http client with a ratelimiter
+// NewClient returns a rate limited http client.
 func NewClient(rl *rate.Limiter) *RLHTTPClient {
-	c := &RLHTTPClient{
+	return &RLHTTPClient{
 		Client:      http.DefaultClient,
 		Ratelimiter: rl,
 	}
-	return c
 }
