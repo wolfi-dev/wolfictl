@@ -72,65 +72,105 @@ func TestChecks_getSonameFiles(t *testing.T) {
 func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 	tests := []struct {
 		name                string
-		existingSonameFiles []string
-		newSonameFiles      []string
-		wantErr             assert.ErrorAssertionFunc
+		existingSonameFiles map[string][]string
+		newSonameFiles      map[string][]string
+		wantErr             bool
 	}{
 		{
-			name: "deleted", existingSonameFiles: []string{"foo.so", "bar.so"}, newSonameFiles: []string{"foo.so"},
-			wantErr: assert.NoError,
+			name:                "deleted",
+			existingSonameFiles: map[string][]string{"foo": {"so"}, "bar": {"so"}},
+			newSonameFiles:      map[string][]string{"foo": {"so"}},
+			wantErr:             false,
 		},
 		{
-			name: "match", existingSonameFiles: []string{"foo.so", "bar.so"}, newSonameFiles: []string{"foo.so", "bar.so"},
-			wantErr: assert.NoError,
+			name:                "match",
+			existingSonameFiles: map[string][]string{"foo": {"so"}, "bar": {"so"}},
+			newSonameFiles:      map[string][]string{"foo": {"so"}, "bar": {"so"}},
+			wantErr:             false,
 		},
 		{
-			name: "ignore", existingSonameFiles: []string{"foo.so"}, newSonameFiles: []string{"foo.so.1"},
-			wantErr: assert.NoError,
+			name:                "ignore",
+			existingSonameFiles: map[string][]string{"foo": {"so"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.1"}},
+			wantErr:             false,
 		},
 		{
-			name: "match", existingSonameFiles: []string{"foo.so.1"}, newSonameFiles: []string{"foo.so.1"},
-			wantErr: assert.NoError,
+			name:                "match",
+			existingSonameFiles: map[string][]string{"foo": {"so.1"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.1"}},
+			wantErr:             false,
 		},
 		{
-			name: "match_multiple", existingSonameFiles: []string{"foo.so.1", "bar.so.2"}, newSonameFiles: []string{"foo.so.1", "bar.so.2"},
-			wantErr: assert.NoError,
+			name:                "match_multiple",
+			existingSonameFiles: map[string][]string{"foo": {"so.1"}, "bar": {"so.2"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.1"}, "bar": {"so.2"}},
+			wantErr:             false,
 		},
 		{
-			name: "match_multiple_different_order", existingSonameFiles: []string{"bar.so.2", "foo.so.1"}, newSonameFiles: []string{"foo.so.1", "bar.so.2"},
-			wantErr: assert.NoError,
+			name:                "match_multiple_different_order",
+			existingSonameFiles: map[string][]string{"bar": {"so.2"}, "foo": {"so.1"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.1"}, "bar": {"so.2"}},
+			wantErr:             false,
 		},
 		{
-			name: "single_fail", existingSonameFiles: []string{"foo.so.1"}, newSonameFiles: []string{"foo.so.2"},
-			wantErr: assert.Error,
+			name:                "single_fail",
+			existingSonameFiles: map[string][]string{"foo": {"so.1"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.2"}},
+			wantErr:             true,
 		},
 		{
-			name: "multi_fail", existingSonameFiles: []string{"foo.so.1", "bar.so.1"}, newSonameFiles: []string{"foo.so.1", "bar.so.2"},
-			wantErr: assert.Error,
+			name:                "multi_fail",
+			existingSonameFiles: map[string][]string{"foo": {"so.1"}, "bar": {"so.1"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.1"}, "bar": {"so.2"}},
+			wantErr:             true,
 		},
 		{
-			name: "skip_new", existingSonameFiles: []string{"foo.so.1", "bar.so.1"}, newSonameFiles: []string{"cheese.so.1"},
-			wantErr: assert.NoError,
+			name:                "skip_new",
+			existingSonameFiles: map[string][]string{"foo": {"so.1"}, "bar": {"so.1"}},
+			newSonameFiles:      map[string][]string{"cheese": {"so.1"}},
+			wantErr:             false,
 		},
 		{
-			name: "abi_compatible", existingSonameFiles: []string{"foo.so.1.2"}, newSonameFiles: []string{"foo.so.1.3"},
-			wantErr: assert.NoError,
+			name:                "abi_compatible",
+			existingSonameFiles: map[string][]string{"foo": {"so.1.2"}},
+			newSonameFiles:      map[string][]string{"foo": {"so.1.3"}},
+			wantErr:             false,
 		},
 		{
-			name: "no_existing", existingSonameFiles: []string{}, newSonameFiles: []string{"cheese.so.1"},
-			wantErr: assert.NoError,
+			name:                "no_existing",
+			existingSonameFiles: map[string][]string{},
+			newSonameFiles:      map[string][]string{"cheese": {"so.1"}},
+			wantErr:             false,
 		},
 		{
-			name: "none_at_all", existingSonameFiles: []string{}, newSonameFiles: []string{},
-			wantErr: assert.NoError,
+			name:                "none_at_all",
+			existingSonameFiles: map[string][]string{},
+			newSonameFiles:      map[string][]string{},
+			wantErr:             false,
 		},
 		{
-			name: "complex_chars_with_qualifier", existingSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"}, newSonameFiles: []string{"libstdc++.so.6.0.30-gdb.py"},
-			wantErr: assert.NoError,
+			name:                "complex_chars_with_qualifier",
+			existingSonameFiles: map[string][]string{"libstdc++": {"so.6.0.30-gdb.py"}},
+			newSonameFiles:      map[string][]string{"libstdc++": {"so.6.0.30-gdb.py"}},
+			wantErr:             false,
 		},
 		{
-			name: "ignore_non_standard_version_suffix", existingSonameFiles: []string{"libgs.so.10.02.debug"}, newSonameFiles: []string{"libgs.so.10.02.debug"},
-			wantErr: assert.NoError,
+			name:                "ignore_non_standard_version_suffix",
+			existingSonameFiles: map[string][]string{"libgs": {"so.10.02.debug"}},
+			newSonameFiles:      map[string][]string{"libgs": {"so.10.02.debug"}},
+			wantErr:             false,
+		},
+		{
+			name:                "multiple_versions_handled",
+			existingSonameFiles: map[string][]string{"libkrb5": {"so.26", "so.3"}},
+			newSonameFiles:      map[string][]string{"libkrb5": {"so.26", "so.3"}},
+			wantErr:             false,
+		},
+		{
+			name:                "multiple_versions_handled_new_version",
+			existingSonameFiles: map[string][]string{"libkrb5": {"so.26", "so.3"}},
+			newSonameFiles:      map[string][]string{"libkrb5": {"so.27", "so.3"}},
+			wantErr:             true,
 		},
 	}
 	for _, tt := range tests {
@@ -138,7 +178,12 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 			o := SoNameOptions{
 				Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 			}
-			tt.wantErr(t, o.checkSonamesMatch(tt.existingSonameFiles, tt.newSonameFiles), fmt.Sprintf("checkSonamesMatch(%v, %v)", tt.existingSonameFiles, tt.newSonameFiles))
+			err := o.checkSonamesMatch(tt.existingSonameFiles, tt.newSonameFiles)
+			if tt.wantErr {
+				assert.Error(t, err, fmt.Sprintf("checkSonamesMatch(%v, %v) should fail", tt.existingSonameFiles, tt.newSonameFiles))
+			} else {
+				assert.NoError(t, err, fmt.Sprintf("checkSonamesMatch(%v, %v)", tt.existingSonameFiles, tt.newSonameFiles))
+			}
 		})
 	}
 }
@@ -152,7 +197,8 @@ func TestSoNameOptions_checkSonamesSubFolders(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = os.WriteFile(filepath.Join(subDir, "bar.so.1.2.3"), []byte("test"), os.ModePerm)
+	filename := "bar.so.1.2.3"
+	err = os.WriteFile(filepath.Join(subDir, filename), []byte("test"), os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,5 +206,9 @@ func TestSoNameOptions_checkSonamesSubFolders(t *testing.T) {
 	got, err := o.getSonameFiles(dir)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "bar.so.1.2.3", got[0])
+	// Check if the map correctly identifies the base name 'bar' and includes the version 'so.1.2.3'
+	expected := map[string][]string{
+		"bar": {".so.1.2.3"},
+	}
+	assert.Equal(t, expected, got)
 }
