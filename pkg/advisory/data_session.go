@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -180,8 +181,10 @@ func (ds DataSession) Push(ctx context.Context) error {
 
 // OpenPullRequest opens a pull request for the changes made during the session.
 func (ds DataSession) OpenPullRequest(ctx context.Context) (*PullRequest, error) {
+	slices.Sort(ds.modifiedPackages)
+	compact := slices.Compact(ds.modifiedPackages)
 	newPullRequest := github.NewPullRequest{
-		Title:               github.String(fmt.Sprintf("Add advisory data for %s", strings.Join(ds.modifiedPackages, ", "))),
+		Title:               github.String(fmt.Sprintf("Add advisory data for %s", strings.Join(compact, ", "))),
 		Body:                github.String(pullRequestBody),
 		Head:                github.String(ds.workingBranch),
 		Base:                github.String("main"),
