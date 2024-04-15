@@ -34,6 +34,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
+//nolint:gocyclo
 func cmdAdvisoryGuide() *cobra.Command {
 	opts := &advisoryGuideParams{}
 
@@ -338,7 +339,7 @@ var (
 		Do: func(selected resultWithAPKs) tea.Cmd {
 			id := selected.Result.Findings[0].Vulnerability.ID
 			u := vuln.URL(id)
-			_ = browser.OpenURL(u)
+			_ = browser.OpenURL(u) //nolint:errcheck
 			return nil
 		},
 	}
@@ -358,7 +359,7 @@ var (
 					return picker.ErrCmd(fmt.Errorf("data session pull request: %w", err))
 				}
 
-				_ = browser.OpenURL(pr.URL)
+				_ = browser.OpenURL(pr.URL) //nolint:errcheck
 				return tea.Quit
 			},
 		}
@@ -404,7 +405,7 @@ func collateVulnerabilities(results []scan.Result) []resultWithAPKs {
 	vulnAPKsMap := make(map[string]resultWithAPKs)
 
 	for _, result := range results {
-		for _, finding := range result.Findings {
+		for _, finding := range result.Findings { //nolint:gocritic
 			match, exists := vulnAPKsMap[finding.Vulnerability.ID]
 			if !exists {
 				match = resultWithAPKs{
