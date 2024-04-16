@@ -25,6 +25,9 @@ type HTTPAliasFinder struct {
 	cacheCVEByGHSA  map[string]string
 }
 
+// TODO: Allow providing a standard GitHub client that has taken care of its own
+//  auth.
+
 func NewHTTPAliasFinderWithToken(client *http.Client, ghToken string) *HTTPAliasFinder {
 	return &HTTPAliasFinder{
 		ghToken:         ghToken,

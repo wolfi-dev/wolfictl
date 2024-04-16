@@ -69,7 +69,7 @@ func cmdAdvisoryDiff() *cobra.Command {
 }
 
 func getAdvisoriesHTTPSRemoteURL(d distro.Distro) (string, error) {
-	for _, u := range d.Absolute.AdvisoriesRemoteURLs {
+	for _, u := range d.Absolute.AdvisoriesRemoteURLs() {
 		if strings.HasPrefix(u, "https://") {
 			return u, nil
 		}

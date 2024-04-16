@@ -123,7 +123,7 @@ func identifyDistroFromLocalRepoDir(dir string) (Distro, error) {
 			// Fill in the local properties that we can cheaply here. We'll fill in the rest
 			// later, outside of this function call.
 
-			if slices.Contains(d.DistroRemoteURLs, url) {
+			if slices.Contains(d.DistroRemoteURLs(), url) {
 				return Distro{
 					Absolute: d,
 					Local: LocalProperties{
@@ -136,7 +136,7 @@ func identifyDistroFromLocalRepoDir(dir string) (Distro, error) {
 				}, nil
 			}
 
-			if slices.Contains(d.AdvisoriesRemoteURLs, url) {
+			if slices.Contains(d.AdvisoriesRemoteURLs(), url) {
 				return Distro{
 					Absolute: d,
 					Local: LocalProperties{

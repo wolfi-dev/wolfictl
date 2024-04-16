@@ -8,8 +8,9 @@ var (
 	defaultStyle = lipgloss.NewStyle()
 	accented     = lipgloss.NewStyle().Foreground(lipgloss.Color("#ffffff"))
 	secondary    = lipgloss.NewStyle().Foreground(lipgloss.Color("#888888"))
-	faint        = lipgloss.NewStyle().Foreground(lipgloss.Color("#606060"))
-	faintAccent  = lipgloss.NewStyle().Foreground(lipgloss.Color("#777777"))
+	faint        = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
+	faintAccent  = lipgloss.NewStyle().Foreground(lipgloss.Color("#aaaaaa"))
+	bold         = lipgloss.NewStyle().Bold(true)
 
 	accentedLight    = lipgloss.NewStyle().Foreground(lipgloss.Color("#000000"))
 	secondaryLight   = lipgloss.NewStyle().Foreground(lipgloss.Color("#444444"))
@@ -47,4 +48,8 @@ func FaintAccent() lipgloss.Style {
 		return faintAccentLight
 	}
 	return faintAccent
+}
+
+func Bold() lipgloss.Style {
+	return bold
 }

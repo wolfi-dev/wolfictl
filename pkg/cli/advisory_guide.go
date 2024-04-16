@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -11,21 +13,28 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cli/browser"
 	"github.com/dustin/go-humanize"
+	"github.com/google/go-github/v58/github"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/ctrlcwrapper"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/interview"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/keytocontinue"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/picker"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/builds"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/questions"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/wrapped"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
+//nolint:gocyclo
 func cmdAdvisoryGuide() *cobra.Command {
 	opts := &advisoryGuideParams{}
 
@@ -35,6 +44,13 @@ func cmdAdvisoryGuide() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
+
+			// Construct some things we'll need later.
+
+			githubClient := github.NewClient(nil).WithAuthToken(os.Getenv("GITHUB_TOKEN"))
+			af := advisory.NewHTTPAliasFinder(http.DefaultClient)
+
+			// Begin the guide!
 
 			if !opts.speedy {
 				fmt.Println()
@@ -51,7 +67,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 					),
 				).Run()
 				if err != nil {
-					return fmt.Errorf("failed to run key_to_continue program: %w", err)
+					return fmt.Errorf("running key_to_continue: %w", err)
 				}
 				if m, ok := model.(ctrlcwrapper.Any); ok {
 					if m.UserWantsToExit() {
@@ -67,20 +83,18 @@ func cmdAdvisoryGuide() *cobra.Command {
 				return fmt.Errorf("failed to get current working directory: %w", err)
 			}
 
-			detected, err := distro.DetectFromDir(cwd)
+			detected, err := distro.DetectFromDirV2(cwd)
 			if err != nil {
-				if errors.Is(err, distro.ErrNotDistroRepo) {
+				if errors.Is(err, distro.ErrNotPackagesRepo) {
 					wrapped.Fatal(errorForNotADistroDirectory(cwd))
 				}
-
-				// TODO: handle other cases, such as: this is the distro dir but there's no advisories clone for it
 
 				return fmt.Errorf("failed to detect distro: %w", err)
 			}
 
 			wrapped.Println(fmt.Sprintf(
-				"It looks like you're working in the %s distro.",
-				styleBold.Render(detected.Absolute.Name),
+				"It looks like you're working in %s.",
+				styles.Bold().Render(detected.Absolute.Name),
 			))
 			fmt.Println()
 
@@ -92,17 +106,15 @@ func cmdAdvisoryGuide() *cobra.Command {
 
 			wrapped.Println(fmt.Sprintf(
 				"We'll look in %s to see what packages you've built so far.",
-				styleBold.Render(packagesDir),
+				styles.Bold().Render(packagesDir),
 			))
 			fmt.Println()
 
 			opts.pause()
 
 			fsys := os.DirFS(packagesDir)
-
 			buildMap, err := builds.Find(fsys, detected.Absolute.SupportedArchitectures)
 			if err != nil {
-				// TODO: make this a user friendly error!
 				return fmt.Errorf("failed to find builds: %w", err)
 			}
 
@@ -116,47 +128,51 @@ func cmdAdvisoryGuide() *cobra.Command {
 				return buildGroups[i].Origin.FileInfo.ModTime().After(buildGroups[j].Origin.FileInfo.ModTime())
 			})
 
-			// Take at most the 5 latest
+			// Look at only the 5 latest builds
 			if len(buildGroups) > 5 {
 				buildGroups = buildGroups[:5]
 			}
 
-			p := picker.New(buildGroups, renderBuildGroup)
-
-			model, err := tea.NewProgram(ctrlcwrapper.New(p)).Run()
-			if err != nil {
-				return fmt.Errorf("failed to run picker for build groups: %w", err)
+			bgPickerOpts := picker.Options[builds.BuildGroup]{
+				Items:               buildGroups,
+				MessageForZeroItems: "No builds found",
+				ItemRenderFunc:      renderBuildGroup,
 			}
-			if m, ok := model.(ctrlcwrapper.Model[picker.Model[builds.BuildGroup]]); ok {
-				if m.UserWantsToExit() {
+			bgPicker := picker.New(bgPickerOpts)
+			bgPickerTea, err := tea.NewProgram(ctrlcwrapper.New(bgPicker)).Run()
+			if err != nil {
+				return fmt.Errorf("running picker for build groups: %w", err)
+			}
+			if bgPickerCtrlC, ok := bgPickerTea.(ctrlcwrapper.Model[picker.Model[builds.BuildGroup]]); ok {
+				if bgPickerCtrlC.UserWantsToExit() {
 					return nil
 				}
 
-				p = m.Unwrap()
+				bgPicker = bgPickerCtrlC.Unwrap()
 			}
+			bg := bgPicker.Picked()
 
-			bg := p.Picked
-
-			wrapped.Println(fmt.Sprintf("Cool! We'll focus on %s.\n", styleBold.Render(bg.Origin.PkgInfo.Name)))
+			if !opts.speedy {
+				wrapped.Println(fmt.Sprintf("Cool! We'll focus on %s.\n", styles.Bold().Render(bg.Origin.PkgInfo.Name)))
+			}
 
 			opts.pause()
 
 			fmt.Println(sectionDivider)
 			fmt.Println()
 
-			// Step: Scan packages for vulnerabilities
+			if !opts.speedy {
+				wrapped.Println(fmt.Sprintf(
+					"Filing advisory data is necessary %s there are vulnerabilities in the APKs you've built that don't already have the advisory data they need.\n",
+					styleBoldItalic.Render("if and only if"),
+				))
 
-			// TODO: Show the user the equivalent `wolfictl scan ...` command to run if they're curious about isolating this step
+				opts.pause()
 
-			// TODO: factor out this message
-			wrapped.Println(fmt.Sprintf(
-				"Filing advisory data is necessary %s there are vulnerabilities in the APKs you've built that don't already have the advisory data they need.\n",
-				styleBoldItalic.Render("if and only if"),
-			))
+				wrapped.Println("So, to see how much work we have to do, we'll scan your APK file(s) for vulnerabilities, and we'll filter out the vulnerabilities that already have the advisory data they need.\n")
+			}
 
-			opts.pause()
-
-			wrapped.Println("So, to see how much work we have to do, we'll scan your APK file(s) for vulnerabilities.\n")
+			// Scan all APK builds from the build group!
 
 			distroID := strings.ToLower(detected.Absolute.Name)
 
@@ -165,71 +181,190 @@ func cmdAdvisoryGuide() *cobra.Command {
 				return fmt.Errorf("failed to create vulnerability scanner: %w", err)
 			}
 
-			apkfile, err := fsys.Open(bg.Origin.FsysPath)
+			results, err := bg.Scan(ctx, scanner, distroID)
 			if err != nil {
-				return fmt.Errorf("failed to open APK file: %w", err)
+				return fmt.Errorf("failed to scan build group: %w", err)
 			}
+			collated := collateVulnerabilities(results)
 
-			// TODO: insert animation for scanning
+			// Grab the latest advisory data in a new session.
 
-			// TODO: figure out how to ensure the local advisory data is up to date
-
-			advisoryFsys := rwos.DirFS(detected.Local.AdvisoriesRepo.Dir)
-			index, err := v2.NewIndex(ctx, advisoryFsys)
+			sess, err := advisory.NewDataSession(
+				ctx,
+				advisory.DataSessionOptions{
+					Distro:       detected,
+					GitHubClient: githubClient,
+				},
+			)
 			if err != nil {
-				return fmt.Errorf("failed to create advisory index: %w", err)
+				return fmt.Errorf("initializing advisory data session: %w", err)
 			}
+			defer sess.Close()
 
-			result, err := scanner.ScanAPK(ctx, apkfile, distroID)
-			if err != nil {
-				return fmt.Errorf("failed to scan APK: %w", err)
-			}
+			// Important! If there are no vulns from the get-go, exit with a happy message and don't run any pickers.
+			triagingHasBegun := false
 
-			// TODO: scan the rest of the build group, too!
+			// Continue to look for unaddressed vulnerabilities until there are none left
+			// (or the user quits early).
 
-			remainingFindings, err := scan.FilterWithAdvisories(*result, []*configs.Index[v2.Document]{index}, scan.AdvisoriesSetResolved)
-			if err != nil {
-				return err
-			}
+			for {
+				filtered, err := filterCollatedVulnerabilities(collated, sess)
+				if err != nil {
+					return fmt.Errorf("filtering APK findings with advisories: %w", err)
+				}
 
-			countRemainingFindings := len(remainingFindings)
-			if countRemainingFindings == 0 {
+				if len(filtered) == 0 && !triagingHasBegun {
+					wrapped.Println("🎉 No vulnerabilities found that need advisory data. You're all set!\n")
+					return nil
+				}
+				triagingHasBegun = true
+
+				sort.Slice(filtered, func(i, j int) bool {
+					return filtered[i].Result.Findings[0].Vulnerability.ID < filtered[j].Result.Findings[0].Vulnerability.ID
+				})
+
+				// Let the user pick a package vulnerability match to focus on.
+
+				wrapped.Println("Remaining vulnerabilities:\n")
+
+				var actions []picker.CustomAction[resultWithAPKs]
+				if len(filtered) > 0 {
+					actions = append(actions, customActionBrowser)
+				}
+				if sess.Modified() {
+					actions = append(actions, newCustomActionPR(ctx, sess))
+				}
+
+				vaPickerOpts := picker.Options[resultWithAPKs]{
+					Items:               filtered,
+					MessageForZeroItems: "✅ No vulnerabilities left. Let's open a PR!",
+					ItemRenderFunc:      renderResultWithAPKs,
+					CustomActions:       actions,
+				}
+				vaPicker := picker.New(vaPickerOpts)
+				vaPickerTea, err := tea.NewProgram(ctrlcwrapper.New(vaPicker)).Run()
+				if err != nil {
+					return fmt.Errorf("running picker for vulnerabilities: %w", err)
+				}
+				if vaPickerCtrlC, ok := vaPickerTea.(ctrlcwrapper.Model[picker.Model[resultWithAPKs]]); ok {
+					if vaPickerCtrlC.UserWantsToExit() {
+						return nil
+					}
+
+					vaPicker = vaPickerCtrlC.Unwrap()
+				}
+				vaPicked := vaPicker.Picked()
+				if vaPicked == nil {
+					// The user selected a custom action that quit the picker. Nothing was picked.
+					return nil
+				}
+
+				// Interview the user about the selected vulnerability match to derive an
+				// advisory request.
+
+				req := advisory.Request{
+					Package:         vaPicked.APKs[0],
+					VulnerabilityID: vaPicked.Result.Findings[0].Vulnerability.ID,
+				}
+				resolvedReq, err := req.ResolveAliases(ctx, af)
+				if err != nil {
+					return fmt.Errorf("resolving aliases for advisory request: %w", err)
+				}
+				req = *resolvedReq
+
+				iv := interview.New(questionIsThisAFalsePositive, req)
+				ivTea, err := tea.NewProgram(ctrlcwrapper.New(iv)).Run()
+				if err != nil {
+					return fmt.Errorf("running interview for advisory request: %w", err)
+				}
+				if ivCtrlC, ok := ivTea.(ctrlcwrapper.Model[interview.Model[advisory.Request]]); ok {
+					if ivCtrlC.UserWantsToExit() {
+						return nil
+					}
+
+					iv = ivCtrlC.Unwrap()
+				}
+
+				req = iv.State()
+
+				err = sess.Append(ctx, req)
+				if err != nil {
+					return fmt.Errorf("adding advisory data: %w", err)
+				}
+
+				aka := ""
+				if len(req.Aliases) > 0 {
+					aka = fmt.Sprintf(" (%s)", strings.Join(req.Aliases, ", "))
+				}
+
 				wrapped.Println(fmt.Sprintf(
-					"Great news! We didn't find any vulnerabilities in %s that don't already have resolutions in the advisory data.\n",
-					styleBold.Render(bg.Origin.PkgInfo.Name),
+					"🙌 Nice! We've marked %s in %s as %s.\n",
+					styles.Bold().Render(req.VulnerabilityID+aka),
+					styles.Bold().Render(req.Package),
+					styles.Bold().Render(humanizeAdvisoryEventType(req.Event.Type)),
 				))
-
-				opts.pause()
-
-				wrapped.Println("You're all done with this package! 🎉\n")
-
-				return nil
 			}
-
-			vulnNoun := "vulnerability"
-			vulnPronoun := "it"
-			if countRemainingFindings > 1 {
-				vulnNoun = "vulnerabilities"
-				vulnPronoun = "them"
-			}
-
-			wrapped.Println(fmt.Sprintf(
-				"Alrighty then! We found %d %s in %s lacking a resolution in the advisory data. Let's take a look at %s.",
-				countRemainingFindings,
-				vulnNoun,
-				styleBold.Render(bg.Origin.PkgInfo.Name),
-				vulnPronoun,
-			))
-
-			fmt.Println()
-
-			return nil
 		},
 	}
 
 	opts.addToCmd(cmd)
 	return cmd
 }
+
+func humanizeAdvisoryEventType(typ string) string {
+	switch typ {
+	case v2.EventTypeFalsePositiveDetermination:
+		return "a false positive"
+
+	case v2.EventTypeTruePositiveDetermination:
+		return "a true positive"
+
+	case v2.EventTypeAnalysisNotPlanned:
+		return "not planned for analysis"
+
+	case v2.EventTypeFixNotPlanned:
+		return "not planned for a fix"
+
+	case v2.EventTypeFixed:
+		return "fixed"
+	}
+
+	return typ
+}
+
+var (
+	customActionBrowser = picker.CustomAction[resultWithAPKs]{
+		Key:         "b",
+		Description: "to see the vulnerability in a web browser",
+		Do: func(selected resultWithAPKs) tea.Cmd {
+			id := selected.Result.Findings[0].Vulnerability.ID
+			u := vuln.URL(id)
+			_ = browser.OpenURL(u) //nolint:errcheck
+			return nil
+		},
+	}
+
+	newCustomActionPR = func(ctx context.Context, sess *advisory.DataSession) picker.CustomAction[resultWithAPKs] {
+		return picker.CustomAction[resultWithAPKs]{
+			Key:         "p",
+			Description: "to open a PR with your updates",
+			Do: func(_ resultWithAPKs) tea.Cmd {
+				err := sess.Push(ctx)
+				if err != nil {
+					return picker.ErrCmd(fmt.Errorf("data session push: %w", err))
+				}
+
+				pr, err := sess.OpenPullRequest(ctx)
+				if err != nil {
+					return picker.ErrCmd(fmt.Errorf("data session pull request: %w", err))
+				}
+
+				_ = browser.OpenURL(pr.URL) //nolint:errcheck
+				return tea.Quit
+			},
+		}
+	}
+)
 
 type advisoryGuideParams struct {
 	speedy bool
@@ -243,6 +378,87 @@ func (p advisoryGuideParams) pause() {
 	if !p.speedy {
 		time.Sleep(1200 * time.Millisecond)
 	}
+}
+
+// resultWithAPKs holds a scan result with a single finding and a list of the
+// APK names affected by the vulnerability.
+type resultWithAPKs struct {
+	Result scan.Result
+	APKs   []string
+}
+
+func renderResultWithAPKs(r resultWithAPKs) string {
+	finding := r.Result.Findings[0]
+	return fmt.Sprintf(
+		"%s (%s) %s @ %s (%d APKs)",
+		finding.Vulnerability.ID,
+		finding.Package.Type,
+		finding.Package.Name,
+		finding.Package.Version,
+		len(r.APKs),
+	)
+}
+
+// collateVulnerabilities takes a slice of scan.Result and returns a slice of
+// resultWithAPKs.
+func collateVulnerabilities(results []scan.Result) []resultWithAPKs {
+	vulnAPKsMap := make(map[string]resultWithAPKs)
+
+	for _, result := range results {
+		for _, finding := range result.Findings { //nolint:gocritic
+			match, exists := vulnAPKsMap[finding.Vulnerability.ID]
+			if !exists {
+				match = resultWithAPKs{
+					Result: scan.Result{
+						TargetAPK: result.TargetAPK,
+						Findings:  []scan.Finding{finding},
+					},
+					APKs: []string{},
+				}
+			}
+			match.APKs = append(match.APKs, result.TargetAPK.Name)
+			vulnAPKsMap[finding.Vulnerability.ID] = match
+		}
+	}
+
+	var vulnAPKs []resultWithAPKs
+	for _, v := range vulnAPKsMap {
+		vulnAPKs = append(vulnAPKs, v)
+	}
+
+	return vulnAPKs
+}
+
+func filterCollatedVulnerabilities(apkResults []resultWithAPKs, sess *advisory.DataSession) ([]resultWithAPKs, error) {
+	var filtered []resultWithAPKs
+	indexes := []*configs.Index[v2.Document]{sess.Index()}
+
+	for _, ar := range apkResults {
+		filteredFindings, err := scan.FilterWithAdvisories(
+			ar.Result,
+			indexes,
+			scan.AdvisoriesSetConcluded,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("filtering result findings with advisories: %w", err)
+		}
+
+		if len(filteredFindings) == 0 {
+			continue
+		}
+
+		filteredResult := resultWithAPKs{
+			Result: scan.Result{
+				TargetAPK: ar.Result.TargetAPK,
+				Findings:  filteredFindings,
+			},
+			APKs: ar.APKs,
+		}
+
+		filtered = append(filtered, filteredResult)
+	}
+
+	return filtered, nil
 }
 
 func renderBuildGroup(bg builds.BuildGroup) string {
@@ -295,16 +511,100 @@ var (
 	sectionDivider = wrapped.Repeat("—")
 
 	welcomeMessage = func() string {
-		return fmt.Sprintf(welcomeMessageFormat, styleBold.Render("ctrl+C"))
+		return fmt.Sprintf(welcomeMessageFormat, styles.Bold().Render("ctrl+C"))
 	}()
 
 	errorForNotADistroDirectory = func(cwd string) string {
 		return fmt.Sprintf(
 			notADistroDirectoryMessageFormat,
-			styleBold.Render(cwd),
-			styleBold.Copy().Italic(true).Render("is"),
+			styles.Bold().Render(cwd),
+			styles.Bold().Copy().Italic(true).Render("is"),
 		)
 	}
 
 	styleBoldItalic = lipgloss.NewStyle().Bold(true).Italic(true)
+)
+
+var (
+	questionIsThisAFalsePositive = questions.Question[advisory.Request]{
+		Text: "Any obvious sign that this is a false positive?",
+		Choices: []questions.Choice[advisory.Request]{
+			{
+				Text: "No",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					return req, &questionIsPackageSupported
+				},
+			},
+			{
+				Text: "Yes",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					e := v2.Event{
+						Timestamp: v2.Now(),
+						Type:      v2.EventTypeFalsePositiveDetermination,
+					}
+
+					req.Event = e
+					return req, &questionWhyFalsePositive
+				},
+			},
+		},
+	}
+
+	questionWhyFalsePositive = questions.Question[advisory.Request]{
+		Text: "Why is this a false positive?",
+		Choices: []questions.Choice[advisory.Request]{
+			{
+				Text: "The maintainers don't agree that this is a security problem.",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					req.Event.Data = v2.FalsePositiveDetermination{
+						Type: v2.FPTypeVulnerabilityRecordAnalysisContested,
+						Note: "The maintainers don't agree that this is a security problem.",
+					}
+					// TODO: Get more specific: Link to a citation? Where is the dispute recorded and who made it?
+					return req, nil
+				},
+			},
+			{
+				Text: "This is specific to another distro, not ours.",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					req.Event.Data = v2.FalsePositiveDetermination{
+						Type: v2.FPTypeComponentVulnerabilityMismatch,
+						Note: "This is specific to another distro, not ours.",
+					}
+					// TODO: Which distro?
+					return req, nil
+				},
+			},
+			{
+				Text: "This seems to refer to a past version of the software, not the version we have now.",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					req.Event.Data = v2.FalsePositiveDetermination{
+						Type: v2.FPTypeVulnerableCodeVersionNotUsed,
+						Note: "This seems to refer to a past version of the software, not the version we have now.",
+					}
+					// TODO: Which version? Why doesn't this apply to our current version?
+					return req, nil
+				},
+			},
+		},
+	}
+
+	questionIsPackageSupported = questions.Question[advisory.Request]{
+		Text: "Is this package still supported upstream?",
+		Choices: []questions.Choice[advisory.Request]{
+			{
+				Text: "Yes",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					return req, nil
+				},
+			},
+			{
+				Text: "No",
+				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
+					// TODO: Why not? What's the upstream status and how do we know?
+					return req, nil
+				},
+			},
+		},
+	}
 )

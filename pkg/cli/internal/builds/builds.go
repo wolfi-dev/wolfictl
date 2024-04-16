@@ -1,6 +1,7 @@
 package builds
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 
 	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
+	"github.com/wolfi-dev/wolfictl/pkg/scan"
 )
 
 // Find walks the given filesystem and returns a map of build groups, where each
@@ -66,7 +68,9 @@ func Find(fsys fs.FS, architectures []string) (map[string]BuildGroup, error) {
 		k := built.buildGroupKey()
 
 		if _, ok := buildsByOrigin[k]; !ok {
-			buildsByOrigin[k] = BuildGroup{}
+			buildsByOrigin[k] = BuildGroup{
+				Fsys: fsys,
+			}
 		}
 		bg := buildsByOrigin[k]
 
@@ -125,6 +129,39 @@ func newBuiltPackage(fi fs.FileInfo, p *goapk.Package, fsysPath string) Package 
 // Melange build of a package definition, which includes the origin package and
 // 0-n subpackages as well.
 type BuildGroup struct {
+	// Fsys is the filesystem where the build group was found.
+	Fsys fs.FS
+
 	Origin      Package
 	Subpackages []Package
+}
+
+// Scan uses the provided scan.Scanner to scan the APKs in the build group for
+// vulnerabilities. It returns a slice of scan results, one for each APK in the
+// build group. The first slice member is the result for the origin APK, and the
+// rest are for the subpackages.
+func (bg BuildGroup) Scan(ctx context.Context, scanner *scan.Scanner, distroID string) ([]scan.Result, error) {
+	fsys := bg.Fsys
+
+	targets := append([]Package{bg.Origin}, bg.Subpackages...)
+
+	var results []scan.Result
+
+	for _, target := range targets {
+		// TODO: Run these scans in parallel to restore friendship with Jon.
+
+		apkfile, err := fsys.Open(target.FsysPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open APK %q: %w", target.FsysPath, err)
+		}
+
+		result, err := scanner.ScanAPK(ctx, apkfile, distroID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan APK %q: %w", target.FsysPath, err)
+		}
+
+		results = append(results, *result)
+	}
+
+	return results, nil
 }

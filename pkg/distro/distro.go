@@ -1,5 +1,9 @@
 package distro
 
+import (
+	"fmt"
+)
+
 // Distro represents a wolfictl-compatible distro, along with important
 // properties discovered about how the user interacts with the distro.
 type Distro struct {
@@ -40,11 +44,14 @@ type AbsoluteProperties struct {
 	// The Name of the distro, e.g. "Wolfi".
 	Name string
 
-	// The known possible git remote URLs of the distro repo.
-	DistroRemoteURLs []string
+	// DistroRepoOwner is the GitHub organization name that owns the packages repo.
+	DistroRepoOwner string
 
-	// The known possible git remote URLs of the distro's advisories repo.
-	AdvisoriesRemoteURLs []string
+	// DistroPackagesRepo is the name of the distro's packages repo.
+	DistroPackagesRepo string
+
+	// DistroAdvisoriesRepo is the name of the distro's advisories repo.
+	DistroAdvisoriesRepo string
 
 	// APKRepositoryURL is the URL to the distro's package repository (e.g.
 	// "https://packages.wolfi.dev/os").
@@ -54,22 +61,55 @@ type AbsoluteProperties struct {
 	SupportedArchitectures []string
 }
 
+const (
+	githubURLFormatGit   = "git@github.com:%s/%s"
+	githubURLFormatHTTPS = "https://github.com/%s/%s"
+	gitSuffix            = ".git"
+)
+
+// DistroRemoteURLs is the known set of possible git remote URLs of the distro
+// repo.
+func (ap AbsoluteProperties) DistroRemoteURLs() []string {
+	return githubRemoteURLs(ap.DistroRepoOwner, ap.DistroPackagesRepo)
+}
+
+// AdvisoriesRemoteURLs is the known set of possible git remote URLs of the
+// advisories repo.
+func (ap AbsoluteProperties) AdvisoriesRemoteURLs() []string {
+	return githubRemoteURLs(ap.DistroRepoOwner, ap.DistroAdvisoriesRepo)
+}
+
+func githubRemoteURLs(owner, repo string) []string {
+	formats := []string{
+		githubURLFormatGit,
+		githubURLFormatHTTPS,
+	}
+
+	suffixes := []string{
+		gitSuffix,
+		"",
+	}
+
+	var urls []string
+	for _, format := range formats {
+		for _, suffix := range suffixes {
+			urls = append(urls, fmt.Sprintf(format, owner, repo)+suffix)
+		}
+	}
+	return urls
+}
+
+func (ap AbsoluteProperties) AdvisoriesHTTPSCloneURL() string {
+	return fmt.Sprintf(githubURLFormatHTTPS, ap.DistroRepoOwner, ap.DistroAdvisoriesRepo) + gitSuffix
+}
+
 var (
 	wolfiDistro = AbsoluteProperties{
-		Name: "Wolfi",
-		DistroRemoteURLs: []string{
-			"git@github.com:wolfi-dev/os.git",
-			"git@github.com:wolfi-dev/os",
-			"https://github.com/wolfi-dev/os.git",
-			"https://github.com/wolfi-dev/os",
-		},
-		AdvisoriesRemoteURLs: []string{
-			"git@github.com:wolfi-dev/advisories.git",
-			"git@github.com:wolfi-dev/advisories",
-			"https://github.com/wolfi-dev/advisories.git",
-			"https://github.com/wolfi-dev/advisories",
-		},
-		APKRepositoryURL: "https://packages.wolfi.dev/os",
+		Name:                 "Wolfi",
+		DistroRepoOwner:      "wolfi-dev",
+		DistroPackagesRepo:   "os",
+		DistroAdvisoriesRepo: "advisories",
+		APKRepositoryURL:     "https://packages.wolfi.dev/os",
 		SupportedArchitectures: []string{
 			"x86_64",
 			"aarch64",
@@ -77,20 +117,11 @@ var (
 	}
 
 	chainguardDistro = AbsoluteProperties{
-		Name: "Chainguard",
-		DistroRemoteURLs: []string{
-			"git@github.com:chainguard-dev/enterprise-packages.git",
-			"git@github.com:chainguard-dev/enterprise-packages",
-			"https://github.com/chainguard-dev/enterprise-packages.git",
-			"https://github.com/chainguard-dev/enterprise-packages",
-		},
-		AdvisoriesRemoteURLs: []string{
-			"git@github.com:chainguard-dev/enterprise-advisories.git",
-			"git@github.com:chainguard-dev/enterprise-advisories",
-			"https://github.com/chainguard-dev/enterprise-advisories.git",
-			"https://github.com/chainguard-dev/enterprise-advisories",
-		},
-		APKRepositoryURL: "https://packages.cgr.dev/os",
+		Name:                 "Enterprise Packages",
+		DistroRepoOwner:      "chainguard-dev",
+		DistroPackagesRepo:   "enterprise-packages",
+		DistroAdvisoriesRepo: "enterprise-advisories",
+		APKRepositoryURL:     "https://packages.cgr.dev/os",
 		SupportedArchitectures: []string{
 			"x86_64",
 			"aarch64",
@@ -98,20 +129,11 @@ var (
 	}
 
 	extraPackagesDistro = AbsoluteProperties{
-		Name: "Extra Packages",
-		DistroRemoteURLs: []string{
-			"git@github.com:chainguard-dev/extra-packages.git",
-			"git@github.com:chainguard-dev/extra-packages",
-			"https://github.com/chainguard-dev/extra-packages.git",
-			"https://github.com/chainguard-dev/extra-packages",
-		},
-		AdvisoriesRemoteURLs: []string{
-			"git@github.com:chainguard-dev/extra-advisories.git",
-			"git@github.com:chainguard-dev/extra-advisories",
-			"https://github.com/chainguard-dev/extra-advisories.git",
-			"https://github.com/chainguard-dev/extra-advisories",
-		},
-		APKRepositoryURL: "https://packages.cgr.dev/extras",
+		Name:                 "Extra Packages",
+		DistroRepoOwner:      "chainguard-dev",
+		DistroPackagesRepo:   "extra-packages",
+		DistroAdvisoriesRepo: "extra-advisories",
+		APKRepositoryURL:     "https://packages.cgr.dev/extras",
 		SupportedArchitectures: []string{
 			"x86_64",
 			"aarch64",

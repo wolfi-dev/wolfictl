@@ -20,6 +20,7 @@ import (
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/buildlog"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -818,13 +819,12 @@ func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
 }
 
 func renderTriageAssessment(verticalLine string, tr scan.TriageAssessment) string {
-	label := styleBold.Render(fmt.Sprintf("%t positive", tr.TruePositive))
+	label := styles.Bold().Render(fmt.Sprintf("%t positive", tr.TruePositive))
 	return fmt.Sprintf("%s             ⚖️  %s according to %s", verticalLine, label, tr.Source)
 }
 
 var (
 	styleSubtle = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
-	styleBold   = lipgloss.NewStyle().Bold(true)
 
 	styleNegligible = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
 	styleLow        = lipgloss.NewStyle().Foreground(lipgloss.Color("#00ff00"))
