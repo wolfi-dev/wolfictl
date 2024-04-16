@@ -19,12 +19,12 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory/question"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/ctrlcwrapper"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/interview"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/keytocontinue"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/picker"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/builds"
-	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/questions"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/wrapped"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -272,7 +272,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 				}
 				req = *resolvedReq
 
-				iv := interview.New(questionIsThisAFalsePositive, req)
+				iv := interview.New(question.IsFalsePositive, req)
 				ivTea, err := tea.NewProgram(ctrlcwrapper.New(iv)).Run()
 				if err != nil {
 					return fmt.Errorf("running interview for advisory request: %w", err)
@@ -306,6 +306,10 @@ func cmdAdvisoryGuide() *cobra.Command {
 			}
 		},
 	}
+
+	cmd.AddCommand(
+		cmdAdvisoryGuideGraph(),
+	)
 
 	opts.addToCmd(cmd)
 	return cmd
@@ -523,88 +527,4 @@ var (
 	}
 
 	styleBoldItalic = lipgloss.NewStyle().Bold(true).Italic(true)
-)
-
-var (
-	questionIsThisAFalsePositive = questions.Question[advisory.Request]{
-		Text: "Any obvious sign that this is a false positive?",
-		Choices: []questions.Choice[advisory.Request]{
-			{
-				Text: "No",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					return req, &questionIsPackageSupported
-				},
-			},
-			{
-				Text: "Yes",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					e := v2.Event{
-						Timestamp: v2.Now(),
-						Type:      v2.EventTypeFalsePositiveDetermination,
-					}
-
-					req.Event = e
-					return req, &questionWhyFalsePositive
-				},
-			},
-		},
-	}
-
-	questionWhyFalsePositive = questions.Question[advisory.Request]{
-		Text: "Why is this a false positive?",
-		Choices: []questions.Choice[advisory.Request]{
-			{
-				Text: "The maintainers don't agree that this is a security problem.",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					req.Event.Data = v2.FalsePositiveDetermination{
-						Type: v2.FPTypeVulnerabilityRecordAnalysisContested,
-						Note: "The maintainers don't agree that this is a security problem.",
-					}
-					// TODO: Get more specific: Link to a citation? Where is the dispute recorded and who made it?
-					return req, nil
-				},
-			},
-			{
-				Text: "This is specific to another distro, not ours.",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					req.Event.Data = v2.FalsePositiveDetermination{
-						Type: v2.FPTypeComponentVulnerabilityMismatch,
-						Note: "This is specific to another distro, not ours.",
-					}
-					// TODO: Which distro?
-					return req, nil
-				},
-			},
-			{
-				Text: "This seems to refer to a past version of the software, not the version we have now.",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					req.Event.Data = v2.FalsePositiveDetermination{
-						Type: v2.FPTypeVulnerableCodeVersionNotUsed,
-						Note: "This seems to refer to a past version of the software, not the version we have now.",
-					}
-					// TODO: Which version? Why doesn't this apply to our current version?
-					return req, nil
-				},
-			},
-		},
-	}
-
-	questionIsPackageSupported = questions.Question[advisory.Request]{
-		Text: "Is this package still supported upstream?",
-		Choices: []questions.Choice[advisory.Request]{
-			{
-				Text: "Yes",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					return req, nil
-				},
-			},
-			{
-				Text: "No",
-				Choose: func(req advisory.Request) (updated advisory.Request, next *questions.Question[advisory.Request]) {
-					// TODO: Why not? What's the upstream status and how do we know?
-					return req, nil
-				},
-			},
-		},
-	}
 )

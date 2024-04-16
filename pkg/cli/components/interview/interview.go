@@ -5,25 +5,25 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/picker"
-	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/questions"
+	"github.com/wolfi-dev/wolfictl/pkg/question"
 )
 
 type Model[T any] struct {
-	root        questions.Question[T]
-	stack       []questions.Question[T]
-	pickerStack []picker.Model[questions.Choice[T]]
+	root        question.Question[T]
+	stack       []question.Question[T]
+	pickerStack []picker.Model[question.Choice[T]]
 	state       T
 	done        bool
 }
 
 // New returns a new interview model.
-func New[T any](root questions.Question[T], initialState T) Model[T] {
+func New[T any](root question.Question[T], initialState T) Model[T] {
 	m := Model[T]{
 		root:  root,
 		state: initialState,
 	}
 
-	pickerOpts := picker.Options[questions.Choice[T]]{
+	pickerOpts := picker.Options[question.Choice[T]]{
 		Items:          root.Choices,
 		ItemRenderFunc: renderChoice[T],
 	}
@@ -38,7 +38,7 @@ func (m Model[T]) stackTopIndex() int {
 	return len(m.stack) - 1
 }
 
-func (m Model[T]) pickerStackTop() picker.Model[questions.Choice[T]] {
+func (m Model[T]) pickerStackTop() picker.Model[question.Choice[T]] {
 	return m.pickerStack[m.stackTopIndex()]
 }
 
@@ -54,7 +54,7 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "enter", "up", "down":
 			pTea, cmd := m.pickerStackTop().Update(msg)
-			p, ok := pTea.(picker.Model[questions.Choice[T]])
+			p, ok := pTea.(picker.Model[question.Choice[T]])
 			if !ok {
 				// Nothing we can do here, but this shouldn't ever happen.
 				return m, nil
@@ -76,7 +76,7 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			// Update the state.
-			var nextQuestion *questions.Question[T]
+			var nextQuestion *question.Question[T]
 			m.state, nextQuestion = c.Choose(m.state)
 			if nextQuestion == nil {
 				// The line of questioning is concluded.
@@ -87,7 +87,7 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// The line of questioning continues.
 			// Update the stack.
 			m.stack = append(m.stack, *nextQuestion)
-			nextPickerOpts := picker.Options[questions.Choice[T]]{
+			nextPickerOpts := picker.Options[question.Choice[T]]{
 				Items:          nextQuestion.Choices,
 				ItemRenderFunc: renderChoice[T],
 			}
@@ -100,7 +100,7 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	default:
 		// Pass the message to the picker.
 		pTea, cmd := m.pickerStackTop().Update(msg)
-		p, ok := pTea.(picker.Model[questions.Choice[T]])
+		p, ok := pTea.(picker.Model[question.Choice[T]])
 		if !ok {
 			// Nothing we can do here, but this shouldn't ever happen.
 			return m, nil
@@ -131,6 +131,6 @@ func (m Model[T]) State() T {
 	return m.state
 }
 
-func renderChoice[T any](c questions.Choice[T]) string {
+func renderChoice[T any](c question.Choice[T]) string {
 	return c.Text
 }
