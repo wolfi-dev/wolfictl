@@ -324,10 +324,10 @@ func humanizeAdvisoryEventType(typ string) string {
 		return "a true positive"
 
 	case v2.EventTypeAnalysisNotPlanned:
-		return "not planned for analysis"
+		return "analysis not planned"
 
 	case v2.EventTypeFixNotPlanned:
-		return "not planned for a fix"
+		return "fix not planned"
 
 	case v2.EventTypeFixed:
 		return "fixed"

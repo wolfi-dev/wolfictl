@@ -12,7 +12,7 @@ func TestDot(t *testing.T) {
 	var (
 		qIcecreamFlavor = question.Question[string]{
 			Text: "What flavor of ice cream do you like?",
-			Choices: []question.Choice[string]{
+			Answer: question.MultipleChoice[string]{
 				{
 					Text: "Vanilla",
 					Choose: func(state string) (string, *question.Question[string]) {
@@ -30,7 +30,7 @@ func TestDot(t *testing.T) {
 
 		qCookieKind = question.Question[string]{
 			Text: "What kind of cookie do you like?",
-			Choices: []question.Choice[string]{
+			Answer: question.MultipleChoice[string]{
 				{
 					Text: "Chocolate chip",
 					Choose: func(state string) (string, *question.Question[string]) {
@@ -42,7 +42,7 @@ func TestDot(t *testing.T) {
 
 		qFavoriteDessert = question.Question[string]{
 			Text: "What is your favorite dessert?",
-			Choices: []question.Choice[string]{
+			Answer: question.MultipleChoice[string]{
 				{
 					Text: "Ice cream",
 					Choose: func(_ string) (string, *question.Question[string]) {
@@ -63,6 +63,7 @@ func TestDot(t *testing.T) {
 		expected = `digraph interview {
 Done;
 "What is your favorite dessert?";
+"START" -> "What is your favorite dessert?"  [ label="" ]
 "What flavor of ice cream do you like?";
 "What is your favorite dessert?" -> "What flavor of ice cream do you like?"  [ label="Ice cream" ]
 "What flavor of ice cream do you like?" -> Done  [ label=Vanilla ]
@@ -74,7 +75,7 @@ Done;
 `
 	)
 
-	dot, err := Dot(context.Background(), qFavoriteDessert, "")
+	dot, err := Dot(context.Background(), qFavoriteDessert, "START")
 	if err != nil {
 		t.Fatalf("Dot() error = %v", err)
 	}

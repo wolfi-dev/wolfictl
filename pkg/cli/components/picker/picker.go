@@ -74,8 +74,8 @@ func ErrCmd(err error) tea.Cmd {
 	}
 }
 
-// ErrMsg is a bubbletea message that indicates an error occurred during the
-// picker's lifecycle.
+// ErrMsg is a tea.Msg that indicates an error occurred during the picker's
+// lifecycle.
 type ErrMsg error
 
 func (m Model[T]) Init() tea.Cmd {
