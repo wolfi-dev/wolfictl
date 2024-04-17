@@ -1,4 +1,4 @@
-package questions
+package question
 
 type Question[T any] struct {
 	// The question to ask the user.
