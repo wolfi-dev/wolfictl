@@ -19,7 +19,9 @@ func Dot[T any](ctx context.Context, root question.Question[T], initialState T) 
 	doneNode := dot.NewNode("Done")
 	g.AddNode(doneNode)
 
-	err := traverse(ctx, g, root, initialState, nil, "", doneNode)
+	startNode := dot.NewNode(fmt.Sprintf(`"%+v"`, initialState))
+
+	err := traverse(ctx, g, root, initialState, startNode, "", doneNode)
 	if err != nil {
 		return "", err
 	}
@@ -33,7 +35,7 @@ func traverse[T any](
 	q question.Question[T],
 	state T,
 	parentNode *dot.Node,
-	choiceText string,
+	edgeLabel string,
 	doneNode *dot.Node,
 ) error {
 	// Create a unique ID for this question based on its text
@@ -46,27 +48,54 @@ func traverse[T any](
 	// If this question has a parent, add an edge from the parent to this question
 	if parentNode != nil {
 		edge := dot.NewEdge(parentNode, node)
-		_ = edge.Set("label", choiceText) //nolint:errcheck
+		_ = edge.Set("label", edgeLabel) //nolint:errcheck
 		g.AddEdge(edge)
 	}
 
-	// Iterate over the choices for this question
-	for _, choice := range q.Choices {
-		// If the choice leads to another question, recursively traverse that question
-		updatedState, next := choice.Choose(state)
-		if next != nil {
-			err := traverse(ctx, g, *next, updatedState, node, choice.Text, doneNode)
+	switch a := q.Answer.(type) {
+	case question.AcceptText[T]:
+		// Simulate a text answer to advance the propagation through the graph.
+		answer := mockTextEntry
+
+		updatedState, nextQuestion := a(state, answer)
+		if nextQuestion != nil {
+			err := traverse(ctx, g, *nextQuestion, updatedState, node, answer, doneNode)
 			if err != nil {
 				return err
 			}
-			continue
+			return nil
 		}
 
 		// If the choice leads to a nil question, create an edge to the "Done" node
 		edge := dot.NewEdge(node, doneNode)
-		_ = edge.Set("label", choice.Text) //nolint:errcheck
+		_ = edge.Set("label", answer) //nolint:errcheck
 		g.AddEdge(edge)
+
+	case question.MultipleChoice[T]:
+		// Iterate over the choices for this question
+		for _, choice := range a {
+			if choice.Choose == nil {
+				continue
+			}
+
+			// If the choice leads to another question, recursively traverse that question
+			updatedState, nextQuestion := choice.Choose(state)
+			if nextQuestion != nil {
+				err := traverse(ctx, g, *nextQuestion, updatedState, node, choice.Text, doneNode)
+				if err != nil {
+					return err
+				}
+				continue
+			}
+
+			// If the choice leads to a nil question, create an edge to the "Done" node
+			edge := dot.NewEdge(node, doneNode)
+			_ = edge.Set("label", choice.Text) //nolint:errcheck
+			g.AddEdge(edge)
+		}
 	}
 
 	return nil
 }
+
+const mockTextEntry = "<TEXT INPUT>"
