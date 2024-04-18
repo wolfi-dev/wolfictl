@@ -15,14 +15,14 @@ func TestDot(t *testing.T) {
 			Answer: question.MultipleChoice[string]{
 				{
 					Text: "Vanilla",
-					Choose: func(state string) (string, *question.Question[string]) {
-						return "vanilla " + state, nil
+					Choose: func(state string) (string, *question.Question[string], error) {
+						return "vanilla " + state, nil, nil
 					},
 				},
 				{
 					Text: "Chocolate",
-					Choose: func(state string) (string, *question.Question[string]) {
-						return "chocolate " + state, nil
+					Choose: func(state string) (string, *question.Question[string], error) {
+						return "chocolate " + state, nil, nil
 					},
 				},
 			},
@@ -33,8 +33,8 @@ func TestDot(t *testing.T) {
 			Answer: question.MultipleChoice[string]{
 				{
 					Text: "Chocolate chip",
-					Choose: func(state string) (string, *question.Question[string]) {
-						return "chocolate chip " + state, nil
+					Choose: func(state string) (string, *question.Question[string], error) {
+						return "chocolate chip " + state, nil, nil
 					},
 				},
 			},
@@ -45,14 +45,14 @@ func TestDot(t *testing.T) {
 			Answer: question.MultipleChoice[string]{
 				{
 					Text: "Ice cream",
-					Choose: func(_ string) (string, *question.Question[string]) {
-						return "ice cream", &qIcecreamFlavor
+					Choose: func(_ string) (string, *question.Question[string], error) {
+						return "ice cream", &qIcecreamFlavor, nil
 					},
 				},
 				{
 					Text: "Cookie",
-					Choose: func(_ string) (string, *question.Question[string]) {
-						return "cookie", &qCookieKind
+					Choose: func(_ string) (string, *question.Question[string], error) {
+						return "cookie", &qCookieKind, nil
 					},
 				},
 			},

@@ -1,11 +1,15 @@
 package interview
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/accept"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/picker"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/textinput"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/wrapped"
 	"github.com/wolfi-dev/wolfictl/pkg/question"
 )
 
@@ -15,10 +19,11 @@ type Model[T any] struct {
 	answerComponentStack []tea.Model
 	state                T
 	done                 bool
+	err                  error
 }
 
 // New returns a new interview model.
-func New[T any](root question.Question[T], initialState T) Model[T] {
+func New[T any](root question.Question[T], initialState T) (Model[T], error) {
 	m := Model[T]{
 		root:  root,
 		state: initialState,
@@ -26,27 +31,33 @@ func New[T any](root question.Question[T], initialState T) Model[T] {
 
 	m.stack = append(m.stack, root)
 
-	ac := newAnswerComponent(root)
+	ac, err := newAnswerComponent(root)
+	if err != nil {
+		return m, fmt.Errorf("creating answer component: %w", err)
+	}
 	m.answerComponentStack = append(m.answerComponentStack, ac)
 
-	return m
+	return m, nil
 }
 
-func newAnswerComponent[T any](q question.Question[T]) tea.Model {
+func newAnswerComponent[T any](q question.Question[T]) (tea.Model, error) {
 	switch a := q.Answer.(type) {
 	case question.MultipleChoice[T]:
 		opts := picker.Options[question.Choice[T]]{
 			Items:          a,
 			ItemRenderFunc: renderChoice[T],
 		}
-		return picker.New(opts)
+		return picker.New(opts), nil
 
 	case question.AcceptText[T]:
-		return textinput.New()
+		return textinput.New(), nil
+
+	case question.MessageOnly[T]:
+		return accept.Model{}, nil
 	}
 
 	// This should never happen.
-	panic("unsupported question answer type")
+	return nil, fmt.Errorf("unsupported question answer type %T for question %q", q.Answer, q.Text)
 }
 
 func (m Model[T]) stackTopIndex() int {
@@ -70,9 +81,67 @@ func (m Model[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case textinput.Model:
 		return m.updateForTextInput(msg)
+
+	case accept.Model:
+		return m.updateForMessage(msg)
 	}
 
 	return m, nil
+}
+
+func (m Model[T]) updateForMessage(msg tea.Msg) (tea.Model, tea.Cmd) {
+	messageTea, cmd := m.answerComponentStackTop().Update(msg)
+	messageModel, ok := messageTea.(accept.Model)
+	if !ok {
+		// Nothing we can do here, but this shouldn't ever happen.
+		return m, nil
+	}
+	m.answerComponentStack[m.stackTopIndex()] = messageModel
+
+	if !messageModel.Accepted {
+		// The user hasn't acknowledged the message yet.
+		return m, cmd
+	}
+
+	// The user has acknowledged the message.
+
+	// Update the state.
+	var nextQuestion *question.Question[T]
+	var err error
+	m.state, nextQuestion, err = m.stack[m.stackTopIndex()].Answer.(question.MessageOnly[T])(m.state)
+	if err != nil {
+		if errors.Is(err, question.ErrTerminate) {
+			// Exit the interview without a resulting state.
+			m.done = true
+			m.err = err
+			return m, tea.Quit
+		}
+
+		// An error occurred.
+		m.err = err
+		return m, tea.Quit
+	}
+
+	if nextQuestion == nil {
+		// The line of questioning is concluded.
+		m.done = true
+		return m, tea.Quit
+	}
+
+	// The line of questioning continues.
+	// Update the stack.
+	m.stack = append(m.stack, *nextQuestion)
+
+	// Create a new answer component for the next question.
+	ac, err := newAnswerComponent(*nextQuestion)
+	if err != nil {
+		// An error occurred.
+		m.err = err
+		return m, tea.Quit
+	}
+	m.answerComponentStack = append(m.answerComponentStack, ac)
+
+	return m, ac.Init()
 }
 
 func (m Model[T]) updateForTextInput(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -86,7 +155,20 @@ func (m Model[T]) updateForTextInput(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// Update the state.
 			var nextQuestion *question.Question[T]
-			m.state, nextQuestion = m.stack[m.stackTopIndex()].Answer.(question.AcceptText[T])(m.state, val)
+			var err error
+			m.state, nextQuestion, err = m.stack[m.stackTopIndex()].Answer.(question.AcceptText[T])(m.state, val)
+			if err != nil {
+				if errors.Is(err, question.ErrTerminate) {
+					// Exit the interview without a resulting state.
+					m.done = true
+					m.err = err
+					return m, tea.Quit
+				}
+
+				// An error occurred.
+				m.err = err
+				return m, tea.Quit
+			}
 			if nextQuestion == nil {
 				// The line of questioning is concluded.
 				m.done = true
@@ -98,7 +180,12 @@ func (m Model[T]) updateForTextInput(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.stack = append(m.stack, *nextQuestion)
 
 			// Create a new answer component for the next question.
-			ac := newAnswerComponent(*nextQuestion)
+			ac, err := newAnswerComponent(*nextQuestion)
+			if err != nil {
+				// An error occurred.
+				m.err = err
+				return m, tea.Quit
+			}
 			m.answerComponentStack = append(m.answerComponentStack, ac)
 
 			return m, ac.Init()
@@ -154,7 +241,20 @@ func (m Model[T]) updateForPicker(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// Update the state.
 			var nextQuestion *question.Question[T]
-			m.state, nextQuestion = c.Choose(m.state)
+			var err error
+			m.state, nextQuestion, err = c.Choose(m.state)
+			if err != nil {
+				if errors.Is(err, question.ErrTerminate) {
+					// Exit the interview without a resulting state.
+					m.done = true
+					m.err = err
+					return m, tea.Quit
+				}
+
+				// An error occurred.
+				m.err = err
+				return m, tea.Quit
+			}
 			if nextQuestion == nil {
 				// The line of questioning is concluded.
 				m.done = true
@@ -166,7 +266,12 @@ func (m Model[T]) updateForPicker(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.stack = append(m.stack, *nextQuestion)
 
 			// Create a new answer component for the next question.
-			ac := newAnswerComponent(*nextQuestion)
+			ac, err := newAnswerComponent(*nextQuestion)
+			if err != nil {
+				// An error occurred.
+				m.err = err
+				return m, tea.Quit
+			}
 			m.answerComponentStack = append(m.answerComponentStack, ac)
 
 			return m, ac.Init()
@@ -193,7 +298,8 @@ func (m Model[T]) View() string {
 	sb := strings.Builder{}
 
 	for i, q := range m.stack {
-		sb.WriteString(q.Text + "\n\n")
+		qText := wrapped.Sprint(q.Text)
+		sb.WriteString(qText + "\n\n")
 
 		acView := m.answerComponentStack[i].View()
 		sb.WriteString(acView)
@@ -202,8 +308,8 @@ func (m Model[T]) View() string {
 	return sb.String()
 }
 
-func (m Model[T]) State() T {
-	return m.state
+func (m Model[T]) State() (T, error) {
+	return m.state, m.err
 }
 
 func renderChoice[T any](c question.Choice[T]) string {
