@@ -28,6 +28,11 @@ func Println(msg string) {
 	fmt.Println(wrapToLineLength(msg))
 }
 
+// Sprint wraps the given message using LineLength and returns it as a string.
+func Sprint(msg string) string {
+	return wrapToLineLength(msg)
+}
+
 // Fatal wraps the given message using LineLength and prints it to stderr with a
 // trailing newline, then exits with a non-zero status code.
 func Fatal(msg string) {

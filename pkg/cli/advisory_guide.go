@@ -30,6 +30,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	question2 "github.com/wolfi-dev/wolfictl/pkg/question"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
@@ -272,7 +273,10 @@ func cmdAdvisoryGuide() *cobra.Command {
 				}
 				req = *resolvedReq
 
-				iv := interview.New(question.IsFalsePositive, req)
+				iv, err := interview.New(question.IsFalsePositive, req)
+				if err != nil {
+					return fmt.Errorf("creating interview for advisory request: %w", err)
+				}
 				ivTea, err := tea.NewProgram(ctrlcwrapper.New(iv)).Run()
 				if err != nil {
 					return fmt.Errorf("running interview for advisory request: %w", err)
@@ -285,7 +289,16 @@ func cmdAdvisoryGuide() *cobra.Command {
 					iv = ivCtrlC.Unwrap()
 				}
 
-				req = iv.State()
+				req, err = iv.State()
+				if err != nil {
+					if errors.Is(err, question2.ErrTerminate) {
+						// No advisory data was entered for this vulnerability. Back to the list!
+						wrapped.Println("👀 Let's come back to that one later.\n")
+						continue
+					}
+
+					return fmt.Errorf("getting data back from interview: %w", err)
+				}
 
 				err = sess.Append(ctx, req)
 				if err != nil {

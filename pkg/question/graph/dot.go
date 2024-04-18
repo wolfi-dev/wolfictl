@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/tmc/dot"
@@ -23,7 +24,7 @@ func Dot[T any](ctx context.Context, root question.Question[T], initialState T) 
 
 	err := traverse(ctx, g, root, initialState, startNode, "", doneNode)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("traversing graph: %w", err)
 	}
 
 	return g.String(), nil
@@ -55,9 +56,17 @@ func traverse[T any](
 	switch a := q.Answer.(type) {
 	case question.AcceptText[T]:
 		// Simulate a text answer to advance the propagation through the graph.
-		answer := mockTextEntry
+		answer := textInput
 
-		updatedState, nextQuestion := a(state, answer)
+		updatedState, nextQuestion, err := a(state, answer)
+		if err != nil {
+			if errors.Is(err, question.ErrTerminate) {
+				connectToTerminatedNode(g, node, answer)
+				return nil
+			}
+
+			return err
+		}
 		if nextQuestion != nil {
 			err := traverse(ctx, g, *nextQuestion, updatedState, node, answer, doneNode)
 			if err != nil {
@@ -79,7 +88,15 @@ func traverse[T any](
 			}
 
 			// If the choice leads to another question, recursively traverse that question
-			updatedState, nextQuestion := choice.Choose(state)
+			updatedState, nextQuestion, err := choice.Choose(state)
+			if err != nil {
+				if errors.Is(err, question.ErrTerminate) {
+					connectToTerminatedNode(g, node, choice.Text)
+					return nil
+				}
+
+				return err
+			}
 			if nextQuestion != nil {
 				err := traverse(ctx, g, *nextQuestion, updatedState, node, choice.Text, doneNode)
 				if err != nil {
@@ -93,9 +110,47 @@ func traverse[T any](
 			_ = edge.Set("label", choice.Text) //nolint:errcheck
 			g.AddEdge(edge)
 		}
+
+	case question.MessageOnly[T]:
+		edgeLabel := messageAccepted
+		updatedState, nextQuestion, err := a(state)
+		if err != nil {
+			if errors.Is(err, question.ErrTerminate) {
+				connectToTerminatedNode(g, node, edgeLabel)
+				return nil
+			}
+
+			return err
+		}
+		if nextQuestion != nil {
+			err := traverse(ctx, g, *nextQuestion, updatedState, node, edgeLabel, doneNode)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
+		// If the choice leads to a nil question, create an edge to the "Done" node
+		edge := dot.NewEdge(node, doneNode)
+		_ = edge.Set("label", edgeLabel) //nolint:errcheck
+		g.AddEdge(edge)
 	}
 
 	return nil
 }
 
-const mockTextEntry = "<TEXT INPUT>"
+func connectToTerminatedNode(g *dot.Graph, node *dot.Node, edgeLabel string) {
+	term := terminatedNode()
+	g.AddNode(term)
+	edge := dot.NewEdge(node, term)
+	_ = edge.Set("label", edgeLabel) //nolint:errcheck
+	g.AddEdge(edge)
+}
+func terminatedNode() *dot.Node {
+	return dot.NewNode(`"<EXIT WITH NO RESULT>"`)
+}
+
+const (
+	textInput       = "<TEXT INPUT>"
+	messageAccepted = "<MESSAGE ACCEPTED>"
+)
