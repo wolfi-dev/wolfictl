@@ -102,7 +102,10 @@ func (o *DiffOptions) Diff() error {
 	// If bincapz is on the path, then run it to get a capability diff.
 	var result []byte
 	if path, err := exec.LookPath("bincapz"); err == nil {
-		cmd := exec.Command(path, "-diff", "-format=markdown", dirExistingApk, dirNewApk)
+		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
+		//
+		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
+		cmd := exec.Command(path, "-diff", "-format=markdown", "-min-file-level=3", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
 			return err
