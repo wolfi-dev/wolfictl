@@ -29,7 +29,10 @@ func ImporAdvisoriesYAML(inputData []byte) (tempDir string, documents *configs.I
 		docs = append(docs, pkg)
 	}
 
-	tempDir = os.TempDir()
+	tempDir, err = os.MkdirTemp("", "adv-")
+	if err != nil {
+		return "", nil, fmt.Errorf("unable to create temporary directory: %v", err)
+	}
 	for _, doc := range docs {
 		f, err := os.Create(filepath.Join(tempDir, fmt.Sprintf("%s.advisories.yaml", doc.Name())))
 		if err != nil {
