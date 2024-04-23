@@ -11,7 +11,7 @@ require (
 	github.com/anchore/syft v1.2.0
 	github.com/chainguard-dev/clog v1.3.1
 	github.com/chainguard-dev/go-apk v0.0.0-20240326222549-a33562753ea5
-	github.com/chainguard-dev/yam v0.0.3
+	github.com/chainguard-dev/yam v0.0.4
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/lipgloss v0.10.0
