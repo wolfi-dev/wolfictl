@@ -212,7 +212,11 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 	return matcher.NewDefaultMatchers(
 		matcher.Config{
 			Dotnet: dotnet.MatcherConfig{UseCPEs: useCPEs},
-			Golang: golang.MatcherConfig{UseCPEs: useCPEs, AlwaysUseCPEForStdlib: true},
+			Golang: golang.MatcherConfig{
+				UseCPEs:                                useCPEs,
+				AlwaysUseCPEForStdlib:                  true,
+				AllowMainModulePseudoVersionComparison: true,
+			},
 			Java: java.MatcherConfig{
 				ExternalSearchConfig: java.ExternalSearchConfig{
 					SearchMavenUpstream: true,
