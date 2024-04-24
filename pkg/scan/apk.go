@@ -3,7 +3,6 @@ package scan
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path"
@@ -25,6 +24,7 @@ import (
 	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
+	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
 
@@ -88,22 +88,6 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 	}, nil
 }
 
-// APKSBOM parses and scans an SBOM of an APK for vulnerabilities.
-// Deprecated: Use Scanner.APKSBOM
-func APKSBOM(r io.ReadSeeker, localDBFilePath string, useCPEs bool) (*Result, error) {
-	s, err := sbom.FromSyftJSON(r)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode Syft SBOM: %w", err)
-	}
-
-	scanner, err := NewScanner(localDBFilePath, useCPEs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create scanner: %w", err)
-	}
-
-	return scanner.APKSBOM(s)
-}
-
 type Scanner struct {
 	datastore            *store.Store
 	dbStatus             *db.Status
@@ -144,21 +128,29 @@ func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 
 // ScanAPK scans an APK file for vulnerabilities.
 func (s *Scanner) ScanAPK(ctx context.Context, apk fs.File, distroID string) (*Result, error) {
+	logger := clog.FromContext(ctx)
+
 	stat, err := apk.Stat()
 	if err != nil {
 		return nil, fmt.Errorf("failed to stat APK file: %w", err)
 	}
+
+	logger.Info("scanning APK for vulnerabilities", "path", stat.Name())
 
 	ssbom, err := sbom.CachedGenerate(ctx, stat.Name(), apk, distroID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate SBOM from APK: %w", err)
 	}
 
-	return s.APKSBOM(ssbom)
+	return s.APKSBOM(ctx, ssbom)
 }
 
 // APKSBOM scans an SBOM of an APK for vulnerabilities.
-func (s *Scanner) APKSBOM(ssbom *sbomSyft.SBOM) (*Result, error) {
+func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, error) {
+	logger := clog.FromContext(ctx)
+
+	logger.Debug("scanning APK SBOM for vulnerabilities", "packageCount", ssbom.Artifacts.Packages.PackageCount())
+
 	apk, err := newTargetAPK(ssbom)
 	if err != nil {
 		return nil, err
@@ -166,6 +158,8 @@ func (s *Scanner) APKSBOM(ssbom *sbomSyft.SBOM) (*Result, error) {
 
 	syftPkgs := ssbom.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})
+
+	logger.Debug("converted packages to grype packages", "packageCount", len(grypePkgs))
 
 	// Find vulnerability matches
 	matchesCollection, _, err := s.vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{
@@ -175,6 +169,8 @@ func (s *Scanner) APKSBOM(ssbom *sbomSyft.SBOM) (*Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to find vulnerability matches: %w", err)
 	}
+
+	logger.Debug("grype matching finished", "matchCount", matchesCollection.Count())
 
 	matches := matchesCollection.Sorted()
 

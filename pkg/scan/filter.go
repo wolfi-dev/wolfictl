@@ -1,6 +1,7 @@
 package scan
 
 import (
+	"context"
 	"fmt"
 	"slices"
 
@@ -18,16 +19,14 @@ const (
 var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetConcluded}
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
-func FilterWithAdvisories(result Result, advisoryDocIndices []*configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
-	if advisoryDocIndices == nil {
-		return nil, fmt.Errorf("advisory configs cannot be nil")
+func FilterWithAdvisories(_ context.Context, result Result, advisoryDocIndex *configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
+	// TODO: consider using the context for more detailed logging of the filtering logic.
+
+	if advisoryDocIndex == nil {
+		return nil, fmt.Errorf("advisory document index cannot be nil")
 	}
 
-	var documents []v2.Document
-	for _, index := range advisoryDocIndices {
-		docs := index.Select().WhereName(result.TargetAPK.Origin()).Configurations()
-		documents = append(documents, docs...)
-	}
+	documents := advisoryDocIndex.Select().WhereName(result.TargetAPK.Origin()).Configurations()
 
 	// TODO: Should we error out if we end up with multiple documents for a single package?
 

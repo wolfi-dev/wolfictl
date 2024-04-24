@@ -11,6 +11,7 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/anchore/syft/syft/sbom"
+	"github.com/chainguard-dev/clog"
 )
 
 var sbomCacheDirectory = path.Join(xdg.CacheHome, "wolfictl", "sbom", "apk")
@@ -35,6 +36,8 @@ func cachedSBOMPath(inputFilePath string, f io.Reader) (string, error) {
 // CachedGenerate will return the cached SBOM immediately instead of generating
 // a new SBOM.
 func CachedGenerate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
+	logger := clog.FromContext(ctx)
+
 	// Check cache first
 
 	// The cache check needs to read the input file, so we need to tee the input to
@@ -48,11 +51,15 @@ func CachedGenerate(ctx context.Context, inputFilePath string, f io.Reader, dist
 		return nil, fmt.Errorf("failed to compute cached SBOM path: %w", err)
 	}
 
+	logger.Debug("checking cache for SBOM", "expectedPath", cachedPath)
+
 	cached, err := os.Open(cachedPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return nil, fmt.Errorf("failed to open cached SBOM for %q: %w", inputFilePath, err)
 		}
+
+		logger.Debug("SBOM cache miss", "cachedPath", cachedPath)
 
 		// Cache miss. Generate the SBOM.
 
@@ -90,6 +97,8 @@ func CachedGenerate(ctx context.Context, inputFilePath string, f io.Reader, dist
 	}
 
 	// Cache hit!
+
+	logger.Debug("SBOM cache hit", "cachedPath", cachedPath)
 
 	defer cached.Close()
 	s, err := FromSyftJSON(cached)

@@ -10,6 +10,7 @@ import (
 	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
+	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
@@ -30,6 +31,9 @@ func cmdSBOM() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logger := clog.NewLogger(newLogger(p.verbosity))
+			ctx := clog.WithLogger(cmd.Context(), logger)
+
 			if !slices.Contains([]string{sbomFormatOutline, sbomFormatSyftJSON}, p.outputFormat) {
 				return fmt.Errorf("invalid output format %q, must be one of [%s]", p.outputFormat, strings.Join([]string{sbomFormatOutline, sbomFormatSyftJSON}, ", "))
 			}
@@ -48,9 +52,9 @@ func cmdSBOM() *cobra.Command {
 
 			var s *sbomSyft.SBOM
 			if p.disableSBOMCache {
-				s, err = sbom.Generate(cmd.Context(), apkFilePath, apkFile, p.distro)
+				s, err = sbom.Generate(ctx, apkFilePath, apkFile, p.distro)
 			} else {
-				s, err = sbom.CachedGenerate(cmd.Context(), apkFilePath, apkFile, p.distro)
+				s, err = sbom.CachedGenerate(ctx, apkFilePath, apkFile, p.distro)
 			}
 			if err != nil {
 				return fmt.Errorf("failed to generate SBOM: %w", err)
@@ -85,12 +89,14 @@ type sbomParams struct {
 	outputFormat     string
 	distro           string
 	disableSBOMCache bool
+	verbosity        int
 }
 
 func (p *sbomParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", sbomFormatOutline, "output format (outline, syft-json)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to report in SBOM")
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
+	addVerboseFlag(&p.verbosity, cmd)
 }
 
 type packageTree struct {

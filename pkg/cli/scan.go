@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	sbomSyft "github.com/anchore/syft/syft/sbom"
+	"github.com/chainguard-dev/clog"
 	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
@@ -70,8 +71,8 @@ By default, the command will print all vulnerabilities found in the package(s)
 to stdout. You can filter the vulnerabilities shown using existing local
 advisory data. To do this, you must first clone the advisory data from the
 advisories repository for the distro whose packages you are scanning. You
-specify the path to each local advisories repository using the
---advisories-repo-dir flag for each repository. Then, you can use the
+specify the path to the local advisories repository using the
+--advisories-repo-dir flag for the repository. Then, you can use the
 "--advisory-filter" flag to specify which set of advisories to use for
 filtering. The following sets of advisories are available:
 
@@ -143,7 +144,8 @@ wolfictl scan package1 package2 --remote
 		Args:          cobra.MinimumNArgs(1),
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
+			logger := clog.NewLogger(newLogger(p.verbosity))
+			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if p.outputFormat == "" {
 				p.outputFormat = outputFormatOutline
@@ -178,35 +180,43 @@ wolfictl scan package1 package2 --remote
 					)
 				}
 
-				if len(p.advisoriesRepoDirs) == 0 {
-					return errors.New("advisory-based filtering requested, but no advisories repo dirs were provided")
+				if p.advisoriesRepoDir == "" {
+					return errors.New("advisory-based filtering requested, but no advisories repo dir was provided")
 				}
+
+				logger.Info("scan results will be filtered using advisory data", "filterSet", p.advisoryFilterSet, "advisoriesRepoDir", p.advisoriesRepoDir)
 			}
 
-			advisoryDocumentIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
+			var advisoryDocumentIndex *configs.Index[v2.Document]
 
-			if len(p.advisoriesRepoDirs) > 0 {
+			if p.advisoriesRepoDir != "" {
 				if p.advisoryFilterSet == "" {
-					return errors.New("advisories repo dir(s) provided, but no advisory filter set was specified (see -f/--advisory-filter)")
+					return errors.New("advisories repo dir provided, but no advisory filter set was specified (see -f/--advisory-filter)")
 				}
 
-				for _, dir := range p.advisoriesRepoDirs {
-					advisoryFsys := rwos.DirFS(dir)
-					index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
-					if err != nil {
-						return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
-					}
-
-					advisoryDocumentIndices = append(advisoryDocumentIndices, index)
+				dir := p.advisoriesRepoDir
+				advisoryFsys := rwos.DirFS(dir)
+				index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
+				if err != nil {
+					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
 				}
+				advisoryDocumentIndex = index
 			}
 
-			inputs, err := p.resolveInputsToScan(ctx, args)
+			inputs, cleanup, err := p.resolveInputsToScan(ctx, args)
 			if err != nil {
 				return err
 			}
+			defer func() {
+				if err := cleanup(); err != nil {
+					logger.Error("failed to clean up", "error", err)
+					return
+				}
 
-			scans, inputPathsFailingRequireZero, err := scanEverything(ctx, p, inputs, advisoryDocumentIndices)
+				logger.Debug("cleaned up after scan")
+			}()
+
+			scans, inputPathsFailingRequireZero, err := scanEverything(ctx, p, inputs, advisoryDocumentIndex)
 			if err != nil {
 				return err
 			}
@@ -231,7 +241,7 @@ wolfictl scan package1 package2 --remote
 	return cmd
 }
 
-func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisoryDocumentIndices []*configs.Index[v2.Document]) ([]scan.Result, []string, error) {
+func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisoryDocumentIndex *configs.Index[v2.Document]) ([]scan.Result, []string, error) {
 	// We're going to generate the SBOMs concurrently, then scan them sequentially.
 	var g errgroup.Group
 	g.SetLimit(runtime.GOMAXPROCS(0) + 1)
@@ -250,7 +260,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 
 	var inputPathsFailingRequireZero []string
 
-	// Immediately start a goroutine so we can initialize the vulnerability database.
+	// Immediately start a goroutine, so we can initialize the vulnerability database.
 	// Once that's finished, we will start to pull sboms off of done as they become ready.
 	g.Go(func() error {
 		scanner, err := scan.NewScanner(p.localDBFilePath, p.useCPEMatching)
@@ -281,7 +291,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 				fmt.Printf("🔎 Scanning %q\n", input)
 			}
 
-			result, err := p.doScanCommandForSingleInput(ctx, scanner, file, apkSBOM, advisoryDocumentIndices)
+			result, err := p.doScanCommandForSingleInput(ctx, scanner, file, apkSBOM, advisoryDocumentIndex)
 			if err != nil {
 				return fmt.Errorf("failed to scan %q: %w", input, err)
 			}
@@ -339,11 +349,12 @@ type scanParams struct {
 	packageBuildLogInput  bool
 	distro                string
 	advisoryFilterSet     string
-	advisoriesRepoDirs    []string
+	advisoriesRepoDir     string
 	disableSBOMCache      bool
 	triageWithGoVulnCheck bool
 	remoteScanning        bool
 	useCPEMatching        bool
+	verbosity             int
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -354,27 +365,31 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
-	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "local directory for advisory data")
+	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
 	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
 	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
 	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
 	cmd.Flags().BoolVar(&p.useCPEMatching, "use-cpes", false, "turn on all CPE matching in Grype")
+	addVerboseFlag(&p.verbosity, cmd)
 }
 
-func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]string, error) {
-	var inputs []string
+func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (inputs []string, cleanup func() error, err error) {
+	logger := clog.FromContext(ctx)
+
+	var cleanupFuncs []func() error
 	switch {
 	case p.packageBuildLogInput:
 		if len(args) != 1 {
-			return nil, fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
+			return nil, nil, fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
 		}
 
 		var err error
 		inputs, err = resolveInputFilePathsFromBuildLog(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
+			return nil, nil, fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
 		}
+		logger.Debug("resolved inputs from build log", "inputs", strings.Join(inputs, ", "))
 
 	case p.remoteScanning:
 		// For each input, download the APK from the Wolfi package repository and update `inputs` to point to the downloaded APKs
@@ -384,18 +399,32 @@ func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) ([]
 		}
 
 		for _, arg := range args {
-			targetPaths, err := resolveInputForRemoteTarget(ctx, arg)
+			targetPaths, cleanup, err := resolveInputForRemoteTarget(ctx, arg)
 			if err != nil {
-				return nil, fmt.Errorf("failed to resolve input %q for remote scanning: %w", arg, err)
+				return nil, nil, fmt.Errorf("failed to resolve input %q for remote scanning: %w", arg, err)
 			}
 			inputs = append(inputs, targetPaths...)
+			cleanupFuncs = append(cleanupFuncs, cleanup)
 		}
 
 	default:
 		inputs = args
 	}
 
-	return inputs, nil
+	cleanup = func() error {
+		var errs []error
+		for _, f := range cleanupFuncs {
+			if f == nil {
+				continue
+			}
+			if err := f(); err != nil {
+				errs = append(errs, err)
+			}
+		}
+		return errors.Join(errs...)
+	}
+
+	return inputs, cleanup, nil
 }
 
 func (p *scanParams) doScanCommandForSingleInput(
@@ -403,9 +432,9 @@ func (p *scanParams) doScanCommandForSingleInput(
 	scanner *scan.Scanner,
 	inputFile *os.File,
 	apkSBOM *sbomSyft.SBOM,
-	advisoryDocumentIndices []*configs.Index[v2.Document],
+	advisoryDocumentIndex *configs.Index[v2.Document],
 ) (*scan.Result, error) {
-	result, err := scanner.APKSBOM(apkSBOM)
+	result, err := scanner.APKSBOM(ctx, apkSBOM)
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan APK: %w", err)
 	}
@@ -425,7 +454,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	// If requested, filter scan results using advisories
 
 	if set := p.advisoryFilterSet; set != "" {
-		findings, err := scan.FilterWithAdvisories(*result, advisoryDocumentIndices, set)
+		findings, err := scan.FilterWithAdvisories(ctx, *result, advisoryDocumentIndex, set)
 		if err != nil {
 			return nil, fmt.Errorf("failed to filter scan results with advisories: %w", err)
 		}
@@ -582,13 +611,14 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 // For example, given the input value "calico", this function will find the
 // latest version of the package (e.g. "calico-3.26.3-r3.apk") and download it
 // for each architecture.
-func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, error) {
-	var downloadedAPKFilePaths []string
+func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedAPKFilePaths []string, cleanup func() error, err error) {
+	logger := clog.FromContext(ctx)
+
 	for _, arch := range []string{"x86_64", "aarch64"} {
 		const apkRepositoryURL = "https://packages.wolfi.dev/os"
 		apkindex, err := index.Index(arch, apkRepositoryURL)
 		if err != nil {
-			return nil, fmt.Errorf("getting APKINDEX: %w", err)
+			return nil, nil, fmt.Errorf("getting APKINDEX: %w", err)
 		}
 
 		nameMatches := lo.Filter(apkindex.Packages, func(pkg *apk.Package, _ int) bool {
@@ -596,7 +626,7 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, e
 		})
 
 		if len(nameMatches) == 0 {
-			return nil, fmt.Errorf("no Wolfi package found with name %q in arch %q", input, arch)
+			return nil, nil, fmt.Errorf("no Wolfi package found with name %q in arch %q", input, arch)
 		}
 
 		vers := lo.Map(nameMatches, func(pkg *apk.Package, _ int) string {
@@ -615,33 +645,53 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) ([]string, e
 		}
 		downloadURL := fmt.Sprintf("%s/%s/%s", apkRepositoryURL, arch, latestPkg.Filename())
 
-		tmpFile, err := os.CreateTemp("", fmt.Sprintf("%s-%s-%s-*.apk", arch, input, latestVersion))
+		apkTempFileName := fmt.Sprintf("%s-%s-%s-*.apk", arch, input, latestVersion)
+		tmpFile, err := os.CreateTemp("", apkTempFileName)
 		if err != nil {
-			return nil, fmt.Errorf("creating temp dir: %w", err)
+			return nil, nil, fmt.Errorf("creating temp dir: %w", err)
 		}
+		apkTmpFilePath := tmpFile.Name()
+
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
 		if err != nil {
-			return nil, fmt.Errorf("creating request for %q: %w", downloadURL, err)
+			return nil, nil, fmt.Errorf("creating request for %q: %w", downloadURL, err)
 		}
+
+		logger.Debug("downloading APK", "url", downloadURL)
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			return nil, fmt.Errorf("downloading %q: %w", downloadURL, err)
+			return nil, nil, fmt.Errorf("downloading %q: %w", downloadURL, err)
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			return nil, fmt.Errorf("downloading %q (status: %d): %w", downloadURL, resp.StatusCode, err)
+			return nil, nil, fmt.Errorf("downloading %q (status: %d): %w", downloadURL, resp.StatusCode, err)
 		}
 		_, err = io.Copy(tmpFile, resp.Body)
 		if err != nil {
-			return nil, fmt.Errorf("saving contents of %q to %q: %w", downloadURL, tmpFile.Name(), err)
+			return nil, nil, fmt.Errorf("saving contents of %q to %q: %w", downloadURL, apkTmpFilePath, err)
 		}
 		resp.Body.Close()
 		tmpFile.Close()
 
-		downloadedAPKFilePaths = append(downloadedAPKFilePaths, tmpFile.Name())
+		logger.Info("downloaded APK", "path", apkTmpFilePath)
+
+		downloadedAPKFilePaths = append(downloadedAPKFilePaths, apkTmpFilePath)
 	}
 
-	return downloadedAPKFilePaths, nil
+	cleanup = func() error {
+		var errs []error
+		for _, path := range downloadedAPKFilePaths {
+			if err := os.Remove(path); err != nil {
+				errs = append(errs, err)
+			}
+		}
+		if len(errs) > 0 {
+			return fmt.Errorf("failed to clean up downloaded APKs: %w", errors.Join(errs...))
+		}
+		return nil
+	}
+
+	return downloadedAPKFilePaths, cleanup, nil
 }
 
 type findingsTree struct {
