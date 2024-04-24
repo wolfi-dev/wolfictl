@@ -7,7 +7,7 @@ require (
 	chainguard.dev/melange v0.6.11
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.77.0
-	github.com/anchore/stereoscope v0.0.2-0.20240229175558-fe426d1b1c84
+	github.com/anchore/stereoscope v0.0.2
 	github.com/anchore/syft v1.2.0
 	github.com/chainguard-dev/clog v1.3.1
 	github.com/chainguard-dev/go-apk v0.0.0-20240326222549-a33562753ea5
