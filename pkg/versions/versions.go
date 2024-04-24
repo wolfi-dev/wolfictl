@@ -1,10 +1,13 @@
 package versions
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/go-version"
 )
+
+const apkEpochPrefix = "r"
 
 type Interface interface {
 	// Len is the number of elements in the collection.
@@ -32,6 +35,27 @@ func (u ByLatest) Less(i, j int) bool {
 		if u[j].Metadata() != "" {
 			if u[j].Metadata() > u[i].Metadata() {
 				return true
+			}
+		}
+		if u[j].Prerelease() != "" {
+			if u[i].Prerelease() != "" && string(u[j].Prerelease()[0]) == apkEpochPrefix && string(u[i].Prerelease()[0]) == apkEpochPrefix {
+				ujInt, err := strconv.ParseInt(u[j].Prerelease()[1:], 10, 64)
+				isNumeric := true
+				if err != nil {
+					isNumeric = false
+				}
+
+				uiInt, err := strconv.ParseInt(u[i].Prerelease()[1:], 10, 64)
+				if err != nil {
+					isNumeric = false
+				}
+
+				if !isNumeric {
+					if u[j].Prerelease()[1:] > u[i].Prerelease()[1:] {
+						return false
+					}
+				}
+				return uiInt > ujInt
 			}
 		}
 	}
@@ -78,6 +102,31 @@ func (by ByLatestStrings) Less(i, j int) bool {
 		if vj.Metadata() != "" {
 			if vj.Metadata() > vi.Metadata() {
 				return false
+			}
+		}
+		// Prerelease information is anything that comes after the "-" in the
+		// version.
+		// If Prerelease information begins with a "r" anything that comes after "r" is treated as a numeric for comparison.
+		// This handles comparisons were `0.0.0-r9` is lower than `0.0.0-r10`.
+		if vj.Prerelease() != "" {
+			if vi.Prerelease() != "" && string(vj.Prerelease()[0]) == apkEpochPrefix && string(vi.Prerelease()[0]) == apkEpochPrefix {
+				vjInt, err := strconv.ParseInt(vj.Prerelease()[1:], 10, 64)
+				isNumeric := true
+				if err != nil {
+					isNumeric = false
+				}
+
+				viInt, err := strconv.ParseInt(vi.Prerelease()[1:], 10, 64)
+				if err != nil {
+					isNumeric = false
+				}
+
+				if !isNumeric {
+					if vj.Prerelease()[1:] > vi.Prerelease()[1:] {
+						return false
+					}
+				}
+				return viInt > vjInt
 			}
 		}
 	}
