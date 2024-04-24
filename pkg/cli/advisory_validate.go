@@ -214,6 +214,8 @@ print an error message that specifies where and how the data is invalid.`,
 		},
 	}
 
+	cmd.AddCommand(cmdAdvisoryValidateFixes())
+
 	p.addFlagsTo(cmd)
 	return cmd
 }
