@@ -96,6 +96,26 @@ func TestSort_ByLatestStrings(t *testing.T) {
 			input:    []string{"0.1.0-r5", "0.1.0-r4", "0.2.0-r0"},
 			expected: []string{"0.2.0-r0", "0.1.0-r5", "0.1.0-r4"},
 		},
+		{
+			input:    []string{"0.1.0-r5", "0.1.0-r1", "0.1.0-r12"},
+			expected: []string{"0.1.0-r12", "0.1.0-r5", "0.1.0-r1"},
+		},
+		{
+			input:    []string{"0.1.0-r15", "0.1.0-r1", "0.1.0-r12"},
+			expected: []string{"0.1.0-r15", "0.1.0-r12", "0.1.0-r1"},
+		},
+		{
+			input:    []string{"1.1.0-r3", "0.1.0-r1", "0.1.0-r12"},
+			expected: []string{"1.1.0-r3", "0.1.0-r12", "0.1.0-r1"},
+		},
+		{
+			input:    []string{"2.1.0-r1", "2.1.0-r2", "0.1.0-r12"},
+			expected: []string{"2.1.0-r2", "2.1.0-r1", "0.1.0-r12"},
+		},
+		{
+			input:    []string{"5.0.0-r1", "9.1.0-r22", "9.1.0-r20"},
+			expected: []string{"9.1.0-r22", "9.1.0-r20", "5.0.0-r1"},
+		},
 	}
 
 	for _, tt := range cases {
