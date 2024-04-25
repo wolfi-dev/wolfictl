@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path"
 	"strings"
@@ -21,6 +22,7 @@ import (
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
 	"github.com/anchore/syft/syft/source/directorysource"
+	"github.com/chainguard-dev/clog"
 	"github.com/package-url/packageurl-go"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
@@ -29,17 +31,43 @@ const cpeSourceWolfictl cpe.Source = "wolfictl"
 
 // Generate creates an SBOM for the given APK file.
 func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
+	logger := clog.FromContext(ctx)
+
+	logger.Info("generating SBOM for APK file", "path", inputFilePath, "distroID", distroID)
+
 	// Create a temp directory to house the unpacked APK file
 	tempDir, err := os.MkdirTemp("", "wolfictl-sbom-*")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create temp directory: %w", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		logger.Debug("cleaning up temp directory", "path", tempDir)
+		_ = os.RemoveAll(tempDir)
+	}()
+
+	logger.Debug("created temp directory to unpack APK", "path", tempDir)
 
 	// Unpack apk to temp directory
 	err = tar.Untar(f, tempDir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack apk file: %w", err)
+	}
+	logger.Debug("unpacked APK file to temp directory", "apkFilePath", inputFilePath)
+
+	// Sanity check: count the number of files in the temp directory. Create an fs.FS and walk it.
+
+	tempFsys := os.DirFS(tempDir)
+	err = fs.WalkDir(tempFsys, ".", func(path string, _ os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		logger.Debug("apk temp directory item", "path", path)
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("walking APK's temp directory: %w", err)
 	}
 
 	// Analyze the APK metadata
@@ -52,6 +80,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	if err != nil {
 		return nil, fmt.Errorf("failed to create APK package: %w", err)
 	}
+	logger.Debug("synthesized APK package for SBOM", "name", apkPackage.Name, "version", apkPackage.Version, "id", string(apkPackage.ID()))
 
 	src, err := directorysource.New(
 		directorysource.Config{
@@ -61,6 +90,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	if err != nil {
 		return nil, fmt.Errorf("failed to create source from directory: %w", err)
 	}
+	logger.Debug("created Syft source from directory", "description", src.Describe())
 
 	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
 		pkgcataloging.NewSelectionRequest().WithDefaults(
@@ -77,6 +107,8 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 
 	packageCollection := createdSBOM.Artifacts.Packages
 	packageCollection.Add(*apkPackage)
+
+	logger.Info("finished Syft SBOM generation", "packageCount", packageCollection.PackageCount())
 
 	s := sbom.SBOM{
 		Artifacts: sbom.Artifacts{

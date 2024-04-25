@@ -27,7 +27,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/builds"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/wrapped"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
-	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	question2 "github.com/wolfi-dev/wolfictl/pkg/question"
@@ -209,7 +208,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 			// (or the user quits early).
 
 			for {
-				filtered, err := filterCollatedVulnerabilities(collated, sess)
+				filtered, err := filterCollatedVulnerabilities(ctx, collated, sess)
 				if err != nil {
 					return fmt.Errorf("filtering APK findings with advisories: %w", err)
 				}
@@ -446,14 +445,14 @@ func collateVulnerabilities(results []scan.Result) []resultWithAPKs {
 	return vulnAPKs
 }
 
-func filterCollatedVulnerabilities(apkResults []resultWithAPKs, sess *advisory.DataSession) ([]resultWithAPKs, error) {
+func filterCollatedVulnerabilities(ctx context.Context, apkResults []resultWithAPKs, sess *advisory.DataSession) ([]resultWithAPKs, error) {
 	var filtered []resultWithAPKs
-	indexes := []*configs.Index[v2.Document]{sess.Index()}
 
 	for _, ar := range apkResults {
 		filteredFindings, err := scan.FilterWithAdvisories(
+			ctx,
 			ar.Result,
-			indexes,
+			sess.Index(),
 			scan.AdvisoriesSetConcluded,
 		)
 		if err != nil {
