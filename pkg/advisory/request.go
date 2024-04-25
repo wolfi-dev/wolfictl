@@ -56,6 +56,10 @@ func (req Request) ResolveAliases(ctx context.Context, af AliasFinder) (*Request
 			return nil, fmt.Errorf("resolving GHSA %q: %w", req.VulnerabilityID, err)
 		}
 
+		if cve == "" {
+			return &req, nil
+		}
+
 		req.Aliases = append(req.Aliases, req.VulnerabilityID)
 		slices.Sort(req.Aliases)
 		req.Aliases = slices.Compact(req.Aliases)

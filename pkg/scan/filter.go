@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	"go.opentelemetry.io/otel"
 )
 
 const (
@@ -18,9 +20,18 @@ const (
 
 var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, AdvisoriesSetConcluded}
 
-// FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
-func FilterWithAdvisories(_ context.Context, result Result, advisoryDocIndex *configs.Index[v2.Document], advisoryFilterSet string) ([]Finding, error) {
-	// TODO: consider using the context for more detailed logging of the filtering logic.
+// FilterWithAdvisories filters the findings in the result based on the
+// advisories for the target APK.
+func FilterWithAdvisories(
+	ctx context.Context,
+	result Result,
+	advisoryDocIndex *configs.Index[v2.Document],
+	advisoryFilterSet string,
+) ([]Finding, error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, fmt.Sprintf("FilterWithAdvisories %s", result.TargetAPK.Name))
+	defer span.End()
+
+	logger := clog.FromContext(ctx)
 
 	if advisoryDocIndex == nil {
 		return nil, fmt.Errorf("advisory document index cannot be nil")
@@ -31,7 +42,7 @@ func FilterWithAdvisories(_ context.Context, result Result, advisoryDocIndex *co
 	// TODO: Should we error out if we end up with multiple documents for a single package?
 
 	if len(documents) == 0 {
-		// No advisory configs for this package, so we know we wouldn't be able to filter anything.
+		logger.Debug("no advisory documents found for package, so no filtering occurred", "package", result.TargetAPK.Origin())
 		return result.Findings, nil
 	}
 
@@ -55,6 +66,8 @@ func FilterWithAdvisories(_ context.Context, result Result, advisoryDocIndex *co
 			return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
 		}
 	}
+
+	logger.Debug("filtered vulnerability findings using advisories", "advisoryFilterSet", advisoryFilterSet, "filteredCount", len(filteredFindings))
 
 	return filteredFindings, nil
 }

@@ -144,7 +144,7 @@ wolfictl scan package1 package2 --remote
 		Args:          cobra.MinimumNArgs(1),
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := clog.NewLogger(newLogger(p.verbosity))
+			logger := clog.NewLogger(getLogger(p.verbosity))
 			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if p.outputFormat == "" {
@@ -263,7 +263,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 	// Immediately start a goroutine, so we can initialize the vulnerability database.
 	// Once that's finished, we will start to pull sboms off of done as they become ready.
 	g.Go(func() error {
-		scanner, err := scan.NewScanner(p.localDBFilePath, p.useCPEMatching)
+		scanner, err := scan.NewScanner(ctx, p.localDBFilePath, p.useCPEMatching)
 		if err != nil {
 			return fmt.Errorf("failed to create scanner: %w", err)
 		}
@@ -442,7 +442,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	// If requested, triage vulnerabilities in Go binaries using govulncheck
 
 	if p.triageWithGoVulnCheck {
-		triagedFindings, err := scan.Triage(ctx, *result, inputFile)
+		triagedFindings, err := scan.Triage(ctx, *result, inputFile) //nolint:staticcheck // we'll clean this when we remove the deprecated code
 		if err != nil {
 			return nil, fmt.Errorf("failed to triage vulnerability matches: %w", err)
 		}
@@ -772,7 +772,7 @@ func (t findingsTree) render() string {
 					renderSeverity(f.Vulnerability.Severity),
 					renderVulnerabilityID(f.Vulnerability),
 					renderFixedIn(f.Vulnerability),
-					renderTriaging(verticalLine, f.TriageAssessments),
+					renderTriaging(verticalLine, f.TriageAssessments), //nolint:staticcheck // we'll clean this when we remove the deprecated code
 				)
 				lines = append(lines, line)
 			}
@@ -849,6 +849,7 @@ func renderFixedIn(vuln scan.Vulnerability) string {
 	return fmt.Sprintf(" fixed in %s", vuln.FixedVersion)
 }
 
+//nolint:staticcheck // we'll clean this when we remove the deprecated code
 func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
 	if len(trs) == 0 {
 		return ""
@@ -868,6 +869,7 @@ func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
 	return "\n" + strings.Join(lines, "\n")
 }
 
+//nolint:staticcheck // we'll clean this when we remove the deprecated code
 func renderTriageAssessment(verticalLine string, tr scan.TriageAssessment) string {
 	label := styles.Bold().Render(fmt.Sprintf("%t positive", tr.TruePositive))
 	return fmt.Sprintf("%s             ⚖️  %s according to %s", verticalLine, label, tr.Source)

@@ -21,6 +21,9 @@ const (
 
 // runGovulncheck is our entrypoint for running govulncheck on a Go binary (as
 // the exe parameter).
+//
+// Deprecated: this function is deprecated and will be removed in a future. This
+// functionality is now available in the "scan/triage/govulncheck" package.
 func runGovulncheck(ctx context.Context, exe io.ReaderAt) (*vulncheck.Result, error) {
 	// TODO: implement a smarter client that can cache the DB locally.
 	c, err := client.NewClient(govulncheckDB, nil)
@@ -41,19 +44,19 @@ func runGovulncheck(ctx context.Context, exe io.ReaderAt) (*vulncheck.Result, er
 	return result, nil
 }
 
-type GoVulnDBIndex struct {
-	index map[string]GoVulnDBIndexEntry
+type goVulnDBIndex struct {
+	index map[string]goVulnDBIndexEntry
 }
 
-type GoVulnDBIndexEntry struct {
+type goVulnDBIndexEntry struct {
 	ID       string    `json:"id"`
 	Modified time.Time `json:"modified"`
 	Aliases  []string  `json:"aliases,omitempty"`
 }
 
-// BuildIndexForGoVulnDB builds an index of GoVulnDB entries, keyed by aliases
+// buildIndexForGoVulnDB builds an index of GoVulnDB entries, keyed by aliases
 // (like CVE IDs and GHSA IDs).
-func BuildIndexForGoVulnDB(ctx context.Context) (*GoVulnDBIndex, error) {
+func buildIndexForGoVulnDB(ctx context.Context) (*goVulnDBIndex, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", govulncheckDB+indexEndpoint, nil)
 	if err != nil {
 		return nil, err
@@ -66,12 +69,12 @@ func BuildIndexForGoVulnDB(ctx context.Context) (*GoVulnDBIndex, error) {
 	}
 	defer resp.Body.Close()
 
-	var entries []GoVulnDBIndexEntry
+	var entries []goVulnDBIndexEntry
 	if err := json.NewDecoder(resp.Body).Decode(&entries); err != nil {
 		return nil, err
 	}
 
-	index := make(map[string]GoVulnDBIndexEntry)
+	index := make(map[string]goVulnDBIndexEntry)
 	for _, entry := range entries {
 		index[entry.ID] = entry
 		for _, alias := range entry.Aliases {
@@ -79,12 +82,12 @@ func BuildIndexForGoVulnDB(ctx context.Context) (*GoVulnDBIndex, error) {
 		}
 	}
 
-	return &GoVulnDBIndex{index}, nil
+	return &goVulnDBIndex{index}, nil
 }
 
 // Get returns the GoVulnDB index entry for the given ID, or false if it doesn't
 // exist.
-func (i *GoVulnDBIndex) Get(id string) (GoVulnDBIndexEntry, bool) {
+func (i *goVulnDBIndex) Get(id string) (goVulnDBIndexEntry, bool) {
 	entry, ok := i.index[id]
 	return entry, ok
 }

@@ -10,6 +10,7 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/go-apk/pkg/apk"
+	charmlog "github.com/charmbracelet/log"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -44,6 +45,7 @@ func cmdAdvisory() *cobra.Command {
 		cmdAdvisoryList(),
 		cmdAdvisoryMigrate(),
 		cmdAdvisorySecDB(),
+		cmdAdvisoryTriage(),
 		cmdAdvisoryUpdate(),
 		cmdAdvisoryValidate(),
 	)
@@ -144,11 +146,14 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 const (
 	flagNamePackage           = "package"
 	flagNameVuln              = "vuln"
+	flagNameDistro            = "distro"
 	flagNameDistroRepoDir     = "distro-repo-dir"
 	flagNameAdvisoriesRepoDir = "advisories-repo-dir"
+	flagNameBuiltPackagesDir  = "built-packages-dir"
 	flagNameNoPrompt          = "no-prompt"
 	flagNameNoDistroDetection = "no-distro-detection"
 	flagNamePackageRepoURL    = "package-repo-url"
+	flagNameVerbose           = "verbose"
 )
 
 func addPackageFlag(val *string, cmd *cobra.Command) {
@@ -180,21 +185,29 @@ func addPackageRepoURLFlag(val *string, cmd *cobra.Command) {
 }
 
 func addVerboseFlag(val *int, cmd *cobra.Command) {
-	cmd.Flags().CountVarP(val, "verbose", "v", "logging verbosity (v = info, vv = debug, default is none)")
+	cmd.Flags().CountVarP(val, flagNameVerbose, "v", "logging verbosity (v = info, vv = debug, default is none)")
 }
 
-func newLogger(verbosity int) *slog.Logger {
-	var h slog.Handler
+func addBuiltPackagesDirFlag(val *string, cmd *cobra.Command) {
+	cmd.Flags().StringVarP(val, flagNameBuiltPackagesDir, "b", "", "directory containing built packages")
+}
+
+func addDistroFlag(val *string, cmd *cobra.Command) {
+	cmd.Flags().StringVar(val, flagNameDistro, "wolfi", "distro to use during vulnerability matching")
+}
+
+func getLogger(verbosity int) *slog.Logger {
+	var level slog.Level
 	switch {
 	case verbosity == 1:
-		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})
+		level = slog.LevelInfo
 	case verbosity >= 2:
-		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})
+		level = slog.LevelDebug
 	default:
 		return internal.NopLogger()
 	}
 
-	return slog.New(h)
+	return slog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.Level(level)}))
 }
 
 func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {
