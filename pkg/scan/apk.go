@@ -159,7 +159,7 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	syftPkgs := ssbom.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})
 
-	logger.Debug("converted packages to grype packages", "packageCount", len(grypePkgs))
+	logger.Info("converted packages to grype packages", "packageCount", len(grypePkgs))
 
 	// Find vulnerability matches
 	matchesCollection, _, err := s.vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{

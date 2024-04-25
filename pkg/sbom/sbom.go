@@ -108,7 +108,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	packageCollection := createdSBOM.Artifacts.Packages
 	packageCollection.Add(*apkPackage)
 
-	logger.Debug("finished Syft SBOM generation", "packageCount", packageCollection.PackageCount())
+	logger.Info("finished Syft SBOM generation", "packageCount", packageCollection.PackageCount())
 
 	s := sbom.SBOM{
 		Artifacts: sbom.Artifacts{
