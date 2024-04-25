@@ -36,6 +36,10 @@ var (
 		"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub",
 	}
 
+	// subtly incorrect URLs to scan for
+	// match https://github.com/microsoft/vcpkg/files/14125503/Cheat.Lab.2.7.2.zip (comment attachment)
+	forbiddenURLRe = regexp.MustCompile(`github\.com\/\w+\/\w+\/files\/\d+\/`)
+
 	// Used for comparing hosts between configs
 	seenHosts = map[string]bool{}
 	// The minimum edit distance between two hostnames
@@ -155,6 +159,11 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						if err != nil {
 							return fmt.Errorf("uri is invalid URL structure")
 						}
+
+						if forbiddenURLRe.MatchString(uri) {
+							return fmt.Errorf("uri forbidden: %q", uri)
+						}
+
 						if !reValidHostname.MatchString(u.Host) {
 							return fmt.Errorf("uri hostname %q is invalid", u.Host)
 						}
