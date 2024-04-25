@@ -50,6 +50,22 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			file: "forbidden-github-url.yaml",
+			want: EvalResult{
+				File: "forbidden-github-url",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-fetch-uri",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-fetch-uri]: uri forbidden: \"https://github.com/microsoft/vcpkg/files/14125503/backd00r-${{package.version}}.src.tgz\" (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			file: "forbidden-repository-tagged.yaml",
 			want: EvalResult{
 				File: "forbidden-repository-tagged",
