@@ -191,7 +191,7 @@ func generatePURL(info pkgInfo, distroID string) string {
 func generateCPEs(p pkg.Package) []cpe.CPE {
 	dictionaryCPE, ok := cpegen.DictionaryFind(p)
 	if ok {
-		return []cpe.CPE{dictionaryCPE}
+		return dictionaryCPE
 	}
 
 	// TODO: This is a workaround for Syft not coming up with this CPE for OpenJDK
