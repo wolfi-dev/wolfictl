@@ -6,7 +6,7 @@ require (
 	chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa
 	chainguard.dev/melange v0.6.11
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.75.0
+	github.com/anchore/grype v0.77.0
 	github.com/anchore/stereoscope v0.0.3-0.20240423181235-8b297badafd5
 	github.com/anchore/syft v1.3.0
 	github.com/chainguard-dev/clog v1.3.1
