@@ -209,9 +209,9 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 		matcher.Config{
 			Dotnet: dotnet.MatcherConfig{UseCPEs: useCPEs},
 			Golang: golang.MatcherConfig{
-				UseCPEs:               useCPEs,
-				AlwaysUseCPEForStdlib: true,
-				//AllowMainModulePseudoVersionComparison: true, // remove so compatible with grype v0.75.0
+				UseCPEs:                                useCPEs,
+				AlwaysUseCPEForStdlib:                  true,
+				AllowMainModulePseudoVersionComparison: false,
 			},
 			Java: java.MatcherConfig{
 				ExternalSearchConfig: java.ExternalSearchConfig{
