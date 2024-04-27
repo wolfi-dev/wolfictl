@@ -38,5 +38,5 @@ func Test_ParseApkIndex(t *testing.T) {
 	wolfiPackages, err := ParseUnpackedApkIndex(f)
 	assert.NoError(t, err)
 	assert.Equal(t, "4.33-r0", wolfiPackages["libev-doc"].Version)
-	assert.Equal(t, "0.19.0-r3", wolfiPackages["tini"].Version)
+	assert.Equal(t, "0.19.0-r13", wolfiPackages["tini"].Version)
 }
