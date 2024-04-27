@@ -8,13 +8,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
-	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
 type SoNameOptions struct {
@@ -134,16 +134,16 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 
 	err = o.checkSonamesMatch(existingSonameFiles, newSonameFiles)
 	if err != nil {
-		return fmt.Errorf("soname files differ, this can cause an ABI break.  Existing soname files %s, New soname files %s: %w", strings.Join(existingSonameFiles, ","), strings.Join(newSonameFiles, ","), err)
+		return fmt.Errorf("soname files differ, this can cause an ABI breakage %w", err)
 	}
 
 	return nil
 }
 
-func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
-	reg := regexp.MustCompile(`\.so.(\d+\.)?(\d+\.)?(\*|\d+)`)
+func (o *SoNameOptions) getSonameFiles(dir string) (map[string][]string, error) {
+	reg := regexp.MustCompile(`\.so\.(\d+\.)?(\d+\.)?(\*|\d+)`)
 
-	var fileList []string
+	sonameFiles := make(map[string][]string)
 	err := filepath.Walk(dir, func(path string, _ os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -151,91 +151,82 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 		basePath := filepath.Base(path)
 		s := reg.FindString(basePath)
 		if s != "" {
-			fileList = append(fileList, basePath)
+			name := strings.Split(basePath, ".so")[0]
+			sonameFiles[name] = append(sonameFiles[name], s)
 		}
 
-		// also check for DT_SONAME
 		ef, err := elf.Open(filepath.Join(dir, basePath))
 		if err != nil {
-			return nil
+			return nil // Skipping files that can't be opened as ELF files
 		}
 		defer ef.Close()
 
 		sonames, err := ef.DynString(elf.DT_SONAME)
-		// most likely SONAME is not set on this object
-		if err != nil {
-			return nil
-		}
-
-		if len(sonames) > 0 {
-			fileList = append(fileList, sonames...)
+		if err == nil && len(sonames) > 0 {
+			name := strings.Split(sonames[0], ".so")[0]
+			sonameFiles[name] = append(sonameFiles[name], sonames[0])
 		}
 		return nil
 	})
 
-	return fileList, err
+	return sonameFiles, err
 }
 
-func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
-	if len(existingSonameFiles) == 0 {
-		o.Logger.Printf("no existing soname files, skipping")
-		return nil
-	}
-
-	// regex to match version and optional qualifier
-	// \d+(\.\d+)* captures version numbers that may have multiple parts separated by dots
-	// ([a-zA-Z0-9-_]*) captures optional alphanumeric (including hyphens and underscores) qualifiers
-	r := regexp.MustCompile(`(\d+(\.\d+)*)([a-zA-Z0-9-_]*)`)
-
-	// first turn the existing soname files into a map so it is easier to match with
-	existingSonameMap := make(map[string]string)
-	for _, soname := range existingSonameFiles {
-		o.Logger.Printf("checking soname file %s", soname)
-		sonameParts := strings.Split(soname, ".so")
-
-		// Find the version and optional qualifier
-		matches := r.FindStringSubmatch(sonameParts[1])
-		if len(matches) > 0 {
-			version := matches[0] // The entire match, including optional qualifier
-			existingSonameMap[sonameParts[0]] = version
-		}
-	}
-
-	// now iterate over new soname files and compare with existing files
-	for _, soname := range newSonameFiles {
-		sonameParts := strings.Split(soname, ".so")
-		name := sonameParts[0]
-		versionStr := strings.TrimPrefix(sonameParts[1], ".")
-		existingVersionStr := existingSonameMap[name]
-
-		// skip if no matching file
-		if existingVersionStr == "" {
-			o.Logger.Printf("no existing soname version found for %s, skipping", name)
+func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles map[string][]string) error {
+	for name, newVersions := range newSonameFiles {
+		existingVersions, exists := existingSonameFiles[name]
+		if !exists {
+			// Continue if there are no existing versions to compare against, assuming no conflict.
 			continue
 		}
 
-		// turning the string version into proper version will give us major.minor.patch segments
-		existingVersion, err := versions.NewVersion(existingVersionStr)
-		if err != nil {
-			return fmt.Errorf("failed to parse existing version %s: %w", existingVersionStr, err)
-		}
-
-		matches := r.FindStringSubmatch(versionStr)
-		if len(matches) > 0 {
-			versionStr = matches[0] // The entire match, including optional qualifier
-		}
-
-		version, err := versions.NewVersion(versionStr)
-		if err != nil {
-			return fmt.Errorf("failed to parse new version %s: %w", existingVersionStr, err)
-		}
-
-		// let's now compare the major segments as only major version increments indicate a break ABI compatibility
-		newVersionMajor := version.Segments()[0]
-		existingVersionMajor := existingVersion.Segments()[0]
-		if newVersionMajor > existingVersionMajor {
-			return fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version)
+		for _, newVer := range newVersions {
+			versionMatch := false
+			for _, existVer := range existingVersions {
+				compatible, err := areVersionsCompatible(newVer, existVer)
+				if err != nil {
+					return fmt.Errorf("error checking version compatibility for %s: %w", name, err)
+				}
+				if compatible {
+					versionMatch = true
+					break
+				}
+			}
+			if !versionMatch {
+				return fmt.Errorf("soname version mismatch for %s: existing versions %v, new version %s", name, existingVersions, newVer)
+			}
 		}
 	}
 	return nil
+}
+
+// Example helper function to decide if versions are compatible
+func areVersionsCompatible(newVer, existVer string) (bool, error) {
+	// Check if either version string is the base "so", which we treat as a wildcard.
+	if existVer == "so" {
+		return true, nil
+	}
+	newMajor, err := parseMajorVersion(newVer)
+	if err != nil {
+		return false, fmt.Errorf("failed to parse new version: %w", err)
+	}
+	existMajor, err := parseMajorVersion(existVer)
+	if err != nil {
+		return false, fmt.Errorf("failed to parse existing version: %w", err)
+	}
+	return newMajor == existMajor, nil
+}
+
+// Parses the major version part from a version string
+func parseMajorVersion(ver string) (int, error) {
+	// Simplified version parsing logic here, assuming version string starts with "so."
+	parts := strings.Split(ver, ".")
+	if len(parts) < 2 {
+		return 0, fmt.Errorf("invalid version format")
+	}
+	major, err := strconv.Atoi(parts[1]) // Assuming "so.1.2.3" format
+	if err != nil {
+		return 0, err
+	}
+	return major, nil
 }
