@@ -211,7 +211,7 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 			Golang: golang.MatcherConfig{
 				UseCPEs:                                useCPEs,
 				AlwaysUseCPEForStdlib:                  true,
-				AllowMainModulePseudoVersionComparison: false,
+				AllowMainModulePseudoVersionComparison: true,
 			},
 			Java: java.MatcherConfig{
 				ExternalSearchConfig: java.ExternalSearchConfig{
