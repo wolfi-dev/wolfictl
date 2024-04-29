@@ -6,7 +6,7 @@ require (
 	chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa
 	chainguard.dev/melange v0.6.12-0.20240428172622-054e78847f6f
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.77.0
+	github.com/anchore/grype v0.77.1
 	github.com/anchore/stereoscope v0.0.3-0.20240423181235-8b297badafd5
 	github.com/anchore/syft v1.3.0
 	github.com/chainguard-dev/clog v1.3.1
@@ -306,7 +306,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gorm.io/gorm v1.25.9 // indirect
+	gorm.io/gorm v1.25.10 // indirect
 	k8s.io/kube-openapi v0.0.0-20240429181424-4a129a0ff6f9 // indirect
 	modernc.org/libc v1.49.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
