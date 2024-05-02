@@ -14,10 +14,10 @@ require (
 	github.com/chainguard-dev/yam v0.0.5
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.0
-	github.com/charmbracelet/lipgloss v0.10.0
+	github.com/charmbracelet/lipgloss v0.10.1-0.20240413172830-d0be07ea6b9c
 	github.com/charmbracelet/log v0.4.0
 	github.com/cli/browser v1.3.0
-	github.com/cli/go-gh/v2 v2.8.0
+	github.com/cli/go-gh/v2 v2.9.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dominikbraun/graph v0.23.0
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
@@ -107,6 +107,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 // indirect
+	github.com/charmbracelet/x/exp/term v0.0.0-20240425164147-ba2a9512b05f // indirect
 	github.com/cli/safeexec v1.0.0 // indirect
 	github.com/cloudflare/circl v1.3.8 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
