@@ -4,13 +4,13 @@ go 1.22.0
 
 require (
 	chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa
-	chainguard.dev/melange v0.6.12-0.20240428172622-054e78847f6f
+	chainguard.dev/melange v0.6.12-0.20240502164957-fefc79347a56
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.77.2
 	github.com/anchore/stereoscope v0.0.3-0.20240423181235-8b297badafd5
 	github.com/anchore/syft v1.3.0
 	github.com/chainguard-dev/clog v1.3.1
-	github.com/chainguard-dev/go-apk v0.0.0-20240426144607-789246e329da
+	github.com/chainguard-dev/go-apk v0.0.0-20240430200504-6b01e99a4dd3
 	github.com/chainguard-dev/yam v0.0.5
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.0

@@ -1,7 +1,7 @@
 chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa h1:XiSZKbrGmtUzHPhx8CoDUdKEYKbezZQya6DeJX4p2+M=
 chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa/go.mod h1:/A1I9+7X83gDEC0RyWpdVxKvTWMi93AqlfLgLZaow2M=
-chainguard.dev/melange v0.6.12-0.20240428172622-054e78847f6f h1:EO2OSQyl1/AOkmoxVd++HZjlmiVL/WuLYLYvkwoSNy0=
-chainguard.dev/melange v0.6.12-0.20240428172622-054e78847f6f/go.mod h1:Le5qlklmzlZAwryS5pzPVdS5uKfe9MdCweBaniXtwDo=
+chainguard.dev/melange v0.6.12-0.20240502164957-fefc79347a56 h1:RaMlJJLLQR8t4e2b09PiHZgwMPSxGajqVXjQi4CL/pc=
+chainguard.dev/melange v0.6.12-0.20240502164957-fefc79347a56/go.mod h1:PcZHuQD9tIvvADBYHfz5YDK7LU7hjB62kMUd0gFtrb8=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=
@@ -316,8 +316,8 @@ github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/chainguard-dev/clog v1.3.1 h1:CDNCty5WKQhJzoOPubk0GdXt+bPQyargmfClqebrpaQ=
 github.com/chainguard-dev/clog v1.3.1/go.mod h1:cV516KZWqYc/phZsCNwF36u/KMGS+Gj5Uqeb8Hlp95Y=
-github.com/chainguard-dev/go-apk v0.0.0-20240426144607-789246e329da h1:iwpkWtlgnZCWkRV8lnJFAzzE0THmLQsV7ORB2fch2lk=
-github.com/chainguard-dev/go-apk v0.0.0-20240426144607-789246e329da/go.mod h1:ktcgE+WYkJuQV6ooQWjSq6jQJQPt5w7BUG6Hx+0l844=
+github.com/chainguard-dev/go-apk v0.0.0-20240430200504-6b01e99a4dd3 h1:M2RATMXQOrTBgRssUW9XTYQnRazTq2bFTso4SjUAG5U=
+github.com/chainguard-dev/go-apk v0.0.0-20240430200504-6b01e99a4dd3/go.mod h1:ktcgE+WYkJuQV6ooQWjSq6jQJQPt5w7BUG6Hx+0l844=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 h1:XR2vgQC024I9/boh9r1ihVv8Z14+pbvWqXeYMCnZJpc=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10/go.mod h1:1p6+MesLcjKeON5BRWa7I87mvAY0QmKjgginIM3w6BI=
 github.com/chainguard-dev/yam v0.0.5 h1:bdRLCji+Ze50f409mLw7Z8XODh+OYWiJShiFfDy1bew=
