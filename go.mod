@@ -13,7 +13,7 @@ require (
 	github.com/chainguard-dev/go-apk v0.0.0-20240430200504-6b01e99a4dd3
 	github.com/chainguard-dev/yam v0.0.5
 	github.com/charmbracelet/bubbles v0.18.0
-	github.com/charmbracelet/bubbletea v0.26.0
+	github.com/charmbracelet/bubbletea v0.26.1
 	github.com/charmbracelet/lipgloss v0.10.1-0.20240413172830-d0be07ea6b9c
 	github.com/charmbracelet/log v0.4.0
 	github.com/cli/browser v1.3.0
