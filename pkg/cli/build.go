@@ -660,7 +660,7 @@ func filterArchs(archs, targets []string) []string {
 
 	filtered := slices.DeleteFunc(cloned, func(arch string) bool {
 		for _, want := range targets {
-			if arch == want {
+			if types.ParseArchitecture(arch) == types.ParseArchitecture(want) {
 				return false
 			}
 		}
