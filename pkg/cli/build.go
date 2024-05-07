@@ -908,10 +908,13 @@ func (t *task) build(ctx context.Context) error {
 		needsIndex[arch] = true
 
 		// See if we already have the package built.
-		if _, err := os.Stat(apkPath); err == nil {
+		_, err := os.Stat(apkPath)
+		if err == nil {
 			log.Debugf("Skipping %s, already built", apkPath)
 			continue
 		}
+
+		log.Infof("Checking if %q already exists: %v", apkPath, err)
 
 		needsBuild[arch] = true
 	}
