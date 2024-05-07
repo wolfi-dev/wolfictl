@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa
-	chainguard.dev/melange v0.6.12-0.20240502164957-fefc79347a56
+	chainguard.dev/melange v0.6.12-0.20240507090727-a2d0d9a1f0d9
 	cloud.google.com/go/storage v1.40.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.77.2
