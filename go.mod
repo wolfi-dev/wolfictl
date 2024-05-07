@@ -7,7 +7,7 @@ require (
 	chainguard.dev/melange v0.6.12-0.20240502164957-fefc79347a56
 	cloud.google.com/go/storage v1.40.0
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.77.2
+	github.com/anchore/grype v0.77.3
 	github.com/anchore/stereoscope v0.0.3-0.20240423181235-8b297badafd5
 	github.com/anchore/syft v1.3.0
 	github.com/chainguard-dev/clog v1.3.1
@@ -130,7 +130,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v26.1.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v26.1.0+incompatible // indirect
+	github.com/docker/docker v26.1.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.1 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
