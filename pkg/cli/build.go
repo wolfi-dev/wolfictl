@@ -925,7 +925,11 @@ func (t *task) build(ctx context.Context) error {
 	}
 
 	var buildGroup errgroup.Group
-	for _, arch := range t.archs {
+	for arch, need := range needsBuild {
+		if !need {
+			continue
+		}
+
 		arch := types.ParseArchitecture(arch).ToAPK()
 		buildGroup.Go(func() error {
 			return t.buildArch(ctx, arch)
@@ -948,7 +952,11 @@ func (t *task) build(ctx context.Context) error {
 	defer t.cfg.mu.Unlock()
 
 	var indexGroup errgroup.Group
-	for _, arch := range t.archs {
+	for arch, need := range needsIndex {
+		if !need {
+			continue
+		}
+
 		arch := types.ParseArchitecture(arch).ToAPK()
 		indexGroup.Go(func() error {
 			packageDir := filepath.Join(t.cfg.outDir, arch)
@@ -1036,7 +1044,11 @@ func (t *task) buildBundle(ctx context.Context) error {
 	}
 
 	var buildGroup errgroup.Group
-	for _, arch := range t.archs {
+	for arch, need := range needsBuild {
+		if !need {
+			continue
+		}
+
 		arch := types.ParseArchitecture(arch).ToAPK()
 		buildGroup.Go(func() error {
 			return t.buildBundleArch(ctx, arch)
@@ -1059,7 +1071,11 @@ func (t *task) buildBundle(ctx context.Context) error {
 	defer t.cfg.mu.Unlock()
 
 	var indexGroup errgroup.Group
-	for _, arch := range t.archs {
+	for arch, need := range needsIndex {
+		if !need {
+			continue
+		}
+
 		arch := types.ParseArchitecture(arch).ToAPK()
 		indexGroup.Go(func() error {
 			log.Infof("this is where we'd fetch from the bucket for %s", t.pkg)
