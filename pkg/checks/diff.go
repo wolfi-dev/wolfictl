@@ -102,6 +102,7 @@ func (o *DiffOptions) Diff() error {
 	// If bincapz is on the path, then run it to get a capability diff.
 	var result []byte
 	if path, err := exec.LookPath("bincapz"); err == nil {
+		o.Logger.Printf("starting bincapz for %d packages", len(newPackages))
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
@@ -110,6 +111,7 @@ func (o *DiffOptions) Diff() error {
 		if err != nil {
 			return err
 		}
+		o.Logger.Printf("finished bincapz")
 	}
 
 	diffFile := filepath.Join(o.Dir, "diff.log")
