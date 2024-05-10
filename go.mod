@@ -3,7 +3,7 @@ module github.com/wolfi-dev/wolfictl
 go 1.22.0
 
 require (
-	chainguard.dev/apko v0.14.1-0.20240308000904-c510767a86aa
+	chainguard.dev/apko v0.14.1
 	chainguard.dev/melange v0.6.12-0.20240510155128-801d514d15cc
 	cloud.google.com/go/storage v1.40.0
 	github.com/adrg/xdg v0.4.0
