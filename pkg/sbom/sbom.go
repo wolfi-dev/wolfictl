@@ -48,8 +48,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	logger.Debug("created temp directory to unpack APK", "path", tempDir)
 
 	// Unpack apk to temp directory
-	err = tar.Untar(f, tempDir)
-	if err != nil {
+	if err := tar.Untar(f, tempDir); err != nil {
 		return nil, fmt.Errorf("failed to unpack apk file: %w", err)
 	}
 	logger.Debug("unpacked APK file to temp directory", "apkFilePath", inputFilePath)

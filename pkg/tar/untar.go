@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Untar should be named Untargz.
 func Untar(src io.Reader, dst string) error {
 	zr, err := gzip.NewReader(src)
 	if err != nil {
@@ -74,11 +75,11 @@ func Untar(src io.Reader, dst string) error {
 }
 
 // From https://github.com/securego/gosec/issues/324
-func sanitizeArchivePath(d, t string) (v string, err error) {
+func sanitizeArchivePath(d, t string) (string, error) {
 	// Convert to forward slashes
 	cleanedTarget := filepath.FromSlash(t)
 
-	v = filepath.Join(d, cleanedTarget)
+	v := filepath.Join(d, cleanedTarget)
 	cleanedBase := filepath.Clean(d)
 
 	if strings.HasPrefix(v, cleanedBase) {

@@ -99,8 +99,7 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 		return fmt.Errorf("failed to read %s: %w", filename, err)
 	}
 
-	err = tar.Untar(newFile, dirNewApk)
-	if err != nil {
+	if err := tar.Untar(newFile, dirNewApk); err != nil {
 		return fmt.Errorf("failed to untar new apk: %w", err)
 	}
 
