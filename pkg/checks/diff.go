@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/google/go-cmp/cmp"
@@ -113,7 +115,7 @@ func (o *DiffOptions) Diff() error {
 		result, err = cmd.Output()
 
 		if ctx.Err() == context.DeadlineExceeded {
-			return fmt.Sprintf("%s timed out: %w", cmd.Args(), ctx.Err())
+			return fmt.Errorf("%v timed out: %v", cmd.Args, err)
 		}
 
 		if err != nil {
@@ -207,7 +209,6 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		return diffResult{}, err
 	}
@@ -239,7 +240,6 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		return diffResult{}, err
 	}
