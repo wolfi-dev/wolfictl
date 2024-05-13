@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sort"
 
 	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/go-ini/ini"
@@ -57,18 +58,10 @@ func ParseUnpackedApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, er
 func getLatestPackagesMap(apkIndexPackages []*apk.Package, wolfiPackages map[string]*apk.Package) (map[string]*apk.Package, error) {
 	for _, p := range apkIndexPackages {
 		if wolfiPackages[p.Name] != nil {
-			existingPackageVersion, err := versions.NewVersion(wolfiPackages[p.Name].Version)
-			if err != nil {
-				return nil, fmt.Errorf("failed to create a version for package %s from %s: %w", p.Name, wolfiPackages[p.Name].Version, err)
-			}
-
-			apkPackageVersion, err := versions.NewVersion(p.Version)
-			if err != nil {
-				return nil, fmt.Errorf("failed to create a new version for package %s from %s: %w", p.Name, p.Version, err)
-			}
-
+			vers := []string{wolfiPackages[p.Name].Version, p.Version}
+			sort.Sort(versions.ByLatestStrings(vers))
 			// replace in our map if we find a newer version in the APKINDEX
-			if existingPackageVersion.LessThan(apkPackageVersion) {
+			if p.Version == vers[0] {
 				wolfiPackages[p.Name] = p
 			}
 		} else {
