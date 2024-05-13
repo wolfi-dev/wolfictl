@@ -68,8 +68,7 @@ func downloadCurrentAPK(client *http.Client, apkIndexURL, newPackageName, dirCur
 		return fmt.Errorf("download failed for %s, status code: %d", apkURL, resp.StatusCode)
 	}
 
-	err = tar.Untar(resp.Body, dirCurrentApk)
-	if err != nil {
+	if err := tar.Untar(resp.Body, dirCurrentApk); err != nil {
 		return fmt.Errorf("failed to untar new apk: %w", err)
 	}
 	return nil
