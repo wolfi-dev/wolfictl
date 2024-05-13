@@ -108,7 +108,7 @@ func (o *DiffOptions) Diff() error {
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
-		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 		defer cancel()
 
 		cmd := exec.CommandContext(ctx, path, "-diff", "-format=markdown", "-min-file-level=3", dirExistingApk, dirNewApk)
