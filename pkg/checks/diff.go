@@ -112,7 +112,7 @@ func (o *DiffOptions) Diff() error {
 		result, err = cmd.Output()
 
 		if ctx.Err() == context.DeadlineExceeded {
-			return fmt.Sprintf("bincapz timed out: %w", ctx.Err())
+			return fmt.Sprintf("%s timed out: %w", cmd.Args(), ctx.Err())
 		}
 
 		if err != nil {
