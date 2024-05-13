@@ -56,7 +56,7 @@ func updateMakefile(repoDir, packageName, latestVersion string, epoch uint64) er
 func cmdBump() *cobra.Command {
 	opts := bumpOptions{}
 	cmd := &cobra.Command{
-		Use:     "bump [flags] config[.yaml] [config[.yaml]...]",
+		Use:     "bump config[.yaml] [config[.yaml]...]",
 		Short:   "Bumps the epoch field in melange configuration files",
 		Example: "wolfictl bump openssh.yaml perl lib*.yaml",
 		Long: `Bumps the epoch field in melange configuration files

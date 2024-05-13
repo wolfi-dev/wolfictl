@@ -41,7 +41,7 @@ more about the VEX tooling powering wolfictl see: https://openvex.dev/
 
 func addPackage(parent *cobra.Command) {
 	cmd := &cobra.Command{
-		Use:           "package [flags] CONFIG [CONFIG]...",
+		Use:           "package CONFIG [CONFIG]...",
 		Example:       "wolfictl vex package --author=joe@doe.com config1.yaml config2.yaml",
 		Short:         "Generate a VEX document from package configuration files",
 		SilenceErrors: true,
