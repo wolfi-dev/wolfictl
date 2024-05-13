@@ -14,7 +14,7 @@ func CheckUpdate() *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:               "update",
+		Use:               "update [config[.yaml]...]",
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
