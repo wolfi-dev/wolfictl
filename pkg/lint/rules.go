@@ -384,7 +384,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
-					if p.Uses == gitCheckout {
+					if p.Uses == gitCheckout && strings.HasPrefix(p.With["repository"], "https://github.com/") {
 						if config.Update.Enabled && config.Update.GitHubMonitor == nil {
 							return fmt.Errorf("configure update.github when using git-checkout")
 						}
