@@ -53,11 +53,16 @@ func (o *PackageOptions) UpdatePackageCmd(ctx context.Context) error {
 		defer os.Remove(tempDir)
 	}
 
+	gitAuth, err := wolfigit.GetGitAuth(o.TargetRepo)
+	if err != nil {
+		return fmt.Errorf("failed to get git auth: %w", err)
+	}
+
 	cloneOpts := &git.CloneOptions{
 		URL:               o.TargetRepo,
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.NoRecurseSubmodules,
-		Auth:              wolfigit.GetGitAuth(),
+		Auth:              gitAuth,
 		Depth:             1,
 	}
 
@@ -119,12 +124,18 @@ func (o *PackageOptions) updateAdvisories(ctx context.Context, repo *git.Reposit
 	if err != nil {
 		return err
 	}
+
+	gitAuth, err := wolfigit.GetGitAuth(gitURL.RawURL)
+	if err != nil {
+		return fmt.Errorf("failed to get git auth: %w", err)
+	}
+
 	// checkout repo into tmp dir so we know we are working on a clean HEAD
 	cloneOpts := &git.CloneOptions{
 		URL:               gitURL.RawURL,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		ShallowSubmodules: true,
-		Auth:              wolfigit.GetGitAuth(),
+		Auth:              gitAuth,
 		Tags:              git.AllTags,
 		Depth:             20,
 	}

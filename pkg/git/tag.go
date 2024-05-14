@@ -51,11 +51,16 @@ func PushTag(dir, tagName string) error {
 	}
 	remoteURL := fmt.Sprintf("https://github.com/%s/%s.git", gitURL.Organisation, gitURL.Name)
 
+	gitAuth, err := GetGitAuth(remoteURL)
+	if err != nil {
+		return fmt.Errorf("failed to get git auth: %w", err)
+	}
+
 	po := &git.PushOptions{
 		RemoteName: "origin",
 		RemoteURL:  remoteURL,
 		RefSpecs:   []config.RefSpec{config.RefSpec(fmt.Sprintf("refs/tags/%s:refs/tags/%s", tagName, tagName))},
-		Auth:       GetGitAuth(),
+		Auth:       gitAuth,
 	}
 
 	err = r.Push(po)

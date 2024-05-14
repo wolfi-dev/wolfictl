@@ -40,13 +40,18 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 		return err
 	}
 
+	gitAuth, err := wgit.GetGitAuth(repoValue)
+	if err != nil {
+		return fmt.Errorf("failed to get git auth: %w", err)
+	}
+
 	cloneOpts := &git.CloneOptions{
 		URL:               repoValue,
 		ReferenceName:     plumbing.ReferenceName(fmt.Sprintf("refs/tags/%s", evaluatedTag)),
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		Depth:             1,
-		Auth:              wgit.GetGitAuth(),
+		Auth:              gitAuth,
 	}
 
 	log.Printf("cloning sources from %s tag %s into a temporary directory '%s', this may take a while", repoValue, dir, evaluatedTag)
