@@ -65,7 +65,7 @@ func cmdBundle() *cobra.Command {
 			}
 
 			if bcfg.repo != "" {
-				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithUserAgent("jon"))
+				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithUserAgent("wolfictl bundle"))
 				if err != nil {
 					return err
 				}
