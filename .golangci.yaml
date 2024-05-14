@@ -1,7 +1,7 @@
 ---
 run:
   concurrency: 6
-  deadline: 5m
+  timeout: 10m
 issues:
   exclude-rules:
     # counterfeiter fakes are usually named 'fake_<something>.go'
@@ -9,6 +9,9 @@ issues:
       linters:
         - gocritic
         - golint
+        - dupl
+    - path: .*_test.go
+      linters:
         - dupl
 
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
@@ -99,22 +102,8 @@ linters-settings:
   gocritic:
     enabled-checks:
       # Diagnostic
-      - appendAssign
-      - argOrder
-      - badCond
-      - caseOrder
-      - codegenComment
       - commentedOutCode
-      - deprecatedComment
-      - dupArg
-      - dupBranchBody
-      - dupCase
-      - dupSubExpr
-      - exitAfterDefer
-      - flagDeref
-      - flagName
       - nilValReturn
-      - offBy1
       - sloppyReassign
       - weakCond
       - octalLiteral
@@ -128,31 +117,16 @@ linters-settings:
       - rangeValCopy
 
       # Style
-      - assignOp
       - boolExprSimplify
-      - captLocal
-      - commentFormatting
       - commentedOutImport
-      - defaultCaseOrder
       - docStub
-      - elseif
       - emptyFallthrough
       - emptyStringTest
       - hexLiteral
       - methodExprCall
-      - regexpMust
-      - singleCaseSwitch
-      - sloppyLen
       - stringXbytes
-      - switchTrue
       - typeAssertChain
-      - typeSwitchVar
-      - underef
       - unlabelStmt
-      - unlambda
-      - unslice
-      - valSwap
-      - wrapperFunc
       - yodaStyleExpr
       # - ifElseChain
 
@@ -169,9 +143,6 @@ linters-settings:
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    # TODO(lint): Enforce machine-readable `nolint` directives
-    allow-leading-space: true
     # Exclude following linters from requiring an explanation.  Default is [].
     allow-no-explanation: []
     # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
