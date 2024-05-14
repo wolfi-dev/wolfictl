@@ -110,13 +110,22 @@ func ParseGitURL(rawURL string) (*URL, error) {
 
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
-		return gitURL, fmt.Errorf("failed to parse git url %s: %w", rawURL, err)
+		return nil, fmt.Errorf("failed to parse git url %s: %w", rawURL, err)
 	}
 	gitURL.Scheme = parsedURL.Scheme
+	if gitURL.Scheme != "https" {
+		return nil, fmt.Errorf("unsupported scheme: %v", parsedURL.Scheme)
+	}
+
 	gitURL.Host = parsedURL.Host
 	parts := strings.Split(parsedURL.Path, "/")
-	gitURL.Organisation = parts[1]
-	gitURL.Name = parts[2]
+	if parsedURL.Host == "github.com" {
+		if len(parts) < 2 {
+			return nil, fmt.Errorf("invalid github path: %s", parsedURL.Path)
+		}
+		gitURL.Organisation = parts[1]
+		gitURL.Name = parts[2]
+	}
 	gitURL.RawURL = rawURL
 
 	return gitURL, nil
