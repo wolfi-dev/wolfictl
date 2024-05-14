@@ -51,14 +51,16 @@ func NewDataSession(ctx context.Context, opts DataSessionOptions) (*DataSession,
 
 	ds.githubClient = opts.GitHubClient
 
-	gitAuth, err := wgit.GetGitAuth(opts.Distro.Absolute.AdvisoriesHTTPSCloneURL())
+	gitURL := opts.Distro.Absolute.AdvisoriesHTTPSCloneURL()
+
+	gitAuth, err := wgit.GetGitAuth(gitURL)
 	if err != nil {
 		return nil, fmt.Errorf("getting git auth: %w", err)
 	}
 
 	// clone advisories repo
 	repo, err := git.PlainCloneContext(ctx, tempDir, false, &git.CloneOptions{
-		URL:  opts.Distro.Absolute.AdvisoriesHTTPSCloneURL(),
+		URL:  gitURL,
 		Auth: gitAuth,
 	})
 	if err != nil {
@@ -173,13 +175,14 @@ func (ds DataSession) Modified() bool {
 // Push pushes the changes made during the session to the remote advisories
 // repository.
 func (ds DataSession) Push(ctx context.Context) error {
-	gitAuth, err := wgit.GetGitAuth(ds.distro.Absolute.AdvisoriesHTTPSCloneURL())
+	gitURL := ds.distro.Absolute.AdvisoriesHTTPSCloneURL()
+	gitAuth, err := wgit.GetGitAuth(gitURL)
 	if err != nil {
 		return fmt.Errorf("getting git auth: %w", err)
 	}
 
 	err = ds.repo.PushContext(ctx, &git.PushOptions{
-		RemoteURL: ds.distro.Absolute.AdvisoriesHTTPSCloneURL(),
+		RemoteURL: gitURL,
 		Auth:      gitAuth,
 	})
 	if err != nil {
