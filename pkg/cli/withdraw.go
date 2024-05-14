@@ -19,7 +19,7 @@ import (
 func cmdWithdraw() *cobra.Command {
 	key := ""
 	cmd := &cobra.Command{
-		Use:           "withdraw [flags] example-pkg-1.2.3-r4",
+		Use:           "withdraw example-pkg-1.2.3-r4",
 		Short:         "Withdraw packages from an APKINDEX.tar.gz",
 		Example:       "withdraw --signing-key ./foo.rsa example-pkg-1.2.3-r4 also-bad-2.3.4-r1 <old/APKINDEX.tar.gz >new/APKINDEX.tar.gz",
 		SilenceErrors: true,
