@@ -25,8 +25,8 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "first advisory for package",
 			req: Request{
-				Package:         "crane",
-				VulnerabilityID: "CVE-2023-1234",
+				Package: "crane",
+				Aliases: []string{"CVE-2023-1234"},
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,
@@ -40,8 +40,8 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "updating existing advisory",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CVE-2020-8927",
+				Package: "brotli",
+				Aliases: []string{"CVE-2020-8927"},
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,
@@ -56,7 +56,8 @@ func TestUpdate(t *testing.T) {
 				Package:       v2.Package{Name: "brotli"},
 				Advisories: v2.Advisories{
 					{
-						ID: "CVE-2020-8927",
+						ID:      "CGA-qq5h-9c62-2jc3",
+						Aliases: []string{"CVE-2020-8927"},
 						Events: []v2.Event{
 							{
 								Timestamp: brotliExistingEventTime,
@@ -80,8 +81,8 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "creating additional advisory for package",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CVE-2023-1234",
+				Package: "brotli",
+				Aliases: []string{"CVE-2023-1234"},
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,
@@ -95,16 +96,16 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "no events",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CVE-2023-1234",
+				Package: "brotli",
+				Aliases: []string{"CVE-2023-1234"},
 			},
 			wantErr: true,
 		},
 		{
 			name: "event type doesn't match data type",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CVE-2023-1234",
+				Package: "brotli",
+				Aliases: []string{"CVE-2023-1234"},
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,
@@ -124,6 +125,9 @@ func TestUpdate(t *testing.T) {
 			// We want a fresh memfs for each test case.
 			memFS := memfs.New(dirFS)
 			advisoryDocs, err := v2.NewIndex(context.Background(), memFS)
+			require.NoError(t, err)
+
+			tt.req.VulnerabilityID, err = GenerateCGAID(tt.req.Package, tt.req.Aliases[0])
 			require.NoError(t, err)
 
 			err = Update(context.Background(), tt.req, UpdateOptions{

@@ -4,7 +4,9 @@ package:
   name: brotli
 
 advisories:
-  - id: CVE-2020-8927
+  - id: CGA-qq5h-9c62-2jc3
+    aliases:
+      - CVE-2020-8927
     events:
       - timestamp: 2022-09-15T02:40:18Z
         type: fixed

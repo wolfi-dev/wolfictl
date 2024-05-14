@@ -112,8 +112,8 @@ required fields are missing.`,
 				allowedVulnerabilities := func(packageName string) []string {
 					var vulnerabilities []string
 					for _, cfg := range advisoryCfgs.Select().WhereName(packageName).Configurations() {
-						vulns := lo.Map(cfg.Advisories, func(adv v2.Advisory, _ int) string {
-							return adv.ID
+						vulns := lo.FlatMap(cfg.Advisories, func(adv v2.Advisory, _ int) []string {
+							return adv.Aliases
 						})
 						sort.Strings(vulns)
 						vulnerabilities = append(vulnerabilities, vulns...)
@@ -149,6 +149,11 @@ required fields are missing.`,
 
 			opts := advisory.UpdateOptions{
 				AdvisoryDocs: advisoryCfgs,
+			}
+
+			req.VulnerabilityID, err = advisory.GenerateCGAID(req.Package, req.Aliases[0])
+			if err != nil {
+				return fmt.Errorf("unable to create advisory id: %w", err)
 			}
 
 			err = advisory.Update(cmd.Context(), req, opts)
