@@ -3,7 +3,6 @@ package update
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -25,7 +24,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/wolfi-dev/wolfictl/pkg/gh"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
-	"github.com/wolfi-dev/wolfictl/pkg/git/submodules"
 	http2 "github.com/wolfi-dev/wolfictl/pkg/http"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/wolfi-dev/wolfictl/pkg/update/deps"
@@ -135,12 +133,17 @@ func (o *Options) Update(ctx context.Context) error {
 			defer os.Remove(tempDir)
 		}
 
+		gitAuth, err := wgit.GetGitAuth(o.RepoURI)
+		if err != nil {
+			return fmt.Errorf("failed to get git auth: %w", err)
+		}
+
 		cloneOpts := &git.CloneOptions{
 			URL:               o.RepoURI,
 			Progress:          os.Stdout,
 			RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 			ShallowSubmodules: true,
-			Auth:              wgit.GetGitAuth(),
+			Auth:              gitAuth,
 			Depth:             1,
 		}
 
@@ -401,20 +404,6 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 		return fmt.Sprintf("failed to update Makefile: %s", err.Error()), nil
 	}
 
-	// if mapping data has a strip prefix, add it back in to the version for when updating git modules
-	latestVersionWithPrefix := newVersion.Version
-	ghm := o.PackageConfigs[packageName].Config.Update.GitHubMonitor
-	if ghm != nil {
-		if ghm.StripPrefix != "" {
-			latestVersionWithPrefix = ghm.StripPrefix + latestVersionWithPrefix
-		}
-	}
-	// some repos could use git submodules, let's check if a submodule file exists and bump any matching packages
-	err = o.updateGitModules(root, packageName, latestVersionWithPrefix, worktree)
-	if err != nil {
-		return fmt.Sprintf("failed to update git modules: %s", err.Error()), nil
-	}
-
 	// now make sure update config is configured
 	updated, err := config.ParseConfiguration(ctx, filepath.Join(root, pc.Filename))
 	if err != nil {
@@ -534,35 +523,6 @@ func (o *Options) updateMakefile(tempDir, packageName, latestVersion string, wor
 	return nil
 }
 
-// some melange config repos use submodules to pull in git repositories into the source dir before the melange pipelines run
-// this function is a noop if no git submodules exist
-func (o *Options) updateGitModules(dir, packageName, version string, wt *git.Worktree) error {
-	// if no gitmodules file exist this in a noop
-	if _, err := os.Stat(filepath.Join(dir, ".gitmodules")); errors.Is(err, os.ErrNotExist) {
-		return nil
-	}
-
-	ghm := o.PackageConfigs[packageName].Config.Update.GitHubMonitor
-
-	if ghm == nil {
-		o.Logger.Printf("package %s  is not a github repo in mapping data, not attempting to bump gitmodules", packageName)
-		return nil
-	}
-
-	if ghm.Identifier == "" {
-		o.Logger.Printf("no identifier found in mapping data for package %s, not attempting to bump gitmodules", packageName)
-		return nil
-	}
-
-	parts := strings.Split(ghm.Identifier, "/")
-	if len(parts) != 2 {
-		o.Logger.Printf("identifier doesn't look like a github owner/repo in mapping data for package %s, not attempting to bump gitmodules", packageName)
-		return nil
-	}
-
-	return submodules.Update(dir, parts[0], parts[1], version, wt)
-}
-
 // create a unique branch
 func (o *Options) createBranch(repo *git.Repository) (plumbing.ReferenceName, error) {
 	name := uuid.New().String()
@@ -637,11 +597,15 @@ func (o *Options) proposeChanges(ctx context.Context, repo *git.Repository, ref 
 	}
 	o.Logger.Printf("proposeChanges: %s git status: %s", packageName, string(rs))
 
+	gitAuth, err := wgit.GetGitAuth(o.RepoURI)
+	if err != nil {
+		return "", fmt.Errorf("failed to get git auth: %w", err)
+	}
+
 	// setup githubReleases auth using standard environment variables
 	pushOpts := &git.PushOptions{
 		RemoteName: "origin",
-		Auth:       wgit.GetGitAuth(),
-		Progress:   os.Stdout, // todo remove if this doesn't help: extra logging to help debug intermittent "object not found" when pushing
+		Auth:       gitAuth,
 	}
 
 	// push the version update changes to our working branch

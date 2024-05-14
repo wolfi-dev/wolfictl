@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
-
 	"chainguard.dev/melange/pkg/config"
 	"chainguard.dev/melange/pkg/util"
 	"github.com/dprotaso/go-yit"
@@ -46,7 +44,6 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		Depth:             1,
-		Auth:              wgit.GetGitAuth(),
 	}
 
 	log.Printf("cloning sources from %s tag %s into a temporary directory '%s', this may take a while", repoValue, dir, evaluatedTag)

@@ -2,11 +2,14 @@ package git
 
 import (
 	"fmt"
+	"log/slog"
 	"net/url"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/chainguard-dev/clog"
 
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -19,20 +22,33 @@ import (
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
-func GetGitAuth() *gitHttp.BasicAuth {
+func GetGitAuth(gitURL string) (*gitHttp.BasicAuth, error) {
+	logger := clog.NewLogger(slog.Default()) // TODO: plumb through context, everywhere
+
+	parsedURL, err := ParseGitURL(gitURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse git URL %q: %w", gitURL, err)
+	}
+
+	// Only use GITHUB_TOKEN for github.com URLs
+	if parsedURL.Host != "github.com" {
+		logger.Warnf("host %q is not github.com, not using GITHUB_TOKEN for authentication", parsedURL.Host)
+		return nil, nil
+	}
+
 	gitToken := os.Getenv("GITHUB_TOKEN")
 
 	if gitToken == "" {
 		// If the token is empty, there's no way we can return a usable authentication
 		// anyway. Whereas if we return nil, and don't auth, we have a chance at
 		// succeeding with access of a public repo.
-		return nil
+		return &gitHttp.BasicAuth{}, nil
 	}
 
 	return &gitHttp.BasicAuth{
 		Username: "abc123",
 		Password: gitToken,
-	}
+	}, nil
 }
 
 type URL struct {
@@ -182,7 +198,10 @@ func TempClone(gitURL, hash string, useAuth bool) (repoDir string, err error) {
 
 	var auth transport.AuthMethod
 	if useAuth {
-		auth = GetGitAuth()
+		auth, err = GetGitAuth(gitURL)
+		if err != nil {
+			return dir, fmt.Errorf("unable to get git auth: %w", err)
+		}
 	}
 
 	repo, err := git.PlainClone(dir, false, &git.CloneOptions{

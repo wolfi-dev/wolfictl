@@ -1,7 +1,10 @@
 package git
 
 import (
+	"os"
 	"testing"
+
+	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -40,6 +43,77 @@ func TestParseGitURL(t *testing.T) {
 			assert.Equal(t, test.scheme, got.Scheme)
 			assert.Equal(t, test.org, got.Organisation)
 			assert.Equal(t, test.repoName, got.Name)
+		})
+	}
+}
+
+func TestGetGitAuth(t *testing.T) {
+	tests := []struct {
+		name           string
+		gitURL         string
+		envToken       string
+		expectedError  bool
+		expectedAuth   *gitHttp.BasicAuth
+		expectedErrMsg string
+	}{
+		{
+			name:           "Empty URL",
+			gitURL:         "",
+			envToken:       "",
+			expectedError:  true,
+			expectedAuth:   nil,
+			expectedErrMsg: "failed to parse git URL \"\": ",
+		},
+		{
+			name:           "Malformed URL",
+			gitURL:         "://invalid-url",
+			envToken:       "",
+			expectedError:  true,
+			expectedAuth:   nil,
+			expectedErrMsg: "failed to parse git URL \"://invalid-url\": ",
+		},
+		{
+			name:           "Non-GitHub Host",
+			gitURL:         "https://example.com/cheese/repo.git",
+			envToken:       "",
+			expectedError:  false,
+			expectedAuth:   nil,
+			expectedErrMsg: "",
+		},
+		{
+			name:           "GitHub Host with No Token",
+			gitURL:         "https://github.com/cheese/repo.git",
+			envToken:       "",
+			expectedError:  false,
+			expectedAuth:   &gitHttp.BasicAuth{},
+			expectedErrMsg: "",
+		},
+		{
+			name:           "GitHub Host with Token",
+			gitURL:         "https://github.com/cheese/repo.git",
+			envToken:       "test-token",
+			expectedError:  false,
+			expectedAuth:   &gitHttp.BasicAuth{Username: "abc123", Password: "test-token"},
+			expectedErrMsg: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.envToken != "" {
+				os.Setenv("GITHUB_TOKEN", tt.envToken)
+				defer os.Unsetenv("GITHUB_TOKEN")
+			}
+
+			auth, err := GetGitAuth(tt.gitURL)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedErrMsg)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedAuth, auth)
+			}
 		})
 	}
 }
