@@ -50,7 +50,7 @@ melange build {{.File}} \
 tar -czvf packages.tar.gz ./packages
 
 # TODO: Content-Type
-curl -X PUT --data-binary @packages.tar.gz -H "Content-Type: application/octet-stream" $PACKAGES_UPLOAD_URL
+curl --upload-file packages.tar.gz -H "Content-Type: application/octet-stream" $PACKAGES_UPLOAD_URL
 
 sha256sum packages.tar.gz
 sha256sum packages.tar.gz | cut -d' ' -f1 > /dev/termination-log
