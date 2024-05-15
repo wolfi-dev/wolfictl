@@ -18,8 +18,6 @@ type UpdateOptions struct {
 // Update adds a new event to an existing advisory (named by the vuln parameter)
 // in the document at the provided path.
 func Update(ctx context.Context, req Request, opts UpdateOptions) error {
-	vulnID := req.VulnerabilityID
-
 	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
 	if count := documents.Len(); count != 1 {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
@@ -28,13 +26,13 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories
 
-		adv, ok := advisories.Get(vulnID)
+		adv, ok := advisories.GetAlias(req.Aliases[0])
 		if !ok {
-			return nil, fmt.Errorf("advisory %q does not exist", vulnID)
+			return nil, fmt.Errorf("advisory %q does not exist", req.Aliases[0])
 		}
 
 		adv.Events = append(adv.Events, req.Event)
-		advisories = advisories.Update(vulnID, adv)
+		advisories = advisories.Update(adv.ID, adv)
 
 		// Ensure the package's advisory list is sorted before returning it.
 		sort.Sort(advisories)
@@ -43,7 +41,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	})
 	err := documents.Update(ctx, u)
 	if err != nil {
-		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", vulnID, req.Package, err)
+		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", req.Aliases[0], req.Package, err)
 	}
 
 	// Update the schema version to the latest version.

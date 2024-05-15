@@ -151,11 +151,6 @@ required fields are missing.`,
 				AdvisoryDocs: advisoryCfgs,
 			}
 
-			req.VulnerabilityID, err = advisory.GenerateCGAID(req.Package, req.Aliases[0])
-			if err != nil {
-				return fmt.Errorf("unable to create advisory id: %w", err)
-			}
-
 			err = advisory.Update(cmd.Context(), req, opts)
 			if err != nil {
 				return err

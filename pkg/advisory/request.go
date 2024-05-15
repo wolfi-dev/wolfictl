@@ -26,11 +26,6 @@ func (req Request) Validate() error {
 		return errors.New("package cannot be empty")
 	}
 
-	// TODO: cleanup
-	// if err := vuln.ValidateID(req.VulnerabilityID); err != nil { //nolint: gocritic
-	// 	return err
-	// }
-
 	if len(req.Aliases) == 0 {
 		return errors.New("aliases should have at least one vulnerability ID")
 	}
@@ -41,10 +36,9 @@ func (req Request) Validate() error {
 		return err
 	}
 
-	// TODO: cleanup
-	// if req.VulnerabilityID == "" { //nolint: gocritic
-	// 	return errors.New("vulnerability cannot be empty")
-	// }
+	if req.VulnerabilityID != "" {
+		return errors.New("vulnerability should be empty")
+	}
 
 	if req.Event.IsZero() {
 		return errors.New("event cannot be zero")

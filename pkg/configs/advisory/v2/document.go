@@ -141,6 +141,20 @@ func (advs Advisories) Get(id string) (Advisory, bool) {
 	return Advisory{}, false
 }
 
+// Get returns the advisory with the given ID. If such an advisory does not
+// exist, the second return value will be false; otherwise it will be true.
+func (advs Advisories) GetAlias(id string) (Advisory, bool) {
+	for _, adv := range advs {
+		for _, alias := range adv.Aliases {
+			if alias == id {
+				return adv, true
+			}
+		}
+	}
+
+	return Advisory{}, false
+}
+
 // GetByVulnerability returns the advisory that references the given
 // vulnerability ID as its advisory ID or as one of the advisory's aliases. If
 // such an advisory does not exist, the second return value will be false;

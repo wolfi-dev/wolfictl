@@ -41,7 +41,7 @@ func TestCreate(t *testing.T) {
 				Package:       v2.Package{Name: "crane"},
 				Advisories: v2.Advisories{
 					{
-						ID:      "CGA-3c77-m99p-4594",
+						ID:      "CGA-xoxo-xoxo-xoxo", // will be ignored as we generate random ones
 						Aliases: []string{"CVE-2023-1234"},
 						Events: []v2.Event{
 							{
@@ -90,7 +90,7 @@ func TestCreate(t *testing.T) {
 				Package:       v2.Package{Name: "brotli"},
 				Advisories: v2.Advisories{
 					{
-						ID:      "CGA-q257-m724-pqfg",
+						ID:      "CGA-xoxo-xoxo-xoxo2", // will be ignored as we generate random ones
 						Aliases: []string{"CVE-2023-1234"},
 						Events: []v2.Event{
 							{
@@ -103,7 +103,7 @@ func TestCreate(t *testing.T) {
 						},
 					},
 					{
-						ID:      "CGA-qq5h-9c62-2jc3",
+						ID:      "CGA-xoxo-xoxo-xoxo", // will be ignored as we generate random ones
 						Aliases: []string{"CVE-2020-8927"},
 						Events: []v2.Event{
 							{
@@ -137,7 +137,7 @@ func TestCreate(t *testing.T) {
 				Package:       v2.Package{Name: "brotli"},
 				Advisories: v2.Advisories{
 					{
-						ID:      "CGA-6j86-6jh9-6qph",
+						ID:      "CGA-xoxo-xoxo-xoxo2", // will be ignored as we generate random ones
 						Aliases: []string{"CVE-2000-1234"},
 						Events: []v2.Event{
 							{
@@ -150,7 +150,7 @@ func TestCreate(t *testing.T) {
 						},
 					},
 					{
-						ID:      "CGA-qq5h-9c62-2jc3",
+						ID:      "CGA-xoxo-xoxo-xoxo", // will be ignored as we generate random ones
 						Aliases: []string{"CVE-2020-8927"},
 						Events: []v2.Event{
 							{
@@ -165,29 +165,29 @@ func TestCreate(t *testing.T) {
 				},
 			},
 		},
-		// {
-		// 	name: "no events",
-		// 	req: Request{
-		// 		Package:         "brotli",
-		// 		VulnerabilityID: "CVE-2023-1234",
-		// 	},
-		// 	wantErr: true,
-		// },
-		// {
-		// 	name: "event type doesn't match data type",
-		// 	req: Request{
-		// 		Package:         "brotli",
-		// 		VulnerabilityID: "CVE-2023-1234",
-		// 		Event: v2.Event{
-		// 			Timestamp: testTime,
-		// 			Type:      v2.EventTypeDetection,
-		// 			Data: v2.Fixed{
-		// 				FixedVersion: "1.0.9-r0",
-		// 			},
-		// 		},
-		// 	},
-		// 	wantErr: true,
-		// },
+		{
+			name: "no events",
+			req: Request{
+				Package:         "brotli",
+				VulnerabilityID: "CVE-2023-1234",
+			},
+			wantErr: true,
+		},
+		{
+			name: "event type doesn't match data type",
+			req: Request{
+				Package:         "brotli",
+				VulnerabilityID: "CVE-2023-1234",
+				Event: v2.Event{
+					Timestamp: testTime,
+					Type:      v2.EventTypeDetection,
+					Data: v2.Fixed{
+						FixedVersion: "1.0.9-r0",
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 
 	dirFS := os.DirFS("testdata/create/advisories")
@@ -199,9 +199,6 @@ func TestCreate(t *testing.T) {
 			advisoryDocs, err := v2.NewIndex(context.Background(), fsys)
 			require.NoError(t, err)
 
-			tt.req.VulnerabilityID, err = GenerateCGAID(tt.req.Package, tt.req.Aliases[0])
-			require.NoError(t, err)
-
 			err = Create(context.Background(), tt.req, CreateOptions{
 				AdvisoryDocs: advisoryDocs,
 			})
@@ -211,8 +208,20 @@ func TestCreate(t *testing.T) {
 			}
 
 			if err == nil {
-				if diff := cmp.Diff(tt.expectedDoc, advisoryDocs.Select().WhereName(tt.req.Package).Configurations()[0]); diff != "" {
-					t.Errorf("Create() mismatch (-want +got):\n%s", diff)
+				diff := cmp.Diff(tt.expectedDoc, advisoryDocs.Select().WhereName(tt.req.Package).Configurations()[0], cmp.FilterPath(func(p cmp.Path) bool {
+					// Check if the path is accessing the ID field within the Advisories slice.
+					if len(p) < 2 {
+						return false
+					}
+					if p[len(p)-1].String() == ".ID" {
+						if _, ok := p[len(p)-2].(cmp.SliceIndex); ok {
+							return true
+						}
+					}
+					return false
+				}, cmp.Ignore()))
+				if diff != "" {
+					t.Errorf("Update() mismatch (-want +got):\n%s", diff)
 				}
 			}
 		})

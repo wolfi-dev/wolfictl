@@ -2,8 +2,6 @@ package advisory
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"sort"
 
@@ -34,11 +32,15 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		return createAdvisoryConfig(ctx, opts.AdvisoryDocs, req)
 
 	case 1:
-		newAdvisoryID := req.VulnerabilityID
 		// i.e. exactly one advisories file for this package
 		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
-			if _, exists := doc.Advisories.Get(newAdvisoryID); exists {
-				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", newAdvisoryID, req.Package)
+			if _, exists := doc.Advisories.GetAlias(req.Aliases[0]); exists {
+				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", req.Aliases[0], req.Package)
+			}
+
+			newAdvisoryID, err := GenerateCGAID()
+			if err != nil {
+				return v2.Advisories{}, err
 			}
 
 			advisories := doc.Advisories
@@ -56,7 +58,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		})
 		err := documents.Update(ctx, u)
 		if err != nil {
-			return fmt.Errorf("unable to create advisory %q for %q: %w", newAdvisoryID, req.Package, err)
+			return fmt.Errorf("unable to create advisory %q for %q: %w", req.Aliases[0], req.Package, err)
 		}
 
 		// Update the schema version to the latest version.
@@ -72,14 +74,18 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 }
 
 func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Document], req Request) error {
-	newAdvisoryID := req.VulnerabilityID
+	newAdvisoryID, err := GenerateCGAID()
+	if err != nil {
+		return err
+	}
+
 	newAdvisory := v2.Advisory{
 		ID:      newAdvisoryID,
 		Aliases: req.Aliases,
 		Events:  []v2.Event{req.Event},
 	}
 
-	err := documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
+	err = documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
 		SchemaVersion: v2.SchemaVersion,
 		Package: v2.Package{
 			Name: req.Package,
@@ -91,39 +97,4 @@ func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Docum
 	}
 
 	return nil
-}
-
-func GenerateCGAID(packageName, vulnerabilityID string) (string, error) {
-	// Concatenate package name and VulnerabilityID
-	inputString := packageName + vulnerabilityID
-
-	// Generate SHA-256 hash of the input string
-	hash := sha256.Sum256([]byte(inputString))
-	hashHex := hex.EncodeToString(hash[:])
-
-	// Allowed characters [23456789cfghjmpqrvwx]
-	allowedChars := "23456789cfghjmpqrvwx"
-
-	// Create a map from hex characters to allowed characters
-	hexChars := "0123456789abcdef"
-	charMap := make(map[byte]byte)
-	for i := 0; i < len(hexChars); i++ {
-		charMap[hexChars[i]] = allowedChars[i%len(allowedChars)]
-	}
-
-	// Replace each hex digit with corresponding allowed character
-	var customUUID []byte
-	for i := 0; i < len(hashHex); i++ {
-		customUUID = append(customUUID, charMap[hashHex[i]])
-	}
-
-	// Ensure the string is long enough
-	if len(customUUID) < 12 {
-		return "", fmt.Errorf("hash length is insufficient to generate the UUID with the desired pattern")
-	}
-
-	// Format the custom UUID to match CGA(-[23456789cfghjmpqrvwx]{4}){3}
-	formattedUUID := fmt.Sprintf("CGA-%s-%s-%s", customUUID[0:4], customUUID[4:8], customUUID[8:12])
-
-	return formattedUUID, nil
 }

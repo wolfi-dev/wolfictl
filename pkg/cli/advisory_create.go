@@ -147,11 +147,6 @@ newly created advisory and any other advisories for the same package.`,
 				AdvisoryDocs: advisoryCfgs,
 			}
 
-			req.VulnerabilityID, err = advisory.GenerateCGAID(req.Package, req.Aliases[0])
-			if err != nil {
-				return fmt.Errorf("unable to create advisory id: %w", err)
-			}
-
 			err = advisory.Create(cmd.Context(), req, opts)
 			if err != nil {
 				return fmt.Errorf("unable to create advisory: %w", err)

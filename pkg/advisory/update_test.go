@@ -56,7 +56,7 @@ func TestUpdate(t *testing.T) {
 				Package:       v2.Package{Name: "brotli"},
 				Advisories: v2.Advisories{
 					{
-						ID:      "CGA-qq5h-9c62-2jc3",
+						ID:      "CGA-xoxo-xoxo-xoxo", // will be ignored as we generate random ones
 						Aliases: []string{"CVE-2020-8927"},
 						Events: []v2.Event{
 							{
@@ -127,9 +127,6 @@ func TestUpdate(t *testing.T) {
 			advisoryDocs, err := v2.NewIndex(context.Background(), memFS)
 			require.NoError(t, err)
 
-			tt.req.VulnerabilityID, err = GenerateCGAID(tt.req.Package, tt.req.Aliases[0])
-			require.NoError(t, err)
-
 			err = Update(context.Background(), tt.req, UpdateOptions{
 				AdvisoryDocs: advisoryDocs,
 			})
@@ -139,7 +136,19 @@ func TestUpdate(t *testing.T) {
 			}
 
 			if err == nil {
-				if diff := cmp.Diff(tt.expectedDoc, advisoryDocs.Select().WhereName(tt.req.Package).Configurations()[0]); diff != "" {
+				diff := cmp.Diff(tt.expectedDoc, advisoryDocs.Select().WhereName(tt.req.Package).Configurations()[0], cmp.FilterPath(func(p cmp.Path) bool {
+					// Check if the path is accessing the ID field within the Advisories slice.
+					if len(p) < 2 {
+						return false
+					}
+					if p[len(p)-1].String() == ".ID" {
+						if _, ok := p[len(p)-2].(cmp.SliceIndex); ok {
+							return true
+						}
+					}
+					return false
+				}, cmp.Ignore()))
+				if diff != "" {
 					t.Errorf("Update() mismatch (-want +got):\n%s", diff)
 				}
 			}
