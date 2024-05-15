@@ -330,3 +330,5 @@ require (
 )
 
 replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
+
+replace github.com/github/go-spdx/v2 v2.2.0 => github.com/darsh12/go-spdx/v2 v2.0.0-20240506204000-9af17522cc6e
