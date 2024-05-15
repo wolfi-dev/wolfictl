@@ -13,7 +13,7 @@
             "tag": {
               "name": "jenkins-2.397",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/37ceefe983a32b6e193dda8b43ee67661a881994"
+                "oid": "37ceefe983a32b6e193dda8b43ee67661a881994"
               }
             },
             "name": "2.397",
@@ -25,7 +25,7 @@
             "tag": {
               "name": "jenkins-2.396",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/5789e5c2303f73f5aa3ae891dc315122b598845a"
+                "oid": "5789e5c2303f73f5aa3ae891dc315122b598845a"
               }
             },
             "name": "2.396",
@@ -37,7 +37,7 @@
             "tag": {
               "name": "jenkins-2.387.2-rc",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/6fe70e9212e118415eea77fc2ea2380ded11243d"
+                "oid": "6fe70e9212e118415eea77fc2ea2380ded11243d"
               }
             },
             "name": "2.387.2 RC",
@@ -49,7 +49,7 @@
             "tag": {
               "name": "jenkins-2.395",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/45542cc65b17650942214f4e983ec658172cb16a"
+                "oid": "45542cc65b17650942214f4e983ec658172cb16a"
               }
             },
             "name": "2.395",
@@ -61,7 +61,7 @@
             "tag": {
               "name": "jenkins-2.394",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/2fe98001f3ab22c36fe3911253a1e7be658222c4"
+                "oid": "2fe98001f3ab22c36fe3911253a1e7be658222c4"
               }
             },
             "name": "2.394",
@@ -73,7 +73,7 @@
             "tag": {
               "name": "jenkins-2.387.1",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/c2f94c98ac9768b1108f3890e80b133c06d31562"
+                "oid": "c2f94c98ac9768b1108f3890e80b133c06d31562"
               }
             },
             "name": "2.387.1",
@@ -85,7 +85,7 @@
             "tag": {
               "name": "jenkins-2.375.4",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/721f445841ca8c6f29cb314e2dedddf0949461ed"
+                "oid": "721f445841ca8c6f29cb314e2dedddf0949461ed"
               }
             },
             "name": "2.375.4",
@@ -97,7 +97,7 @@
             "tag": {
               "name": "jenkins-2.393",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/9044b4379cd7bbede8dbccc20f15a02eafd7a97e"
+                "oid": "9044b4379cd7bbede8dbccc20f15a02eafd7a97e"
               }
             },
             "name": "2.393",
@@ -109,7 +109,7 @@
             "tag": {
               "name": "jenkins-2.392",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/936e9f83dba2f8ce74c8495b6b1b101282414890"
+                "oid": "936e9f83dba2f8ce74c8495b6b1b101282414890"
               }
             },
             "name": "2.392",
@@ -121,7 +121,7 @@
             "tag": {
               "name": "jenkins-2.387.1-rc",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/bf418c7c9f793927861124b011eb9e0002fb018e"
+                "oid": "bf418c7c9f793927861124b011eb9e0002fb018e"
               }
             },
             "name": "2.387.1 RC",
@@ -133,7 +133,7 @@
             "tag": {
               "name": "jenkins-2.391",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/f8e69628ac8048b6d50f9f111a3b183507b47a12"
+                "oid": "f8e69628ac8048b6d50f9f111a3b183507b47a12"
               }
             },
             "name": "2.391",
@@ -145,7 +145,7 @@
             "tag": {
               "name": "jenkins-2.375.3",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/2caf8dcac49d5e7d67b3f50d780722a67adde107"
+                "oid": "2caf8dcac49d5e7d67b3f50d780722a67adde107"
               }
             },
             "name": "2.375.3",
@@ -157,7 +157,7 @@
             "tag": {
               "name": "jenkins-2.390",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/3c46e8665f850ec3cbad6f9d45f5f7e4c7649761"
+                "oid": "3c46e8665f850ec3cbad6f9d45f5f7e4c7649761"
               }
             },
             "name": "2.390",
@@ -169,7 +169,7 @@
             "tag": {
               "name": "jenkins-2.389",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/abdae6c27109cfa96c54df89e45783555318761b"
+                "oid": "abdae6c27109cfa96c54df89e45783555318761b"
               }
             },
             "name": "2.389",
@@ -181,7 +181,7 @@
             "tag": {
               "name": "jenkins-2.388",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/b2f4d1111422f70d2307534b288c83b15e8834f7"
+                "oid": "b2f4d1111422f70d2307534b288c83b15e8834f7"
               }
             },
             "name": "2.388",
@@ -193,7 +193,7 @@
             "tag": {
               "name": "jenkins-2.375.3-rc",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/00973b768ef97c806a57364418332f815485599a"
+                "oid": "00973b768ef97c806a57364418332f815485599a"
               }
             },
             "name": "2.375.3 RC",
@@ -205,7 +205,7 @@
             "tag": {
               "name": "jenkins-2.387",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/8c774b6e633f59bf9c807ebc14d712d5b6629fc8"
+                "oid": "8c774b6e633f59bf9c807ebc14d712d5b6629fc8"
               }
             },
             "name": "2.387",
@@ -217,7 +217,7 @@
             "tag": {
               "name": "jenkins-2.375.2",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/544889a9617ae58520910989eba56d253d99cbea"
+                "oid": "544889a9617ae58520910989eba56d253d99cbea"
               }
             },
             "name": "2.375.2",
@@ -229,7 +229,7 @@
             "tag": {
               "name": "jenkins-2.386",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/5cecd13ec34c7a710b782db1a5d9f751d3e1c07c"
+                "oid": "5cecd13ec34c7a710b782db1a5d9f751d3e1c07c"
               }
             },
             "name": "2.386",
@@ -241,7 +241,7 @@
             "tag": {
               "name": "jenkins-2.385",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/36457c6d5fdb8c51605e52215511074468cd8abc"
+                "oid": "36457c6d5fdb8c51605e52215511074468cd8abc"
               }
             },
             "name": "2.385",
@@ -253,7 +253,7 @@
             "tag": {
               "name": "jenkins-2.384",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/ce7e5d70373a36c8d26d4117384a9c5cb57ff1c1"
+                "oid": "ce7e5d70373a36c8d26d4117384a9c5cb57ff1c1"
               }
             },
             "name": "2.384",
@@ -265,7 +265,7 @@
             "tag": {
               "name": "jenkins-2.383",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/c03ccfd0c3b34b8b9ee4720b92bed121d619610f"
+                "oid": "c03ccfd0c3b34b8b9ee4720b92bed121d619610f"
               }
             },
             "name": "2.383",
@@ -277,7 +277,7 @@
             "tag": {
               "name": "jenkins-2.375.2-rc",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/9098ec4d3a01c9a3f5490562b1fb4092299551c2"
+                "oid": "9098ec4d3a01c9a3f5490562b1fb4092299551c2"
               }
             },
             "name": "2.375.2 RC",
@@ -289,7 +289,7 @@
             "tag": {
               "name": "jenkins-2.382",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/bcdb87773db6899adc602f80a3a6a1010d187c62"
+                "oid": "bcdb87773db6899adc602f80a3a6a1010d187c62"
               }
             },
             "name": "2.382",
@@ -301,7 +301,7 @@
             "tag": {
               "name": "jenkins-2.381",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/467d2fd1d8444ce1542c0f3a35353970f5a01a66"
+                "oid": "467d2fd1d8444ce1542c0f3a35353970f5a01a66"
               }
             },
             "name": "2.381",
@@ -313,7 +313,7 @@
             "tag": {
               "name": "jenkins-2.375.1",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/6412c44cbf23a51dca952a19a2d1ced7b291e680"
+                "oid": "6412c44cbf23a51dca952a19a2d1ced7b291e680"
               }
             },
             "name": "2.375.1",
@@ -325,7 +325,7 @@
             "tag": {
               "name": "jenkins-2.380",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/d34df8b5e5f885443d83af6e263afe3ae5cb1eb3"
+                "oid": "d34df8b5e5f885443d83af6e263afe3ae5cb1eb3"
               }
             },
             "name": "2.380",
@@ -337,7 +337,7 @@
             "tag": {
               "name": "jenkins-2.379",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/d8da52694f9e52d6dca3820409fc99585c722abd"
+                "oid": "d8da52694f9e52d6dca3820409fc99585c722abd"
               }
             },
             "name": "2.379",
@@ -349,7 +349,7 @@
             "tag": {
               "name": "jenkins-2.378",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/124d4b73fc983ece9b8fc43830abcf958befddcf"
+                "oid": "124d4b73fc983ece9b8fc43830abcf958befddcf"
               }
             },
             "name": "2.378",
@@ -361,7 +361,7 @@
             "tag": {
               "name": "jenkins-2.361.4",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/6e53e71a1358372a46c9b78e453802ceee1c73c5"
+                "oid": "6e53e71a1358372a46c9b78e453802ceee1c73c5"
               }
             },
             "name": "2.361.4",
@@ -373,7 +373,7 @@
             "tag": {
               "name": "jenkins-2.375.1-rc",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/c76c5e60b0090613da6f34efff1533e38762b92a"
+                "oid": "c76c5e60b0090613da6f34efff1533e38762b92a"
               }
             },
             "name": "2.375.1 RC",
@@ -385,7 +385,7 @@
             "tag": {
               "name": "jenkins-2.377",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/168e1ddef32fc4d5d4d61d3d96bb178acfd271e0"
+                "oid": "168e1ddef32fc4d5d4d61d3d96bb178acfd271e0"
               }
             },
             "name": "2.377",
@@ -397,7 +397,7 @@
             "tag": {
               "name": "jenkins-2.361.3",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/07d79f0c7a68e99c77401fc208859fafc7d40f22"
+                "oid": "07d79f0c7a68e99c77401fc208859fafc7d40f22"
               }
             },
             "name": "2.361.3",
@@ -409,7 +409,7 @@
             "tag": {
               "name": "jenkins-2.376",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/c641f666b37977f3db6eb32198f4278393bd17dc"
+                "oid": "c641f666b37977f3db6eb32198f4278393bd17dc"
               }
             },
             "name": "2.376",
@@ -421,7 +421,7 @@
             "tag": {
               "name": "jenkins-2.375",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/2a6b4b6821f84f47e98727490fa24754f4ef4287"
+                "oid": "2a6b4b6821f84f47e98727490fa24754f4ef4287"
               }
             },
             "name": "2.375",
@@ -433,7 +433,7 @@
             "tag": {
               "name": "jenkins-2.374",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/c447e86314dd623e9e0f3fecc10d7b2585421592"
+                "oid": "c447e86314dd623e9e0f3fecc10d7b2585421592"
               }
             },
             "name": "2.374",
@@ -445,7 +445,7 @@
             "tag": {
               "name": "jenkins-2.361.3-rc",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/1c071ea74a386b9eecb68d54c1c71c3c0e1baaf9"
+                "oid": "1c071ea74a386b9eecb68d54c1c71c3c0e1baaf9"
               }
             },
             "name": "2.361.3 RC",
@@ -457,7 +457,7 @@
             "tag": {
               "name": "jenkins-2.373",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/2188525757084bdcba584f1a473f0484fa82e690"
+                "oid": "2188525757084bdcba584f1a473f0484fa82e690"
               }
             },
             "name": "2.373",
@@ -469,7 +469,7 @@
             "tag": {
               "name": "jenkins-2.361.2",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/e3ab2f9465626d6fe5ecc527dd8ca97ee659d1be"
+                "oid": "e3ab2f9465626d6fe5ecc527dd8ca97ee659d1be"
               }
             },
             "name": "2.361.2",
@@ -481,7 +481,7 @@
             "tag": {
               "name": "jenkins-2.372",
               "target": {
-                "commitUrl": "https://github.com/jenkinsci/jenkins/commit/2a30d71878928322ad827d10015feb69441b4df3"
+                "oid": "2a30d71878928322ad827d10015feb69441b4df3"
               }
             },
             "name": "2.372",
@@ -505,7 +505,7 @@
             "tag": {
               "name": "v2.0.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/d6b9001f8e6ed745fb845849d623274c897d55f2"
+                "oid": "d6b9001f8e6ed745fb845849d623274c897d55f2"
               }
             },
             "name": "v2.0.0",
@@ -517,7 +517,7 @@
             "tag": {
               "name": "v2.0.0-rc.3",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/5d2964c3d7cb33dada6e945aac2c80008780475d"
+                "oid": "5d2964c3d7cb33dada6e945aac2c80008780475d"
               }
             },
             "name": "v2.0.0-rc.3",
@@ -529,7 +529,7 @@
             "tag": {
               "name": "v2.0.0-rc.2",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/f708d3900b41ea69c402c545b6526797bd5e8d1c"
+                "oid": "f708d3900b41ea69c402c545b6526797bd5e8d1c"
               }
             },
             "name": "v2.0.0-rc.2",
@@ -541,7 +541,7 @@
             "tag": {
               "name": "v2.0.0-rc.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/03468a1498876ccfb72e06f63fdb4f1c562dbca1"
+                "oid": "03468a1498876ccfb72e06f63fdb4f1c562dbca1"
               }
             },
             "name": "v2.0.0-rc.1",
@@ -553,7 +553,7 @@
             "tag": {
               "name": "v2.0.0-rc.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/a827922053c48283fb458b7b6bc51be3f477ec4d"
+                "oid": "a827922053c48283fb458b7b6bc51be3f477ec4d"
               }
             },
             "name": "v2.0.0-rc.0",
@@ -565,7 +565,7 @@
             "tag": {
               "name": "v1.13.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/d1c6336475b4be26bb7fb52d97f56ea0a1767f9f"
+                "oid": "d1c6336475b4be26bb7fb52d97f56ea0a1767f9f"
               }
             },
             "name": "v1.13.1",
@@ -577,7 +577,7 @@
             "tag": {
               "name": "v1.13.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/6b9820a68e861c91d07b1d0414d150411b60111f"
+                "oid": "6b9820a68e861c91d07b1d0414d150411b60111f"
               }
             },
             "name": "v1.13.0",
@@ -589,7 +589,7 @@
             "tag": {
               "name": "v1.12.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/0baa044bea61e7c16d56023be20ead3d9204b24a"
+                "oid": "0baa044bea61e7c16d56023be20ead3d9204b24a"
               }
             },
             "name": "v1.12.1",
@@ -601,7 +601,7 @@
             "tag": {
               "name": "v1.12.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/8483d6c71f153f38f237ba79c88d0fda6306e6e3"
+                "oid": "8483d6c71f153f38f237ba79c88d0fda6306e6e3"
               }
             },
             "name": "v1.12.0",
@@ -613,7 +613,7 @@
             "tag": {
               "name": "v1.11.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/b3b6ae25362dc2c92c78abf2370ba0342ee86b2f"
+                "oid": "b3b6ae25362dc2c92c78abf2370ba0342ee86b2f"
               }
             },
             "name": "v1.11.1",
@@ -625,7 +625,7 @@
             "tag": {
               "name": "v1.11.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/6bfac1a470492d8964778b1b8c41e0056bf5dbdd"
+                "oid": "6bfac1a470492d8964778b1b8c41e0056bf5dbdd"
               }
             },
             "name": "v1.11.0",
@@ -637,7 +637,7 @@
             "tag": {
               "name": "v1.10.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/a39ce91fadc582e0efce3321744a79ccd3c8b39c"
+                "oid": "a39ce91fadc582e0efce3321744a79ccd3c8b39c"
               }
             },
             "name": "v1.10.1",
@@ -649,7 +649,7 @@
             "tag": {
               "name": "v1.10.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/3a6088d03d7c053f9b3bd61ed07fba92133579cf"
+                "oid": "3a6088d03d7c053f9b3bd61ed07fba92133579cf"
               }
             },
             "name": "v1.10.0",
@@ -661,7 +661,7 @@
             "tag": {
               "name": "v1.10.0-rc.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/6a902ec76ff82c0e562875a997096bf0dab9088a"
+                "oid": "6a902ec76ff82c0e562875a997096bf0dab9088a"
               }
             },
             "name": "v1.10.0-rc.1",
@@ -673,7 +673,7 @@
             "tag": {
               "name": "v1.9.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/a4cb262dc3d45a283a6a7513bb767a38a2d3f448"
+                "oid": "a4cb262dc3d45a283a6a7513bb767a38a2d3f448"
               }
             },
             "name": "v1.9.0",
@@ -685,7 +685,7 @@
             "tag": {
               "name": "v1.8.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/9ef6b207218572b3257a5b4251418d75569baaae"
+                "oid": "9ef6b207218572b3257a5b4251418d75569baaae"
               }
             },
             "name": "v1.8.0",
@@ -697,7 +697,7 @@
             "tag": {
               "name": "v1.7.2",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/1b1bca3280994eebe38d35e03bbd66af6214f0f1"
+                "oid": "1b1bca3280994eebe38d35e03bbd66af6214f0f1"
               }
             },
             "name": "v1.7.2",
@@ -709,7 +709,7 @@
             "tag": {
               "name": "v1.7.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/53c28e44f10548c8839d4c72e5909fa74e08b5f6"
+                "oid": "53c28e44f10548c8839d4c72e5909fa74e08b5f6"
               }
             },
             "name": "v1.7.1",
@@ -721,7 +721,7 @@
             "tag": {
               "name": "v1.6.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/4b2c3c0c8ee97f31b9dac3859b40e0a48b8648ee"
+                "oid": "4b2c3c0c8ee97f31b9dac3859b40e0a48b8648ee"
               }
             },
             "name": "v1.6.0",
@@ -733,7 +733,7 @@
             "tag": {
               "name": "v1.5.2",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/8ffcd1228c463e1ad26ccce68ae16deeca2960b4"
+                "oid": "8ffcd1228c463e1ad26ccce68ae16deeca2960b4"
               }
             },
             "name": "v1.5.2 - CVE-2022-23649",
@@ -745,7 +745,7 @@
             "tag": {
               "name": "v1.5.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/c3e4d8b7cd2f6f065941510b260f173b70c695fa"
+                "oid": "c3e4d8b7cd2f6f065941510b260f173b70c695fa"
               }
             },
             "name": "v1.5.1",
@@ -757,7 +757,7 @@
             "tag": {
               "name": "v1.5.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/757252063bf4724f11a52336ef13a724059a39b6"
+                "oid": "757252063bf4724f11a52336ef13a724059a39b6"
               }
             },
             "name": "v1.5.0",
@@ -769,7 +769,7 @@
             "tag": {
               "name": "v1.4.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/934567a4c606cf59e6ab17af889b4db3ee0a3f0b"
+                "oid": "934567a4c606cf59e6ab17af889b4db3ee0a3f0b"
               }
             },
             "name": "v1.4.1",
@@ -781,7 +781,7 @@
             "tag": {
               "name": "v1.4.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/50315fcc82a3d07d6983515bbfa0f2a6c39f7c31"
+                "oid": "50315fcc82a3d07d6983515bbfa0f2a6c39f7c31"
               }
             },
             "name": "v1.4.0",
@@ -793,7 +793,7 @@
             "tag": {
               "name": "v1.3.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/645ebf09fc555762a0494baa30edc08c38435368"
+                "oid": "645ebf09fc555762a0494baa30edc08c38435368"
               }
             },
             "name": "v1.3.1",
@@ -805,7 +805,7 @@
             "tag": {
               "name": "v1.3.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/a91aa202a01b830dafa969bb46f168e9c44580bd"
+                "oid": "a91aa202a01b830dafa969bb46f168e9c44580bd"
               }
             },
             "name": "v1.3.0",
@@ -817,7 +817,7 @@
             "tag": {
               "name": "v1.2.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/96d39a9f1d1861657c6d89aed9aa1903b42ea2f2"
+                "oid": "96d39a9f1d1861657c6d89aed9aa1903b42ea2f2"
               }
             },
             "name": "v1.2.1",
@@ -829,7 +829,7 @@
             "tag": {
               "name": "v1.2.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/aa5d23b86d09c2275dd3a7317b7c98cc30a8eee7"
+                "oid": "aa5d23b86d09c2275dd3a7317b7c98cc30a8eee7"
               }
             },
             "name": "v1.2.0",
@@ -841,7 +841,7 @@
             "tag": {
               "name": "cosigned-v0.0.3-dev",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/36fa588ceb589d192753364e77756fb1431e8267"
+                "oid": "36fa588ceb589d192753364e77756fb1431e8267"
               }
             },
             "name": "cosigned-v0.0.3-dev",
@@ -853,7 +853,7 @@
             "tag": {
               "name": "cosigned-v0.0.2-dev",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/fe21c9f008f83af7ce4cef26670faa930a2daeb3"
+                "oid": "fe21c9f008f83af7ce4cef26670faa930a2daeb3"
               }
             },
             "name": "cosigned-v0.0.2-dev",
@@ -865,7 +865,7 @@
             "tag": {
               "name": "cosigned-v0.0.1-dev",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/30fa296b85bad44c8f84a04fdd29b770b02d733b"
+                "oid": "30fa296b85bad44c8f84a04fdd29b770b02d733b"
               }
             },
             "name": "cosigned-v0.0.1-dev",
@@ -877,7 +877,7 @@
             "tag": {
               "name": "v1.1.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/67934a685ddc83aa7b0b8a55c911e299117afac5"
+                "oid": "67934a685ddc83aa7b0b8a55c911e299117afac5"
               }
             },
             "name": "v1.1.0",
@@ -889,7 +889,7 @@
             "tag": {
               "name": "v1.0.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/33973d078170f586cf27f2cc464844b3f1fa1abb"
+                "oid": "33973d078170f586cf27f2cc464844b3f1fa1abb"
               }
             },
             "name": "v1.0.0",
@@ -901,7 +901,7 @@
             "tag": {
               "name": "v0.6.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/bbaca4429c11981c877cf279fb3dc740c54903b8"
+                "oid": "bbaca4429c11981c877cf279fb3dc740c54903b8"
               }
             },
             "name": "v0.6.0",
@@ -913,7 +913,7 @@
             "tag": {
               "name": "v0.5.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/5cb21aa7fbf9ef25dbb8179785a05d695e4cef2c"
+                "oid": "5cb21aa7fbf9ef25dbb8179785a05d695e4cef2c"
               }
             },
             "name": "v0.5.0",
@@ -925,7 +925,7 @@
             "tag": {
               "name": "v0.4.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/2e1191e354cf905b335439916dc8116c3bc362f9"
+                "oid": "2e1191e354cf905b335439916dc8116c3bc362f9"
               }
             },
             "name": "v0.4.0",
@@ -937,7 +937,7 @@
             "tag": {
               "name": "v0.3.1",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/76fde761a4e016c57293113ee1362f1c24a647cb"
+                "oid": "76fde761a4e016c57293113ee1362f1c24a647cb"
               }
             },
             "name": "v0.3.1",
@@ -949,7 +949,7 @@
             "tag": {
               "name": "v0.3.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/5f83dcdcbff7f3bfc18981eee1557dc068ccea06"
+                "oid": "5f83dcdcbff7f3bfc18981eee1557dc068ccea06"
               }
             },
             "name": "v0.3.0",
@@ -961,7 +961,7 @@
             "tag": {
               "name": "v0.2.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/64057e11c7cc287c094e879f470769e2bc662f98"
+                "oid": "64057e11c7cc287c094e879f470769e2bc662f98"
               }
             },
             "name": "v0.2.0 Release",
@@ -973,7 +973,7 @@
             "tag": {
               "name": "v0.1.0",
               "target": {
-                "commitUrl": "https://github.com/sigstore/cosign/commit/083406c6e85284ded34af96048361d1e8c887e50"
+                "oid": "083406c6e85284ded34af96048361d1e8c887e50"
               }
             },
             "name": "v0.1.0",

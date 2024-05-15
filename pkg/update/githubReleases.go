@@ -9,9 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"path"
 	"regexp"
 	"sort"
 	"strings"
@@ -46,7 +44,7 @@ query {
       nodes {
         name
         target {
-          commitUrl
+          oid
         }
       }
     }
@@ -75,7 +73,7 @@ query {
         tag {
           name
           target {
-            commitUrl
+            oid
           }
         }
         name
@@ -124,7 +122,7 @@ type Repo struct {
 		Nodes      []struct {
 			TagName string `json:"name"`
 			Target  struct {
-				CommitURL string `json:"commitUrl"`
+				Oid string `json:"oid"`
 			} `json:"target"`
 		} `json:"nodes"`
 	} `json:"refs"`
@@ -143,7 +141,7 @@ type Releases struct {
 			Tag struct {
 				Name   string `json:"name"`
 				Target struct {
-					CommitURL string `json:"commitUrl"`
+					Oid string `json:"oid"`
 				} `json:"target"`
 			} `json:"tag"`
 			Name         string `json:"name"`
@@ -411,10 +409,10 @@ func (o GitHubReleaseOptions) parseGitHubTags(repos *QueryTagsResponse) (results
 		}
 
 		for _, node := range repo.Refs.Nodes {
-			var commitSha string
-			commitSha, err = getCommit(node.Target.CommitURL)
+			var objID string = node.Target.Oid
+			err = validSha(objID)
 			if err != nil {
-				return nil, fmt.Errorf("failed to get commit sha from commit URL %s: %w", node.Target.CommitURL, err)
+				return nil, fmt.Errorf("invalid object id %s: %w", objID, err)
 			}
 
 			v, err := o.prepareVersion(packageNameHash, node.TagName, repo.NameWithOwner)
@@ -425,7 +423,7 @@ func (o GitHubReleaseOptions) parseGitHubTags(repos *QueryTagsResponse) (results
 			if v == "" {
 				continue
 			}
-			versions[v] = commitSha
+			versions[v] = objID
 		}
 		err = o.getLatestVersion(packageNameHash, versions, repo.NameWithOwner, results)
 		if err != nil {
@@ -461,10 +459,10 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos *QueryReleasesResponse) 
 			}
 
 			// first get the version from the release name but fall back to using the tag
-			var commitSha string
-			commitSha, err = getCommit(release.Tag.Target.CommitURL)
+			var objID string = release.Tag.Target.Oid
+			err = validSha(objID)
 			if err != nil {
-				return nil, fmt.Errorf("failed to get commit sha from commit URL %s: %w", release.Tag.Target.CommitURL, err)
+				return nil, fmt.Errorf("invalid object id %s: %w", objID, err)
 			}
 
 			tag := release.Tag.Name
@@ -487,7 +485,7 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos *QueryReleasesResponse) 
 				continue
 			}
 
-			versions[v] = commitSha
+			versions[v] = objID
 		}
 
 		err = o.getLatestVersion(packageNameHash, versions, node.NameWithOwner, results)
@@ -499,20 +497,14 @@ func (o GitHubReleaseOptions) parseGitHubReleases(repos *QueryReleasesResponse) 
 	return results, nil
 }
 
-func getCommit(commitURLStr string) (string, error) {
-	commitURL, err := url.Parse(commitURLStr)
-	if err != nil {
-		return "", err
-	}
-	sha := path.Base(commitURL.Path)
-
+func validSha(objID string) error {
 	// Git SHA should be 40 hexadecimal chars
 	r := regexp.MustCompile(`^[0-9a-fA-F]{40}$`)
 
-	if r.MatchString(sha) {
-		return sha, nil
+	if r.MatchString(objID) {
+		return nil
 	}
-	return "", fmt.Errorf("%s is not a sha", sha)
+	return fmt.Errorf("%s is not a sha", objID)
 }
 
 // createSemverSlice creates a slice of semver.Version pointers from the map of github results

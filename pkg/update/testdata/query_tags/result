@@ -7,7 +7,7 @@ query {
       nodes {
         name
         target {
-          commitUrl
+          oid
         }
       }
     }
@@ -20,7 +20,7 @@ query {
       nodes {
         name
         target {
-          commitUrl
+          oid
         }
       }
     }

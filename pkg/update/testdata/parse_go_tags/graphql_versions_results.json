@@ -8,67 +8,67 @@
           {
             "name": "go1.19.7",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/7bd22aafe41be40e2174335a3dc55431ca9548ec"
+              "oid": "7bd22aafe41be40e2174335a3dc55431ca9548ec"
             }
           },
           {
             "name": "go1.19.6",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/8656c03fee94ce9cdc4da120b831c2fb9fd68d9d"
+              "oid": "8656c03fee94ce9cdc4da120b831c2fb9fd68d9d"
             }
           },
           {
             "name": "go1.19.5",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/1e9ff255a130200fcc4ec5e911d28181fce947d5"
+              "oid": "1e9ff255a130200fcc4ec5e911d28181fce947d5"
             }
           },
           {
             "name": "go1.19.4",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/dc04f3ba1f25313bc9c97e728620206c235db9ee"
+              "oid": "dc04f3ba1f25313bc9c97e728620206c235db9ee"
             }
           },
           {
             "name": "go1.19.3",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/5d5ed57b134b7a02259ff070864f753c9e601a18"
+              "oid": "5d5ed57b134b7a02259ff070864f753c9e601a18"
             }
           },
           {
             "name": "go1.19.2",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/895664482c0ebe5cec4a6935615a1e9610bbf1e3"
+              "oid": "895664482c0ebe5cec4a6935615a1e9610bbf1e3"
             }
           },
           {
             "name": "go1.19.1",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/4a4127bccc826ebb6079af3252bc6bfeaec187c4"
+              "oid": "4a4127bccc826ebb6079af3252bc6bfeaec187c4"
             }
           },
           {
             "name": "go1.19",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/43456202a1e55da55666fac9d56ace7654a65b64"
+              "oid": "43456202a1e55da55666fac9d56ace7654a65b64"
             }
           },
           {
             "name": "go1.19rc2",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/ad672e7ce101cc52e38bae3d7484e4660a20d575"
+              "oid": "ad672e7ce101cc52e38bae3d7484e4660a20d575"
             }
           },
           {
             "name": "go1.19rc1",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/bac4eb53d64ee402af1d52ac18fb9f0ea76c74e2"
+              "oid": "bac4eb53d64ee402af1d52ac18fb9f0ea76c74e2"
             }
           },
           {
             "name": "go1.19beta1",
             "target": {
-              "commitUrl": "https://github.com/golang/go/commit/2cfbef438049fd4c3f73d1562773ad1f93900897"
+              "oid": "2cfbef438049fd4c3f73d1562773ad1f93900897"
             }
           }
         ]

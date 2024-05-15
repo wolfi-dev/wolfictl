@@ -235,23 +235,21 @@ func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
 	}
 }
 
-func Test_getCommit(t *testing.T) {
+func Test_validSha(t *testing.T) {
 	tests := []struct {
-		name         string
-		commitURLStr string
-		want         string
-		wantErr      assert.ErrorAssertionFunc
+		name     string
+		objIDstr string
+		wantErr  assert.ErrorAssertionFunc
 	}{
-		{name: "simple", commitURLStr: "https://github.com/golang/go/commit/7bd22aafe41be40e2174335a3dc55431ca9548ec", want: "7bd22aafe41be40e2174335a3dc55431ca9548ec", wantErr: assert.NoError},
-		{name: "bad_sha", commitURLStr: "https://github.com/golang/go/commit/abc123", want: "", wantErr: assert.Error},
+		{name: "simple", objIDstr: "7bd22aafe41be40e2174335a3dc55431ca9548ec", wantErr: assert.NoError},
+		{name: "bad_sha", objIDstr: "abc123", wantErr: assert.Error},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getCommit(tt.commitURLStr)
-			if !tt.wantErr(t, err, fmt.Sprintf("getCommit(%v)", tt.commitURLStr)) {
+			err := validSha(tt.objIDstr)
+			if !tt.wantErr(t, err, fmt.Sprintf("valid(%v)", tt.objIDstr)) {
 				return
 			}
-			assert.Equalf(t, tt.want, got, "getCommit(%v)", tt.commitURLStr)
 		})
 	}
 }
