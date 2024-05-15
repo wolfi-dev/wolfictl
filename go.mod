@@ -62,8 +62,8 @@ require (
 	golang.org/x/time v0.5.0
 	golang.org/x/vuln v1.0.4
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.30.0
-	k8s.io/apimachinery v0.30.0
+	k8s.io/api v0.30.1
+	k8s.io/apimachinery v0.30.1
 	k8s.io/client-go v0.30.0
 	knative.dev/pkg v0.0.0-20240513091600-b1fd04d5c458
 	sigs.k8s.io/release-utils v0.8.2
