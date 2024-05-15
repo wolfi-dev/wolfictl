@@ -342,7 +342,7 @@ func Pull(pull string) (*Bundles, error) {
 // being collision free because these are generally fed to generateName which
 // appends a randomized suffix.
 func escapeRFC1123(s string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(s, ".", "-"), "_", "-")
+	return strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(s, ".", "-"), "_", "-"))
 }
 
 // Podspec returns bytes of yaml representing a podspec.
@@ -377,7 +377,7 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: fmt.Sprintf("melange-builder-%s-%s-", escapeRFC1123(cfg.Package.Name), goarch),
+			GenerateName: fmt.Sprintf("%s-%s-", escapeRFC1123(cfg.Package.Name), goarch),
 			Namespace:    "default",
 			Labels: map[string]string{
 				"kubernetes.io/arch":             goarch,
