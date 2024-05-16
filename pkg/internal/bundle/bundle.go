@@ -396,8 +396,13 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 				// TODO: Do we need this??
 				// ldconfig is run to prime ld.so.cache for glibc packages which require it.
 				// Command:      []string{"/bin/sh", "-c", "[ -x /sbin/ldconfig ] && /sbin/ldconfig /lib || true\nsleep infinity"},
-				Resources:    rr,
-				VolumeMounts: []corev1.VolumeMount{},
+				Resources: rr,
+				VolumeMounts: []corev1.VolumeMount{
+					{
+						Name:      "tmp-dir-bundle-builder",
+						MountPath: "/tmp",
+					},
+				},
 				SecurityContext: &corev1.SecurityContext{
 					Privileged: ptr.Bool(true),
 				},
@@ -424,7 +429,14 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 					Type: corev1.SeccompProfileTypeRuntimeDefault,
 				},
 			},
-			Volumes: []corev1.Volume{},
+			Volumes: []corev1.Volume{
+				{
+					Name: "tmp-dir-bundle-builder",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
 		},
 	}
 
