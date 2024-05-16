@@ -2,7 +2,6 @@ package lint
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"regexp"
@@ -399,14 +398,13 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, c := range config.Package.Copyright {
-					// TODO(jason): make these errors
-					if c.License == "" {
-						log.Println("license is missing")
-						return nil
+					switch c.License {
+					// Allow wicked licenses
+					case "custom", "PROPRIETARY":
+						continue
 					}
 					if valid, _ := spdxexp.ValidateLicenses([]string{c.License}); !valid {
-						log.Printf("license %q is not valid SPDX license", c.License)
-						return nil
+						return fmt.Errorf("license %q is not valid SPDX license", c.License)
 					}
 				}
 				return nil
