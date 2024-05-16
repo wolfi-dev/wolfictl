@@ -837,12 +837,6 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) error {
 		return fmt.Errorf("waiting for pod: %w", err)
 	}
 
-	tmp, err := os.CreateTemp("", "")
-	if err != nil {
-		return err
-	}
-	defer tmp.Close()
-
 	log.Info("fetching object")
 	rc, err := t.cfg.gcs.Bucket(t.cfg.bucket).Object(object).NewReader(ctx)
 	if err != nil {
@@ -851,27 +845,24 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) error {
 	defer rc.Close()
 
 	h := sha256.New()
-	tr := io.TeeReader(rc, h)
+	tee := io.TeeReader(rc, h)
 
-	zr, err := gzip.NewReader(bufio.NewReaderSize(tr, 1<<20))
+	zr, err := gzip.NewReader(bufio.NewReaderSize(tee, 1<<20))
 	if err != nil {
 		return err
 	}
 
+	// TODO: Write to a temp file here and upload to GCS after confirming hash.
 	log.Info("downloading object")
-	if _, err := io.Copy(tmp, zr); err != nil { //nolint: gosec
+	if _, err := io.Copy(io.Discard, zr); err != nil { //nolint: gosec
 		return err
 	}
 
-	if _, err := io.Copy(io.Discard, tr); err != nil {
+	if _, err := io.Copy(io.Discard, tee); err != nil {
 		return err
 	}
 
 	if err := zr.Close(); err != nil {
-		return err
-	}
-
-	if err := tmp.Close(); err != nil {
 		return err
 	}
 
