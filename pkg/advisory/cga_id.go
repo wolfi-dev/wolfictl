@@ -35,7 +35,7 @@ func GenerateCGAID() (string, error) {
 		randomChars[i] = char
 	}
 
-	// Format the custom UUID to match CGA(-[23456789cfghjmpqrvwx]{4}){3}
+	// Format the custom UID to match CGA(-[23456789cfghjmpqrvwx]{4}){3}
 	formattedUUID := fmt.Sprintf("CGA-%s-%s-%s", randomChars[0:4], randomChars[4:8], randomChars[8:12])
 
 	return formattedUUID, nil

@@ -4,4 +4,6 @@ package:
   name: scenario-1
 
 advisories:
-  - id: CVE-2222-2222
+  - id: CGA-xoxo-xoxo-xoxo
+    aliases:
+      - CVE-2222-2222

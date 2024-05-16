@@ -169,7 +169,7 @@ func TestCreate(t *testing.T) {
 			name: "no events",
 			req: Request{
 				Package:         "brotli",
-				VulnerabilityID: "CVE-2023-1234",
+				VulnerabilityID: "CGA-xoxo-xoxo-xoxo",
 			},
 			wantErr: true,
 		},
@@ -177,7 +177,7 @@ func TestCreate(t *testing.T) {
 			name: "event type doesn't match data type",
 			req: Request{
 				Package:         "brotli",
-				VulnerabilityID: "CVE-2023-1234",
+				VulnerabilityID: "CGA-xoxo-xoxo-xoxo",
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,

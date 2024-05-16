@@ -32,7 +32,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 		return err
 	}
 
-	adv, ok := doc.Advisories.Get(advisoryID)
+	adv, ok := doc.Advisories.Get(advisoryID, []string{advisoryID})
 	if !ok {
 		return fmt.Errorf("advisory %q not found in document %q", advisoryID, doc.Name())
 	}
@@ -45,7 +45,6 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 
 	updatedAliases := lo.Uniq(append(adv.Aliases, ghsas...))
 	adv.Aliases = updatedAliases
-
 	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories.Update(advisoryID, adv)
 
@@ -73,29 +72,38 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	if err != nil {
 		return err
 	}
+
 	if cve == "" {
 		// No CVE ID was found for this GHSA ID, so there's nothing else we can do here.
 		return nil
 	}
 
-	// Rearrange the data so that the advisory ID is set to the CVE ID, and the GHSA
-	// ID, which was originally the value of the advisory ID, is now an alias.
-	ghsaFromAdvisoryID := advisoryID
-	adv, ok := doc.Advisories.Get(advisoryID)
+	// Get the advisory data to add the CVE ID in the list of aliases
+	adv, ok := doc.Advisories.Get(advisoryID, []string{advisoryID})
+
 	if !ok {
 		return fmt.Errorf("advisory %q not found in document %q", advisoryID, doc.Name())
 	}
-	adv.ID = cve
-	adv.Aliases = append(adv.Aliases, ghsaFromAdvisoryID)
 
-	if _, ok := doc.Advisories.Get(cve); ok {
-		// This CVE ID is already present in the document as the ID of another advisory.
-		// This means we'd end up with two advisories with the same ID, which is not
-		// allowed. Rather than try any kind of merging operation, this should be
-		// resolved manually, so we'll error out here.
-		return DuplicateAdvisoryIDError{
-			Package:    doc.Package.Name,
-			AdvisoryID: cve,
+	vulnIDExist := false
+	for _, alias := range adv.Aliases {
+		if alias == cve {
+			vulnIDExist = true
+			break
+		}
+	}
+	adv.Aliases = append(adv.Aliases, cve)
+
+	if !vulnIDExist {
+		if _, ok := doc.Advisories.Get(cve, []string{cve}); ok {
+			// This CVE ID is already present in the document as the ID of another advisory.
+			// This means we'd end up with two advisories with the same ID, which is not
+			// allowed. Rather than try any kind of merging operation, this should be
+			// resolved manually, so we'll error out here.
+			return DuplicateAdvisoryIDError{
+				Package:    doc.Package.Name,
+				AdvisoryID: cve,
+			}
 		}
 	}
 
@@ -105,15 +113,15 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	}
 
 	updatedAliases := lo.Uniq(append(adv.Aliases, ghsas...))
+	sort.Strings(updatedAliases)
 	adv.Aliases = updatedAliases
-
 	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		// First, check if there would be a collision with the new CVE ID. If so, error
 		// out.
 
 		// Note: Until updated, the advisory in the document still has the original
 		// ID (i.e. the GHSA ID).
-		advisories := doc.Advisories.Update(ghsaFromAdvisoryID, adv)
+		advisories := doc.Advisories.Update(adv.ID, adv)
 
 		// Ensure the package's advisory list is sorted before returning it.
 		sort.Sort(advisories)
@@ -151,23 +159,25 @@ func DiscoverAliases(ctx context.Context, opts DiscoverAliasesOptions) error {
 
 	for _, doc := range documents {
 		for _, adv := range doc.Advisories {
-			switch {
-			// If the advisory ID is already a CVE ID, do a lookup and ensure the discovered
-			// aliases are present in the advisory's list of aliases.
-			case vuln.RegexCVE.MatchString(adv.ID):
-				err := opts.discoverAliasesForAdvisoriesWithCVEIDs(ctx, doc, adv.ID)
-				if err != nil {
-					return err
-				}
+			for _, alias := range adv.Aliases {
+				switch {
+				// If the advisory ID is already a CVE ID, do a lookup and ensure the discovered
+				// aliases are present in the advisory's list of aliases.
+				case vuln.RegexCVE.MatchString(alias):
+					err := opts.discoverAliasesForAdvisoriesWithCVEIDs(ctx, doc, alias)
+					if err != nil {
+						return err
+					}
 
-			// If the advisory ID isn't a CVE ID, lookup aliases for this ID, and see if
-			// there exists a CVE ID among those aliases. If so, adjust the advisory so that
-			// the advisory ID is this CVE ID, and ensure all other IDs are present in the
-			// advisory's list of aliases (including the advisory's original ID).
-			case vuln.RegexGHSA.MatchString(adv.ID):
-				err := opts.discoverAliasesForAdvisoriesWithGHSAIDs(ctx, doc, adv.ID)
-				if err != nil {
-					return err
+				// If the advisory ID isn't a CVE ID, lookup aliases for this ID, and see if
+				// there exists a CVE ID among those aliases. If so, adjust the advisory so that
+				// the advisory ID is this CVE ID, and ensure all other IDs are present in the
+				// advisory's list of aliases (including the advisory's original ID).
+				case vuln.RegexGHSA.MatchString(alias):
+					err := opts.discoverAliasesForAdvisoriesWithGHSAIDs(ctx, doc, alias)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}

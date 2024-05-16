@@ -131,10 +131,20 @@ var (
 
 // Get returns the advisory with the given ID. If such an advisory does not
 // exist, the second return value will be false; otherwise it will be true.
-func (advs Advisories) Get(id string) (Advisory, bool) {
+func (advs Advisories) Get(id string, aliases []string) (Advisory, bool) {
 	for _, adv := range advs {
 		if adv.ID == id {
 			return adv, true
+		}
+	}
+
+	for _, reqAlias := range aliases {
+		for _, adv := range advs {
+			for _, alias := range adv.Aliases {
+				if alias == reqAlias {
+					return adv, true
+				}
+			}
 		}
 	}
 
@@ -180,6 +190,15 @@ func (advs Advisories) Update(id string, advisory Advisory) Advisories {
 		if adv.ID == id {
 			advs[i] = advisory
 			return advs
+		}
+	}
+
+	for i, adv := range advs {
+		for _, alias := range adv.Aliases {
+			if alias == id {
+				advs[i] = advisory
+				return advs
+			}
 		}
 	}
 

@@ -18,6 +18,9 @@ type UpdateOptions struct {
 // Update adds a new event to an existing advisory (named by the vuln parameter)
 // in the document at the provided path.
 func Update(ctx context.Context, req Request, opts UpdateOptions) error {
+	vulnID := req.VulnerabilityID
+	fmt.Println(vulnID, req.Aliases)
+
 	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
 	if count := documents.Len(); count != 1 {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
@@ -26,7 +29,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories
 
-		adv, ok := advisories.GetAlias(req.Aliases[0])
+		adv, ok := advisories.Get(vulnID, req.Aliases)
 		if !ok {
 			return nil, fmt.Errorf("advisory %q does not exist", req.Aliases[0])
 		}

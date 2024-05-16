@@ -108,8 +108,8 @@ func documentDiff(a, b v2.Document) DocumentDiffResult {
 	}
 
 	for _, id := range advisoryIDs(common) {
-		advA, _ := a.Advisories.Get(id)
-		advB, _ := b.Advisories.Get(id)
+		advA, _ := a.Advisories.Get(id, []string{})
+		advB, _ := b.Advisories.Get(id, []string{})
 
 		diff := advisoryDiff(advA, advB)
 		if !diff.IsZero() {

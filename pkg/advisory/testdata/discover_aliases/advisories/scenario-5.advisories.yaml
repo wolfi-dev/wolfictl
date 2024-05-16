@@ -4,4 +4,6 @@ package:
   name: scenario-5
 
 advisories:
-  - id: GHSA-3333-3333-3333
+  - id: CGA-xoxo-xoxo-xoxo
+    aliases:
+      - GHSA-3333-3333-3333
