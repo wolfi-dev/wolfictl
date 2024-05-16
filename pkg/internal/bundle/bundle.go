@@ -423,6 +423,23 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 				Operator: "Equal",
 				Value:    "bundle-builder",
 			}},
+			Affinity: &corev1.Affinity{
+				NodeAffinity: &corev1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+						NodeSelectorTerms: []corev1.NodeSelectorTerm{
+							{
+								MatchExpressions: []corev1.NodeSelectorRequirement{
+									{
+										Key:      "cloud.google.com/machine-family",
+										Operator: corev1.NodeSelectorOpIn,
+										Values:   []string{"n2", "n2d", "t2a"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			ServiceAccountName: "default",
 			SecurityContext: &corev1.PodSecurityContext{
 				SeccompProfile: &corev1.SeccompProfile{
