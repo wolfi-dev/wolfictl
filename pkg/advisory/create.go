@@ -34,13 +34,18 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 	case 1:
 		// i.e. exactly one advisories file for this package
 		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
-			if _, exists := doc.Advisories.GetAlias(req.Aliases[0]); exists {
-				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", req.Aliases[0], req.Package)
+			if _, exists := doc.Advisories.Get(req.VulnerabilityID); exists {
+				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", req.VulnerabilityID, req.Package)
+			}
+			for _, alias := range req.Aliases {
+				if _, exists := doc.Advisories.Get(alias); exists {
+					return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", req.VulnerabilityID, req.Package)
+				}
 			}
 
 			newAdvisoryID, err := GenerateCGAID()
 			if err != nil {
-				return v2.Advisories{}, err
+				return v2.Advisories{}, fmt.Errorf("generating CGA ID: %w", err)
 			}
 
 			advisories := doc.Advisories
@@ -58,7 +63,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		})
 		err := documents.Update(ctx, u)
 		if err != nil {
-			return fmt.Errorf("unable to create advisory %q for %q: %w", req.Aliases[0], req.Package, err)
+			return fmt.Errorf("unable to create advisory %q for %q: %w", req.VulnerabilityID, req.Package, err)
 		}
 
 		// Update the schema version to the latest version.
@@ -76,7 +81,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Document], req Request) error {
 	newAdvisoryID, err := GenerateCGAID()
 	if err != nil {
-		return err
+		return fmt.Errorf("generating CGA ID: %w", err)
 	}
 
 	newAdvisory := v2.Advisory{

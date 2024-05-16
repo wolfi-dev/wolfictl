@@ -19,7 +19,6 @@ type UpdateOptions struct {
 // in the document at the provided path.
 func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	vulnID := req.VulnerabilityID
-	fmt.Println(vulnID, req.Aliases)
 
 	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
 	if count := documents.Len(); count != 1 {
@@ -29,9 +28,21 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories
 
-		adv, ok := advisories.Get(vulnID, req.Aliases)
+		var adv v2.Advisory
+		var ok bool
+		adv, ok = advisories.Get(vulnID)
 		if !ok {
-			return nil, fmt.Errorf("advisory %q does not exist", req.Aliases[0])
+			found := false
+			for _, alias := range req.Aliases {
+				adv, ok = advisories.Get(alias)
+				if ok {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return nil, fmt.Errorf("advisory %q with aliases %v does not exist", vulnID, req.Aliases)
+			}
 		}
 
 		adv.Events = append(adv.Events, req.Event)

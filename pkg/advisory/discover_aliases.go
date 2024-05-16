@@ -32,7 +32,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 		return err
 	}
 
-	adv, ok := doc.Advisories.Get(advisoryID, []string{advisoryID})
+	adv, ok := doc.Advisories.Get(advisoryID)
 	if !ok {
 		return fmt.Errorf("advisory %q not found in document %q", advisoryID, doc.Name())
 	}
@@ -79,7 +79,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	}
 
 	// Get the advisory data to add the CVE ID in the list of aliases
-	adv, ok := doc.Advisories.Get(advisoryID, []string{advisoryID})
+	adv, ok := doc.Advisories.Get(advisoryID)
 
 	if !ok {
 		return fmt.Errorf("advisory %q not found in document %q", advisoryID, doc.Name())
@@ -95,7 +95,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	adv.Aliases = append(adv.Aliases, cve)
 
 	if !vulnIDExist {
-		if _, ok := doc.Advisories.Get(cve, []string{cve}); ok {
+		if _, ok := doc.Advisories.Get(cve); ok {
 			// This CVE ID is already present in the document as the ID of another advisory.
 			// This means we'd end up with two advisories with the same ID, which is not
 			// allowed. Rather than try any kind of merging operation, this should be
