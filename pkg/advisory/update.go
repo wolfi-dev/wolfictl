@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -41,7 +42,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 				}
 			}
 			if !found {
-				return nil, fmt.Errorf("advisory %q with aliases %v does not exist", vulnID, req.Aliases)
+				return nil, fmt.Errorf("advisory %q with aliases %s does not exist", vulnID, strings.Join(req.Aliases, ", "))
 			}
 		}
 
@@ -55,7 +56,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	})
 	err := documents.Update(ctx, u)
 	if err != nil {
-		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", req.Aliases[0], req.Package, err)
+		return fmt.Errorf("unable to add entry for advisory %q with aliases %s in %q: %w", vulnID, strings.Join(req.Aliases, ", "), req.Package, err)
 	}
 
 	// Update the schema version to the latest version.

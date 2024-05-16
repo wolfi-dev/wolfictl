@@ -1,9 +1,9 @@
 package advisory
 
 import (
-	"crypto/rand"
 	"fmt"
-	"math/big"
+	"math/rand"
+	"time"
 )
 
 func GenerateCGAID() (string, error) {
@@ -14,25 +14,18 @@ func GenerateCGAID() (string, error) {
 	partLength := 4
 	totalLength := partLength * 3
 
+	seed := time.Now().UnixNano()
+	rng := rand.New(rand.NewSource(seed)) //nolint: gosec
+
 	// Function to get a random character from allowedChars
-	getRandomChar := func() (byte, error) {
-		max := big.NewInt(int64(len(allowedChars)))
-		n, err := rand.Int(rand.Reader, max)
-		if err != nil {
-			return 0, err
-		}
-		return allowedChars[n.Int64()], nil
+	getRandomChar := func() byte {
+		return allowedChars[rng.Intn(len(allowedChars))]
 	}
 
 	// Generate random characters
 	randomChars := make([]byte, totalLength)
 	for i := 0; i < totalLength; i++ {
-		char, err := getRandomChar()
-		if err != nil {
-			return "", err
-		}
-
-		randomChars[i] = char
+		randomChars[i] = getRandomChar()
 	}
 
 	// Format the custom UID to match CGA(-[23456789cfghjmpqrvwx]{4}){3}
