@@ -45,7 +45,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp" // pull in GCP auth
+	_ "k8s.io/cloud-provider-gcp/pkg/clientauthplugin/gcp" // pull in GCP auth
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
 	"github.com/wolfi-dev/wolfictl/pkg/internal/bundle"
