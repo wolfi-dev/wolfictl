@@ -788,6 +788,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) error {
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
+	log.Infof("created signed URL for %s", object)
 	u, err := t.signedURL(object)
 	if err != nil {
 		return err
@@ -807,6 +808,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) error {
 		return err
 	}
 
+	log.Infof("creating pod for %s", t.pkgver())
 	pod, err = clientset.CoreV1().Pods("default").Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return fmt.Errorf("creating pod: %w", err)
@@ -815,19 +817,15 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) error {
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
 	defer cancel()
 	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
-		log.Info("polling pod")
 		pod, err = clientset.CoreV1().Pods("default").Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
 		if err != nil {
 			return false, err
 		}
-		log.Infof("phase %s", pod.Status.Phase)
 		switch pod.Status.Phase {
 		case corev1.PodSucceeded:
 			if pod.Status.ContainerStatuses[0].State.Terminated == nil {
-				log.Info("termination state is nil")
 				return false, nil
 			}
-			log.Info("termination state is non-nil")
 			return true, nil
 		case corev1.PodFailed:
 			return false, fmt.Errorf("pod failed")
