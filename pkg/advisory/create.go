@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -60,7 +61,13 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		})
 		err := documents.Update(ctx, u)
 		if err != nil {
-			return fmt.Errorf("unable to create advisory %q for %q: %w", req.Aliases[0], req.Package, err)
+			var showIDs string
+			if len(req.Aliases) == 1 {
+				showIDs = req.Aliases[0]
+			} else {
+				showIDs = strings.Join(req.Aliases, ", ")
+			}
+			return fmt.Errorf("unable to create advisory %q for %q: %w", showIDs, req.Package, err)
 		}
 
 		// Update the schema version to the latest version.

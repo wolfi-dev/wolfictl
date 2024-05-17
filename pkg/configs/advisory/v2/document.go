@@ -169,15 +169,6 @@ func (advs Advisories) Update(id string, advisory Advisory) Advisories {
 		}
 	}
 
-	for i, adv := range advs {
-		for _, alias := range adv.Aliases {
-			if alias == id {
-				advs[i] = advisory
-				return advs
-			}
-		}
-	}
-
 	return advs
 }
 

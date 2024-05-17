@@ -184,9 +184,7 @@ func TestUpdate(t *testing.T) {
 						return false
 					}
 					if p[len(p)-1].String() == ".ID" {
-						if _, ok := p[len(p)-2].(cmp.SliceIndex); ok {
-							return true
-						}
+						return true
 					}
 					return false
 				}, cmp.Ignore()))

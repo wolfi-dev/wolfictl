@@ -46,7 +46,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 	updatedAliases := lo.Uniq(append(adv.Aliases, ghsas...))
 	adv.Aliases = updatedAliases
 	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
-		advisories := doc.Advisories.Update(advisoryID, adv)
+		advisories := doc.Advisories.Update(adv.ID, adv)
 
 		// Ensure the package's advisory list is sorted before returning it.
 		sort.Sort(advisories)
