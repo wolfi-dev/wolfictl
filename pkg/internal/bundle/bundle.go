@@ -371,6 +371,8 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 		},
 	}
 
+	mf := map[string]string{"amd64": "n2d", "arm64": "t2a"}
+
 	pod := &corev1.Pod{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Pod",
@@ -423,6 +425,7 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 				Operator: "Equal",
 				Value:    "bundle-builder",
 			}},
+			// https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning#custom_machine_family
 			Affinity: &corev1.Affinity{
 				NodeAffinity: &corev1.NodeAffinity{
 					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
@@ -432,7 +435,8 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 									{
 										Key:      "cloud.google.com/machine-family",
 										Operator: corev1.NodeSelectorOpIn,
-										Values:   []string{"n2", "n2d", "t2a"},
+										// Warning: Node auto-provisioning doesn't support multiple value assigned to the node affinity. Make sure you assign only one value to the node affinity.
+										Values: []string{mf[goarch]},
 									},
 								},
 							},
