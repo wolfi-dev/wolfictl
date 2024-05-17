@@ -176,8 +176,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "event type doesn't match data type",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CGA-xoxo-xoxo-xoxo",
+				Package: "brotli",
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,
@@ -214,9 +213,7 @@ func TestCreate(t *testing.T) {
 						return false
 					}
 					if p[len(p)-1].String() == ".ID" {
-						if _, ok := p[len(p)-2].(cmp.SliceIndex); ok {
-							return true
-						}
+						return true
 					}
 					return false
 				}, cmp.Ignore()))

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -19,8 +18,6 @@ type UpdateOptions struct {
 // Update adds a new event to an existing advisory (named by the vuln parameter)
 // in the document at the provided path.
 func Update(ctx context.Context, req Request, opts UpdateOptions) error {
-	vulnID := req.VulnerabilityID
-
 	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)
 	if count := documents.Len(); count != 1 {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
@@ -31,18 +28,10 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 
 		var adv v2.Advisory
 		var ok bool
-		adv, ok = advisories.Get(vulnID)
-		if !ok {
-			found := false
-			for _, alias := range req.Aliases {
-				adv, ok = advisories.Get(alias)
-				if ok {
-					found = true
-					break
-				}
-			}
-			if !found {
-				return nil, fmt.Errorf("advisory %q with aliases %s does not exist", vulnID, strings.Join(req.Aliases, ", "))
+		for _, alias := range req.Aliases {
+			adv, ok = advisories.GetByVulnerability(alias)
+			if !ok {
+				return nil, fmt.Errorf("advisory %q does not exist", alias)
 			}
 		}
 
@@ -56,7 +45,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	})
 	err := documents.Update(ctx, u)
 	if err != nil {
-		return fmt.Errorf("unable to add entry for advisory %q with aliases %s in %q: %w", vulnID, strings.Join(req.Aliases, ", "), req.Package, err)
+		return fmt.Errorf("unable to add entry for advisory %q in %q: %w", req.Aliases[0], req.Package, err)
 	}
 
 	// Update the schema version to the latest version.

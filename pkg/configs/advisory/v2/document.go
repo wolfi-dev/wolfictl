@@ -138,16 +138,6 @@ func (advs Advisories) Get(id string) (Advisory, bool) {
 		}
 	}
 
-	// for _, reqAlias := range aliases {
-	for _, adv := range advs {
-		for _, alias := range adv.Aliases {
-			if alias == id {
-				return adv, true
-			}
-		}
-		// }
-	}
-
 	return Advisory{}, false
 }
 
