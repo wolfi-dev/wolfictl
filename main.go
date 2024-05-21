@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/cli"
 )
 
 func main() {
-	if err := mainE(context.Background()); err != nil {
-		log.Fatalf("error during command execution: %v", err)
+	ctx := context.Background()
+	if err := mainE(ctx); err != nil {
+		clog.FromContext(ctx).Fatal(err.Error())
 	}
 }
 
