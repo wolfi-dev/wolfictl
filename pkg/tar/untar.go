@@ -54,16 +54,9 @@ func Untar(src io.Reader, dst string) error {
 			if err != nil {
 				return err
 			}
-			// copy over contents in chunks for security reasons
-			// G110: Potential DoS vulnerability via decompression bomb
-			for {
-				_, err := io.CopyN(fileToWrite, tr, 1024)
-				if err != nil {
-					if errors.Is(err, io.EOF) {
-						break
-					}
-					return err
-				}
+
+			if _, err := io.CopyN(fileToWrite, tr, header.Size); err != nil {
+				return err
 			}
 
 			if err := fileToWrite.Close(); err != nil {

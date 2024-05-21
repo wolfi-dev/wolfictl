@@ -47,7 +47,7 @@ melange build {{.File}} \
 {{ range .Flags }} {{.}} \
 {{end}}
 
-tar -czvf packages.tar.gz ./packages
+tar -C packages -czvf packages.tar.gz .
 
 # TODO: Content-Type
 curl --upload-file packages.tar.gz -H "Content-Type: application/octet-stream" $PACKAGES_UPLOAD_URL
