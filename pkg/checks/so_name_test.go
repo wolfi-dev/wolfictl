@@ -44,13 +44,13 @@ func TestChecks_getSonameFiles(t *testing.T) {
 			dir := t.TempDir()
 
 			for _, f := range tt.sonameFiles {
-				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm)
+				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm) //nolint: gosec
 				assert.NoError(t, err)
 			}
 
 			// simulate DT_SONAME
 			for _, f := range tt.dtSoname {
-				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm)
+				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm) //nolint: gosec
 				assert.NoError(t, err)
 				err = os.Link(filepath.Join(dir, f), filepath.Join(dir, "cheese.so.1"))
 				assert.NoError(t, err)
@@ -152,7 +152,7 @@ func TestSoNameOptions_checkSonamesSubFolders(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = os.WriteFile(filepath.Join(subDir, "bar.so.1.2.3"), []byte("test"), os.ModePerm)
+	err = os.WriteFile(filepath.Join(subDir, "bar.so.1.2.3"), []byte("test"), os.ModePerm) //nolint: gosec
 	if err != nil {
 		t.Fatal(err)
 	}
