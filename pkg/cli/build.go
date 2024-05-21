@@ -597,6 +597,8 @@ type global struct {
 	cacheDir    string
 	outDir      string
 
+	fuses []string
+
 	// arch -> foo.apk -> exists in APKINDEX
 	exists map[string]map[string]struct{}
 

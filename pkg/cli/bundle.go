@@ -88,6 +88,7 @@ func cmdBundle() *cobra.Command {
 	cmd.Flags().BoolVar(&cfg.dryrun, "dry-run", false, "print commands instead of executing them")
 	cmd.Flags().StringSliceVarP(&cfg.extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
 	cmd.Flags().StringSliceVarP(&cfg.extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringSliceVar(&cfg.fuses, "gcsfuse", []string{}, "list of gcsfuse mounts to make available to the build environment (e.g. gs://my-bucket/subdir:/mnt/my-bucket)")
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
 	cmd.Flags().StringVar(&cfg.namespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
 	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
@@ -394,9 +395,19 @@ func (t *task) bundle(ctx context.Context) error {
 				flags = append(flags, "--repository-append="+r)
 			}
 
+			mounts := make([]*bundle.GCSFuseMount, 0, len(t.cfg.fuses))
+			for _, f := range t.cfg.fuses {
+				mount, err := bundle.ParseGCSFuseMount(f)
+				if err != nil {
+					return err
+				}
+				mounts = append(mounts, mount)
+			}
+
 			entrypoints[types.ParseArchitecture(arch)] = &bundle.Entrypoint{
-				File:  t.config.Path,
-				Flags: flags,
+				File:          t.config.Path,
+				Flags:         flags,
+				GCSFuseMounts: mounts,
 			}
 		}
 
