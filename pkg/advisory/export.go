@@ -196,19 +196,24 @@ func ExportOSV(opts ExportOptions, output string) error {
 
 					entry, ok := osvExport[adv.ID]
 					if ok {
-						entry.Affected = append(entry.Affected, tempAffected)
+						// check if there is a CGA duplicate across different packages
+						for i := range entry.Affected {
+							if !strings.EqualFold(doc.Package.Name, entry.Affected[i].Package.Name) {
+								log.Fatalf("maybe a CGA id conflict for %s: %s against %s ", adv.ID, doc.Package.Name, entry.Affected[i].Package.Name)
+							}
+						}
 
+						entry.Affected = append(entry.Affected, tempAffected)
 						if updatedTime.After(entry.Modified) {
 							entry.Modified = updatedTime
 						}
-
 						osvExport[adv.ID] = entry
 					} else {
 						// new entry
 						aliases := []string{adv.ID}
 						aliases = append(aliases, adv.Aliases...)
 						temp := models.Vulnerability{
-							ID:       fmt.Sprintf("%s-%s", strings.ToUpper(string(opts.Ecosystem)), adv.ID),
+							ID:       adv.ID,
 							Aliases:  aliases,
 							Affected: []models.Affected{tempAffected},
 						}
@@ -239,7 +244,12 @@ func ExportOSV(opts ExportOptions, output string) error {
 
 	all := []models.Vulnerability{}
 	for _, k := range keys {
-		all = append(all, osvExport[k])
+		// for the all.json we just need the id and modified date
+		temp := models.Vulnerability{
+			ID:       osvExport[k].ID,
+			Modified: osvExport[k].Modified,
+		}
+		all = append(all, temp)
 
 		e, err := osvExport[k].MarshalJSON()
 		if err != nil {
@@ -257,7 +267,7 @@ func ExportOSV(opts ExportOptions, output string) error {
 			log.Fatalf("failed to validate OSV JSON Schema for %s: %v", k, err)
 		}
 
-		filepath := path.Join(output, fmt.Sprintf("%s-%s.json", strings.ToUpper(string(opts.Ecosystem)), k))
+		filepath := path.Join(output, fmt.Sprintf("%s.json", k))
 		err = os.WriteFile(filepath, e, 0o644)
 		if err != nil {
 			log.Fatal(err)
