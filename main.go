@@ -12,8 +12,7 @@ import (
 func main() {
 	ctx := context.Background()
 	if err := mainE(ctx); err != nil {
-		clog.FromContext(ctx).Error(err.Error())
-		os.Exit(1)
+		clog.FromContext(ctx).Fatal(err.Error())
 	}
 }
 
