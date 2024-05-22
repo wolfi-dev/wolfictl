@@ -374,7 +374,7 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa string) *corev1.Pod {
+func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa, ns string) *corev1.Pod {
 	goarch := types.ParseArchitecture(arch).String()
 
 	resources := cfg.Package.Resources
@@ -424,7 +424,7 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa st
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: fmt.Sprintf("%s-%s-", escapeRFC1123(cfg.Package.Name), goarch),
-			Namespace:    "default",
+			Namespace:    ns,
 			Labels: map[string]string{
 				"kubernetes.io/arch":             goarch,
 				"app.kubernetes.io/component":    cfg.Package.Name,
