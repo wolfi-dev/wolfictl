@@ -295,7 +295,7 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	if err != nil {
 		return err
 	}
-	log.Infof("map is %d big", len(m))
+	log.Infof("bundle contains %d builds", len(m))
 
 	b, err := json.Marshal(m)
 	if err != nil {

@@ -301,7 +301,7 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 				}
 				defer rc.Close()
 
-				clog.FromContext(ctx).Infof("downloading %s to %s", obj, out)
+				clog.FromContext(ctx).Debugf("downloading %s to %s", obj, out)
 
 				f, err := os.Create(out)
 				if err != nil {
@@ -829,13 +829,16 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		return nil, err
 	}
 
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, arch)
+	defer span.End()
+
 	log := clog.FromContext(ctx)
 
 	pod := bundle.Podspec(t.config.Configuration, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount, t.cfg.k8sNamespace)
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
-	log.Infof("created signed URL for %s", object)
+	log.Debugf("created signed URL for %s", object)
 	u, err := t.signedURL(object)
 	if err != nil {
 		return nil, err
@@ -884,7 +887,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	want := strings.TrimSpace(pod.Status.ContainerStatuses[0].State.Terminated.Message)
 
-	log.Infof("want hash: %s", want)
+	log.Debugf("want hash: %s", want)
 
 	return &bundleResult{
 		object: object,
@@ -1020,6 +1023,9 @@ type bundleResult struct {
 }
 
 func (t *task) buildBundle(ctx context.Context) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, t.pkg)
+	defer span.End()
+
 	log := clog.FromContext(ctx)
 
 	needsBuild := map[string]bool{}
@@ -1143,6 +1149,9 @@ func (t *task) buildBundle(ctx context.Context) error {
 }
 
 func (t *task) indexBundle(ctx context.Context, arch string, results map[string]*bundleResult) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "indexBundle")
+	defer span.End()
+
 	log := clog.FromContext(ctx)
 	tmpdir, err := os.MkdirTemp("", "")
 	if err != nil {
@@ -1178,7 +1187,7 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 				continue
 			}
 
-			log.Infof("re-signing %s", subpkgApk)
+			log.Debugf("re-signing %s", subpkgApk)
 			if err := sign.APK(ctx, subpkgFileName, t.cfg.signingKey); err != nil {
 				return fmt.Errorf("signing %s: %w", subpkgApk, err)
 			}
@@ -1189,7 +1198,7 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 		// Note that the primary APK here is intentionally last.
 		// When we check if a package has already been uploaded (needsBuild above), we use this file.
 		// It's important that we upload it last so that we know all the other APKs were also uploaded.
-		log.Infof("re-signing %s", apkFile)
+		log.Debugf("re-signing %s", apkFile)
 		if err := sign.APK(ctx, apkPath, t.cfg.signingKey); err != nil {
 			return fmt.Errorf("signing %s: %w", apkFile, err)
 		}
@@ -1247,6 +1256,9 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 }
 
 func (t *task) downloadAPK(ctx context.Context, arch, pkgdir, apkfile string) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "downloadAPK")
+	defer span.End()
+
 	log := clog.FromContext(ctx)
 
 	obj := path.Join(arch, apkfile)
@@ -1255,7 +1267,7 @@ func (t *task) downloadAPK(ctx context.Context, arch, pkgdir, apkfile string) er
 		obj = path.Join(dir, obj)
 	}
 
-	log.Infof("Downloading previously uploaded %s", obj)
+	log.Debugf("Downloading previously uploaded %s", obj)
 
 	rc, err := t.cfg.gcs.Bucket(bucket).Object(obj).NewReader(ctx)
 	if err != nil {
@@ -1280,9 +1292,12 @@ func (t *task) downloadAPK(ctx context.Context, arch, pkgdir, apkfile string) er
 }
 
 func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchResult")
+	defer span.End()
+
 	log := clog.FromContext(ctx)
 
-	log.Infof("fetching object %s", res.object)
+	log.Debugf("fetching object %s", res.object)
 	rc, err := t.cfg.gcs.Bucket(t.cfg.stagingBucket).Object(res.object).NewReader(ctx)
 	if err != nil {
 		return err
@@ -1298,7 +1313,7 @@ func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string
 	h := sha256.New()
 	mw := io.MultiWriter(tmp, h)
 
-	log.Infof("downloading %s to %s", res.object, tmp.Name())
+	log.Debugf("downloading %s to %s", res.object, tmp.Name())
 	if _, err := io.Copy(mw, rc); err != nil {
 		return err
 	}
@@ -1308,14 +1323,14 @@ func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string
 		return fmt.Errorf("hashing %s got != want; %q != %q", res.object, got, res.hash)
 	}
 
-	log.Infof("hashes matched %s", res.hash)
+	log.Debugf("hashes matched %s", res.hash)
 
 	// Seek to the start so we can untar it.
 	if _, err := tmp.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
 
-	log.Infof("untarring %s", tmp.Name())
+	log.Debugf("untarring %s", tmp.Name())
 	if err := tar.Untar(tmp, tmpdir); err != nil {
 		return fmt.Errorf("untarring %s: %w", tmp.Name(), err)
 	}
@@ -1324,6 +1339,9 @@ func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string
 }
 
 func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadAPKs")
+	defer span.End()
+
 	if t.cfg.dstBucket == "" {
 		clog.FromContext(ctx).Warnf("Skipping uploading packages because --destination-bucket is not set")
 		return nil
@@ -1357,6 +1375,9 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 }
 
 func (t *task) uploadIndex(ctx context.Context, arch string) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadIndex")
+	defer span.End()
+
 	filename := filepath.Join(t.cfg.outDir, arch, "APKINDEX.tar.gz")
 
 	f, err := os.Open(filename)
