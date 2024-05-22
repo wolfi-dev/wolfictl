@@ -3,9 +3,11 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -24,6 +26,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/static"
 	ggcrtypes "github.com/google/go-containerregistry/pkg/v1/types"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
@@ -31,6 +34,7 @@ import (
 )
 
 func cmdBundle() *cobra.Command {
+	var jobs int
 	cfg := global{}
 	bcfg := bundleConfig{
 		base: empty.Index,
@@ -42,7 +46,13 @@ func cmdBundle() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
-			cfg.donech = make(chan *task, runtime.GOMAXPROCS(0))
+			if jobs == 0 {
+				jobs = runtime.GOMAXPROCS(0)
+			}
+
+			cfg.jobch = make(chan struct{}, jobs)
+			cfg.donech = make(chan *task, jobs)
+
 			if cfg.signingKey == "" {
 				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
 			}
@@ -71,6 +81,20 @@ func cmdBundle() *cobra.Command {
 				}
 				bcfg.pusher = pusher
 
+				if bcfg.baseRef != "" {
+					// Push this immediately to the repo to avoid having to push the base layers multiple times.
+					baseRef := path.Join(bcfg.repo, "base")
+					clog.FromContext(ctx).Infof("pushing base image to %s", baseRef)
+					ref, err := name.ParseReference(baseRef)
+					if err != nil {
+						return err
+					}
+
+					if err := pusher.Push(ctx, ref, bcfg.base); err != nil {
+						return err
+					}
+				}
+
 				bcfg.commonFiles, err = commonFS(os.DirFS(cfg.dir))
 				if err != nil {
 					return err
@@ -98,6 +122,7 @@ func cmdBundle() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.dst, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
 	cmd.Flags().StringVar(&bcfg.baseRef, "bundle-base", "", "base image used for melange build bundles")
 	cmd.Flags().StringVar(&bcfg.repo, "bundle-repo", "", "where to push the bundles")
+	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 
 	return cmd
 }
@@ -110,7 +135,7 @@ type bundleConfig struct {
 	pusher      *remote.Pusher
 }
 
-func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []string) error {
+func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []string) error { //nolint:gocyclo
 	var eg errgroup.Group
 
 	var stuff *configStuff
@@ -225,25 +250,8 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 
 	var g errgroup.Group
 	g.Go(func() error {
-		defer close(cfg.donech)
-
 		for _, todo := range todos {
-			log.Infof("bundling %s", todo.pkg)
-			if err := todo.bundle(ctx); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-	g.Go(func() error {
-		for t := range cfg.donech {
-			delete(todos, t.pkg)
-
-			if t.bundled != nil {
-				log.Infof("built %q", t.pkg)
-				built[t.pkg] = t
-			}
+			todo.maybeStartBundle(ctx)
 		}
 
 		return nil
@@ -251,6 +259,28 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 
 	if err := g.Wait(); err != nil {
 		return err
+	}
+
+	errs := []error{}
+	for len(todos) != 0 {
+		t := <-cfg.donech
+		delete(todos, t.pkg)
+
+		if t.bundled != nil {
+			log.Infof("built %q", t.pkg)
+			built[t.pkg] = t
+		}
+
+		if err := t.err; err != nil {
+			errs = append(errs, fmt.Errorf("failed to bundle %s: %w", t.pkg, err))
+			log.Errorf("Failed to bundle %s", t.pkg)
+			continue
+		}
+	}
+
+	if len(errs) != 0 {
+		log.Errorf("Failed to bundle %d builds", len(errs))
+		return errors.Join(errs...)
 	}
 
 	needed, err := stuff.g.Filter(func(pkg dag.Package) bool {
@@ -316,126 +346,142 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	return nil
 }
 
-func (t *task) bundle(ctx context.Context) error {
-	log := clog.FromContext(ctx)
-	log.Infof("bundle(%q)", t.pkg)
+// If this task hasn't already been started, start it.
+func (t *task) maybeStartBundle(ctx context.Context) {
+	t.cond.L.Lock()
+	defer t.cond.L.Unlock()
 
-	if t.done {
-		return nil
+	if !t.started {
+		t.started = true
+		go t.bundle(ctx)
 	}
+}
 
+func (t *task) bundle(ctx context.Context) {
 	defer func() {
 		// When we finish, wake up any goroutines that are waiting on us.
+		t.cond.L.Lock()
 		t.done = true
+		t.cond.Broadcast()
+		t.cond.L.Unlock()
 		t.cfg.donech <- t
 	}()
 
+	log := clog.FromContext(ctx)
+
 	for _, dep := range t.deps {
-		if dep.done {
-			continue
-		}
-		if err := dep.bundle(ctx); err != nil {
-			return fmt.Errorf("bundling dep %q: %w", dep.pkg, err)
-		}
+		dep.maybeStartBundle(ctx)
 	}
 
-	needsBuild := map[string]bool{}
-	needsIndex := map[string]bool{}
+	if len(t.deps) != 0 {
+		clog.FromContext(ctx).Debugf("task %q waiting on %q", t.pkg, maps.Keys(t.deps))
+	}
 
-	for _, arch := range t.archs {
-		apkFile := t.pkgver() + ".apk"
-		apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
+	t.err = func() error {
+		for _, dep := range t.deps {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
 
-		// See if we already have the package indexed.
-		if _, ok := t.cfg.exists[arch][apkFile]; ok {
-			log.Infof("Skipping %s, already indexed", apkFile)
-			continue
+			if err := dep.wait(); err != nil {
+				return err
+			}
 		}
 
-		needsIndex[arch] = true
+		// Block on jobch, to limit concurrency. Remove from jobch when done.
+		t.cfg.jobch <- struct{}{}
+		defer func() { <-t.cfg.jobch }()
 
-		// See if we already have the package built.
-		if _, err := os.Stat(apkPath); err == nil {
-			log.Infof("Skipping %s, already built", apkPath)
-			continue
-		}
+		log.Infof("bundle(%q)", t.pkg)
 
-		needsBuild[arch] = true
-	}
-
-	if len(needsBuild) == 0 && len(needsIndex) == 0 {
-		t.skipped = true
-		return nil
-	}
-
-	sdir, err := t.sourceDir()
-	if err != nil {
-		return err
-	}
-
-	if t.bcfg.repo != "" {
-		entrypoints := map[types.Architecture]*bundle.Entrypoint{}
+		needsIndex := map[string]bool{}
 
 		for _, arch := range t.archs {
-			flags := []string{
-				"--arch=" + arch,
-				"--env-file=" + envFile(arch),
-				"--runner=" + t.cfg.runner,
-				"--namespace=" + t.cfg.namespace,
-				"--source-dir=" + sdir,
-				"--signing-key=" + t.cfg.signingKey,
-				"--pipeline-dir=" + t.cfg.pipelineDir,
+			apkFile := t.pkgver() + ".apk"
+
+			// See if we already have the package indexed.
+			if _, ok := t.cfg.exists[arch][apkFile]; ok {
+				log.Infof("Skipping %s, already indexed", apkFile)
+				continue
 			}
 
-			for _, k := range t.cfg.extraKeys {
-				flags = append(flags, "--keyring-append="+k)
-			}
+			needsIndex[arch] = true
+		}
 
-			for _, r := range t.cfg.extraRepos {
-				flags = append(flags, "--repository-append="+r)
-			}
+		if len(needsIndex) == 0 {
+			t.skipped = true
+			return nil
+		}
 
-			mounts := make([]*bundle.GCSFuseMount, 0, len(t.cfg.fuses))
-			for _, f := range t.cfg.fuses {
-				mount, err := bundle.ParseGCSFuseMount(f)
-				if err != nil {
-					return err
+		sdir, err := t.sourceDir()
+		if err != nil {
+			return err
+		}
+
+		if t.bcfg.repo != "" {
+			entrypoints := map[types.Architecture]*bundle.Entrypoint{}
+
+			for _, arch := range t.archs {
+				flags := []string{
+					"--arch=" + arch,
+					"--env-file=" + envFile(arch),
+					"--runner=" + t.cfg.runner,
+					"--namespace=" + t.cfg.namespace,
+					"--source-dir=" + sdir,
+					"--signing-key=" + t.cfg.signingKey,
+					"--pipeline-dir=" + t.cfg.pipelineDir,
 				}
-				mounts = append(mounts, mount)
+
+				for _, k := range t.cfg.extraKeys {
+					flags = append(flags, "--keyring-append="+k)
+				}
+
+				for _, r := range t.cfg.extraRepos {
+					flags = append(flags, "--repository-append="+r)
+				}
+
+				mounts := make([]*bundle.GCSFuseMount, 0, len(t.cfg.fuses))
+				for _, f := range t.cfg.fuses {
+					mount, err := bundle.ParseGCSFuseMount(f)
+					if err != nil {
+						return err
+					}
+					mounts = append(mounts, mount)
+				}
+
+				entrypoints[types.ParseArchitecture(arch)] = &bundle.Entrypoint{
+					File:          t.config.Path,
+					Flags:         flags,
+					GCSFuseMounts: mounts,
+				}
 			}
 
-			entrypoints[types.ParseArchitecture(arch)] = &bundle.Entrypoint{
-				File:          t.config.Path,
-				Flags:         flags,
-				GCSFuseMounts: mounts,
+			srcfs, err := t.sourceFS(os.DirFS(t.cfg.dir))
+			if err != nil {
+				return err
 			}
+
+			bundled, err := bundle.New(t.bcfg.base, entrypoints, t.bcfg.commonFiles, srcfs)
+			if err != nil {
+				return err
+			}
+
+			t.bundled = bundled
+
+			dst, err := name.ParseReference(fmt.Sprintf("%s/%s", t.bcfg.repo, t.pkgver()), name.Insecure)
+			if err != nil {
+				return err
+			}
+
+			if err := t.bcfg.pusher.Push(ctx, dst, bundled); err != nil {
+				return err
+			}
+
+			log.Infof("pushed bundle to %s", dst.String())
 		}
 
-		srcfs, err := t.sourceFS(os.DirFS(t.cfg.dir))
-		if err != nil {
-			return err
-		}
-
-		bundled, err := bundle.New(t.bcfg.base, entrypoints, t.bcfg.commonFiles, srcfs)
-		if err != nil {
-			return err
-		}
-
-		t.bundled = bundled
-
-		dst, err := name.ParseReference(fmt.Sprintf("%s/%s", t.bcfg.repo, t.pkgver()), name.Insecure)
-		if err != nil {
-			return err
-		}
-
-		if err := t.bcfg.pusher.Push(ctx, dst, bundled); err != nil {
-			return err
-		}
-
-		log.Infof("pushed bundle to %s", dst.String())
-	}
-
-	return nil
+		return nil
+	}()
 }
 
 func (t *task) sourceFS(dirfs fs.FS) (fs.FS, error) {
