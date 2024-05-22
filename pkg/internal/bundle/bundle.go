@@ -374,7 +374,7 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1.Pod {
+func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa string) *corev1.Pod {
 	goarch := types.ParseArchitecture(arch).String()
 
 	resources := cfg.Package.Resources
@@ -398,7 +398,24 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 		},
 	}
 
-	mf := map[string]string{"amd64": "n2d", "arm64": "t2a"}
+	t := []corev1.Toleration{{
+		Effect:   "NoSchedule",
+		Key:      "chainguard.dev/runner",
+		Operator: "Equal",
+		Value:    "bundle-builder",
+	}}
+
+	mf := mFamily
+	if goarch == "arm64" {
+		mf = "t2a"
+
+		t = append(t, corev1.Toleration{
+			Effect:   "NoSchedule",
+			Key:      "kubernetes.io/arch",
+			Operator: "Equal",
+			Value:    "arm64",
+		})
+	}
 
 	pod := &corev1.Pod{
 		TypeMeta: metav1.TypeMeta{
@@ -441,37 +458,8 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 			NodeSelector: map[string]string{
 				"kubernetes.io/arch": goarch,
 			},
-			Tolerations: []corev1.Toleration{{
-				Effect:   "NoSchedule",
-				Key:      "kubernetes.io/arch",
-				Operator: "Equal",
-				Value:    "arm64",
-			}, {
-				Effect:   "NoSchedule",
-				Key:      "chainguard.dev/runner",
-				Operator: "Equal",
-				Value:    "bundle-builder",
-			}},
-			// https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning#custom_machine_family
-			Affinity: &corev1.Affinity{
-				NodeAffinity: &corev1.NodeAffinity{
-					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-						NodeSelectorTerms: []corev1.NodeSelectorTerm{
-							{
-								MatchExpressions: []corev1.NodeSelectorRequirement{
-									{
-										Key:      "cloud.google.com/machine-family",
-										Operator: corev1.NodeSelectorOpIn,
-										// Warning: Node auto-provisioning doesn't support multiple value assigned to the node affinity. Make sure you assign only one value to the node affinity.
-										Values: []string{mf[goarch]},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			ServiceAccountName: "default",
+			Tolerations:        t,
+			ServiceAccountName: sa,
 			SecurityContext: &corev1.PodSecurityContext{
 				SeccompProfile: &corev1.SeccompProfile{
 					Type: corev1.SeccompProfileTypeRuntimeDefault,
@@ -486,6 +474,28 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch string) *corev1
 				},
 			},
 		},
+	}
+
+	if mf != "" {
+		// https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning#custom_machine_family
+		pod.Spec.Affinity = &corev1.Affinity{
+			NodeAffinity: &corev1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{
+							MatchExpressions: []corev1.NodeSelectorRequirement{
+								{
+									Key:      "cloud.google.com/machine-family",
+									Operator: corev1.NodeSelectorOpIn,
+									// Warning: Node auto-provisioning doesn't support multiple value assigned to the node affinity. Make sure you assign only one value to the node affinity.
+									Values: []string{mf},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
 	}
 
 	for k, v := range cfg.Environment.Environment {

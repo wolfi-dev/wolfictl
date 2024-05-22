@@ -142,6 +142,10 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
 
+	cmd.Flags().StringVar(&cfg.k8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
+	cmd.Flags().StringVar(&cfg.machineFamily, "machine-family", "", "machine family for amd64 builds")
+	cmd.Flags().StringVar(&cfg.serviceAccount, "service-account", "default", "service-account to run pods as.")
+
 	return cmd
 }
 
@@ -608,6 +612,10 @@ type global struct {
 	gcs           *storage.Client
 	stagingBucket string
 	dstBucket     string
+
+	k8sNamespace   string
+	serviceAccount string
+	machineFamily  string
 }
 
 func (g *global) logdir(arch string) string {
@@ -823,7 +831,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	log := clog.FromContext(ctx)
 
-	pod := bundle.Podspec(t.config.Configuration, t.ref, arch)
+	pod := bundle.Podspec(t.config.Configuration, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount)
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
@@ -848,7 +856,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	}
 
 	log.Infof("creating pod for %s", t.pkgver())
-	pod, err = clientset.CoreV1().Pods("default").Create(ctx, pod, metav1.CreateOptions{})
+	pod, err = clientset.CoreV1().Pods(t.cfg.k8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("creating pod: %w", err)
 	}
@@ -856,7 +864,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
 	defer cancel()
 	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
-		pod, err = clientset.CoreV1().Pods("default").Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
+		pod, err = clientset.CoreV1().Pods(t.cfg.k8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
 		if err != nil {
 			return false, err
 		}
