@@ -681,7 +681,7 @@ func (t *task) start(ctx context.Context) {
 
 	for _, dep := range t.deps {
 		if err := dep.wait(); err != nil {
-			t.err = err
+			t.err = fmt.Errorf("waiting on %s: %w", dep.pkg, err)
 			return
 		}
 	}
