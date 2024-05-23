@@ -13,7 +13,7 @@ import (
 func cmdAdvisoryCopy() *cobra.Command {
 	var dir string
 	cmd := &cobra.Command{
-		Use:   "copy",
+		Use:   "copy <source-package-name> <destination-package-name>",
 		Short: "Copy a package's advisories into a new package.",
 		Long: `Copy a package's advisories into a new package.
 
