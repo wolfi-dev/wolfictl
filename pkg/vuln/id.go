@@ -12,7 +12,7 @@ var (
 	RegexGO   = regexp.MustCompile(`^GO-\d{4}-\d{4}$`)
 )
 
-// ValidateID returns an error if the given ID is not a valid CVE ID, GHSA ID,
+// ValidateID returns an error if the given ID is not a valid CVE ID, CGA ID, GHSA ID,
 // or Go vulnerability ID.
 func ValidateID(id string) error {
 	if !RegexCVE.MatchString(id) && !RegexCGA.MatchString(id) && !RegexGHSA.MatchString(id) && !RegexGO.MatchString(id) {
