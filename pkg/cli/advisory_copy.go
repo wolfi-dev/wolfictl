@@ -57,7 +57,7 @@ of the event to now. The command will not copy events of type "detection", "fixe
 						continue
 
 					case v2.EventTypePendingUpstreamFix, v2.EventTypeFalsePositiveDetermination, v2.EventTypeTruePositiveDetermination:
-						// Carry these over as-is, with the timestamp updated to now.
+						// Carry these over as-is.
 						evts = append(evts, evt)
 
 					default:
