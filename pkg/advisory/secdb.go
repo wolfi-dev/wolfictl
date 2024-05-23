@@ -68,18 +68,14 @@ func BuildSecurityDatabase(ctx context.Context, opts BuildSecurityDatabaseOption
 					case v2.EventTypeFixed:
 						version := latest.Data.(v2.Fixed).FixedVersion
 						secfixes[version] = append(secfixes[version], vulnID)
+						sort.Strings(secfixes[version])
 					case v2.EventTypeFalsePositiveDetermination:
 						secfixes[secdb.NAK] = append(secfixes[secdb.NAK], vulnID)
+						sort.Strings(secfixes[secdb.NAK])
 					}
 				}
 
-				// Get vulnerability from advisory ID
-
-				vulnID := advisory.ID
-				addVulnToPkgVersion(vulnID)
-
 				// Get vulnerabilities from advisory aliases
-
 				for _, alias := range advisory.Aliases {
 					vulnID := alias
 					addVulnToPkgVersion(vulnID)
