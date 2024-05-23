@@ -1362,6 +1362,9 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 		}
 		wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
 
+		// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
+		wc.ChunkSize = 0
+
 		if _, err := io.Copy(wc, f); err != nil {
 			return fmt.Errorf("uploading %s: %w", obj, err)
 		}
@@ -1392,6 +1395,9 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 	}
 
 	wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
+
+	// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
+	wc.ChunkSize = 0
 
 	if _, err := io.Copy(wc, f); err != nil {
 		return fmt.Errorf("uploading %s: %w", obj, err)
