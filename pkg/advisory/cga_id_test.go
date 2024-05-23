@@ -1,20 +1,19 @@
 package advisory
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-)
 
-const regexPattern = `^CGA(-[23456789cfghjmpqrvwx]{4}){3}$`
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+)
 
 func TestGenerateCGAID(t *testing.T) {
 	existingUIDs := make(map[string]struct{})
 	numUUIDs := 10000
 
 	// Compile the regular expression once
-	regex := regexp.MustCompile(regexPattern)
+	regex := vuln.RegexCGA
 
 	for i := 0; i < numUUIDs; i++ {
 		uid, err := GenerateCGAID()
@@ -32,7 +31,7 @@ func TestGenerateCGAID(t *testing.T) {
 
 func TestGenerateCGAIDWithSeed(t *testing.T) {
 	// Compile the regular expression once
-	regex := regexp.MustCompile(regexPattern)
+	regex := vuln.RegexCGA
 
 	// Test deterministic output with a specific seed
 	seed := int64(12345)
@@ -49,7 +48,7 @@ func TestGenerateCGAIDWithSeed(t *testing.T) {
 
 func TestGenerateCGAIDFormat(t *testing.T) {
 	// Compile the regular expression once
-	regex := regexp.MustCompile(regexPattern)
+	regex := vuln.RegexCGA
 
 	// Test multiple seeds for format compliance
 	seeds := []int64{12345, 54321, 67890, 98765}
