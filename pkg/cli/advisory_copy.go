@@ -13,8 +13,9 @@ import (
 func cmdAdvisoryCopy() *cobra.Command {
 	var dir string
 	cmd := &cobra.Command{
-		Use:   "copy <source-package-name> <destination-package-name>",
-		Short: "Copy a package's advisories into a new package.",
+		Use:     "copy <source-package-name> <destination-package-name>",
+		Aliases: []string{"cp"},
+		Short:   "Copy a package's advisories into a new package.",
 		Long: `Copy a package's advisories into a new package.
 
 This command will copy most advisories for the given package into a new package.
