@@ -383,7 +383,7 @@ func (t *task) bundle(ctx context.Context) {
 				return err
 			}
 
-			if err := dep.wait(); err != nil {
+			if err := dep.wait(ctx); err != nil {
 				return err
 			}
 		}
