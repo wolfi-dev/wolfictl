@@ -39,6 +39,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/time/rate"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -54,7 +55,13 @@ func cmdBuild() *cobra.Command {
 	var jobs int
 	var traceFile string
 
-	cfg := global{}
+	cfg := global{
+		// Trying to avoid this error:
+		// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
+		// Please reduce your request rate.
+		// See https://cloud.google.com/storage/docs/gcs429.
+		writeLimiter: rate.NewLimiter(rate.Every(1*time.Second), 1),
+	}
 
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
@@ -114,6 +121,7 @@ func cmdBuild() *cobra.Command {
 					return fmt.Errorf("creating gcs client: %w", err)
 				}
 				cfg.gcs = client
+
 				return buildBundles(ctx, &cfg, cfg.bundle)
 			}
 
@@ -609,6 +617,7 @@ type global struct {
 	mu sync.Mutex
 
 	bundle        string
+	writeLimiter  *rate.Limiter
 	gcs           *storage.Client
 	stagingBucket string
 	dstBucket     string
@@ -620,6 +629,14 @@ type global struct {
 
 func (g *global) logdir(arch string) string {
 	return filepath.Join(g.outDir, arch, "buildlogs")
+}
+
+// wrapper around the writeLimiter so this is accounted for in traces
+func (g *global) wait(ctx context.Context) error {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "wait")
+	defer span.End()
+
+	return g.writeLimiter.Wait(ctx)
 }
 
 type task struct {
@@ -1360,6 +1377,10 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 		if err != nil {
 			return err
 		}
+
+		if err := t.cfg.wait(ctx); err != nil {
+			return fmt.Errorf("waiting for rate limit: %w", err)
+		}
 		wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
 
 		// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
@@ -1394,6 +1415,9 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 		obj = path.Join(dir, obj)
 	}
 
+	if err := t.cfg.wait(ctx); err != nil {
+		return fmt.Errorf("waiting for rate limit: %w", err)
+	}
 	wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
 
 	// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
