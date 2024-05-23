@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/config"
@@ -53,7 +53,6 @@ func ParseGCSFuseMount(s string) (*GCSFuseMount, error) {
 }
 
 type Entrypoint struct {
-	File          string
 	Flags         []string
 	GCSFuseMounts []*GCSFuseMount
 }
@@ -69,8 +68,13 @@ gcsfuse -o ro --implicit-dirs {{ if .OnlyDir }} --only-dir {{ .OnlyDir }} {{ end
 # TODO: Should this be in the bundle?
 melange keygen local-melange.rsa
 
-melange build {{.File}} \
+# Generate this source-dir in case it doesn't exist.
+# TODO: We shouldn't need this.
+mkdir -p $2
+
+melange build $1 \
  --gcplog \
+ --source-dir $2 \
 {{ range .Flags }} {{.}} \
 {{ end }}
 
@@ -187,7 +191,6 @@ func New(base v1.ImageIndex, entrypoints map[types.Architecture]*Entrypoint, com
 			return nil, err
 		}
 
-		// TODO: DO NOT SUBMIT. This is probably wrong.
 		entrypoint, ok := entrypoints[arch]
 		if !ok {
 			return nil, fmt.Errorf("unexpected arch %q for entrypoints: %v", arch, maps.Keys(entrypoints))
@@ -232,74 +235,13 @@ func New(base v1.ImageIndex, entrypoints map[types.Architecture]*Entrypoint, com
 	return idx, nil
 }
 
-type Bundle struct {
-	idx           v1.ImageIndex
-	Package       string
-	Version       string
-	Epoch         uint64
-	Architectures []string
-}
-
 // Yuck.
 type Graph = map[string]map[string]graph.Edge[string]
 
 type Bundles struct {
-	idx      v1.ImageIndex
-	Graph    Graph
-	Packages map[string]name.Digest
-}
-
-func (b *Bundles) Bundle(want string) (*Bundle, error) {
-	im, err := b.idx.IndexManifest()
-	if err != nil {
-		return nil, err
-	}
-
-	for i, desc := range im.Manifests[1:] { //nolint: gocritic
-		pkg, ok := desc.Annotations["dev.wolfi.bundle.package"]
-		if !ok {
-			return nil, fmt.Errorf("expected package annotation in %dth descriptor", i)
-		}
-		version, ok := desc.Annotations["dev.wolfi.bundle.version"]
-		if !ok {
-			return nil, fmt.Errorf("expected package annotation in %dth descriptor", i)
-		}
-		sepoch, ok := desc.Annotations["dev.wolfi.bundle.epoch"]
-		if !ok {
-			return nil, fmt.Errorf("expected package annotation in %dth descriptor", i)
-		}
-		epoch, err := strconv.ParseUint(sepoch, 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("parsing epoch: %w", err)
-		}
-
-		if pkg == want {
-			child, err := b.idx.ImageIndex(desc.Digest)
-			if err != nil {
-				return nil, err
-			}
-
-			cm, err := child.IndexManifest()
-			if err != nil {
-				return nil, err
-			}
-
-			archs := []string{}
-			for _, desc := range cm.Manifests { //nolint: gocritic
-				archs = append(archs, desc.Platform.Architecture)
-			}
-
-			return &Bundle{
-				idx:           child,
-				Package:       want,
-				Version:       version,
-				Epoch:         epoch,
-				Architectures: archs,
-			}, nil
-		}
-	}
-
-	return nil, fmt.Errorf("could not find package %q", want)
+	Graph   Graph
+	Tasks   []Task
+	Runtime name.Digest
 }
 
 // TODO: dependency injection
@@ -323,46 +265,65 @@ func Pull(pull string) (*Bundles, error) {
 		return nil, fmt.Errorf("no manifests in bundle index: %s", pull)
 	}
 
-	desc := im.Manifests[0]
-	img, err := idx.Image(desc.Digest)
-	if err != nil {
-		return nil, err
-	}
-	layers, err := img.Layers()
-	if err != nil {
-		return nil, err
-	}
+	bundles := &Bundles{}
+	for _, desc := range im.Manifests { //nolint:gocritic
+		switch desc.Annotations["dev.wolfi.bundle"] {
+		case "graph":
+			img, err := idx.Image(desc.Digest)
+			if err != nil {
+				return nil, err
+			}
+			layers, err := img.Layers()
+			if err != nil {
+				return nil, err
+			}
 
-	if len(layers) == 0 {
-		return nil, fmt.Errorf("no layers in first entry %s of bundle %s", desc.Digest.String(), pull)
-	}
+			if len(layers) == 0 {
+				return nil, fmt.Errorf("no graph layers in entry %s of bundle %s", desc.Digest.String(), pull)
+			}
 
-	rc, err := layers[0].Compressed()
-	if err != nil {
-		return nil, err
-	}
+			rc, err := layers[0].Compressed()
+			if err != nil {
+				return nil, err
+			}
 
-	var g Graph
-	if err := json.NewDecoder(rc).Decode(&g); err != nil {
-		return nil, err
-	}
+			var g Graph
+			if err := json.NewDecoder(rc).Decode(&g); err != nil {
+				return nil, err
+			}
 
-	pkgs := map[string]name.Digest{}
+			bundles.Graph = g
+		case "tasks":
+			img, err := idx.Image(desc.Digest)
+			if err != nil {
+				return nil, err
+			}
+			layers, err := img.Layers()
+			if err != nil {
+				return nil, err
+			}
 
-	for i, desc := range im.Manifests[1:] { //nolint: gocritic
-		pkg, ok := desc.Annotations["dev.wolfi.bundle.package"]
-		if !ok {
-			return nil, fmt.Errorf("expected package annotation in %dth descriptor", i)
+			if len(layers) == 0 {
+				return nil, fmt.Errorf("no tasks layers in entry %s of bundle %s", desc.Digest.String(), pull)
+			}
+
+			rc, err := layers[0].Compressed()
+			if err != nil {
+				return nil, err
+			}
+
+			var tasks []Task
+			if err := json.NewDecoder(rc).Decode(&tasks); err != nil {
+				return nil, err
+			}
+
+			bundles.Tasks = tasks
+		case "runtime":
+			bundles.Runtime = ref.Context().Digest(desc.Digest.String())
 		}
-
-		pkgs[pkg] = ref.Context().Digest(desc.Digest.String())
 	}
 
-	return &Bundles{
-		idx:      idx,
-		Graph:    g,
-		Packages: pkgs,
-	}, nil
+	return bundles, nil
 }
 
 // escapeRFC1123 escapes a string to be RFC1123 compliant.  We don't worry about
@@ -374,10 +335,10 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa, ns string) *corev1.Pod {
+func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev1.Pod {
 	goarch := types.ParseArchitecture(arch).String()
 
-	resources := cfg.Package.Resources
+	resources := task.Resources
 	if resources == nil {
 		resources = &config.Resources{}
 	}
@@ -423,13 +384,13 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa, n
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: fmt.Sprintf("%s-%s-", escapeRFC1123(cfg.Package.Name), goarch),
+			GenerateName: fmt.Sprintf("%s-%s-", escapeRFC1123(task.Package), goarch),
 			Namespace:    ns,
 			Labels: map[string]string{
 				"kubernetes.io/arch":             goarch,
-				"app.kubernetes.io/component":    cfg.Package.Name,
+				"app.kubernetes.io/component":    task.Package,
 				"melange.chainguard.dev/arch":    goarch,
-				"melange.chainguard.dev/package": cfg.Package.Name,
+				"melange.chainguard.dev/package": task.Package,
 			},
 			Annotations: map[string]string{},
 		},
@@ -442,6 +403,7 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa, n
 				// TODO: Do we need this??
 				// ldconfig is run to prime ld.so.cache for glibc packages which require it.
 				// Command:      []string{"/bin/sh", "-c", "[ -x /sbin/ldconfig ] && /sbin/ldconfig /lib || true\nsleep infinity"},
+				Args:      []string{task.Path, task.SourceDir},
 				Resources: rr,
 				VolumeMounts: []corev1.VolumeMount{
 					{
@@ -498,13 +460,6 @@ func Podspec(cfg *config.Configuration, ref name.Reference, arch, mFamily, sa, n
 		}
 	}
 
-	for k, v := range cfg.Environment.Environment {
-		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
-			Name:  k,
-			Value: v,
-		})
-	}
-
 	return pod
 }
 
@@ -544,4 +499,16 @@ func tarAddFS(tw *tar.Writer, fsys fs.FS) error {
 		_, err = io.Copy(tw, f)
 		return err
 	})
+}
+
+type Task struct {
+	Package        string            `json:"package"`
+	Version        string            `json:"version"`
+	Epoch          uint64            `json:"epoch"`
+	Path           string            `json:"path,omitempty"`
+	SourceDir      string            `json:"sourceDir,omitempty"`
+	Architectures  []string          `json:"architectures,omitempty"`
+	Subpackages    []string          `json:"subpackages,omitempty"`
+	Resources      *config.Resources `json:"resources,omitempty"`
+	BuildDateEpoch time.Time         `json:"buildDateEpoch,omitempty"`
 }
