@@ -32,7 +32,6 @@ import (
 	charmlog "github.com/charmbracelet/log"
 	"github.com/dominikbraun/graph"
 	"github.com/google/go-containerregistry/pkg/name"
-	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -252,28 +251,11 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 		return err
 	}
 
-	var stuff *configStuff
-	eg.Go(func() error {
-		var err error
-		stuff, err = walkConfigs(ctx, cfg)
-		return err
-	})
-
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
 	for _, arch := range cfg.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
-
-		eg.Go(func() error {
-			// Logs will go here to mimic the wolfi Makefile.
-			archDir := cfg.logdir(arch)
-			if err := os.MkdirAll(archDir, os.ModePerm); err != nil {
-				return fmt.Errorf("creating buildlogs directory: %w", err)
-			}
-
-			return nil
-		})
 
 		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
 		eg.Go(func() error {
@@ -332,27 +314,13 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 		return err
 	}
 
-	newTask := func(pkg string, ref name.Digest) *task {
-		// TODO: We shouldn't need this since it would be included in the bundle.
-		loadedCfg := stuff.pkgs.Config(pkg, true)
-		if len(loadedCfg) == 0 {
-			panic(fmt.Sprintf("package does not seem to exist: %s", pkg))
-		}
-		c := loadedCfg[0]
-		if pkg != c.Package.Name {
-			panic(fmt.Sprintf("mismatched package, got %q, want %q", c.Package.Name, pkg))
-		}
-
-		bundle, err := bundles.Bundle(pkg)
-		if err != nil {
-			panic(fmt.Errorf("fetching bundle %s: %w", pkg, err))
-		}
+	newTask := func(pkg string, bundle bundle.Task, ref name.Digest) *task {
 		return &task{
 			cfg:    cfg,
 			pkg:    pkg,
 			ver:    bundle.Version,
 			epoch:  bundle.Epoch,
-			config: c,
+			bundle: &bundle,
 			ref:    &ref,
 			archs:  filterArchs(cfg.archs, bundle.Architectures),
 			cond:   sync.NewCond(&sync.Mutex{}),
@@ -361,8 +329,8 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 	}
 
 	tasks := map[string]*task{}
-	for pkg, ref := range bundles.Packages {
-		tasks[pkg] = newTask(pkg, ref)
+	for _, btask := range bundles.Tasks { //nolint:gocritic
+		tasks[btask.Package] = newTask(btask.Package, btask, bundles.Runtime)
 	}
 
 	for k, v := range bundles.Graph {
@@ -647,7 +615,8 @@ type task struct {
 	epoch  uint64
 	config *dag.Configuration
 
-	archs []string
+	bundle *bundle.Task
+	archs  []string
 
 	err  error
 	deps map[string]*task
@@ -658,24 +627,23 @@ type task struct {
 	skipped bool
 
 	// TODO: This is a hack, refactor the task execution out from the graph walking.
-	ref     *name.Digest
-	bundled v1.ImageIndex
-	bcfg    *bundleConfig
+	ref  *name.Digest
+	bcfg *bundleConfig
 }
 
-func (t *task) gitSDE(ctx context.Context) (string, error) {
+func (t *task) gitSDE(ctx context.Context) (time.Time, error) {
 	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%ct", "--follow", t.config.Path) // #nosec G204
 	b, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return time.Time{}, err
 	}
 
 	sde, err := strconv.ParseInt(strings.TrimSpace(string(b)), 10, 64)
 	if err != nil {
-		return "", err
+		return time.Time{}, err
 	}
 
-	return time.Unix(sde, 0).Format(time.RFC3339), nil
+	return time.Unix(sde, 0), nil
 }
 
 func (t *task) start(ctx context.Context) {
@@ -792,7 +760,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 		build.WithCacheSource(t.cfg.cacheSource),
 		build.WithCacheDir(t.cfg.cacheDir),
 		build.WithOutDir(t.cfg.outDir),
-		build.WithBuildDate(sde),
+		build.WithBuildDate(sde.Format(time.RFC3339)),
 		build.WithRemove(true),
 	)
 	if err != nil {
@@ -851,7 +819,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	log := clog.FromContext(ctx)
 
-	pod := bundle.Podspec(t.config.Configuration, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount, t.cfg.k8sNamespace)
+	pod := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount, t.cfg.k8sNamespace)
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
@@ -1181,8 +1149,7 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 		return err
 	}
 
-	cfg := t.config.Configuration
-	apkFiles := make([]string, 0, len(cfg.Subpackages)+1)
+	apkFiles := make([]string, 0, len(t.bundle.Subpackages)+1)
 
 	apkFile := t.pkgver() + ".apk"
 	apkPath := filepath.Join(packageDir, apkFile)
@@ -1193,11 +1160,8 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 			return fmt.Errorf("fetching bundle output: %w", err)
 		}
 
-		for i := range cfg.Subpackages {
-			// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
-			subName := cfg.Subpackages[i].Name
-
-			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
+		for _, subName := range t.bundle.Subpackages {
+			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, t.ver, t.epoch)
 			subpkgFileName := filepath.Join(packageDir, subpkgApk)
 			if _, err := os.Stat(subpkgFileName); err != nil {
 				log.Warnf("Skipping subpackage %s (was not built): %v", subpkgFileName, err)
@@ -1226,11 +1190,8 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 			return err
 		}
 	} else {
-		for i := range cfg.Subpackages {
-			// gocritic complains about copying if you do the normal thing because Subpackages is not a slice of pointers.
-			subName := cfg.Subpackages[i].Name
-
-			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, cfg.Package.Version, cfg.Package.Epoch)
+		for _, subName := range t.bundle.Subpackages {
+			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, t.ver, t.epoch)
 			subpkgFileName := filepath.Join(packageDir, subpkgApk)
 
 			if err := t.downloadAPK(ctx, arch, packageDir, subpkgApk); err != nil {
