@@ -46,7 +46,7 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 		Depth:             1,
 	}
 
-	log.Printf("cloning sources from %s tag %s into a temporary directory '%s', this may take a while", repoValue, dir, evaluatedTag)
+	log.Printf("cloning sources from %s tag %s into a temporary directory '%s', this may take a while", repoValue, evaluatedTag, dir)
 
 	maxRetries := 3
 	r := &git.Repository{}
