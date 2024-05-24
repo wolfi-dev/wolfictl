@@ -111,7 +111,7 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 	// moving things around. Skip doing go/bump clean ups, instead
 	// of erroring out creating an update.
 	if errors.Is(err, fs.ErrNotExist) {
-		log.Printf("Failed to locate go.mod, go/bump cleanups skipped")
+		log.Printf("failed to locate go.mod, go/bump cleanups skipped")
 		return nil
 	}
 	if err != nil {
