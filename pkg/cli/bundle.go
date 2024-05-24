@@ -265,24 +265,19 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	// Second is all the metadata.
 	bundleTasks := make([]bundle.Task, 0, len(built))
 	for pkg, t := range built {
-		sde, err := t.gitSDE(ctx)
-		if err != nil {
-			return fmt.Errorf("getting source date epoch for %s: %w", t.pkg, err)
-		}
 		subpkgs := make([]string, 0, len(t.config.Subpackages))
 		for _, sp := range t.config.Subpackages { //nolint:gocritic
 			subpkgs = append(subpkgs, sp.Name)
 		}
 		bundleTasks = append(bundleTasks, bundle.Task{
-			Package:        pkg,
-			Version:        t.config.Package.Version,
-			Epoch:          t.config.Package.Epoch,
-			Path:           t.config.Path,
-			SourceDir:      filepath.Join(t.cfg.dir, t.pkg),
-			Architectures:  t.archs,
-			Subpackages:    subpkgs,
-			Resources:      t.config.Package.Resources,
-			BuildDateEpoch: sde,
+			Package:       pkg,
+			Version:       t.config.Package.Version,
+			Epoch:         t.config.Package.Epoch,
+			Path:          t.config.Path,
+			SourceDir:     filepath.Join(t.cfg.dir, t.pkg),
+			Architectures: t.archs,
+			Subpackages:   subpkgs,
+			Resources:     t.config.Package.Resources,
 		})
 	}
 
