@@ -1,7 +1,9 @@
 package deps
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"os/exec"
@@ -104,6 +106,14 @@ func cleanupGoBumpPipelineDeps(p *config.Pipeline, tempDir string, tidy bool) er
 	// Read the entire go.mod one more time into memory and check that all the version constraints are met.
 	modpath := path.Join(tempDir, modroot, "go.mod")
 	modFile, err := parseGoModfile(modpath)
+	// Likely package does odd things to create go.mod, for
+	// example by doing git reset, custom git clone, patching,
+	// moving things around. Skip doing go/bump clean ups, instead
+	// of erroring out creating an update.
+	if errors.Is(err, fs.ErrNotExist) {
+		log.Printf("Failed to locate go.mod, go/bump cleanups skipped")
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("unable to parse the go mod file with error: %v", err)
 	}
