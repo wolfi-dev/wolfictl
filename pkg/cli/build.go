@@ -257,6 +257,10 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 	for _, arch := range cfg.archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
+		if err := os.MkdirAll(filepath.Join(cfg.outDir, arch), os.ModePerm); err != nil {
+			return fmt.Errorf("creating arch directory: %w", err)
+		}
+
 		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
 		eg.Go(func() error {
 			exist, err := fetchIndex(ctx, cfg.dst, arch)
