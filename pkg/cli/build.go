@@ -39,6 +39,7 @@ import (
 	"golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/time/rate"
+	"google.golang.org/api/option"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -115,7 +116,7 @@ func cmdBuild() *cobra.Command {
 					return fmt.Errorf("need --bucket with --bundle")
 				}
 
-				client, err := storage.NewClient(ctx)
+				client, err := storage.NewClient(ctx, option.WithTelemetryDisabled())
 				if err != nil {
 					return fmt.Errorf("creating gcs client: %w", err)
 				}
@@ -651,6 +652,9 @@ func (t *task) gitSDE(ctx context.Context) (time.Time, error) {
 }
 
 func (t *task) start(ctx context.Context) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "start "+t.pkg)
+	defer span.End()
+
 	defer func() {
 		// When we finish, wake up any goroutines that are waiting on us.
 		t.cond.L.Lock()
@@ -1021,7 +1025,7 @@ type bundleResult struct {
 }
 
 func (t *task) buildBundle(ctx context.Context) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, t.pkg)
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "build "+t.pkg)
 	defer span.End()
 
 	log := clog.FromContext(ctx)
