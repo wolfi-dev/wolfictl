@@ -11,7 +11,7 @@ require (
 	github.com/anchore/stereoscope v0.0.3-0.20240501181043-2e9894674185
 	github.com/anchore/syft v1.4.1
 	github.com/chainguard-dev/clog v1.3.1
-	github.com/chainguard-dev/go-apk v0.0.0-20240514202343-05db79c0242f
+	github.com/chainguard-dev/go-apk v0.0.0-20240525220135-173ab6801f2d
 	github.com/chainguard-dev/yam v0.0.7
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.3
