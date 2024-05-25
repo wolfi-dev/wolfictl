@@ -853,6 +853,8 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		return nil, fmt.Errorf("creating pod: %w", err)
 	}
 
+	lastPhase := corev1.PodUnknown
+
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
 	defer cancel()
 	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
@@ -860,6 +862,13 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		if err != nil {
 			return false, err
 		}
+
+		// Only log when stuff actually changes.
+		if pod.Status.Phase != lastPhase {
+			log.Infof("pod %s phase changed: %s -> %s", pod.ObjectMeta.Name, lastPhase, pod.Status.Phase)
+		}
+		lastPhase = pod.Status.Phase
+
 		switch pod.Status.Phase {
 		case corev1.PodSucceeded:
 			if pod.Status.ContainerStatuses[0].State.Terminated == nil {
@@ -867,7 +876,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 			}
 			return true, nil
 		case corev1.PodFailed:
-			return false, fmt.Errorf("pod failed")
+			return false, fmt.Errorf("pod failed: %s", pod.Status.Message)
 		}
 		return false, nil
 	})); err != nil {
@@ -1084,6 +1093,8 @@ func (t *task) buildBundle(ctx context.Context) error {
 		return err
 	}
 
+	log.Infof("Pods finished: %s", t.pkg)
+
 	if t.cfg.dryrun {
 		return nil
 	}
@@ -1094,6 +1105,8 @@ func (t *task) buildBundle(ctx context.Context) error {
 
 	t.cfg.mu.Lock()
 	defer t.cfg.mu.Unlock()
+
+	log.Infof("Processing results: %s", t.pkg)
 
 	var indexGroup errgroup.Group
 	for arch, need := range needsIndex {
@@ -1115,6 +1128,8 @@ func (t *task) buildBundle(ctx context.Context) error {
 		clog.FromContext(ctx).Warnf("Skipping uploading indexes because --destination-bucket is not set")
 		return nil
 	}
+
+	log.Infof("Uploading APKINDEX: %s", t.pkg)
 
 	// We do this after indexGroup because we only want to upload them if all archs succeeded.
 	var uploadGroup errgroup.Group
@@ -1216,8 +1231,6 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 		apkFiles = append(apkFiles, apkPath)
 	}
 
-	log.Infof("re-generating APKINDEX for main package %s (%d packages)", t.pkg, len(apkFiles))
-
 	opts := []index.Option{
 		index.WithPackageFiles(apkFiles),
 		index.WithSigningKey(t.cfg.signingKey),
@@ -1230,7 +1243,11 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 		return fmt.Errorf("unable to create index: %w", err)
 	}
 
-	if err := idx.GenerateIndex(ctx); err != nil {
+	// GenerateIndex is a little too chatty for my liking, so only log warnings and up.
+	quiet := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
+	qctx := clog.WithLogger(ctx, quiet)
+
+	if err := idx.GenerateIndex(qctx); err != nil {
 		return fmt.Errorf("unable to generate index: %w", err)
 	}
 
