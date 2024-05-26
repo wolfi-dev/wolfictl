@@ -50,6 +50,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/texttheater/golang-levenshtein/levenshtein v0.0.0-20200805054039-cae8b0eaed6c
 	github.com/tmc/dot v0.0.0-20210901225022-f9bc17da75c0
+	github.com/xanzy/go-gitlab v0.105.0
 	go.lsp.dev/uri v0.3.0
 	go.opentelemetry.io/otel v1.27.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.27.0
