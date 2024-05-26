@@ -38,6 +38,7 @@ func SetupUpdate(ctx context.Context) (*update.Options, lint.EvalRuleErrors) {
 	o := update.New(ctx)
 	o.GithubReleaseQuery = true
 	o.ReleaseMonitoringQuery = true
+	o.GitlabReleaseQuery = true
 	o.ErrorMessages = make(map[string]string)
 	o.Logger = log.New(log.Writer(), "wolfictl check update: ", log.LstdFlags|log.Lmsgprefix)
 	checkErrors := make(lint.EvalRuleErrors, 0)
@@ -121,8 +122,8 @@ func validateUpdateConfig(ctx context.Context, files []string, checkErrors *lint
 
 		// ensure a backend has been configured
 		if c.Update.Enabled {
-			if c.Update.ReleaseMonitor == nil && c.Update.GitHubMonitor == nil {
-				addCheckError(checkErrors, fmt.Errorf("config %s has update config enabled but no release-monitor or github backend monitor configured, see examples in this repository", file))
+			if c.Update.ReleaseMonitor == nil && c.Update.GitHubMonitor == nil && c.Update.GitLabMonitor == nil {
+				addCheckError(checkErrors, fmt.Errorf("config %s has update config enabled but no release-monitor , github backend monitor or gitlab api monitor configured, see examples in this repository", file))
 				continue
 			}
 		}

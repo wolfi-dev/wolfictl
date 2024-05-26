@@ -45,6 +45,7 @@ type Options struct {
 	DryRun                 bool
 	ReleaseMonitoringQuery bool
 	GithubReleaseQuery     bool
+	GitlabReleaseQuery     bool
 	UseGitSign             bool
 	CreateIssues           bool
 	ReleaseMonitorClient   *http2.RLHTTPClient
@@ -243,6 +244,19 @@ func (o *Options) GetLatestVersions(ctx context.Context, dir string, packageName
 		v, errorMessages, err := g.getLatestGitHubVersions()
 		if err != nil {
 			return latestVersions, fmt.Errorf("failed getting github releases: %w", err)
+		}
+		fmt.Println("v", v)
+		maps.Copy(o.ErrorMessages, errorMessages)
+		maps.Copy(latestVersions, v)
+	}
+
+	if o.GithubReleaseQuery {
+		// get latest versions from gitlab(using the same client for now)
+		glo := NewGitlabReleaseOptions(o.PackageConfigs)
+
+		v, errorMessages, err := glo.getLatestGitLabVersions()
+		if err != nil {
+			return nil, fmt.Errorf("failed gitlab releases: %w", err)
 		}
 		maps.Copy(o.ErrorMessages, errorMessages)
 		maps.Copy(latestVersions, v)
