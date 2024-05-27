@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -347,6 +348,14 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev
 	// This is required for GKE Autopilot.
 	if resources.CPU == "" {
 		resources.CPU = "2"
+	}
+	// Arm machines max out at 48 cores, if a CPU value of greater than 44 is given,
+	// set it to 44 to avoid pod being unschedulable.
+	if resources.CPU != "" && goarch == "arm64" {
+		cpu, err := strconv.ParseFloat(resources.CPU, 64)
+		if err == nil && cpu > 44 {
+			resources.CPU = "44"
+		}
 	}
 	if resources.Memory == "" {
 		resources.Memory = "4Gi"
