@@ -359,10 +359,15 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev
 		if err == nil {
 			// Set to MaxArmCore if greater than MaxArmCore
 			if goarch == "arm64" && cpu > MaxArmCore {
-				cpu = MaxArmcore
+				cpu = MaxArmCore
 			}
-			// Reduce cpu by 1% for better bin packing of pods on nodes
-			cpu = cpu * 0.99
+			// Reduce cpu by 2% for better bin packing of pods on nodes
+			// Example:
+			//   64 core machines has 63.77 core available
+			//   48 core machines has 47.81 core available
+			//   32 core machines has 31.85 core available
+			//   16 core machines has 15.89 core available
+			cpu = cpu * 0.98
 
 			resources.CPU = fmt.Sprintf("%f", cpu)
 		}
