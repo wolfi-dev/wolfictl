@@ -1359,25 +1359,35 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 			obj = path.Join(dir, obj)
 		}
 
-		f, err := os.Open(apkFile)
-		if err != nil {
-			return err
+		try := func() error {
+			f, err := os.Open(apkFile)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+
+			wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
+
+			// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
+			wc.ChunkSize = 0
+
+			if _, err := io.Copy(wc, f); err != nil {
+				return fmt.Errorf("uploading %s: %w", obj, err)
+			}
+
+			if err := wc.Close(); err != nil {
+				return fmt.Errorf("finalizing uploading of %s: %w", obj, err)
+			}
+
+			return nil
 		}
 
-		if err := t.cfg.wait(ctx); err != nil {
-			return fmt.Errorf("waiting for rate limit: %w", err)
-		}
-		wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
-
-		// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
-		wc.ChunkSize = 0
-
-		if _, err := io.Copy(wc, f); err != nil {
-			return fmt.Errorf("uploading %s: %w", obj, err)
-		}
-
-		if err := wc.Close(); err != nil {
-			return fmt.Errorf("finalizing uploading of %s: %w", obj, err)
+		// Retry failures once. If this isn't robust, consider exponential backoff.
+		if err := try(); storage.ShouldRetry(err) {
+			time.Sleep(2 * time.Second)
+			if err2 := try(); err != nil {
+				return fmt.Errorf("original: %w, retried: %w", err, err2)
+			}
 		}
 	}
 
