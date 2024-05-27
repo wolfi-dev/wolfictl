@@ -1107,10 +1107,45 @@ func (t *task) buildBundle(ctx context.Context) error {
 		return nil
 	}
 
+	log.Infof("Processing results: %s", t.pkg)
+
+	tmpdir, err := os.MkdirTemp("", "")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpdir)
+
+	var filemu sync.Mutex
+	filesByArch := map[string][]string{}
+
+	var pkgGroup errgroup.Group
+	for arch, need := range needsIndex {
+		if !need {
+			continue
+		}
+
+		arch := types.ParseArchitecture(arch).ToAPK()
+		pkgGroup.Go(func() error {
+			files, err := t.uploadBundle(ctx, arch, results, tmpdir)
+			if err != nil {
+				return err
+			}
+
+			filemu.Lock()
+			defer filemu.Unlock()
+
+			filesByArch[arch] = files
+
+			return nil
+		})
+	}
+
+	if err := pkgGroup.Wait(); err != nil {
+		return fmt.Errorf("uploading bundles: %w", err)
+	}
+
 	t.cfg.mu.Lock()
 	defer t.cfg.mu.Unlock()
-
-	log.Infof("Processing results: %s", t.pkg)
 
 	var indexGroup errgroup.Group
 	for arch, need := range needsIndex {
@@ -1120,7 +1155,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 
 		arch := types.ParseArchitecture(arch).ToAPK()
 		indexGroup.Go(func() error {
-			return t.indexBundle(ctx, arch, results)
+			return t.indexBundle(ctx, arch, filesByArch[arch])
 		})
 	}
 
@@ -1143,7 +1178,6 @@ func (t *task) buildBundle(ctx context.Context) error {
 		}
 
 		arch := types.ParseArchitecture(arch).ToAPK()
-
 		uploadGroup.Go(func() error {
 			return t.uploadIndex(ctx, arch)
 		})
@@ -1156,20 +1190,15 @@ func (t *task) buildBundle(ctx context.Context) error {
 	return nil
 }
 
-func (t *task) indexBundle(ctx context.Context, arch string, results map[string]*bundleResult) error {
+func (t *task) uploadBundle(ctx context.Context, arch string, results map[string]*bundleResult, tmpdir string) ([]string, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "indexBundle")
 	defer span.End()
 
 	log := clog.FromContext(ctx)
-	tmpdir, err := os.MkdirTemp("", "")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tmpdir)
 
 	packageDir := filepath.Join(tmpdir, arch)
 	if err := os.MkdirAll(packageDir, os.ModePerm); err != nil {
-		return err
+		return nil, err
 	}
 
 	apkFiles := make([]string, 0, len(t.bundle.Subpackages)+1)
@@ -1180,7 +1209,7 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 	res, ok := results[arch]
 	if ok {
 		if err := t.fetchResult(ctx, res, tmpdir); err != nil {
-			return fmt.Errorf("fetching bundle output: %w", err)
+			return nil, fmt.Errorf("fetching bundle output: %w", err)
 		}
 
 		for _, subName := range t.bundle.Subpackages {
@@ -1193,7 +1222,7 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 
 			log.Debugf("re-signing %s", subpkgApk)
 			if err := sign.APK(ctx, subpkgFileName, t.cfg.signingKey); err != nil {
-				return fmt.Errorf("signing %s: %w", subpkgApk, err)
+				return nil, fmt.Errorf("signing %s: %w", subpkgApk, err)
 			}
 
 			apkFiles = append(apkFiles, subpkgFileName)
@@ -1204,13 +1233,13 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 		// It's important that we upload it last so that we know all the other APKs were also uploaded.
 		log.Debugf("re-signing %s", apkFile)
 		if err := sign.APK(ctx, apkPath, t.cfg.signingKey); err != nil {
-			return fmt.Errorf("signing %s: %w", apkFile, err)
+			return nil, fmt.Errorf("signing %s: %w", apkFile, err)
 		}
 
 		apkFiles = append(apkFiles, apkPath)
 
 		if err := t.uploadAPKs(ctx, arch, apkFiles); err != nil {
-			return err
+			return nil, err
 		}
 	} else {
 		for _, subName := range t.bundle.Subpackages {
@@ -1222,19 +1251,23 @@ func (t *task) indexBundle(ctx context.Context, arch string, results map[string]
 					log.Warnf("Skipping subpackage %s (was not built): %v", subpkgApk, err)
 					continue
 				}
-				return err
+				return nil, err
 			}
 
 			apkFiles = append(apkFiles, subpkgFileName)
 		}
 
 		if err := t.downloadAPK(ctx, arch, packageDir, apkFile); err != nil {
-			return err
+			return nil, err
 		}
 
 		apkFiles = append(apkFiles, apkPath)
 	}
 
+	return apkFiles, nil
+}
+
+func (t *task) indexBundle(ctx context.Context, arch string, apkFiles []string) error {
 	opts := []index.Option{
 		index.WithPackageFiles(apkFiles),
 		index.WithSigningKey(t.cfg.signingKey),
