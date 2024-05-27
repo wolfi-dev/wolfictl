@@ -367,7 +367,7 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev
 			//   48 core machines has 47.81 core available
 			//   32 core machines has 31.85 core available
 			//   16 core machines has 15.89 core available
-			cpu = cpu * 0.98
+			cpu *= 0.98
 
 			resources.CPU = fmt.Sprintf("%f", cpu)
 		}
