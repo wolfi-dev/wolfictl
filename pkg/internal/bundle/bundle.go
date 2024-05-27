@@ -32,6 +32,8 @@ import (
 	"knative.dev/pkg/ptr"
 )
 
+const MaxArmCore = 48
+
 type GCSFuseMount struct {
 	Bucket  string
 	Mount   string
@@ -349,12 +351,25 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev
 	if resources.CPU == "" {
 		resources.CPU = "2"
 	}
-	// Arm machines max out at 48 cores, if a CPU value of greater than 44 is given,
-	// set it to 44 to avoid pod being unschedulable.
-	if resources.CPU != "" && goarch == "arm64" {
+	// Arm machines max out at 48 cores, if a CPU value of greater than 48 is given,
+	// set it to 48 to avoid pod being unschedulable.
+	if resources.CPU != "" {
 		cpu, err := strconv.ParseFloat(resources.CPU, 64)
-		if err == nil && cpu > 44 {
-			resources.CPU = "44"
+
+		if err == nil {
+			// Set to MaxArmCore if greater than MaxArmCore
+			if goarch == "arm64" && cpu > MaxArmCore {
+				cpu = MaxArmCore
+			}
+			// Reduce cpu by 2% for better bin packing of pods on nodes
+			// Example:
+			//   64 core machines has 63.77 core available
+			//   48 core machines has 47.81 core available
+			//   32 core machines has 31.85 core available
+			//   16 core machines has 15.89 core available
+			cpu *= 0.98
+
+			resources.CPU = fmt.Sprintf("%f", cpu)
 		}
 	}
 	if resources.Memory == "" {
