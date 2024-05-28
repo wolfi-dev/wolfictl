@@ -1418,7 +1418,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 		// Retry failures once. If this isn't robust, consider exponential backoff.
 		if err := try(); storage.ShouldRetry(err) {
 			time.Sleep(2 * time.Second)
-			if err2 := try(); err != nil {
+			if err2 := try(); err2 != nil {
 				return fmt.Errorf("original: %w, retried: %w", err, err2)
 			}
 		}
