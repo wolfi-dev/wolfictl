@@ -1399,7 +1399,12 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 			}
 			defer f.Close()
 
-			wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
+			// The gcs client will only retry wc.Close() errors if the upload is idempotent.
+			// Using this DoesNotExist condition causes the upload to be idempotent.
+			// This is fine because these objects should only ever be written once.
+			cond := storage.Conditions{DoesNotExist: true}
+
+			wc := t.cfg.gcs.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
 
 			// We are attempting to avoid 429s from GCS, remove this line if it doesn't help.
 			wc.ChunkSize = 0
