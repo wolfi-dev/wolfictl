@@ -36,7 +36,6 @@ func (o *Options) DiscoverRubyPackages(ctx context.Context) ([]Package, error) {
 		if o.isRubyPackage(pkg.Config) {
 			gitURL, err := wgit.ParseGitURL(parseRepo(pkg))
 			if err != nil {
-				// fmt.Printf("
 				continue
 			}
 			rubyFiles = append(rubyFiles, Package{

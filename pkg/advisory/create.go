@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -32,12 +33,17 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		return createAdvisoryConfig(ctx, opts.AdvisoryDocs, req)
 
 	case 1:
-		newAdvisoryID := req.VulnerabilityID
-
 		// i.e. exactly one advisories file for this package
 		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
-			if _, exists := doc.Advisories.Get(newAdvisoryID); exists {
-				return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", newAdvisoryID, req.Package)
+			for _, alias := range req.Aliases {
+				if _, exists := doc.Advisories.GetByVulnerability(alias); exists {
+					return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", alias, req.Package)
+				}
+			}
+
+			newAdvisoryID, err := GenerateCGAID()
+			if err != nil {
+				return v2.Advisories{}, fmt.Errorf("generating CGA ID: %w", err)
 			}
 
 			advisories := doc.Advisories
@@ -55,7 +61,13 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		})
 		err := documents.Update(ctx, u)
 		if err != nil {
-			return fmt.Errorf("unable to create advisory %q for %q: %w", newAdvisoryID, req.Package, err)
+			var showIDs string
+			if len(req.Aliases) == 1 {
+				showIDs = req.Aliases[0]
+			} else {
+				showIDs = strings.Join(req.Aliases, ", ")
+			}
+			return fmt.Errorf("unable to create advisory %q for %q: %w", showIDs, req.Package, err)
 		}
 
 		// Update the schema version to the latest version.
@@ -71,14 +83,18 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 }
 
 func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Document], req Request) error {
-	newAdvisoryID := req.VulnerabilityID
+	newAdvisoryID, err := GenerateCGAID()
+	if err != nil {
+		return fmt.Errorf("generating CGA ID: %w", err)
+	}
+
 	newAdvisory := v2.Advisory{
 		ID:      newAdvisoryID,
 		Aliases: req.Aliases,
 		Events:  []v2.Event{req.Event},
 	}
 
-	err := documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
+	err = documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
 		SchemaVersion: v2.SchemaVersion,
 		Package: v2.Package{
 			Name: req.Package,

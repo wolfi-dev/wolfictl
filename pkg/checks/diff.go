@@ -299,5 +299,5 @@ func writeDiffLog(diff diffResult, bcz []byte, filename string, newPackages map[
 
 	content := builder.String()
 
-	return os.WriteFile(filename, []byte(content), os.ModePerm)
+	return os.WriteFile(filename, []byte(content), 0o644)
 }

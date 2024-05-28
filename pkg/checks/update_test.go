@@ -146,7 +146,7 @@ func TestUpdateKeyExists(t *testing.T) {
 	// create a temporary file with an update key
 	yamlData := []byte("package:\n  name: cheese\n  version: 1\nupdate:\n  manual: true\n")
 	fileContainsUpdate := filepath.Join(dir, "contains.yaml")
-	err := os.WriteFile(fileContainsUpdate, yamlData, os.ModePerm)
+	err := os.WriteFile(fileContainsUpdate, yamlData, os.ModePerm) //nolint: gosec
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,7 +163,7 @@ func TestUpdateKeyExists(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = os.WriteFile(fileNoContainsUpdate, yamlData, os.ModePerm)
+	err = os.WriteFile(fileNoContainsUpdate, yamlData, os.ModePerm) //nolint: gosec
 	if err != nil {
 		t.Fatal(err)
 	}

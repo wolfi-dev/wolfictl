@@ -186,11 +186,12 @@ func (adv Advisory) validateEvents() error {
 
 func validateAliasFormat(alias string) error {
 	switch {
-	case vuln.RegexGHSA.MatchString(alias),
+	case vuln.RegexCVE.MatchString(alias),
+		vuln.RegexGHSA.MatchString(alias),
 		vuln.RegexGO.MatchString(alias):
 		return nil
 	default:
-		return fmt.Errorf("%q is not a valid GHSA ID or Go vuln ID", alias)
+		return fmt.Errorf("%q is not a valid CVE ID, GHSA ID or Go vuln ID", alias)
 	}
 }
 

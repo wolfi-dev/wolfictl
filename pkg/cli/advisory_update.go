@@ -112,8 +112,8 @@ required fields are missing.`,
 				allowedVulnerabilities := func(packageName string) []string {
 					var vulnerabilities []string
 					for _, cfg := range advisoryCfgs.Select().WhereName(packageName).Configurations() {
-						vulns := lo.Map(cfg.Advisories, func(adv v2.Advisory, _ int) string {
-							return adv.ID
+						vulns := lo.FlatMap(cfg.Advisories, func(adv v2.Advisory, _ int) []string {
+							return adv.Aliases
 						})
 						sort.Strings(vulns)
 						vulnerabilities = append(vulnerabilities, vulns...)

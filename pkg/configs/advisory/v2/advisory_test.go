@@ -124,11 +124,12 @@ func TestAdvisory_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "CVE in alias instead of advisory ID",
+			name: "CGA ID in alias instead of advisory CVE/GHSA ID",
 			adv: Advisory{
-				ID: "GHSA-5j9q-4xjw-3j3q",
+				ID: "CGA-3j9q-4fjf-3jsq",
 				Aliases: []string{
 					"CVE-2020-0001",
+					"GHSA-5j9q-4xjw-3j3q",
 				},
 				Events: []Event{
 					{

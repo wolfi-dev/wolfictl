@@ -69,7 +69,7 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 		ID:     fieldIDVulnerability,
 		Prompt: "Vulnerability: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.VulnerabilityID = value
+			req.Aliases = append(req.Aliases, value)
 			return req
 		},
 		EmptyValueHelpMsg: "Provide a valid vulnerability ID.",
@@ -284,7 +284,7 @@ func (m Model) addMissingFields() (Model, bool) {
 		return m, true
 	}
 
-	if m.Request.VulnerabilityID == "" {
+	if len(m.Request.Aliases) == 0 {
 		f := field.NewTextField(m.newVulnerabilityFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true

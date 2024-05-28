@@ -7,6 +7,7 @@ import (
 	"slices"
 
 	"github.com/samber/lo"
+
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
@@ -25,8 +26,8 @@ func (req Request) Validate() error {
 		return errors.New("package cannot be empty")
 	}
 
-	if err := vuln.ValidateID(req.VulnerabilityID); err != nil {
-		return err
+	if len(req.Aliases) == 0 {
+		return errors.New("aliases should have at least one vulnerability ID")
 	}
 
 	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
@@ -35,8 +36,8 @@ func (req Request) Validate() error {
 		return err
 	}
 
-	if req.VulnerabilityID == "" {
-		return errors.New("vulnerability cannot be empty")
+	if req.VulnerabilityID != "" {
+		return errors.New("vulnerability should be empty")
 	}
 
 	if req.Event.IsZero() {

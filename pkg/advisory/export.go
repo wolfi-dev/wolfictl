@@ -258,7 +258,7 @@ func ExportOSV(opts ExportOptions, output string) error {
 		}
 
 		filepath := path.Join(output, fmt.Sprintf("%s-%s.json", strings.ToUpper(string(opts.Ecosystem)), k))
-		err = os.WriteFile(filepath, e, 0o644) //nolint: gosec
+		err = os.WriteFile(filepath, e, 0o644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -270,7 +270,7 @@ func ExportOSV(opts ExportOptions, output string) error {
 	}
 
 	filepath := path.Join(output, "all.json")
-	err = os.WriteFile(filepath, allData, 0o644) //nolint: gosec
+	err = os.WriteFile(filepath, allData, 0o644)
 	if err != nil {
 		log.Fatal(err)
 	}

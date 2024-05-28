@@ -23,7 +23,7 @@ func TestChecks_ParsePackages(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, data)
 
-	err = os.WriteFile(filepath.Join(dir, "bind.yaml"), melangeData, os.ModePerm)
+	err = os.WriteFile(filepath.Join(dir, "bind.yaml"), melangeData, os.ModePerm) //nolint: gosec
 	assert.NoError(t, err)
 
 	packages, err := getNewPackages(filepath.Join("testdata", "packages.log"))

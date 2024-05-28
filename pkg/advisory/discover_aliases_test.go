@@ -27,8 +27,8 @@ func TestDiscoverAliases(t *testing.T) {
 				},
 				Advisories: v2.Advisories{
 					{
-						ID:      "CVE-2222-2222",
-						Aliases: []string{"GHSA-2222-2222-2222"},
+						ID:      "CGA-xoxo-xoxo-xoxo",
+						Aliases: []string{"CVE-2222-2222", "GHSA-2222-2222-2222"},
 					},
 				},
 			},
@@ -43,8 +43,8 @@ func TestDiscoverAliases(t *testing.T) {
 				},
 				Advisories: v2.Advisories{
 					{
-						ID:      "CVE-2222-2222",
-						Aliases: []string{"GHSA-2222-2222-2222"},
+						ID:      "CGA-xoxo-xoxo-xoxo",
+						Aliases: []string{"CVE-2222-2222", "GHSA-2222-2222-2222"},
 					},
 				},
 			},
@@ -74,7 +74,8 @@ func TestDiscoverAliases(t *testing.T) {
 				},
 				Advisories: v2.Advisories{
 					{
-						ID: "CVE-4444-4444",
+						ID:      "CGA-xoxo-xoxo-xoxo",
+						Aliases: []string{"CVE-4444-4444"},
 					},
 				},
 			},
@@ -89,7 +90,8 @@ func TestDiscoverAliases(t *testing.T) {
 				},
 				Advisories: v2.Advisories{
 					{
-						ID: "GHSA-3333-3333-3333",
+						ID:      "CGA-xoxo-xoxo-xoxo",
+						Aliases: []string{"GHSA-3333-3333-3333"},
 					},
 				},
 			},
@@ -104,13 +106,17 @@ func TestDiscoverAliases(t *testing.T) {
 				},
 				Advisories: v2.Advisories{
 					{
-						ID: "CVE-1111-1111",
+						ID: "CGA-honk-xoxo-xoxo",
 						Aliases: []string{
+							"CVE-1111-1111",
 							"GHSA-5555-5555-5555",
 						},
 					},
 					{
-						ID: "GHSA-3333-3333-3333",
+						ID: "CGA-xoxo-xoxo-xoxo",
+						Aliases: []string{
+							"GHSA-3333-3333-3333",
+						},
 					},
 				},
 			},

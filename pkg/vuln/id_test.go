@@ -19,6 +19,11 @@ func TestValidateID(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "valid CGA",
+			id:      "CGA-xg8w-q25p-9gcc",
+			wantErr: false,
+		},
+		{
 			name:    "valid Go",
 			id:      "GO-2018-9999",
 			wantErr: false,
@@ -36,6 +41,11 @@ func TestValidateID(t *testing.T) {
 		{
 			name:    "invalid Go",
 			id:      "GO-2018-999",
+			wantErr: true,
+		},
+		{
+			name:    "invalid CGA",
+			id:      "CGA-4aj9-honk-9j91",
 			wantErr: true,
 		},
 		{

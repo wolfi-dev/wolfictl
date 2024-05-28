@@ -4,8 +4,9 @@ package:
   name: brotli
 
 advisories:
-  - id: CVE-2020-8927
+  - id: CGA-xg8w-q25p-9gcc
     aliases:
+      - CVE-2020-8927
       - GHSA-2222-2222-2222
       - GHSA-3333-3333-3333
     events:

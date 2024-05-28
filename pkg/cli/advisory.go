@@ -44,6 +44,7 @@ func cmdAdvisory() *cobra.Command {
 		cmdAdvisoryGuide(),
 		cmdAdvisoryList(),
 		cmdAdvisoryMigrate(),
+		cmdAdvisoryMigrateIDs(),
 		cmdAdvisorySecDB(),
 		cmdAdvisoryUpdate(),
 		cmdAdvisoryValidate(),
