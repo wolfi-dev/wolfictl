@@ -23,6 +23,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/static"
 	ggcrtypes "github.com/google/go-containerregistry/pkg/v1/types"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
@@ -265,9 +266,11 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	// Second is all the metadata.
 	bundleTasks := make([]bundle.Task, 0, len(built))
 	for pkg, t := range built {
-		subpkgs := make([]string, 0, len(t.config.Subpackages))
+		// TODO: Remove workaround once we've fixed melange and wolfi.
+		// See https://github.com/chainguard-dev/melange/issues/1236
+		subpkgs := map[string]struct{}{}
 		for _, sp := range t.config.Subpackages { //nolint:gocritic
-			subpkgs = append(subpkgs, sp.Name)
+			subpkgs[sp.Name] = struct{}{}
 		}
 		bundleTasks = append(bundleTasks, bundle.Task{
 			Package:       pkg,
@@ -276,7 +279,7 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 			Path:          t.config.Path,
 			SourceDir:     filepath.Join(t.cfg.dir, t.pkg),
 			Architectures: t.archs,
-			Subpackages:   subpkgs,
+			Subpackages:   maps.Keys(subpkgs),
 			Resources:     t.config.Package.Resources,
 		})
 	}
