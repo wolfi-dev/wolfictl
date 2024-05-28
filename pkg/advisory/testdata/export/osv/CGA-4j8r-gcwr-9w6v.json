@@ -1,0 +1,1 @@
+{"modified":"2023-05-04T14:34:34Z","id":"CGA-4j8r-gcwr-9w6v","aliases":["CGA-4j8r-gcwr-9w6v","GHSA-232p-vwff-86mp"],"affected":[{"package":{"ecosystem":"wolfi","name":"ko","purl":"pkg:apk/wolfi/ko"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"0.13.0-r3"}]}]}]}

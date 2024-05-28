@@ -1,0 +1,1 @@
+{"modified":"2023-04-08T16:32:54Z","id":"CGA-mm7m-x6cw-5fg4","aliases":["CGA-mm7m-x6cw-5fg4","CVE-2023-0466"],"affected":[{"package":{"ecosystem":"wolfi","name":"openssl","purl":"pkg:apk/wolfi/openssl"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"0"}],"database_specific":{"false_positive":true}}]}]}
