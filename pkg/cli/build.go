@@ -827,7 +827,10 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	log := clog.FromContext(ctx)
 
-	pod := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount, t.cfg.k8sNamespace)
+	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount, t.cfg.k8sNamespace)
+	if err != nil {
+		return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
+	}
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 

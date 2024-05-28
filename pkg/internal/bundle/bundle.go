@@ -338,43 +338,47 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev1.Pod {
+func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*corev1.Pod, error) {
 	goarch := types.ParseArchitecture(arch).String()
-
-	resources := task.Resources
-	if resources == nil {
-		resources = &config.Resources{}
-	}
 
 	// Set some sane default resource requests if none are specified by flag or config.
 	// This is required for GKE Autopilot.
-	if resources.CPU == "" {
-		resources.CPU = "2"
+	resources := config.Resources{
+		CPU:    "2",
+		Memory: "4Gi",
 	}
-	// Arm machines max out at 48 cores, if a CPU value of greater than 48 is given,
-	// set it to 48 to avoid pod being unschedulable.
-	if resources.CPU != "" {
-		cpu, err := strconv.ParseFloat(resources.CPU, 64)
 
-		if err == nil {
-			// Set to MaxArmCore if greater than MaxArmCore
-			if goarch == "arm64" && cpu > MaxArmCore {
-				cpu = MaxArmCore
-			}
-			// Reduce cpu by 2% for better bin packing of pods on nodes
-			// Example:
-			//   64 core machines has 63.77 core available
-			//   48 core machines has 47.81 core available
-			//   32 core machines has 31.85 core available
-			//   16 core machines has 15.89 core available
-			cpu *= 0.98
-
-			resources.CPU = fmt.Sprintf("%f", cpu)
+	// Copy resources out of the task rather than overwriting in place because both archs share the same task.
+	if in := task.Resources; in != nil {
+		if in.CPU != "" {
+			resources.CPU = in.CPU
+		}
+		if in.Memory != "" {
+			resources.Memory = in.Memory
 		}
 	}
-	if resources.Memory == "" {
-		resources.Memory = "4Gi"
+
+	cpu, err := strconv.ParseFloat(resources.CPU, 64)
+	if err != nil {
+		return nil, fmt.Errorf("parsing cpu %q: %w", resources.CPU, err)
 	}
+
+	if goarch == "arm64" && cpu > MaxArmCore {
+		// Arm machines max out at 48 cores, if a CPU value of greater than 48 is given,
+		// set it to 48 to avoid pod being unschedulable.
+		// Set to MaxArmCore if greater than MaxArmCore
+		cpu = MaxArmCore
+	}
+
+	// Reduce cpu by 2% for better bin packing of pods on nodes
+	// Example:
+	//   64 core machines has 63.77 core available
+	//   48 core machines has 47.81 core available
+	//   32 core machines has 31.85 core available
+	//   16 core machines has 15.89 core available
+	cpu *= 0.98
+
+	resources.CPU = fmt.Sprintf("%f", cpu)
 
 	rr := corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
@@ -484,7 +488,7 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) *corev
 		}
 	}
 
-	return pod
+	return pod, nil
 }
 
 // TODO: Just use tar.Writer.AddFS: https://github.com/golang/go/issues/66831
