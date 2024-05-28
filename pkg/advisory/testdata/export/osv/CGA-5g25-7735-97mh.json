@@ -1,0 +1,1 @@
+{"modified":"2023-03-23T09:31:00Z","id":"CGA-5g25-7735-97mh","aliases":["CGA-5g25-7735-97mh","CVE-2023-0464"],"affected":[{"package":{"ecosystem":"wolfi","name":"openssl","purl":"pkg:apk/wolfi/openssl"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"3.1.0-r1"}]}]}]}

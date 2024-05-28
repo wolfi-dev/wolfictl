@@ -1,0 +1,1 @@
+{"modified":"2023-02-07T16:50:00Z","id":"CGA-7w75-jqq5-8pj3","aliases":["CGA-7w75-jqq5-8pj3","CVE-2022-4203"],"affected":[{"package":{"ecosystem":"wolfi","name":"openssl","purl":"pkg:apk/wolfi/openssl"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"3.0.8-r0"}]}]}]}
