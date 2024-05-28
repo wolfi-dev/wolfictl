@@ -55,13 +55,7 @@ func cmdBuild() *cobra.Command {
 	var jobs int
 	var traceFile string
 
-	cfg := global{
-		// Trying to avoid this error:
-		// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
-		// Please reduce your request rate.
-		// See https://cloud.google.com/storage/docs/gcs429.
-		writeLimiter: rate.NewLimiter(rate.Every(1*time.Second), 1),
-	}
+	cfg := global{}
 
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
@@ -109,6 +103,15 @@ func cmdBuild() *cobra.Command {
 			}
 			if cfg.outDir == "" {
 				cfg.outDir = filepath.Join(cfg.dir, "packages")
+			}
+
+			// Trying to avoid this error:
+			// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
+			// Please reduce your request rate.
+			// See https://cloud.google.com/storage/docs/gcs429.
+			cfg.writeLimiters = map[string]*rate.Limiter{}
+			for _, arch := range cfg.archs {
+				cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
 			}
 
 			if cfg.bundle != "" {
@@ -589,8 +592,9 @@ type global struct {
 
 	mu sync.Mutex
 
-	bundle        string
-	writeLimiter  *rate.Limiter
+	bundle string
+	// per arch rate limiter (for APKINDEX)
+	writeLimiters map[string]*rate.Limiter
 	gcs           *storage.Client
 	stagingBucket string
 	dstBucket     string
@@ -605,11 +609,11 @@ func (g *global) logdir(arch string) string {
 }
 
 // wrapper around the writeLimiter so this is accounted for in traces
-func (g *global) wait(ctx context.Context) error {
+func (g *global) wait(ctx context.Context, arch string) error {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "wait")
 	defer span.End()
 
-	return g.writeLimiter.Wait(ctx)
+	return g.writeLimiters[arch].Wait(ctx)
 }
 
 type task struct {
@@ -1437,7 +1441,7 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 		obj = path.Join(dir, obj)
 	}
 
-	if err := t.cfg.wait(ctx); err != nil {
+	if err := t.cfg.wait(ctx, arch); err != nil {
 		return fmt.Errorf("waiting for rate limit: %w", err)
 	}
 
