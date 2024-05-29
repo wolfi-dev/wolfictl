@@ -39,7 +39,6 @@ func New() *cobra.Command {
 		cmdCheck(),
 		cmdGh(),
 		cmdImage(),
-		cmdIndex(),
 		cmdLint(),
 		cmdRuby(),
 		cmdLs(),
