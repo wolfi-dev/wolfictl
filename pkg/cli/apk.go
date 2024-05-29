@@ -1,156 +1,246 @@
 package cli
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"io"
+	"io/fs"
+	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"cloud.google.com/go/storage"
 	"github.com/chainguard-dev/go-apk/pkg/apk"
-	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
+	"golang.org/x/exp/maps"
+	"golang.org/x/sync/errgroup"
 )
 
-var repos = map[string]string{
-	"wolfi":  "https://packages.wolfi.dev/os",
-	"stage1": "https://packages.wolfi.dev/bootstrap/stage1",
-	"stage2": "https://packages.wolfi.dev/bootstrap/stage2",
-	"stage3": "https://packages.wolfi.dev/bootstrap/stage3",
-}
-
 func cmdApk() *cobra.Command {
-	var arch, repo string
+	cmd := &cobra.Command{Use: "apk"}
+	cmd.AddCommand(cmdCp())
+	return cmd
+}
+
+func fetchIndexURL(ctx context.Context, u string) (io.ReadCloser, error) {
+	if u == "-" {
+		return os.Stdin, nil
+	}
+
+	scheme, _, ok := strings.Cut(u, "://")
+	if !ok || !strings.HasPrefix(scheme, "http") {
+		return os.Open(u)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("GET %q: %w", u, err)
+	}
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("GET %q: status %d", u, resp.StatusCode)
+	}
+
+	return resp.Body, nil
+}
+
+func cmdCp() *cobra.Command {
+	var latest bool
+	var indexURL, outDir, gcsPath string
 	cmd := &cobra.Command{
-		Use:  "apk",
-		Args: cobra.MaximumNArgs(1),
+		Use:          "cp",
+		Aliases:      []string{"copy"},
+		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
+			errg, ctx := errgroup.WithContext(cmd.Context())
 
-			// Map a friendly string like "wolfi" to its repo URL.
-			if got, found := repos[repo]; found {
-				repo = got
+			repoURL := strings.TrimSuffix(indexURL, "/APKINDEX.tar.gz")
+			arch := repoURL[strings.LastIndex(repoURL, "/")+1:]
+
+			in, err := fetchIndexURL(ctx, indexURL)
+			if err != nil {
+				return fmt.Errorf("fetching %q: %w", indexURL, err)
+			}
+			defer in.Close()
+			index, err := apk.IndexFromArchive(io.NopCloser(in))
+			if err != nil {
+				return fmt.Errorf("parsing %q: %w", indexURL, err)
 			}
 
-			if len(args) == 0 {
-				// Get the index and present a searchable list to select.
-				idx, err := index.Index(arch, repo)
+			wantSet := map[string]struct{}{}
+			for _, p := range args {
+				wantSet[p] = struct{}{}
+			}
+			var packages []*apk.Package
+			for _, pkg := range index.Packages {
+				if _, ok := wantSet[pkg.Name]; !ok {
+					continue
+				}
+				packages = append(packages, pkg)
+			}
+
+			if latest {
+				packages = onlyLatest(packages)
+			}
+
+			if len(packages) == 0 {
+				return fmt.Errorf("no packages found")
+			}
+
+			log.Printf("downloading %d packages for %s", len(packages), arch)
+
+			for _, pkg := range packages {
+				pkg := pkg
+				errg.Go(func() error {
+					fn := filepath.Join(outDir, arch, pkg.Filename())
+					if _, err := os.Stat(fn); err == nil {
+						log.Printf("skipping %s: already exists", fn)
+						return nil
+					}
+
+					var rc io.ReadCloser
+					if gcsPath == "" {
+						url := fmt.Sprintf("%s/%s", repoURL, pkg.Filename())
+						log.Println("downloading", url)
+						req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+						if err != nil {
+							return err
+						}
+						resp, err := http.DefaultClient.Do(req)
+						if err != nil {
+							return err
+						}
+
+						if err := os.MkdirAll(filepath.Join(outDir, arch), 0755); err != nil {
+							return err
+						}
+						rc = resp.Body
+					} else {
+						gcsPath = strings.TrimPrefix(gcsPath, "gs://")
+						bucket, path, _ := strings.Cut(gcsPath, "/")
+						fullPath := filepath.Join(path, arch, pkg.Filename())
+						log.Printf("downloading gs://%s/%s", bucket, fullPath)
+
+						client, err := storage.NewClient(ctx)
+						if err != nil {
+							return err
+						}
+						rc, err = client.Bucket(bucket).Object(fullPath).NewReader(ctx)
+						if err != nil {
+							return err
+						}
+					}
+					defer rc.Close()
+
+					if err := os.MkdirAll(filepath.Dir(fn), 0755); err != nil {
+						return err
+					}
+					f, err := os.Create(fn)
+					if err != nil {
+						return err
+					}
+					defer f.Close()
+					if _, err := io.Copy(f, rc); err != nil {
+						return err
+					}
+					log.Printf("wrote %s", fn)
+					return nil
+				})
+
+				// TODO: Also get (latest) runtime deps here?
+			}
+
+			if err := errg.Wait(); err != nil {
+				return err
+			}
+
+			// Update the local index for all the apks currently in the outDir.
+			index.Packages = nil
+
+			if err := filepath.WalkDir(filepath.Join(outDir, arch), func(path string, d fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
-
-				var items []list.Item
-				for _, p := range idx.Packages {
-					items = append(items, item{p})
-				}
-				m := &model{list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
-				m.list.Title = "Select a Package"
-				p := tea.NewProgram(m, tea.WithAltScreen())
-				if _, err := p.Run(); err != nil {
-					return err
+				if !strings.HasSuffix(path, ".apk") {
+					return nil
 				}
 
-				it := m.list.SelectedItem()
-				enc := json.NewEncoder(os.Stdout)
-				enc.SetIndent("", "  ")
-				return enc.Encode(it.(item).p)
-			}
-
-			if !strings.HasSuffix(args[0], ".apk") {
-				args[0] += ".apk"
-			}
-
-			url := fmt.Sprintf("%s/%s/%s", repo, arch, args[0])
-			resp, err := http.Get(url) //nolint:gosec
-			if err != nil {
-				return err
-			}
-			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusOK {
-				b, err := io.ReadAll(resp.Body)
+				f, err := os.Open(path)
 				if err != nil {
 					return err
 				}
-				return fmt.Errorf("GET %s (%d): %s", url, resp.StatusCode, b)
+				defer f.Close()
+				pkg, err := apk.ParsePackage(ctx, f)
+				if err != nil {
+					return err
+				}
+				index.Packages = append(index.Packages, pkg)
+				return nil
+			}); err != nil {
+				return err
 			}
-
-			pkg, err := apk.ParsePackage(ctx, resp.Body)
+			fn := filepath.Join(outDir, arch, "APKINDEX.tar.gz")
+			log.Printf("writing index: %s (%d total packages)", fn, len(index.Packages))
+			f, err := os.Create(fn)
 			if err != nil {
 				return err
 			}
-			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "  ")
-			return enc.Encode(pkg)
-		},
-	}
-	cmd.Flags().StringVar(&arch, "arch", "x86_64", "arch of package to get")
-	cmd.Flags().StringVar(&repo, "repo", "wolfi", "repo to get packages from")
-	return cmd
-}
-
-func cmdIndex() *cobra.Command {
-	var arch, repo string
-	cmd := &cobra.Command{
-		Use:  "index",
-		Args: cobra.NoArgs,
-		RunE: func(_ *cobra.Command, _ []string) error {
-			// Map a friendly string like "wolfi" to its repo URL.
-			if got, found := repos[repo]; found {
-				repo = got
-			}
-
-			idx, err := index.Index(arch, repo)
+			defer f.Close()
+			r, err := apk.ArchiveFromIndex(index)
 			if err != nil {
 				return err
 			}
+			if _, err := io.Copy(f, r); err != nil {
+				return err
+			}
 
-			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "  ")
-			return enc.Encode(idx)
+			// TODO: Sign index?
+
+			return nil
 		},
 	}
-	cmd.Flags().StringVar(&arch, "arch", "x86_64", "arch of package to get")
-	cmd.Flags().StringVar(&repo, "repo", "wolfi", "repo to get packages from")
+	cmd.Flags().StringVarP(&outDir, "out-dir", "o", "./packages", "directory to copy packages to")
+	cmd.Flags().StringVarP(&indexURL, "index", "i", "https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz", "APKINDEX.tar.gz URL")
+	cmd.Flags().BoolVar(&latest, "latest", true, "copy only the latest version of each package")
+	cmd.Flags().StringVar(&gcsPath, "gcs", "", "copy objects from a GCS bucket")
 	return cmd
 }
 
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
+func onlyLatest(packages []*apk.Package) []*apk.Package {
+	// by package
+	highest := map[string]*apk.Package{}
 
-type item struct {
-	p *apk.Package
-}
-
-func (i item) Title() string       { return i.p.Name }
-func (i item) Description() string { return i.p.Version }
-func (i item) FilterValue() string { return fmt.Sprintf("%s-%s", i.p.Name, i.p.Version) }
-
-type model struct {
-	list list.Model
-}
-
-func (m *model) Init() tea.Cmd { return nil }
-
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "enter", "ctrl+c":
-			return m, tea.Quit
+	for _, pkg := range packages {
+		got, err := apk.ParseVersion(pkg.Version)
+		if err != nil {
+			// TODO: We should really fail here.
+			log.Printf("parsing %q: %v", pkg.Filename(), err)
+			continue
 		}
-	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
+
+		have, ok := highest[pkg.Name]
+		if !ok {
+			highest[pkg.Name] = pkg
+			continue
+		}
+
+		// TODO: We re-parse this for no reason.
+		parsed, err := apk.ParseVersion(have.Version)
+		if err != nil {
+			// TODO: We should really fail here.
+			log.Printf("parsing %q: %v", have.Version, err)
+			continue
+		}
+
+		if apk.CompareVersions(got, parsed) > 0 {
+			highest[pkg.Name] = pkg
+		}
 	}
 
-	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
-	return m, cmd
-}
-
-func (m *model) View() string {
-	return docStyle.Render(m.list.View())
+	return maps.Values(highest)
 }
