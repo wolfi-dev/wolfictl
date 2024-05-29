@@ -534,7 +534,7 @@ var (
 		return fmt.Sprintf(
 			notADistroDirectoryMessageFormat,
 			styles.Bold().Render(cwd),
-			styles.Bold().Copy().Italic(true).Render("is"),
+			styles.Bold().Italic(true).Render("is"),
 		)
 	}
 
