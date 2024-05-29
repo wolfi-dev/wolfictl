@@ -206,7 +206,7 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 		}
 	}
 	if len(repos) > 0 {
-		loadedRepos, err := apk.GetRepositoryIndexes(ctx, repos, allKeys, arch)
+		loadedRepos, err := apk.GetRepositoryIndexes(ctx, repos, allKeys, arch, apk.WithHTTPClient(http.DefaultClient))
 		if err != nil {
 			return "", err
 		}
