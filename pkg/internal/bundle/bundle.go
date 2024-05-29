@@ -428,6 +428,10 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*core
 			Containers: []corev1.Container{{
 				Name:  "workspace",
 				Image: ref.String(),
+				Env: []corev1.EnvVar{{
+					Name:  "SOURCE_DATE_EPOCH",
+					Value: strconv.FormatInt(task.BuildDateEpoch.Unix(), 10),
+				}},
 				// TODO: Do we need this??
 				// ldconfig is run to prime ld.so.cache for glibc packages which require it.
 				// Command:      []string{"/bin/sh", "-c", "[ -x /sbin/ldconfig ] && /sbin/ldconfig /lib || true\nsleep infinity"},
