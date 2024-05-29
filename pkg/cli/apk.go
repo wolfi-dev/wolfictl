@@ -45,7 +45,6 @@ func fetchIndexURL(ctx context.Context, u string) (io.ReadCloser, error) {
 	if resp.StatusCode >= 400 {
 		return nil, fmt.Errorf("GET %q: status %d", u, resp.StatusCode)
 	}
-
 	return resp.Body, nil
 }
 
@@ -116,7 +115,7 @@ func cmdCp() *cobra.Command {
 							return err
 						}
 
-						if err := os.MkdirAll(filepath.Join(outDir, arch), 0755); err != nil {
+						if err := os.MkdirAll(filepath.Join(outDir, arch), 0o755); err != nil {
 							return err
 						}
 						rc = resp.Body
@@ -137,7 +136,7 @@ func cmdCp() *cobra.Command {
 					}
 					defer rc.Close()
 
-					if err := os.MkdirAll(filepath.Dir(fn), 0755); err != nil {
+					if err := os.MkdirAll(filepath.Dir(fn), 0o755); err != nil {
 						return err
 					}
 					f, err := os.Create(fn)
@@ -162,7 +161,7 @@ func cmdCp() *cobra.Command {
 			// Update the local index for all the apks currently in the outDir.
 			index.Packages = nil
 
-			if err := filepath.WalkDir(filepath.Join(outDir, arch), func(path string, d fs.DirEntry, err error) error {
+			if err := filepath.WalkDir(filepath.Join(outDir, arch), func(path string, _ fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
