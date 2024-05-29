@@ -114,6 +114,7 @@ func cmdCp() *cobra.Command {
 						if err != nil {
 							return err
 						}
+						defer resp.Body.Close()
 
 						if err := os.MkdirAll(filepath.Join(outDir, arch), 0o755); err != nil {
 							return err
@@ -133,8 +134,8 @@ func cmdCp() *cobra.Command {
 						if err != nil {
 							return err
 						}
+						defer rc.Close()
 					}
-					defer rc.Close()
 
 					if err := os.MkdirAll(filepath.Dir(fn), 0o755); err != nil {
 						return err
