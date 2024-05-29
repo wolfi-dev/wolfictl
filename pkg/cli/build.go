@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -142,6 +143,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
 	cmd.Flags().StringVar(&cfg.namespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
 	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
+	cmd.Flags().StringVar(&cfg.summary, "summary", "", "file to write build summary")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
@@ -210,6 +212,62 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 	}, nil
 }
 
+func (g *global) fetchIndexFromBucket(ctx context.Context, arch string) (map[string]struct{}, error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchIndexFromBucket")
+	defer span.End()
+
+	exist := map[string]struct{}{}
+
+	if g.dstBucket == "" {
+		return exist, nil
+	}
+
+	obj := path.Join(arch, "APKINDEX.tar.gz")
+	out := filepath.Join(g.outDir, arch, "APKINDEX.tar.gz")
+
+	bucket, dir, ok := strings.Cut(g.dstBucket, "/")
+	if ok {
+		obj = path.Join(dir, obj)
+	}
+
+	rc, err := g.gcs.Bucket(bucket).Object(obj).NewReader(ctx)
+	if err != nil {
+		if errors.Is(err, storage.ErrObjectNotExist) {
+			return exist, nil
+		}
+		return nil, err
+	}
+	defer rc.Close()
+
+	clog.FromContext(ctx).Debugf("downloading %s to %s", obj, out)
+
+	f, err := os.Create(out)
+	if err != nil {
+		return nil, err
+	}
+
+	tee := io.TeeReader(rc, f)
+
+	idx, err := apk.IndexFromArchive(io.NopCloser(tee))
+	if err != nil {
+		return nil, fmt.Errorf("parsing index %s: %w", obj, err)
+	}
+
+	for _, pkg := range idx.Packages {
+		exist[pkg.Filename()] = struct{}{}
+	}
+
+	if _, err := io.Copy(io.Discard, tee); err != nil {
+		return nil, err
+	}
+
+	if err := f.Close(); err != nil {
+		return nil, f.Close()
+	}
+
+	return exist, nil
+}
+
 func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchIndex")
 	defer span.End()
@@ -247,6 +305,14 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 	return exist, nil
 }
 
+type buildResult struct {
+	Package  string        `json:"package"`
+	Pods     []string      `json:"pods,omitempty"`
+	Duration time.Duration `json:"duration,omitempty"`
+	Status   string        `json:"status,omitempty"`
+	Error    error         `json:"error,omitempty"`
+}
+
 func buildBundles(ctx context.Context, cfg *global, ref string) error {
 	var eg errgroup.Group
 
@@ -265,11 +331,20 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 			return fmt.Errorf("creating arch directory: %w", err)
 		}
 
-		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
+		// If --destination-repository or --destination-bucket is set, we want to fetch and parse the APKINDEXes concurrently with walking all the configs.
 		eg.Go(func() error {
 			exist, err := fetchIndex(ctx, cfg.dst, arch)
 			if err != nil {
 				return err
+			}
+
+			existBucket, err := cfg.fetchIndexFromBucket(ctx, arch)
+			if err != nil {
+				return err
+			}
+
+			for k, v := range existBucket {
+				exist[k] = v
 			}
 
 			mu.Lock()
@@ -279,43 +354,6 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 
 			return nil
 		})
-
-		if cfg.dstBucket != "" {
-			eg.Go(func() error {
-				obj := path.Join(arch, "APKINDEX.tar.gz")
-				out := filepath.Join(cfg.outDir, arch, "APKINDEX.tar.gz")
-
-				bucket, dir, ok := strings.Cut(cfg.dstBucket, "/")
-				if ok {
-					obj = path.Join(dir, obj)
-				}
-
-				rc, err := cfg.gcs.Bucket(bucket).Object(obj).NewReader(ctx)
-				if err != nil {
-					if errors.Is(err, storage.ErrObjectNotExist) {
-						return nil
-					}
-					return err
-				}
-				defer rc.Close()
-
-				clog.FromContext(ctx).Debugf("downloading %s to %s", obj, out)
-
-				f, err := os.Create(out)
-				if err != nil {
-					return err
-				}
-
-				if _, err := io.Copy(f, rc); err != nil {
-					return fmt.Errorf("downloading APKINDEX: %w", err)
-				}
-
-				if err := f.Close(); err != nil {
-					return err
-				}
-				return nil
-			})
-		}
 	}
 
 	if err := eg.Wait(); err != nil {
@@ -371,6 +409,8 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 	// We're ok with Info level from here on.
 	log := clog.FromContext(ctx)
 
+	report := make([]*buildResult, 0, count)
+
 	errs := []error{}
 	skipped := 0
 
@@ -378,7 +418,16 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 		t := <-cfg.donech
 		delete(todos, t.pkg)
 
+		result := &buildResult{
+			Package:  t.pkgver(),
+			Pods:     t.pods,
+			Duration: t.duration,
+		}
+		report = append(report, result)
+
 		if err := t.err; err != nil {
+			result.Error = err
+			result.Status = "error"
 			errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
 			log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
 			continue
@@ -387,6 +436,7 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 		// Logging every skipped package is too noisy, so we just print a summary
 		// of the number of packages we skipped between actual builds.
 		if t.skipped {
+			result.Status = "skipped"
 			skipped++
 			continue
 		} else if skipped != 0 {
@@ -394,11 +444,27 @@ func buildBundles(ctx context.Context, cfg *global, ref string) error {
 			skipped = 0
 		}
 
+		result.Status = "ok"
 		log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
 	}
 
 	if skipped != 0 {
 		log.Infof("Skipped building %d packages", skipped)
+	}
+
+	if cfg.summary != "" {
+		out := os.Stdout
+		if cfg.summary != "-" {
+			f, err := os.Create(cfg.summary)
+			if err != nil {
+				return err
+			}
+
+			out = f
+		}
+		if err := json.NewEncoder(out).Encode(report); err != nil {
+			return fmt.Errorf("writing report: %w", err)
+		}
 	}
 
 	// If the context is cancelled, it's not useful to print everything, just summarize the count.
@@ -585,6 +651,8 @@ type global struct {
 	cacheDir    string
 	outDir      string
 
+	summary string
+
 	fuses []string
 
 	// arch -> foo.apk -> exists in APKINDEX
@@ -634,6 +702,12 @@ type task struct {
 	started bool
 	done    bool
 	skipped bool
+
+	mupods sync.Mutex
+	pods   []string
+
+	// How long the actual builds took, including pod scheduling.
+	duration time.Duration
 
 	// TODO: This is a hack, refactor the task execution out from the graph walking.
 	ref  *name.Digest
@@ -864,6 +938,11 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		return nil, fmt.Errorf("creating pod: %w", err)
 	}
 
+	// Needed for report output.
+	t.mupods.Lock()
+	t.pods = append(t.pods, pod.ObjectMeta.Name)
+	t.mupods.Unlock()
+
 	lastPhase := corev1.PodUnknown
 
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
@@ -1075,10 +1154,12 @@ func (t *task) buildBundle(ctx context.Context) error {
 
 	var (
 		buildGroup errgroup.Group
-		mu         sync.Mutex
 	)
 
+	var mu sync.Mutex
 	results := map[string]*bundleResult{}
+
+	start := time.Now()
 	for arch, need := range needsBuild {
 		if !need {
 			continue
@@ -1100,11 +1181,15 @@ func (t *task) buildBundle(ctx context.Context) error {
 		})
 	}
 
-	if err := buildGroup.Wait(); err != nil {
+	err := buildGroup.Wait()
+	t.duration = time.Since(start)
+	if err != nil {
 		return err
 	}
 
-	log.Infof("Pods finished: %s", t.pkg)
+	if len(needsBuild) != 0 {
+		log.Infof("Pods finished: %s", t.pkg)
+	}
 
 	if t.cfg.dryrun {
 		return nil
