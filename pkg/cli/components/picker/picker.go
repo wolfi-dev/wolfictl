@@ -209,6 +209,6 @@ var (
 )
 
 var (
-	styleHelpKey         = styles.FaintAccent().Copy().Bold(true)
-	styleHelpExplanation = styles.Faint().Copy()
+	styleHelpKey         = styles.FaintAccent().Bold(true)
+	styleHelpExplanation = styles.Faint()
 )

@@ -15,8 +15,8 @@ import (
 var _ tea.Model = (*Model)(nil)
 
 var (
-	helpKeyStyle         = styles.FaintAccent().Copy().Bold(true)
-	helpExplanationStyle = styles.Faint().Copy()
+	helpKeyStyle         = styles.FaintAccent().Bold(true)
+	helpExplanationStyle = styles.Faint()
 
 	styleSubtle = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
 
