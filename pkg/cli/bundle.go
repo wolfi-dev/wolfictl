@@ -494,27 +494,45 @@ func (t *task) addSourceFS(mapfs fstest.MapFS, dirfs fs.FS) error {
 func commonFS(dirfs fs.FS) (fs.FS, error) {
 	mapfs := fstest.MapFS{}
 
+	// melange reads these files to get the commit info
+	files := []string{".git/HEAD"}
+
+	heads, err := fs.Glob(dirfs, ".git/refs/heads/*")
+	if err != nil {
+		return nil, err
+	}
+	files = append(files, heads...)
+
+	// For --env-file flags.
 	envs, err := fs.Glob(dirfs, "build-*.env")
 	if err != nil {
 		return nil, err
 	}
-	for _, name := range envs {
-		data, err := fs.ReadFile(dirfs, name)
-		if err != nil {
-			return nil, err
-		}
+	files = append(files, envs...)
+
+	for _, name := range files {
 		info, err := fs.Stat(dirfs, name)
 		if err != nil {
 			return nil, err
 		}
 
-		mapfs[name] = &fstest.MapFile{
-			Data:    data,
+		mf := &fstest.MapFile{
 			Mode:    info.Mode(),
 			ModTime: info.ModTime(),
 		}
+
+		if !info.IsDir() {
+			data, err := fs.ReadFile(dirfs, name)
+			if err != nil {
+				return nil, err
+			}
+			mf.Data = data
+		}
+
+		mapfs[name] = mf
 	}
 
+	// Pipelines can be dynamically loaded by melange.
 	if err := fs.WalkDir(dirfs, "pipelines", func(p string, d fs.DirEntry, _ error) error {
 		info, err := d.Info()
 		if err != nil {
