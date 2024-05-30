@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,31 +24,7 @@ func cmdApk() *cobra.Command {
 	return cmd
 }
 
-func fetchIndexURL(ctx context.Context, u string) (io.ReadCloser, error) {
-	if u == "-" {
-		return os.Stdin, nil
-	}
-
-	scheme, _, ok := strings.Cut(u, "://")
-	if !ok || !strings.HasPrefix(scheme, "http") {
-		return os.Open(u)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("GET %q: %w", u, err)
-	}
-	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("GET %q: status %d", u, resp.StatusCode)
-	}
-	return resp.Body, nil
-}
-
-func cmdCp() *cobra.Command {
+func cmdCp() *cobra.Command { //nolint:gocyclo
 	var latest bool
 	var indexURL, outDir, gcsPath string
 	cmd := &cobra.Command{
@@ -59,14 +35,44 @@ func cmdCp() *cobra.Command {
 			errg, ctx := errgroup.WithContext(cmd.Context())
 
 			repoURL := strings.TrimSuffix(indexURL, "/APKINDEX.tar.gz")
-			arch := repoURL[strings.LastIndex(repoURL, "/")+1:]
 
-			in, err := fetchIndexURL(ctx, indexURL)
-			if err != nil {
-				return fmt.Errorf("fetching %q: %w", indexURL, err)
+			var in io.ReadCloser
+			var arch string
+			switch {
+			case indexURL == "-":
+				in = os.Stdin
+				arch = "x86_64" // TODO: This is hardcoded.
+			case strings.HasPrefix(indexURL, "file://"):
+				f, err := os.Open(strings.TrimPrefix(indexURL, "file://"))
+				if err != nil {
+					return fmt.Errorf("opening %q: %w", indexURL, err)
+				}
+				in = f
+
+				arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
+			default:
+				u, err := url.Parse(indexURL)
+				if err != nil {
+					return fmt.Errorf("parsing %q: %w", indexURL, err)
+				}
+				addAuth(u)
+				req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+				if err != nil {
+					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
+				}
+				resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
+				if err != nil {
+					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
+				}
+				if resp.StatusCode >= 400 {
+					return fmt.Errorf("GET %q: status %d: %s", u.Redacted(), resp.StatusCode, resp.Status)
+				}
+				in = resp.Body
+
+				arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
 			}
 			defer in.Close()
-			index, err := apk.IndexFromArchive(io.NopCloser(in))
+			index, err := apk.IndexFromArchive(in)
 			if err != nil {
 				return fmt.Errorf("parsing %q: %w", indexURL, err)
 			}
@@ -104,9 +110,13 @@ func cmdCp() *cobra.Command {
 
 					var rc io.ReadCloser
 					if gcsPath == "" {
-						url := fmt.Sprintf("%s/%s", repoURL, pkg.Filename())
-						log.Println("downloading", url)
-						req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+						u, err := url.Parse(fmt.Sprintf("%s/%s", repoURL, pkg.Filename()))
+						if err != nil {
+							return err
+						}
+						addAuth(u)
+						log.Println("downloading", u.Redacted())
+						req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 						if err != nil {
 							return err
 						}
@@ -209,6 +219,16 @@ func cmdCp() *cobra.Command {
 	cmd.Flags().BoolVar(&latest, "latest", true, "copy only the latest version of each package")
 	cmd.Flags().StringVar(&gcsPath, "gcs", "", "copy objects from a GCS bucket")
 	return cmd
+}
+
+func addAuth(u *url.URL) {
+	env := os.Getenv("HTTP_AUTH")
+	parts := strings.Split(env, ":")
+	if len(parts) != 4 || parts[0] != "basic" {
+		return
+	}
+	// parts[1] is the realm, ignore it.
+	u.User = url.UserPassword(parts[2], parts[3])
 }
 
 func onlyLatest(packages []*apk.Package) []*apk.Package {
