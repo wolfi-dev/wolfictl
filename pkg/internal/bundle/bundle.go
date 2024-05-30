@@ -81,6 +81,12 @@ melange build $1 \
 {{ range .Flags }} {{.}} \
 {{ end }}
 
+melange test $1 \
+ --gcplog \
+ --source-dir $2 \
+{{ range .Flags }} {{.}} \
+{{ end }}
+
 tar -C packages -czvf packages.tar.gz .
 
 # TODO: Content-Type
