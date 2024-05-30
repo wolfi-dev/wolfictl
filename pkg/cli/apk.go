@@ -24,7 +24,7 @@ func cmdApk() *cobra.Command {
 	return cmd
 }
 
-func cmdCp() *cobra.Command {
+func cmdCp() *cobra.Command { //nolint:gocyclo
 	var latest bool
 	var indexURL, outDir, gcsPath string
 	cmd := &cobra.Command{
@@ -38,10 +38,11 @@ func cmdCp() *cobra.Command {
 
 			var in io.ReadCloser
 			var arch string
-			if indexURL == "-" {
+			switch {
+			case indexURL == "-":
 				in = os.Stdin
 				arch = "x86_64" // TODO: This is hardcoded.
-			} else if strings.HasPrefix(indexURL, "file://") {
+			case strings.HasPrefix(indexURL, "file://"):
 				f, err := os.Open(strings.TrimPrefix(indexURL, "file://"))
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", indexURL, err)
@@ -49,7 +50,7 @@ func cmdCp() *cobra.Command {
 				in = f
 
 				arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
-			} else {
+			default:
 				u, err := url.Parse(indexURL)
 				if err != nil {
 					return fmt.Errorf("parsing %q: %w", indexURL, err)
@@ -59,7 +60,7 @@ func cmdCp() *cobra.Command {
 				if err != nil {
 					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
 				}
-				resp, err := http.DefaultClient.Do(req)
+				resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
 				if err != nil {
 					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
 				}
