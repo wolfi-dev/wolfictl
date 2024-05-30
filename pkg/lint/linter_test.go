@@ -92,7 +92,7 @@ func TestLinter_Dir(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
 			l := newTestLinterWithDir(tt.path)
-			got, err := l.Lint(ctx)
+			got, err := l.Lint(ctx, SeverityWarning)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Lint() error = %v, wantErr %v", err, tt.wantErr)
 			}

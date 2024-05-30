@@ -11,3 +11,7 @@ environment:
       - foo
       - bar
       - foo
+
+test:
+  pipeline:
+    - runs: "echo 'test'"

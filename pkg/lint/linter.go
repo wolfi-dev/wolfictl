@@ -30,7 +30,7 @@ func New(opts ...Option) *Linter {
 }
 
 // Lint evaluates all rules and returns the result.
-func (l *Linter) Lint(ctx context.Context) (Result, error) {
+func (l *Linter) Lint(ctx context.Context, minSeverity Severity) (Result, error) {
 	log := clog.FromContext(ctx)
 	rules := AllRules(l)
 
@@ -85,12 +85,15 @@ func (l *Linter) Lint(ctx context.Context) (Result, error) {
 
 			// Evaluate the rule.
 			if err := rule.LintFunc(namesToPkg[name].Config); err != nil {
-				msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity)
+				// Only add to failedRules if the severity is inclusive of the minSeverity
+				if rule.Severity.Value <= minSeverity.Value {
+					msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity.Name)
 
-				failedRules = append(failedRules, EvalRuleError{
-					Rule:  rule,
-					Error: fmt.Errorf(msg),
-				})
+					failedRules = append(failedRules, EvalRuleError{
+						Rule:  rule,
+						Error: fmt.Errorf(msg),
+					})
+				}
 			}
 		}
 		// If we have errors we append them to the result.
