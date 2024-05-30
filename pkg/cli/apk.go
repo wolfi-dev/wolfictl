@@ -64,7 +64,7 @@ func cmdCp() *cobra.Command {
 					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
 				}
 				if resp.StatusCode >= 400 {
-					return fmt.Errorf("GET %q: status %d", u.Redacted(), resp.StatusCode, resp.Status)
+					return fmt.Errorf("GET %q: status %d: %s", u.Redacted(), resp.StatusCode, resp.Status)
 				}
 				in = resp.Body
 
