@@ -337,12 +337,21 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 				"--pipeline-dir=" + cfg.pipelineDir,
 			}
 
+			testflags := []string{
+				"--arch=" + arch,
+				"--env-file=" + envFile(arch),
+				"--runner=" + cfg.runner,
+				"--pipeline-dirs=" + cfg.pipelineDir,
+			}
+
 			for _, k := range cfg.extraKeys {
 				flags = append(flags, "--keyring-append="+k)
+				testflags = append(testflags, "--keyring-append="+k)
 			}
 
 			for _, r := range cfg.extraRepos {
 				flags = append(flags, "--repository-append="+r)
+				testflags = append(testflags, "--repository-append="+r)
 			}
 
 			mounts := make([]*bundle.GCSFuseMount, 0, len(cfg.fuses))
@@ -356,6 +365,7 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 
 			entrypoints[types.ParseArchitecture(arch)] = &bundle.Entrypoint{
 				Flags:         flags,
+				TestFlags:     testflags,
 				GCSFuseMounts: mounts,
 			}
 		}

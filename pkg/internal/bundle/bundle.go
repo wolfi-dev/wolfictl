@@ -57,6 +57,7 @@ func ParseGCSFuseMount(s string) (*GCSFuseMount, error) {
 
 type Entrypoint struct {
 	Flags         []string
+	TestFlags     []string
 	GCSFuseMounts []*GCSFuseMount
 }
 
@@ -84,7 +85,7 @@ melange build $1 \
 melange test $1 \
  --gcplog \
  --source-dir $2 \
-{{ range .Flags }} {{.}} \
+{{ range .TestFlags }} {{.}} \
 {{ end }}
 
 tar -C packages -czvf packages.tar.gz .
