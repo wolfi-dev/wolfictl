@@ -614,6 +614,7 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedAPKFilePaths []string, cleanup func() error, err error) {
 	logger := clog.FromContext(ctx)
 
+	archesFound := 0
 	for _, arch := range []string{"x86_64", "aarch64"} {
 		const apkRepositoryURL = "https://packages.wolfi.dev/os"
 		apkindex, err := index.Index(arch, apkRepositoryURL)
@@ -626,8 +627,11 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedA
 		})
 
 		if len(nameMatches) == 0 {
-			return nil, nil, fmt.Errorf("no Wolfi package found with name %q in arch %q", input, arch)
+			logger.Warnf("no Wolfi package found with name %q in arch %q but will continue, it might not have a package built for this arch.", input, arch)
+			continue
 		}
+		// we found a package for this arch
+		archesFound++
 
 		vers := lo.Map(nameMatches, func(pkg *apk.Package, _ int) string {
 			return pkg.Version
@@ -676,6 +680,10 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedA
 		logger.Info("downloaded APK", "path", apkTmpFilePath)
 
 		downloadedAPKFilePaths = append(downloadedAPKFilePaths, apkTmpFilePath)
+	}
+
+	if archesFound == 0 {
+		return nil, nil, fmt.Errorf("no packages found with name %q in any arch", input)
 	}
 
 	cleanup = func() error {
