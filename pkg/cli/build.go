@@ -115,6 +115,9 @@ func cmdBuild() *cobra.Command {
 				cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
 			}
 
+			// Used to track expected generation of index file to allow idempotent writes.
+			cfg.generations = map[string]int64{}
+
 			if cfg.bundle != "" {
 				if cfg.stagingBucket == "" {
 					return fmt.Errorf("need --bucket with --bundle")
@@ -238,6 +241,9 @@ func (g *global) fetchIndexFromBucket(ctx context.Context, arch string) (map[str
 		return nil, err
 	}
 	defer rc.Close()
+
+	// Set this for conditional requests on upload.
+	g.generations[arch] = rc.Attrs.Generation
 
 	clog.FromContext(ctx).Debugf("downloading %s to %s", obj, out)
 
@@ -661,8 +667,11 @@ type global struct {
 	mu sync.Mutex
 
 	bundle string
+
 	// per arch rate limiter (for APKINDEX)
 	writeLimiters map[string]*rate.Limiter
+	generations   map[string]int64
+
 	gcs           *storage.Client
 	stagingBucket string
 	dstBucket     string
@@ -1530,8 +1539,13 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 		return fmt.Errorf("waiting for rate limit: %w", err)
 	}
 
-	// TODO: Optimistic concurrency goes here.
-	wc := t.cfg.gcs.Bucket(bucket).Object(obj).NewWriter(ctx)
+	// The gcs client will only retry wc.Close() errors if the upload is idempotent.
+	// Using this GenerationMatch condition causes the upload to be idempotent.
+	// We expect to be the only writer of these objects, so this is fine.
+	// If we allow multiple concurrent index uploaders, we can also use this to safely retry.
+	cond := storage.Conditions{GenerationMatch: t.cfg.generations[arch]}
+
+	wc := t.cfg.gcs.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
 
 	if _, err := io.Copy(wc, f); err != nil {
 		return fmt.Errorf("uploading %s: %w", obj, err)
@@ -1540,6 +1554,9 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 	if err := wc.Close(); err != nil {
 		return fmt.Errorf("finalizing upload of %s: %w", obj, err)
 	}
+
+	// Update this arch's generation so we can use it for idempotency above.
+	t.cfg.generations[arch] = wc.Attrs().Generation
 
 	return nil
 }
