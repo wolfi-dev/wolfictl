@@ -12,13 +12,22 @@ type Function func(config.Configuration) error
 // ConditionFunc is a function that checks if a rule should be executed.
 type ConditionFunc func() bool
 
-// Severity is the severity of a rule.
-type Severity string
+// Severity is the severity level of a rule.
+type Severity struct {
+	Name  string
+	Value int
+}
 
 const (
-	SeverityError   Severity = "ERROR"
-	SeverityWarning Severity = "WARNING"
-	SeverityInfo    Severity = "INFO"
+	SeverityErrorLevel = iota
+	SeverityWarningLevel
+	SeverityInfoLevel
+)
+
+var (
+	SeverityError   = Severity{"ERROR", SeverityErrorLevel}
+	SeverityWarning = Severity{"WARNING", SeverityWarningLevel}
+	SeverityInfo    = Severity{"INFO", SeverityInfoLevel}
 )
 
 // Rule represents a linter rule.

@@ -12,13 +12,16 @@ import (
 
 func TestLinter_Rules(t *testing.T) {
 	tests := []struct {
-		name    string
-		file    string
-		want    EvalResult
-		wantErr bool
+		name        string
+		file        string
+		minSeverity Severity
+		matches     int
+		want        EvalResult
+		wantErr     bool
 	}{
 		{
-			file: "missing-copyright.yaml",
+			file:        "missing-copyright.yaml",
+			minSeverity: SeverityInfo,
 			want: EvalResult{
 				File: "missing-copyright",
 				Errors: EvalRuleErrors{
@@ -32,9 +35,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "forbidden-repository.yaml",
+			file:        "forbidden-repository.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "forbidden-repository",
 				Errors: EvalRuleErrors{
@@ -48,9 +53,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "forbidden-repository-tagged.yaml",
+			file:        "forbidden-repository-tagged.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "forbidden-repository-tagged",
 				Errors: EvalRuleErrors{
@@ -64,9 +71,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "forbidden-keyring.yaml",
+			file:        "forbidden-keyring.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "forbidden-keyring",
 				Errors: EvalRuleErrors{
@@ -80,9 +89,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "wrong-pipeline-fetch-uri.yaml",
+			file:        "wrong-pipeline-fetch-uri.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "wrong-pipeline-fetch-uri",
 				Errors: EvalRuleErrors{
@@ -96,9 +107,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "idn-homograph-attack.yaml",
+			file:        "idn-homograph-attack.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "idn-homograph-attack",
 				Errors: EvalRuleErrors{
@@ -112,9 +125,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "wrong-pipeline-fetch-digest.yaml",
+			file:        "wrong-pipeline-fetch-digest.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "wrong-pipeline-fetch-digest",
 				Errors: EvalRuleErrors{
@@ -128,9 +143,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "duplicated-package.yaml",
+			file:        "duplicated-package.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "duplicated-package",
 				Errors: EvalRuleErrors{
@@ -144,9 +161,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "bad-template-var.yaml",
+			file:        "bad-template-var.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "bad-template-var",
 				Errors: EvalRuleErrors{
@@ -160,9 +179,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "bad-version.yaml",
+			file:        "bad-version.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "bad-version",
 				Errors: EvalRuleErrors{
@@ -175,9 +196,11 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+			matches: 1,
 		},
 		{
-			file: "wrong-pipeline-git-checkout-commit.yaml",
+			file:        "wrong-pipeline-git-checkout-commit.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "wrong-pipeline-git-checkout-commit",
 				Errors: EvalRuleErrors{
@@ -191,9 +214,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "missing-pipeline-git-checkout-commit.yaml",
+			file:        "missing-pipeline-git-checkout-commit.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "missing-pipeline-git-checkout-commit",
 				Errors: EvalRuleErrors{
@@ -207,9 +232,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "wrong-pipeline-git-checkout-tag.yaml",
+			file:        "wrong-pipeline-git-checkout-tag.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "wrong-pipeline-git-checkout-tag",
 				Errors: EvalRuleErrors{
@@ -223,9 +250,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "nolint.yaml",
+			file:        "nolint.yaml",
+			minSeverity: SeverityInfo,
 			want: EvalResult{
 				File: "nolint",
 				Errors: EvalRuleErrors{
@@ -239,9 +268,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "no-epoch.yaml",
+			file:        "no-epoch.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "no-epoch",
 				Errors: EvalRuleErrors{
@@ -255,9 +286,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "check-version-matches.yaml",
+			file:        "check-version-matches.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "check-version-matches",
 				Errors: EvalRuleErrors{
@@ -271,9 +304,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "check-subpipeline-version-matches.yaml",
+			file:        "check-subpipeline-version-matches.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "check-version-matches",
 				Errors: EvalRuleErrors{
@@ -287,9 +322,11 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
 		},
 		{
-			file: "missing-github-update-git-checkout.yaml",
+			file:        "missing-github-update-git-checkout.yaml",
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "missing-github-update-git-checkout",
 				Errors: EvalRuleErrors{
@@ -303,6 +340,62 @@ func TestLinter_Rules(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "no-main-test.yaml",
+			minSeverity: SeverityInfo,
+			want: EvalResult{
+				File: "no-main-test",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-package-or-subpackage-test",
+							Severity: SeverityInfo,
+						},
+						Error: fmt.Errorf("[valid-package-or-subpackage-test]: no main package or subpackage test found (INFO)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			// Validate rule is not triggered when min severity < rule severity
+			file:        "no-main-test.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "no-main-test",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-package-or-subpackage-test",
+							Severity: SeverityInfo,
+						},
+						Error: fmt.Errorf("[valid-package-or-subpackage-test]: no main package or subpackage test found (INFO)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 0,
+		},
+		{
+			file:        "has-subpackage-test.yaml",
+			minSeverity: SeverityInfo,
+			want: EvalResult{
+				File: "has-subpackage-test",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-package-or-subpackage-test",
+							Severity: SeverityInfo,
+						},
+						Error: fmt.Errorf("[valid-package-or-subpackage-test]: no main package or subpackage test found (INFO)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 0,
 		},
 	}
 
@@ -310,14 +403,18 @@ func TestLinter_Rules(t *testing.T) {
 		t.Run(tt.file, func(t *testing.T) {
 			ctx := context.Background()
 			l := newTestLinterWithFile(tt.file)
-			got, err := l.Lint(ctx)
+			got, err := l.Lint(ctx, tt.minSeverity)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Lint() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			// Always should be a single element array.
-			require.Len(t, got, 1)
+			require.Len(t, got, tt.matches)
+
+			if tt.matches == 0 {
+				return
+			}
 
 			g := got[0]
 

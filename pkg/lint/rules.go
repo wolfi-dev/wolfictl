@@ -337,7 +337,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				re := regexp.MustCompile(`# CHECK-WHEN-VERSION-CHANGES: (.+)`)
-				var checkString = func(s string) error {
+				checkString := func(s string) error {
 					match := re.FindStringSubmatch(s)
 					if len(match) == 0 {
 						return nil
@@ -408,6 +408,25 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					}
 				}
 				return nil
+			},
+		},
+		{
+			Name:        "valid-package-or-subpackage-test",
+			Description: "every package should have a valid main or subpackage test",
+			Severity:    SeverityInfo,
+			LintFunc: func(c config.Configuration) error {
+				if len(c.Test.Pipeline) > 0 {
+					// Main package has at least one test
+					return nil
+				}
+
+				for _, sp := range c.Subpackages {
+					if len(sp.Test.Pipeline) > 0 {
+						// A subpackage has at least one test
+						return nil
+					}
+				}
+				return fmt.Errorf("no main package or subpackage test found")
 			},
 		},
 	}

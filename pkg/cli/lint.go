@@ -12,6 +12,7 @@ type lintOptions struct {
 	args      []string
 	list      bool
 	skipRules []string
+	severity  string
 }
 
 func cmdLint() *cobra.Command {
@@ -31,6 +32,7 @@ func cmdLint() *cobra.Command {
 	}
 	cmd.Flags().BoolVarP(&o.list, "list", "l", false, "prints the all of available rules and exits")
 	cmd.Flags().StringArrayVarP(&o.skipRules, "skip-rule", "", []string{}, "list of rules to skip")
+	cmd.Flags().StringVarP(&o.severity, "severity", "s", "warning", "minimum severity level to report (error, warning, info)")
 
 	cmd.AddCommand(cmdLintYam())
 
@@ -47,7 +49,14 @@ func (o lintOptions) LintCmd(ctx context.Context) error {
 	}
 
 	// Run the linter.
-	result, err := linter.Lint(ctx)
+	minSeverity := lint.SeverityWarning
+	switch {
+	case o.severity == "error", o.severity == "ERROR":
+		minSeverity = lint.SeverityError
+	case o.severity == "info", o.severity == "INFO":
+		minSeverity = lint.SeverityInfo
+	}
+	result, err := linter.Lint(ctx, minSeverity)
 	if err != nil {
 		return err
 	}
