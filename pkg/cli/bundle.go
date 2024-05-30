@@ -1,16 +1,22 @@
 package cli
 
 import (
+	"bufio"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"testing/fstest"
+	"time"
 
 	"chainguard.dev/apko/pkg/build/types"
 	"github.com/chainguard-dev/clog"
@@ -229,6 +235,11 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 		return errors.Join(errs...)
 	}
 
+	epochs, err := getEpochs(ctx, maps.Values(built))
+	if err != nil {
+		return fmt.Errorf("computing build date epochs: %w", err)
+	}
+
 	needed, err := stuff.g.Filter(func(pkg dag.Package) bool {
 		_, ok := built[pkg.Name()]
 		return ok
@@ -264,25 +275,35 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	}}
 
 	// Second is all the metadata.
-	bundleTasks := make([]bundle.Task, 0, len(built))
+	bundleTasks := make([]*bundle.Task, 0, len(built))
 	for pkg, t := range built {
-		// TODO: Remove workaround once we've fixed melange and wolfi.
-		// See https://github.com/chainguard-dev/melange/issues/1236
-		subpkgs := map[string]struct{}{}
-		for _, sp := range t.config.Subpackages { //nolint:gocritic
-			subpkgs[sp.Name] = struct{}{}
+		subpkgs := make([]string, 0, len(t.config.Subpackages))
+		for i := range t.config.Subpackages {
+			subpkgs = append(subpkgs, t.config.Subpackages[i].Name)
 		}
-		bundleTasks = append(bundleTasks, bundle.Task{
-			Package:       pkg,
-			Version:       t.config.Package.Version,
-			Epoch:         t.config.Package.Epoch,
-			Path:          t.config.Path,
-			SourceDir:     filepath.Join(t.cfg.dir, t.pkg),
-			Architectures: t.archs,
-			Subpackages:   maps.Keys(subpkgs),
-			Resources:     t.config.Package.Resources,
+
+		bde, ok := epochs[t.config.Path]
+		if !ok {
+			return fmt.Errorf("missing buildDateEpoch: %s", t.pkg)
+		}
+
+		bundleTasks = append(bundleTasks, &bundle.Task{
+			Package:        pkg,
+			Version:        t.config.Package.Version,
+			Epoch:          t.config.Package.Epoch,
+			Path:           t.config.Path,
+			SourceDir:      filepath.Join(t.cfg.dir, t.pkg),
+			Architectures:  t.archs,
+			Subpackages:    subpkgs,
+			Resources:      t.config.Package.Resources,
+			BuildDateEpoch: bde,
 		})
 	}
+
+	// Sorted as an attempt to get some reproducibility.
+	slices.SortFunc(bundleTasks, func(a, b *bundle.Task) int {
+		return cmp.Compare(a.Package, b.Package)
+	})
 
 	tb, err := json.Marshal(bundleTasks)
 	if err != nil {
@@ -523,4 +544,84 @@ func commonFS(dirfs fs.FS) (fs.FS, error) {
 
 func envFile(arch string) string {
 	return fmt.Sprintf("build-%s.env", arch)
+}
+
+// this is faster than calling task.gitSDE() for every task
+func getEpochs(ctx context.Context, tasks []*task) (map[string]time.Time, error) {
+	times := make(map[string]time.Time, len(tasks))
+
+	// Set of files we care about.
+	need := make(map[string]struct{}, len(tasks))
+	for _, t := range tasks {
+		need[t.config.Path] = struct{}{}
+	}
+
+	// Shell out to git to generate a list of commit timestamps with their changed files.
+	cmd := exec.CommandContext(ctx, "git", "--no-pager", "log", "--pretty=format:%ct", "--name-only", "--no-merges")
+	pipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+	scanner := bufio.NewScanner(pipe)
+
+	// Format looks something like this:
+	//
+	// 	1716930261
+	// 	abseil-cpp.yaml
+	// 	btrfs-progs.yaml
+	// 	postgresql-16.yaml
+	//
+	// 	1716927753
+	// 	neuvector-manager.yaml
+	//
+	// 	1716927723
+	// 	neuvector-controller.yaml
+	// 	neuvector-manager.yaml
+	// 	neuvector-monitor.yaml
+	// 	neuvector-nstools.yaml
+	//
+	// First line is the timestamp, then subsequent lines are changed files.
+	group := []string{}
+
+	for scanner.Scan() {
+		// Accumulate lines in group until we hit an empty line.
+		line := scanner.Text()
+		if line != "" {
+			group = append(group, line)
+			continue
+		}
+
+		// Parse the group.
+		start := group[0]
+		sde, err := strconv.ParseInt(strings.TrimSpace(start), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		for _, line := range group[1:] {
+			if _, ok := need[line]; !ok {
+				continue
+			}
+
+			times[line] = time.Unix(sde, 0)
+			delete(need, line)
+		}
+
+		// Empty group so we can reuse it for the next one.
+		group = slices.Delete(group, 0, len(group))
+
+		// TODO: Maybe exit early if len(need) == 0 and this is slow.
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return nil, err
+	}
+
+	return times, nil
 }
