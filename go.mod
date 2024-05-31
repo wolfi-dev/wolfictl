@@ -3,7 +3,7 @@ module github.com/wolfi-dev/wolfictl
 go 1.22.3
 
 require (
-	chainguard.dev/apko v0.14.3
+	chainguard.dev/apko v0.14.6
 	chainguard.dev/melange v0.8.3
 	cloud.google.com/go/storage v1.41.0
 	github.com/adrg/xdg v0.4.0
@@ -11,7 +11,7 @@ require (
 	github.com/anchore/stereoscope v0.0.3-0.20240501181043-2e9894674185
 	github.com/anchore/syft v1.5.0
 	github.com/chainguard-dev/clog v1.3.1
-	github.com/chainguard-dev/go-apk v0.0.0-20240529184756-80073b57da97
+	github.com/chainguard-dev/go-apk v0.0.0-20240530214935-2ff9aee8385a
 	github.com/chainguard-dev/yam v0.0.7
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.3
