@@ -586,6 +586,8 @@ func getEpochs(ctx context.Context, tasks []*task) (map[string]time.Time, error)
 
 	// Shell out to git to generate a list of commit timestamps with their changed files.
 	cmd := exec.CommandContext(ctx, "git", "--no-pager", "log", "--pretty=format:%ct", "--name-only", "--no-merges")
+	cmd.Stderr = os.Stderr
+
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
