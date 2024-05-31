@@ -345,7 +345,7 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*corev1.Pod, error) {
+func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, memTmpfs bool) (*corev1.Pod, error) {
 	goarch := types.ParseArchitecture(arch).String()
 
 	// Set some sane default resource requests if none are specified by flag or config.
@@ -355,10 +355,15 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*core
 		Memory: "4Gi",
 	}
 
+	emptyDirMedium := corev1.StorageMediumDefault
 	// Copy resources out of the task rather than overwriting in place because both archs share the same task.
 	if in := task.Resources; in != nil {
 		if in.CPU != "" {
 			resources.CPU = in.CPU
+
+			if memTmpfs {
+				emptyDirMedium = corev1.StorageMediumMemory
+			}
 		}
 		if in.Memory != "" {
 			resources.Memory = in.Memory
@@ -470,7 +475,9 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*core
 				{
 					Name: "tmp-dir-bundle-builder",
 					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{},
+						EmptyDir: &corev1.EmptyDirVolumeSource{
+							Medium: emptyDirMedium,
+						},
 					},
 				},
 			},
