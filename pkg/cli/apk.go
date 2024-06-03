@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
@@ -9,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"cloud.google.com/go/storage"
@@ -21,10 +24,11 @@ import (
 func cmdApk() *cobra.Command {
 	cmd := &cobra.Command{Use: "apk"}
 	cmd.AddCommand(cmdCp())
+	cmd.AddCommand(cmdApkLs())
 	return cmd
 }
 
-func cmdCp() *cobra.Command { //nolint:gocyclo
+func cmdCp() *cobra.Command {
 	var latest bool
 	var indexURL, outDir, gcsPath string
 	cmd := &cobra.Command{
@@ -36,45 +40,9 @@ func cmdCp() *cobra.Command { //nolint:gocyclo
 
 			repoURL := strings.TrimSuffix(indexURL, "/APKINDEX.tar.gz")
 
-			var in io.ReadCloser
-			var arch string
-			switch {
-			case indexURL == "-":
-				in = os.Stdin
-				arch = "x86_64" // TODO: This is hardcoded.
-			case strings.HasPrefix(indexURL, "file://"):
-				f, err := os.Open(strings.TrimPrefix(indexURL, "file://"))
-				if err != nil {
-					return fmt.Errorf("opening %q: %w", indexURL, err)
-				}
-				in = f
-
-				arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
-			default:
-				u, err := url.Parse(indexURL)
-				if err != nil {
-					return fmt.Errorf("parsing %q: %w", indexURL, err)
-				}
-				addAuth(u)
-				req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-				if err != nil {
-					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
-				}
-				resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
-				if err != nil {
-					return fmt.Errorf("GET %q: %w", u.Redacted(), err)
-				}
-				if resp.StatusCode >= 400 {
-					return fmt.Errorf("GET %q: status %d: %s", u.Redacted(), resp.StatusCode, resp.Status)
-				}
-				in = resp.Body
-
-				arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
-			}
-			defer in.Close()
-			index, err := apk.IndexFromArchive(in)
+			index, arch, err := fetchAPKIndex(ctx, indexURL)
 			if err != nil {
-				return fmt.Errorf("parsing %q: %w", indexURL, err)
+				return err
 			}
 
 			wantSet := map[string]struct{}{}
@@ -114,12 +82,12 @@ func cmdCp() *cobra.Command { //nolint:gocyclo
 						if err != nil {
 							return err
 						}
-						addAuth(u)
 						log.Println("downloading", u.Redacted())
 						req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 						if err != nil {
 							return err
 						}
+						addAuth(req)
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
 							return err
@@ -221,14 +189,124 @@ func cmdCp() *cobra.Command { //nolint:gocyclo
 	return cmd
 }
 
-func addAuth(u *url.URL) {
+func cmdApkLs() *cobra.Command {
+	var full bool
+	var latest bool
+	var j bool
+	var packageFilter string
+
+	cmd := &cobra.Command{
+		Use:     "ls",
+		Example: `wolfictl apk ls https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz`,
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			u := args[0]
+
+			dir := strings.TrimSuffix(u, "/APKINDEX.tar.gz")
+
+			index, _, err := fetchAPKIndex(ctx, u)
+			if err != nil {
+				return err
+			}
+
+			w := cmd.OutOrStdout()
+			enc := json.NewEncoder(w)
+
+			packages := index.Packages
+
+			// TODO: origin filter as well?
+			if packageFilter != "" {
+				packages = slices.DeleteFunc(packages, func(pkg *apk.Package) bool {
+					return pkg.Name != packageFilter
+				})
+			}
+
+			if latest {
+				packages = onlyLatest(packages)
+			}
+
+			for _, pkg := range packages {
+				p := fmt.Sprintf("%s-%s.apk", pkg.Name, pkg.Version)
+				u := fmt.Sprintf("%s/%s", dir, p)
+				switch {
+				case j:
+					if err := enc.Encode(pkg); err != nil {
+						return fmt.Errorf("encoding %s: %w", pkg.Name, err)
+					}
+				case full:
+					fmt.Fprintf(w, "%s\n", u)
+				default:
+					fmt.Fprintf(w, "%s\n", p)
+				}
+			}
+
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVarP(&packageFilter, "package", "P", "", "print only packages with the given name")
+	cmd.Flags().BoolVar(&latest, "latest", false, "print only the latest version of each package")
+	cmd.Flags().BoolVar(&full, "full", false, "print the full url or path")
+	cmd.Flags().BoolVar(&j, "json", false, "print each package as json")
+
+	return cmd
+}
+
+func fetchAPKIndex(ctx context.Context, indexURL string) (*apk.APKIndex, string, error) {
+	var arch string
+	repoURL := strings.TrimSuffix(indexURL, "/APKINDEX.tar.gz")
+	var in io.ReadCloser
+	switch {
+	case indexURL == "-":
+		in = os.Stdin
+		arch = "x86_64" // TODO: This is hardcoded.
+	case strings.HasPrefix(indexURL, "file://"):
+		f, err := os.Open(strings.TrimPrefix(indexURL, "file://"))
+		if err != nil {
+			return nil, "", fmt.Errorf("opening %q: %w", indexURL, err)
+		}
+		in = f
+
+		arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
+	default:
+		u, err := url.Parse(indexURL)
+		if err != nil {
+			return nil, "", fmt.Errorf("parsing %q: %w", indexURL, err)
+		}
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+		if err != nil {
+			return nil, "", fmt.Errorf("GET %q: %w", u.Redacted(), err)
+		}
+		addAuth(req)
+		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
+		if err != nil {
+			return nil, "", fmt.Errorf("GET %q: %w", u.Redacted(), err)
+		}
+		if resp.StatusCode >= 400 {
+			return nil, "", fmt.Errorf("GET %q: status %d: %s", u.Redacted(), resp.StatusCode, resp.Status)
+		}
+		in = resp.Body
+
+		arch = repoURL[strings.LastIndex(repoURL, "/")+1:]
+	}
+	defer in.Close()
+	index, err := apk.IndexFromArchive(in)
+	if err != nil {
+		return nil, "", fmt.Errorf("parsing %q: %w", indexURL, err)
+	}
+	return index, arch, nil
+}
+
+func addAuth(req *http.Request) {
 	env := os.Getenv("HTTP_AUTH")
 	parts := strings.Split(env, ":")
 	if len(parts) != 4 || parts[0] != "basic" {
 		return
 	}
-	// parts[1] is the realm, ignore it.
-	u.User = url.UserPassword(parts[2], parts[3])
+	if req.URL.Host == parts[1] {
+		req.SetBasicAuth(parts[2], parts[3])
+	}
 }
 
 func onlyLatest(packages []*apk.Package) []*apk.Package {
