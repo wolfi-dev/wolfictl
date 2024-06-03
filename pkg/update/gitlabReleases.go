@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"strings"
 
 	"chainguard.dev/melange/pkg/config"
@@ -88,16 +87,14 @@ func (o GitLabReleaseOptions) getLatestGitLabVersions() (map[string]NewVersionRe
 					Commit:  release.Commit.ID,
 				})
 			}
-			properVersionList, err := prepareVersion(allReleaseList, &o.PackageConfigs[packageName].Config)
+			v, c, err := prepareLatestVersion(allReleaseList, &o.PackageConfigs[packageName].Config)
 			if err != nil {
 				o.ErrorMessages[packageName] = fmt.Sprintf("Failed to prepare version for %s: %v", packageName, err)
 				continue
 			}
-			if len(properVersionList) > 0 {
-				latestVersionResults[packageName] = NewVersionResults{
-					Version: properVersionList[0].Version,
-					Commit:  properVersionList[0].Commit,
-				}
+			latestVersionResults[packageName] = NewVersionResults{
+				Version: v,
+				Commit:  c,
 			}
 		}
 	}
@@ -131,16 +128,15 @@ func (o GitLabReleaseOptions) getLatestGitLabVersions() (map[string]NewVersionRe
 					Commit:  tag.Commit.ID,
 				})
 			}
-			properVersionList, err := prepareVersion(allTagsList, &o.PackageConfigs[packageName].Config)
+			v, c, err := prepareLatestVersion(allTagsList, &o.PackageConfigs[packageName].Config)
 			if err != nil {
 				o.ErrorMessages[packageName] = fmt.Sprintf("Failed to prepare version for %s: %v", packageName, err)
 				continue
 			}
-			if len(properVersionList) > 0 {
-				latestVersionResults[packageName] = NewVersionResults{
-					Version: properVersionList[0].Version,
-					Commit:  properVersionList[0].Commit,
-				}
+
+			latestVersionResults[packageName] = NewVersionResults{
+				Version: v,
+				Commit:  c,
 			}
 		}
 	}
@@ -148,28 +144,26 @@ func (o GitLabReleaseOptions) getLatestGitLabVersions() (map[string]NewVersionRe
 	return latestVersionResults, o.ErrorMessages, nil
 }
 
-func prepareVersion(versionList []VersionComit, packageConfig *config.Configuration) ([]VersionComit, error) {
-	properVersionList := []VersionComit{}
+func prepareLatestVersion(versionList []VersionComit, packageConfig *config.Configuration) (latestVersion, commit string, err error) {
 	if len(versionList) == 0 {
-		return properVersionList, errors.New("No versions found, empty list")
+		return latestVersion, commit, errors.New("No versions found, empty list of tags/releases")
 	}
 
 	glm := packageConfig.Update.GitLabMonitor
 	if glm == nil {
-		return properVersionList, errors.New("No GitLab update configuration found for package")
+		return latestVersion, commit, errors.New("No GitLab update configuration found for package")
 	}
 
 	for _, vc := range versionList {
-		if len(packageConfig.Update.IgnoreRegexPatterns) > 0 {
-			for _, pattern := range packageConfig.Update.IgnoreRegexPatterns {
-				regex, err := regexp.Compile(pattern)
-				if err != nil {
-					return properVersionList, fmt.Errorf("Failed to compile regex %s", pattern)
-				}
-				if regex.MatchString(vc.Version) {
-					continue
-				}
-			}
+		ignore, err := ignoreVersions(packageConfig.Update.IgnoreRegexPatterns, vc.Version)
+		if err != nil {
+			return latestVersion, commit, err
+		}
+		if ignore {
+			continue
+		}
+		if shouldSkipVersion(vc.Version) {
+			continue
 		}
 		if glm.TagFilterPrefix != "" {
 			if !strings.HasPrefix(vc.Version, glm.TagFilterPrefix) {
@@ -182,21 +176,27 @@ func prepareVersion(versionList []VersionComit, packageConfig *config.Configurat
 			}
 		}
 
-		version := vc.Version
+		latestVersion = vc.Version
+		commit = vc.Commit
 		if glm.StripPrefix != "" {
-			version = strings.TrimPrefix(version, glm.StripPrefix)
+			latestVersion = strings.TrimPrefix(latestVersion, glm.StripPrefix)
 		}
 		if glm.StripSuffix != "" {
-			version = strings.TrimSuffix(version, glm.StripSuffix)
+			latestVersion = strings.TrimSuffix(latestVersion, glm.StripSuffix)
 		}
-		properVersionList = append(properVersionList, VersionComit{
-			Version: version,
-			Commit:  vc.Commit,
-		})
-	}
 
-	return properVersionList, nil
+		latestVersion, er := transformVersion(packageConfig.Update, latestVersion)
+		if er != nil {
+			return latestVersion, commit, fmt.Errorf("Failed to apply version transforms to %s.  Error: %s", latestVersion, er)
+		}
+		break
+	}
+	if latestVersion == "" {
+		return latestVersion, commit, errors.New("No latest version found")
+	}
+	return latestVersion, commit, nil
 }
+
 func (o GitLabReleaseOptions) getSeparateRepoLists() (releaseRepoList, tagRepoList map[string]string) {
 	tagRepoList = make(map[string]string)
 	releaseRepoList = make(map[string]string)
