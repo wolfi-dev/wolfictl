@@ -235,11 +235,6 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 		return errors.Join(errs...)
 	}
 
-	epochs, err := getEpochs(ctx, maps.Values(built))
-	if err != nil {
-		return fmt.Errorf("computing build date epochs: %w", err)
-	}
-
 	needed, err := stuff.g.Filter(func(pkg dag.Package) bool {
 		_, ok := built[pkg.Name()]
 		return ok
@@ -273,6 +268,12 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 			},
 		},
 	}}
+
+	epochs, err := getEpochs(ctx, maps.Values(built))
+	if err != nil {
+		return fmt.Errorf("computing build date epochs: %w", err)
+	}
+	log.Infof("saw %d epochs from git", len(epochs))
 
 	// Second is all the metadata.
 	bundleTasks := make([]*bundle.Task, 0, len(built))
@@ -651,6 +652,10 @@ func getEpochs(ctx context.Context, tasks []*task) (map[string]time.Time, error)
 
 	if err := cmd.Wait(); err != nil {
 		return nil, err
+	}
+
+	if len(need) != 0 {
+		clog.FromContext(ctx).Warnf("getEpochs missed files: %v", maps.Keys(need))
 	}
 
 	return times, nil
