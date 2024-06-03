@@ -2,6 +2,9 @@ module github.com/wolfi-dev/wolfictl
 
 go 1.22.3
 
+// Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
+replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
+
 require (
 	chainguard.dev/apko v0.14.7
 	chainguard.dev/melange v0.8.3
