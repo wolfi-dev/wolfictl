@@ -28,7 +28,7 @@ func cmdApk() *cobra.Command {
 	return cmd
 }
 
-func cmdCp() *cobra.Command { //nolint:gocyclo
+func cmdCp() *cobra.Command {
 	var latest bool
 	var indexURL, outDir, gcsPath string
 	cmd := &cobra.Command{
@@ -229,13 +229,14 @@ func cmdApkLs() *cobra.Command {
 			for _, pkg := range packages {
 				p := fmt.Sprintf("%s-%s.apk", pkg.Name, pkg.Version)
 				u := fmt.Sprintf("%s/%s", dir, p)
-				if j {
+				switch {
+				case j:
 					if err := enc.Encode(pkg); err != nil {
 						return fmt.Errorf("encoding %s: %w", pkg.Name, err)
 					}
-				} else if full {
+				case full:
 					fmt.Fprintf(w, "%s\n", u)
-				} else {
+				default:
 					fmt.Fprintf(w, "%s\n", p)
 				}
 			}
