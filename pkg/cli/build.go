@@ -1544,6 +1544,11 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 	// We expect to be the only writer of these objects, so this is fine.
 	// If we allow multiple concurrent index uploaders, we can also use this to safely retry.
 	cond := storage.Conditions{GenerationMatch: t.cfg.generations[arch]}
+	if cond.GenerationMatch == 0 {
+		// This fails with "NewWriter: empty conditions" if generation is 0,
+		// so set DoesNotExist instead.
+		cond.DoesNotExist = true
+	}
 
 	wc := t.cfg.gcs.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
 
