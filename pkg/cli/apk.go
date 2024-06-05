@@ -14,8 +14,8 @@ import (
 	"slices"
 	"strings"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"cloud.google.com/go/storage"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
@@ -153,7 +153,13 @@ func cmdCp() *cobra.Command {
 					return err
 				}
 				defer f.Close()
-				pkg, err := apk.ParsePackage(ctx, f)
+
+				stat, err := f.Stat()
+				if err != nil {
+					return err
+				}
+
+				pkg, err := apk.ParsePackage(ctx, f, uint64(stat.Size()))
 				if err != nil {
 					return err
 				}

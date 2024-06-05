@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"

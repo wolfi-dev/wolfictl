@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/container"
@@ -29,7 +30,6 @@ import (
 	"chainguard.dev/melange/pkg/sign"
 	"cloud.google.com/go/storage"
 	"github.com/chainguard-dev/clog"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/dominikbraun/graph"
 	"github.com/google/go-containerregistry/pkg/name"

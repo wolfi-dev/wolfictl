@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"

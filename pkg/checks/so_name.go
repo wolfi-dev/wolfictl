@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
+	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
