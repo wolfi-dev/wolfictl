@@ -2,13 +2,14 @@ package cli
 
 import (
 	"fmt"
-	"os"
+	"slices"
 	"strings"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
-	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
 func cmdAdvisoryList() *cobra.Command {
@@ -19,7 +20,7 @@ func cmdAdvisoryList() *cobra.Command {
 		Short:   "List advisories for specific packages, vulnerabilities, or the entire data set",
 		Long: `List advisories for specific packages, vulnerabilities, or the entire data set.
 
-The 'list' (or 'ls') command prints a list of advisories based on the given 
+The 'list' (or 'ls') command prints a table of advisories based on the given 
 selection criteria. By default, all advisories in the current advisory data set 
 will be listed.
 
@@ -32,6 +33,10 @@ You can list advisories for a single package:
 You can list all advisories for a given vulnerability ID across all packages:
 
 	wolfictl adv ls -V CVE-2023-38545
+
+You can filter advisories by the type of the latest event:
+
+	wolfictl adv ls -t detection
 
 You can show only advisories that are considered not to be "resolved":
 
@@ -48,25 +53,28 @@ investigation over time for a given package/vulnerability match.'
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
-			if advisoriesRepoDir == "" {
-				if p.doNotDetectDistro {
-					return fmt.Errorf("no advisories repo dir specified")
-				}
-
-				d, err := distro.Detect()
-				if err != nil {
-					return fmt.Errorf("no advisories repo dir specified, and distro auto-detection failed: %w", err)
-				}
-
-				advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
-				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
+			if p.history && p.typ != "" {
+				return fmt.Errorf("cannot use --history and --type together")
 			}
 
-			advisoriesFsys := rwos.DirFS(advisoriesRepoDir)
+			p.typ = translateEventTypeAlternativeNames(p.typ)
+
+			if p.typ != "" && !slices.Contains(v2.EventTypes, p.typ) {
+				return fmt.Errorf("invalid event type: %s", p.typ)
+			}
+
+			if p.advisoriesRepoDir == "" {
+				p.advisoriesRepoDir = "." // default to current working directory
+			}
+
+			advisoriesFsys := rwos.DirFS(p.advisoriesRepoDir)
 			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoriesFsys)
 			if err != nil {
 				return err
+			}
+
+			if advisoryCfgs.Select().Len() == 0 {
+				return fmt.Errorf("no advisory data found in %q; cd to an advisories directory, or use -a flag", p.advisoriesRepoDir)
 			}
 
 			var cfgs []v2.Document
@@ -76,12 +84,15 @@ investigation over time for a given package/vulnerability match.'
 				cfgs = advisoryCfgs.Select().Configurations()
 			}
 
-			var output string
+			list := advisoryListRenderer{
+				showHistory: p.history,
+				showAliases: p.showAliases,
+			}
 
 			for _, cfg := range cfgs {
 				for _, adv := range cfg.Advisories {
 					if len(adv.Events) == 0 {
-						// nothing to show
+						// nothing to add
 						continue
 					}
 
@@ -91,40 +102,33 @@ investigation over time for a given package/vulnerability match.'
 					}
 
 					if p.unresolved && adv.Resolved() {
-						// user only wants to see unresolved advisories
+						// user only wants unresolved advisories
 						continue
 					}
 
-					vulnID := adv.ID
-					if len(adv.Aliases) > 0 {
-						vulnID += fmt.Sprintf(" (%s)", strings.Join(adv.Aliases, ", "))
-					}
-
 					if p.history {
-						// user wants to see the full history
+						// user wants the full history
 						sorted := adv.SortedEvents()
-						for _, event := range sorted {
-							statusDescription := renderListItem(event)
-							timestamp := event.Timestamp
-
-							output += fmt.Sprintf(
-								"%s: %s: %s @ %s\n",
-								cfg.Package.Name,
-								vulnID,
-								statusDescription,
-								timestamp,
-							)
+						for i, event := range sorted {
+							isLatest := i == len(sorted)-1 // last event is the latest
+							list.add(cfg.Package.Name, adv.ID, adv.Aliases, event, isLatest)
 						}
 
 						continue
 					}
 
-					statusDescription := renderListItem(adv.Latest())
-					output += fmt.Sprintf("%s: %s: %s\n", cfg.Package.Name, vulnID, statusDescription)
+					latest := adv.Latest()
+
+					if p.typ != "" && latest.Type != p.typ {
+						// user wants to filter by event type
+						continue
+					}
+
+					list.add(cfg.Package.Name, adv.ID, adv.Aliases, latest, true)
 				}
 			}
 
-			fmt.Print(output)
+			fmt.Printf("%s\n", list)
 			return nil
 		},
 	}
@@ -134,19 +138,17 @@ investigation over time for a given package/vulnerability match.'
 }
 
 type listParams struct {
-	doNotDetectDistro bool
-
 	advisoriesRepoDir string
 
 	packageName string
 	vuln        string
 	history     bool
 	unresolved  bool
+	typ         string
+	showAliases bool
 }
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
-	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
-
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 
 	addPackageFlag(&p.packageName, cmd)
@@ -154,50 +156,229 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 
 	cmd.Flags().BoolVar(&p.history, "history", false, "show full history for advisories")
 	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, "only show advisories considered to be unresolved")
+	cmd.Flags().StringVarP(&p.typ, "type", "t", "", "filter advisories by event type")
+	cmd.Flags().BoolVar(&p.showAliases, "aliases", true, "show other known vulnerability IDs for each advisory")
+}
+
+type advisoryListTableRow struct {
+	pkg, advID        string
+	aliases           []string
+	ts, event         string
+	isLatestInHistory bool
+}
+
+type advisoryListRenderer struct {
+	// configuration values
+	showHistory bool
+	showAliases bool
+
+	// internal state
+	rows                     []advisoryListTableRow
+	currentPkg, currentAdvID string
+}
+
+func (r *advisoryListRenderer) add(pkg, advID string, aliases []string, event v2.Event, isLatest bool) {
+	row := advisoryListTableRow{}
+
+	// Don't show the package name again if it's the same as for the prior row
+	if pkg != r.currentPkg {
+		row.pkg = pkg
+		r.currentPkg = pkg
+	}
+
+	// Don't show the advisory ID again if it's the same as for the prior event
+	if advID != r.currentAdvID {
+		row.advID = advID
+		if r.showAliases && len(aliases) > 0 {
+			row.aliases = aliases
+		}
+
+		r.currentAdvID = advID
+	}
+
+	if r.showHistory {
+		row.ts = event.Timestamp.String()
+	}
+
+	row.event = renderListItem(event)
+	row.isLatestInHistory = isLatest
+
+	r.rows = append(r.rows, row)
+}
+
+func (r advisoryListRenderer) String() string {
+	var (
+		stylePkg            = styles.Bold().Foreground(lipgloss.Color("#3ba0f7"))
+		styleAdvID          = lipgloss.NewStyle().Foreground(lipgloss.Color("#bc85ff"))
+		styleAliases        = styleAdvID
+		styleTS             = lipgloss.NewStyle().Foreground(lipgloss.Color("#7f7f7f"))
+		styleNonLatestEvent = lipgloss.NewStyle().Foreground(lipgloss.Color("#a7a7a7"))
+	)
+
+	// calculate column widths
+	var pkgWidth, advIDWidth, aliasesWidth, tsWidth int
+	for _, row := range r.rows {
+		if l := len(row.pkg); l > pkgWidth {
+			pkgWidth = l
+		}
+		if l := len(row.advID); l > advIDWidth {
+			advIDWidth = l
+		}
+		if l := calculateAliasesContentWidth(row.aliases); l > aliasesWidth {
+			aliasesWidth = l
+		}
+		if l := len(row.ts); l > tsWidth {
+			tsWidth = l
+		}
+	}
+
+	sb := strings.Builder{}
+
+	// render table
+	for _, row := range r.rows {
+		sb.WriteString(stylePkg.Render(row.pkg))
+		sb.WriteString(strings.Repeat(" ", pkgWidth-len(row.pkg)+1))
+
+		sb.WriteString(styleAdvID.Render(row.advID))
+		sb.WriteString(strings.Repeat(" ", advIDWidth-len(row.advID)+1))
+
+		if r.showAliases {
+			if len(row.aliases) == 0 {
+				sb.WriteString(strings.Repeat(" ", aliasesWidth+1))
+			} else {
+				// Normally this would be a simple fmt.Sprintf and strings.Join. However, we
+				// need to render each alias as a hyperlink, so we have to do this formatting
+				// manually to avoid ANSI escape code clashes.
+
+				asb := strings.Builder{}
+
+				asb.WriteString(styleAliases.Render("("))
+				for i, alias := range row.aliases {
+					asb.WriteString(styleAliases.Render(hyperlinkVulnerabilityID(alias)))
+
+					if i < len(row.aliases)-1 {
+						asb.WriteString(styleAliases.Render(", "))
+					}
+				}
+				asb.WriteString(styleAliases.Render(")"))
+
+				sb.WriteString(asb.String())
+				sb.WriteString(strings.Repeat(" ", aliasesWidth-calculateAliasesContentWidth(row.aliases)+1))
+			}
+		}
+
+		if r.showHistory {
+			sb.WriteString(styleTS.Render(row.ts))
+			sb.WriteString(strings.Repeat(" ", tsWidth-len(row.ts)+1))
+		}
+
+		if row.isLatestInHistory {
+			sb.WriteString(row.event)
+		} else {
+			sb.WriteString(styleNonLatestEvent.Render(row.event))
+		}
+
+		sb.WriteString("\n")
+	}
+
+	return sb.String()
+}
+
+func translateEventTypeAlternativeNames(typ string) string {
+	switch typ {
+	case "analysis not planned":
+		return v2.EventTypeAnalysisNotPlanned
+
+	case "fix not planned":
+		return v2.EventTypeFixNotPlanned
+
+	case "pending upstream fix":
+		return v2.EventTypePendingUpstreamFix
+
+	case "detected":
+		return v2.EventTypeDetection
+
+	case "true positive", "tp", "TP":
+		return v2.EventTypeTruePositiveDetermination
+
+	case "fix":
+		return v2.EventTypeFixed
+
+	case "false positive", "fp", "FP":
+		return v2.EventTypeFalsePositiveDetermination
+	}
+	return typ
+}
+func calculateAliasesContentWidth(aliases []string) int {
+	if len(aliases) == 0 {
+		return 0
+	}
+
+	width := 0
+	for i, alias := range aliases {
+		width += len(alias)
+
+		if i < len(aliases)-1 {
+			width += 2 // ", " separator
+		}
+	}
+
+	width += 2 // parentheses
+
+	return width
 }
 
 func renderListItem(event v2.Event) string {
 	switch t := event.Type; t {
-	case v2.EventTypeAnalysisNotPlanned,
-		v2.EventTypeFixNotPlanned,
-		v2.EventTypePendingUpstreamFix:
-		return t
+	case v2.EventTypeAnalysisNotPlanned:
+		return "analysis not planned"
+
+	case v2.EventTypeFixNotPlanned:
+		return "fix not planned"
+
+	case v2.EventTypePendingUpstreamFix:
+		return "pending upstream fix"
 
 	case v2.EventTypeDetection:
 		expanded := ""
 		if data, ok := event.Data.(v2.Detection); ok && data.Type != "" {
 			switch data.Type {
 			case v2.DetectionTypeManual:
-				expanded = "manual"
+				return "detected"
 
 			case v2.DetectionTypeNVDAPI:
 				if data, ok := data.Data.(v2.DetectionNVDAPI); ok {
-					expanded = fmt.Sprintf("nvdapi: %s", data.CPEFound)
+					expanded = data.CPEFound
+				}
+
+			case v2.DetectionTypeScanV1:
+				if data, ok := data.Data.(v2.DetectionScanV1); ok {
+					expanded = data.ComponentName
 				}
 			}
 		}
-		return fmt.Sprintf("%s (%s)", t, expanded)
+		return fmt.Sprintf("detected (%s)", expanded)
 
 	case v2.EventTypeTruePositiveDetermination:
 		expanded := ""
 		if data, ok := event.Data.(v2.TruePositiveDetermination); ok && data.Note != "" {
 			expanded = data.Note
 		}
-		return fmt.Sprintf("%s (%s)", t, expanded)
+		return fmt.Sprintf("true positive (%s)", expanded)
 
 	case v2.EventTypeFixed:
 		expanded := ""
 		if data, ok := event.Data.(v2.Fixed); ok && data.FixedVersion != "" {
 			expanded = data.FixedVersion
 		}
-		return fmt.Sprintf("%s (%s)", t, expanded)
+		return fmt.Sprintf("fixed (%s)", expanded)
 
 	case v2.EventTypeFalsePositiveDetermination:
 		expanded := ""
 		if data, ok := event.Data.(v2.FalsePositiveDetermination); ok && data.Type != "" {
 			expanded = data.Type
 		}
-		return fmt.Sprintf("%s (%s)", t, expanded)
+		return fmt.Sprintf("false positive (%s)", expanded)
 	}
 
 	return "INVALID EVENT TYPE"
