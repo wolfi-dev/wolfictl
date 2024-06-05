@@ -7,8 +7,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
-	"github.com/wolfi-dev/wolfictl/pkg/apk"
+	"chainguard.dev/apko/pkg/apk/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 )
 
@@ -52,7 +51,7 @@ func Find(fsys fs.FS, architectures []string) (map[string]BuildGroup, error) {
 		if err != nil {
 			return fmt.Errorf("failed to open file %q: %w", path, err)
 		}
-		pkginfo, err := apk.PKGINFOFromAPK(f)
+		pkginfo, _, err := apk.ParsePackageInfo(f)
 		if err != nil {
 			return fmt.Errorf("failed to parse APK file %q: %w", path, err)
 		}
@@ -103,7 +102,7 @@ type Package struct {
 	FileInfo fs.FileInfo
 
 	// PkgInfo is the parsed package information (found in an APK's PKGINFO file).
-	PkgInfo *goapk.Package
+	PkgInfo *apk.PackageInfo
 }
 
 func (p Package) buildGroupKey() string {
@@ -117,7 +116,7 @@ func (p Package) buildGroupKey() string {
 	)
 }
 
-func newBuiltPackage(fi fs.FileInfo, p *goapk.Package, fsysPath string) Package {
+func newBuiltPackage(fi fs.FileInfo, p *apk.PackageInfo, fsysPath string) Package {
 	return Package{
 		FsysPath: fsysPath,
 		FileInfo: fi,

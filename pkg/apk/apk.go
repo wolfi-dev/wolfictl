@@ -1,16 +1,13 @@
 package apk
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"sort"
 
-	"github.com/chainguard-dev/go-apk/pkg/apk"
-	"github.com/go-ini/ini"
+	"chainguard.dev/apko/pkg/apk/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
@@ -81,44 +78,4 @@ func ParseApkIndex(indexData io.ReadCloser) (map[string]*apk.Package, error) {
 	}
 
 	return getLatestPackagesMap(apkIndex.Packages, wolfiPackages)
-}
-
-func PKGINFOFromAPK(r io.Reader) (*apk.Package, error) {
-	gr, err := gzip.NewReader(r)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create gzip reader: %w", err)
-	}
-
-	tr := tar.NewReader(gr)
-	var pkginfoHdr *tar.Header
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, fmt.Errorf("failed to read tar header: %w", err)
-		}
-
-		if hdr.Name == ".PKGINFO" {
-			pkginfoHdr = hdr
-			break
-		}
-	}
-
-	if pkginfoHdr == nil {
-		return nil, fmt.Errorf("failed to find .PKGINFO in apk")
-	}
-
-	pkginfo := new(apk.Package)
-	loaded, err := ini.Load(tr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse INI data: %w", err)
-	}
-	err = loaded.MapTo(pkginfo)
-	if err != nil {
-		return nil, fmt.Errorf("failed to map INI data to struct: %w", err)
-	}
-
-	return pkginfo, nil
 }

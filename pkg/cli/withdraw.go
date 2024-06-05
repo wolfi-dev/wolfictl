@@ -9,9 +9,9 @@ import (
 
 	"golang.org/x/exp/slices"
 
+	"chainguard.dev/apko/pkg/apk/apk"
+	sign "chainguard.dev/apko/pkg/apk/signature"
 	"github.com/chainguard-dev/clog"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
-	sign "github.com/chainguard-dev/go-apk/pkg/signature"
 
 	"github.com/spf13/cobra"
 )

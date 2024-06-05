@@ -8,10 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"github.com/chainguard-dev/clog"
-	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -154,7 +153,7 @@ func findPathsOfAPKs(fsys fs.FS) ([]string, error) {
 }
 
 type invalidFixedAdvisory struct {
-	pkginfo  goapk.Package
+	pkginfo  apk.PackageInfo
 	advisory v2.Advisory
 	finding  scan.Finding
 }
@@ -174,7 +173,7 @@ func findInvalidFixedAdvisoriesForAPK(
 	if err != nil {
 		return nil, fmt.Errorf("opening APK file %q: %w", path, err)
 	}
-	pkginfoRef, err := apk.PKGINFOFromAPK(f)
+	pkginfoRef, _, err := apk.ParsePackageInfo(f)
 	if err != nil {
 		return nil, fmt.Errorf("parsing APK file %q: %w", path, err)
 	}

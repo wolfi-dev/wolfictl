@@ -11,9 +11,9 @@ import (
 
 	goapkversion "github.com/knqyf263/go-apk-version"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"

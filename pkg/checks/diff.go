@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
+	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/google/go-cmp/cmp"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"

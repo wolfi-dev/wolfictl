@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
-	apk "github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
 const (
