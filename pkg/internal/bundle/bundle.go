@@ -85,6 +85,7 @@ melange build $1 \
 melange test $1 \
  --gcplog \
  --source-dir $2 \
+ --test-package-append wolfi-base \
 {{ range .TestFlags }} {{.}} \
 {{ end }}
 
