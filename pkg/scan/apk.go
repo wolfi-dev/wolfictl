@@ -26,6 +26,7 @@ import (
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
+	"go.opentelemetry.io/otel"
 )
 
 const (
@@ -35,6 +36,12 @@ const (
 
 var grypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 
+// GrypeDBDir returns the directory where the Grype DB and its metadata are
+// stored.
+func GrypeDBDir() string {
+	return grypeDBDir
+}
+
 var grypeDBConfig = db.Config{
 	DBRootDir:           grypeDBDir,
 	ListingURL:          grypeDBListingURL,
@@ -43,15 +50,17 @@ var grypeDBConfig = db.Config{
 	MaxAllowedBuiltAge:  24 * time.Hour,
 }
 
-type Result struct {
-	TargetAPK     TargetAPK
-	Findings      []Finding
-	GrypeDBStatus *db.Status
-}
-
+// TargetAPK is the subject of a vulnerability scan operation.
 type TargetAPK struct {
-	Name              string
-	Version           string
+	// Name of the package. Example: "glibc-dev".
+	Name string
+
+	// Version of the package. Epoch should be included. Example: "1.2.3-r4".
+	Version string
+
+	// The name of the origin package for this package. This will differ from Name
+	// if describing a subpackage; for origin packages, this should match Name
+	// exactly. Example: "glibc".
 	OriginPackageName string
 }
 
@@ -95,7 +104,10 @@ type Scanner struct {
 }
 
 // NewScanner initializes the grype DB for reuse across multiple scans.
-func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
+func NewScanner(ctx context.Context, localDBFilePath string, useCPEs bool) (*Scanner, error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "scan.NewScanner")
+	defer span.End()
+
 	updateDB := true
 	if localDBFilePath != "" {
 		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFilePath)
@@ -111,10 +123,12 @@ func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 		updateDB = false
 	}
 
+	_, grypeSpan := otel.Tracer("wolfictl").Start(ctx, "grype.LoadVulnerabilityDB")
 	datastore, dbStatus, dbCloser, err := grype.LoadVulnerabilityDB(grypeDBConfig, updateDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
 	}
+	grypeSpan.End()
 	defer dbCloser.Close()
 
 	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(*datastore, useCPEs)
@@ -128,6 +142,9 @@ func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 
 // ScanAPK scans an APK file for vulnerabilities.
 func (s *Scanner) ScanAPK(ctx context.Context, apk fs.File, distroID string) (*Result, error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "ScanAPK")
+	defer span.End()
+
 	logger := clog.FromContext(ctx)
 
 	stat, err := apk.Stat()
@@ -180,10 +197,10 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 
 		finding, err := mapMatchToFinding(m, s.datastore)
 		if err != nil {
-			return nil, fmt.Errorf("failed to map match to finding: %w", err)
+			return nil, fmt.Errorf("mapping match to finding: %w", err)
 		}
 		if finding == nil {
-			return nil, fmt.Errorf("failed to map match to finding: nil")
+			return nil, fmt.Errorf("mapping match to finding: nil")
 		}
 		findings = append(findings, *finding)
 	}

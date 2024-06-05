@@ -12,6 +12,7 @@ import (
 	"github.com/chainguard-dev/yam/pkg/yam"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
+	"go.opentelemetry.io/otel"
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,6 +42,9 @@ type Index[T Configuration] struct {
 // fs.FS, decode the file to type T, and return a reference the "type T" data,
 // or an error if there was a problem.
 func NewIndex[T Configuration](ctx context.Context, fsys rwfs.FS, cfgDecodeFunc func(context.Context, string) (*T, error)) (*Index[T], error) {
+	ctx, span := otel.Tracer("wolfictl").Start(ctx, "configs.NewIndex")
+	defer span.End()
+
 	if cfgDecodeFunc == nil {
 		return nil, errors.New("must supply a cfgDecodeFunc")
 	}

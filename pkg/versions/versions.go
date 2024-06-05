@@ -90,11 +90,19 @@ func (by ByLatestStrings) Len() int {
 }
 
 func (by ByLatestStrings) Less(i, j int) bool {
-	vi, err := NewVersion(by[i])
+	return Less(by[i], by[j])
+}
+
+func (by ByLatestStrings) Swap(i, j int) {
+	by[i], by[j] = by[j], by[i]
+}
+
+func Less(a, b string) bool {
+	vi, err := NewVersion(a)
 	if err != nil {
 		return false
 	}
-	vj, err := NewVersion(by[j])
+	vj, err := NewVersion(b)
 	if err != nil {
 		return false
 	}
@@ -131,8 +139,4 @@ func (by ByLatestStrings) Less(i, j int) bool {
 		}
 	}
 	return vi.GreaterThan(vj)
-}
-
-func (by ByLatestStrings) Swap(i, j int) {
-	by[i], by[j] = by[j], by[i]
 }

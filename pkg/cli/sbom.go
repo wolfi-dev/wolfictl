@@ -31,7 +31,7 @@ func cmdSBOM() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := clog.NewLogger(newLogger(p.verbosity))
+			logger := clog.NewLogger(getLogger(p.verbosity))
 			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if !slices.Contains([]string{sbomFormatOutline, sbomFormatSyftJSON}, p.outputFormat) {

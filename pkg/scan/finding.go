@@ -14,8 +14,17 @@ import (
 
 // Finding represents a vulnerability finding for a single package.
 type Finding struct {
-	Package           Package
-	Vulnerability     Vulnerability
+	// Package describes the software component to which the scan matched a
+	// vulnerability. This may be an APK package, but it may also be any component
+	// within the APK, such as a Go module, npm package, etc.
+	Package Package
+
+	// Vulnerability describes the known software vulnerability that was matched to
+	// a Package.
+	Vulnerability Vulnerability
+
+	// Deprecated: Triaging is now handled in the package "scan/triage", as a
+	// downstream stage in the vulnerability management workflow.
 	TriageAssessments []TriageAssessment
 }
 
@@ -34,6 +43,8 @@ type Vulnerability struct {
 	FixedVersion string
 }
 
+// Deprecated: Triaging is now handled in the package "scan/triage", as a
+// downstream stage in the vulnerability management workflow.
 type TriageAssessment struct {
 	// Source is the name of the source of the triage assessment, e.g.
 	// "govulncheck".

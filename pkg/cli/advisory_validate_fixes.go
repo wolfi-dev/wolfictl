@@ -28,7 +28,7 @@ func cmdAdvisoryValidateFixes() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			logger := clog.NewLogger(newLogger(p.verbosity))
+			logger := clog.NewLogger(getLogger(p.verbosity))
 			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if p.advisoriesRepoDir == "" {
@@ -115,12 +115,9 @@ type validateFixesParams struct {
 func (p *validateFixesParams) addFlagsToCommand(cmd *cobra.Command) {
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	addVerboseFlag(&p.verbosity, cmd)
-
-	cmd.Flags().StringVarP(&p.builtPackagesDir, flagNameBuiltPackagesDir, "b", "", "directory containing built packages")
-	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
+	addBuiltPackagesDirFlag(&p.builtPackagesDir, cmd)
+	addDistroFlag(&p.distro, cmd)
 }
-
-const flagNameBuiltPackagesDir = "built-packages-dir"
 
 func findPathsOfAPKs(fsys fs.FS) ([]string, error) {
 	var pathsToAPKs []string
@@ -207,7 +204,7 @@ func findInvalidFixedAdvisoriesForAPK(
 	}
 
 	// Scan the APK
-	scanner, err := scan.NewScanner("", false)
+	scanner, err := scan.NewScanner(ctx, "", false)
 	if err != nil {
 		return nil, fmt.Errorf("creating scanner: %w", err)
 	}

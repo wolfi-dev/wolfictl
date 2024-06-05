@@ -13,11 +13,14 @@ import (
 	"golang.org/x/vuln/pkg/vulncheck"
 )
 
-const TriageSourceGovulncheck = "govulncheck"
+const triageSourceGovulncheck = "govulncheck"
 
 // Triage inspects an existing scan Result and attempts to triage each finding,
 // returning a copy of the Result's list of findings, modified to include
 // TriageAssessments where applicable.
+//
+// Deprecated: this function is deprecated and will be removed in a future
+// release. Use the "scan/triage" package instead.
 func Triage(ctx context.Context, result Result, apkFile io.ReadSeeker) ([]Finding, error) {
 	findings := slices.Clone(result.Findings)
 
@@ -81,7 +84,7 @@ func Triage(ctx context.Context, result Result, apkFile io.ReadSeeker) ([]Findin
 		}
 	}
 
-	govulnDBIndex, err := BuildIndexForGoVulnDB(ctx)
+	govulnDBIndex, err := buildIndexForGoVulnDB(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +118,7 @@ func Triage(ctx context.Context, result Result, apkFile io.ReadSeeker) ([]Findin
 				foundByGovulncheck = true
 
 				assessment := TriageAssessment{
-					Source:       TriageSourceGovulncheck,
+					Source:       triageSourceGovulncheck,
 					TruePositive: true,
 					Reason: fmt.Sprintf(
 						"affected symbol %q is present in Go binary (see %s)",
@@ -141,7 +144,7 @@ func Triage(ctx context.Context, result Result, apkFile io.ReadSeeker) ([]Findin
 			}
 
 			assessment := TriageAssessment{
-				Source:       TriageSourceGovulncheck,
+				Source:       triageSourceGovulncheck,
 				TruePositive: false,
 				Reason: fmt.Sprintf(
 					"no known affected symbols present in Go binary (see %s)",
@@ -155,7 +158,7 @@ func Triage(ctx context.Context, result Result, apkFile io.ReadSeeker) ([]Findin
 	return findings, nil
 }
 
-func isKnownToGoVulnDB(v Vulnerability, govulnDBIndex *GoVulnDBIndex) bool {
+func isKnownToGoVulnDB(v Vulnerability, govulnDBIndex *goVulnDBIndex) bool {
 	_, ok := govulnDBIndex.Get(v.ID)
 	if ok {
 		return true

@@ -70,7 +70,7 @@ print an error message that specifies where and how the data is invalid.`,
 			var packagesRepoDir string
 			var apkRepositoryURL string
 
-			logger := clog.NewLogger(newLogger(p.verbosity))
+			logger := clog.NewLogger(getLogger(p.verbosity))
 			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if p.doNotDetectDistro {
