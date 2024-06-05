@@ -13,9 +13,9 @@ import (
 	"sort"
 	"strings"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
 	"github.com/savioxavier/termlink"

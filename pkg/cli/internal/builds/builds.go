@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
+	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 )

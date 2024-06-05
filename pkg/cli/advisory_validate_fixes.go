@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/chainguard-dev/clog"
-	goapk "github.com/chainguard-dev/go-apk/pkg/apk"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"

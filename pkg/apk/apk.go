@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/chainguard-dev/go-apk/pkg/apk"
+	"chainguard.dev/apko/pkg/apk/apk"
 	"github.com/go-ini/ini"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )

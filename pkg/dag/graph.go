@@ -17,8 +17,8 @@ import (
 	"github.com/dominikbraun/graph"
 	"go.lsp.dev/uri"
 
+	"chainguard.dev/apko/pkg/apk/apk"
 	"github.com/chainguard-dev/clog"
-	"github.com/chainguard-dev/go-apk/pkg/apk"
 )
 
 const (

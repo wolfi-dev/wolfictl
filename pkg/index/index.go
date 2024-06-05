@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/chainguard-dev/go-apk/pkg/apk"
+	"chainguard.dev/apko/pkg/apk/apk"
 )
 
 func Index(arch, repo string) (*apk.APKIndex, error) {
