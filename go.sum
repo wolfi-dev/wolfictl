@@ -1,7 +1,7 @@
 chainguard.dev/apko v0.14.8 h1:UHnn4qm/erRppygHH8/0OEA+E72fnwAY2px/YaRaI8g=
 chainguard.dev/apko v0.14.8/go.mod h1:aFEwAkFsf7sXvVFQ2ui6KRK3tbG3mIl5PmPd4JqKGVM=
-chainguard.dev/melange v0.8.4 h1:bdAoto/FE0PXKAE8JwoGBfCjk3shh/TjuM8XczJgq2k=
-chainguard.dev/melange v0.8.4/go.mod h1:rPaRHyK9dDT+G6ob/WrmxjFR3ghdOUItXgretJqHjU0=
+chainguard.dev/melange v0.8.5 h1:GOFB8NvHxr9sKDja3vF1vsy5Us2OW7UxJmz2ZkPMnds=
+chainguard.dev/melange v0.8.5/go.mod h1:rPaRHyK9dDT+G6ob/WrmxjFR3ghdOUItXgretJqHjU0=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=
@@ -496,8 +496,6 @@ github.com/go-git/go-git/v5 v5.12.0/go.mod h1:FTM9VKtnI2m65hNI/TenDDDnUf2Q9FHnXY
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
-github.com/go-ini/ini v1.67.0 h1:z6ZrTEZqSWOTyH2FlglNbNgARyHG8oLW9gMELqKr06A=
-github.com/go-ini/ini v1.67.0/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
 github.com/go-jose/go-jose/v4 v4.0.2 h1:R3l3kkBds16bO7ZFAEEcofK0MkrAJt3jlJznWZG0nvk=
 github.com/go-jose/go-jose/v4 v4.0.2/go.mod h1:WVf9LFMHh/QVrmqrOfqun0C45tMe3RoiKJMPvgWwLfY=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
