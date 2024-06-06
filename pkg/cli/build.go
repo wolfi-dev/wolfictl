@@ -243,7 +243,9 @@ func (g *global) fetchIndexFromBucket(ctx context.Context, arch string) (map[str
 	defer rc.Close()
 
 	// Set this for conditional requests on upload.
+	g.genmu.Lock()
 	g.generations[arch] = rc.Attrs.Generation
+	g.genmu.Unlock()
 
 	clog.FromContext(ctx).Debugf("downloading %s to %s", obj, out)
 
@@ -670,7 +672,9 @@ type global struct {
 
 	// per arch rate limiter (for APKINDEX)
 	writeLimiters map[string]*rate.Limiter
-	generations   map[string]int64
+
+	genmu       sync.Mutex
+	generations map[string]int64
 
 	gcs           *storage.Client
 	stagingBucket string
@@ -1561,7 +1565,9 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 	}
 
 	// Update this arch's generation so we can use it for idempotency above.
+	t.cfg.genmu.Lock()
 	t.cfg.generations[arch] = wc.Attrs().Generation
+	t.cfg.genmu.Unlock()
 
 	return nil
 }
