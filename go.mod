@@ -7,7 +7,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
 	chainguard.dev/apko v0.14.8
-	chainguard.dev/melange v0.8.4
+	chainguard.dev/melange v0.8.5
 	cloud.google.com/go/storage v1.41.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.78.0
@@ -30,7 +30,6 @@ require (
 	github.com/github/go-spdx/v2 v2.2.0
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.12.0
-	github.com/go-ini/ini v1.67.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-containerregistry v0.19.1
 	github.com/google/go-github/v58 v58.0.0
