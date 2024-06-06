@@ -53,7 +53,11 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	}
 	logger.Debug("unpacked APK file to temp directory", "apkFilePath", inputFilePath)
 
-	// Sanity check: count the number of files in the temp directory. Create an fs.FS and walk it.
+	// Sanity check: count the number of files in the temp directory. Create an
+	// fs.FS and walk it. We'll also use this to attach a list of files to the APK
+	// package.
+
+	var includedFiles []string
 
 	tempFsys := os.DirFS(tempDir)
 	err = fs.WalkDir(tempFsys, ".", func(path string, _ os.DirEntry, err error) error {
@@ -62,6 +66,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		}
 
 		logger.Debug("apk temp directory item", "path", path)
+		includedFiles = append(includedFiles, path)
 
 		return nil
 	})
@@ -75,7 +80,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		return nil, fmt.Errorf("failed to read %s: %w", pkginfoPath, err)
 	}
 	defer pkginfo.Close()
-	apkPackage, err := newAPKPackage(pkginfo, distroID)
+	apkPackage, err := newAPKPackage(pkginfo, distroID, includedFiles)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create APK package: %w", err)
 	}
@@ -106,6 +111,20 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 
 	packageCollection := createdSBOM.Artifacts.Packages
 	packageCollection.Add(*apkPackage)
+
+	if cfg.Relationships.ExcludeBinaryPackagesWithFileOwnershipOverlap {
+		// This setting is enabled by default in Syft/Grype. If it's enabled here in
+		// this code, we can simulate its behavior in our tailored APK analysis by
+		// removing all binary packages from the SBOM, since we know they are all owned
+		// by the APK package, and would thus be excluded.
+
+		binaryPkgs := packageCollection.Sorted(pkg.BinaryPkg)
+		for i := range binaryPkgs {
+			p := binaryPkgs[i]
+			logger.Info("removing binary package from SBOM", "name", p.Name, "version", p.Version, "location", p.Locations.CoordinateSet().ToSlice())
+			packageCollection.Delete(p.ID())
+		}
+	}
 
 	logger.Info("finished Syft SBOM generation", "packageCount", packageCollection.PackageCount())
 
@@ -139,11 +158,19 @@ func getDeterministicSourceDescription(src source.Source, inputFilePath, apkName
 	return description
 }
 
-func newAPKPackage(r io.Reader, distroID string) (*pkg.Package, error) {
+func newAPKPackage(r io.Reader, distroID string, includedFiles []string) (*pkg.Package, error) {
 	pkginfo, err := parsePkgInfo(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse APK metadata: %w", err)
 	}
+
+	files := make([]pkg.ApkFileRecord, 0, len(includedFiles))
+	for _, f := range includedFiles {
+		files = append(files, pkg.ApkFileRecord{
+			Path: f,
+		})
+	}
+
 	metadata := pkg.ApkDBEntry{
 		Package:       pkginfo.PkgName,
 		OriginPackage: pkginfo.Origin,
@@ -156,6 +183,7 @@ func newAPKPackage(r io.Reader, distroID string) (*pkg.Package, error) {
 		Provides:      pkginfo.Provides,
 		Checksum:      pkginfo.DataHash,
 		GitCommit:     pkginfo.Commit,
+		Files:         files,
 	}
 
 	p := pkg.Package{
