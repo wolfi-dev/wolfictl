@@ -1,0 +1,215 @@
+{
+  "artifacts": [
+    {
+      "id": "c0044d4ea9b8e0a5",
+      "name": "openjdk-21",
+      "version": "21.0.3-r3",
+      "type": "apk",
+      "foundBy": "wolfictl",
+      "locations": [
+        {
+          "path": ".PKGINFO",
+          "accessPath": ".PKGINFO"
+        }
+      ],
+      "licenses": [
+        {
+          "value": "GPL-2.0-or-later",
+          "spdxExpression": "GPL-2.0-or-later",
+          "type": "declared",
+          "urls": [],
+          "locations": []
+        }
+      ],
+      "language": "",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:oracle:jdk:21.0.3-r3:*:*:*:*:*:*:*",
+          "source": "wolfictl"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64&origin=openjdk-21",
+      "metadataType": "apk-db-entry",
+      "metadata": {
+        "package": "openjdk-21",
+        "originPackage": "openjdk-21",
+        "maintainer": "",
+        "version": "21.0.3-r3",
+        "architecture": "x86_64",
+        "url": "",
+        "description": "",
+        "size": 590756,
+        "installedSize": 0,
+        "pullDependencies": [
+          "openjdk-21-jre",
+          "so:ld-linux-x86-64.so.2",
+          "so:libc.so.6"
+        ],
+        "provides": null,
+        "pullChecksum": "f8f9eef7be3a125cca4509f2a41c15d4b0a73782f1f0f85d13acd2b84832d71a",
+        "gitCommitOfApkPort": "3b915d4f70c04a3011cef6de40436d6285dd0f98",
+        "files": [
+          {
+            "path": "."
+          },
+          {
+            "path": ".PKGINFO"
+          },
+          {
+            "path": ".SIGN.RSA.wolfi-signing.rsa.pub"
+          },
+          {
+            "path": "usr"
+          },
+          {
+            "path": "usr/lib"
+          },
+          {
+            "path": "usr/lib/jvm"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jar"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jarsigner"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/javac"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/javadoc"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/javap"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jcmd"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jconsole"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jdb"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jdeprscan"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jdeps"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jhsdb"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jimage"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jinfo"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jlink"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jmap"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jmod"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jpackage"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jps"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jshell"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jstack"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jstat"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/jstatd"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/bin/serialver"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/classfile_constants.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/jawt.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/jdwpTransport.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/jni.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/jvmti.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/jvmticmlr.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/linux"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/linux/jawt_md.h"
+          },
+          {
+            "path": "usr/lib/jvm/java-21-openjdk/include/linux/jni_md.h"
+          },
+          {
+            "path": "var"
+          },
+          {
+            "path": "var/lib"
+          },
+          {
+            "path": "var/lib/db"
+          },
+          {
+            "path": "var/lib/db/sbom"
+          },
+          {
+            "path": "var/lib/db/sbom/openjdk-21-21.0.3-r3.spdx.json"
+          }
+        ]
+      }
+    }
+  ],
+  "artifactRelationships": [],
+  "source": {
+    "id": "(redacted for determinism)",
+    "name": "openjdk-21",
+    "version": "21.0.3-r3",
+    "type": "directory",
+    "metadata": {
+      "path": "testdata/apks/x86_64/openjdk-21-21.0.3-r3.apk"
+    }
+  },
+  "distro": {
+    "id": "wolfi"
+  },
+  "descriptor": {
+    "name": "wolfictl",
+    "version": ""
+  },
+  "schema": {
+    "version": "16.0.12",
+    "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-16.0.12.json"
+  }
+}

@@ -1,0 +1,5911 @@
+{
+  "artifacts": [
+    {
+      "id": "6c03fe3277ec44f7",
+      "name": "cloud.google.com/go",
+      "version": "v0.110.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/cloud.google.com/go@v0.110.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Zc8gqp3+a9/Eyph2KDmcGaPtbKRIoqq4YTlL4NMD0Ys=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "fc375e66590c199f",
+      "name": "cloud.google.com/go/compute/metadata",
+      "version": "v0.2.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:go:compute\\/metadata:v0.2.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/cloud.google.com/go/compute@v0.2.3#metadata",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:mg4jlk7mCAj6xXp9UJ4fjI9VUI5rubuGBW5aJ7UnBMY=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c62f7d4a539fa8e9",
+      "name": "cloud.google.com/go/iam",
+      "version": "v0.13.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:go:iam:v0.13.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/cloud.google.com/go/iam@v0.13.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:+CmB+K0J/33d0zSQ9SlFWUeCCEn5XJA0ZMZ3pHE9u8k=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "92481624866996a8",
+      "name": "cloud.google.com/go/storage",
+      "version": "v1.28.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:go:storage:v1.28.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/cloud.google.com/go/storage@v1.28.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:F5QDG5ChchaAVQhINh24U99OWHURqrW8OmQcGKXcbgI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "aa801db4b8e641df",
+      "name": "github.com/Azure/azure-sdk-for-go",
+      "version": "v59.2.0+incompatible",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:azure-sdk-for-go:v59.2.0\\+incompatible:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:azure_sdk_for_go:v59.2.0\\+incompatible:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/azure-sdk-for-go@v59.2.0%2Bincompatible",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:mbxiZy1K820hQ+dI+YIO/+a0wQDYqOu18BAGe4lXjVk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "cd710b61137ffd72",
+      "name": "github.com/Azure/go-autorest/autorest",
+      "version": "v0.11.24",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/autorest:v0.11.24:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/autorest:v0.11.24:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.11.24#autorest",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:1fIGgHKqVm54KIPT+q8Zmd1QlVsmHqeUGso5qm2BqqE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e8fd41efa9327d50",
+      "name": "github.com/Azure/go-autorest/autorest/adal",
+      "version": "v0.9.18",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/autorest\\/adal:v0.9.18:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/autorest\\/adal:v0.9.18:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.9.18#autorest/adal",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:kLnPsRjzZZUF3K5REu/Kc+qMQrvuza2bwSnNdhmzLfQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "78364f12e4a359f0",
+      "name": "github.com/Azure/go-autorest/autorest/azure/cli",
+      "version": "v0.4.4",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/autorest\\/azure\\/cli:v0.4.4:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/autorest\\/azure\\/cli:v0.4.4:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.4.4#autorest/azure/cli",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:iuooz5cZL6VRcO7DVSFYxRcouqn6bFVE/e77Wts50Zk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a6b2b31eb4091d44",
+      "name": "github.com/Azure/go-autorest/autorest/date",
+      "version": "v0.3.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/autorest\\/date:v0.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/autorest\\/date:v0.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.3.0#autorest/date",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:7gUk1U5M/CQbp9WoqinNzJar+8KY+LPI6wiWrP/myHw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "ea7782437e36a65c",
+      "name": "github.com/Azure/go-autorest/autorest/to",
+      "version": "v0.4.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/autorest\\/to:v0.4.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/autorest\\/to:v0.4.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.4.0#autorest/to",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:oXVqrxakqqV1UZdSazDOPOLvOIz+XA683u8EctwboHk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "795ed30b708432e9",
+      "name": "github.com/Azure/go-autorest/autorest/validation",
+      "version": "v0.3.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/autorest\\/validation:v0.3.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/autorest\\/validation:v0.3.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.3.1#autorest/validation",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:AgyqjAd94fwNAoTjl/WQXg4VvFeRFpO+UhNyRXqF1ac=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "1354787b2929a11b",
+      "name": "github.com/Azure/go-autorest/logger",
+      "version": "v0.2.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/logger:v0.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/logger:v0.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.2.1#logger",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:IG7i4p/mDa2Ce4TRyAO8IHnVhAVF3RFU+ZtXWSmf4Tg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b3e716631d9bc774",
+      "name": "github.com/Azure/go-autorest/tracing",
+      "version": "v0.6.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-autorest\\/tracing:v0.6.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_autorest\\/tracing:v0.6.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-autorest@v0.6.0#tracing",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:TYi4+3m5t6K48TGI9AUdb+IzbnSxvnvUMfuitfgcfuo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "60baf469bf500890",
+      "name": "github.com/Azure/go-ntlmssp",
+      "version": "v0.0.0-20200615164410-66371956d46c",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Azure:go-ntlmssp:v0.0.0-20200615164410-66371956d46c:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:Azure:go_ntlmssp:v0.0.0-20200615164410-66371956d46c:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Azure/go-ntlmssp@v0.0.0-20200615164410-66371956d46c",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:/IBSNwUN8+eKzUzbJPqhK839ygXJ82sde8x3ogr6R28=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e7fc5a3227de46dd",
+      "name": "github.com/ChrisTrenkamp/goxpath",
+      "version": "v0.0.0-20190607011252-c5096ec8773d",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:ChrisTrenkamp:goxpath:v0.0.0-20190607011252-c5096ec8773d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/ChrisTrenkamp/goxpath@v0.0.0-20190607011252-c5096ec8773d",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:W1diKnDQkXxNDhghdBSbQ4LI/E1aJNTwpqPp3KtlB8w=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "6cb18ecff7cf2a94",
+      "name": "github.com/Masterminds/goutils",
+      "version": "v1.1.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:goutils_project:goutils:v1.1.1:*:*:*:*:go:*:*",
+          "source": "nvd-cpe-dictionary"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Masterminds/goutils@v1.1.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c44f9273b68ef41e",
+      "name": "github.com/Masterminds/semver/v3",
+      "version": "v3.1.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Masterminds:semver\\/v3:v3.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Masterminds/semver@v3.1.1#v3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "782329a41abad62e",
+      "name": "github.com/Masterminds/sprig/v3",
+      "version": "v3.2.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Masterminds:sprig\\/v3:v3.2.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/Masterminds/sprig@v3.2.2#v3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:17jRggJu518dr3QaafizSXOjKYp94wKfABxUmyxvxX8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "386f93bcfc228126",
+      "name": "github.com/agext/levenshtein",
+      "version": "v1.2.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:agext:levenshtein:v1.2.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/agext/levenshtein@v1.2.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:YB2fHEn0UJagG8T1rrWknE3ZQzWM06O8AMAatNn7lmo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "cb12953f60775752",
+      "name": "github.com/aliyun/alibaba-cloud-sdk-go",
+      "version": "v1.61.1501",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:aliyun:alibaba-cloud-sdk-go:v1.61.1501:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:aliyun:alibaba_cloud_sdk_go:v1.61.1501:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/aliyun/alibaba-cloud-sdk-go@v1.61.1501",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Ij3S0pNUMgHlhx3Ew8g9RNrt59EKhHYdMODGtFXJfSc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "ff4d524a99ac546e",
+      "name": "github.com/aliyun/aliyun-oss-go-sdk",
+      "version": "v0.0.0-20190103054945-8205d1f41e70",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:aliyun:aliyun-oss-go-sdk:v0.0.0-20190103054945-8205d1f41e70:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:aliyun:aliyun_oss_go_sdk:v0.0.0-20190103054945-8205d1f41e70:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/aliyun/aliyun-oss-go-sdk@v0.0.0-20190103054945-8205d1f41e70",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:FrF4uxA24DF3ARNXVbUin3wa5fDLaB1Cy8mKks/LRz4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b33a4c8d5a84dd31",
+      "name": "github.com/aliyun/aliyun-tablestore-go-sdk",
+      "version": "v4.1.2+incompatible",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:aliyun:aliyun-tablestore-go-sdk:v4.1.2\\+incompatible:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:aliyun:aliyun_tablestore_go_sdk:v4.1.2\\+incompatible:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/aliyun/aliyun-tablestore-go-sdk@v4.1.2%2Bincompatible",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:ABQ7FF+IxSFHDMOTtjCfmMDMHiCq6EsAoCV/9sFinaM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "239b5e3299d15e04",
+      "name": "github.com/apparentlymart/go-cidr",
+      "version": "v1.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go-cidr:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go_cidr:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/apparentlymart/go-cidr@v1.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:2mAhrMoF+nhXqxTzSZMUzDHkLjmIHC+Zzn4tdgBZjnU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "f179a23c3398d788",
+      "name": "github.com/apparentlymart/go-shquot",
+      "version": "v0.0.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go-shquot:v0.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go_shquot:v0.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/apparentlymart/go-shquot@v0.0.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:MGV8lwxF4zw75lN7e0MGs7o6AFYn7L6AZaExUpLh0Mo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "da7dfad188b79846",
+      "name": "github.com/apparentlymart/go-textseg/v13",
+      "version": "v13.0.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go-textseg\\/v13:v13.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go_textseg\\/v13:v13.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/apparentlymart/go-textseg@v13.0.0#v13",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Y+KvPE1NYz0xl601PVImeQfFyEy6iT90AvPUL1NNfNw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "21d3cff52235fb12",
+      "name": "github.com/apparentlymart/go-userdirs",
+      "version": "v0.0.0-20200915174352-b0c018a67c13",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go-userdirs:v0.0.0-20200915174352-b0c018a67c13:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go_userdirs:v0.0.0-20200915174352-b0c018a67c13:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/apparentlymart/go-userdirs@v0.0.0-20200915174352-b0c018a67c13",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:JtuelWqyixKApmXm3qghhZ7O96P6NKpyrlSIe8Rwnhw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "af72d9f9b4d5e10d",
+      "name": "github.com/apparentlymart/go-versions",
+      "version": "v1.0.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go-versions:v1.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apparentlymart:go_versions:v1.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/apparentlymart/go-versions@v1.0.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:ECIpSn0adcYNsBfSRwdDdz9fWlL+S/6EUd9+irwkBgU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "870e1b21155f8393",
+      "name": "github.com/armon/circbuf",
+      "version": "v0.0.0-20190214190532-5111143e8da2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:armon:circbuf:v0.0.0-20190214190532-5111143e8da2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/armon/circbuf@v0.0.0-20190214190532-5111143e8da2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:7Ip0wMmLHLRJdrloDxZfhMm0xrLXZS8+COSu2bXmEQs=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c511e9fa27658c4b",
+      "name": "github.com/armon/go-metrics",
+      "version": "v0.0.0-20180917152333-f0300d1749da",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:armon:go-metrics:v0.0.0-20180917152333-f0300d1749da:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:armon:go_metrics:v0.0.0-20180917152333-f0300d1749da:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/armon/go-metrics@v0.0.0-20180917152333-f0300d1749da",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:8GUt8eRujhVEGZFFEjBj46YV4rDjvGrNxb0KMWYkL2I=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "474566af2c675a3e",
+      "name": "github.com/armon/go-radix",
+      "version": "v1.0.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:armon:go-radix:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:armon:go_radix:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/armon/go-radix@v1.0.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:F4z6KzEeeQIMeLFa97iZU6vupzoecKdU5TX24SNppXI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "f09f2cedc043f969",
+      "name": "github.com/aws/aws-sdk-go",
+      "version": "v1.44.122",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:amazon:aws_software_development_kit:v1.44.122:*:*:*:*:go:*:*",
+          "source": "nvd-cpe-dictionary"
+        }
+      ],
+      "purl": "pkg:golang/github.com/aws/aws-sdk-go@v1.44.122",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:p6mw01WBaNpbdP2xrisz5tIkcNwzj/HysobNoaAHjgo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e06cbc60610c4cdf",
+      "name": "github.com/bgentry/go-netrc",
+      "version": "v0.0.0-20140422174119-9fd32a8b3d3d",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:bgentry:go-netrc:v0.0.0-20140422174119-9fd32a8b3d3d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:bgentry:go_netrc:v0.0.0-20140422174119-9fd32a8b3d3d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/bgentry/go-netrc@v0.0.0-20140422174119-9fd32a8b3d3d",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:xDfNPAt8lFiC1UJrqV3uuy861HCTo708pDMbjHHdCas=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "961621f9dae5835d",
+      "name": "github.com/bgentry/speakeasy",
+      "version": "v0.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:bgentry:speakeasy:v0.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/bgentry/speakeasy@v0.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "0521fa72cc5bc896",
+      "name": "github.com/bmatcuk/doublestar",
+      "version": "v1.1.5",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:bmatcuk:doublestar:v1.1.5:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/bmatcuk/doublestar@v1.1.5",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:2bNwBOmhyFEFcoB3tGvTD5xanq+4kyOZlB8wFYbMjkk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e8d4aff886b4ec5c",
+      "name": "github.com/chzyer/readline",
+      "version": "v0.0.0-20180603132655-2972be24d48e",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:chzyer:readline:v0.0.0-20180603132655-2972be24d48e:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/chzyer/readline@v0.0.0-20180603132655-2972be24d48e",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:fY5BOSpyZCqRo5OhCuC+XN+r/bBCmeuuJtjz+bCNIf8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "886f832454302d03",
+      "name": "github.com/coreos/go-systemd",
+      "version": "v0.0.0-20181012123002-c6f51f82210d",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:coreos:go-systemd:v0.0.0-20181012123002-c6f51f82210d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:coreos:go_systemd:v0.0.0-20181012123002-c6f51f82210d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/coreos/go-systemd@v0.0.0-20181012123002-c6f51f82210d",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:t5Wuyh53qYyg9eqn4BbnlIT+vmhyww0TatL+zT3uWgI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "aa541563f691fcb2",
+      "name": "github.com/coreos/pkg",
+      "version": "v0.0.0-20180928190104-399ea9e2e55f",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:coreos:pkg:v0.0.0-20180928190104-399ea9e2e55f:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/coreos/pkg@v0.0.0-20180928190104-399ea9e2e55f",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:lBNOc5arjvs8E5mO2tbpBpLoyyu8B6e44T7hJy6potg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "285f1bbe42500f28",
+      "name": "github.com/davecgh/go-spew",
+      "version": "v1.1.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:davecgh:go-spew:v1.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:davecgh:go_spew:v1.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/davecgh/go-spew@v1.1.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "66023959aca69415",
+      "name": "github.com/dimchansky/utfbom",
+      "version": "v1.1.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:dimchansky:utfbom:v1.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/dimchansky/utfbom@v1.1.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:vV6w1AhK4VMnhBno/TPVCoK9U/LP0PkLCS9tbxHdi/U=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "9116aab542fb95d6",
+      "name": "github.com/dylanmei/iso8601",
+      "version": "v0.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:dylanmei:iso8601:v0.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/dylanmei/iso8601@v0.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:812NGQDBcqquTfH5Yeo7lwR0nzx/cKdsmf3qMjPURUI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "88c5dacdf0ba95f4",
+      "name": "github.com/fatih/color",
+      "version": "v1.13.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:fatih:color:v1.13.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/fatih/color@v1.13.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "cd61d1771b3bf3f5",
+      "name": "github.com/go-logr/logr",
+      "version": "v1.2.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:go-logr:logr:v1.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:go_logr:logr:v1.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:go:logr:v1.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/go-logr/logr@v1.2.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:QK40JKJyMdUDz+h+xvCsru/bJhvG0UxvePV0ufL/AcE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "37ef748c730f9b18",
+      "name": "github.com/gofrs/uuid",
+      "version": "v4.0.0+incompatible",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:gofrs:uuid:v4.0.0\\+incompatible:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/gofrs/uuid@v4.0.0%2Bincompatible",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:1SD/1F5pU8p29ybwgQSwpQk+mwdRrXCYuPhW6m+TnJw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "1f948f3e7ae5e046",
+      "name": "github.com/gogo/protobuf",
+      "version": "v1.3.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:gogo:protobuf:v1.3.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/gogo/protobuf@v1.3.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Ov1cvc58UF3b5XjBnZv7+opcTcQFZebYjWzi34vdm4Q=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "cd36405cb70a38d6",
+      "name": "github.com/golang-jwt/jwt/v4",
+      "version": "v4.2.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang-jwt:jwt\\/v4:v4.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang_jwt:jwt\\/v4:v4.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:jwt\\/v4:v4.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/golang-jwt/jwt@v4.2.0#v4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:besgBTC8w8HjP6NzQdxwKH9Z5oQMZ24ThTrHp3cZ8eU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "37e7a96bd1962c0c",
+      "name": "github.com/golang/groupcache",
+      "version": "v0.0.0-20210331224755-41bb18bfe9da",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:groupcache:v0.0.0-20210331224755-41bb18bfe9da:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/golang/groupcache@v0.0.0-20210331224755-41bb18bfe9da",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "7fe22ae182a4a06b",
+      "name": "github.com/golang/protobuf",
+      "version": "v1.5.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:protobuf:v1.5.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/golang/protobuf@v1.5.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "3f17a330ca8efa0d",
+      "name": "github.com/google/go-cmp",
+      "version": "v0.5.9",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:go-cmp:v0.5.9:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:google:go_cmp:v0.5.9:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/google/go-cmp@v0.5.9",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8a53a7d5bd3eb0cb",
+      "name": "github.com/google/go-querystring",
+      "version": "v1.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:go-querystring:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:google:go_querystring:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/google/go-querystring@v1.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "ed6d8e8c88e0707d",
+      "name": "github.com/google/gofuzz",
+      "version": "v1.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:gofuzz:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/google/gofuzz@v1.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Hsa8mG0dQ46ij8Sl2AYJDUv1oA9/d6Vk+3LG99Oe02g=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b28b55f23331b82c",
+      "name": "github.com/google/uuid",
+      "version": "v1.3.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:uuid:v1.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/google/uuid@v1.3.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "db3177ab3b240cd1",
+      "name": "github.com/googleapis/enterprise-certificate-proxy",
+      "version": "v0.2.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:googleapis:enterprise-certificate-proxy:v0.2.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:googleapis:enterprise_certificate_proxy:v0.2.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/googleapis/enterprise-certificate-proxy@v0.2.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:yk9/cqRKtT9wXZSsRH9aurXEpJX+U6FLtpYTdC3R06k=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "497385855aa5727d",
+      "name": "github.com/googleapis/gax-go/v2",
+      "version": "v2.7.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:googleapis:gax-go\\/v2:v2.7.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:googleapis:gax_go\\/v2:v2.7.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/googleapis/gax-go@v2.7.1#v2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:gF4c0zjUP2H/s/hEGyLA3I0fA2ZWjzYiONAD6cvPr8A=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a55b76673edbef19",
+      "name": "github.com/googleapis/gnostic",
+      "version": "v0.5.5",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:googleapis:gnostic:v0.5.5:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/googleapis/gnostic@v0.5.5",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:9fHAtK0uDfpveeqqo1hkEZJcFvYXAiCN3UutL8F9xHw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "dbeb51822d912e7f",
+      "name": "github.com/hashicorp/aws-sdk-go-base",
+      "version": "v0.7.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:aws-sdk-go-base:v0.7.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:aws_sdk_go_base:v0.7.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/aws-sdk-go-base@v0.7.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:7s/aR3hFn74tYPVihzDyZe7y/+BorN70rr9ZvpV3j3o=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a2bcfbded2c1446b",
+      "name": "github.com/hashicorp/consul/api",
+      "version": "v1.9.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:consul\\/api:v1.9.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/consul@v1.9.1#api",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:SngrdG2L62qqLsUz85qcPhFZ78rPf8tcD5qjMgs6MME=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "dfd2df97d0a13f2e",
+      "name": "github.com/hashicorp/errwrap",
+      "version": "v1.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:errwrap:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/errwrap@v1.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY2I=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "162cd88127c6d7f4",
+      "name": "github.com/hashicorp/go-azure-helpers",
+      "version": "v0.43.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-azure-helpers:v0.43.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_azure_helpers:v0.43.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-azure-helpers@v0.43.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:larj4ZgwO3hKzA9xIOTXRW4NBpI6F3K8wpig8eikNOw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "bacbc64e71ee6d9f",
+      "name": "github.com/hashicorp/go-checkpoint",
+      "version": "v0.5.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-checkpoint:v0.5.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_checkpoint:v0.5.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-checkpoint@v0.5.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:MFYpPZCnQqQTE18jFwSII6eUQrD/oxMFp3mlgcqk5mU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "75453e75aa5f4caf",
+      "name": "github.com/hashicorp/go-cleanhttp",
+      "version": "v0.5.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-cleanhttp:v0.5.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_cleanhttp:v0.5.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-cleanhttp@v0.5.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9neXJWAZQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "604020f9a243bdf0",
+      "name": "github.com/hashicorp/go-getter",
+      "version": "v1.7.4",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-getter:v1.7.4:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_getter:v1.7.4:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-getter@v1.7.4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:3yQjWuxICvSpYwqSayAdKRFcvBl1y/vogCxczWSmix0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "cc7d5f5558db86ca",
+      "name": "github.com/hashicorp/go-hclog",
+      "version": "v0.15.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-hclog:v0.15.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_hclog:v0.15.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-hclog@v0.15.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:qMuK0wxsoW4D0ddCCYwPSTm4KQv1X1ke3WmPWZ0Mvsk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "dfb6cbcf9210c611",
+      "name": "github.com/hashicorp/go-immutable-radix",
+      "version": "v1.0.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-immutable-radix:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_immutable_radix:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-immutable-radix@v1.0.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:AKDB1HM5PWEA7i4nhcpwOrO2byshxBjXVn/J/3+z5/0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "5e5562d8c6e03682",
+      "name": "github.com/hashicorp/go-multierror",
+      "version": "v1.1.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-multierror:v1.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_multierror:v1.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-multierror@v1.1.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+lD48awMYo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "36f18d3b28c2772c",
+      "name": "github.com/hashicorp/go-plugin",
+      "version": "v1.4.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-plugin:v1.4.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_plugin:v1.4.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-plugin@v1.4.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:DXmvivbWD5qdiBts9TpBC7BYL1Aia5sxbRgQB+v6UZM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "3a6df904ce997cce",
+      "name": "github.com/hashicorp/go-retryablehttp",
+      "version": "v0.7.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-retryablehttp:v0.7.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_retryablehttp:v0.7.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-retryablehttp@v0.7.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:AcYqCvkpalPnPF2pn0KamgwamS42TqUDDYFRKq/RAd0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "6e8c2799081cbafc",
+      "name": "github.com/hashicorp/go-rootcerts",
+      "version": "v1.0.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-rootcerts:v1.0.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_rootcerts:v1.0.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-rootcerts@v1.0.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:jzhAVGtqPKbwpyCPELlgNWhE1znq+qwJtW5Oi2viEzc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "2d1b14692d87cb0e",
+      "name": "github.com/hashicorp/go-safetemp",
+      "version": "v1.0.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-safetemp:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_safetemp:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-safetemp@v1.0.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:2HR189eFNrjHQyENnQMMpCiBAsRxzbTMIgBhEyExpmo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a48140a901fca7f7",
+      "name": "github.com/hashicorp/go-slug",
+      "version": "v0.11.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-slug:v0.11.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_slug:v0.11.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-slug@v0.11.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:c6lLdQnlhUWbS5I7hw8SvfymoFuy6EmiFDedy6ir994=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "ab81396968cb8553",
+      "name": "github.com/hashicorp/go-tfe",
+      "version": "v1.26.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-tfe:v1.26.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_tfe:v1.26.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-tfe@v1.26.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:aacguqCENg6Z7ttfhAxdbbY2vm/jKrntl5sUUY0h6EM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "234bdf10ae85d060",
+      "name": "github.com/hashicorp/go-uuid",
+      "version": "v1.0.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-uuid:v1.0.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_uuid:v1.0.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-uuid@v1.0.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:2gKiV6YVmrJ1i2CKKa9obLvRieoRGviZFL26PcT/Co8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "41f8a318c827770c",
+      "name": "github.com/hashicorp/go-version",
+      "version": "v1.6.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go-version:v1.6.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:go_version:v1.6.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/go-version@v1.6.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mOkIeek=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "387fecd05df63ff0",
+      "name": "github.com/hashicorp/golang-lru",
+      "version": "v0.5.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:golang-lru:v0.5.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:golang_lru:v0.5.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/golang-lru@v0.5.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:0hERBMJE1eitiLkihrMvRVBYAkpHzc/J3QdDN+dAcgU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "44e125a1c90a5e44",
+      "name": "github.com/hashicorp/hcl",
+      "version": "v0.0.0-20170504190234-a4b07c25de5f",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:hcl:v0.0.0-20170504190234-a4b07c25de5f:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/hcl@v0.0.0-20170504190234-a4b07c25de5f",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:UdxlrJz4JOnY8W+DbLISwf2B8WXEolNRA8BGCwI9jws=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "bbc2025537a3240e",
+      "name": "github.com/hashicorp/hcl/v2",
+      "version": "v2.16.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:hcl\\/v2:v2.16.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/hcl@v2.16.2#v2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:mpkHZh/Tv+xet3sy3F9Ld4FyI2tUpWe9x3XtPx9f1a0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c0f0cf5c0160c1fb",
+      "name": "github.com/hashicorp/jsonapi",
+      "version": "v0.0.0-20210826224640-ee7dae0fb22d",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:jsonapi:v0.0.0-20210826224640-ee7dae0fb22d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/jsonapi@v0.0.0-20210826224640-ee7dae0fb22d",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:9ARUJJ1VVynB176G1HCwleORqCaXm/Vx0uUi0dL26I0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "36751fa32300a95e",
+      "name": "github.com/hashicorp/serf",
+      "version": "v0.9.5",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:serf:v0.9.5:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/serf@v0.9.5",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:EBWvyu9tcRszt3Bxp3KNssBMP1KuHWyO51lz9+786iM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "bf5bbaed406579fe",
+      "name": "github.com/hashicorp/terraform",
+      "version": "v0.0.0-20230907181950-ee58ac1851c8",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:terraform:v0.0.0-20230907181950-ee58ac1851c8:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/terraform@v0.0.0-20230907181950-ee58ac1851c8",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goBuildSettings": [
+          {
+            "key": "-buildmode",
+            "value": "exe"
+          },
+          {
+            "key": "-compiler",
+            "value": "gc"
+          },
+          {
+            "key": "-ldflags",
+            "value": "-w "
+          },
+          {
+            "key": "-tags",
+            "value": "netgo,osusergo"
+          },
+          {
+            "key": "-trimpath",
+            "value": "true"
+          },
+          {
+            "key": "CGO_ENABLED",
+            "value": "1"
+          },
+          {
+            "key": "GOARCH",
+            "value": "arm64"
+          },
+          {
+            "key": "GOOS",
+            "value": "linux"
+          },
+          {
+            "key": "vcs",
+            "value": "git"
+          },
+          {
+            "key": "vcs.revision",
+            "value": "ee58ac1851c8a433005df9863ed47796a9f6b5e7"
+          },
+          {
+            "key": "vcs.time",
+            "value": "2023-09-07T18:19:50Z"
+          },
+          {
+            "key": "vcs.modified",
+            "value": "true"
+          }
+        ],
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "4d425f3b062c2984",
+      "name": "github.com/hashicorp/terraform-registry-address",
+      "version": "v0.0.0-20220623143253-7d51757b572c",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:terraform-registry-address:v0.0.0-20220623143253-7d51757b572c:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:terraform_registry_address:v0.0.0-20220623143253-7d51757b572c:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/terraform-registry-address@v0.0.0-20220623143253-7d51757b572c",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:D8aRO6+mTqHfLsK/BC3j5OAoogv1WLRWzY1AaTo3rBg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "672d2de4834458c9",
+      "name": "github.com/hashicorp/terraform-svchost",
+      "version": "v0.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:terraform-svchost:v0.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:hashicorp:terraform_svchost:v0.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/terraform-svchost@v0.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:0+RcgZdZYNd81Vw7tu62g9JiLLvbOigp7QtyNh6CjXk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e02da128741ebff5",
+      "name": "github.com/hashicorp/yamux",
+      "version": "v0.0.0-20181012175058-2f1d1f20f75d",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:hashicorp:yamux:v0.0.0-20181012175058-2f1d1f20f75d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/hashicorp/yamux@v0.0.0-20181012175058-2f1d1f20f75d",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:kJCB4vdITiW1eC1vq2e6IsrXKrZit1bv/TDYFGMp4BQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "6260894a06c558c9",
+      "name": "github.com/huandu/xstrings",
+      "version": "v1.3.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:huandu:xstrings:v1.3.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/huandu/xstrings@v1.3.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:/Gcsuc1x8JVbJ9/rlye4xZnVAbEkGauT8lbebqcQws4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "14a8e83011b1d5b7",
+      "name": "github.com/imdario/mergo",
+      "version": "v0.3.13",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:imdario:mergo:v0.3.13:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/imdario/mergo@v0.3.13",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d8d49f105c98ecd4",
+      "name": "github.com/jmespath/go-jmespath",
+      "version": "v0.4.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:jmespath:go-jmespath:v0.4.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:jmespath:go_jmespath:v0.4.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/jmespath/go-jmespath@v0.4.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "1b580f85714c0f3c",
+      "name": "github.com/json-iterator/go",
+      "version": "v1.1.12",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:json-iterator:go:v1.1.12:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:json_iterator:go:v1.1.12:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:json:go:v1.1.12:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/json-iterator/go@v1.1.12",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a46cc4bcd8fc6b09",
+      "name": "github.com/kardianos/osext",
+      "version": "v0.0.0-20190222173326-2bc1f35cddc0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:kardianos:osext:v0.0.0-20190222173326-2bc1f35cddc0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/kardianos/osext@v0.0.0-20190222173326-2bc1f35cddc0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:iQTw/8FWTuc7uiaSepXwyf3o52HaUYcV+Tu66S3F5GA=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "f576ba4673462711",
+      "name": "github.com/klauspost/compress",
+      "version": "v1.15.11",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:klauspost:compress:v1.15.11:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/klauspost/compress@v1.15.11",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Lcadnb3RKGin4FYM/orgq0qde+nc15E5Cbqg4B9Sx9c=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "22d0d00e3bb000a3",
+      "name": "github.com/lib/pq",
+      "version": "v1.10.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:lib:pq:v1.10.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/lib/pq@v1.10.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:v9QZf2Sn6AmjXtQeFpdoq/eaNtYP6IN+7lcrygsIAtg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "fef4ee73c03c440e",
+      "name": "github.com/manicminer/hamilton",
+      "version": "v0.44.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:manicminer:hamilton:v0.44.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/manicminer/hamilton@v0.44.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:mLb4Vxbt2dsAvOpaB7xd/5D8LaTTX6ACwVP4TmW8qwE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "eb45b69dece96a73",
+      "name": "github.com/manicminer/hamilton-autorest",
+      "version": "v0.2.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:manicminer:hamilton-autorest:v0.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:manicminer:hamilton_autorest:v0.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/manicminer/hamilton-autorest@v0.2.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:dDL+t2DrQza0EfNYINYCvXISeNwVqzgVAQh+CH/19ZU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b48635873653e66e",
+      "name": "github.com/masterzen/simplexml",
+      "version": "v0.0.0-20190410153822-31eea3082786",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:masterzen:simplexml:v0.0.0-20190410153822-31eea3082786:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/masterzen/simplexml@v0.0.0-20190410153822-31eea3082786",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:2ZKn+w/BJeL43sCxI2jhPLRv73oVVOjEKZjKkflyqxg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c71b33d7251ea0b7",
+      "name": "github.com/masterzen/winrm",
+      "version": "v0.0.0-20200615185753-c42b5136ff88",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:masterzen:winrm:v0.0.0-20200615185753-c42b5136ff88:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/masterzen/winrm@v0.0.0-20200615185753-c42b5136ff88",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:cxuVcCvCLD9yYDbRCWw0jSgh1oT6P6mv3aJDKK5o7X4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d762027ae0046acf",
+      "name": "github.com/mattn/go-colorable",
+      "version": "v0.1.13",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mattn:go-colorable:v0.1.13:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mattn:go_colorable:v0.1.13:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mattn/go-colorable@v0.1.13",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d500431ca673ae45",
+      "name": "github.com/mattn/go-isatty",
+      "version": "v0.0.16",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mattn:go-isatty:v0.0.16:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mattn:go_isatty:v0.0.16:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mattn/go-isatty@v0.0.16",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:bq3VjFmv/sOjHtdEhmkEV4x1AJtvUvOJ2PFAZ5+peKQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "f5c4c3aec35b896a",
+      "name": "github.com/mattn/go-shellwords",
+      "version": "v1.0.4",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mattn:go-shellwords:v1.0.4:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mattn:go_shellwords:v1.0.4:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mattn/go-shellwords@v1.0.4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:xmZZyxuP+bYKAKkA9ABYXVNJ+G/Wf3R8d8vAP3LDJJk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "329e80d7b30436dd",
+      "name": "github.com/mitchellh/cli",
+      "version": "v1.1.5",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:cli:v1.1.5:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/cli@v1.1.5",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:OxRIeJXpAMztws/XHlN2vu6imG5Dpq+j61AzAX5fLng=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "1e89e74432f9f23c",
+      "name": "github.com/mitchellh/colorstring",
+      "version": "v0.0.0-20190213212951-d06e56a500db",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:colorstring:v0.0.0-20190213212951-d06e56a500db:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/colorstring@v0.0.0-20190213212951-d06e56a500db",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:62I3jR2EmQ4l5rM/4FEfDWcRD+abF5XlKShorW5LRoQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "68fb27f50e43cb98",
+      "name": "github.com/mitchellh/copystructure",
+      "version": "v1.2.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:copystructure:v1.2.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/copystructure@v1.2.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:vpKXTN4ewci03Vljg/q9QvCGUDttBOGBIa15WveJJGw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d8000205a6498c80",
+      "name": "github.com/mitchellh/go-homedir",
+      "version": "v1.1.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go-homedir:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go_homedir:v1.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/go-homedir@v1.1.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "9238d2524a7cb62e",
+      "name": "github.com/mitchellh/go-linereader",
+      "version": "v0.0.0-20190213213312-1b945b3263eb",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go-linereader:v0.0.0-20190213213312-1b945b3263eb:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go_linereader:v0.0.0-20190213213312-1b945b3263eb:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/go-linereader@v0.0.0-20190213213312-1b945b3263eb",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:GRiLv4rgyqjqzxbhJke65IYUf4NCOOvrPOJbV/sPxkM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "4e937322e5ade2f5",
+      "name": "github.com/mitchellh/go-testing-interface",
+      "version": "v1.14.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go-testing-interface:v1.14.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go_testing_interface:v1.14.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/go-testing-interface@v1.14.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:jrgshOhYAUVNMAJiKbEu7EqAwgJJ2JqpQmpLJOu07cU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "5cca2eb1ba227af9",
+      "name": "github.com/mitchellh/go-wordwrap",
+      "version": "v1.0.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go-wordwrap:v1.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mitchellh:go_wordwrap:v1.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/go-wordwrap@v1.0.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:TLuKupo69TCn6TQSyGxwI1EblZZEsQ0vMlAFQflz0v0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b9b89119ec6d1ad1",
+      "name": "github.com/mitchellh/mapstructure",
+      "version": "v1.1.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:mapstructure:v1.1.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/mapstructure@v1.1.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:fmNYVwqnSfB9mZU6OS2O6GsXM+wcskZDuKQzvN1EDeE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "93bfc89a29a2aff9",
+      "name": "github.com/mitchellh/reflectwalk",
+      "version": "v1.0.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mitchellh:reflectwalk:v1.0.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mitchellh/reflectwalk@v1.0.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:G2LzWKi524PWgd3mLHV8Y5k7s6XUvT0Gef6zxSIeXaQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "fce76153a24a81ec",
+      "name": "github.com/modern-go/concurrent",
+      "version": "v0.0.0-20180306012644-bacd9c7ef1dd",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:modern-go:concurrent:v0.0.0-20180306012644-bacd9c7ef1dd:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:modern_go:concurrent:v0.0.0-20180306012644-bacd9c7ef1dd:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:modern:concurrent:v0.0.0-20180306012644-bacd9c7ef1dd:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/modern-go/concurrent@v0.0.0-20180306012644-bacd9c7ef1dd",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:TRLaZ9cD/w8PVh93nsPXa1VrQ6jlwL5oN8l14QlcNfg=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "0ab3f85d9b53023c",
+      "name": "github.com/modern-go/reflect2",
+      "version": "v1.0.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:modern-go:reflect2:v1.0.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:modern_go:reflect2:v1.0.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:modern:reflect2:v1.0.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/modern-go/reflect2@v1.0.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "9af70e63411356d6",
+      "name": "github.com/mozillazg/go-httpheader",
+      "version": "v0.3.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:mozillazg:go-httpheader:v0.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:mozillazg:go_httpheader:v0.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/mozillazg/go-httpheader@v0.3.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:3brX5z8HTH+0RrNA1362Rc3HsaxyWEKtGY45YrhuINM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "212dc1c4038cbb94",
+      "name": "github.com/nu7hatch/gouuid",
+      "version": "v0.0.0-20131221200532-179d4d0c4d8d",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:nu7hatch:gouuid:v0.0.0-20131221200532-179d4d0c4d8d:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/nu7hatch/gouuid@v0.0.0-20131221200532-179d4d0c4d8d",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:VhgPp6v9qf9Agr/56bj7Y/xa04UccTW04VP0Qed4vnQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "6f006e6bcb737859",
+      "name": "github.com/oklog/run",
+      "version": "v1.0.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:oklog:run:v1.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/oklog/run@v1.0.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Ru7dDtJNOyC66gQ5dQmaCa0qIsAUFY3sFpK1Xk8igrw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "67ae1571385453cb",
+      "name": "github.com/packer-community/winrmcp",
+      "version": "v0.0.0-20180921211025-c76d91c1e7db",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:packer-community:winrmcp:v0.0.0-20180921211025-c76d91c1e7db:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:packer_community:winrmcp:v0.0.0-20180921211025-c76d91c1e7db:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:packer:winrmcp:v0.0.0-20180921211025-c76d91c1e7db:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/packer-community/winrmcp@v0.0.0-20180921211025-c76d91c1e7db",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:9uViuKtx1jrlXLBW/pMnhOfzn3iSEdLase/But/IZRU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "924ab8e90cfb8712",
+      "name": "github.com/pkg/browser",
+      "version": "v0.0.0-20201207095918-0426ae3fba23",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:pkg:browser:v0.0.0-20201207095918-0426ae3fba23:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/pkg/browser@v0.0.0-20201207095918-0426ae3fba23",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:dofHuld+js7eKSemxqTVIo8yRlpRw+H1SdpzZxWruBc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d76abd74a2c1f7be",
+      "name": "github.com/pkg/errors",
+      "version": "v0.9.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:pkg:errors:v0.9.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/pkg/errors@v0.9.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c8c62175df9b5134",
+      "name": "github.com/posener/complete",
+      "version": "v1.2.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:posener:complete:v1.2.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/posener/complete@v1.2.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:NP0eAhjcjImqslEwo/1hq7gpajME0fTLTezBKDqfXqo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e2476f8a78fe9a53",
+      "name": "github.com/shopspring/decimal",
+      "version": "v1.3.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:shopspring:decimal:v1.3.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/shopspring/decimal@v1.3.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8a3e17f00e5a72d8",
+      "name": "github.com/spf13/afero",
+      "version": "v1.2.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:spf13:afero:v1.2.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/spf13/afero@v1.2.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:5jhuqJyZCZf2JRofRvN/nIFgIWNzPa3/Vz8mYylgbWc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c26888b514b3501e",
+      "name": "github.com/spf13/cast",
+      "version": "v1.5.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:spf13:cast:v1.5.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/spf13/cast@v1.5.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:rj3WzYc11XZaIZMPKmwP96zkFEnnAmV8s6XbB2aY32w=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e371d648a15d1ea8",
+      "name": "github.com/spf13/pflag",
+      "version": "v1.0.5",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:spf13:pflag:v1.0.5:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/spf13/pflag@v1.0.5",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "75451bb5eef3d49f",
+      "name": "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common",
+      "version": "v1.0.588",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:tencentcloud:tencentcloud-sdk-go\\/tencentcloud\\/common:v1.0.588:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:tencentcloud:tencentcloud_sdk_go\\/tencentcloud\\/common:v1.0.588:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/tencentcloud/tencentcloud-sdk-go@v1.0.588#tencentcloud/common",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:DYtBXB7sVc3EOW5horg8j55cLZynhsLYhHrvQ/jXKKM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a2cca8e80a67a079",
+      "name": "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts",
+      "version": "v1.0.588",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:tencentcloud:tencentcloud-sdk-go\\/tencentcloud\\/sts:v1.0.588:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:tencentcloud:tencentcloud_sdk_go\\/tencentcloud\\/sts:v1.0.588:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/tencentcloud/tencentcloud-sdk-go@v1.0.588#tencentcloud/sts",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:PlkFOALQZ9BLUyX8EalATUQD5xEn1Sz34C+Rw5VSpvk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "bffefbfbb85acbc7",
+      "name": "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag",
+      "version": "v1.0.233",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:tencentcloud:tencentcloud-sdk-go\\/tencentcloud\\/tag:v1.0.233:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:tencentcloud:tencentcloud_sdk_go\\/tencentcloud\\/tag:v1.0.233:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/tencentcloud/tencentcloud-sdk-go@v1.0.233#tencentcloud/tag",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:5Tbi+jyZ2MojC6GK8V6hchwtnkP2IuENUTqSisbYOlA=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "eacd5e0d7a55c312",
+      "name": "github.com/tencentyun/cos-go-sdk-v5",
+      "version": "v0.7.29",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:tencentyun:cos-go-sdk-v5:v0.7.29:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:tencentyun:cos_go_sdk_v5:v0.7.29:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/tencentyun/cos-go-sdk-v5@v0.7.29",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:uwRBzc70Wgtc5iQQCowqecfRT0OpCXUOZzodZHOOEDs=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "9a699db668c08742",
+      "name": "github.com/tombuildsstuff/giovanni",
+      "version": "v0.15.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:tombuildsstuff:giovanni:v0.15.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/tombuildsstuff/giovanni@v0.15.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:CVRaLOJ7C/eercCrKIsarfJ4SZoGMdBL9Q2deFDUXco=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a44956285c9c6343",
+      "name": "github.com/ulikunitz/xz",
+      "version": "v0.5.10",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:ulikunitz:xz:v0.5.10:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/ulikunitz/xz@v0.5.10",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:t92gobL9l3HE202wg3rlk19F6X+JOxl9BBrCCMYEYd8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "fe64cdb3b2c82ab3",
+      "name": "github.com/vmihailenco/msgpack/v4",
+      "version": "v4.3.12",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:vmihailenco:msgpack\\/v4:v4.3.12:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/vmihailenco/msgpack@v4.3.12#v4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:07s4sz9IReOgdikxLTKNbBdqDMLsjPKXwvCazn8G65U=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8df3a62df5a0c379",
+      "name": "github.com/vmihailenco/tagparser",
+      "version": "v0.1.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:vmihailenco:tagparser:v0.1.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/vmihailenco/tagparser@v0.1.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:quXMXlA39OCbd2wAdTsGDlK9RkOk6Wuw+x37wVyIuWY=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "5c662c8dec913b57",
+      "name": "github.com/xanzy/ssh-agent",
+      "version": "v0.3.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:xanzy:ssh-agent:v0.3.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:xanzy:ssh_agent:v0.3.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/xanzy/ssh-agent@v0.3.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:AmzO1SSWxw73zxFZPRwaMN1MohDw8UyHnmuxyceTEGo=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "17df55363884a269",
+      "name": "github.com/xlab/treeprint",
+      "version": "v0.0.0-20161029104018-1d6e34225557",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:xlab:treeprint:v0.0.0-20161029104018-1d6e34225557:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/xlab/treeprint@v0.0.0-20161029104018-1d6e34225557",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:Jpn2j6wHkC9wJv5iMfJhKqrZJx3TahFx+7sbZ7zQdxs=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "fa4f8a6b2a28bc68",
+      "name": "github.com/zclconf/go-cty",
+      "version": "v1.12.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:zclconf:go-cty:v1.12.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:zclconf:go_cty:v1.12.2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/zclconf/go-cty@v1.12.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:h4VH6eKXHTw60DiEJEVjh6pqVPDcoe3DuAkH/Ejs+4g=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "98224cad4a1b485b",
+      "name": "github.com/zclconf/go-cty-yaml",
+      "version": "v1.0.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:zclconf:go-cty-yaml:v1.0.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:zclconf:go_cty_yaml:v1.0.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/github.com/zclconf/go-cty-yaml@v1.0.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:og/eOQ7lvA/WWhHGFETVWNduJM7Rjsv2RRpx1sdFMLc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8299f899634de85e",
+      "name": "go.opencensus.io",
+      "version": "v0.24.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/go.opencensus.io@v0.24.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d2c28a4da59036a5",
+      "name": "golang.org/x/crypto",
+      "version": "v0.21.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/crypto:v0.21.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/crypto@v0.21.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:X31++rzVUdKhX5sWmSOFZxx8UW/ldWx55cbf08iNAMA=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e5d96f610f9a9323",
+      "name": "golang.org/x/mod",
+      "version": "v0.8.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/mod:v0.8.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/mod@v0.8.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:LUYupSeNrTNCGzR/hVBk2NHZO4hXcVaW1k4Qx7rjPx8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "d1d9c96e749f7111",
+      "name": "golang.org/x/net",
+      "version": "v0.23.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:networking:v0.23.0:*:*:*:*:go:*:*",
+          "source": "nvd-cpe-dictionary"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/net@v0.23.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:7EYJ93RZ9vYSZAIb2x3lnuvqO5zneoD6IvWjuhfxjTs=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "4fea663fb4a99251",
+      "name": "golang.org/x/oauth2",
+      "version": "v0.7.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/oauth2:v0.7.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/oauth2@v0.7.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:qe6s0zUXlPX80/dITx3440hWZ7GwMwgDDyrSGTPJG/g=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "f3407619e1d9502b",
+      "name": "golang.org/x/sys",
+      "version": "v0.18.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/sys:v0.18.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/sys@v0.18.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:DBdB3niSjOA/O0blCZBqDefyWNYveAYMNF1Wum0DYQ4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b8a673e9931cb5e6",
+      "name": "golang.org/x/term",
+      "version": "v0.18.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/term:v0.18.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/term@v0.18.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:FcHjZXDMxI8mM3nwhX9HlKop4C0YQvCVCdwYl2wOtE8=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a85f4f312c196eab",
+      "name": "golang.org/x/text",
+      "version": "v0.14.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:text:v0.14.0:*:*:*:*:*:*:*",
+          "source": "nvd-cpe-dictionary"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/text@v0.14.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "add1d9db2b0c48dc",
+      "name": "golang.org/x/time",
+      "version": "v0.3.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/time:v0.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/time@v0.3.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:rg5rLMjNzMS1RkNLzCG38eapWhnYLFYXDXj2gOlr8j4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "fa21b2fc7423ba4a",
+      "name": "golang.org/x/xerrors",
+      "version": "v0.0.0-20220907171357-04be3eba64a2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:x\\/xerrors:v0.0.0-20220907171357-04be3eba64a2:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/golang.org/x/xerrors@v0.0.0-20220907171357-04be3eba64a2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:H2TDz8ibqkAF6YGhCdN3jS9O0/s90v0rJh3X/OLHEUk=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "5212b6b6c72e4665",
+      "name": "google.golang.org/api",
+      "version": "v0.114.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:api:v0.114.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/google.golang.org/api@v0.114.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:1xQPji6cO2E2vLiI+C/XiFAnsn1WV3mjaEwGLhi3grE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8619f3cf73bdad8b",
+      "name": "google.golang.org/genproto",
+      "version": "v0.0.0-20230410155749-daa745c078e1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:genproto:v0.0.0-20230410155749-daa745c078e1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/google.golang.org/genproto@v0.0.0-20230410155749-daa745c078e1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:KpwkzHKEF7B9Zxg18WzOa7djJ+Ha5DzthMyZYQfEn2A=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "9906461f0b92ce8c",
+      "name": "google.golang.org/grpc",
+      "version": "v1.56.3",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:grpc:v1.56.3:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/google.golang.org/grpc@v1.56.3",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:8I4C0Yq1EjstUzUJzpcRVbuYA2mODtEmpWiQoN/b2nc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8959e811604414da",
+      "name": "google.golang.org/protobuf",
+      "version": "v1.33.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:google:protobuf:v1.33.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/google.golang.org/protobuf@v1.33.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:uNO2rsAINq/JlFpSdYEKIZ0uKD/R9cpdv0T+yoGwGmI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "30b0922f1a1c452b",
+      "name": "gopkg.in/inf.v0",
+      "version": "v0.9.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/gopkg.in/inf.v0@v0.9.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:73M5CoZyi3ZLMOyDlQh031Cx6N9NDJ2Vvfl76EDAgDc=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c5111f8688522d13",
+      "name": "gopkg.in/ini.v1",
+      "version": "v1.66.2",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/gopkg.in/ini.v1@v1.66.2",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:XfR1dOYubytKy4Shzc2LHrrGhU0lDCfDGG1yLPmpgsI=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "5c908bf15725ed85",
+      "name": "gopkg.in/yaml.v2",
+      "version": "v2.4.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/gopkg.in/yaml.v2@v2.4.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "b4a9c7976323c5ee",
+      "name": "gopkg.in/yaml.v3",
+      "version": "v3.0.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:yaml_project:yaml:v3.0.1:*:*:*:*:go:*:*",
+          "source": "nvd-cpe-dictionary"
+        }
+      ],
+      "purl": "pkg:golang/gopkg.in/yaml.v3@v3.0.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "6f7beb1b3a875307",
+      "name": "k8s.io/api",
+      "version": "v0.23.4",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/k8s.io/api@v0.23.4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:85gnfXQOWbJa1SiWGpE9EEtHs0UVvDyIsSMpEtl2D4E=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "6c1cb209a8d4731d",
+      "name": "k8s.io/apimachinery",
+      "version": "v0.23.4",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/k8s.io/apimachinery@v0.23.4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:fhnuMd/xUL3Cjfl64j5ULKZ1/J9n8NuQEgNL+WXWfdM=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "16d179bad4bf07cc",
+      "name": "k8s.io/client-go",
+      "version": "v0.23.4",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/k8s.io/client-go@v0.23.4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:YVWvPeerA2gpUudLelvsolzH7c2sFoXXR5wM/sWqNFU=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "8cbfb889aee10685",
+      "name": "k8s.io/klog/v2",
+      "version": "v2.30.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:klog:v2:v2.30.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/k8s.io/klog/v2@v2.30.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:bUO6drIvCIsvZ/XFgfxoGFQU/a4Qkh0iAlvUR7vlHJw=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "50078d96b003a628",
+      "name": "k8s.io/kube-openapi",
+      "version": "v0.0.0-20211115234752-e816edb12b65",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/k8s.io/kube-openapi@v0.0.0-20211115234752-e816edb12b65",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:E3J9oCLlaobFUqsjG9DfKbP2BmgwBL2p7pn0A3dG9W4=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "c09282ef4c1d9707",
+      "name": "k8s.io/utils",
+      "version": "v0.0.0-20211116205334-6203023598ed",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/k8s.io/utils@v0.0.0-20211116205334-6203023598ed",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:ck1fRPWPJWsMd8ZRFsWc6mh/zHp5fZ/shhbrgPUxDAE=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "e4908f3b0393f957",
+      "name": "sigs.k8s.io/json",
+      "version": "v0.0.0-20211020170558-c049b76a60c6",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/sigs.k8s.io/json@v0.0.0-20211020170558-c049b76a60c6",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:fD1pz4yfdADVNfFmcP2aBEtudwUQ1AlLnRBALr33v3s=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "3a8146ce33e87920",
+      "name": "sigs.k8s.io/structured-merge-diff/v4",
+      "version": "v4.2.1",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:structured-merge-diff:v4:v4.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:structured_merge_diff:v4:v4.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:structured-merge:v4:v4.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:structured_merge:v4:v4.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:structured:v4:v4.2.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/sigs.k8s.io/structured-merge-diff/v4@v4.2.1",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:bKCqE9GvQ5tiVHn5rfn1r+yao3aLQEaLzkkmAkf+A6Y=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "0c7c20f393c2acea",
+      "name": "sigs.k8s.io/yaml",
+      "version": "v1.2.0",
+      "type": "go-module",
+      "foundBy": "go-module-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "go",
+      "cpes": [],
+      "purl": "pkg:golang/sigs.k8s.io/yaml@v1.2.0",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": "arm64",
+        "h1Digest": "h1:kr/MCeFWJWTwyaHoR9c8EjH9OumOmoF9YGiZd7lFm/Q=",
+        "mainModule": "github.com/hashicorp/terraform",
+        "goCryptoSettings": [
+          "standard-crypto"
+        ]
+      }
+    },
+    {
+      "id": "a1fa4cba82f98855",
+      "name": "stdlib",
+      "version": "go1.22.4",
+      "type": "go-module",
+      "foundBy": "",
+      "locations": [
+        {
+          "path": "usr/bin/terraform",
+          "accessPath": "usr/bin/terraform",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [
+        {
+          "value": "BSD-3-Clause",
+          "spdxExpression": "BSD-3-Clause",
+          "type": "declared",
+          "urls": [],
+          "locations": []
+        }
+      ],
+      "language": "go",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:golang:go:1.22.4:-:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:golang/stdlib@1.22.4",
+      "metadataType": "go-module-buildinfo-entry",
+      "metadata": {
+        "goCompiledVersion": "go1.22.4",
+        "architecture": ""
+      }
+    },
+    {
+      "id": "248def2b3c072156",
+      "name": "terraform",
+      "version": "1.5.7-r12",
+      "type": "apk",
+      "foundBy": "wolfictl",
+      "locations": [
+        {
+          "path": ".PKGINFO",
+          "accessPath": ".PKGINFO"
+        }
+      ],
+      "licenses": [
+        {
+          "value": "MPL-2.0",
+          "spdxExpression": "MPL-2.0",
+          "type": "declared",
+          "urls": [],
+          "locations": []
+        }
+      ],
+      "language": "",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:terraform:terraform:1.5.7-r12:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/terraform@1.5.7-r12?arch=aarch64&origin=terraform",
+      "metadataType": "apk-db-entry",
+      "metadata": {
+        "package": "terraform",
+        "originPackage": "terraform",
+        "maintainer": "",
+        "version": "1.5.7-r12",
+        "architecture": "aarch64",
+        "url": "",
+        "description": "",
+        "size": 73995412,
+        "installedSize": 0,
+        "pullDependencies": null,
+        "provides": [
+          "cmd:terraform=1.5.7-r12"
+        ],
+        "pullChecksum": "ea39b3f6d6857ce8fd51910524b230c0927ce4a72c285ba2ef94895a05f8dab8",
+        "gitCommitOfApkPort": "3979bc2c18775b50285431391e4aea5da9d62dd2",
+        "files": [
+          {
+            "path": "."
+          },
+          {
+            "path": ".PKGINFO"
+          },
+          {
+            "path": ".SIGN.RSA.wolfi-signing.rsa.pub"
+          },
+          {
+            "path": "usr"
+          },
+          {
+            "path": "usr/bin"
+          },
+          {
+            "path": "usr/bin/terraform"
+          },
+          {
+            "path": "var"
+          },
+          {
+            "path": "var/lib"
+          },
+          {
+            "path": "var/lib/db"
+          },
+          {
+            "path": "var/lib/db/sbom"
+          },
+          {
+            "path": "var/lib/db/sbom/terraform-1.5.7-r12.spdx.json"
+          }
+        ]
+      }
+    }
+  ],
+  "artifactRelationships": [],
+  "source": {
+    "id": "(redacted for determinism)",
+    "name": "terraform",
+    "version": "1.5.7-r12",
+    "type": "directory",
+    "metadata": {
+      "path": "testdata/apks/aarch64/terraform-1.5.7-r12.apk"
+    }
+  },
+  "distro": {
+    "id": "wolfi"
+  },
+  "descriptor": {
+    "name": "wolfictl",
+    "version": ""
+  },
+  "schema": {
+    "version": "16.0.12",
+    "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-16.0.12.json"
+  }
+}
