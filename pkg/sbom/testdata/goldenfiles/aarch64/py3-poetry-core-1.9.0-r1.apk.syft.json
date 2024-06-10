@@ -1,0 +1,2514 @@
+{
+  "artifacts": [
+    {
+      "id": "5f3a44d946dc198e",
+      "name": "poetry-core",
+      "version": "1.9.0",
+      "type": "python",
+      "foundBy": "python-installed-package-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/METADATA",
+          "accessPath": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/METADATA",
+          "annotations": {
+            "evidence": "primary"
+          }
+        },
+        {
+          "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/RECORD",
+          "accessPath": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/RECORD",
+          "annotations": {
+            "evidence": "supporting"
+          }
+        }
+      ],
+      "licenses": [
+        {
+          "value": "MIT",
+          "spdxExpression": "MIT",
+          "type": "declared",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/METADATA",
+              "accessPath": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/METADATA"
+            }
+          ]
+        }
+      ],
+      "language": "python",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:python-poetry-core:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry-core:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry_core:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry_core:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien_project:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien_project:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastienproject:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastienproject:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry-core:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry-core:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry_core:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry_core:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien_project:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien_project:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastienproject:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastienproject:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python-poetry:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python:python-poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python:python_poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python_poetry:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sebastien:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python:poetry-core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:python:poetry_core:1.9.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:pypi/poetry-core@1.9.0",
+      "metadataType": "python-package",
+      "metadata": {
+        "name": "poetry-core",
+        "version": "1.9.0",
+        "author": "Sébastien Eustace",
+        "authorEmail": "sebastien@eustace.io",
+        "platform": "",
+        "files": [
+          {
+            "path": "poetry/core/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "002K9r_S8D1y2KZsoHZ7HLg2anRRzibuWDUfG1Yhays"
+            },
+            "size": "394"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/LICENSE",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "nM3faes5mKYBSN6-hblMWv7VNpG2R0aS54q8wKDlRPE"
+            },
+            "size": "1518"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "ObCyDMkkAt3D3xBF409xoWcxBB8arp-QJ-yN_Bm9dX4"
+            },
+            "size": "9720"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/__main__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "4hfd23przxmQc8VjL0fUsbsrvvA73gJ2HDNPgLLFdAI"
+            },
+            "size": "312"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/draft04.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Ds0M9W38Zs5YNhmOSuL2Cp1kFP5hTdcNt4S5f5A7rHE"
+            },
+            "size": "29714"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/draft06.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "qfIMGhVDc8gLlYcFrVlnIFf5E8G2sjONM0drdkmnyCc"
+            },
+            "size": "7845"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/draft07.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "FWI64sLZNDqSDwWbvKH4X60XgJsu4uzu_fG8ySRe78A"
+            },
+            "size": "4249"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/exceptions.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "w749JgqKi8clBFcObdcbZVqsmF4oJ_QByhZ1SGbUFNw"
+            },
+            "size": "1612"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/generator.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "ujPoMpneDZctejy8jXxkLS2t5EomfscQ-C_t35dt2us"
+            },
+            "size": "12844"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/indent.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "juZFW9LSvmDJbPFIUm3GPqdPqJoUnqvM8neHN5rkvzU"
+            },
+            "size": "920"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/ref_resolver.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "CSfaEA-97_DGN9aXA7-j0nAfAhkrkggCEaZcfcR8ZKE"
+            },
+            "size": "5536"
+          },
+          {
+            "path": "poetry/core/_vendor/fastjsonschema/version.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "RIhx1lOJFJpBlFOJ6gqOjBZUXNkRoHhVsK4RfpMgpNA"
+            },
+            "size": "19"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/LICENSE",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "gmPlZS0Hzss62t8FFAtl5wz6Fp7OxfUg_hZxR5zhKoM"
+            },
+            "size": "1073"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "-7O4u-eNiPG1jtscKTuxV7e-uSkUfYVMq8UpYOz8Xa8"
+            },
+            "size": "744"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/__pyinstaller/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "_PpFm44f_mwHlCpvYgv9ZgubLfNDc3PlePVir4sxRfI"
+            },
+            "size": "182"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/__pyinstaller/hook-lark.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "5aFHiZWVHPRdHT8qnb4kW4JSOql5GusHodHR25_q9sU"
+            },
+            "size": "599"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/ast_utils.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "jwn44ocNQhZGbfcFsEZnwi_gGvPbNgzjQ-0RuEtwDzI"
+            },
+            "size": "2117"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/common.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Zf52srBmaFHQf8hDHqg0wVfRfFQwjIilOizT7C2xlRg"
+            },
+            "size": "3103"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/exceptions.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "g76ygMPfSMl6ukKqFAZVpR2EAJTOOdyfJ_ALXc_MCR8"
+            },
+            "size": "10939"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/grammar.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "DR17QSLSKCRhMOqx2UQh4n-Ywu4CD-wjdQxtuM8OHkY"
+            },
+            "size": "3665"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/grammars/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/grammars/common.lark",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "aTv39kqbl8haIV6D88I0-dWf_C6jl3X8y9GKPt7yddE"
+            },
+            "size": "944"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/grammars/lark.lark",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "mp2F9PYTmm8Jl7vjjUslEeHrcL9ZwfhJnDlcqhzeAWI"
+            },
+            "size": "1603"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/grammars/python.lark",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "p5S5hYeA20GEDAHql8gb4TsZvqfZN36PYrJZhauiokc"
+            },
+            "size": "10943"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/grammars/unicode.lark",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "_0Clod4_uthpQK_Cd52ZjTPkNTwHuzI_sYbYDr1yGOg"
+            },
+            "size": "103"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/indenter.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "SDlclk84KMLuGSVkK1yWA_EolWI0kG3zwaIsAqFtTPo"
+            },
+            "size": "3062"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/lark.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "dbnLl2IK_RvpTEGM6j72uSrYqS54dOWTo9bNLguJMeg"
+            },
+            "size": "28287"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/lexer.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "OwgQPCpQ-vUi-2aeZztsydd4DLkEgCbZeucvEPvHFi4"
+            },
+            "size": "24037"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/load_grammar.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "WYZDxyO6omhA8NKyMjSckfAMwVKuIMF3liiYXE_-kHo"
+            },
+            "size": "53946"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parse_tree_builder.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "jT_3gCEkBGZoTXAWSnhMn1kRuJILWB-E7XkUciYNHI4"
+            },
+            "size": "14412"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parser_frontends.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "mxMXxux2hkfTfE859wuVp4-Fr1no6YVEUt8toDjEdPQ"
+            },
+            "size": "10165"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/cyk.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "c3GLk3kq23Xwb8MqUOjvivwP488KJY6NUWgxqeR5980"
+            },
+            "size": "12192"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/earley.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "65MMBF2xS5f1liBIpfPFr_ouJSUyx0bt2681Lg5Ui5o"
+            },
+            "size": "14596"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/earley_common.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "qoaNBCx1FPwfaqvxwRunfOBC84ukav5_h_cMXCgEctk"
+            },
+            "size": "1581"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/earley_forest.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "kgGWRTO0JHzbTUeshoRJ0_Rr7yx7748l6cu3RA86g7c"
+            },
+            "size": "31634"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/grammar_analysis.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "WoxuPu53lXJAGmdyldfaRy4yKJ9LRPl90VBYczyaVZA"
+            },
+            "size": "7106"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/lalr_analysis.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "DGHFk2tIluIyeFEVFfsMRU77DVbd598IJnUUOXO04yo"
+            },
+            "size": "12207"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/lalr_interactive_parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "3AFACuc9JaC_m_TeGSAwpn9L9PjbfhgbeEtXsTv9rD8"
+            },
+            "size": "5624"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/lalr_parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "6U8jP1AlUsuGxgJBWMq15WuGuyaolsLPevcf8HZ_zZk"
+            },
+            "size": "4586"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/lalr_parser_state.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Ayavomb_VgPlY8G4nI45wdoiHl3jQvPbomECKf6wglE"
+            },
+            "size": "3723"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/parsers/xearley.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "4_K5-oSBsEdheDD3Wve8JhbmnKN1pFYNS4rTw_-JbeU"
+            },
+            "size": "7821"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/py.typed",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/reconstruct.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "s7CevBXchUG_fe2otdAITxIaSXCEIiSjy4Sbh5QC0hs"
+            },
+            "size": "3763"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tools/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "99Pxx6Ir884diNszhi7Cv4KYo0i6Wm4mgVsJZl1uS5Q"
+            },
+            "size": "2544"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tools/nearley.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "QaLYdW6mYQdDq8JKMisV3lvPqzF0wPgu8q8BtsSA33g"
+            },
+            "size": "6265"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tools/serialize.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "nwt46LNxkDm0T_Uh9k2wS4fcfgvZQ2dy4-YC_aKhTQk"
+            },
+            "size": "965"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tools/standalone.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "6eXDqBuzZSpE5BGZm_Fh6X5yRhAPYxNVyl2aUU3ABzA"
+            },
+            "size": "5627"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tree.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Vtph_uYBabyAACilb2Yr8oC1UNfWyXTHYxNY7WoWhos"
+            },
+            "size": "8753"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tree_matcher.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "jHdZJggn405SXmPpGf9U9HLrrsfP4eNNZaj267UTB00"
+            },
+            "size": "6003"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/tree_templates.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "u9rgvQ9X3sDweRkhtteF9nPzCYpQPKvxQowkvU5rOcY"
+            },
+            "size": "5959"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/utils.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "j2cAz9hcAIkDfqPzp6DwDu7UyjuO2FqHR9wtIrZGNTw"
+            },
+            "size": "11898"
+          },
+          {
+            "path": "poetry/core/_vendor/lark/visitors.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "2pHaAr1swj_Ttxt3M-u5-8zdmhYpTIo-xXFVRMQpLi0"
+            },
+            "size": "21363"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/LICENSE",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "ytHvW9NA1z4HS6YU0m996spceUDD2MNIUuZcSQlobEg"
+            },
+            "size": "197"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/LICENSE.APACHE",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "DVQuDIgE45qn836wDaWnYhSdxoLXgpRRKH4RuTjpRZQ"
+            },
+            "size": "10174"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/LICENSE.BSD",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "tw5-m3QvHMb5SLNMFqo5_-zpQZY2S8iP8NIYDwAo-sU"
+            },
+            "size": "1344"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "EhCMuCSz60IgQJ93b_4wJyAoHpU9J-uddG4QaMT0Pu4"
+            },
+            "size": "496"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/_elffile.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "hbmK8OD6Z7fY6hwinHEUcD1by7czkGiNYu7ShnFEk2k"
+            },
+            "size": "3266"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/_manylinux.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Rq6ppXAxH8XFtNf6tC-B-1SKuvCODPBvcCoSulMtbtk"
+            },
+            "size": "9526"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/_musllinux.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "kgmBGLFybpy8609-KTvzmt2zChCPWYvhp5BWP4JX7dE"
+            },
+            "size": "2676"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/_parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "5DhK_zYJE4U4yzSkgEBT4F7tT2xZ6Pkx4gSRKyvXneQ"
+            },
+            "size": "10382"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/_structures.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "q3eVNmbWJGG_S0Dit_S3Ao8qQqz_5PYTXFAKBZe5yr4"
+            },
+            "size": "1431"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/_tokenizer.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "alCtbwXhOFAmFGZ6BQ-wCTSFoRAJ2z-ysIf7__MTJ_k"
+            },
+            "size": "5292"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/markers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "eH-txS2zq1HdNpTd9LcZUcVIwewAiNU0grmq5wjKnOk"
+            },
+            "size": "8208"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/metadata.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "ToxjINOmSn8mbEeXRSVNMidEJsPUYHEYFnnN4MaqvH0"
+            },
+            "size": "32750"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/py.typed",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/requirements.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "wswG4mXHSgE9w4NjNnlSvgLGo6yYvfHVEFnWhuEmXxg"
+            },
+            "size": "2952"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/specifiers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "ZOpqL_w_Kj6ZF_OWdliQUzhEyHlDbi6989kr-sF5GHs"
+            },
+            "size": "39206"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/tags.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "pkG6gQ28RlhS09VzymVhVpGrWF5doHXfK1VxG9cdhoY"
+            },
+            "size": "18355"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/utils.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "XgdmP3yx9-wQEFjO7OvMj9RjEf5JlR5HFFR69v7SQ9E"
+            },
+            "size": "5268"
+          },
+          {
+            "path": "poetry/core/_vendor/packaging/version.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "XjRBLNK17UMDgLeP8UHnqwiY3TdSi03xFQURtec211A"
+            },
+            "size": "16236"
+          },
+          {
+            "path": "poetry/core/_vendor/tomli/LICENSE",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "uAgWsNUwuKzLTCIReDeQmEpuO2GSLCte6S8zcqsnQv4"
+            },
+            "size": "1072"
+          },
+          {
+            "path": "poetry/core/_vendor/tomli/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "JhUwV66DB1g4Hvt1UQCVMdfCu-IgAV8FXmvDU9onxd4"
+            },
+            "size": "396"
+          },
+          {
+            "path": "poetry/core/_vendor/tomli/_parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "g9-ENaALS-B8dokYpCuzUFalWlog7T-SIYMjLZSWrtM"
+            },
+            "size": "22633"
+          },
+          {
+            "path": "poetry/core/_vendor/tomli/_re.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "dbjg5ChZT23Ka9z9DHOXfdtSpPwUfdgMXnj8NOoly-w"
+            },
+            "size": "2943"
+          },
+          {
+            "path": "poetry/core/_vendor/tomli/_types.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "-GTG2VUqkpxwMqzmVO4F7ybKddIbAnuAHXfmWQcTi3Q"
+            },
+            "size": "254"
+          },
+          {
+            "path": "poetry/core/_vendor/tomli/py.typed",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "8PjyZ1aVoQpRVvt71muvuq5qE-jTFZkK-GLHkhdebmc"
+            },
+            "size": "26"
+          },
+          {
+            "path": "poetry/core/_vendor/vendor.txt",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "xl4X29jOA6BGs6o0-xC1tJs6NPrQ-_W9jOMGfwD_4jM"
+            },
+            "size": "276"
+          },
+          {
+            "path": "poetry/core/constraints/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/constraints/generic/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "q2b6g_VyJygeshz5jkPg59nPGFX6aGjwTyqXXB9KXxg"
+            },
+            "size": "719"
+          },
+          {
+            "path": "poetry/core/constraints/generic/any_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "WtNd1k32NoxOe9HkJHV3T1xSLTvz9qRBl5BRqw6zxpk"
+            },
+            "size": "1236"
+          },
+          {
+            "path": "poetry/core/constraints/generic/base_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "tp7ztq1DjNoLRzbWUsVd7Nfh5XbmFs4aNMQYzg2Q1Lw"
+            },
+            "size": "1109"
+          },
+          {
+            "path": "poetry/core/constraints/generic/constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "vw56XHxvmaDj44srkgJ0pN2vMqAOZwkl_B4Sluy7HqA"
+            },
+            "size": "4991"
+          },
+          {
+            "path": "poetry/core/constraints/generic/empty_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "YuORG4NloQmlMaTcshY8Wv1wprNXOeGuhyuAV4c4DD8"
+            },
+            "size": "1151"
+          },
+          {
+            "path": "poetry/core/constraints/generic/multi_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "3PsL5Vwt4E0pSiVB15OJij0Dpj5Bb_9jA9dTtQBxOlE"
+            },
+            "size": "4323"
+          },
+          {
+            "path": "poetry/core/constraints/generic/parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "LMdTlYt8hzm7skWiuO-lpQME2XgAAVgiPrp6SDWHZ44"
+            },
+            "size": "2036"
+          },
+          {
+            "path": "poetry/core/constraints/generic/union_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "LC5pgJy6TDU3Fu5yeuBFVsi6x0JWtXdZHgkS_Ql2YKw"
+            },
+            "size": "6977"
+          },
+          {
+            "path": "poetry/core/constraints/version/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "RGDbUbddbKyMYegl6qbkcnzlMKHFR40jLMRdcz6-jJ4"
+            },
+            "size": "954"
+          },
+          {
+            "path": "poetry/core/constraints/version/empty_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "p3IZ8U0VeY9PV5dItOKWj2WAexq5MeyNHEA2MzSFNe4"
+            },
+            "size": "1416"
+          },
+          {
+            "path": "poetry/core/constraints/version/exceptions.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "KyVaLVndfhf_jPFaU5LjwkFq-2gb1bDDjLHzr52c9Wg"
+            },
+            "size": "86"
+          },
+          {
+            "path": "poetry/core/constraints/version/parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "noZ0mWqcE2TMXfZMuEG13vgwL7Yp4eb_gRWG8VWpL-Q"
+            },
+            "size": "7241"
+          },
+          {
+            "path": "poetry/core/constraints/version/patterns.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "BnSvvAthzqcjmlDHhpj25qXeVA9J_ua6L92shDbRdeY"
+            },
+            "size": "941"
+          },
+          {
+            "path": "poetry/core/constraints/version/util.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "yu7nC9Xk0DCj2mOBCV3jsa9gV-l6dPLY3LMoluNheCo"
+            },
+            "size": "1543"
+          },
+          {
+            "path": "poetry/core/constraints/version/version.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "sLRSctCh-nEv__SAp1B9e_mH3PpfR60VTUUajaMmqMs"
+            },
+            "size": "5081"
+          },
+          {
+            "path": "poetry/core/constraints/version/version_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "jRvcNDjwmd2unOIZeVp4cmm-UWi1Y2vWOM_2VPrngig"
+            },
+            "size": "3401"
+          },
+          {
+            "path": "poetry/core/constraints/version/version_range.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Aaje_XQ9F_QUOgkX2-1lM6lYfJarrI-bGzcM6ELJ4kM"
+            },
+            "size": "15653"
+          },
+          {
+            "path": "poetry/core/constraints/version/version_range_constraint.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "oZFT3vRkX7-bESVvz_KO2eVadkgJZour3KrYlfLNEHI"
+            },
+            "size": "3677"
+          },
+          {
+            "path": "poetry/core/constraints/version/version_union.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "9yeMA5sa9MoVSWytoJ0HDRVgFi5Yyo6XfrfFRqfsxW8"
+            },
+            "size": "10797"
+          },
+          {
+            "path": "poetry/core/exceptions/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "taNya--Pl6WTRp7iT9LbDIGmyFY82CuGx9njgIAJopw"
+            },
+            "size": "133"
+          },
+          {
+            "path": "poetry/core/exceptions/base.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Rqbd5ylCO9em1RfkiUuEJhMqq75pyKpiRKm6Fa_7guc"
+            },
+            "size": "84"
+          },
+          {
+            "path": "poetry/core/factory.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "gfjwkpQzDt23vdIzypdWIW_Vem0mUoYFBTE6rGgNV7w"
+            },
+            "size": "19222"
+          },
+          {
+            "path": "poetry/core/json/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "wytqrxK2JHzZ8zLm1YkC76_qbVfN331ANVpIRXz_K4M"
+            },
+            "size": "1186"
+          },
+          {
+            "path": "poetry/core/json/schemas/poetry-schema.json",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "PvmFixIY-xTPumUSVhiZuZoloa_EgMlI6j1lHNJgCHc"
+            },
+            "size": "19031"
+          },
+          {
+            "path": "poetry/core/masonry/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "FK7uCIiiy0xF5W18UiV4aGouOyckSbDxJTpAu_eZ0SQ"
+            },
+            "size": "255"
+          },
+          {
+            "path": "poetry/core/masonry/api.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "3MAT24SKhx7upLb5nvIfERNhWx5n5XjPE1JbN1W2Ncg"
+            },
+            "size": "2687"
+          },
+          {
+            "path": "poetry/core/masonry/builder.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "1-YMRU-vgwqEFVVDLCXiYBzPve_LbF0ENcPwEfwvtOA"
+            },
+            "size": "1221"
+          },
+          {
+            "path": "poetry/core/masonry/builders/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/masonry/builders/builder.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "6UBHt6ewA6xEfk4YM6GcvMlA_7e1oiw4ApgDJWj3yUs"
+            },
+            "size": "14776"
+          },
+          {
+            "path": "poetry/core/masonry/builders/sdist.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "9tddj9VlrmqauzUjAZolxd5O2VJvGx_0Gl1Se1t7cSs"
+            },
+            "size": "15020"
+          },
+          {
+            "path": "poetry/core/masonry/builders/wheel.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "tonjaz0V1T2WBNFxL32A4ff7lg91qkiu9QcAmNjmnMY"
+            },
+            "size": "16964"
+          },
+          {
+            "path": "poetry/core/masonry/metadata.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "yU3yCTLyLYf6g9HRlfdmp5nCyUtUjyosYB1iRBG3dxo"
+            },
+            "size": "2992"
+          },
+          {
+            "path": "poetry/core/masonry/utils/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/masonry/utils/helpers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "FbuS1ffo6Yo5U6iNxugqP-_mYfbv_He2TpQD29nIjq8"
+            },
+            "size": "3070"
+          },
+          {
+            "path": "poetry/core/masonry/utils/include.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "L7tGkvBvmI-mzyBeTySBkNWFCubBFFaROLCSQRTYqhY"
+            },
+            "size": "1100"
+          },
+          {
+            "path": "poetry/core/masonry/utils/module.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "_qCnsUQCNl_EZk4Vp_MMtfAw61AVv3ToCUzeHogIdPA"
+            },
+            "size": "3610"
+          },
+          {
+            "path": "poetry/core/masonry/utils/package_include.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Mp4sAgcksTcvR5I0cJmwyMgcloP9k3ppP_5sdkVQxzM"
+            },
+            "size": "2806"
+          },
+          {
+            "path": "poetry/core/packages/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/packages/dependency.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "K4I8is1-Qn_v10wDErrHrsoW4QEEtgc7Xn9BwE_jkek"
+            },
+            "size": "19191"
+          },
+          {
+            "path": "poetry/core/packages/dependency_group.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "AmT-_fI9cpl7t2Wkif8R2ZuHoJ5Stb9J4rNPr8XAFfc"
+            },
+            "size": "1479"
+          },
+          {
+            "path": "poetry/core/packages/directory_dependency.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "fr5Bts1CaZyxJueSOGGexcT-9WW5tIZ7U1byyFg7hQc"
+            },
+            "size": "1964"
+          },
+          {
+            "path": "poetry/core/packages/file_dependency.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "nX5cjmAl-q-7U5AkupC7Itcrp6VD_zrYE4Ha2G6j-Po"
+            },
+            "size": "2087"
+          },
+          {
+            "path": "poetry/core/packages/package.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "ZFc6M5GaSr4o0O-E5f5kaGLIrSZOsmkZrFEzYui2ckY"
+            },
+            "size": "22020"
+          },
+          {
+            "path": "poetry/core/packages/path_dependency.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Qv5YWA11eZsE4e8-EuF5TteFq-ANgLyyeJmbaCSdGsc"
+            },
+            "size": "2609"
+          },
+          {
+            "path": "poetry/core/packages/project_package.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "vda7tcjMogZL6nBxZ4qCqPZnTDKiss_QqRKjIOAVnAU"
+            },
+            "size": "3129"
+          },
+          {
+            "path": "poetry/core/packages/specification.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "NksR9iIDBYN8_iDgKyyzE4M23bnB99Jtg-nuhFzpUyE"
+            },
+            "size": "6750"
+          },
+          {
+            "path": "poetry/core/packages/url_dependency.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "GOjMVXIKHzvvNTego866zTAjRMJwJlvmlVvSJq-3AAA"
+            },
+            "size": "1616"
+          },
+          {
+            "path": "poetry/core/packages/utils/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/packages/utils/link.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "vjaRcwBIQV_Es0Gxc1Qh8Zhm_pywYytCPZOtJm9znbI"
+            },
+            "size": "8805"
+          },
+          {
+            "path": "poetry/core/packages/utils/utils.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "YVoapi8GpsUHIvFH3Iy2GY7DTJFhgQCx5gxvewum-R8"
+            },
+            "size": "13536"
+          },
+          {
+            "path": "poetry/core/packages/vcs_dependency.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "RqnvOU3rkwRaBMkgyEVv6CbVKQKux9o8yKwfGGkCkPc"
+            },
+            "size": "3579"
+          },
+          {
+            "path": "poetry/core/poetry.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "7oNDRIqBb4YYegyHPFASvEKKuaOQDQStAWYnY-vVTao"
+            },
+            "size": "1292"
+          },
+          {
+            "path": "poetry/core/py.typed",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/pyproject/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/pyproject/exceptions.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "6pWE7NHM6BbBf29qc7fHHdjkovDtap3FixctQhDtrtE"
+            },
+            "size": "149"
+          },
+          {
+            "path": "poetry/core/pyproject/tables.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "mIgkJ85wV4rXMRIbprHRxF0DgFupot4QTIMJyov9sAU"
+            },
+            "size": "2127"
+          },
+          {
+            "path": "poetry/core/pyproject/toml.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "jzqXyGqk-qu8xhORRvFULX1MGh10lHsfG79dJ6AAmFs"
+            },
+            "size": "2213"
+          },
+          {
+            "path": "poetry/core/spdx/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/spdx/data/licenses.json",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "AxYRXt92Ej9_HuC9I2XpAdF9w-ARbCon0w8tAyOPNbk"
+            },
+            "size": "52942"
+          },
+          {
+            "path": "poetry/core/spdx/helpers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "qrf9OpdTHyKpiFiHar4fG0iucsjK76zK-tG-kNBPcXk"
+            },
+            "size": "1718"
+          },
+          {
+            "path": "poetry/core/spdx/license.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "2y24mbUrtDq_MjDCV3ngP0r6h0tj3CA-SYqVUe8nsik"
+            },
+            "size": "5713"
+          },
+          {
+            "path": "poetry/core/spdx/updater.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "lkx1XESp0RBtwfymdMrK4WUeyHP_NgAEKakMWg4f5yA"
+            },
+            "size": "1106"
+          },
+          {
+            "path": "poetry/core/utils/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/utils/_compat.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "G5-ZbeJc_kkDBXbPM6iN2Vc55snwarVYdhw2fqH5axY"
+            },
+            "size": "229"
+          },
+          {
+            "path": "poetry/core/utils/helpers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "O1b5fctYZfNW0MEy3t1cKfAaKe0WZrsNFiR_z-mXR-c"
+            },
+            "size": "3577"
+          },
+          {
+            "path": "poetry/core/utils/patterns.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "8104wWADvwlSDTiTt4gbnIYELxCZ5sF-p7PAPDw8bTA"
+            },
+            "size": "252"
+          },
+          {
+            "path": "poetry/core/vcs/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "LBZdwVpf_FAHeDKBSaR7Kr74WX2EyjyHRQlwP31itOc"
+            },
+            "size": "1004"
+          },
+          {
+            "path": "poetry/core/vcs/git.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "JAOu_CnlgUFBPp0NMeOE-BJp8B-aTXNmhQxphIQmjsM"
+            },
+            "size": "11253"
+          },
+          {
+            "path": "poetry/core/version/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+            },
+            "size": "0"
+          },
+          {
+            "path": "poetry/core/version/exceptions.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "CNsvHCImzy570r1yrUT44U2AhOA5dxfhjBbeUnXT0Yc"
+            },
+            "size": "80"
+          },
+          {
+            "path": "poetry/core/version/grammars/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "qS2cctcUTMc9WMZaJ-dWaCNz75pUGf7hmxNlIL9tnoo"
+            },
+            "size": "214"
+          },
+          {
+            "path": "poetry/core/version/grammars/markers.lark",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "TVq_LJAiJaq78zDoe51lX4_T6ZqPzTGMek7kMuBIBBE"
+            },
+            "size": "972"
+          },
+          {
+            "path": "poetry/core/version/grammars/pep508.lark",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "1TYLM1-0cUDah6008tEi-ZEcRtO3J-9eM9uYoUf6tSo"
+            },
+            "size": "1401"
+          },
+          {
+            "path": "poetry/core/version/helpers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "fPA13SMeGNU_W0LBw3E2J8BILR5D9H8JyXsqaxT8MV4"
+            },
+            "size": "1615"
+          },
+          {
+            "path": "poetry/core/version/markers.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "pMecduclpCQ_C0o1fs-NLGpO3SabN9wNN75hdUxBb3Q"
+            },
+            "size": "35860"
+          },
+          {
+            "path": "poetry/core/version/parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "CHCBMgm7ozH8AR2JBm8UMpIhuB84jULU1qj0SySyuvE"
+            },
+            "size": "752"
+          },
+          {
+            "path": "poetry/core/version/pep440/__init__.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "KsSbN8Aqx1Yd7DXqOKEVWIMyIp76Bpwu2UwJXstR_tw"
+            },
+            "size": "352"
+          },
+          {
+            "path": "poetry/core/version/pep440/parser.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "Alp2p6cNXjTeimpebD1W5FY3ik9Tf7dyE-KeAYC1f6c"
+            },
+            "size": "2909"
+          },
+          {
+            "path": "poetry/core/version/pep440/segments.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "pbcqEkoA5NmptHS9Afz9GQhxa1HBpRcyP3PGQ3jf5gw"
+            },
+            "size": "5505"
+          },
+          {
+            "path": "poetry/core/version/pep440/version.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "MjWHjAZIs7EBYOOM8gmOjZq7__Bfb5tKwgGqwIFn4yI"
+            },
+            "size": "11179"
+          },
+          {
+            "path": "poetry/core/version/requirements.py",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "w_YV_kzjq_7_rIe2hrpZC3vB6K59AYq_QCUj5DNAJxg"
+            },
+            "size": "3381"
+          },
+          {
+            "path": "poetry_core-1.9.0.dist-info/LICENSE",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "8ZeBM3grkPRzO8MI3bGSZ8P-BHl8iNntO8IZAySVqYI"
+            },
+            "size": "1062"
+          },
+          {
+            "path": "poetry_core-1.9.0.dist-info/METADATA",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "a7hZRswvX2btNXzRDXNhaSrhA6pus8mh4i3jwQ1kvP0"
+            },
+            "size": "3488"
+          },
+          {
+            "path": "poetry_core-1.9.0.dist-info/WHEEL",
+            "digest": {
+              "algorithm": "sha256",
+              "value": "sP946D7jFCHeNz5Iq4fL4Lu-PrWrFsgfLXbbkciIZwg"
+            },
+            "size": "88"
+          },
+          {
+            "path": "poetry_core-1.9.0.dist-info/RECORD"
+          }
+        ],
+        "sitePackagesRootPath": "usr/lib/python3.12/site-packages",
+        "requiresPython": ">=3.8,<4.0"
+      }
+    },
+    {
+      "id": "50f132e43de05e45",
+      "name": "py3-poetry-core",
+      "version": "1.9.0-r1",
+      "type": "apk",
+      "foundBy": "wolfictl",
+      "locations": [
+        {
+          "path": ".PKGINFO",
+          "accessPath": ".PKGINFO"
+        }
+      ],
+      "licenses": [
+        {
+          "value": "MIT",
+          "spdxExpression": "MIT",
+          "type": "declared",
+          "urls": [],
+          "locations": []
+        }
+      ],
+      "language": "",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:poetry-core-project:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core-project:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core_project:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core_project:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core_project:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core_project:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-coreproject:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-coreproject:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_coreproject:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_coreproject:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core-project:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core-project:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core_project:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core_project:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core_project:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core_project:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry-core:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry-core:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry_core:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry_core:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-coreproject:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-coreproject:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_coreproject:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_coreproject:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry-core:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry-core:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry_core:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry_core:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry-core:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry_core:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3-poetry:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3_poetry:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3:py3-poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3:py3_poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:poetry:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3:poetry-core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:py3:poetry_core:1.9.0-r1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/py3-poetry-core@1.9.0-r1?arch=aarch64&origin=py3-poetry-core",
+      "metadataType": "apk-db-entry",
+      "metadata": {
+        "package": "py3-poetry-core",
+        "originPackage": "py3-poetry-core",
+        "maintainer": "",
+        "version": "1.9.0-r1",
+        "architecture": "aarch64",
+        "url": "",
+        "description": "Poetry PEP 517 Build Backend",
+        "size": 1318614,
+        "installedSize": 0,
+        "pullDependencies": [
+          "python-3"
+        ],
+        "provides": null,
+        "pullChecksum": "1d8cd154e94bab34b21b1e5dcf8004ebe438ff7a9b3f0fb68cabce8f74e55b7b",
+        "gitCommitOfApkPort": "4da823d1bcd36e315d46214cde977d962697af97",
+        "files": [
+          {
+            "path": "."
+          },
+          {
+            "path": ".PKGINFO"
+          },
+          {
+            "path": ".SIGN.RSA.wolfi-signing.rsa.pub"
+          },
+          {
+            "path": "usr"
+          },
+          {
+            "path": "usr/lib"
+          },
+          {
+            "path": "usr/lib/python3.12"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/LICENSE"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/__main__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/draft04.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/draft06.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/draft07.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/exceptions.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/generator.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/indent.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/ref_resolver.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/fastjsonschema/version.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/LICENSE"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/__pyinstaller"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/__pyinstaller/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/__pyinstaller/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/__pyinstaller/hook-lark.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/ast_utils.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/common.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/exceptions.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammar.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars/common.lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars/lark.lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars/python.lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/grammars/unicode.lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/indenter.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/lark.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/lexer.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/load_grammar.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parse_tree_builder.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parser_frontends.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/cyk.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/earley.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/earley_common.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/earley_forest.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/grammar_analysis.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/lalr_analysis.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/lalr_interactive_parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/lalr_parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/lalr_parser_state.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/parsers/xearley.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/py.typed"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/reconstruct.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tools"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tools/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tools/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tools/nearley.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tools/serialize.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tools/standalone.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tree.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tree_matcher.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/tree_templates.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/utils.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/lark/visitors.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/LICENSE"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/LICENSE.APACHE"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/LICENSE.BSD"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/_elffile.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/_manylinux.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/_musllinux.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/_parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/_structures.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/_tokenizer.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/markers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/metadata.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/py.typed"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/requirements.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/specifiers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/tags.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/utils.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/packaging/version.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/LICENSE"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/_parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/_re.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/_types.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/tomli/py.typed"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/_vendor/vendor.txt"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/any_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/base_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/empty_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/multi_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/generic/union_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/empty_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/exceptions.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/patterns.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/util.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/version.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/version_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/version_range.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/version_range_constraint.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/constraints/version/version_union.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/exceptions"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/exceptions/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/exceptions/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/exceptions/base.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/factory.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/json"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/json/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/json/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/json/schemas"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/json/schemas/poetry-schema.json"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/api.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builder.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builders"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builders/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builders/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builders/builder.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builders/sdist.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/builders/wheel.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/metadata.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils/helpers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils/include.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils/module.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/masonry/utils/package_include.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/dependency.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/dependency_group.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/directory_dependency.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/file_dependency.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/package.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/path_dependency.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/project_package.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/specification.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/url_dependency.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/utils"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/utils/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/utils/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/utils/link.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/utils/utils.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/packages/vcs_dependency.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/poetry.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/py.typed"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/pyproject"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/pyproject/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/pyproject/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/pyproject/exceptions.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/pyproject/tables.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/pyproject/toml.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/data"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/data/licenses.json"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/helpers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/license.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/spdx/updater.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/utils"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/utils/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/utils/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/utils/_compat.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/utils/helpers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/utils/patterns.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/vcs"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/vcs/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/vcs/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/vcs/git.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/exceptions.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/grammars"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/grammars/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/grammars/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/grammars/markers.lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/grammars/pep508.lark"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/helpers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/markers.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/pep440"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/pep440/__init__.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/pep440/__pycache__"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/pep440/parser.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/pep440/segments.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/pep440/version.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry/core/version/requirements.py"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/LICENSE"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/METADATA"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/RECORD"
+          },
+          {
+            "path": "usr/lib/python3.12/site-packages/poetry_core-1.9.0.dist-info/WHEEL"
+          },
+          {
+            "path": "var"
+          },
+          {
+            "path": "var/lib"
+          },
+          {
+            "path": "var/lib/db"
+          },
+          {
+            "path": "var/lib/db/sbom"
+          },
+          {
+            "path": "var/lib/db/sbom/py3-poetry-core-1.9.0-r1.spdx.json"
+          }
+        ]
+      }
+    }
+  ],
+  "artifactRelationships": [],
+  "source": {
+    "id": "(redacted for determinism)",
+    "name": "py3-poetry-core",
+    "version": "1.9.0-r1",
+    "type": "directory",
+    "metadata": {
+      "path": "testdata/apks/aarch64/py3-poetry-core-1.9.0-r1.apk"
+    }
+  },
+  "distro": {
+    "id": "wolfi"
+  },
+  "descriptor": {
+    "name": "wolfictl",
+    "version": ""
+  },
+  "schema": {
+    "version": "16.0.12",
+    "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-16.0.12.json"
+  }
+}

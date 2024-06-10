@@ -1,0 +1,4570 @@
+{
+  "artifacts": [
+    {
+      "id": "de2693ea33fcefe3",
+      "name": "JetBrains .NET Platform",
+      "version": "2021.2.0.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/JetBrains.Annotations.dll",
+          "accessPath": "usr/lib/powershell/JetBrains.Annotations.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:JetBrains_.NET_Platform:JetBrains_.NET_Platform:2021.2.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/JetBrains%20.NET%20Platform@2021.2.0.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "2021.2.0.0",
+        "legalCopyright": " ",
+        "comments": "Annotations to increase accuracy of ReSharper code inspections",
+        "internalName": "JetBrains.Annotations.dll",
+        "companyName": "JetBrains",
+        "productName": "JetBrains .NET Platform",
+        "productVersion": "2021.2"
+      }
+    },
+    {
+      "id": "50a466ad01a8aa9a",
+      "name": "Json.More",
+      "version": "1.9.3.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Json.More.dll",
+          "accessPath": "usr/lib/powershell/Json.More.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Json.More:Json.More:1.9.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Json.More@1.9.3.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "1.0.0.0",
+        "legalCopyright": " ",
+        "comments": "\n\t\tProvides extended functionality for the System.Text.Json namespace.\n\t\n\t\tRead the full documentation at https://docs.json-everything.net/more/json-more/.\n\t",
+        "internalName": "Json.More.dll",
+        "companyName": "Greg Dennis",
+        "productName": "Json.More",
+        "productVersion": "1.9.3+a186fbf344cc9efcc533ac5c85e65b5a7761c115"
+      }
+    },
+    {
+      "id": "034e7111be84104b",
+      "name": "Json.NET",
+      "version": "13.0.3.27908",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Newtonsoft.Json.dll",
+          "accessPath": "usr/lib/powershell/Newtonsoft.Json.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Json.NET:Json.NET:13.0.3.27908:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Json.NET@13.0.3.27908",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "13.0.0.0",
+        "legalCopyright": "Copyright © James Newton-King 2008",
+        "comments": "Json.NET is a popular high-performance JSON framework for .NET",
+        "internalName": "Newtonsoft.Json.dll",
+        "companyName": "Newtonsoft",
+        "productName": "Json.NET",
+        "productVersion": "13.0.3+0a2e291c0d9c0c7675d445703e51750363a549ef"
+      }
+    },
+    {
+      "id": "21738f6e0aa11006",
+      "name": "JsonPointer.Net",
+      "version": "3.0.3.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/JsonPointer.Net.dll",
+          "accessPath": "usr/lib/powershell/JsonPointer.Net.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:JsonPointer.Net:JsonPointer.Net:3.0.3.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/JsonPointer.Net@3.0.3.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "3.0.0.0",
+        "legalCopyright": " ",
+        "comments": "\n\t\t[JSON Pointer](https://tools.ietf.org/html/rfc6901) built on the System.Text.Json namespace.\n\t\n\t\tRead the full documentation at https://docs.json-everything.net/pointer/basics/.\n\t",
+        "internalName": "JsonPointer.Net.dll",
+        "companyName": "Greg Dennis",
+        "productName": "JsonPointer.Net",
+        "productVersion": "3.0.3+27e320a9fbd3119bd1046ab7063b0cad4c746045"
+      }
+    },
+    {
+      "id": "955a84219931ff0a",
+      "name": "JsonSchema.Net",
+      "version": "5.2.7.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/JsonSchema.Net.dll",
+          "accessPath": "usr/lib/powershell/JsonSchema.Net.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:JsonSchema.Net:JsonSchema.Net:5.2.7.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/JsonSchema.Net@5.2.7.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "5.0.0.0",
+        "legalCopyright": " ",
+        "comments": "\n\t\t[JSON Schema](https://json-schema.org) built on the System.Text.Json namespace.\n\n\t\tRead the full documentation at https://docs.json-everything.net/schema/basics/.\n\t",
+        "internalName": "JsonSchema.Net.dll",
+        "companyName": "Greg Dennis",
+        "productName": "JsonSchema.Net",
+        "productVersion": "5.2.7+e5d87c00da2b42f03648727e5284fec73c1e3794"
+      }
+    },
+    {
+      "id": "0c91d8b87053aa2e",
+      "name": "Markdig.Signed",
+      "version": "0.33.0.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Markdig.Signed.dll",
+          "accessPath": "usr/lib/powershell/Markdig.Signed.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Markdig.Signed:Markdig.Signed:0.33.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Markdig.Signed@0.33.0.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "0.33.0.0",
+        "legalCopyright": "Alexandre Mutel",
+        "comments": "A fast, powerful, CommonMark compliant, extensible Markdown processor for .NET with 20+ builtin extensions (pipetables, footnotes, definition lists... etc.)",
+        "internalName": "Markdig.Signed.dll",
+        "companyName": "Alexandre Mutel",
+        "productName": "Markdig.Signed",
+        "productVersion": "0.33.0+7d40bc118bc28095f01699d3d1759ae5a1c18b80"
+      }
+    },
+    {
+      "id": "c61fd6f8b02e8240",
+      "name": "Microsoft.ApplicationInsights",
+      "version": "2.21.0.00429",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.ApplicationInsights.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.ApplicationInsights.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.ApplicationInsights:Microsoft.ApplicationInsights:2.21.0.00429:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.ApplicationInsights@2.21.0.00429",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "2.21.0.429",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Application Insights Base API. This package provides core functionality for transmission of all Application Insights Telemetry Types and is a dependent package for all other Application Insights packages. Please install the platform specific package for the best experience. Privacy statement: https://go.microsoft.com/fwlink/?LinkId=512156",
+        "internalName": "Microsoft.ApplicationInsights.dll",
+        "companyName": "Microsoft",
+        "productName": "Microsoft.ApplicationInsights",
+        "productVersion": "2.21.0+5e2e7ddda961ec0e16a75b1ae0a37f6a13c777f5"
+      }
+    },
+    {
+      "id": "a419869199dcfb3e",
+      "name": "Microsoft.Bcl.AsyncInterfaces",
+      "version": "5.0.20.51904",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.Bcl.AsyncInterfaces.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.Bcl.AsyncInterfaces.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.Bcl.AsyncInterfaces:Microsoft.Bcl.AsyncInterfaces:5.0.20.51904:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Bcl.AsyncInterfaces@5.0.20.51904",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "5.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Microsoft.Bcl.AsyncInterfaces",
+        "internalName": "Microsoft.Bcl.AsyncInterfaces.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "5.0.0+cf258a14b70ad9069470a108f13765e0e5988f51"
+      }
+    },
+    {
+      "id": "8980022f86c1b893",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.CodeAnalysis.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.CodeAnalysis.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "ef419b5c10f8e58e",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/cs/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/cs/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "ae1d80945d4097df",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/de/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/de/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "bf30539af68ebebf",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/es/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/es/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "7e8a85960480c8bc",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/fr/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/fr/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "a19a38865fbc72a9",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/it/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/it/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "e5859e38dc092883",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ja/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/ja/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "7c0d848bb57ae2e3",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ko/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/ko/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "d3a380a78fa1148f",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pl/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/pl/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "17b88543c540ae2b",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pt-BR/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/pt-BR/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "8e579a5c8f7b8a29",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ru/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/ru/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "14e9ed57836af3df",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/tr/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/tr/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "dcfc918d0183b693",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hans/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hans/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "7d193249bef97174",
+      "name": "Microsoft.CodeAnalysis",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hant/Microsoft.CodeAnalysis.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hant/Microsoft.CodeAnalysis.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis:Microsoft.CodeAnalysis:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "d37e4121d193f880",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.CodeAnalysis.CSharp.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.CodeAnalysis.CSharp.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "b7337471a2cceffe",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/cs/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/cs/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "7118a5e290c36f47",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/de/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/de/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "e012287732a48e2f",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/es/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/es/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "7f655489d2c21067",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/fr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/fr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "bfd7ba57c521b74c",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/it/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/it/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "0f451a99af54dbc7",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ja/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/ja/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "2c7bf268e006e847",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ko/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/ko/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "36113fcec10d992c",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pl/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/pl/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "989b4d071df4bae0",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "bfed5c11b4985187",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ru/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/ru/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "e384dc1617113eb7",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/tr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/tr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "dc7353c47ccd2534",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "d8f1f244c66fdc7b",
+      "name": "Microsoft.CodeAnalysis.CSharp",
+      "version": "4.800.23.55801",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.CodeAnalysis.CSharp:Microsoft.CodeAnalysis.CSharp:4.800.23.55801:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@4.800.23.55801",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.8.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "internalName": "Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft.CodeAnalysis.CSharp",
+        "productVersion": "4.8.0-7.23558.1+e091728607ca0fc9efca55ccfb3e59259c6b5a0a"
+      }
+    },
+    {
+      "id": "d9beb8815ff1e05f",
+      "name": "Microsoft.Extensions.ObjectPool",
+      "version": "5.0.1722.21507",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.Extensions.ObjectPool.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.Extensions.ObjectPool.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.Extensions.ObjectPool:Microsoft.Extensions.ObjectPool:5.0.1722.21507:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Extensions.ObjectPool@5.0.1722.21507",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "5.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "A simple object pool implementation.",
+        "internalName": "Microsoft.Extensions.ObjectPool.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft ASP.NET Core",
+        "productVersion": "5.0.17+02c6de4ba6022025fcda7581415f310f8c73cdc3"
+      }
+    },
+    {
+      "id": "ed5ed2e318ba4a83",
+      "name": "Microsoft.Management.Infrastructure",
+      "version": "2.0.0-preview.1",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.Management.Infrastructure.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.Management.Infrastructure.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.Management.Infrastructure:Microsoft.Management.Infrastructure:2.0.0-preview.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Management.Infrastructure@2.0.0-preview.1",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "2.0.0.0",
+        "legalCopyright": " ",
+        "internalName": "Microsoft.Management.Infrastructure.dll",
+        "companyName": "Microsoft.Management.Infrastructure",
+        "productName": "Microsoft.Management.Infrastructure",
+        "productVersion": "2.0.0-preview.1"
+      }
+    },
+    {
+      "id": "090e4623ce7f6b79",
+      "name": "Microsoft.PowerShell.Commands.Management",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Management.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.PowerShell.Commands.Management.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.PowerShell.Commands.Management:Microsoft.PowerShell.Commands.Management:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.Commands.Management@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell's Microsoft.PowerShell.Commands.Management project",
+        "internalName": "Microsoft.PowerShell.Commands.Management.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    },
+    {
+      "id": "8cdb5b6d51e0bb69",
+      "name": "Microsoft.PowerShell.Commands.Utility",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Utility.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.PowerShell.Commands.Utility.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.PowerShell.Commands.Utility:Microsoft.PowerShell.Commands.Utility:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.Commands.Utility@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell's Microsoft.PowerShell.Commands.Utility project",
+        "internalName": "Microsoft.PowerShell.Commands.Utility.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    },
+    {
+      "id": "28d1f5f2130f694a",
+      "name": "Microsoft.PowerShell.ConsoleHost",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.PowerShell.ConsoleHost.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.PowerShell.ConsoleHost.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.PowerShell.ConsoleHost:Microsoft.PowerShell.ConsoleHost:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.ConsoleHost@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell Host",
+        "internalName": "Microsoft.PowerShell.ConsoleHost.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    },
+    {
+      "id": "cfca66c035070947",
+      "name": "Microsoft.PowerShell.MarkdownRender",
+      "version": "7.2.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.PowerShell.MarkdownRender.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.PowerShell.MarkdownRender.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.PowerShell.MarkdownRender:Microsoft.PowerShell.MarkdownRender:7.2.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.MarkdownRender@7.2.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.2.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell's Markdown Rendering project",
+        "internalName": "Microsoft.PowerShell.MarkdownRender.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell Markdown Renderer",
+        "productVersion": "7.2.1"
+      }
+    },
+    {
+      "id": "75d6b9c51681721b",
+      "name": "Microsoft.PowerShell.SDK",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.PowerShell.SDK.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.PowerShell.SDK.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.PowerShell.SDK:Microsoft.PowerShell.SDK:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.SDK@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell SDK metapackage",
+        "internalName": "Microsoft.PowerShell.SDK.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    },
+    {
+      "id": "68448f7d92353837",
+      "name": "Microsoft.PowerShell.Security",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.PowerShell.Security.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.PowerShell.Security.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.PowerShell.Security:Microsoft.PowerShell.Security:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.Security@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell's Microsoft.PowerShell.Security project",
+        "internalName": "Microsoft.PowerShell.Security.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    },
+    {
+      "id": "5e121d0b2a2651bc",
+      "name": "Microsoft.Win32.Registry.AccessControl",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.Win32.Registry.AccessControl.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.Win32.Registry.AccessControl.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.Win32.Registry.AccessControl:Microsoft.Win32.Registry.AccessControl:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Win32.Registry.AccessControl@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides support for managing access and audit control lists for Microsoft.Win32.RegistryKey.\r\n\r\nCommonly Used Types:\r\nSystem.Security.AccessControl.RegistryAccessRule\r\nSystem.Security.AccessControl.RegistryAuditRule\r\nSystem.Security.AccessControl.RegistrySecurity",
+        "internalName": "Microsoft.Win32.Registry.AccessControl.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "9ad781b7316ee245",
+      "name": "Microsoft.Win32.SystemEvents",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/Microsoft.Win32.SystemEvents.dll",
+          "accessPath": "usr/lib/powershell/Microsoft.Win32.SystemEvents.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:Microsoft.Win32.SystemEvents:Microsoft.Win32.SystemEvents:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Win32.SystemEvents@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides access to Windows system event notifications.\r\n\r\nCommonly Used Types:\r\nMicrosoft.Win32.SystemEvents",
+        "internalName": "Microsoft.Win32.SystemEvents.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "4b5c3408f5c5dba5",
+      "name": "System.CodeDom",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.CodeDom.dll",
+          "accessPath": "usr/lib/powershell/System.CodeDom.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.CodeDom:System.CodeDom:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.CodeDom@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides types that can be used to model the structure of a source code document and to output source code for that model in a supported language.\r\n\r\nCommonly Used Types:\r\nSystem.CodeDom.CodeObject\r\nSystem.CodeDom.Compiler.CodeDomProvider\r\nMicrosoft.CSharp.CSharpCodeProvider\r\nMicrosoft.VisualBasic.VBCodeProvider",
+        "internalName": "System.CodeDom.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "e9abaeb393c4e2fc",
+      "name": "System.ComponentModel.Composition",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ComponentModel.Composition.dll",
+          "accessPath": "usr/lib/powershell/System.ComponentModel.Composition.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ComponentModel.Composition:System.ComponentModel.Composition:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ComponentModel.Composition@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "This namespace provides classes that constitute the core of the Managed Extensibility Framework, or MEF.\r\n\r\nCommonly Used Types:\r\nSystem.ComponentModel.Composition.ChangeRejectedException\r\nSystem.ComponentModel.Composition.CompositionContractMismatchException\r\nSystem.ComponentModel.Composition.CompositionError\r\nSystem.ComponentModel.Composition.CompositionException\r\nSystem.ComponentModel.Composition.ExportAttribute\r\nSystem.ComponentModel.Composition.ImportAttribute\r\nSystem.ComponentModel.Composition.ImportCardinalityMismatchException\r\nSystem.ComponentModel.Composition.Hosting.AggregateCatalog\r\nSystem.ComponentModel.Composition.Hosting.ApplicationCatalog\r\nSystem.ComponentModel.Composition.Hosting.AssemblyCatalog\r\nSystem.ComponentModel.Composition.Hosting.CompositionContainer\r\nSystem.ComponentModel.Composition.Primitives.ComposablePartException\r\nSystem.ComponentModel.Composition.Primitives.ExportDefinition\r\nSystem.ComponentModel.Composition.Primitives.ImportDefinition\r\nSystem.ComponentModel.Composition.ReflectionModel.ReflectionModelServices",
+        "internalName": "System.ComponentModel.Composition.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "7ae7a3dddfb31dd4",
+      "name": "System.ComponentModel.Composition.Registration",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ComponentModel.Composition.Registration.dll",
+          "accessPath": "usr/lib/powershell/System.ComponentModel.Composition.Registration.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ComponentModel.Composition.Registration:System.ComponentModel.Composition.Registration:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ComponentModel.Composition.Registration@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "This namespace provides classes that constitute the core of the Managed Extensibility Framework, or MEF.\r\n\r\nCommonly Used Types:\r\nSystem.ComponentModel.Composition.Registration.RegistrationBuilder\r\nSystem.ComponentModel.Composition.Registration.PartBuilder\r\nSystem.ComponentModel.Composition.Registration.PartBuilder<T>\r\nSystem.ComponentModel.Composition.Registration.ParameterImportBuilder\r\nSystem.ComponentModel.Composition.Registration.ImportBuilder\r\nSystem.ComponentModel.Composition.Registration.ExportBuilder",
+        "internalName": "System.ComponentModel.Composition.Registration.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "b3dfcc9a0665c6d2",
+      "name": "System.Configuration.ConfigurationManager",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Configuration.ConfigurationManager.dll",
+          "accessPath": "usr/lib/powershell/System.Configuration.ConfigurationManager.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Configuration.ConfigurationManager:System.Configuration.ConfigurationManager:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Configuration.ConfigurationManager@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides types that support using XML configuration files (app.config). This package exists only to support migrating existing .NET Framework code that already uses System.Configuration. When writing new code, use another configuration system instead, such as Microsoft.Extensions.Configuration.",
+        "internalName": "System.Configuration.ConfigurationManager.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "34becec1779b1884",
+      "name": "System.Data.Odbc",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Data.Odbc.dll",
+          "accessPath": "usr/lib/powershell/System.Data.Odbc.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Data.Odbc:System.Data.Odbc:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Data.Odbc@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides a collection of classes used to access an ODBC data source in the managed space\r\n\r\nCommonly Used Types:\r\nSystem.Data.Odbc.OdbcCommand\r\nSystem.Data.Odbc.OdbcConnection\r\nSystem.Data.Odbc.OdbcDataReader\r\nSystem.Data.Odbc.OdbcDataAdapter\r\nSystem.Data.Odbc.OdbcParameter\r\nSystem.Data.Odbc.OdbcParameterCollection\r\nSystem.Data.Odbc.OdbcTransaction",
+        "internalName": "System.Data.Odbc.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "040a46795acab948",
+      "name": "System.Data.OleDb",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Data.OleDb.dll",
+          "accessPath": "usr/lib/powershell/System.Data.OleDb.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Data.OleDb:System.Data.OleDb:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Data.OleDb@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides a collection of classes for OLEDB.\r\n\r\nCommonly Used Types:\r\nSystem.Data.OleDb.OleDbCommand\r\nSystem.Data.OleDb.OleDbCommandBuilder\r\nSystem.Data.OleDb.OleDbConnection\r\nSystem.Data.OleDb.OleDbDataAdapter\r\nSystem.Data.OleDb.OleDbDataReader\r\nSystem.Data.OleDb.OleDbParameter\r\nSystem.Data.OleDb.OleDbParameterCollection\r\nSystem.Data.OleDb.OleDbTransaction",
+        "internalName": "System.Data.OleDb.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "ba8092163c042380",
+      "name": "System.Data.SqlClient",
+      "version": "4.700.23.52603",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Data.SqlClient.dll",
+          "accessPath": "usr/lib/powershell/System.Data.SqlClient.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Data.SqlClient:System.Data.SqlClient:4.700.23.52603:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Data.SqlClient@4.700.23.52603",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.6.1.6",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Data.SqlClient",
+        "internalName": "System.Data.SqlClient.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.1.39+fa27c9f378dde822f9ebe5af1f0dfd22be1778b1"
+      }
+    },
+    {
+      "id": "80c41f22b6336ecf",
+      "name": "System.Diagnostics.EventLog",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Diagnostics.EventLog.dll",
+          "accessPath": "usr/lib/powershell/System.Diagnostics.EventLog.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Diagnostics.EventLog:System.Diagnostics.EventLog:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Diagnostics.EventLog@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides the System.Diagnostics.EventLog class, which allows the applications to use the Windows event log service.\r\n\r\nCommonly Used Types:\r\nSystem.Diagnostics.EventLog",
+        "internalName": "System.Diagnostics.EventLog.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "fe5bfb7b4944734a",
+      "name": "System.Diagnostics.PerformanceCounter",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Diagnostics.PerformanceCounter.dll",
+          "accessPath": "usr/lib/powershell/System.Diagnostics.PerformanceCounter.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Diagnostics.PerformanceCounter:System.Diagnostics.PerformanceCounter:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Diagnostics.PerformanceCounter@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides the System.Diagnostics.PerformanceCounter class, which allows access to Windows performance counters.\r\n\r\nCommonly Used Types:\r\nSystem.Diagnostics.PerformanceCounter",
+        "internalName": "System.Diagnostics.PerformanceCounter.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "c2f2c7e7b41181b6",
+      "name": "System.DirectoryServices",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.DirectoryServices.dll",
+          "accessPath": "usr/lib/powershell/System.DirectoryServices.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.DirectoryServices:System.DirectoryServices:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.DirectoryServices@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides easy access to Active Directory Domain Services.\r\n\r\nCommonly Used Types:\r\nSystem.DirectoryServices.DirectoryEntry\r\nSystem.DirectoryServices.DirectorySearcher\r\nSystem.DirectoryServices.ActiveDirectory.ActiveDirectorySite\r\nSystem.DirectoryServices.ActiveDirectory.ApplicationPartition\r\nSystem.DirectoryServices.ActiveDirectory.DirectoryContext\r\nSystem.DirectoryServices.ActiveDirectory.DirectoryServer\r\nSystem.DirectoryServices.ActiveDirectory.Domain\r\nSystem.DirectoryServices.ActiveDirectory.DomainController",
+        "internalName": "System.DirectoryServices.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "61602e58c600d231",
+      "name": "System.DirectoryServices.AccountManagement",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.DirectoryServices.AccountManagement.dll",
+          "accessPath": "usr/lib/powershell/System.DirectoryServices.AccountManagement.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.DirectoryServices.AccountManagement:System.DirectoryServices.AccountManagement:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.DirectoryServices.AccountManagement@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides uniform access and manipulation of user, computer, and group security principals across the multiple principal stores: Active Directory Domain Services (AD DS), Active Directory Lightweight Directory Services (AD LDS), and Machine SAM (MSAM).",
+        "internalName": "System.DirectoryServices.AccountManagement.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "bc3afb643d818bbb",
+      "name": "System.DirectoryServices.Protocols",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.DirectoryServices.Protocols.dll",
+          "accessPath": "usr/lib/powershell/System.DirectoryServices.Protocols.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.DirectoryServices.Protocols:System.DirectoryServices.Protocols:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.DirectoryServices.Protocols@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides the methods defined in the Lightweight Directory Access Protocol (LDAP) version 3 (V3) and Directory Services Markup Language (DSML) version 2.0 (V2) standards.",
+        "internalName": "System.DirectoryServices.Protocols.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "797048f3a4a5780c",
+      "name": "System.Drawing.Common",
+      "version": "8.0.123.58006",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Drawing.Common.dll",
+          "accessPath": "usr/lib/powershell/System.Drawing.Common.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Drawing.Common:System.Drawing.Common:8.0.123.58006:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Drawing.Common@8.0.123.58006",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Drawing.Common",
+        "internalName": "System.Drawing.Common.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.1+0b4028eb507aeb222f5bd1fc421876cc5e5e3fb8"
+      }
+    },
+    {
+      "id": "7a273016aa80e3a9",
+      "name": "System.IO.Packaging",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.IO.Packaging.dll",
+          "accessPath": "usr/lib/powershell/System.IO.Packaging.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.IO.Packaging:System.IO.Packaging:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.IO.Packaging@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides classes that support storage of multiple data objects in a single container.",
+        "internalName": "System.IO.Packaging.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "2c39898517d88bad",
+      "name": "System.IO.Ports",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.IO.Ports.dll",
+          "accessPath": "usr/lib/powershell/System.IO.Ports.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.IO.Ports:System.IO.Ports:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.IO.Ports@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides classes for controlling serial ports.\r\n\r\nCommonly Used Types:\r\nSystem.IO.Ports.SerialPort",
+        "internalName": "System.IO.Ports.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "80d0a0081d20e26a",
+      "name": "System.Management",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Management.dll",
+          "accessPath": "usr/lib/powershell/System.Management.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Management:System.Management:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Management@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides access to a rich set of management information and management events about the system, devices, and applications instrumented to the Windows Management Instrumentation (WMI) infrastructure.\r\n\r\nCommonly Used Types:\r\nSystem.Management.ManagementClass\r\nSystem.Management.ManagementObject\r\nSystem.Management.SelectQuery",
+        "internalName": "System.Management.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "92955a7b78109c06",
+      "name": "System.Management.Automation",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Management.Automation.dll",
+          "accessPath": "usr/lib/powershell/System.Management.Automation.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Management.Automation:System.Management.Automation:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Management.Automation@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell's System.Management.Automation project",
+        "internalName": "System.Management.Automation.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    },
+    {
+      "id": "ca6741eab5711c20",
+      "name": "System.Net.Http.WinHttpHandler",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Net.Http.WinHttpHandler.dll",
+          "accessPath": "usr/lib/powershell/System.Net.Http.WinHttpHandler.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Net.Http.WinHttpHandler:System.Net.Http.WinHttpHandler:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Net.Http.WinHttpHandler@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides a message handler for HttpClient based on the WinHTTP interface of Windows. While similar to HttpClientHandler, it provides developers more granular control over the application's HTTP communication than the HttpClientHandler.\r\n\r\nCommonly Used Types:\r\nSystem.Net.Http.WinHttpHandler",
+        "internalName": "System.Net.Http.WinHttpHandler.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "b7578665393412fb",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Private.ServiceModel.dll",
+          "accessPath": "usr/lib/powershell/System.Private.ServiceModel.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "9493685910da1a24",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/cs/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/cs/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "f062228b1d54aba0",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/de/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/de/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "2ce8e53215693013",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/es/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/es/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "d7de2a8e2f9d87b7",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/fr/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/fr/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "76692d8966c81fbc",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/it/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/it/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "555c4d3606a1e922",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ja/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/ja/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "7e196db882bb809c",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ko/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/ko/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "b0b9e4d8097ab923",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pl/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/pl/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "14fd0a230221c342",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pt-BR/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/pt-BR/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "72a63924619527d1",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ru/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/ru/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "06b5a14a415cce74",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/tr/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/tr/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "2a0a791e9ec0c9f9",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hans/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hans/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "eeeebd74f2fb7362",
+      "name": "System.Private.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hant/System.Private.ServiceModel.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hant/System.Private.ServiceModel.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Private.ServiceModel:System.Private.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Private.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Private.ServiceModel",
+        "internalName": "System.Private.ServiceModel.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "f04a422ec34f4178",
+      "name": "System.Reflection.Context",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Reflection.Context.dll",
+          "accessPath": "usr/lib/powershell/System.Reflection.Context.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Reflection.Context:System.Reflection.Context:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Reflection.Context@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides classes that enable customized reflection contexts.\r\n\r\nCommonly Used Types:\r\nSystem.Reflection.Context.CustomReflectionContext",
+        "internalName": "System.Reflection.Context.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "e49671a0c2d2c496",
+      "name": "System.Runtime.Caching",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Runtime.Caching.dll",
+          "accessPath": "usr/lib/powershell/System.Runtime.Caching.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Runtime.Caching:System.Runtime.Caching:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Runtime.Caching@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides classes to use caching facilities.\r\n\r\nCommonly Used Types:\r\nSystem.Runtime.Caching.CacheEntryChangeMonitor\r\nSystem.Runtime.Caching.CacheEntryRemovedArguments\r\nSystem.Runtime.Caching.CacheEntryUpdateArguments\r\nSystem.Runtime.Caching.CacheItem\r\nSystem.Runtime.Caching.CacheItemPolicy\r\nSystem.Runtime.Caching.ChangeMonitor\r\nSystem.Runtime.Caching.FileChangeMonitor\r\nSystem.Runtime.Caching.HostFileChangeMonitor\r\nSystem.Runtime.Caching.MemoryCache\r\nSystem.Runtime.Caching.ObjectCache",
+        "internalName": "System.Runtime.Caching.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "9f5ff2a14d855331",
+      "name": "System.Security.Cryptography.Pkcs",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Security.Cryptography.Pkcs.dll",
+          "accessPath": "usr/lib/powershell/System.Security.Cryptography.Pkcs.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Security.Cryptography.Pkcs:System.Security.Cryptography.Pkcs:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Security.Cryptography.Pkcs@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides support for PKCS and CMS algorithms.\r\n\r\nCommonly Used Types:\r\nSystem.Security.Cryptography.Pkcs.EnvelopedCms",
+        "internalName": "System.Security.Cryptography.Pkcs.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "d249afbfbe4d6f66",
+      "name": "System.Security.Cryptography.ProtectedData",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Security.Cryptography.ProtectedData.dll",
+          "accessPath": "usr/lib/powershell/System.Security.Cryptography.ProtectedData.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Security.Cryptography.ProtectedData:System.Security.Cryptography.ProtectedData:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Security.Cryptography.ProtectedData@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides access to Windows Data Protection Api.\r\n\r\nCommonly Used Types:\r\nSystem.Security.Cryptography.DataProtectionScope\r\nSystem.Security.Cryptography.ProtectedData",
+        "internalName": "System.Security.Cryptography.ProtectedData.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "e14d47837e7ef19f",
+      "name": "System.Security.Cryptography.Xml",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Security.Cryptography.Xml.dll",
+          "accessPath": "usr/lib/powershell/System.Security.Cryptography.Xml.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Security.Cryptography.Xml:System.Security.Cryptography.Xml:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Security.Cryptography.Xml@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides classes to support the creation and validation of XML digital signatures. The classes in this namespace implement the World Wide Web Consortium Recommendation, \"XML-Signature Syntax and Processing\", described at http://www.w3.org/TR/xmldsig-core/.\r\n\r\nCommonly Used Types:\r\nSystem.Security.Cryptography.Xml.CipherData\r\nSystem.Security.Cryptography.Xml.CipherReference\r\nSystem.Security.Cryptography.Xml.DataObject\r\nSystem.Security.Cryptography.Xml.DataReference\r\nSystem.Security.Cryptography.Xml.DSAKeyValue\r\nSystem.Security.Cryptography.Xml.EncryptedData\r\nSystem.Security.Cryptography.Xml.EncryptedKey\r\nSystem.Security.Cryptography.Xml.EncryptedReference\r\nSystem.Security.Cryptography.Xml.EncryptedType\r\nSystem.Security.Cryptography.Xml.EncryptedXml\r\nSystem.Security.Cryptography.Xml.EncryptionMethod\r\nSystem.Security.Cryptography.Xml.EncryptionProperty\r\nSystem.Security.Cryptography.Xml.EncryptionPropertyCollection\r\nSystem.Security.Cryptography.Xml.KeyInfo\r\nSystem.Security.Cryptography.Xml.KeyInfoClause\r\nSystem.Security.Cryptography.Xml.KeyInfoEncryptedKey\r\nSystem.Security.Cryptography.Xml.KeyInfoName\r\nSystem.Security.Cryptography.Xml.KeyInfoNode\r\nSystem.Security.Cryptography.Xml.KeyInfoRetrievalMethod\r\nSystem.Security.Cryptography.Xml.KeyInfoX509Data\r\nSystem.Security.Cryptography.Xml.KeyReference\r\nSystem.Security.Cryptography.Xml.Reference\r\nSystem.Security.Cryptography.Xml.ReferenceList\r\nSystem.Security.Cryptography.Xml.RSAKeyValue\r\nSystem.Security.Cryptography.Xml.Signature\r\nSystem.Security.Cryptography.Xml.SignedInfo\r\nSystem.Security.Cryptography.Xml.SignedXml\r\nSystem.Security.Cryptography.Xml.Transform\r\nSystem.Security.Cryptography.Xml.TransformChain\r\nSystem.Security.Cryptography.Xml.XmlDecryptionTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigBase64Transform\r\nSystem.Security.Cryptography.Xml.XmlDsigC14NTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigC14NWithCommentsTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigEnvelopedSignatureTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigExcC14NTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigExcC14NWithCommentsTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigXPathTransform\r\nSystem.Security.Cryptography.Xml.XmlDsigXsltTransform\r\nSystem.Security.Cryptography.Xml.XmlLicenseTransform",
+        "internalName": "System.Security.Cryptography.Xml.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "e3007c88e4955116",
+      "name": "System.Security.Permissions",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Security.Permissions.dll",
+          "accessPath": "usr/lib/powershell/System.Security.Permissions.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Security.Permissions:System.Security.Permissions:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Security.Permissions@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides types supporting Code Access Security (CAS).",
+        "internalName": "System.Security.Permissions.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "c88218f15e3f1dbd",
+      "name": "System.ServiceModel",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel:System.ServiceModel:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.ServiceModel",
+        "internalName": "System.ServiceModel.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "958d24120c556ca8",
+      "name": "System.ServiceModel.Duplex",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.Duplex.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.Duplex.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel.Duplex:System.ServiceModel.Duplex:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel.Duplex@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.ServiceModel.Duplex",
+        "internalName": "System.ServiceModel.Duplex.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "8655d6b79517809f",
+      "name": "System.ServiceModel.Http",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.Http.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.Http.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel.Http:System.ServiceModel.Http:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel.Http@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.ServiceModel.Http",
+        "internalName": "System.ServiceModel.Http.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "f72f905f5b27f04b",
+      "name": "System.ServiceModel.NetTcp",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.NetTcp.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.NetTcp.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel.NetTcp:System.ServiceModel.NetTcp:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel.NetTcp@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.ServiceModel.NetTcp",
+        "internalName": "System.ServiceModel.NetTcp.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "6924ccd0334eae49",
+      "name": "System.ServiceModel.Primitives",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.Primitives.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.Primitives.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel.Primitives:System.ServiceModel.Primitives:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel.Primitives@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.ServiceModel.Primitives",
+        "internalName": "System.ServiceModel.Primitives.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "fd92ec1a015dcec1",
+      "name": "System.ServiceModel.Security",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.Security.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.Security.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel.Security:System.ServiceModel.Security:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel.Security@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.ServiceModel.Security",
+        "internalName": "System.ServiceModel.Security.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "abd0ba35278ed23a",
+      "name": "System.ServiceModel.Syndication",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceModel.Syndication.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceModel.Syndication.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceModel.Syndication:System.ServiceModel.Syndication:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceModel.Syndication@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides classes related to service model syndication.",
+        "internalName": "System.ServiceModel.Syndication.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "7e7a2d6a05faa6c8",
+      "name": "System.ServiceProcess.ServiceController",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.ServiceProcess.ServiceController.dll",
+          "accessPath": "usr/lib/powershell/System.ServiceProcess.ServiceController.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.ServiceProcess.ServiceController:System.ServiceProcess.ServiceController:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.ServiceProcess.ServiceController@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides the System.ServiceProcess.ServiceController class, which allows you to connect to a Windows service, manipulate it, or get information about it.\r\n\r\nCommonly Used Types:\r\nSystem.ServiceProcess.ServiceController\r\nSystem.ServiceProcess.ServiceControllerStatus\r\nSystem.ServiceProcess.ServiceType",
+        "internalName": "System.ServiceProcess.ServiceController.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "88d0043aea1397a5",
+      "name": "System.Speech",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Speech.dll",
+          "accessPath": "usr/lib/powershell/System.Speech.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Speech:System.Speech:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Speech@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides types to perform speech synthesis and speech recognition.\r\n\r\nCommonly Used Types\r\nSystem.Speech.Synthesis.SpeechSynthesizer\r\nSystem.Speech.Recognition.SpeechRecognizer",
+        "internalName": "System.Speech.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "3a47a43bf2eb54cf",
+      "name": "System.Threading.AccessControl",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Threading.AccessControl.dll",
+          "accessPath": "usr/lib/powershell/System.Threading.AccessControl.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Threading.AccessControl:System.Threading.AccessControl:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Threading.AccessControl@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides support for managing access and audit control lists for synchronization primitives.\r\n\r\nCommonly Used Types:\r\nSystem.Security.AccessControl.EventWaitHandleAccessRule\r\nSystem.Security.AccessControl.EventWaitHandleAuditRule\r\nSystem.Security.AccessControl.MutexAccessRule\r\nSystem.Security.AccessControl.MutexAuditRule\r\nSystem.Security.AccessControl.MutexSecurity\r\nSystem.Security.AccessControl.SemaphoreAccessRule\r\nSystem.Security.AccessControl.SemaphoreAuditRule\r\nSystem.Security.AccessControl.SemaphoreSecurity",
+        "internalName": "System.Threading.AccessControl.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "e52feb071b67c0c9",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Web.Services.Description.dll",
+          "accessPath": "usr/lib/powershell/System.Web.Services.Description.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "ebe729e28ae9eaf6",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/cs/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/cs/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "86a2289db6a57cd5",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/de/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/de/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "b0aa5148b0019581",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/es/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/es/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "6bf8379a38c5a09c",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/fr/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/fr/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "9a095a5e906215d1",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/it/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/it/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "52c4e0a5805f372e",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ja/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/ja/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "3f6f0b0bd46b2385",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ko/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/ko/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "8fd80f91122a16cb",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pl/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/pl/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "3623a858a4816622",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pt-BR/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/pt-BR/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "f346d392c25308ff",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/ru/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/ru/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "548875d7f8a9d10b",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/tr/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/tr/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "7d6237c2208ffeee",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hans/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hans/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "3deb7d569c981e60",
+      "name": "System.Web.Services.Description",
+      "version": "4.1000.323.51101",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/zh-Hant/System.Web.Services.Description.resources.dll",
+          "accessPath": "usr/lib/powershell/zh-Hant/System.Web.Services.Description.resources.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Web.Services.Description:System.Web.Services.Description:4.1000.323.51101:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Web.Services.Description@4.1000.323.51101",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "4.10.3.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "System.Web.Services.Description",
+        "internalName": "System.Web.Services.Description.resources.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET Core",
+        "productVersion": "3.4.3"
+      }
+    },
+    {
+      "id": "258887ca2a9ba989",
+      "name": "System.Windows.Extensions",
+      "version": "8.0.23.53103",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/System.Windows.Extensions.dll",
+          "accessPath": "usr/lib/powershell/System.Windows.Extensions.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:System.Windows.Extensions:System.Windows.Extensions:8.0.23.53103:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/System.Windows.Extensions@8.0.23.53103",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "8.0.0.0",
+        "legalCopyright": "© Microsoft Corporation. All rights reserved.",
+        "comments": "Provides miscellaneous Windows-specific types\r\n\r\nCommonly Used Types:\r\nSystem.Security.Cryptography.X509Certificates.X509Certificate2UI\r\nSystem.Security.Cryptography.X509Certificates.X509SelectionFlag",
+        "internalName": "System.Windows.Extensions.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "Microsoft® .NET",
+        "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
+      }
+    },
+    {
+      "id": "bcb44b8dfdf94acd",
+      "name": "powershell",
+      "version": "7.4.1-r0",
+      "type": "apk",
+      "foundBy": "wolfictl",
+      "locations": [
+        {
+          "path": ".PKGINFO",
+          "accessPath": ".PKGINFO"
+        }
+      ],
+      "licenses": [
+        {
+          "value": "MIT",
+          "spdxExpression": "MIT",
+          "type": "declared",
+          "urls": [],
+          "locations": []
+        }
+      ],
+      "language": "",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:powershell:powershell:7.4.1-r0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/powershell@7.4.1-r0?arch=aarch64&origin=powershell",
+      "metadataType": "apk-db-entry",
+      "metadata": {
+        "package": "powershell",
+        "originPackage": "powershell",
+        "maintainer": "",
+        "version": "7.4.1-r0",
+        "architecture": "aarch64",
+        "url": "",
+        "description": "cross-platform automation and configuration tool/framework",
+        "size": 53116326,
+        "installedSize": 0,
+        "pullDependencies": [
+          "aspnet-8-runtime",
+          "dotnet-8-runtime",
+          "libpsl-native",
+          "ncurses-terminfo-base",
+          "so:ld-linux-aarch64.so.1",
+          "so:libc.so.6",
+          "so:libgcc_s.so.1",
+          "so:libm.so.6",
+          "so:libstdc++.so.6"
+        ],
+        "provides": null,
+        "pullChecksum": "f589e90c248da43279afef4c431e07baced027d6b5c89075883502f6be77c3b7",
+        "gitCommitOfApkPort": "01ae596eab726da6448b6aa914096650604dde29",
+        "files": [
+          {
+            "path": "."
+          },
+          {
+            "path": ".PKGINFO"
+          },
+          {
+            "path": ".SIGN.RSA.wolfi-signing.rsa.pub"
+          },
+          {
+            "path": "usr"
+          },
+          {
+            "path": "usr/bin"
+          },
+          {
+            "path": "usr/lib"
+          },
+          {
+            "path": "usr/lib/powershell"
+          },
+          {
+            "path": "usr/lib/powershell/JetBrains.Annotations.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Json.More.dll"
+          },
+          {
+            "path": "usr/lib/powershell/JsonPointer.Net.dll"
+          },
+          {
+            "path": "usr/lib/powershell/JsonSchema.Net.dll"
+          },
+          {
+            "path": "usr/lib/powershell/LICENSE.txt"
+          },
+          {
+            "path": "usr/lib/powershell/Markdig.Signed.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.ApplicationInsights.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.Bcl.AsyncInterfaces.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.CodeAnalysis.CSharp.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.CodeAnalysis.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.Extensions.ObjectPool.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.Management.Infrastructure.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Management.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Management.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Management.xml"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Utility.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Utility.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Commands.Utility.xml"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.ConsoleHost.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.ConsoleHost.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.ConsoleHost.xml"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.MarkdownRender.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.SDK.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.SDK.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.SDK.xml"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Security.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Security.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.PowerShell.Security.xml"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.Win32.Registry.AccessControl.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Microsoft.Win32.SystemEvents.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Modules"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Host"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Host/Microsoft.PowerShell.Host.psd1"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Management"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Management/Microsoft.PowerShell.Management.psd1"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Security"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Utility"
+          },
+          {
+            "path": "usr/lib/powershell/Modules/Microsoft.PowerShell.Utility/Microsoft.PowerShell.Utility.psd1"
+          },
+          {
+            "path": "usr/lib/powershell/Newtonsoft.Json.dll"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/ITPro.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/Maml.rld"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/Maml.tbr"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/Maml.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/Maml.xsx"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/Maml_HTML.xsl"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/Maml_HTML_Style.xsl"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/ManagedDeveloper.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/ManagedDeveloperStructure.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/ProviderHelp.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/base.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/baseConditional.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/block.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/blockCommon.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/blockSoftware.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/command.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/conditionSet.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developer.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerCommand.rld"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerCommand.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerDscResource.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManaged.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedClass.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedConstructor.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedDelegate.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedEnumeration.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedEvent.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedField.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedInterface.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedMethod.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedNamespace.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedOperator.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedOverload.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedProperty.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerManagedStructure.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerReference.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerStructure.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/developerXaml.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/endUser.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/hierarchy.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/inline.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/inlineCommon.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/inlineSoftware.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/inlineUi.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/shellExecute.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/structure.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/structureGlossary.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/structureList.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/structureProcedure.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/structureTable.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/structureTaskExecution.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/task.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/Schemas/PSMaml/troubleshooting.xsd"
+          },
+          {
+            "path": "usr/lib/powershell/System.CodeDom.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ComponentModel.Composition.Registration.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ComponentModel.Composition.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Configuration.ConfigurationManager.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Data.Odbc.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Data.OleDb.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Data.SqlClient.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Diagnostics.EventLog.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Diagnostics.PerformanceCounter.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.DirectoryServices.AccountManagement.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.DirectoryServices.Protocols.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.DirectoryServices.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Drawing.Common.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.IO.Packaging.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.IO.Ports.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Management.Automation.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Management.Automation.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/System.Management.Automation.xml"
+          },
+          {
+            "path": "usr/lib/powershell/System.Management.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Net.Http.WinHttpHandler.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Private.ServiceModel.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Reflection.Context.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Runtime.Caching.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Security.Cryptography.Pkcs.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Security.Cryptography.ProtectedData.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Security.Cryptography.Xml.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Security.Permissions.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.Duplex.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.Http.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.NetTcp.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.Primitives.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.Security.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.Syndication.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceModel.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.ServiceProcess.ServiceController.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Speech.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Threading.AccessControl.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Web.Services.Description.dll"
+          },
+          {
+            "path": "usr/lib/powershell/System.Windows.Extensions.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ThirdPartyNotices.txt"
+          },
+          {
+            "path": "usr/lib/powershell/cs"
+          },
+          {
+            "path": "usr/lib/powershell/cs/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/cs/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/cs/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/cs/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/de"
+          },
+          {
+            "path": "usr/lib/powershell/de/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/de/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/de/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/de/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/en-US"
+          },
+          {
+            "path": "usr/lib/powershell/en-US/default.help.txt"
+          },
+          {
+            "path": "usr/lib/powershell/es"
+          },
+          {
+            "path": "usr/lib/powershell/es/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/es/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/es/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/es/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/fr"
+          },
+          {
+            "path": "usr/lib/powershell/fr/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/fr/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/fr/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/fr/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/it"
+          },
+          {
+            "path": "usr/lib/powershell/it/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/it/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/it/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/it/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ja"
+          },
+          {
+            "path": "usr/lib/powershell/ja/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ja/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ja/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ja/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ko"
+          },
+          {
+            "path": "usr/lib/powershell/ko/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ko/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ko/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ko/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/libSystem.IO.Ports.Native.so"
+          },
+          {
+            "path": "usr/lib/powershell/libpsl-native.so"
+          },
+          {
+            "path": "usr/lib/powershell/pl"
+          },
+          {
+            "path": "usr/lib/powershell/pl/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pl/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pl/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pl/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pt-BR"
+          },
+          {
+            "path": "usr/lib/powershell/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pt-BR/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pt-BR/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pt-BR/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pwsh"
+          },
+          {
+            "path": "usr/lib/powershell/pwsh.deps.json"
+          },
+          {
+            "path": "usr/lib/powershell/pwsh.dll"
+          },
+          {
+            "path": "usr/lib/powershell/pwsh.pdb"
+          },
+          {
+            "path": "usr/lib/powershell/pwsh.runtimeconfig.json"
+          },
+          {
+            "path": "usr/lib/powershell/pwsh.xml"
+          },
+          {
+            "path": "usr/lib/powershell/ru"
+          },
+          {
+            "path": "usr/lib/powershell/ru/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ru/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ru/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/ru/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/tr"
+          },
+          {
+            "path": "usr/lib/powershell/tr/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/tr/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/tr/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/tr/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hans"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hans/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hans/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hans/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hant"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hant/Microsoft.CodeAnalysis.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hant/System.Private.ServiceModel.resources.dll"
+          },
+          {
+            "path": "usr/lib/powershell/zh-Hant/System.Web.Services.Description.resources.dll"
+          },
+          {
+            "path": "var"
+          },
+          {
+            "path": "var/lib"
+          },
+          {
+            "path": "var/lib/db"
+          },
+          {
+            "path": "var/lib/db/sbom"
+          },
+          {
+            "path": "var/lib/db/sbom/powershell-7.4.1-r0.spdx.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "26066e1ab5cb77ef",
+      "name": "pwsh",
+      "version": "7.4.1.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-portable-executable-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pwsh.dll",
+          "accessPath": "usr/lib/powershell/pwsh.dll",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:pwsh:pwsh:7.4.1.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/pwsh@7.4.1.0",
+      "metadataType": "dotnet-portable-executable-entry",
+      "metadata": {
+        "assemblyVersion": "7.4.1.0",
+        "legalCopyright": "(c) Microsoft Corporation.",
+        "comments": "PowerShell top-level project with .NET CLI host",
+        "internalName": "pwsh.dll",
+        "companyName": "Microsoft Corporation",
+        "productName": "PowerShell",
+        "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
+      }
+    }
+  ],
+  "artifactRelationships": [],
+  "source": {
+    "id": "(redacted for determinism)",
+    "name": "powershell",
+    "version": "7.4.1-r0",
+    "type": "directory",
+    "metadata": {
+      "path": "testdata/apks/aarch64/powershell-7.4.1-r0.apk"
+    }
+  },
+  "distro": {
+    "id": "wolfi"
+  },
+  "descriptor": {
+    "name": "wolfictl",
+    "version": ""
+  },
+  "schema": {
+    "version": "16.0.12",
+    "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-16.0.12.json"
+  }
+}

@@ -102,8 +102,15 @@ lint: checkfmt golangci-lint ## Run linters and checks like golangci-lint
 	$(GOLANGCI_LINT_BIN) run -n
 
 .PHONY: test
-test: ## Run go test
-	go test ./...
+test: integration ## Run go test
+
+.PHONY: unit
+unit: ## Run unit tests
+	go test -v ./...
+
+.PHONY: integration
+integration: ## Run tests, including integration tests
+	go test -v ./... -tags=integration
 
 .PHONY: clean
 clean: ## Clean the workspace
