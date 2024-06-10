@@ -53,6 +53,11 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	}
 	logger.Debug("unpacked APK file to temp directory", "apkFilePath", inputFilePath)
 
+	return GenerateFS(ctx, tempDir, distroID)
+}
+
+func GenerateFS(ctx context.Context, tempDir, distroID string) (*sbom.SBOM, error) {
+	logger := clog.FromContext(ctx)
 	// Sanity check: count the number of files in the temp directory. Create an
 	// fs.FS and walk it. We'll also use this to attach a list of files to the APK
 	// package.
@@ -60,7 +65,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	var includedFiles []string
 
 	tempFsys := os.DirFS(tempDir)
-	err = fs.WalkDir(tempFsys, ".", func(path string, _ os.DirEntry, err error) error {
+	err := fs.WalkDir(tempFsys, ".", func(path string, _ os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -135,7 +140,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 				ID: distroID,
 			},
 		},
-		Source: getDeterministicSourceDescription(src, inputFilePath, apkPackage.Name, apkPackage.Version),
+		Source: getDeterministicSourceDescription(src, apkPackage.Name, apkPackage.Version),
 		Descriptor: sbom.Descriptor{
 			Name: "wolfictl",
 		},
@@ -144,17 +149,13 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	return &s, nil
 }
 
-func getDeterministicSourceDescription(src source.Source, inputFilePath, apkName, apkVersion string) source.Description {
+func getDeterministicSourceDescription(src source.Source, apkName, apkVersion string) source.Description {
 	description := src.Describe()
 
 	description.ID = "(redacted for determinism)"
 	description.Name = apkName
 	description.Version = apkVersion
-	metadata := source.DirectoryMetadata{
-		Path: inputFilePath,
-	}
-	description.Metadata = metadata
-
+	description.Metadata = source.DirectoryMetadata{}
 	return description
 }
 
