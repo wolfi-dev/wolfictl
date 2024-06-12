@@ -260,10 +260,14 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 
 	var inputPathsFailingRequireZero []string
 
+	opts := scan.DefaultOptions
+	opts.UseCPEs = p.useCPEMatching
+	opts.PathOfDatabaseArchiveToImport = p.localDBFilePath
+
 	// Immediately start a goroutine, so we can initialize the vulnerability database.
 	// Once that's finished, we will start to pull sboms off of done as they become ready.
 	g.Go(func() error {
-		scanner, err := scan.NewScanner(p.localDBFilePath, p.useCPEMatching)
+		scanner, err := scan.NewScanner(opts)
 		if err != nil {
 			return fmt.Errorf("failed to create scanner: %w", err)
 		}

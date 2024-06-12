@@ -206,7 +206,7 @@ func findInvalidFixedAdvisoriesForAPK(
 	}
 
 	// Scan the APK
-	scanner, err := scan.NewScanner("", false)
+	scanner, err := scan.NewScanner(scan.DefaultOptions)
 	if err != nil {
 		return nil, fmt.Errorf("creating scanner: %w", err)
 	}

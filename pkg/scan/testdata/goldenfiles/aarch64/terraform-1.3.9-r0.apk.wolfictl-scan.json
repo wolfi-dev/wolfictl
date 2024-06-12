@@ -1,0 +1,1184 @@
+{
+  "TargetAPK": {
+    "Name": "terraform",
+    "Version": "1.3.9-r0",
+    "OriginPackageName": "terraform"
+  },
+  "Findings": [
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24532",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24534",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24536",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24537",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24538",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24539",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24540",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29400",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29402",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29403",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29404",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29405",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29406",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29409",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39318",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39319",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39323",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39325",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39325",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-39325"
+        ],
+        "FixedVersion": "1.5.5-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39326",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-3978",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-3978"
+        ],
+        "FixedVersion": "1.5.5-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-44487",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-44487",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-44487"
+        ],
+        "FixedVersion": "1.5.7-r0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45285",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "1.5.7-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45289",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45289",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2023-45289"
+        ],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45290",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45290",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2023-45290"
+        ],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-48795",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-48795"
+        ],
+        "FixedVersion": "1.5.7-r3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24783",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24783",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24783"
+        ],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24784",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24784",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24784"
+        ],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24785",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24785",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24785"
+        ],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24786",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24786"
+        ],
+        "FixedVersion": "1.5.7-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24787",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24789"
+        ],
+        "FixedVersion": "1.5.7-r12"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24790",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24790",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24790"
+        ],
+        "FixedVersion": "1.5.7-r12"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-3817",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-3817"
+        ],
+        "FixedVersion": "1.5.7-r8"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-236w-p7wf-5ph8",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r12"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "cc1fd97f6c48ba45",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-2wrh-6pvc-2jm9",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-3978"
+        ],
+        "FixedVersion": "0.13.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-2wrh-6pvc-2jm9",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.5-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-32ch-6x54-q4h9",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-3q2c-pvp5-3cqp",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "cc1fd97f6c48ba45",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4374-p667-p6c8",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-39325"
+        ],
+        "FixedVersion": "0.17.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4374-p667-p6c8",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.5-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "4fdbd885f855051c",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-45x7-px36-x8w8",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-48795"
+        ],
+        "FixedVersion": "0.17.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-45x7-px36-x8w8",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-49gw-vxvf-fc2g",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r12"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "cc1fd97f6c48ba45",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4v7x-pqxf-cx7m",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "0.23.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4v7x-pqxf-cx7m",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1f82da5bd4f85217",
+        "Name": "google.golang.org/protobuf",
+        "Version": "v1.27.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-8r3f-844c-mc37",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24786"
+        ],
+        "FixedVersion": "1.33.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-8r3f-844c-mc37",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-fgq5-q76c-gx78",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-j6m3-gc37-6r6q",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "76d38aad17298ccd",
+        "Name": "github.com/hashicorp/go-getter",
+        "Version": "v1.6.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-jpxj-2jvg-6jv9",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-0475"
+        ],
+        "FixedVersion": "1.7.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "e5bae27dd1749a7e",
+        "Name": "google.golang.org/grpc",
+        "Version": "v1.47.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-m425-mq94-257g",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "1.56.3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-m425-mq94-257g",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "76d38aad17298ccd",
+        "Name": "github.com/hashicorp/go-getter",
+        "Version": "v1.6.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-q64h-39hv-4cf7",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-3817"
+        ],
+        "FixedVersion": "1.7.4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-q64h-39hv-4cf7",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r8"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "cc1fd97f6c48ba45",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-qppj-fm5r-hxr3",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-44487"
+        ],
+        "FixedVersion": "0.17.0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "e5bae27dd1749a7e",
+        "Name": "google.golang.org/grpc",
+        "Version": "v1.47.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-qppj-fm5r-hxr3",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-44487"
+        ],
+        "FixedVersion": "1.56.3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-qppj-fm5r-hxr3",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d4826102eb7e273c",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-rr6r-cfgf-gc6h",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r4"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "cc1fd97f6c48ba45",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-vvpx-j8f3-3w6h",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2022-41723"
+        ],
+        "FixedVersion": "0.7.0"
+      },
+      "TriageAssessments": null
+    }
+  ],
+  "GrypeDBStatus": {
+    "built": "2024-06-11T01:29:53Z",
+    "schemaVersion": 5,
+    "location": "testdata/grypedb/5",
+    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
+    "error": null
+  }
+}
