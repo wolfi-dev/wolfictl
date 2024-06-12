@@ -6,7 +6,7 @@ go 1.22.3
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
-	chainguard.dev/apko v0.14.8
+	chainguard.dev/apko v0.14.9
 	chainguard.dev/melange v0.8.6
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
