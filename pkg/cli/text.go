@@ -39,7 +39,7 @@ func cmdText() *cobra.Command {
 				return err
 			}
 
-			return text(*g, pkgs, arch, textType(t), os.Stdout)
+			return text(g, pkgs, arch, textType(t), os.Stdout)
 		},
 	}
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
@@ -69,7 +69,7 @@ var textTypes = []textType{
 	typePackageNameAndVersion,
 }
 
-func text(g dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer) error {
+func text(g *dag.Graph, pkgs *dag.Packages, arch string, t textType, w io.Writer) error {
 	filtered, err := g.Filter(dag.FilterLocal())
 	if err != nil {
 		return err
