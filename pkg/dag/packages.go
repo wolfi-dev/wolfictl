@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/build"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -72,6 +75,7 @@ func (c Configuration) Resolved() bool {
 // It does not try to determine relationships and dependencies between packages. For that,
 // pass a Packages to NewGraph.
 type Packages struct {
+	sync.Mutex
 	configs  map[string][]*Configuration
 	packages map[string][]*Configuration
 	index    map[string]*Configuration
@@ -80,6 +84,9 @@ type Packages struct {
 var ErrMultipleConfigurations = fmt.Errorf("multiple configurations using the same package name")
 
 func (p *Packages) addPackage(name string, configuration *Configuration) error {
+	p.Lock()
+	defer p.Unlock()
+
 	if _, exists := p.packages[name]; exists {
 		return fmt.Errorf("%s: %w", name, ErrMultipleConfigurations)
 	}
@@ -90,6 +97,9 @@ func (p *Packages) addPackage(name string, configuration *Configuration) error {
 }
 
 func (p *Packages) addConfiguration(name string, configuration *Configuration) error {
+	p.Lock()
+	defer p.Unlock()
+
 	p.configs[name] = append(p.configs[name], configuration)
 	p.index[configuration.String()] = configuration
 
@@ -151,6 +161,9 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		packages: make(map[string][]*Configuration),
 		index:    make(map[string]*Configuration),
 	}
+
+	var g errgroup.Group
+	g.SetLimit(runtime.GOMAXPROCS(0))
 	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -182,75 +195,83 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			return nil
 		}
 
-		p := filepath.Join(dirPath, path)
-		buildc, err := config.ParseConfiguration(ctx, p)
-		if err != nil {
-			return err
-		}
-		c := &Configuration{
-			Configuration: buildc,
-			Path:          p,
-			name:          buildc.Package.Name,
-			version:       fullVersion(&buildc.Package),
-			pkg:           buildc.Package.Name,
-		}
-
-		name := c.name
-		if name == "" {
-			return fmt.Errorf("no package name in %q", path)
-		}
-		if err := pkgs.addConfiguration(name, c); err != nil {
-			return err
-		}
-		if err := pkgs.addPackage(name, c); err != nil {
-			return err
-		}
-		if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
-			return err
-		}
-
-		for i := range c.Subpackages {
-			subpkg := c.Subpackages[i]
-			name := subpkg.Name
-			if name == "" {
-				return fmt.Errorf("empty subpackage name at index %d for package %q", i, c.Package.Name)
+		g.Go(func() error {
+			p := filepath.Join(dirPath, path)
+			buildc, err := config.ParseConfiguration(ctx, p)
+			if err != nil {
+				return err
 			}
 			c := &Configuration{
 				Configuration: buildc,
 				Path:          p,
-				name:          name,
-				version:       fullVersion(&buildc.Package), // subpackages have same version as origin
-				pkg:           name,
+				name:          buildc.Package.Name,
+				version:       fullVersion(&buildc.Package),
+				pkg:           buildc.Package.Name,
+			}
+
+			name := c.name
+			if name == "" {
+				return fmt.Errorf("no package name in %q", path)
 			}
 			if err := pkgs.addConfiguration(name, c); err != nil {
 				return err
 			}
-			if err := pkgs.addProvides(c, subpkg.Dependencies.Provides); err != nil {
+			if err := pkgs.addPackage(name, c); err != nil {
+				return err
+			}
+			if err := pkgs.addProvides(c, c.Package.Dependencies.Provides); err != nil {
 				return err
 			}
 
-			// TODO: resolve deps via `uses` for subpackage pipelines.
-		}
-		// Resolve all `uses` used by the pipeline. This updates the set of
-		// .environment.contents.packages so the next block can include those as build deps.
-		pctx := &build.PipelineBuild{
-			Build: &build.Build{
-				PipelineDirs:  []string{pipelineDir},
-				Configuration: *c.Configuration,
-			},
-			Package: &c.Package,
-		}
-		for i := range c.Pipeline {
-			s := &build.PipelineContext{Environment: &pctx.Build.Configuration.Environment, PipelineDirs: []string{pipelineDir}, Pipeline: &c.Pipeline[i]}
-			if err := s.ApplyNeeds(ctx, pctx); err != nil {
-				return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
+			for i := range c.Subpackages {
+				subpkg := c.Subpackages[i]
+				name := subpkg.Name
+				if name == "" {
+					return fmt.Errorf("empty subpackage name at index %d for package %q", i, c.Package.Name)
+				}
+				c := &Configuration{
+					Configuration: buildc,
+					Path:          p,
+					name:          name,
+					version:       fullVersion(&buildc.Package), // subpackages have same version as origin
+					pkg:           name,
+				}
+				if err := pkgs.addConfiguration(name, c); err != nil {
+					return err
+				}
+				if err := pkgs.addProvides(c, subpkg.Dependencies.Provides); err != nil {
+					return err
+				}
+
+				// TODO: resolve deps via `uses` for subpackage pipelines.
 			}
-			c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
-		}
+			// Resolve all `uses` used by the pipeline. This updates the set of
+			// .environment.contents.packages so the next block can include those as build deps.
+			pctx := &build.PipelineBuild{
+				Build: &build.Build{
+					PipelineDirs:  []string{pipelineDir},
+					Configuration: *c.Configuration,
+				},
+				Package: &c.Package,
+			}
+			for i := range c.Pipeline {
+				s := &build.PipelineContext{Environment: &pctx.Build.Configuration.Environment, PipelineDirs: []string{pipelineDir}, Pipeline: &c.Pipeline[i]}
+				if err := s.ApplyNeeds(ctx, pctx); err != nil {
+					return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
+				}
+				c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
+			}
+
+			return nil
+		})
 
 		return nil
 	})
 	if err != nil {
+		return nil, err
+	}
+
+	if err := g.Wait(); err != nil {
 		return nil, err
 	}
 
@@ -262,7 +283,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 // it's not present, Config returns an empty list.
 //
 // Pass packageOnly=true to restruct it just to origin package names.
-func (p Packages) Config(name string, packageOnly bool) []*Configuration {
+func (p *Packages) Config(name string, packageOnly bool) []*Configuration {
 	if p.configs == nil {
 		// this would be unexpected
 		return nil
@@ -290,7 +311,7 @@ func (p Packages) Config(name string, packageOnly bool) []*Configuration {
 	return list
 }
 
-func (p Packages) ConfigByKey(key string) *Configuration {
+func (p *Packages) ConfigByKey(key string) *Configuration {
 	if len(p.index) == 0 {
 		return nil
 	}
@@ -302,7 +323,7 @@ func (p Packages) ConfigByKey(key string) *Configuration {
 }
 
 // PkgConfig returns the melange Configuration for a given package name.
-func (p Packages) PkgConfig(pkgName string) *Configuration {
+func (p *Packages) PkgConfig(pkgName string) *Configuration {
 	for _, cfg := range p.packages[pkgName] {
 		if pkgName == cfg.Package.Name {
 			return cfg
@@ -313,7 +334,7 @@ func (p Packages) PkgConfig(pkgName string) *Configuration {
 
 // PkgInfo returns the build.Package struct for a given package name.
 // If no such package name is found in the packages, return nil package and nil error.
-func (p Packages) PkgInfo(pkgName string) *config.Package {
+func (p *Packages) PkgInfo(pkgName string) *config.Package {
 	if cfg := p.PkgConfig(pkgName); cfg != nil {
 		return &cfg.Package
 	}
@@ -322,7 +343,7 @@ func (p Packages) PkgInfo(pkgName string) *config.Package {
 
 // Packages returns a slice of every package and subpackage available in the Packages struct,
 // sorted alphabetically and then by version, with each package converted to a *apk.RepositoryPackage.
-func (p Packages) Packages() []*Configuration {
+func (p *Packages) Packages() []*Configuration {
 	allPackages := make([]*Configuration, 0, len(p.packages))
 	for _, byVersion := range p.packages {
 		allPackages = append(allPackages, byVersion...)
@@ -339,7 +360,7 @@ func (p Packages) Packages() []*Configuration {
 }
 
 // PackageNames returns a slice of the names of all packages, sorted alphabetically.
-func (p Packages) PackageNames() []string {
+func (p *Packages) PackageNames() []string {
 	allPackages := make([]string, 0, len(p.packages))
 	for name := range p.packages {
 		allPackages = append(allPackages, name)
@@ -354,7 +375,7 @@ func (p Packages) PackageNames() []string {
 // If a listed element is a provides, automatically includes the origin package that provides it.
 // If a listed element is a subpackage, automatically includes the origin package that contains it.
 // If a listed element does not exist, returns an error.
-func (p Packages) Sub(names ...string) (*Packages, error) {
+func (p *Packages) Sub(names ...string) (*Packages, error) {
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		index:    make(map[string]*Configuration),
@@ -392,7 +413,7 @@ func wantArch(have string, want []string) bool {
 }
 
 // WithArch returns a new Packages whose members are valid for the given arch.
-func (p Packages) WithArch(arch string) (*Packages, error) {
+func (p *Packages) WithArch(arch string) (*Packages, error) {
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
 		index:    p.index,
@@ -425,7 +446,7 @@ func (p Packages) WithArch(arch string) (*Packages, error) {
 
 // Repository provide the Packages as a apk.RepositoryWithIndex. To be used in other places that require
 // using alpine/go structs instead of ours.
-func (p Packages) Repository(arch string) apk.NamedIndex {
+func (p *Packages) Repository(arch string) apk.NamedIndex {
 	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
 
 	// Precompute the number of packages to avoid growslice.
