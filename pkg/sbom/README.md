@@ -8,7 +8,7 @@ There are **integration tests** in wolfictl to guard against unexpected behavior
 
 The tests retrieve a selected set of Wolfi APK files for which to generate SBOMs. APKs are saved to "git-ignored" locations in the repository so that they can be reused in subsequent test executions without needing to fetch them again.
 
-Each test uses a "golden file" as the ground truth, and then compare the output of the wolfictl's `sbom.Generate` function to that golden file. If there is no diff, the test passes! If there is a diff, the test is failed, and the diff is reported to the user. JSON representations of the SBOM are used to make diffing easier to reason about. The JSON data uses Syft's native SBOM format.
+Each test uses a "golden file" as the ground truth, and then compare the output of wolfictl's `sbom.Generate` function to that golden file. If there is no diff, the test passes! If there is a diff, the test is failed, and the diff is reported to the user. JSON representations of the SBOM are used to make diffing easier to reason about. The JSON data uses Syft's native SBOM format.
 
 ### Running integration tests
 
@@ -26,7 +26,7 @@ If the new output coming from `Generate` seems acceptable, then it's time to upd
 
 ### Updating the golden files
 
-**Important:** Only update the golden files after you've thoroughly examined the changes to wolfictl's SBOM genereation behavior and determined they are acceptable.
+**Important!** Only update the golden files after you've thoroughly examined the changes to wolfictl's SBOM generation behavior and determined they are acceptable.
 
 When running these SBOM tests, you can pass the test flag `-update-golden-files`. Doing so will cause the tests not to check for diffs, instead saving the current output of the `Generate` function to the golden files. It's important to check these changes into the git repository, so that everyone else starts using this data as the ground truth for their test executions.
 
@@ -38,6 +38,6 @@ The set of packages used in testing has been intentionally chosen to provide thi
 
 But as time goes on, it's natural for the set to need to grow or change. Changing this list should be as simple as:
 
-1. Modifying the `testArtifacts` string slice as desired.
+1. Modifying the `testTargets` string slice as desired.
 2. Running the tests with `-update-golden-files` in order to generate golden files for any new APKs.
 3. Committing in the repo the changes to both of the above.
