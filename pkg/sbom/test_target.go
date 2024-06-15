@@ -53,7 +53,7 @@ func (tt TestTarget) Download(arch string) error {
 		return fmt.Errorf("checking for existing local APK file: %w", err)
 	}
 
-	err = os.MkdirAll(filepath.Dir(localPath), 0755)
+	err = os.MkdirAll(filepath.Dir(localPath), 0o755)
 	if err != nil {
 		return fmt.Errorf("creating directory for local APK file: %w", err)
 	}

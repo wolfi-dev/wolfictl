@@ -249,10 +249,10 @@ func generateCPEs(p pkg.Package) []cpe.CPE {
 func ToSyftJSON(s *sbom.SBOM) (io.ReadSeeker, error) {
 	buf := new(bytes.Buffer)
 
-	model := syftjson.ToFormatModel(*s, syftjson.DefaultEncoderConfig())
+	m := syftjson.ToFormatModel(*s, syftjson.DefaultEncoderConfig())
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(false)
-	err := enc.Encode(model)
+	err := enc.Encode(m)
 	if err != nil {
 		return nil, fmt.Errorf("failed to encode SBOM: %w", err)
 	}
