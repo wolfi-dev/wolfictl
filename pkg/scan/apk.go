@@ -84,6 +84,7 @@ type Scanner struct {
 	datastore            *store.Store
 	dbStatus             *db.Status
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
+	disableSBOMCache     bool
 }
 
 // Options determine the configuration for a new Scanner. The zero-value of this
@@ -113,6 +114,10 @@ type Options struct {
 	// not validate the age of the database. This bool should always be set to false
 	// except for testing purposes.
 	DisableDatabaseAgeValidation bool
+
+	// DisableSBOMCache controls whether the scanner will cache SBOMs generated from
+	// APKs. If true, the scanner will not cache SBOMs or use existing cached SBOMs.
+	DisableSBOMCache bool
 }
 
 // DefaultOptions is the recommended default configuration for a new Scanner.
@@ -161,6 +166,7 @@ func NewScanner(opts Options) (*Scanner, error) {
 		datastore:            datastore,
 		dbStatus:             dbStatus,
 		vulnerabilityMatcher: vulnerabilityMatcher,
+		disableSBOMCache:     opts.DisableSBOMCache,
 	}, nil
 }
 
@@ -175,7 +181,14 @@ func (s *Scanner) ScanAPK(ctx context.Context, apk fs.File, distroID string) (*R
 
 	logger.Info("scanning APK for vulnerabilities", "path", stat.Name())
 
-	ssbom, err := sbom.CachedGenerate(ctx, stat.Name(), apk, distroID)
+	var ssbom *sbomSyft.SBOM
+
+	if s.disableSBOMCache {
+		ssbom, err = sbom.Generate(ctx, stat.Name(), apk, distroID)
+	} else {
+		ssbom, err = sbom.CachedGenerate(ctx, stat.Name(), apk, distroID)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate SBOM from APK: %w", err)
 	}

@@ -88,6 +88,7 @@ func TestScanner_ScanAPK(t *testing.T) {
 		PathOfDatabaseArchiveToImport:      localDBPath,
 		PathOfDatabaseDestinationDirectory: filepath.Dir(localDBPath),
 		DisableDatabaseAgeValidation:       true,
+		DisableSBOMCache:                   true,
 	}
 	scanner, err := NewScanner(scannerOpts)
 	if err != nil {
@@ -109,7 +110,7 @@ func TestScanner_ScanAPK(t *testing.T) {
 					t.Fatalf("opening local APK file for analysis: %v", err)
 				}
 
-				s, err := scanner.ScanAPK(context.Background(), f, "wolfi")
+				result, err := scanner.ScanAPK(context.Background(), f, "wolfi")
 				if err != nil {
 					t.Fatalf("scanning APK: %v", err)
 				}
@@ -117,9 +118,9 @@ func TestScanner_ScanAPK(t *testing.T) {
 				actual := &bytes.Buffer{}
 				enc := json.NewEncoder(actual)
 				enc.SetIndent("", "  ")
-				err = enc.Encode(s)
+				err = enc.Encode(result)
 				if err != nil {
-					t.Fatalf("encoding vulnerability scan results to JSON: %v", err)
+					t.Fatalf("encoding vulnerability scan result to JSON: %v", err)
 				}
 
 				goldenFilePath := tt.GoldenFilePath(arch, goldenFileSuffix)
@@ -137,7 +138,7 @@ func TestScanner_ScanAPK(t *testing.T) {
 
 					_, err = io.Copy(goldenfile, actual)
 					if err != nil {
-						t.Fatalf("writing new scan results to golden file: %v", err)
+						t.Fatalf("writing new scan result to golden file: %v", err)
 					}
 
 					t.Logf("updated golden file: %s", goldenFilePath)
@@ -156,7 +157,7 @@ func TestScanner_ScanAPK(t *testing.T) {
 				}
 
 				if diff := cli.Diff("expected", expectedBytes, "actual", actual.Bytes(), false); len(diff) > 0 {
-					t.Errorf("unexpected vulnerability scan results (-want +got):\n%s", diff)
+					t.Errorf("unexpected vulnerability scan result (-want +got):\n%s", diff)
 				}
 			})
 		}
