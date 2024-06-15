@@ -60,7 +60,7 @@ func TestGenerate(t *testing.T) {
 				if err != nil {
 					t.Fatalf("generating SBOM: %v", err)
 				}
-				r, err := ToSyftJSON(s)
+				r, err := ToSyftJSONSchemaRedacted(s)
 				if err != nil {
 					t.Fatalf("encoding SBOM to Syft JSON: %v", err)
 				}
