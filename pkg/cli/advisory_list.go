@@ -38,6 +38,10 @@ You can filter advisories by the type of the latest event:
 
 	wolfictl adv ls -t detection
 
+You can filter advisories by the detected component type:
+
+	wolfictl adv ls -c python
+
 You can show only advisories that are considered not to be "resolved":
 
 	wolfictl adv ls --unresolved
@@ -106,6 +110,11 @@ investigation over time for a given package/vulnerability match.'
 						continue
 					}
 
+					if p.componentType != "" && !advHasDetectedComponentType(adv, p.componentType) {
+						// user specified a particular different component type
+						continue
+					}
+
 					if p.history {
 						// user wants the full history
 						sorted := adv.SortedEvents()
@@ -140,12 +149,13 @@ investigation over time for a given package/vulnerability match.'
 type listParams struct {
 	advisoriesRepoDir string
 
-	packageName string
-	vuln        string
-	history     bool
-	unresolved  bool
-	typ         string
-	showAliases bool
+	packageName   string
+	vuln          string
+	history       bool
+	unresolved    bool
+	typ           string
+	showAliases   bool
+	componentType string
 }
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
@@ -158,6 +168,24 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.unresolved, "unresolved", false, "only show advisories considered to be unresolved")
 	cmd.Flags().StringVarP(&p.typ, "type", "t", "", "filter advisories by event type")
 	cmd.Flags().BoolVar(&p.showAliases, "aliases", true, "show other known vulnerability IDs for each advisory")
+	cmd.Flags().StringVarP(&p.componentType, "component-type", "c", "", "filter advisories by detected component type")
+}
+
+func advHasDetectedComponentType(adv v2.Advisory, componentType string) bool {
+	for _, event := range adv.Events {
+		if event.Type == v2.EventTypeDetection {
+			if data, ok := event.Data.(v2.Detection); ok {
+				if data.Type == v2.DetectionTypeScanV1 {
+					if data, ok := data.Data.(v2.DetectionScanV1); ok {
+						if data.ComponentType == componentType {
+							return true
+						}
+					}
+				}
+			}
+		}
+	}
+	return false
 }
 
 type advisoryListTableRow struct {
