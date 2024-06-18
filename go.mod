@@ -10,7 +10,7 @@ require (
 	chainguard.dev/melange v0.8.6
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.79.0
+	github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a
 	github.com/anchore/stereoscope v0.0.3-0.20240501181043-2e9894674185
 	github.com/anchore/syft v1.7.0
 	github.com/chainguard-dev/clog v1.3.1
@@ -31,7 +31,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-containerregistry v0.19.1
+	github.com/google/go-containerregistry v0.19.2
 	github.com/google/go-github/v58 v58.0.0
 	github.com/google/osv-scanner v1.7.4
 	github.com/google/uuid v1.6.0
@@ -45,7 +45,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/savioxavier/termlink v1.3.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/texttheater/golang-levenshtein/levenshtein v0.0.0-20200805054039-cae8b0eaed6c
