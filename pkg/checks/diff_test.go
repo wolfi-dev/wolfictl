@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDiff(t *testing.T) {
@@ -16,10 +17,10 @@ func TestDiff(t *testing.T) {
 
 	dir := filepath.Join("testdata", "diff")
 	originalData, err := os.ReadFile(filepath.Join(dir, "test_orig.apk"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	apkIndexData, err := os.ReadFile(filepath.Join(dir, "APKINDEX.tgz"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// create a test server to download the test apk from
 	const apkindexEndpoint = "/APKINDEX.tar.gz"
@@ -27,13 +28,13 @@ func TestDiff(t *testing.T) {
 		switch req.URL.Path {
 		case apkindexEndpoint:
 			_, err = rw.Write(apkIndexData)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		case "/test-1.2.3-r0.apk":
 			_, err = rw.Write(originalData)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		case "/test_sub-1.2.3-r0.apk":
 			_, err = rw.Write(originalData)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		default:
 			http.Error(rw, "Not found", http.StatusNotFound)
 		}
@@ -48,12 +49,12 @@ func TestDiff(t *testing.T) {
 		Logger:              log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
 	}
 	err = diffOpts.Diff()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	diffLogFile := filepath.Join(resultDir, "diff.log")
 
 	actual, err := os.ReadFile(diffLogFile)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	expectedPackage := `
 Package test:
