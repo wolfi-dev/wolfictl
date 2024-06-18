@@ -108,7 +108,7 @@ func (o *DiffOptions) Diff() error {
 		cmd := exec.Command(path, "-diff", "-format=markdown", "-min-file-level=3", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
-			return err
+			return fmt.Errorf("bincapz execution failed with error %w: %s", err, result)
 		}
 		o.Logger.Printf("finished bincapz")
 	}
