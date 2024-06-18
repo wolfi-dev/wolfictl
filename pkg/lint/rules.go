@@ -55,7 +55,12 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "do not specify a forbidden repository",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, repo := range config.Environment.Contents.Repositories {
+				for _, repo := range config.Environment.Contents.BuildRepositories {
+					if slices.Contains(forbiddenRepositories, repo) {
+						return fmt.Errorf("forbidden repository %s is used", repo)
+					}
+				}
+				for _, repo := range config.Environment.Contents.RuntimeRepositories {
 					if slices.Contains(forbiddenRepositories, repo) {
 						return fmt.Errorf("forbidden repository %s is used", repo)
 					}
@@ -369,7 +374,12 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "remove tagged repositories like @local from the repositories block",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, repo := range config.Environment.Contents.Repositories {
+				for _, repo := range config.Environment.Contents.BuildRepositories {
+					if repo[0] == '@' {
+						return fmt.Errorf("repository %q is tagged", repo)
+					}
+				}
+				for _, repo := range config.Environment.Contents.RuntimeRepositories {
 					if repo[0] == '@' {
 						return fmt.Errorf("repository %q is tagged", repo)
 					}
@@ -415,13 +425,13 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every package should have a valid main or subpackage test",
 			Severity:    SeverityInfo,
 			LintFunc: func(c config.Configuration) error {
-				if len(c.Test.Pipeline) > 0 {
+				if c.Test != nil && len(c.Test.Pipeline) > 0 {
 					// Main package has at least one test
 					return nil
 				}
 
 				for _, sp := range c.Subpackages {
-					if len(sp.Test.Pipeline) > 0 {
+					if sp.Test != nil && len(sp.Test.Pipeline) > 0 {
 						// A subpackage has at least one test
 						return nil
 					}

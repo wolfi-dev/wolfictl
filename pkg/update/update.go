@@ -409,18 +409,14 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	if err != nil {
 		return "", fmt.Errorf("failed to parse %v", err)
 	}
-	pctx := &melangebuild.PipelineBuild{
-		Build: &melangebuild.Build{
-			Configuration: *updated,
-		},
-		Package: &updated.Package,
-	}
 
-	// get a map of variable mutations we can substitute vars in URLs
-	mutations, err := melangebuild.MutateWith(pctx, map[string]string{})
+	sm, err := melangebuild.NewSubstitutionMap(updated, "x86_64", "gnu", nil)
 	if err != nil {
 		return "", err
 	}
+
+	// get a map of variable mutations we can substitute vars in URLs
+	mutations := sm.Substitutions
 
 	// Skip any processing for definitions with a single pipeline
 	if len(updated.Pipeline) > 1 && deps.ContainsGoBumpPipeline(updated) {

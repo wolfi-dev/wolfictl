@@ -108,16 +108,11 @@ func (p *Packages) addConfiguration(name string, configuration *Configuration) e
 
 func (p *Packages) addProvides(c *Configuration, provides []string) error {
 	for _, prov := range provides {
-		pctx := &build.PipelineBuild{
-			Build: &build.Build{
-				Configuration: *c.Configuration,
-			},
-			Package: &c.Package,
-		}
-		template, err := build.MutateWith(pctx, nil)
+		sm, err := build.NewSubstitutionMap(c.Configuration, "x86_64", "gnu", nil)
 		if err != nil {
 			return err
 		}
+		template := sm.Substitutions
 		for tmpl, val := range template {
 			prov = strings.ReplaceAll(prov, tmpl, val)
 		}
@@ -247,20 +242,14 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			}
 			// Resolve all `uses` used by the pipeline. This updates the set of
 			// .environment.contents.packages so the next block can include those as build deps.
-			pctx := &build.PipelineBuild{
-				Build: &build.Build{
-					PipelineDirs:  []string{pipelineDir},
-					Configuration: *c.Configuration,
-				},
-				Package: &c.Package,
+			build := &build.Build{
+				PipelineDirs:  []string{pipelineDir},
+				Configuration: *c.Configuration,
 			}
-			for i := range c.Pipeline {
-				s := &build.PipelineContext{Environment: &pctx.Build.Configuration.Environment, PipelineDirs: []string{pipelineDir}, Pipeline: &c.Pipeline[i]}
-				if err := s.ApplyNeeds(ctx, pctx); err != nil {
-					return fmt.Errorf("unable to resolve needs for package %s: %w", name, err)
-				}
-				c.Environment.Contents.Packages = pctx.Build.Configuration.Environment.Contents.Packages
+			if err := build.Compile(ctx); err != nil {
+				return fmt.Errorf("compiling build: %w", err)
 			}
+			c.Environment.Contents.Packages = build.Configuration.Environment.Contents.Packages
 
 			return nil
 		})

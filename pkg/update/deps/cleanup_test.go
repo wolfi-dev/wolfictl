@@ -71,16 +71,11 @@ func TestCleanupDeps(t *testing.T) {
 			updated, err := config.ParseConfiguration(context.Background(), filepath.Join(dir, filename))
 			require.NoError(t, err)
 
-			pctx := &melangebuild.PipelineBuild{
-				Build: &melangebuild.Build{
-					Configuration: *updated,
-				},
-				Package: &updated.Package,
-			}
+			sm, err := melangebuild.NewSubstitutionMap(updated, "x86_64", "gnu", nil)
+			require.NoError(t, err)
 
 			// get a map of variable mutations we can substitute vars in URLs
-			mutations, err := melangebuild.MutateWith(pctx, map[string]string{})
-			require.NoError(t, err)
+			mutations := sm.Substitutions
 
 			var doc yaml.Node
 			err = yaml.Unmarshal(yamlContent, &doc)
