@@ -1,0 +1,118 @@
+{
+  "TargetAPK": {
+    "Name": "openssl",
+    "Version": "3.3.0-r0",
+    "OriginPackageName": "openssl"
+  },
+  "Findings": [
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-6237",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2023-6237"
+        ],
+        "FixedVersion": "3.3.0-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-2511",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-2511"
+        ],
+        "FixedVersion": "3.3.0-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-4603",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-4603"
+        ],
+        "FixedVersion": "3.3.0-r8"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-299c-jvhc-gxj8",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "3.3.0-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-85xr-ghj6-6m46",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "3.3.0-r8"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-hvc4-mjv4-5mw6",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "3.3.0-r5"
+      },
+      "TriageAssessments": null
+    }
+  ],
+  "GrypeDBStatus": {
+    "built": "2024-06-11T01:29:53Z",
+    "schemaVersion": 5,
+    "location": "testdata/grypedb/5",
+    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
+    "error": null
+  }
+}

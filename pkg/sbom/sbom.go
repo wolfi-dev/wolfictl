@@ -16,6 +16,7 @@ import (
 	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/file"
 	"github.com/anchore/syft/syft/format/syftjson"
+	"github.com/anchore/syft/syft/format/syftjson/model"
 	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg"
 	cpegen "github.com/anchore/syft/syft/pkg/cataloger/common/cpe"
@@ -248,10 +249,30 @@ func generateCPEs(p pkg.Package) []cpe.CPE {
 func ToSyftJSON(s *sbom.SBOM) (io.ReadSeeker, error) {
 	buf := new(bytes.Buffer)
 
-	model := syftjson.ToFormatModel(*s, syftjson.DefaultEncoderConfig())
+	m := syftjson.ToFormatModel(*s, syftjson.DefaultEncoderConfig())
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(false)
-	err := enc.Encode(model)
+	err := enc.Encode(m)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode SBOM: %w", err)
+	}
+
+	return bytes.NewReader(buf.Bytes()), nil
+}
+
+// ToSyftJSONSchemaRedacted returns the SBOM as a reader of the Syft JSON
+// format. The returned data has schema information redacted to enable easier
+// testing (less noisy diff comparisons).
+//
+// For most use cases, prefer ToSyftJSON over this function.
+func ToSyftJSONSchemaRedacted(s *sbom.SBOM) (io.ReadSeeker, error) {
+	buf := new(bytes.Buffer)
+
+	m := syftjson.ToFormatModel(*s, syftjson.DefaultEncoderConfig())
+	m.Schema = model.Schema{}
+	enc := json.NewEncoder(buf)
+	enc.SetEscapeHTML(false)
+	err := enc.Encode(m)
 	if err != nil {
 		return nil, fmt.Errorf("failed to encode SBOM: %w", err)
 	}

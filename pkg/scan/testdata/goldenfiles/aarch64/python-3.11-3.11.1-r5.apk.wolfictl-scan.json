@@ -1,0 +1,150 @@
+{
+  "TargetAPK": {
+    "Name": "python-3.11",
+    "Version": "3.11.1-r5",
+    "OriginPackageName": "python-3.11"
+  },
+  "Findings": [
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-27043",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-27043"
+        ],
+        "FixedVersion": "3.11.8-r1"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-40217",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-41105",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-6597",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-6597"
+        ],
+        "FixedVersion": "3.11.8-r0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-0450",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-0450"
+        ],
+        "FixedVersion": "3.11.8-r0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-5mwm-wccq-xqcp",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "3.11.8-r1"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-797f-63wg-8chv",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "3.11.8-r0"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "78d3b97747afe870",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-jm46-725r-hh9v",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "3.11.8-r0"
+      },
+      "TriageAssessments": null
+    }
+  ],
+  "GrypeDBStatus": {
+    "built": "2024-06-11T01:29:53Z",
+    "schemaVersion": 5,
+    "location": "testdata/grypedb/5",
+    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
+    "error": null
+  }
+}

@@ -9,9 +9,7 @@ import (
 	"encoding/json"
 	"flag"
 	"io"
-	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"testing"
 
@@ -23,13 +21,15 @@ var (
 )
 
 func TestGenerate(t *testing.T) {
-	const wolfiAPKRepoURL = "https://packages.wolfi.dev/os"
-
-	testArtifacts := []string{
+	testTargets := []TestTarget{
 		"crane-0.19.1-r6.apk",
 
-		// Note: Syft is producing nondeterministic results for these APKs, so the tests
-		// aren't stable. Uncomment them when the issue is resolved.
+		// TODO: Syft is producing nondeterministic results for these APKs, so the tests
+		//  aren't stable. Filed an issue with Syft:
+		//
+		//  https://github.com/anchore/syft/issues/2967.
+		//
+		//  Uncomment these test cases when the issue is resolved!
 		//
 		// "jenkins-2.461-r0.apk",
 		// "jruby-9.4-9.4.7.0-r0.apk",
@@ -43,37 +43,16 @@ func TestGenerate(t *testing.T) {
 		"terraform-1.5.7-r12.apk",
 		"thanos-0.32-0.32.5-r4.apk",
 	}
+	const goldenFileSuffix = ".syft.json"
 
-	for _, artifact := range testArtifacts {
+	for _, tt := range testTargets {
 		for _, arch := range []string{"x86_64", "aarch64"} {
-			artifactPath := path.Join(arch, artifact)
+			localPath := tt.LocalPath(arch)
 
-			t.Run(artifactPath, func(t *testing.T) {
-				localPath := filepath.Join("testdata", "apks", artifactPath)
-
-				fi, err := os.Stat(localPath)
-				if err != nil && os.IsNotExist(err) || fi.Size() == 0 {
-					err := os.MkdirAll(filepath.Dir(localPath), 0755)
-					if err != nil {
-						t.Fatalf("creating directory for local APK file: %v", err)
-					}
-
-					// if the file doesn't exist, we need to fetch it
-					f, err := os.Create(localPath)
-					if err != nil {
-						t.Fatalf("creating local APK file: %v", err)
-					}
-					defer f.Close()
-
-					rawURL := wolfiAPKRepoURL + "/" + artifactPath
-					resp, err := http.Get(rawURL)
-					if err != nil {
-						t.Fatalf("fetching APK: %v", err)
-					}
-					_, err = io.Copy(f, resp.Body)
-					if err != nil {
-						t.Fatalf("writing fetched APK to local file: %v", err)
-					}
+			t.Run(tt.Describe(arch), func(t *testing.T) {
+				err := tt.Download(arch)
+				if err != nil {
+					t.Fatalf("downloading APK: %v", err)
 				}
 
 				f, err := os.Open(localPath)
@@ -85,19 +64,19 @@ func TestGenerate(t *testing.T) {
 				if err != nil {
 					t.Fatalf("generating SBOM: %v", err)
 				}
-				r, err := ToSyftJSON(s)
+				r, err := ToSyftJSONSchemaRedacted(s)
 				if err != nil {
 					t.Fatalf("encoding SBOM to Syft JSON: %v", err)
 				}
 
-				goldenfilePath := filepath.Join("testdata", "goldenfiles", artifactPath+".syft.json")
+				goldenFilePath := tt.GoldenFilePath(arch, goldenFileSuffix)
 
 				if *updateGoldenFiles {
-					err := os.MkdirAll(filepath.Dir(goldenfilePath), 0755)
+					err := os.MkdirAll(filepath.Dir(goldenFilePath), 0755)
 					if err != nil {
 						t.Fatalf("creating directory for golden file: %v", err)
 					}
-					goldenfile, err := os.Create(goldenfilePath)
+					goldenfile, err := os.Create(goldenFilePath)
 					if err != nil {
 						t.Fatalf("creating golden file: %v", err)
 					}
@@ -118,14 +97,15 @@ func TestGenerate(t *testing.T) {
 						t.Fatalf("writing generated SBOM to golden file: %v", err)
 					}
 
-					t.Logf("updated golden file: %s", goldenfilePath)
+					t.Logf("updated golden file: %s", goldenFilePath)
 					return
 				}
 
-				goldenfile, err := os.Open(goldenfilePath)
+				goldenfile, err := os.Open(goldenFilePath)
 				if err != nil {
 					t.Fatalf("opening golden file: %v", err)
 				}
+				defer goldenfile.Close()
 
 				expectedBytes, err := io.ReadAll(goldenfile)
 				if err != nil {

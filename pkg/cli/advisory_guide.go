@@ -176,7 +176,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 
 			distroID := strings.ToLower(detected.Absolute.Name)
 
-			scanner, err := scan.NewScanner("", false)
+			scanner, err := scan.NewScanner(scan.DefaultOptions)
 			if err != nil {
 				return fmt.Errorf("failed to create vulnerability scanner: %w", err)
 			}

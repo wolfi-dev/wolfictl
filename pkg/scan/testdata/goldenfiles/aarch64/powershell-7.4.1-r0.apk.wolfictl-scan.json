@@ -1,0 +1,15 @@
+{
+  "TargetAPK": {
+    "Name": "powershell",
+    "Version": "7.4.1-r0",
+    "OriginPackageName": "powershell"
+  },
+  "Findings": null,
+  "GrypeDBStatus": {
+    "built": "2024-06-11T01:29:53Z",
+    "schemaVersion": 5,
+    "location": "testdata/grypedb/5",
+    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
+    "error": null
+  }
+}

@@ -33,15 +33,7 @@ const (
 	mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
 )
 
-var grypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
-
-var grypeDBConfig = db.Config{
-	DBRootDir:           grypeDBDir,
-	ListingURL:          grypeDBListingURL,
-	ValidateByHashOnGet: true,
-	ValidateAge:         true,
-	MaxAllowedBuiltAge:  24 * time.Hour,
-}
+var DefaultGrypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 
 type Result struct {
 	TargetAPK     TargetAPK
@@ -92,19 +84,70 @@ type Scanner struct {
 	datastore            *store.Store
 	dbStatus             *db.Status
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
+	disableSBOMCache     bool
 }
 
+// Options determine the configuration for a new Scanner. The zero-value of this
+// struct is a valid configuration.
+type Options struct {
+	// PathOfDatabaseArchiveToImport, if set, is the path to a Grype vulnerability
+	// database archive (.tar.gz file) from which a database will be loaded by
+	// Grype.
+	//
+	// If empty, the default Grype database loading behavior will be used (e.g.
+	// downloading the database from the Internet).
+	PathOfDatabaseArchiveToImport string
+
+	// PathOfDatabaseDestinationDirectory is the directory to which the Grype
+	// database will be extracted, and where the database will be loaded from at
+	// runtime. If empty, the value of DefaultGrypeDBDir will be used.
+	PathOfDatabaseDestinationDirectory string
+
+	// UseCPEs controls whether the scanner will use CPEs to match vulnerabilities
+	// for matcher types that default to not using CPE matching. Most consumers will
+	// probably want this set to false in order to avoid excessive noise from
+	// matching.
+	UseCPEs bool
+
+	// DisableDatabaseAgeValidation controls whether the scanner will validate the
+	// age of the vulnerability database before using it. If true, the scanner will
+	// not validate the age of the database. This bool should always be set to false
+	// except for testing purposes.
+	DisableDatabaseAgeValidation bool
+
+	// DisableSBOMCache controls whether the scanner will cache SBOMs generated from
+	// APKs. If true, the scanner will not cache SBOMs or use existing cached SBOMs.
+	DisableSBOMCache bool
+}
+
+// DefaultOptions is the recommended default configuration for a new Scanner.
+// These options are suitable for most use scanning cases.
+var DefaultOptions = Options{}
+
 // NewScanner initializes the grype DB for reuse across multiple scans.
-func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
+func NewScanner(opts Options) (*Scanner, error) {
+	dbDestDir := opts.PathOfDatabaseDestinationDirectory
+	if dbDestDir == "" {
+		dbDestDir = DefaultGrypeDBDir
+	}
+
+	grypeDBConfig := db.Config{
+		DBRootDir:           dbDestDir,
+		ListingURL:          grypeDBListingURL,
+		ValidateByHashOnGet: true,
+		ValidateAge:         !opts.DisableDatabaseAgeValidation,
+		MaxAllowedBuiltAge:  24 * time.Hour,
+	}
+
 	updateDB := true
-	if localDBFilePath != "" {
-		fmt.Fprintf(os.Stderr, "Loading local grype DB %s...\n", localDBFilePath)
+	if dbArchivePath := opts.PathOfDatabaseArchiveToImport; dbArchivePath != "" {
+		fmt.Fprintf(os.Stderr, "using local grype DB archive %q...\n", dbArchivePath)
 		dbCurator, err := db.NewCurator(grypeDBConfig)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create the grype db import config: %w", err)
 		}
 
-		if err := dbCurator.ImportFrom(localDBFilePath); err != nil {
+		if err := dbCurator.ImportFrom(dbArchivePath); err != nil {
 			return nil, fmt.Errorf("unable to import vulnerability database: %w", err)
 		}
 
@@ -117,12 +160,13 @@ func NewScanner(localDBFilePath string, useCPEs bool) (*Scanner, error) {
 	}
 	defer dbCloser.Close()
 
-	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(*datastore, useCPEs)
+	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(*datastore, opts.UseCPEs)
 
 	return &Scanner{
 		datastore:            datastore,
 		dbStatus:             dbStatus,
 		vulnerabilityMatcher: vulnerabilityMatcher,
+		disableSBOMCache:     opts.DisableSBOMCache,
 	}, nil
 }
 
@@ -137,7 +181,14 @@ func (s *Scanner) ScanAPK(ctx context.Context, apk fs.File, distroID string) (*R
 
 	logger.Info("scanning APK for vulnerabilities", "path", stat.Name())
 
-	ssbom, err := sbom.CachedGenerate(ctx, stat.Name(), apk, distroID)
+	var ssbom *sbomSyft.SBOM
+
+	if s.disableSBOMCache {
+		ssbom, err = sbom.Generate(ctx, stat.Name(), apk, distroID)
+	} else {
+		ssbom, err = sbom.CachedGenerate(ctx, stat.Name(), apk, distroID)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate SBOM from APK: %w", err)
 	}

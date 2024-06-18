@@ -10,9 +10,9 @@ require (
 	chainguard.dev/melange v0.8.6
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
-	github.com/anchore/grype v0.78.0
+	github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a
 	github.com/anchore/stereoscope v0.0.3-0.20240501181043-2e9894674185
-	github.com/anchore/syft v1.5.0
+	github.com/anchore/syft v1.7.0
 	github.com/chainguard-dev/clog v1.3.1
 	github.com/chainguard-dev/yam v0.0.7
 	github.com/charmbracelet/bubbles v0.18.0
@@ -31,7 +31,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-containerregistry v0.19.1
+	github.com/google/go-containerregistry v0.19.2
 	github.com/google/go-github/v58 v58.0.0
 	github.com/google/osv-scanner v1.7.4
 	github.com/google/uuid v1.6.0
@@ -45,7 +45,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/savioxavier/termlink v1.3.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/texttheater/golang-levenshtein/levenshtein v0.0.0-20200805054039-cae8b0eaed6c
@@ -83,7 +83,8 @@ require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20231105174938-2b5cbb29f3e2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
-	github.com/CycloneDX/cyclonedx-go v0.8.0 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/CycloneDX/cyclonedx-go v0.9.0 // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/Khan/genqlient v0.7.0 // indirect
 	github.com/MakeNowJust/heredoc/v2 v2.0.1 // indirect
@@ -292,7 +293,7 @@ require (
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
-	github.com/vbatts/go-mtree v0.5.3 // indirect
+	github.com/vbatts/go-mtree v0.5.4 // indirect
 	github.com/vbatts/tar-split v0.11.5 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.11 // indirect
 	github.com/vifraa/gopom v1.0.0 // indirect
@@ -329,10 +330,10 @@ require (
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240521193020-835d969ad83a // indirect
 	k8s.io/utils v0.0.0-20240502163921-fe8a2dddb1d0 // indirect
-	modernc.org/libc v1.49.3 // indirect
+	modernc.org/libc v1.52.1 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.29.10 // indirect
+	modernc.org/sqlite v1.30.1 // indirect
 	mvdan.cc/sh/v3 v3.8.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect

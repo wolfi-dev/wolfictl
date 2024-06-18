@@ -1,0 +1,808 @@
+{
+  "TargetAPK": {
+    "Name": "crane",
+    "Version": "0.14.0-r0",
+    "OriginPackageName": "crane"
+  },
+  "Findings": [
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24534",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24536",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24537",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24538",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24539",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24540",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29400",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29402",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29403",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29404",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29405",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29406",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-29409",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39318",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39319",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39323",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39325",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39326",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-44487",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45285",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "0.19.1-r3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45289",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45290",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24557",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-24557"
+        ],
+        "FixedVersion": "0.19.1-r1"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24783",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24784",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24785",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24787",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24787"
+        ],
+        "FixedVersion": "0.19.1-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24787",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24788",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24788"
+        ],
+        "FixedVersion": "0.19.1-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24789"
+        ],
+        "FixedVersion": "0.19.1-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24790",
+        "Severity": "Unknown",
+        "Aliases": [
+          "CVE-2024-24790"
+        ],
+        "FixedVersion": "0.19.1-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "db84999c857a6353",
+        "Name": "stdlib",
+        "Version": "go1.20.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24790",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": ""
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "21006541b5815819",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-232p-vwff-86mp",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-28840"
+        ],
+        "FixedVersion": "23.0.3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-236w-p7wf-5ph8",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "0.19.1-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-2jwv-jmq4-4j3r",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "0.19.1-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "21006541b5815819",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-33pg-m6jh-5237",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-28841"
+        ],
+        "FixedVersion": "23.0.3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-49gw-vxvf-fc2g",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "0.19.1-r6"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4v7x-pqxf-cx7m",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "0.19.1-r3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-5fq7-4mxc-535h",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "0.19.1-r5"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "21006541b5815819",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-6wrf-mxfj-pf5p",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-28842"
+        ],
+        "FixedVersion": "23.0.3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "d3b1ec258cb888a6",
+        "Name": "github.com/docker/distribution",
+        "Version": "v2.8.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-hqxw-f8mx-cpmw",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-2253"
+        ],
+        "FixedVersion": "2.8.2-beta.1"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "21006541b5815819",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-jq35-85cj-fj4p",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "23.0.8"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "21006541b5815819",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-mq39-4gv4-mvpx",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-29018"
+        ],
+        "FixedVersion": "23.0.11"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "1792457b179e4082",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xw73-rw38-6vjc",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "0.19.1-r1"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "21006541b5815819",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xw73-rw38-6vjc",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24557"
+        ],
+        "FixedVersion": "24.0.9"
+      },
+      "TriageAssessments": null
+    }
+  ],
+  "GrypeDBStatus": {
+    "built": "2024-06-11T01:29:53Z",
+    "schemaVersion": 5,
+    "location": "testdata/grypedb/5",
+    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
+    "error": null
+  }
+}
