@@ -3,19 +3,11 @@ package advisory
 import (
 	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io"
-	"log"
-	"os"
-	"path"
-	"sort"
-	"strings"
-	"time"
 
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader" // to be able to download the schema from the URL
 
-	"github.com/google/osv-scanner/pkg/models"
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v3"
 
@@ -23,11 +15,8 @@ import (
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
-const OSVSchema = "https://raw.githubusercontent.com/ossf/osv-schema/main/validation/schema.json"
-
 type ExportOptions struct {
 	AdvisoryDocIndices []*configs.Index[v2.Document]
-	Ecosystem          models.Ecosystem
 }
 
 // ExportCSV returns a reader of advisory data encoded as CSV.
@@ -125,154 +114,4 @@ func ExportYAML(opts ExportOptions) (io.Reader, error) {
 	}
 
 	return buf, nil
-}
-
-func ExportOSV(opts ExportOptions, output string) error {
-	osvExport := make(map[string]models.Vulnerability)
-
-	for _, index := range opts.AdvisoryDocIndices {
-		documents := index.Select().Configurations()
-
-		for _, doc := range documents {
-			for _, adv := range doc.Advisories {
-				sortedEvents := adv.SortedEvents()
-
-				var updatedTime time.Time
-				tempAffected := models.Affected{}
-
-				for _, event := range sortedEvents {
-					switch event.Type {
-					case v2.EventTypeFixed:
-						tempAffected.Package = models.Package{
-							Name:      doc.Package.Name,
-							Ecosystem: opts.Ecosystem,
-							Purl:      fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(opts.Ecosystem)), doc.Package.Name),
-						}
-						tempAffected.Ranges = []models.Range{
-							{
-								Type: models.RangeEcosystem,
-								Events: []models.Event{
-									{
-										Introduced: "0",
-									},
-									{
-										Fixed: event.Data.(v2.Fixed).FixedVersion,
-									},
-								},
-							},
-						}
-						updatedTime = time.Time(event.Timestamp)
-					case v2.EventTypeFalsePositiveDetermination:
-						tempAffected.Package = models.Package{
-							Name:      doc.Package.Name,
-							Ecosystem: opts.Ecosystem,
-							Purl:      fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(opts.Ecosystem)), doc.Package.Name),
-						}
-						tempAffected.Ranges = []models.Range{
-							{
-								Type: models.RangeEcosystem,
-								Events: []models.Event{
-									{
-										Introduced: "0",
-									},
-									{
-										Fixed: "0",
-									},
-								},
-								DatabaseSpecific: map[string]interface{}{
-									"false_positive": true,
-								},
-							},
-						}
-						updatedTime = time.Time(event.Timestamp)
-					default:
-						continue
-					}
-
-					if len(tempAffected.Ranges) == 0 {
-						continue
-					}
-
-					entry, ok := osvExport[adv.ID]
-					if ok {
-						// check if there is a CGA duplicate across different packages
-						for i := range entry.Affected {
-							if !strings.EqualFold(doc.Package.Name, entry.Affected[i].Package.Name) {
-								log.Fatalf("maybe a CGA id conflict for %s: %s against %s ", adv.ID, doc.Package.Name, entry.Affected[i].Package.Name)
-							}
-						}
-
-						entry.Affected = append(entry.Affected, tempAffected)
-						if updatedTime.After(entry.Modified) {
-							entry.Modified = updatedTime
-						}
-						osvExport[adv.ID] = entry
-					} else {
-						// new entry
-						aliases := []string{adv.ID}
-						aliases = append(aliases, adv.Aliases...)
-						temp := models.Vulnerability{
-							ID:       adv.ID,
-							Aliases:  aliases,
-							Affected: []models.Affected{tempAffected},
-						}
-						if updatedTime.After(entry.Modified) {
-							temp.Modified = updatedTime
-						}
-
-						osvExport[adv.ID] = temp
-					}
-				}
-			}
-		}
-	}
-
-	keys := make([]string, 0, len(osvExport))
-	for k := range osvExport {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	all := []models.Vulnerability{}
-	for _, k := range keys {
-		// for the all.json we just need the id and modified date
-		temp := models.Vulnerability{
-			ID:       osvExport[k].ID,
-			Modified: osvExport[k].Modified,
-		}
-		all = append(all, temp)
-
-		e, err := osvExport[k].MarshalJSON()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// TODO(luhring): This should probably be moved to a test. But it's also failing
-		//  for a separate reason, which is that we're using the "wolfi" ecosystem, which
-		//  isn't valid according to the OSV schema. We'll have to submit the
-		//  "chainguard" ecosystem upstream.
-		//
-		// err = schema.Validate(result) if err != nil {
-		// 	log.Fatalf("failed to validate OSV JSON Schema for %s: %v", k, err)
-		// }
-
-		filepath := path.Join(output, fmt.Sprintf("%s.json", k))
-		err = os.WriteFile(filepath, e, 0o644)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	allData, err := json.Marshal(all)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	filepath := path.Join(output, "all.json")
-	err = os.WriteFile(filepath, allData, 0o644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
 }

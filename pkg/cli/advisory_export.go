@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/google/osv-scanner/pkg/models"
 	"github.com/spf13/cobra"
 
 	"github.com/chainguard-dev/clog"
@@ -29,10 +28,13 @@ func cmdAdvisoryExport() *cobra.Command {
 
 		PreRunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
+			logger := clog.FromContext(ctx)
 
 			if p.format == OutputOSV {
+				logger.Warn("DEPRECATED: Very soon, using the 'advisory export' command for OSV data will stop working. Please use the 'advisory osv' command instead.")
+
 				if _, err := os.Stat(p.outputLocation); os.IsNotExist(err) {
-					clog.FromContext(ctx).Errorf("directory %s does not exist, please create that first", p.outputLocation)
+					logger.Errorf("directory %s does not exist, please create that first", p.outputLocation)
 					return err
 				}
 			}
@@ -41,6 +43,8 @@ func cmdAdvisoryExport() *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ctx := cmd.Context()
+
 			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")
@@ -68,7 +72,6 @@ func cmdAdvisoryExport() *cobra.Command {
 
 			opts := advisory.ExportOptions{
 				AdvisoryDocIndices: indices,
-				Ecosystem:          models.Ecosystem(p.ecosystem),
 			}
 
 			var export io.Reader
@@ -79,7 +82,12 @@ func cmdAdvisoryExport() *cobra.Command {
 			case OutputCSV:
 				export, err = advisory.ExportCSV(opts)
 			case OutputOSV:
-				err = advisory.ExportOSV(opts, p.outputLocation)
+				opts := advisory.OSVOptions{
+					AdvisoryDocIndices: indices,
+					OutputDirectory:    p.outputLocation,
+					Ecosystem:          p.ecosystem,
+				}
+				err = advisory.BuildOSVDataset(ctx, opts)
 			default:
 				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", "))
 			}

@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/osv-scanner/pkg/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -46,7 +45,6 @@ func Test_ExportFuncs(t *testing.T) {
 
 			opts := ExportOptions{
 				AdvisoryDocIndices: indices,
-				Ecosystem:          models.Ecosystem("wolfi"),
 			}
 
 			exported, err := tt.exportFuncUnderTest(opts)
@@ -67,7 +65,7 @@ func Test_ExportFuncs(t *testing.T) {
 	}
 }
 
-func Test_ExportOSV(t *testing.T) {
+func Test_BuildOSVDataset(t *testing.T) {
 	const testdataDir = "./testdata/export/advisories"
 	const expectedOSVDir = "./testdata/export/osv"
 
@@ -76,16 +74,17 @@ func Test_ExportOSV(t *testing.T) {
 	require.NoError(t, err)
 	indices := []*configs.Index[v2.Document]{advisoryDocs}
 
-	opts := ExportOptions{
-		AdvisoryDocIndices: indices,
-		Ecosystem:          models.Ecosystem("wolfi"),
-	}
-
 	tempOSVDir, err := os.MkdirTemp("", "test-osv")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempOSVDir)
 
-	err = ExportOSV(opts, tempOSVDir)
+	opts := OSVOptions{
+		AdvisoryDocIndices: indices,
+		OutputDirectory:    tempOSVDir,
+		Ecosystem:          "wolfi",
+	}
+
+	err = BuildOSVDataset(context.Background(), opts)
 	assert.NoError(t, err)
 
 	expectedOSVFiles, err := os.ReadDir(expectedOSVDir)
@@ -106,7 +105,7 @@ func Test_ExportOSV(t *testing.T) {
 		require.NoError(t, err)
 
 		if diff := cmp.Diff(string(expectedBytes), string(actualBytes)); diff != "" {
-			t.Errorf("ExportOSV() produced unexpected data (-want +got):\n%s", diff)
+			t.Errorf("BuildOSVDataset() produced unexpected data (-want +got):\n%s", diff)
 		}
 	}
 }
