@@ -227,18 +227,11 @@ func (o CheckUpdateOptions) processUpdates(ctx context.Context, latestVersions m
 			return err
 		}
 
-		pctx := &build.PipelineBuild{
-			Build: &build.Build{
-				Configuration: *updated,
-			},
-			Package: &updated.Package,
-		}
-
-		// get a map of variable mutations we can substitute vars in URLs
-		mutations, err := build.MutateWith(pctx, map[string]string{})
+		sm, err := build.NewSubstitutionMap(updated, "x86_64", "gnu", nil)
 		if err != nil {
 			return err
 		}
+		mutations := sm.Substitutions
 
 		// Skip any processing for definitions with a single pipeline
 		if len(updated.Pipeline) > 1 && deps.ContainsGoBumpPipeline(updated) {

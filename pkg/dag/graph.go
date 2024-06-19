@@ -128,7 +128,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 			localRepo,
 			indexes,
 			keys,
-			append(c.Environment.Contents.Repositories, opts.repos...),
+			append(c.Environment.Contents.BuildRepositories, opts.repos...),
 			append(c.Environment.Contents.Keyring, opts.keys...),
 		)
 		if err != nil {
@@ -149,7 +149,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 			localRepo,
 			indexes,
 			keys,
-			append(c.Environment.Contents.Repositories, opts.repos...),
+			append(c.Environment.Contents.BuildRepositories, opts.repos...),
 			append(c.Environment.Contents.Keyring, opts.keys...),
 		)
 		if err != nil {

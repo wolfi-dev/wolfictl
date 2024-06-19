@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"fmt"
 	"log/slog"
+	"os"
 
 	"chainguard.dev/apko/pkg/log"
 	charmlog "github.com/charmbracelet/log"
@@ -19,11 +19,7 @@ func New() *cobra.Command {
 		SilenceUsage:      true,
 		Short:             "A CLI helper for developing Wolfi",
 		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-			out, err := log.Writer(logPolicy)
-			if err != nil {
-				return fmt.Errorf("failed to create log writer: %w", err)
-			}
-			slog.SetDefault(slog.New(charmlog.NewWithOptions(out, charmlog.Options{ReportTimestamp: true, Level: charmlog.Level(level)})))
+			slog.SetDefault(slog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.Level(level)})))
 			return nil
 		},
 	}
