@@ -67,7 +67,7 @@ require (
 	golang.org/x/vuln v1.1.0
 	google.golang.org/api v0.185.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.30.1
+	k8s.io/api v0.30.2
 	k8s.io/apimachinery v0.30.2
 	k8s.io/client-go v0.30.1
 	knative.dev/pkg v0.0.0-20240516194901-4a9c38d654dc
