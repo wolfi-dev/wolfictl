@@ -6,7 +6,7 @@ go 1.22.3
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
-	chainguard.dev/apko v0.14.8
+	chainguard.dev/apko v0.15.0
 	chainguard.dev/melange v0.8.6
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
@@ -65,7 +65,7 @@ require (
 	google.golang.org/api v0.183.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.30.1
-	k8s.io/apimachinery v0.30.1
+	k8s.io/apimachinery v0.30.2
 	k8s.io/client-go v0.30.1
 	knative.dev/pkg v0.0.0-20240516194901-4a9c38d654dc
 	sigs.k8s.io/release-utils v0.8.2
@@ -211,7 +211,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kastenhq/goversion v0.0.0-20230811215019-93b2f8823953 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.17.8 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.1.1 // indirect
