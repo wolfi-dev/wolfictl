@@ -1,9 +1,11 @@
 package advisory
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -152,9 +154,12 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 		}
 		all = append(all, temp)
 
-		e, err := osvExport[k].MarshalJSON()
+		buf := &bytes.Buffer{}
+		enc := json.NewEncoder(buf)
+		// enc.SetIndent("", "  ")
+		err := enc.Encode(osvExport[k])
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("encoding OSV advisory %q to JSON: %w", k, err)
 		}
 
 		// TODO(luhring): This should probably be moved to a test. But it's also failing
@@ -167,9 +172,16 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 		// }
 
 		filepath := path.Join(opts.OutputDirectory, fmt.Sprintf("%s.json", k))
-		err = os.WriteFile(filepath, e, 0o644)
+		osvFile, err := os.Create(filepath)
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("creating file for OSV advisory %q: %w", k, err)
+		}
+
+		// TODO: remove, this is just to make the test pass by stripping the final \n
+		r := io.LimitReader(buf, int64(buf.Len()-1))
+		_, err = io.Copy(osvFile, r)
+		if err != nil {
+			return fmt.Errorf("writing OSV advisory %q: %w", k, err)
 		}
 	}
 
