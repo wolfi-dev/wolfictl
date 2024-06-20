@@ -2,17 +2,19 @@ package advisory
 
 import (
 	"context"
+	"flag"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
+
+var update = flag.Bool("update", false, "update golden files instead of comparing them to actual output")
 
 func Test_BuildOSVDataset(t *testing.T) {
 	const advisoriesDir = "./testdata/osv/advisories"
@@ -23,34 +25,46 @@ func Test_BuildOSVDataset(t *testing.T) {
 	require.NoError(t, err)
 	indices := []*configs.Index[v2.Document]{advisoryDocs}
 
-	tempOSVDir, err := os.MkdirTemp("", "test-osv")
-	assert.NoError(t, err)
-	defer os.RemoveAll(tempOSVDir)
+	var outputDir string
+	if *update {
+		outputDir = expectedOSVDir
+	} else {
+		tempDir, err := os.MkdirTemp("", "test-osv")
+		require.NoError(t, err)
+		defer os.RemoveAll(tempDir)
+
+		outputDir = tempDir
+	}
 
 	opts := OSVOptions{
 		AdvisoryDocIndices: indices,
-		OutputDirectory:    tempOSVDir,
+		OutputDirectory:    outputDir,
 		Ecosystem:          "wolfi",
 	}
 
 	err = BuildOSVDataset(context.Background(), opts)
-	assert.NoError(t, err)
+	require.NoError(t, err)
+
+	if *update {
+		// We've updated the golden files as requested, and there's nothing to compare/test.
+		return
+	}
 
 	expectedOSVFiles, err := os.ReadDir(expectedOSVDir)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	actualOSVFiles, err := os.ReadDir(tempOSVDir)
-	assert.NoError(t, err)
+	actualOSVFiles, err := os.ReadDir(outputDir)
+	require.NoError(t, err)
 
 	if len(expectedOSVFiles) != len(actualOSVFiles) {
-		t.Error("missing OSV files")
+		t.Fatal("missing OSV files")
 	}
 
 	for i, expectedCVEFile := range expectedOSVFiles {
-		expectedBytes, err := os.ReadFile(path.Join(expectedOSVDir, expectedCVEFile.Name()))
+		expectedBytes, err := os.ReadFile(filepath.Join(expectedOSVDir, expectedCVEFile.Name()))
 		require.NoError(t, err)
 
-		actualBytes, err := os.ReadFile(path.Join(tempOSVDir, actualOSVFiles[i].Name()))
+		actualBytes, err := os.ReadFile(filepath.Join(outputDir, actualOSVFiles[i].Name()))
 		require.NoError(t, err)
 
 		if diff := cmp.Diff(string(expectedBytes), string(actualBytes)); diff != "" {

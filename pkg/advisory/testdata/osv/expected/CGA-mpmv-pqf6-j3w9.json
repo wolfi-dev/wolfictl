@@ -1,1 +1,30 @@
-{"modified":"2023-02-07T16:50:08Z","id":"CGA-mpmv-pqf6-j3w9","aliases":["CGA-mpmv-pqf6-j3w9","CVE-2023-0215"],"affected":[{"package":{"ecosystem":"wolfi","name":"openssl","purl":"pkg:apk/wolfi/openssl"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"3.0.8-r0"}]}]}]}
+{
+  "modified": "2023-02-07T16:50:08Z",
+  "id": "CGA-mpmv-pqf6-j3w9",
+  "aliases": [
+    "CGA-mpmv-pqf6-j3w9",
+    "CVE-2023-0215"
+  ],
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "wolfi",
+        "name": "openssl",
+        "purl": "pkg:apk/wolfi/openssl"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "3.0.8-r0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

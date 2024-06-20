@@ -1,1 +1,30 @@
-{"modified":"2023-02-07T16:49:50Z","id":"CGA-mpp5-xvx9-xj5q","aliases":["CGA-mpp5-xvx9-xj5q","CVE-2022-4304"],"affected":[{"package":{"ecosystem":"wolfi","name":"openssl","purl":"pkg:apk/wolfi/openssl"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"3.0.8-r0"}]}]}]}
+{
+  "modified": "2023-02-07T16:49:50Z",
+  "id": "CGA-mpp5-xvx9-xj5q",
+  "aliases": [
+    "CGA-mpp5-xvx9-xj5q",
+    "CVE-2022-4304"
+  ],
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "wolfi",
+        "name": "openssl",
+        "purl": "pkg:apk/wolfi/openssl"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "3.0.8-r0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

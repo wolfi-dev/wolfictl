@@ -1,1 +1,30 @@
-{"modified":"2022-11-01T16:49:56Z","id":"CGA-j59r-vcf2-x9p7","aliases":["CGA-j59r-vcf2-x9p7","CVE-2022-3786"],"affected":[{"package":{"ecosystem":"wolfi","name":"openssl","purl":"pkg:apk/wolfi/openssl"},"ranges":[{"type":"ECOSYSTEM","events":[{"introduced":"0"},{"fixed":"3.0.7-r0"}]}]}]}
+{
+  "modified": "2022-11-01T16:49:56Z",
+  "id": "CGA-j59r-vcf2-x9p7",
+  "aliases": [
+    "CGA-j59r-vcf2-x9p7",
+    "CVE-2022-3786"
+  ],
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "wolfi",
+        "name": "openssl",
+        "purl": "pkg:apk/wolfi/openssl"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "3.0.7-r0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
