@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/google/osv-scanner/pkg/models"
+	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
@@ -37,7 +38,7 @@ const OSVEcosystem = "Chainguard"
 // BuildOSVDataset produces an OSV dataset from Chainguard advisory data, using
 // the given set of options.
 func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
-	osvExport := make(map[string]models.Vulnerability)
+	advisoryIDsToModels := make(map[string]models.Vulnerability)
 	ecosystem := models.Ecosystem(opts.Ecosystem)
 
 	for _, index := range opts.AdvisoryDocIndices {
@@ -103,7 +104,7 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 						continue
 					}
 
-					entry, ok := osvExport[adv.ID]
+					entry, ok := advisoryIDsToModels[adv.ID]
 					if ok {
 						// check if there is a CGA duplicate across different packages
 						for i := range entry.Affected {
@@ -116,7 +117,7 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 						if updatedTime.After(entry.Modified) {
 							entry.Modified = updatedTime
 						}
-						osvExport[adv.ID] = entry
+						advisoryIDsToModels[adv.ID] = entry
 					} else {
 						// new entry
 						aliases := []string{adv.ID}
@@ -130,32 +131,29 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 							temp.Modified = updatedTime
 						}
 
-						osvExport[adv.ID] = temp
+						advisoryIDsToModels[adv.ID] = temp
 					}
 				}
 			}
 		}
 	}
 
-	keys := make([]string, 0, len(osvExport))
-	for k := range osvExport {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	ids := lo.Keys(advisoryIDsToModels)
+	sort.Strings(ids)
 
-	all := []models.Vulnerability{}
-	for _, k := range keys {
-		// for the all.json we just need the id and modified date
-		temp := models.Vulnerability{
-			ID:       osvExport[k].ID,
-			Modified: osvExport[k].Modified,
-		}
-		all = append(all, temp)
+	// write the all.json ("the index") and individual advisory files
 
-		e, err := osvExport[k].MarshalJSON()
-		if err != nil {
-			log.Fatal(err)
+	var indexEntries []models.Vulnerability
+
+	for _, id := range ids {
+		advisoryModel := advisoryIDsToModels[id]
+
+		// for the all.json, we just need the id and modified date
+		indexEntry := models.Vulnerability{
+			ID:       advisoryModel.ID,
+			Modified: advisoryModel.Modified,
 		}
+		indexEntries = append(indexEntries, indexEntry)
 
 		// TODO(luhring): This should probably be moved to a test. But it's also failing
 		//  for a separate reason, which is that we're using the "wolfi" ecosystem, which
@@ -163,25 +161,35 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 		//  "chainguard" ecosystem upstream.
 		//
 		// err = schema.Validate(result) if err != nil {
-		// 	log.Fatalf("failed to validate OSV JSON Schema for %s: %v", k, err)
+		// 	log.Fatalf("failed to validate OSV JSON Schema for %s: %v", id, err)
 		// }
 
-		filepath := path.Join(opts.OutputDirectory, fmt.Sprintf("%s.json", k))
-		err = os.WriteFile(filepath, e, 0o644)
+		advisoryFilepath := filepath.Join(opts.OutputDirectory, fmt.Sprintf("%s.json", id))
+		advisoryFile, err := os.Create(advisoryFilepath)
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("creating file for OSV advisory %q: %w", id, err)
+		}
+
+		enc := json.NewEncoder(advisoryFile)
+		enc.SetIndent("", "  ")
+		err = enc.Encode(advisoryModel)
+		if err != nil {
+			return fmt.Errorf("encoding OSV advisory %q to JSON: %w", id, err)
 		}
 	}
 
-	allData, err := json.Marshal(all)
+	const indexFileName = "all.json"
+	indexFilepath := filepath.Join(opts.OutputDirectory, indexFileName)
+	indexFile, err := os.Create(indexFilepath)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("creating file for OSV index: %w", err)
 	}
 
-	filepath := path.Join(opts.OutputDirectory, "all.json")
-	err = os.WriteFile(filepath, allData, 0o644)
+	enc := json.NewEncoder(indexFile)
+	enc.SetIndent("", "  ")
+	err = enc.Encode(indexEntries)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("encoding OSV index to JSON: %w", err)
 	}
 
 	return nil
