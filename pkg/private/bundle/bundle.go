@@ -1,3 +1,6 @@
+// Package bundle is not meant for use outside of wolfictl and friends. Do not use it. Don't even look at it. Stop reading this!!
+//
+// Or do whatever you want, I'm not a cop.
 package bundle
 
 import (

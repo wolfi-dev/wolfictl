@@ -33,7 +33,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"github.com/wolfi-dev/wolfictl/pkg/internal/bundle"
+	"github.com/wolfi-dev/wolfictl/pkg/private/bundle"
 )
 
 func cmdBundle() *cobra.Command {

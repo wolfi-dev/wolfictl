@@ -48,7 +48,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"github.com/wolfi-dev/wolfictl/pkg/internal/bundle"
+	"github.com/wolfi-dev/wolfictl/pkg/private/bundle"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
@@ -129,7 +129,7 @@ func cmdBuild() *cobra.Command {
 				}
 				cfg.gcs = client
 
-				return buildBundles(ctx, &cfg, cfg.bundle)
+				return BuildBundles(ctx, &cfg, cfg.bundle)
 			}
 
 			return buildAll(ctx, &cfg, args)
@@ -321,7 +321,7 @@ type buildResult struct {
 	Error    error         `json:"error,omitempty"`
 }
 
-func buildBundles(ctx context.Context, cfg *global, ref string) error {
+func BuildBundles(ctx context.Context, cfg *global, ref string) error {
 	var eg errgroup.Group
 
 	bundles, err := bundle.Pull(ref)
