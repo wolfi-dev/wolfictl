@@ -10,13 +10,13 @@ replace github.com/anchore/stereoscope => github.com/jonjohnsonjr/stereoscope v0
 
 require (
 	chainguard.dev/apko v0.15.0
-	chainguard.dev/melange v0.9.1-0.20240619211446-3cf5782215a0
+	chainguard.dev/melange v0.9.1-0.20240620170401-ff699b7adbb5
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a
 	github.com/anchore/stereoscope v0.0.3-0.20240501181043-2e9894674185
 	github.com/anchore/syft v1.7.0
-	github.com/chainguard-dev/clog v1.3.1
+	github.com/chainguard-dev/clog v1.4.0
 	github.com/chainguard-dev/yam v0.0.8
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.4
@@ -314,7 +314,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.52.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.0.0-20240619101304-773aec217df3 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.0.0-20240620161546-eb6bd28f3288 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.3.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.27.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.27.0 // indirect
@@ -341,7 +341,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/gorm v1.25.10 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20240521193020-835d969ad83a // indirect
+	k8s.io/kube-openapi v0.0.0-20240620162742-e1a2242a2c88 // indirect
 	k8s.io/utils v0.0.0-20240502163921-fe8a2dddb1d0 // indirect
 	modernc.org/libc v1.52.1 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
