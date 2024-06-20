@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
@@ -12,6 +13,7 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
+//nolint:gocyclo // This CLI command is handling business logic while we experiment with the design; we can factor out common patterns later.
 func cmdAdvisoryList() *cobra.Command {
 	p := &listParams{}
 	cmd := &cobra.Command{
@@ -41,6 +43,13 @@ You can filter advisories by the type of the latest event:
 You can filter advisories by the detected component type:
 
 	wolfictl adv ls -c python
+
+You can filter advisories by the date they were created or last updated:
+
+	wolfictl adv ls --created-since 2024-01-01
+	wolfictl adv ls --created-before 2023-12-31
+	wolfictl adv ls --updated-since 2024-06-01
+	wolfictl adv ls --updated-before 2024-06-01
 
 You can show only advisories that are considered not to be "resolved":
 
@@ -77,6 +86,48 @@ investigation over time for a given package/vulnerability match.'
 				return err
 			}
 
+			var (
+				createdSince, createdBefore, updatedSince, updatedBefore *v2.Timestamp
+			)
+
+			const timeLayout = "2006-01-02"
+
+			if p.createdSince != "" {
+				t, err := time.Parse(timeLayout, p.createdSince)
+				if err != nil {
+					return fmt.Errorf("parsing created-since timestamp %q: %w", createdSince, err)
+				}
+				ts := v2.Timestamp(t)
+				createdSince = &ts
+			}
+
+			if p.createdBefore != "" {
+				t, err := time.Parse(timeLayout, p.createdBefore)
+				if err != nil {
+					return fmt.Errorf("parsing created-before timestamp %q: %w", createdBefore, err)
+				}
+				ts := v2.Timestamp(t)
+				createdBefore = &ts
+			}
+
+			if p.updatedSince != "" {
+				t, err := time.Parse(timeLayout, p.updatedSince)
+				if err != nil {
+					return fmt.Errorf("parsing updated-since timestamp %q: %w", updatedSince, err)
+				}
+				ts := v2.Timestamp(t)
+				updatedSince = &ts
+			}
+
+			if p.updatedBefore != "" {
+				t, err := time.Parse(timeLayout, p.updatedBefore)
+				if err != nil {
+					return fmt.Errorf("parsing updated-before timestamp %q: %w", updatedBefore, err)
+				}
+				ts := v2.Timestamp(t)
+				updatedBefore = &ts
+			}
+
 			if advisoryCfgs.Select().Len() == 0 {
 				return fmt.Errorf("no advisory data found in %q; cd to an advisories directory, or use -a flag", p.advisoriesRepoDir)
 			}
@@ -95,7 +146,9 @@ investigation over time for a given package/vulnerability match.'
 
 			for _, cfg := range cfgs {
 				for _, adv := range cfg.Advisories {
-					if len(adv.Events) == 0 {
+					sortedEvents := adv.SortedEvents()
+
+					if len(sortedEvents) == 0 {
 						// nothing to add
 						continue
 					}
@@ -106,7 +159,7 @@ investigation over time for a given package/vulnerability match.'
 					}
 
 					if p.unresolved && adv.Resolved() {
-						// user only wants unresolved advisories
+						// user wants only unresolved advisories
 						continue
 					}
 
@@ -115,11 +168,33 @@ investigation over time for a given package/vulnerability match.'
 						continue
 					}
 
+					created := sortedEvents[0].Timestamp
+					updated := sortedEvents[len(sortedEvents)-1].Timestamp
+
+					if createdSince != nil && !created.After(*createdSince) {
+						// user wants only advisories created since a certain date
+						continue
+					}
+
+					if createdBefore != nil && !created.Before(*createdBefore) {
+						// user wants only advisories created before a certain date
+						continue
+					}
+
+					if updatedSince != nil && !updated.After(*updatedSince) {
+						// user wants only advisories updated since a certain date
+						continue
+					}
+
+					if updatedBefore != nil && !updated.Before(*updatedBefore) {
+						// user wants only advisories updated before a certain date
+						continue
+					}
+
 					if p.history {
 						// user wants the full history
-						sorted := adv.SortedEvents()
-						for i, event := range sorted {
-							isLatest := i == len(sorted)-1 // last event is the latest
+						for i, event := range sortedEvents {
+							isLatest := i == len(sortedEvents)-1 // last event is the latest
 							list.add(cfg.Package.Name, adv.ID, adv.Aliases, event, isLatest)
 						}
 
@@ -156,6 +231,10 @@ type listParams struct {
 	typ           string
 	showAliases   bool
 	componentType string
+	createdSince  string
+	createdBefore string
+	updatedSince  string
+	updatedBefore string
 }
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
@@ -169,6 +248,10 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.typ, "type", "t", "", "filter advisories by event type")
 	cmd.Flags().BoolVar(&p.showAliases, "aliases", true, "show other known vulnerability IDs for each advisory")
 	cmd.Flags().StringVarP(&p.componentType, "component-type", "c", "", "filter advisories by detected component type")
+	cmd.Flags().StringVar(&p.createdSince, "created-since", "", "filter advisories created since a given date")
+	cmd.Flags().StringVar(&p.createdBefore, "created-before", "", "filter advisories created before a given date")
+	cmd.Flags().StringVar(&p.updatedSince, "updated-since", "", "filter advisories updated since a given date")
+	cmd.Flags().StringVar(&p.updatedBefore, "updated-before", "", "filter advisories updated before a given date")
 }
 
 func advHasDetectedComponentType(adv v2.Advisory, componentType string) bool {
