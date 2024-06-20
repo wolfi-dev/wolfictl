@@ -262,7 +262,7 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 			Golang: golang.MatcherConfig{
 				UseCPEs:                                useCPEs,
 				AlwaysUseCPEForStdlib:                  true,
-				AllowMainModulePseudoVersionComparison: true,
+				AllowMainModulePseudoVersionComparison: false,
 			},
 			Java: java.MatcherConfig{
 				ExternalSearchConfig: java.ExternalSearchConfig{
