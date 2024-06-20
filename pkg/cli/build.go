@@ -47,8 +47,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"github.com/wolfi-dev/wolfictl/pkg/bundle"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"github.com/wolfi-dev/wolfictl/pkg/internal/bundle"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
