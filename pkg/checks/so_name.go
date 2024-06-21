@@ -189,6 +189,19 @@ func (o *SoNameOptions) findBumps(soname string) map[string]struct{} {
 	return toBump
 }
 
+func generateVersions(input string) []string {
+	versions := []string{input}
+	parts := strings.Split(input, ".")
+
+	for len(parts) > 3 {
+		parts = parts[:len(parts)-1]
+		versions = append(versions, strings.Join(parts, "."))
+	}
+
+	fmt.Println(versions)
+	return versions
+}
+
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
 	if len(existingSonameFiles) == 0 {
 		o.Logger.Printf("no existing soname files, skipping")
@@ -249,22 +262,23 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		// let's now compare the major segments as only major version increments indicate a break ABI compatibility
 		newVersionMajor := version.Segments()[0]
 		existingVersionMajor := existingVersion.Segments()[0]
+
 		if newVersionMajor > existingVersionMajor {
-			for _, soname := range newSonameFiles {
+			// example: so:libprotobuf.so.26.1.0
+			soNames := generateVersions(existingVersionStr)
+			for _, pkg := range o.ExistingPackages {
+				for _, soname := range soNames {
 
-				if newVersionMajor > existingVersionMajor {
-
-					for _, pkg := range o.ExistingPackages {
-						if slices.Contains(pkg.Dependencies, soname) {
-							toBump[pkg.Origin] = struct{}{}
-						}
+					if slices.Contains(pkg.Dependencies, soname) {
+						toBump[pkg.Origin] = struct{}{}
 					}
-
-					errs = append(errs, fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version))
 				}
+
 			}
 
+			errs = append(errs, fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version))
 		}
+
 	}
 
 	if len(toBump) != 0 {
