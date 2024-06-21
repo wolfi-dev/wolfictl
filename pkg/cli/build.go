@@ -106,15 +106,6 @@ func cmdBuild() *cobra.Command {
 				cfg.outDir = filepath.Join(cfg.dir, "packages")
 			}
 
-			// Trying to avoid this error:
-			// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
-			// Please reduce your request rate.
-			// See https://cloud.google.com/storage/docs/gcs429.
-			cfg.writeLimiters = map[string]*rate.Limiter{}
-			for _, arch := range cfg.Archs {
-				cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
-			}
-
 			// Used to track expected generation of index file to allow idempotent writes.
 			cfg.generations = map[string]int64{}
 
@@ -127,7 +118,7 @@ func cmdBuild() *cobra.Command {
 				if err != nil {
 					return fmt.Errorf("creating gcs client: %w", err)
 				}
-				cfg.gcs = client
+				cfg.GCS = client
 
 				return BuildBundles(ctx, &cfg)
 			}
@@ -158,9 +149,9 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
 
-	cmd.Flags().StringVar(&cfg.k8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
-	cmd.Flags().StringVar(&cfg.machineFamily, "machine-family", "", "machine family for amd64 builds")
-	cmd.Flags().StringVar(&cfg.serviceAccount, "service-account", "default", "service-account to run pods as.")
+	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
+	cmd.Flags().StringVar(&cfg.MachineFamily, "machine-family", "", "machine family for amd64 builds")
+	cmd.Flags().StringVar(&cfg.ServiceAccount, "service-account", "default", "service-account to run pods as.")
 
 	return cmd
 }
@@ -233,7 +224,7 @@ func (g *Global) fetchIndexFromBucket(ctx context.Context, arch string) (map[str
 		obj = path.Join(dir, obj)
 	}
 
-	rc, err := g.gcs.Bucket(bucket).Object(obj).NewReader(ctx)
+	rc, err := g.GCS.Bucket(bucket).Object(obj).NewReader(ctx)
 	if err != nil {
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return exist, nil
@@ -328,6 +319,22 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	bundles, err := bundle.Pull(cfg.Bundle)
 	if err != nil {
 		return err
+	}
+
+	// Trying to avoid this error:
+	// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
+	// Please reduce your request rate.
+	// See https://cloud.google.com/storage/docs/gcs429.
+	cfg.writeLimiters = map[string]*rate.Limiter{}
+	for _, arch := range cfg.Archs {
+		cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
+	}
+
+	if cfg.dir == "" {
+		cfg.dir = "."
+	}
+	if cfg.outDir == "" {
+		cfg.outDir = filepath.Join(cfg.dir, "packages")
 	}
 
 	jobs := runtime.GOMAXPROCS(0)
@@ -490,6 +497,15 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 
 func buildAll(ctx context.Context, cfg *Global, args []string) error {
 	var eg errgroup.Group
+
+	// Trying to avoid this error:
+	// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
+	// Please reduce your request rate.
+	// See https://cloud.google.com/storage/docs/gcs429.
+	cfg.writeLimiters = map[string]*rate.Limiter{}
+	for _, arch := range cfg.Archs {
+		cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
+	}
 
 	var stuff *configStuff
 	eg.Go(func() error {
@@ -681,13 +697,13 @@ type Global struct {
 	genmu       sync.Mutex
 	generations map[string]int64
 
-	gcs               *storage.Client
+	GCS               *storage.Client
 	StagingBucket     string
 	DestinationBucket string
 
-	k8sNamespace   string
-	serviceAccount string
-	machineFamily  string
+	K8sNamespace   string
+	ServiceAccount string
+	MachineFamily  string
 }
 
 func (g *Global) logdir(arch string) string {
@@ -904,7 +920,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 }
 
 func (t *task) signedURL(object string) (string, error) {
-	bucket := t.cfg.gcs.Bucket(t.cfg.StagingBucket)
+	bucket := t.cfg.GCS.Bucket(t.cfg.StagingBucket)
 	opts := &storage.SignedURLOptions{
 		Method:      "PUT",
 		Expires:     time.Now().Add(12 * time.Hour),
@@ -923,7 +939,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	log := clog.FromContext(ctx)
 
-	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.machineFamily, t.cfg.serviceAccount, t.cfg.k8sNamespace)
+	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace)
 	if err != nil {
 		return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
 	}
@@ -951,7 +967,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	}
 
 	log.Infof("creating pod for %s", t.pkgver())
-	pod, err = clientset.CoreV1().Pods(t.cfg.k8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
+	pod, err = clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("creating pod: %w", err)
 	}
@@ -966,7 +982,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
 	defer cancel()
 	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
-		pod, err = clientset.CoreV1().Pods(t.cfg.k8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
+		pod, err = clientset.CoreV1().Pods(t.cfg.K8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
 		if err != nil {
 			return false, err
 		}
@@ -1156,7 +1172,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 			}
 
 			// See if we already have the package built.
-			if _, err := t.cfg.gcs.Bucket(bucket).Object(apkPath).Attrs(ctx); err == nil {
+			if _, err := t.cfg.GCS.Bucket(bucket).Object(apkPath).Attrs(ctx); err == nil {
 				log.Debugf("Skipping %s, already built", apkPath)
 				continue
 			}
@@ -1415,7 +1431,7 @@ func (t *task) downloadAPK(ctx context.Context, arch, pkgdir, apkfile string) er
 
 	log.Debugf("Downloading previously uploaded %s", obj)
 
-	rc, err := t.cfg.gcs.Bucket(bucket).Object(obj).NewReader(ctx)
+	rc, err := t.cfg.GCS.Bucket(bucket).Object(obj).NewReader(ctx)
 	if err != nil {
 		return err
 	}
@@ -1444,7 +1460,7 @@ func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string
 	log := clog.FromContext(ctx)
 
 	log.Debugf("fetching object %s", res.object)
-	rc, err := t.cfg.gcs.Bucket(t.cfg.StagingBucket).Object(res.object).NewReader(ctx)
+	rc, err := t.cfg.GCS.Bucket(t.cfg.StagingBucket).Object(res.object).NewReader(ctx)
 	if err != nil {
 		return err
 	}
@@ -1513,7 +1529,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 		// This is fine because these objects should only ever be written once.
 		cond := storage.Conditions{DoesNotExist: true}
 
-		wc := t.cfg.gcs.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
+		wc := t.cfg.GCS.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
 
 		if _, err := io.Copy(wc, f); err != nil {
 			return fmt.Errorf("uploading %s: %w", obj, err)
@@ -1559,7 +1575,7 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 		cond.DoesNotExist = true
 	}
 
-	wc := t.cfg.gcs.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
+	wc := t.cfg.GCS.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
 
 	if _, err := io.Copy(wc, f); err != nil {
 		return fmt.Errorf("uploading %s: %w", obj, err)
