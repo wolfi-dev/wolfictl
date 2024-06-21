@@ -404,6 +404,9 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 		Operator: "Equal",
 		Value:    "bundle-builder",
 	}}
+	nodeSelector := map[string]string{
+		"kubernetes.io/arch": goarch,
+	}
 
 	if gvisor {
 		t = append(t, corev1.Toleration{
@@ -412,6 +415,7 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 			Operator: "Equal",
 			Value:    "gvisor-builder",
 		})
+		nodeSelector["chainguard.dev/sandbox"] = "gvisor"
 	}
 
 	mf := mFamily
@@ -469,11 +473,9 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 			}},
 			RestartPolicy:                corev1.RestartPolicyNever,
 			AutomountServiceAccountToken: ptr.Bool(false),
-			NodeSelector: map[string]string{
-				"kubernetes.io/arch": goarch,
-			},
-			Tolerations:        t,
-			ServiceAccountName: sa,
+			NodeSelector:                 nodeSelector,
+			Tolerations:                  t,
+			ServiceAccountName:           sa,
 			SecurityContext: &corev1.PodSecurityContext{
 				SeccompProfile: &corev1.SeccompProfile{
 					Type: corev1.SeccompProfileTypeRuntimeDefault,
