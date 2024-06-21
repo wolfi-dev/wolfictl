@@ -8,8 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/chainguard-dev/clog"
-
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -25,26 +23,7 @@ func cmdAdvisoryExport() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		Hidden:        true,
-
-		PreRunE: func(cmd *cobra.Command, _ []string) error {
-			ctx := cmd.Context()
-			logger := clog.FromContext(ctx)
-
-			if p.format == OutputOSV {
-				logger.Warn("DEPRECATED: Very soon, using the 'advisory export' command for OSV data will stop working. Please use the 'advisory osv' command instead.")
-
-				if _, err := os.Stat(p.outputLocation); os.IsNotExist(err) {
-					logger.Errorf("directory %s does not exist, please create that first", p.outputLocation)
-					return err
-				}
-			}
-
-			return nil
-		},
-
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			ctx := cmd.Context()
-
 			if len(p.advisoriesRepoDirs) == 0 {
 				if p.doNotDetectDistro {
 					return fmt.Errorf("no advisories repo dir specified")
@@ -81,36 +60,27 @@ func cmdAdvisoryExport() *cobra.Command {
 				export, err = advisory.ExportYAML(opts)
 			case OutputCSV:
 				export, err = advisory.ExportCSV(opts)
-			case OutputOSV:
-				opts := advisory.OSVOptions{
-					AdvisoryDocIndices: indices,
-					OutputDirectory:    p.outputLocation,
-					Ecosystem:          p.ecosystem,
-				}
-				err = advisory.BuildOSVDataset(ctx, opts)
 			default:
-				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", "))
+				return fmt.Errorf("unrecognized format: %q. Valid formats are: [%s]", p.format, strings.Join([]string{OutputYAML, OutputCSV}, ", "))
 			}
 			if err != nil {
 				return fmt.Errorf("unable to export advisory data: %w", err)
 			}
 
-			if p.format != OutputOSV {
-				var outputFile *os.File
-				if p.outputLocation == "" {
-					outputFile = os.Stdout
-				} else {
-					outputFile, err = os.Create(p.outputLocation)
-					if err != nil {
-						return fmt.Errorf("unable to create output file: %w", err)
-					}
-					defer outputFile.Close()
-				}
-
-				_, err = io.Copy(outputFile, export)
+			var outputFile *os.File
+			if p.outputLocation == "" {
+				outputFile = os.Stdout
+			} else {
+				outputFile, err = os.Create(p.outputLocation)
 				if err != nil {
-					return fmt.Errorf("unable to export data to specified location: %w", err)
+					return fmt.Errorf("unable to create output file: %w", err)
 				}
+				defer outputFile.Close()
+			}
+
+			_, err = io.Copy(outputFile, export)
+			if err != nil {
+				return fmt.Errorf("unable to export data to specified location: %w", err)
 			}
 
 			return nil
@@ -126,8 +96,7 @@ type exportParams struct {
 	advisoriesRepoDirs []string
 	outputLocation     string
 	// format controls how commands will produce their output.
-	format    string
-	ecosystem string
+	format string
 }
 
 const (
@@ -135,8 +104,6 @@ const (
 	OutputYAML = "yaml"
 	// OutputCSV CSV output.
 	OutputCSV = "csv"
-	// OutputOSV OSV output.
-	OutputOSV = "osv"
 )
 
 func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
@@ -144,6 +111,5 @@ func (p *exportParams) addFlagsTo(cmd *cobra.Command) {
 
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "directory containing an advisories repository")
 	cmd.Flags().StringVarP(&p.outputLocation, "output", "o", "", "output location (default: stdout). In case using OSV format this will be the output directory.")
-	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV, OutputOSV}, ", ")))
-	cmd.Flags().StringVarP(&p.ecosystem, "ecosystem", "e", "Wolfi", fmt.Sprintf("Ecosystem format. One of: [%s]", strings.Join([]string{"Wolfi", "Chainguard"}, ", ")))
+	cmd.Flags().StringVarP(&p.format, "format", "f", OutputCSV, fmt.Sprintf("Output format. One of: [%s]", strings.Join([]string{OutputYAML, OutputCSV}, ", ")))
 }
