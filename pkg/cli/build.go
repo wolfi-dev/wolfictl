@@ -56,7 +56,7 @@ func cmdBuild() *cobra.Command {
 	var jobs int
 	var traceFile string
 
-	cfg := global{}
+	cfg := Global{}
 
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
@@ -99,8 +99,8 @@ func cmdBuild() *cobra.Command {
 			if cfg.signingKey == "" {
 				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
 			}
-			if cfg.pipelineDir == "" {
-				cfg.pipelineDir = filepath.Join(cfg.dir, "pipelines")
+			if cfg.PipelineDir == "" {
+				cfg.PipelineDir = filepath.Join(cfg.dir, "pipelines")
 			}
 			if cfg.outDir == "" {
 				cfg.outDir = filepath.Join(cfg.dir, "packages")
@@ -111,15 +111,15 @@ func cmdBuild() *cobra.Command {
 			// Please reduce your request rate.
 			// See https://cloud.google.com/storage/docs/gcs429.
 			cfg.writeLimiters = map[string]*rate.Limiter{}
-			for _, arch := range cfg.archs {
+			for _, arch := range cfg.Archs {
 				cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
 			}
 
 			// Used to track expected generation of index file to allow idempotent writes.
 			cfg.generations = map[string]int64{}
 
-			if cfg.bundle != "" {
-				if cfg.stagingBucket == "" {
+			if cfg.Bundle != "" {
+				if cfg.StagingBucket == "" {
 					return fmt.Errorf("need --bucket with --bundle")
 				}
 
@@ -129,7 +129,7 @@ func cmdBuild() *cobra.Command {
 				}
 				cfg.gcs = client
 
-				return BuildBundles(ctx, &cfg, cfg.bundle)
+				return BuildBundles(ctx, &cfg)
 			}
 
 			return buildAll(ctx, &cfg, args)
@@ -137,23 +137,23 @@ func cmdBuild() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&cfg.dir, "dir", "d", ".", "directory to search for melange configs")
-	cmd.Flags().StringVar(&cfg.pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
-	cmd.Flags().StringVar(&cfg.runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
-	cmd.Flags().StringSliceVar(&cfg.archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
+	cmd.Flags().StringVar(&cfg.PipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	cmd.Flags().StringVar(&cfg.Runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
+	cmd.Flags().StringSliceVar(&cfg.Archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
 	cmd.Flags().BoolVar(&cfg.dryrun, "dry-run", false, "print commands instead of executing them")
-	cmd.Flags().StringSliceVarP(&cfg.extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
-	cmd.Flags().StringSliceVarP(&cfg.extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringSliceVarP(&cfg.ExtraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
+	cmd.Flags().StringSliceVarP(&cfg.ExtraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
-	cmd.Flags().StringVar(&cfg.namespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
+	cmd.Flags().StringVar(&cfg.PurlNamespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
 	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
 	cmd.Flags().StringVar(&cfg.summary, "summary", "", "file to write build summary")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
-	cmd.Flags().StringVar(&cfg.dst, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
-	cmd.Flags().StringVar(&cfg.dstBucket, "destination-bucket", "", "bucket where packages are uploaded (experimental)")
-	cmd.Flags().StringVar(&cfg.bundle, "bundle", "", "bundle of work to do (experimental)")
-	cmd.Flags().StringVar(&cfg.stagingBucket, "bucket", "", "gcs bucket to upload results (experimental)")
+	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
+	cmd.Flags().StringVar(&cfg.DestinationBucket, "destination-bucket", "", "bucket where packages are uploaded (experimental)")
+	cmd.Flags().StringVar(&cfg.Bundle, "bundle", "", "bundle of work to do (experimental)")
+	cmd.Flags().StringVar(&cfg.StagingBucket, "bucket", "", "gcs bucket to upload results (experimental)")
 
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
@@ -171,7 +171,7 @@ type configStuff struct {
 	pkgs *dag.Packages
 }
 
-func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
+func walkConfigs(ctx context.Context, cfg *Global) (*configStuff, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "walkConfigs")
 	defer span.End()
 
@@ -180,12 +180,12 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 	ctx = clog.WithLogger(ctx, log)
 
 	// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
-	pkgs, err := dag.NewPackages(ctx, os.DirFS(cfg.dir), cfg.dir, cfg.pipelineDir)
+	pkgs, err := dag.NewPackages(ctx, os.DirFS(cfg.dir), cfg.dir, cfg.PipelineDir)
 	if err != nil {
 		return nil, err
 	}
 
-	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(cfg.extraKeys...), dag.WithRepos(cfg.extraRepos...))
+	g, err := dag.NewGraph(ctx, pkgs, dag.WithKeys(cfg.ExtraKeys...), dag.WithRepos(cfg.ExtraRepos...))
 	if err != nil {
 		return nil, err
 	}
@@ -215,20 +215,20 @@ func walkConfigs(ctx context.Context, cfg *global) (*configStuff, error) {
 	}, nil
 }
 
-func (g *global) fetchIndexFromBucket(ctx context.Context, arch string) (map[string]struct{}, error) {
+func (g *Global) fetchIndexFromBucket(ctx context.Context, arch string) (map[string]struct{}, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchIndexFromBucket")
 	defer span.End()
 
 	exist := map[string]struct{}{}
 
-	if g.dstBucket == "" {
+	if g.DestinationBucket == "" {
 		return exist, nil
 	}
 
 	obj := path.Join(arch, "APKINDEX.tar.gz")
 	out := filepath.Join(g.outDir, arch, "APKINDEX.tar.gz")
 
-	bucket, dir, ok := strings.Cut(g.dstBucket, "/")
+	bucket, dir, ok := strings.Cut(g.DestinationBucket, "/")
 	if ok {
 		obj = path.Join(dir, obj)
 	}
@@ -294,6 +294,7 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 	if err != nil {
 		return nil, err
 	}
+	addAuth(req)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -321,18 +322,22 @@ type buildResult struct {
 	Error    error         `json:"error,omitempty"`
 }
 
-func BuildBundles(ctx context.Context, cfg *global, ref string) error {
+func BuildBundles(ctx context.Context, cfg *Global) error {
 	var eg errgroup.Group
 
-	bundles, err := bundle.Pull(ref)
+	bundles, err := bundle.Pull(cfg.Bundle)
 	if err != nil {
 		return err
 	}
 
+	jobs := runtime.GOMAXPROCS(0)
+	cfg.jobch = make(chan struct{}, jobs)
+	cfg.donech = make(chan *task, jobs)
+
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
-	for _, arch := range cfg.archs {
+	for _, arch := range cfg.Archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
 		if err := os.MkdirAll(filepath.Join(cfg.outDir, arch), os.ModePerm); err != nil {
@@ -341,7 +346,7 @@ func BuildBundles(ctx context.Context, cfg *global, ref string) error {
 
 		// If --destination-repository or --destination-bucket is set, we want to fetch and parse the APKINDEXes concurrently with walking all the configs.
 		eg.Go(func() error {
-			exist, err := fetchIndex(ctx, cfg.dst, arch)
+			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
 				return err
 			}
@@ -376,7 +381,7 @@ func BuildBundles(ctx context.Context, cfg *global, ref string) error {
 			epoch:  bundle.Epoch,
 			bundle: &bundle,
 			ref:    &ref,
-			archs:  filterArchs(cfg.archs, bundle.Architectures),
+			archs:  filterArchs(cfg.Archs, bundle.Architectures),
 			cond:   sync.NewCond(&sync.Mutex{}),
 			deps:   map[string]*task{},
 		}
@@ -483,7 +488,7 @@ func BuildBundles(ctx context.Context, cfg *global, ref string) error {
 	return errors.Join(errs...)
 }
 
-func buildAll(ctx context.Context, cfg *global, args []string) error {
+func buildAll(ctx context.Context, cfg *Global, args []string) error {
 	var eg errgroup.Group
 
 	var stuff *configStuff
@@ -496,7 +501,7 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
-	for _, arch := range cfg.archs {
+	for _, arch := range cfg.Archs {
 		arch := arch
 
 		eg.Go(func() error {
@@ -511,7 +516,7 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 
 		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
 		eg.Go(func() error {
-			exist, err := fetchIndex(ctx, cfg.dst, arch)
+			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
 				return err
 			}
@@ -546,7 +551,7 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 			ver:    c.Package.Version,
 			epoch:  c.Package.Epoch,
 			config: c,
-			archs:  filterArchs(cfg.archs, c.Package.TargetArchitecture),
+			archs:  filterArchs(cfg.Archs, c.Package.TargetArchitecture),
 			cond:   sync.NewCond(&sync.Mutex{}),
 			deps:   map[string]*task{},
 		}
@@ -636,28 +641,28 @@ func buildAll(ctx context.Context, cfg *global, args []string) error {
 	return errors.Join(errs...)
 }
 
-type global struct {
+type Global struct {
 	dryrun bool
 
 	jobch  chan struct{}
 	donech chan *task
 
-	dir         string
-	dst         string
-	pipelineDir string
-	runner      string
+	dir             string
+	DestinationRepo string
+	PipelineDir     string
+	Runner          string
 
-	archs      []string
-	extraKeys  []string
-	extraRepos []string
+	Archs      []string
+	ExtraKeys  []string
+	ExtraRepos []string
 
 	generateIndex bool
 
-	signingKey  string
-	namespace   string
-	cacheSource string
-	cacheDir    string
-	outDir      string
+	signingKey    string
+	PurlNamespace string
+	cacheSource   string
+	cacheDir      string
+	outDir        string
 
 	summary string
 
@@ -668,7 +673,7 @@ type global struct {
 
 	mu sync.Mutex
 
-	bundle string
+	Bundle string
 
 	// per arch rate limiter (for APKINDEX)
 	writeLimiters map[string]*rate.Limiter
@@ -676,21 +681,21 @@ type global struct {
 	genmu       sync.Mutex
 	generations map[string]int64
 
-	gcs           *storage.Client
-	stagingBucket string
-	dstBucket     string
+	gcs               *storage.Client
+	StagingBucket     string
+	DestinationBucket string
 
 	k8sNamespace   string
 	serviceAccount string
 	machineFamily  string
 }
 
-func (g *global) logdir(arch string) string {
+func (g *Global) logdir(arch string) string {
 	return filepath.Join(g.outDir, arch, "buildlogs")
 }
 
 // wrapper around the writeLimiter so this is accounted for in traces
-func (g *global) wait(ctx context.Context, arch string) error {
+func (g *Global) wait(ctx context.Context, arch string) error {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "wait")
 	defer span.End()
 
@@ -698,7 +703,7 @@ func (g *global) wait(ctx context.Context, arch string) error {
 }
 
 type task struct {
-	cfg *global
+	cfg *Global
 
 	pkg    string
 	ver    string
@@ -834,7 +839,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 		return fmt.Errorf("creating source directory: %v", err)
 	}
 
-	runner, err := newRunner(fctx, t.cfg.runner)
+	runner, err := newRunner(fctx, t.cfg.Runner)
 	if err != nil {
 		return fmt.Errorf("creating runner: %w", err)
 	}
@@ -848,13 +853,13 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 	bc, err := build.New(fctx,
 		build.WithArch(types.ParseArchitecture(arch)),
 		build.WithConfig(t.config.Path),
-		build.WithPipelineDir(t.cfg.pipelineDir),
-		build.WithExtraKeys(t.cfg.extraKeys),
-		build.WithExtraRepos(t.cfg.extraRepos),
+		build.WithPipelineDir(t.cfg.PipelineDir),
+		build.WithExtraKeys(t.cfg.ExtraKeys),
+		build.WithExtraRepos(t.cfg.ExtraRepos),
 		build.WithSigningKey(t.cfg.signingKey),
 		build.WithRunner(runner),
 		build.WithEnvFile(filepath.Join(t.cfg.dir, envFile(arch))),
-		build.WithNamespace(t.cfg.namespace),
+		build.WithNamespace(t.cfg.PurlNamespace),
 		build.WithSourceDir(sdir),
 		build.WithCacheSource(t.cfg.cacheSource),
 		build.WithCacheDir(t.cfg.cacheDir),
@@ -899,7 +904,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 }
 
 func (t *task) signedURL(object string) (string, error) {
-	bucket := t.cfg.gcs.Bucket(t.cfg.stagingBucket)
+	bucket := t.cfg.gcs.Bucket(t.cfg.StagingBucket)
 	opts := &storage.SignedURLOptions{
 		Method:      "PUT",
 		Expires:     time.Now().Add(12 * time.Hour),
@@ -1144,8 +1149,8 @@ func (t *task) buildBundle(ctx context.Context) error {
 
 		needsIndex[arch] = true
 
-		if t.cfg.dstBucket != "" {
-			bucket, dir, ok := strings.Cut(t.cfg.dstBucket, "/")
+		if t.cfg.DestinationBucket != "" {
+			bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
 			if ok {
 				apkPath = path.Join(dir, apkPath)
 			}
@@ -1268,7 +1273,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 		return fmt.Errorf("failed to regenerate index: %w", err)
 	}
 
-	if t.cfg.dstBucket == "" {
+	if t.cfg.DestinationBucket == "" {
 		clog.FromContext(ctx).Warnf("Skipping uploading indexes because --destination-bucket is not set")
 		return nil
 	}
@@ -1403,7 +1408,7 @@ func (t *task) downloadAPK(ctx context.Context, arch, pkgdir, apkfile string) er
 	log := clog.FromContext(ctx)
 
 	obj := path.Join(arch, apkfile)
-	bucket, dir, ok := strings.Cut(t.cfg.dstBucket, "/")
+	bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
 	if ok {
 		obj = path.Join(dir, obj)
 	}
@@ -1439,7 +1444,7 @@ func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string
 	log := clog.FromContext(ctx)
 
 	log.Debugf("fetching object %s", res.object)
-	rc, err := t.cfg.gcs.Bucket(t.cfg.stagingBucket).Object(res.object).NewReader(ctx)
+	rc, err := t.cfg.gcs.Bucket(t.cfg.StagingBucket).Object(res.object).NewReader(ctx)
 	if err != nil {
 		return err
 	}
@@ -1483,7 +1488,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadAPKs")
 	defer span.End()
 
-	if t.cfg.dstBucket == "" {
+	if t.cfg.DestinationBucket == "" {
 		clog.FromContext(ctx).Warnf("Skipping uploading packages because --destination-bucket is not set")
 		return nil
 	}
@@ -1492,7 +1497,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 		base := path.Base(apkFile)
 		obj := path.Join(arch, base)
 
-		bucket, dir, ok := strings.Cut(t.cfg.dstBucket, "/")
+		bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
 		if ok {
 			obj = path.Join(dir, obj)
 		}
@@ -1534,7 +1539,7 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 	}
 
 	obj := path.Join(arch, "APKINDEX.tar.gz")
-	bucket, dir, ok := strings.Cut(t.cfg.dstBucket, "/")
+	bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
 	if ok {
 		obj = path.Join(dir, obj)
 	}
