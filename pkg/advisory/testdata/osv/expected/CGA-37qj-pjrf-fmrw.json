@@ -8,9 +8,89 @@
   "affected": [
     {
       "package": {
-        "ecosystem": "wolfi",
+        "ecosystem": "Chainguard",
         "name": "brotli",
-        "purl": "pkg:apk/wolfi/brotli"
+        "purl": "pkg:apk/chainguard/brotli"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.0.9-r0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Chainguard",
+        "name": "brotli-dev",
+        "purl": "pkg:apk/chainguard/brotli-dev"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.0.9-r0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Chainguard",
+        "name": "libbrotlicommon1",
+        "purl": "pkg:apk/chainguard/libbrotlicommon1"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.0.9-r0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Chainguard",
+        "name": "libbrotlidec1",
+        "purl": "pkg:apk/chainguard/libbrotlidec1"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.0.9-r0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Chainguard",
+        "name": "libbrotlienc1",
+        "purl": "pkg:apk/chainguard/libbrotlienc1"
       },
       "ranges": [
         {

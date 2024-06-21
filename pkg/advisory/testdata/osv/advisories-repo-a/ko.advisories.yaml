@@ -1,0 +1,63 @@
+schema-version: "2"
+
+package:
+  name: ko
+
+advisories:
+  - id: CGA-5f5c-53mg-6p2v
+    aliases:
+      - GHSA-33pg-m6jh-5237
+    events:
+      - timestamp: 2023-05-04T14:34:34Z
+        type: fixed
+        data:
+          fixed-version: 0.13.0-r3
+
+  - id: CGA-gg4h-ppqq-vf35
+    aliases:
+      - GHSA-6wrf-mxfj-pf5p
+    events:
+      - timestamp: 2023-05-04T14:34:34Z
+        type: fixed
+        data:
+          fixed-version: 0.13.0-r3
+
+  - id: CGA-v3wf-pwmr-vcw5
+    aliases:
+      - CVE-2024-28180
+      - GHSA-c5q2-7r4c-mv6g
+    events:
+      - timestamp: 2024-03-08T07:28:02Z
+        type: detection
+        data:
+          type: scan/v1
+          data:
+            subpackageName: zot
+            componentID: e755c368fa7aebeb
+            componentName: github.com/go-jose/go-jose/v3
+            componentVersion: v3.0.1
+            componentType: go-module
+            componentLocation: /usr/bin/zot
+            scanner: grype
+      - timestamp: 2024-06-12T07:05:14Z
+        type: pending-upstream-fix
+        data:
+          note: This vulnerability has recently updated the list of affected packages. Unfortunately the new affected package 'gopkg.in/square/go-jose.v2' is currently used by many indirect dependencies to this package which makes impossible to fix it without upstream code changes
+
+  - id: CGA-wjrr-fwwv-jg6h
+    aliases:
+      - CVE-2020-8559
+      - GHSA-33c5-9fx5-fvjm
+    events:
+      - timestamp: 2024-04-25T13:21:08Z
+        type: detection
+        data:
+          type: scan/v1
+          data:
+            subpackageName: zot
+            componentID: ba4b7aa8acd8e617
+            componentName: k8s.io/apimachinery
+            componentVersion: v0.29.1
+            componentType: go-module
+            componentLocation: /usr/bin/zot
+            scanner: grype

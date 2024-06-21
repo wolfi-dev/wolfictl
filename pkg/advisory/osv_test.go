@@ -7,23 +7,41 @@ import (
 	"path/filepath"
 	"testing"
 
+	"chainguard.dev/melange/pkg/config"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
 var update = flag.Bool("update", false, "update golden files instead of comparing them to actual output")
 
 func Test_BuildOSVDataset(t *testing.T) {
-	const advisoriesDir = "./testdata/osv/advisories"
-	const expectedOSVDir = "./testdata/osv/expected"
+	const testdataOSVDir = "./testdata/osv"
+	expectedOSVDir := filepath.Join(testdataOSVDir, "expected")
 
-	advisoryFsys := rwos.DirFS(advisoriesDir)
-	advisoryDocs, err := v2.NewIndex(context.Background(), advisoryFsys)
-	require.NoError(t, err)
-	indices := []*configs.Index[v2.Document]{advisoryDocs}
+	advisoryRepos := []string{"advisories-repo-a", "advisories-repo-b"}
+	var advisoryIndices []*configs.Index[v2.Document]
+	for _, r := range advisoryRepos {
+		fsys := rwos.DirFS(filepath.Join(testdataOSVDir, r))
+		index, err := v2.NewIndex(context.Background(), fsys)
+		require.NoError(t, err)
+		advisoryIndices = append(advisoryIndices, index)
+	}
+
+	packageRepos := []string{"packages-repo-a", "packages-repo-b"}
+	var packageIndices []*configs.Index[config.Configuration]
+	for _, r := range packageRepos {
+		fsys := rwos.DirFS(filepath.Join(testdataOSVDir, r))
+		index, err := build.NewIndex(context.Background(), fsys)
+		require.NoError(t, err)
+		packageIndices = append(packageIndices, index)
+	}
+
+	// "repo-a" represents "wolfi" (both its packages and its advisories).
+	addedEcosystems := []string{"Wolfi", ""}
 
 	var outputDir string
 	if *update {
@@ -37,12 +55,13 @@ func Test_BuildOSVDataset(t *testing.T) {
 	}
 
 	opts := OSVOptions{
-		AdvisoryDocIndices: indices,
-		OutputDirectory:    outputDir,
-		Ecosystem:          "wolfi",
+		AdvisoryDocIndices:   advisoryIndices,
+		PackageConfigIndices: packageIndices,
+		AddedEcosystems:      addedEcosystems,
+		OutputDirectory:      outputDir,
 	}
 
-	err = BuildOSVDataset(context.Background(), opts)
+	err := BuildOSVDataset(context.Background(), opts)
 	require.NoError(t, err)
 
 	if *update {
