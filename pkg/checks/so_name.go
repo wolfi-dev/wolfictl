@@ -181,14 +181,14 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 // ("foo", "1.2.3") -> ["so:foo.so.1", "so:foo.so.1.2", "so:foo.so.1.2.3"]
 // This might be naive, I'm sorry if this breaks.
 func generateVersions(soname, input string) []string {
-	versions := []string{}
+	sonames := []string{}
 	parts := strings.Split(input, ".")
 
 	for i := range parts {
-		versions = append(versions, fmt.Sprintf("so:%s.so.%s", soname, strings.Join(parts[0:i+1], ".")))
+		sonames = append(sonames, fmt.Sprintf("so:%s.so.%s", soname, strings.Join(parts[0:i+1], ".")))
 	}
 
-	return versions
+	return sonames
 }
 
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
