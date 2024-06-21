@@ -80,6 +80,10 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 	)
 	errs = append(errs, errorhelpers.LabelError("basic validation failure(s)", errors.Join(documentErrs...)))
 
+	if opts.PackageConfigurations != nil {
+		errs = append(errs, opts.validatePackageConfigurationExistence(ctx))
+	}
+
 	if opts.BaseAdvisoryDocs != nil {
 		diff := IndexDiff(opts.BaseAdvisoryDocs, opts.AdvisoryDocs)
 		errs = append(errs, opts.validateIndexDiff(ctx, diff))
@@ -396,6 +400,32 @@ func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) er
 	}
 
 	return errorhelpers.LabelError("alias set completeness validation failure(s)", errors.Join(errs...))
+}
+
+// validatePackageConfigurationExistence validates that the package described by each
+// advisory document currently has a build definition in the packages repo.
+func (opts ValidateOptions) validatePackageConfigurationExistence(ctx context.Context) error {
+	log := clog.FromContext(ctx)
+	log.Info("validating package configuration existence")
+
+	advisoryDocs := opts.AdvisoryDocs.Select().Configurations()
+
+	var errs []error
+
+	for _, doc := range advisoryDocs {
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				return nil
+			}
+		}
+
+		if _, ok := opts.distroPackageMap[doc.Name()]; !ok {
+			errs = append(errs, fmt.Errorf("package %q does not have a build definition", doc.Name()))
+		}
+	}
+
+	return errorhelpers.LabelError("package configuration existence validation failure(s)", errors.Join(errs...))
 }
 
 func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDiffResult) error {
