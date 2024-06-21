@@ -37,9 +37,18 @@ type OSVOptions struct {
 	// corresponding item in AdvisoryDocIndices. The length of this slice is
 	// expected to be the same as the length of AdvisoryDocIndices.
 	//
+	// Use an empty string at slice locations where no additional ecosystems are
+	// needed.
+	//
+	// For example, to add the "wolfi" ecosystem to the advisories in the first
+	// index, and no additional ecosystems to the advisories in the second index:
+	//
+	//   AddedEcosystems: []string{"wolfi", ""}
+	//
 	// TODO(luhring): We should move toward unifying the Chainguard and Wolfi
 	//  ecosystems, so that we don't need to add the "wolfi" ecosystem here, and
-	//  we'll just use "Chainguard" always.
+	//  we'll just use "Chainguard" always. At that point, we can remove this
+	//  option entirely.
 	AddedEcosystems []string
 
 	// OutputDirectory is the path to a local directory in which the generated OSV
