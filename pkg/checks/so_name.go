@@ -2,12 +2,14 @@ package checks
 
 import (
 	"debug/elf"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	goapk "chainguard.dev/apko/pkg/apk/apk"
@@ -15,6 +17,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
+	"golang.org/x/exp/maps"
 )
 
 type SoNameOptions struct {
@@ -175,6 +178,17 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 	return fileList, err
 }
 
+func (o *SoNameOptions) findBumps(soname string) map[string]struct{} {
+	toBump := map[string]struct{}{}
+	for _, pkg := range o.ExistingPackages {
+		if slices.Contains(pkg.Dependencies, soname) {
+			toBump[pkg.Origin] = struct{}{}
+		}
+	}
+
+	return toBump
+}
+
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
 	if len(existingSonameFiles) == 0 {
 		o.Logger.Printf("no existing soname files, skipping")
@@ -199,6 +213,9 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 			existingSonameMap[sonameParts[0]] = version
 		}
 	}
+
+	errs := []error{}
+	toBump := map[string]struct{}{}
 
 	// now iterate over new soname files and compare with existing files
 	for _, soname := range newSonameFiles {
@@ -233,8 +250,26 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		newVersionMajor := version.Segments()[0]
 		existingVersionMajor := existingVersion.Segments()[0]
 		if newVersionMajor > existingVersionMajor {
-			return fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version)
+			for _, soname := range newSonameFiles {
+
+				if newVersionMajor > existingVersionMajor {
+
+					for _, pkg := range o.ExistingPackages {
+						if slices.Contains(pkg.Dependencies, soname) {
+							toBump[pkg.Origin] = struct{}{}
+						}
+					}
+
+					errs = append(errs, fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version))
+				}
+			}
+
 		}
 	}
-	return nil
+
+	if len(toBump) != 0 {
+		errs = append(errs, fmt.Errorf("to fix this, run:\nwolfictl bump %s", strings.Join(maps.Keys(toBump), " ")))
+	}
+
+	return errors.Join(errs...)
 }
