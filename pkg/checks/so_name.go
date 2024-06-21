@@ -136,7 +136,7 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 
 	err = o.checkSonamesMatch(existingSonameFiles, newSonameFiles)
 	if err != nil {
-		return fmt.Errorf("soname files differ, this can cause an ABI break.  Existing soname files %s, New soname files %s: %w", strings.Join(existingSonameFiles, ","), strings.Join(newSonameFiles, ","), err)
+		return fmt.Errorf("soname files differ, this can cause an ABI break: %w", err)
 	}
 
 	return nil
@@ -189,16 +189,16 @@ func (o *SoNameOptions) findBumps(soname string) map[string]struct{} {
 	return toBump
 }
 
-func generateVersions(input string) []string {
-	versions := []string{input}
+// ("foo", "1.2.3") -> ["so:foo.so.1", "so:foo.so.1.2", "so:foo.so.1.2.3"]
+// This might be naive, I'm sorry if this breaks.
+func generateVersions(soname, input string) []string {
+	versions := []string{}
 	parts := strings.Split(input, ".")
 
-	for len(parts) > 3 {
-		parts = parts[:len(parts)-1]
-		versions = append(versions, strings.Join(parts, "."))
+	for i := range parts {
+		versions = append(versions, fmt.Sprintf("so:%s.so.%s", soname, strings.Join(parts[0:i+1], ".")))
 	}
 
-	fmt.Println(versions)
 	return versions
 }
 
@@ -264,21 +264,17 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		existingVersionMajor := existingVersion.Segments()[0]
 
 		if newVersionMajor > existingVersionMajor {
-			// example: so:libprotobuf.so.26.1.0
-			soNames := generateVersions(existingVersionStr)
+			versions := generateVersions(name, existingVersionStr)
 			for _, pkg := range o.ExistingPackages {
-				for _, soname := range soNames {
-
+				for _, soname := range versions {
 					if slices.Contains(pkg.Dependencies, soname) {
 						toBump[pkg.Origin] = struct{}{}
 					}
 				}
-
 			}
 
-			errs = append(errs, fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version))
+			errs = append(errs, fmt.Errorf("%s: %s -> %s", name, existingVersion, version))
 		}
-
 	}
 
 	if len(toBump) != 0 {
