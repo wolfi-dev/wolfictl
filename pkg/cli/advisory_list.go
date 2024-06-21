@@ -62,12 +62,24 @@ HISTORY
 Using the --history flag, you can list advisory events instead of just 
 advisories' latest states. This is useful for viewing a summary of an 
 investigation over time for a given package/vulnerability match.'
+
+COUNT
+
+You get a count of the advisories that match the criteria by using the --count
+flag. This will report just the count, not the full list of advisories.
+
+    wolfictl adv ls <various filter flags> --count
+
 `,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if p.history && p.typ != "" {
 				return fmt.Errorf("cannot use --history and --type together")
+			}
+
+			if p.history && p.count {
+				return fmt.Errorf("cannot use --history and --count together")
 			}
 
 			p.typ = translateEventTypeAlternativeNames(p.typ)
@@ -212,6 +224,12 @@ investigation over time for a given package/vulnerability match.'
 				}
 			}
 
+			if p.count {
+				// Just show the count and then exit.
+				fmt.Printf("%d\n", list.len())
+				return nil
+			}
+
 			fmt.Printf("%s\n", list)
 			return nil
 		},
@@ -235,6 +253,7 @@ type listParams struct {
 	createdBefore string
 	updatedSince  string
 	updatedBefore string
+	count         bool
 }
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
@@ -252,6 +271,7 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.createdBefore, "created-before", "", "filter advisories created before a given date")
 	cmd.Flags().StringVar(&p.updatedSince, "updated-since", "", "filter advisories updated since a given date")
 	cmd.Flags().StringVar(&p.updatedBefore, "updated-before", "", "filter advisories updated before a given date")
+	cmd.Flags().BoolVar(&p.count, "count", false, "show only the count of advisories that match the criteria")
 }
 
 func advHasDetectedComponentType(adv v2.Advisory, componentType string) bool {
@@ -286,6 +306,10 @@ type advisoryListRenderer struct {
 	// internal state
 	rows                     []advisoryListTableRow
 	currentPkg, currentAdvID string
+}
+
+func (r advisoryListRenderer) len() int {
+	return len(r.rows)
 }
 
 func (r *advisoryListRenderer) add(pkg, advID string, aliases []string, event v2.Event, isLatest bool) {
