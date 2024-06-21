@@ -349,7 +349,7 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*corev1.Pod, error) {
+func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor bool) (*corev1.Pod, error) {
 	goarch := types.ParseArchitecture(arch).String()
 
 	// Set some sane default resource requests if none are specified by flag or config.
@@ -404,6 +404,15 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*core
 		Operator: "Equal",
 		Value:    "bundle-builder",
 	}}
+
+	if gvisor {
+		t = append(t, corev1.Toleration{
+			Effect:   "NoSchedule",
+			Key:      "chainguard.dev/runner",
+			Operator: "Equal",
+			Value:    "gvisor-builder",
+		})
+	}
 
 	mf := mFamily
 	if goarch == "arm64" {

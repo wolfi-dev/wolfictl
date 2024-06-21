@@ -152,6 +152,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
 	cmd.Flags().StringVar(&cfg.MachineFamily, "machine-family", "", "machine family for amd64 builds")
 	cmd.Flags().StringVar(&cfg.ServiceAccount, "service-account", "default", "service-account to run pods as.")
+	cmd.Flags().BoolVar(&cfg.GVisor, "gvisor", false, "enable gVisor (GKE Sandbox) for builds")
 
 	return cmd
 }
@@ -704,6 +705,7 @@ type Global struct {
 	K8sNamespace   string
 	ServiceAccount string
 	MachineFamily  string
+	GVisor         bool
 }
 
 func (g *Global) logdir(arch string) string {
@@ -939,7 +941,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	log := clog.FromContext(ctx)
 
-	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace)
+	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.GVisor)
 	if err != nil {
 		return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
 	}
