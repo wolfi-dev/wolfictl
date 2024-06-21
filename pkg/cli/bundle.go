@@ -37,7 +37,7 @@ import (
 )
 
 func cmdBundle() *cobra.Command {
-	cfg := global{}
+	cfg := Global{}
 	bcfg := bundleConfig{
 		base: empty.Index,
 	}
@@ -47,12 +47,13 @@ func cmdBundle() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+			log := clog.FromContext(ctx)
 
 			if cfg.signingKey == "" {
-				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
+				log.Infof("no signing key specified, not signing")
 			}
-			if cfg.pipelineDir == "" {
-				cfg.pipelineDir = filepath.Join(cfg.dir, "pipelines")
+			if cfg.PipelineDir == "" {
+				cfg.PipelineDir = filepath.Join(cfg.dir, "pipelines")
 			}
 			if cfg.outDir == "" {
 				cfg.outDir = filepath.Join(cfg.dir, "packages")
@@ -89,20 +90,20 @@ func cmdBundle() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&cfg.dir, "dir", "d", ".", "directory to search for melange configs")
-	cmd.Flags().StringVar(&cfg.pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
-	cmd.Flags().StringVar(&cfg.runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
-	cmd.Flags().StringSliceVar(&cfg.archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
+	cmd.Flags().StringVar(&cfg.PipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	cmd.Flags().StringVar(&cfg.Runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
+	cmd.Flags().StringSliceVar(&cfg.Archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
 	cmd.Flags().BoolVar(&cfg.dryrun, "dry-run", false, "print commands instead of executing them")
-	cmd.Flags().StringSliceVarP(&cfg.extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
-	cmd.Flags().StringSliceVarP(&cfg.extraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
+	cmd.Flags().StringSliceVarP(&cfg.ExtraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
+	cmd.Flags().StringSliceVarP(&cfg.ExtraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
 	cmd.Flags().StringSliceVar(&cfg.fuses, "gcsfuse", []string{}, "list of gcsfuse mounts to make available to the build environment (e.g. gs://my-bucket/subdir:/mnt/my-bucket)")
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
-	cmd.Flags().StringVar(&cfg.namespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
+	cmd.Flags().StringVar(&cfg.PurlNamespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
 	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
-	cmd.Flags().StringVar(&cfg.dst, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
+	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
 	cmd.Flags().StringVar(&bcfg.baseRef, "bundle-base", "", "base image used for melange build bundles")
 	cmd.Flags().StringVar(&bcfg.repo, "bundle-repo", "", "where to push the bundles")
 
@@ -119,7 +120,7 @@ type bundleConfig struct {
 	dirfs fs.FS
 }
 
-func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []string) error { //nolint:gocyclo
+func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []string) error { //nolint:gocyclo
 	var eg errgroup.Group
 
 	var stuff *configStuff
@@ -132,12 +133,12 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
-	for _, arch := range cfg.archs {
+	for _, arch := range cfg.Archs {
 		arch := arch
 
 		// If --destination-repository is set, we want to fetch and parse the APKINDEX concurrently with walking all the configs.
 		eg.Go(func() error {
-			exist, err := fetchIndex(ctx, cfg.dst, arch)
+			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
 				return err
 			}
@@ -173,7 +174,7 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 			ver:    c.Package.Version,
 			epoch:  c.Package.Epoch,
 			config: c,
-			archs:  filterArchs(cfg.archs, c.Package.TargetArchitecture),
+			archs:  filterArchs(cfg.Archs, c.Package.TargetArchitecture),
 			cond:   sync.NewCond(&sync.Mutex{}),
 			deps:   map[string]*task{},
 		}
@@ -328,29 +329,29 @@ func bundleAll(ctx context.Context, cfg *global, bcfg *bundleConfig, args []stri
 	if bcfg.repo != "" {
 		entrypoints := map[types.Architecture]*bundle.Entrypoint{}
 
-		for _, arch := range cfg.archs {
+		for _, arch := range cfg.Archs {
 			flags := []string{
 				"--arch=" + arch,
 				"--env-file=" + envFile(arch),
-				"--runner=" + cfg.runner,
-				"--namespace=" + cfg.namespace,
+				"--runner=" + cfg.Runner,
+				"--namespace=" + cfg.PurlNamespace,
 				"--signing-key=" + cfg.signingKey,
-				"--pipeline-dir=" + cfg.pipelineDir,
+				"--pipeline-dir=" + cfg.PipelineDir,
 			}
 
 			testflags := []string{
 				"--arch=" + arch,
 				"--env-file=" + envFile(arch),
-				"--runner=" + cfg.runner,
-				"--pipeline-dirs=" + cfg.pipelineDir,
+				"--runner=" + cfg.Runner,
+				"--pipeline-dirs=" + cfg.PipelineDir,
 			}
 
-			for _, k := range cfg.extraKeys {
+			for _, k := range cfg.ExtraKeys {
 				flags = append(flags, "--keyring-append="+k)
 				testflags = append(testflags, "--keyring-append="+k)
 			}
 
-			for _, r := range cfg.extraRepos {
+			for _, r := range cfg.ExtraRepos {
 				flags = append(flags, "--repository-append="+r)
 				testflags = append(testflags, "--repository-append="+r)
 			}
