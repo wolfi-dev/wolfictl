@@ -178,17 +178,6 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 	return fileList, err
 }
 
-func (o *SoNameOptions) findBumps(soname string) map[string]struct{} {
-	toBump := map[string]struct{}{}
-	for _, pkg := range o.ExistingPackages {
-		if slices.Contains(pkg.Dependencies, soname) {
-			toBump[pkg.Origin] = struct{}{}
-		}
-	}
-
-	return toBump
-}
-
 // ("foo", "1.2.3") -> ["so:foo.so.1", "so:foo.so.1.2", "so:foo.so.1.2.3"]
 // This might be naive, I'm sorry if this breaks.
 func generateVersions(soname, input string) []string {
@@ -264,9 +253,9 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		existingVersionMajor := existingVersion.Segments()[0]
 
 		if newVersionMajor > existingVersionMajor {
-			versions := generateVersions(name, existingVersionStr)
+			sonames := generateVersions(name, existingVersionStr)
 			for _, pkg := range o.ExistingPackages {
-				for _, soname := range versions {
+				for _, soname := range sonames {
 					if slices.Contains(pkg.Dependencies, soname) {
 						toBump[pkg.Origin] = struct{}{}
 					}
