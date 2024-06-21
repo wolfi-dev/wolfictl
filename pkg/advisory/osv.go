@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"chainguard.dev/melange/pkg/config"
 	"github.com/google/osv-scanner/pkg/models"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -21,119 +21,143 @@ import (
 type OSVOptions struct {
 	// AdvisoryDocIndices is a list of indexes containing Chainguard advisory
 	// documents.
+	//
+	// TODO(luhring): We should move toward unifying all advisory repositories into
+	//  a single collection of all advisory documents. At that point, we won't need
+	//  to use multiple advisory indices here.
 	AdvisoryDocIndices []*configs.Index[v2.Document]
+
+	// PackageConfigIndices is a list of indexes containing Chainguard package build
+	// configurations. The address of each slice item is expected to correspond to
+	// the address of the corresponding item in AdvisoryDocIndices.
+	PackageConfigIndices []*configs.Index[config.Configuration]
+
+	// AddedEcosystems is a list of ecosystems to be added to the OSV dataset. The
+	// address of each slice item is expected to correspond to the address of the
+	// corresponding item in AdvisoryDocIndices. The length of this slice is
+	// expected to be the same as the length of AdvisoryDocIndices.
+	//
+	// TODO(luhring): We should move toward unifying the Chainguard and Wolfi
+	//  ecosystems, so that we don't need to add the "wolfi" ecosystem here, and
+	//  we'll just use "Chainguard" always.
+	AddedEcosystems []string
 
 	// OutputDirectory is the path to a local directory in which the generated OSV
 	// dataset will be written.
 	OutputDirectory string
-
-	// Deprecated: Soon we'll always use the "chainguard" ecosystem and not
-	// accept any other value.
-	Ecosystem string
 }
 
 // OSVEcosystem is the name of the OSV ecosystem for Chainguard advisories.
-const OSVEcosystem = "Chainguard"
+const OSVEcosystem models.Ecosystem = "Chainguard"
 
 // BuildOSVDataset produces an OSV dataset from Chainguard advisory data, using
 // the given set of options.
 func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
+	if len(opts.AdvisoryDocIndices) != len(opts.AddedEcosystems) {
+		return fmt.Errorf("length of AdvisoryDocIndices and AddedEcosystems must be equal: use an empty string to signal no added ecosystem")
+	}
+
+	if len(opts.PackageConfigIndices) == 0 {
+		return fmt.Errorf("at least one package config index must be provided")
+	}
+
+	// Do one time upfront, instead of per advisory document: Find out the
+	// subpackages for all defined packages in the packages repos.
+	pkgNameToSubpackages := make(map[string][]string)
+	for _, packageConfigIndex := range opts.PackageConfigIndices {
+		// We assume that each package name is unique across all package repos.
+
+		cfgs := packageConfigIndex.Select().Configurations()
+		for i := range cfgs {
+			cfg := cfgs[i]
+
+			var subpackages []string
+			for i := range cfg.Subpackages {
+				sp := cfg.Subpackages[i]
+				subpackages = append(subpackages, sp.Name)
+			}
+			sort.Strings(subpackages)
+			pkgNameToSubpackages[cfg.Package.Name] = subpackages
+		}
+	}
+
 	advisoryIDsToModels := make(map[string]models.Vulnerability)
-	ecosystem := models.Ecosystem(opts.Ecosystem)
 
-	for _, index := range opts.AdvisoryDocIndices {
+	for i, index := range opts.AdvisoryDocIndices {
+		// See if we need to add additional ecosystems for this particular advisories
+		// index.
+		addedEcosystem := opts.AddedEcosystems[i]
+		ecosystems := []models.Ecosystem{OSVEcosystem}
+		if addedEcosystem != "" {
+			ecosystems = append(ecosystems, models.Ecosystem(addedEcosystem))
+		}
+
 		documents := index.Select().Configurations()
-
 		for _, doc := range documents {
-			for _, adv := range doc.Advisories {
-				sortedEvents := adv.SortedEvents()
+			// We'll have one or more affected packages listed for each advisory. We'll
+			// always include the origin package in the Chainguard ecosystem as an 'affected
+			// package'. If there are subpackages, we'll add an 'affected package' for each
+			// of those. Finally, we'll add any specified additional ecosystems (e.g.
+			// "wolfi") to produce additional 'affected packages' for each of the
+			// origin+subpackages.
+			//
+			// The final count of 'affected packages' for each advisory should be:
+			//
+			//   (1 + number of subpackages) * (1 + number of additional ecosystems)
 
-				var updatedTime time.Time
-				tempAffected := models.Affected{}
+			pkgName := doc.Package.Name
+			pkgs := append([]string{pkgName}, pkgNameToSubpackages[pkgName]...)
 
-				for _, event := range sortedEvents {
-					switch event.Type {
-					case v2.EventTypeFixed:
-						tempAffected.Package = models.Package{
-							Name:      doc.Package.Name,
-							Ecosystem: ecosystem,
-							Purl:      fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(ecosystem)), doc.Package.Name),
-						}
-						tempAffected.Ranges = []models.Range{
-							{
-								Type: models.RangeEcosystem,
-								Events: []models.Event{
-									{
-										Introduced: "0",
-									},
-									{
-										Fixed: event.Data.(v2.Fixed).FixedVersion,
-									},
-								},
-							},
-						}
-						updatedTime = time.Time(event.Timestamp)
-					case v2.EventTypeFalsePositiveDetermination:
-						tempAffected.Package = models.Package{
-							Name:      doc.Package.Name,
-							Ecosystem: ecosystem,
-							Purl:      fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(ecosystem)), doc.Package.Name),
-						}
-						tempAffected.Ranges = []models.Range{
-							{
-								Type: models.RangeEcosystem,
-								Events: []models.Event{
-									{
-										Introduced: "0",
-									},
-									{
-										Fixed: "0",
-									},
-								},
-								DatabaseSpecific: map[string]interface{}{
-									"false_positive": true,
-								},
-							},
-						}
-						updatedTime = time.Time(event.Timestamp)
-					default:
-						continue
-					}
-
-					if len(tempAffected.Ranges) == 0 {
-						continue
-					}
-
-					entry, ok := advisoryIDsToModels[adv.ID]
-					if ok {
-						// check if there is a CGA duplicate across different packages
-						for i := range entry.Affected {
-							if !strings.EqualFold(doc.Package.Name, entry.Affected[i].Package.Name) {
-								log.Fatalf("maybe a CGA id conflict for %s: %s against %s ", adv.ID, doc.Package.Name, entry.Affected[i].Package.Name)
-							}
-						}
-
-						entry.Affected = append(entry.Affected, tempAffected)
-						if updatedTime.After(entry.Modified) {
-							entry.Modified = updatedTime
-						}
-						advisoryIDsToModels[adv.ID] = entry
-					} else {
-						// new entry
-						aliases := []string{adv.ID}
-						aliases = append(aliases, adv.Aliases...)
-						temp := models.Vulnerability{
-							ID:       adv.ID,
-							Aliases:  aliases,
-							Affected: []models.Affected{tempAffected},
-						}
-						if updatedTime.After(entry.Modified) {
-							temp.Modified = updatedTime
-						}
-
-						advisoryIDsToModels[adv.ID] = temp
-					}
+			var affectedPackages []models.Package
+			for _, pkg := range pkgs {
+				for _, ecosystem := range ecosystems {
+					affectedPackages = append(affectedPackages, models.Package{
+						Name:      pkg,
+						Ecosystem: ecosystem,
+						Purl:      createPurl(pkg, ecosystem),
+					})
 				}
+			}
+
+			for _, adv := range doc.Advisories {
+				latestEvent := adv.Latest()
+				advisoryLastUpdated := time.Time(latestEvent.Timestamp)
+
+				var affectedRange models.Range
+
+				switch latestEvent.Type {
+				case v2.EventTypeFixed:
+					if d, ok := latestEvent.Data.(v2.Fixed); ok {
+						affectedRange = rangeForFixed(d.FixedVersion)
+					} else {
+						return fmt.Errorf("unexpected data type for fixed event: %T (advisory index %d, package %q, advisory ID %q)", latestEvent.Data, i, pkgName, adv.ID)
+					}
+				case v2.EventTypeFalsePositiveDetermination:
+					affectedRange = rangeForFalsePositive()
+				default:
+					// We don't yet produce OSV data for other event types.
+					continue
+				}
+
+				// Note: The OSV data should include our advisory ID itself among the listed aliases.
+				aliases := append([]string{adv.ID}, adv.Aliases...)
+
+				affecteds := make([]models.Affected, 0, len(affectedPackages))
+				for _, pkg := range affectedPackages {
+					affecteds = append(affecteds, models.Affected{
+						Package: pkg,
+						Ranges:  []models.Range{affectedRange},
+					})
+				}
+
+				entry := models.Vulnerability{
+					ID:       adv.ID,
+					Aliases:  aliases,
+					Affected: affecteds,
+					Modified: advisoryLastUpdated,
+				}
+
+				advisoryIDsToModels[adv.ID] = entry
 			}
 		}
 	}
@@ -193,4 +217,39 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 	}
 
 	return nil
+}
+
+func createPurl(pkgName string, ecosystem models.Ecosystem) string {
+	return fmt.Sprintf("pkg:apk/%s/%s", strings.ToLower(string(ecosystem)), pkgName)
+}
+
+func rangeForFixed(fixedVersion string) models.Range {
+	return models.Range{
+		Type: models.RangeEcosystem,
+		Events: []models.Event{
+			{
+				Introduced: "0",
+			},
+			{
+				Fixed: fixedVersion,
+			},
+		},
+	}
+}
+
+func rangeForFalsePositive() models.Range {
+	return models.Range{
+		Type: models.RangeEcosystem,
+		Events: []models.Event{
+			{
+				Introduced: "0",
+			},
+			{
+				Fixed: "0",
+			},
+		},
+		DatabaseSpecific: map[string]interface{}{
+			"false_positive": true,
+		},
+	}
 }
