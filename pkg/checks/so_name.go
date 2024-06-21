@@ -2,12 +2,14 @@ package checks
 
 import (
 	"debug/elf"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	goapk "chainguard.dev/apko/pkg/apk/apk"
@@ -15,6 +17,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/lint"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
+	"golang.org/x/exp/maps"
 )
 
 type SoNameOptions struct {
@@ -133,7 +136,7 @@ func (o *SoNameOptions) diff(newPackageName string, newAPK NewApkPackage) error 
 
 	err = o.checkSonamesMatch(existingSonameFiles, newSonameFiles)
 	if err != nil {
-		return fmt.Errorf("soname files differ, this can cause an ABI break.  Existing soname files %s, New soname files %s: %w", strings.Join(existingSonameFiles, ","), strings.Join(newSonameFiles, ","), err)
+		return fmt.Errorf("soname files differ, this can cause an ABI break: %w", err)
 	}
 
 	return nil
@@ -175,6 +178,19 @@ func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
 	return fileList, err
 }
 
+// ("foo", "1.2.3") -> ["so:foo.so.1", "so:foo.so.1.2", "so:foo.so.1.2.3"]
+// This might be naive, I'm sorry if this breaks.
+func generateVersions(soname, input string) []string {
+	sonames := []string{}
+	parts := strings.Split(input, ".")
+
+	for i := range parts {
+		sonames = append(sonames, fmt.Sprintf("so:%s.so.%s", soname, strings.Join(parts[0:i+1], ".")))
+	}
+
+	return sonames
+}
+
 func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
 	if len(existingSonameFiles) == 0 {
 		o.Logger.Printf("no existing soname files, skipping")
@@ -199,6 +215,9 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 			existingSonameMap[sonameParts[0]] = version
 		}
 	}
+
+	errs := []error{}
+	toBump := map[string]struct{}{}
 
 	// now iterate over new soname files and compare with existing files
 	for _, soname := range newSonameFiles {
@@ -232,9 +251,24 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		// let's now compare the major segments as only major version increments indicate a break ABI compatibility
 		newVersionMajor := version.Segments()[0]
 		existingVersionMajor := existingVersion.Segments()[0]
+
 		if newVersionMajor > existingVersionMajor {
-			return fmt.Errorf("soname version check failed, %s has an existing version %s while new package contains a different version %s.  This can cause ABI failures", name, existingVersion, version)
+			sonames := generateVersions(name, existingVersionStr)
+			for _, pkg := range o.ExistingPackages {
+				for _, soname := range sonames {
+					if slices.Contains(pkg.Dependencies, soname) {
+						toBump[pkg.Origin] = struct{}{}
+					}
+				}
+			}
+
+			errs = append(errs, fmt.Errorf("%s: %s -> %s", name, existingVersion, version))
 		}
 	}
-	return nil
+
+	if len(toBump) != 0 {
+		errs = append(errs, fmt.Errorf("to fix this, run:\nwolfictl bump %s", strings.Join(maps.Keys(toBump), " ")))
+	}
+
+	return errors.Join(errs...)
 }
