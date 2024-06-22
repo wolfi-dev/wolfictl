@@ -409,13 +409,18 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 	}
 
 	if gvisor {
-		t = append(t, corev1.Toleration{
+		// Override the default, so we dont consider normal bundle-builder
+		t = []corev1.Toleration{{
 			Effect:   "NoSchedule",
 			Key:      "chainguard.dev/runner",
 			Operator: "Equal",
 			Value:    "gvisor-builder",
-		})
-		nodeSelector["chainguard.dev/sandbox"] = "gvisor"
+		}, {
+			Effect:   "NoSchedule",
+			Key:      "sandbox.gke.io/runtime",
+			Operator: "Equal",
+			Value:    "gvisor",
+		}}
 	}
 
 	mf := mFamily
