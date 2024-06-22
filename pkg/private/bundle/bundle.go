@@ -497,6 +497,11 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 		},
 	}
 
+	if gvisor {
+		c := "gvisor"
+		pod.Spec.RuntimeClassName = &c
+	}
+
 	if mf != "" {
 		// https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning#custom_machine_family
 		pod.Spec.Affinity = &corev1.Affinity{
