@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"time"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"cloud.google.com/go/storage"
@@ -200,6 +201,7 @@ func cmdApkLs() *cobra.Command {
 	var latest bool
 	var j bool
 	var packageFilter string
+	var newerThan time.Duration
 
 	cmd := &cobra.Command{
 		Use:     "ls",
@@ -232,6 +234,14 @@ func cmdApkLs() *cobra.Command {
 				packages = onlyLatest(packages)
 			}
 
+			// Filter packages older than `--newer-than`
+			if newerThan > 0 {
+				cutoff := time.Now().Add(-newerThan)
+				packages = slices.DeleteFunc(packages, func(pkg *apk.Package) bool {
+					return pkg.BuildTime.Unix() < cutoff.Unix()
+				})
+			}
+
 			for _, pkg := range packages {
 				p := fmt.Sprintf("%s-%s.apk", pkg.Name, pkg.Version)
 				u := fmt.Sprintf("%s/%s", dir, p)
@@ -255,6 +265,7 @@ func cmdApkLs() *cobra.Command {
 	cmd.Flags().BoolVar(&latest, "latest", false, "print only the latest version of each package")
 	cmd.Flags().BoolVar(&full, "full", false, "print the full url or path")
 	cmd.Flags().BoolVar(&j, "json", false, "print each package as json")
+	cmd.Flags().DurationVar(&newerThan, "newer-than", 0, "print only packages newer than this duration ago")
 
 	return cmd
 }
