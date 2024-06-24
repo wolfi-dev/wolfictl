@@ -95,7 +95,10 @@ func (opts DiscoverOptions) discoverMatchesForPackage(ctx context.Context, pkg s
 		opts.VulnEvents <- vuln.EventPackageMatchingError{Package: pkg, Err: err}
 	}
 
-	matches = opts.filterMatchesForPackage(pkg, matches)
+	matches, err = opts.filterMatchesForPackage(pkg, matches)
+	if err != nil {
+		return fmt.Errorf("filtering vulnerability matches: %w", err)
+	}
 
 	opts.VulnEvents <- vuln.EventPackageMatchingFinished{Package: pkg, Matches: matches}
 
@@ -115,8 +118,11 @@ func (opts DiscoverOptions) discoverMatchesForPackage(ctx context.Context, pkg s
 	return nil
 }
 
-func (opts DiscoverOptions) filterMatchesForPackage(pkg string, matches []vuln.Match) []vuln.Match {
-	buildCfgEntry, _ := opts.BuildCfgs.Select().WhereName(pkg).First() //nolint:errcheck
+func (opts DiscoverOptions) filterMatchesForPackage(pkg string, matches []vuln.Match) ([]vuln.Match, error) {
+	buildCfgEntry, err := opts.BuildCfgs.Select().WhereName(pkg).First()
+	if err != nil {
+		return nil, fmt.Errorf("finding package %q among build configurations: %w", pkg, err)
+	}
 	buildCfg := buildCfgEntry.Configuration()
 
 	var filteredMatches []vuln.Match
@@ -150,7 +156,7 @@ func (opts DiscoverOptions) filterMatchesForPackage(pkg string, matches []vuln.M
 		filteredMatches = append(filteredMatches, match)
 	}
 
-	return filteredMatches
+	return filteredMatches, nil
 }
 
 func advisoryEventForNewDiscovery(match vuln.Match) v2.Event {
