@@ -10,7 +10,7 @@ replace github.com/anchore/stereoscope => github.com/jonjohnsonjr/stereoscope v0
 
 require (
 	chainguard.dev/apko v0.15.0
-	chainguard.dev/melange v0.9.1-0.20240620170401-ff699b7adbb5
+	chainguard.dev/melange v0.10.0
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a
