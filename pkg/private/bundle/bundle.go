@@ -19,7 +19,7 @@ import (
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/dominikbraun/graph"
-	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/gcrane"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/empty"
@@ -265,7 +265,7 @@ func Pull(pull string) (*Bundles, error) {
 		return nil, err
 	}
 
-	idx, err := remote.Index(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithUserAgent("wolfictl bundle"))
+	idx, err := remote.Index(ref, remote.WithAuthFromKeychain(gcrane.Keychain), remote.WithUserAgent("wolfictl bundle"))
 	if err != nil {
 		return nil, err
 	}
