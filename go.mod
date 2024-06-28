@@ -1,12 +1,9 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.22.3
+go 1.22.4
 
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
-
-// https://github.com/anchore/stereoscope/pull/234
-replace github.com/anchore/stereoscope => github.com/jonjohnsonjr/stereoscope v0.0.0-20240618225455-728576e31236
 
 require (
 	chainguard.dev/apko v0.15.0
@@ -14,7 +11,7 @@ require (
 	cloud.google.com/go/storage v1.42.0
 	github.com/adrg/xdg v0.4.0
 	github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a
-	github.com/anchore/stereoscope v0.0.3-0.20240501181043-2e9894674185
+	github.com/anchore/stereoscope v0.0.3-0.20240624202600-753b5576fe42
 	github.com/anchore/syft v1.8.0
 	github.com/chainguard-dev/clog v1.4.0
 	github.com/chainguard-dev/yam v0.0.9
