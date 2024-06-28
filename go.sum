@@ -269,6 +269,8 @@ github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a h1:WruO8/I6X8kiZ2
 github.com/anchore/grype v0.79.2-0.20240618100532-cb188974922a/go.mod h1:0oF4hmYpqidCSwS7VkazkyTS/e7dBefvVrA+4G0iDdU=
 github.com/anchore/packageurl-go v0.1.1-0.20240507183024-848e011fc24f h1:B/E9ixKNCasntpoch61NDaQyGPDXLEJlL+B9B/PbdbA=
 github.com/anchore/packageurl-go v0.1.1-0.20240507183024-848e011fc24f/go.mod h1:Blo6OgJNiYF41ufcgHKkbCKF2MDOMlrqhXv/ij6ocR4=
+github.com/anchore/stereoscope v0.0.3-0.20240624202600-753b5576fe42 h1:9rQYUxTHfGuX6ZyzSAG4vv0uG3SjoW1M5uRtGgO92Oc=
+github.com/anchore/stereoscope v0.0.3-0.20240624202600-753b5576fe42/go.mod h1:sChrYoP82PZDg1V+7O4f8a2XyFkED7FReZsHmwCmSLc=
 github.com/anchore/syft v1.8.0 h1:J4QSQEYWdT/B62O+zh+m6hceS7fZd18zcO+Ov/rDvYw=
 github.com/anchore/syft v1.8.0/go.mod h1:8aanszd+QYEmhRIUxARXjXpVsgspsIGkPJp7a82C8P0=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNgfBlViaCIJKLlCJ6/fmUseuG0wVQ=
@@ -768,8 +770,6 @@ github.com/jmhodges/clock v1.2.0 h1:eq4kys+NI0PLngzaHEe7AmPT90XMGIEySD1JfV1PDIs=
 github.com/jmhodges/clock v1.2.0/go.mod h1:qKjhA7x7u/lQpPB1XAqX1b1lCI/w3/fNuYpI/ZjLynI=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/jonjohnsonjr/stereoscope v0.0.0-20240618225455-728576e31236 h1:Xkr9ske1Vug8KLXAPPE320Ffd0zfEraOEO0Qs1UMb1w=
-github.com/jonjohnsonjr/stereoscope v0.0.0-20240618225455-728576e31236/go.mod h1:sChrYoP82PZDg1V+7O4f8a2XyFkED7FReZsHmwCmSLc=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
