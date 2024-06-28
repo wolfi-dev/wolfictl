@@ -106,6 +106,7 @@ func cmdBundle() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
 	cmd.Flags().StringVar(&bcfg.baseRef, "bundle-base", "", "base image used for melange build bundles")
 	cmd.Flags().StringVar(&bcfg.repo, "bundle-repo", "", "where to push the bundles")
+	cmd.Flags().StringToStringVarP(&bcfg.annotations, "annotation", "a", nil, "New annotations to add")
 
 	return cmd
 }
@@ -116,6 +117,7 @@ type bundleConfig struct {
 	repo        string
 	commonFiles fs.FS
 	pusher      *remote.Pusher
+	annotations map[string]string
 
 	dirfs fs.FS
 }
@@ -388,6 +390,11 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 	}
 
 	idx := mutate.AppendManifests(empty.Index, addendums...)
+
+	if len(bcfg.annotations) != 0 {
+		idx = mutate.Annotations(idx, bcfg.annotations).(v1.ImageIndex) //nolint:errcheck
+	}
+
 	dst, err := name.ParseReference(fmt.Sprintf("%s/%s", bcfg.repo, "bundle"), name.Insecure)
 	if err != nil {
 		return err
