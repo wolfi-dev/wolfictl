@@ -1690,7 +1690,7 @@ func (t *task) sourceDir() (string, error) {
 	return sdir, nil
 }
 
-func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, clusterName string) (*api.Config, error) {
+func getK8sClusterConfig(ctx context.Context, projectID, clusterLocation, clusterName string) (*api.Config, error) {
 	// get a token
 	ts, err := google.DefaultTokenSource(ctx, "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
@@ -1707,7 +1707,7 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 		return nil, fmt.Errorf("container.NewService: %w", err)
 	}
 
-	cName := fmt.Sprintf("projects/%s/locations/%s/clusters/%s", projectId, clusterLocation, clusterName)
+	cName := fmt.Sprintf("projects/%s/locations/%s/clusters/%s", projectID, clusterLocation, clusterName)
 	cluster, err := svc.Projects.Locations.Clusters.Get(cName).Context(ctx).Do()
 	if err != nil {
 		return nil, fmt.Errorf("clusters get name=%s: %w", cName, err)
