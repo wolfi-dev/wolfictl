@@ -1694,7 +1694,7 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 	// get a token
 	ts, err := google.DefaultTokenSource(ctx, "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
-		return nil, fmt.Errorf("failed to get google default token: %v", err)
+		return nil, fmt.Errorf("getting google default token: %w", err)
 	}
 	tok, err := ts.Token()
 	if err != nil {
