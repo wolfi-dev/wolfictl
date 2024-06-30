@@ -484,7 +484,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		if cfg.summary != "-" {
 			f, err := os.Create(cfg.summary)
 			if err != nil {
-				return fmt.Errorf("failed to create summary: %v", err)
+				return fmt.Errorf("creating summary: %w", err)
 			}
 
 			out = f
