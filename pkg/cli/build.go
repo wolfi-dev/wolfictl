@@ -1698,7 +1698,7 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 	}
 	tok, err := ts.Token()
 	if err != nil {
-		return nil, fmt.Errorf("failed to extract token: %v", err)
+		return nil, fmt.Errorf("extracting token: %w", err)
 	}
 
 	// Call out to google to get cluster information
