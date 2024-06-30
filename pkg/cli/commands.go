@@ -43,6 +43,7 @@ func New() *cobra.Command {
 		cmdText(),
 		cmdSBOM(),
 		cmdScan(),
+		cmdScanSource(),
 		cmdUpdate(),
 		cmdVEX(),
 		cmdWithdraw(),
