@@ -984,7 +984,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		clusterName := maps.Keys(kubeConfig.Clusters)[0]
 		config, err := clientcmd.NewNonInteractiveClientConfig(*kubeConfig, clusterName, &clientcmd.ConfigOverrides{}, nil).ClientConfig()
 		if err != nil {
-			return nil, fmt.Errorf("failed to create Kubernetes configuration cluster=%s: %v", clusterName, err)
+			return nil, fmt.Errorf("creating k8s config cluster=%s: %w", clusterName, err)
 		}
 		cfg = config
 	} else {
