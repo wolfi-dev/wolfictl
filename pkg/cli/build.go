@@ -1727,7 +1727,7 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 	kName := fmt.Sprintf("gke_%s_%s_%s", projectID, cluster.Location, cluster.Name)
 	cert, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClusterCaCertificate)
 	if err != nil {
-		return nil, fmt.Errorf("invalid certificate cluster=%s cert=%s: %w", name, cluster.MasterAuth.ClusterCaCertificate, err)
+		return nil, fmt.Errorf("invalid certificate cluster=%s cert=%s: %w", kName, cluster.MasterAuth.ClusterCaCertificate, err)
 	}
 	ret.Clusters[name] = &api.Cluster{
 		CertificateAuthorityData: cert,
