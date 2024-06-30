@@ -1251,7 +1251,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 	err := buildGroup.Wait()
 	t.duration = time.Since(start)
 	if err != nil {
-		return fmt.Errorf("failed build group: %v", err)
+		return fmt.Errorf("building group: %w", err)
 	}
 
 	if len(needsBuild) != 0 {
@@ -1287,7 +1287,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 		pkgGroup.Go(func() error {
 			files, err := t.uploadBundle(ctx, arch, results, tmpdir)
 			if err != nil {
-				return fmt.Errorf("failed upload bundle: %v", err)
+				return fmt.Errorf("uploading bundle: %w", err)
 			}
 
 			filemu.Lock()
@@ -1357,7 +1357,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 
 	packageDir := filepath.Join(tmpdir, arch)
 	if err := os.MkdirAll(packageDir, os.ModePerm); err != nil {
-		return nil, fmt.Errorf("failed to mkdir: %s; %v", packageDir, err)
+		return nil, fmt.Errorf("failed to mkdir: %s; %w", packageDir, err)
 	}
 
 	apkFiles := make([]string, 0, len(t.bundle.Subpackages)+1)
@@ -1398,7 +1398,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 		apkFiles = append(apkFiles, apkPath)
 
 		if err := t.uploadAPKs(ctx, arch, apkFiles); err != nil {
-			return nil, fmt.Errorf("failed to upload apk: %v", err)
+			return nil, fmt.Errorf("uploading apk: %w", err)
 		}
 	} else {
 		for _, subName := range t.bundle.Subpackages {
