@@ -1417,7 +1417,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 		}
 
 		if err := t.downloadAPK(ctx, arch, packageDir, apkFile); err != nil {
-			return nil, fmt.Errorf("failed to download apk: %s; %v", apkFile, err)
+			return nil, fmt.Errorf("downloading apk: %s; %w", apkFile, err)
 		}
 
 		apkFiles = append(apkFiles, apkPath)
