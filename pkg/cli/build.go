@@ -1734,16 +1734,16 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 		Server:                   "https://" + cluster.Endpoint,
 	}
 	// Just reuse the context name as an auth name.
-	ret.Contexts[name] = &api.Context{
-		Cluster:  name,
-		AuthInfo: name,
+	ret.Contexts[kName] = &api.Context{
+		Cluster:  kName,
+		AuthInfo: kName,
 	}
 	// GCP specific configation; use cloud platform scope.
-	ret.AuthInfos[name] = &api.AuthInfo{
+	ret.AuthInfos[kName] = &api.AuthInfo{
 		Token: tok.AccessToken,
 	}
 
-	ret.CurrentContext = name
+	ret.CurrentContext = kName
 
 	return &ret, nil
 }
