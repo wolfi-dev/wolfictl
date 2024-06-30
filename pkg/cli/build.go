@@ -943,7 +943,7 @@ func (t *task) signedURL(object string) (string, error) {
 
 func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, fmt.Errorf("context error: %v", err)
+		return nil, fmt.Errorf("context error: %w", err)
 	}
 
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, arch)
