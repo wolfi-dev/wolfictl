@@ -961,7 +961,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	log.Debugf("created signed URL for %s", object)
 	u, err := t.signedURL(object)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get signed url: %v", err)
+		return nil, fmt.Errorf("getting signed url: %w", err)
 	}
 
 	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
