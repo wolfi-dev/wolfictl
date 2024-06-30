@@ -896,7 +896,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 		build.WithRemove(true),
 	)
 	if err != nil {
-		return fmt.Errorf("failed build new: %v", err)
+		return fmt.Errorf("creating build: %w", err)
 	}
 	defer func() {
 		// We Close() with the original context if we're cancelled so we get cleanup logs to stderr.
