@@ -541,7 +541,7 @@ func buildAll(ctx context.Context, cfg *Global, args []string) error {
 		eg.Go(func() error {
 			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
-				return fmt.Errorf("failed to fetch index from destination repo %s for arch %s; %v", cfg.DestinationRepo, arch, err)
+				return fmt.Errorf("fetching index from destination repo %s for arch %s; %w", cfg.DestinationRepo, arch, err)
 			}
 
 			mu.Lock()
