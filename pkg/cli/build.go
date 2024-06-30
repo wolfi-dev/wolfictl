@@ -1553,7 +1553,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 
 		f, err := os.Open(apkFile)
 		if err != nil {
-			return fmt.Errorf("failed open apk: %s; %v", apkFile, err)
+			return fmt.Errorf("opening apk: %s; %w", apkFile, err)
 		}
 		defer f.Close()
 
