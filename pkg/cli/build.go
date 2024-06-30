@@ -974,7 +974,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	if t.cfg.ClusterName != "" {
 		kubeConfig, err := getK8sClusterConfig(ctx, t.cfg.ProjectID, t.cfg.ClusterLocation, t.cfg.ClusterName)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get gke cluster config: %v", err)
+			return nil, fmt.Errorf("getting gke cluster config: %w", err)
 		}
 
 		if len(kubeConfig.Clusters) != 1 {
