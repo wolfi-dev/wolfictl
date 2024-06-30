@@ -1724,7 +1724,7 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 
 	// Craft kubeconfig
 	// example: gke_my-project_us-central1-b_cluster-1 => https://XX.XX.XX.XX
-	name := fmt.Sprintf("gke_%s_%s_%s", projectId, cluster.Location, cluster.Name)
+	kName := fmt.Sprintf("gke_%s_%s_%s", projectID, cluster.Location, cluster.Name)
 	cert, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClusterCaCertificate)
 	if err != nil {
 		return nil, fmt.Errorf("invalid certificate cluster=%s cert=%s: %w", name, cluster.MasterAuth.ClusterCaCertificate, err)
