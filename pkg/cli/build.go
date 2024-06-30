@@ -236,7 +236,7 @@ func (g *Global) fetchIndexFromBucket(ctx context.Context, arch string) (map[str
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return exist, nil
 		}
-		return nil, fmt.Errorf("failed to create gcs reader for bucket %s with obj %s; %v", bucket, obj, err)
+		return nil, fmt.Errorf("failed to create gcs reader for bucket %s with obj %s; %w", bucket, obj, err)
 	}
 	defer rc.Close()
 
