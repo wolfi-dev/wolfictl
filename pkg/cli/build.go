@@ -996,7 +996,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	}
 	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create client for kubernetes: %v", err)
+		return nil, fmt.Errorf("creating k8s client: %w", err)
 	}
 
 	log.Infof("creating pod for %s", t.pkgver())
