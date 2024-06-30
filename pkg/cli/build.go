@@ -325,7 +325,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 
 	bundles, err := bundle.Pull(cfg.Bundle)
 	if err != nil {
-		return fmt.Errorf("failed to pull bundle: %v", err)
+		return fmt.Errorf("failed to pull bundle: %w", err)
 	}
 
 	// Trying to avoid this error:
