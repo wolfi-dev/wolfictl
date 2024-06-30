@@ -384,7 +384,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	}
 
 	if err := eg.Wait(); err != nil {
-		return fmt.Errorf("failed wait: %v", err)
+		return fmt.Errorf("failed wait: %w", err)
 	}
 
 	newTask := func(pkg string, bundle bundle.Task, ref name.Digest) *task {
