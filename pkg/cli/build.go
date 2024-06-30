@@ -1410,7 +1410,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 					log.Warnf("Skipping subpackage %s (was not built): %v", subpkgApk, err)
 					continue
 				}
-				return nil, fmt.Errorf("failed to subpackage download apk: %s; %v", subpkgApk, err)
+				return nil, fmt.Errorf("downloading subpackage apk: %s; %w", subpkgApk, err)
 			}
 
 			apkFiles = append(apkFiles, subpkgFileName)
