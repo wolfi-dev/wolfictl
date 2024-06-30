@@ -1729,7 +1729,7 @@ func getK8sClusterConfig(ctx context.Context, projectId, clusterLocation, cluste
 	if err != nil {
 		return nil, fmt.Errorf("invalid certificate cluster=%s cert=%s: %w", kName, cluster.MasterAuth.ClusterCaCertificate, err)
 	}
-	ret.Clusters[name] = &api.Cluster{
+	ret.Clusters[kName] = &api.Cluster{
 		CertificateAuthorityData: cert,
 		Server:                   "https://" + cluster.Endpoint,
 	}
