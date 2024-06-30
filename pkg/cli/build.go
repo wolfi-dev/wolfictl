@@ -367,7 +367,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 
 			existBucket, err := cfg.fetchIndexFromBucket(ctx, arch)
 			if err != nil {
-				return fmt.Errorf("failed to fetch index from bucket for arch %s; %v", arch, err)
+				return fmt.Errorf("fetching index from bucket for arch %s; %w", arch, err)
 			}
 
 			for k, v := range existBucket {
