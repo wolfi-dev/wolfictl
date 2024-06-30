@@ -990,7 +990,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	} else {
 		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
 		if err != nil {
-			return nil, fmt.Errorf("failed to create default Kubernetes configuration: %v", err)
+			return nil, fmt.Errorf("creating default k8s config: %w", err)
 		}
 		cfg = config
 	}
