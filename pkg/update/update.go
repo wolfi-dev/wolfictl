@@ -372,7 +372,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	root := worktree.Filesystem.Root()
 	log.Printf("working directory: %s", root)
 
-	configFile := filepath.Join(root, pc.Filename)
+	configFile := filepath.Join(pc.Dir, pc.Filename)
 	if configFile == "" {
 		return "", fmt.Errorf("no config filename found for package %s", packageName)
 	}
@@ -405,7 +405,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	}
 
 	// now make sure update config is configured
-	updated, err := config.ParseConfiguration(ctx, filepath.Join(root, pc.Filename))
+	updated, err := config.ParseConfiguration(ctx, filepath.Join(pc.Dir, pc.Filename))
 	if err != nil {
 		return "", fmt.Errorf("failed to parse %v", err)
 	}
@@ -420,7 +420,7 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 
 	// Skip any processing for definitions with a single pipeline
 	if len(updated.Pipeline) > 1 && deps.ContainsGoBumpPipeline(updated) {
-		if err := o.updateGoBumpDeps(updated, root, pc.Filename, mutations); err != nil {
+		if err := o.updateGoBumpDeps(updated, pc.Dir, pc.Filename, mutations); err != nil {
 			return fmt.Sprintf("error cleaning up go/bump deps: %v", err), nil
 		}
 	}
@@ -432,12 +432,16 @@ func (o *Options) updateGitPackage(ctx context.Context, repo *git.Repository, pa
 	o.Logger.Printf("after clean go bumps: %s git status: %s", packageName, string(rs))
 
 	// Run yam formatter
-	err = yam.FormatConfigurationFile(root, pc.Filename)
+	err = yam.FormatConfigurationFile(root, filepath.Join(pc.Dir, pc.Filename))
 	if err != nil {
 		return fmt.Sprintf("failed to format configuration file: %v", err), nil
 	}
 
-	_, err = worktree.Add(pc.Filename)
+	relativeFilename, err := filepath.Rel(root, filepath.Join(pc.Dir, pc.Filename))
+	if err != nil {
+		return "", fmt.Errorf("failed to get relative path from dir %s and file %s: %v", pc.Dir, pc.Filename, err)
+	}
+	_, err = worktree.Add(relativeFilename)
 	if err != nil {
 		return "", fmt.Errorf("failed to git add %s: %w", configFile, err)
 	}
