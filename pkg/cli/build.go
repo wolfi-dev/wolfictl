@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -21,15 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"chainguard.dev/apko/pkg/apk/apk"
-	"chainguard.dev/apko/pkg/build/types"
-	"chainguard.dev/melange/pkg/build"
-	"chainguard.dev/melange/pkg/container"
-	"chainguard.dev/melange/pkg/container/docker"
-	"chainguard.dev/melange/pkg/index"
-	"chainguard.dev/melange/pkg/sign"
 	"cloud.google.com/go/storage"
-	"github.com/chainguard-dev/clog"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/dominikbraun/graph"
 	"github.com/google/go-containerregistry/pkg/name"
@@ -38,18 +31,31 @@ import (
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/exp/maps"
+	"golang.org/x/oauth2/google"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/time/rate"
+	gcontainer "google.golang.org/api/container/v1"
 	"google.golang.org/api/option"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
 	"github.com/wolfi-dev/wolfictl/pkg/private/bundle"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
+
+	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/build/types"
+	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/container"
+	"chainguard.dev/melange/pkg/container/docker"
+	"chainguard.dev/melange/pkg/index"
+	"chainguard.dev/melange/pkg/sign"
+	"github.com/chainguard-dev/clog"
 )
 
 func cmdBuild() *cobra.Command {
@@ -102,8 +108,8 @@ func cmdBuild() *cobra.Command {
 			if cfg.PipelineDir == "" {
 				cfg.PipelineDir = filepath.Join(cfg.dir, "pipelines")
 			}
-			if cfg.outDir == "" {
-				cfg.outDir = filepath.Join(cfg.dir, "packages")
+			if cfg.OutDir == "" {
+				cfg.OutDir = filepath.Join(cfg.dir, "packages")
 			}
 
 			// Used to track expected generation of index file to allow idempotent writes.
@@ -136,7 +142,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringSliceVarP(&cfg.ExtraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
 	cmd.Flags().StringVar(&cfg.PurlNamespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
-	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
+	cmd.Flags().StringVar(&cfg.OutDir, "out-dir", "", "directory where packages will be output")
 	cmd.Flags().StringVar(&cfg.summary, "summary", "", "file to write build summary")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
@@ -218,7 +224,7 @@ func (g *Global) fetchIndexFromBucket(ctx context.Context, arch string) (map[str
 	}
 
 	obj := path.Join(arch, "APKINDEX.tar.gz")
-	out := filepath.Join(g.outDir, arch, "APKINDEX.tar.gz")
+	out := filepath.Join(g.OutDir, arch, "APKINDEX.tar.gz")
 
 	bucket, dir, ok := strings.Cut(g.DestinationBucket, "/")
 	if ok {
@@ -230,7 +236,7 @@ func (g *Global) fetchIndexFromBucket(ctx context.Context, arch string) (map[str
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return exist, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to create gcs reader for bucket %s with obj %s; %w", bucket, obj, err)
 	}
 	defer rc.Close()
 
@@ -319,7 +325,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 
 	bundles, err := bundle.Pull(cfg.Bundle)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to pull bundle: %w", err)
 	}
 
 	// Trying to avoid this error:
@@ -334,8 +340,8 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	if cfg.dir == "" {
 		cfg.dir = "."
 	}
-	if cfg.outDir == "" {
-		cfg.outDir = filepath.Join(cfg.dir, "packages")
+	if cfg.OutDir == "" {
+		cfg.OutDir = filepath.Join(cfg.dir, "packages")
 	}
 
 	jobs := runtime.GOMAXPROCS(0)
@@ -348,7 +354,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	for _, arch := range cfg.Archs {
 		arch := types.ParseArchitecture(arch).ToAPK()
 
-		if err := os.MkdirAll(filepath.Join(cfg.outDir, arch), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Join(cfg.OutDir, arch), os.ModePerm); err != nil {
 			return fmt.Errorf("creating arch directory: %w", err)
 		}
 
@@ -356,12 +362,12 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		eg.Go(func() error {
 			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to fetch index from destination repo %s for arch %s; %w", cfg.DestinationRepo, arch, err)
 			}
 
 			existBucket, err := cfg.fetchIndexFromBucket(ctx, arch)
 			if err != nil {
-				return err
+				return fmt.Errorf("fetching index from bucket for arch %s; %w", arch, err)
 			}
 
 			for k, v := range existBucket {
@@ -378,7 +384,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	}
 
 	if err := eg.Wait(); err != nil {
-		return err
+		return fmt.Errorf("failed wait: %w", err)
 	}
 
 	newTask := func(pkg string, bundle bundle.Task, ref name.Digest) *task {
@@ -478,7 +484,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		if cfg.summary != "-" {
 			f, err := os.Create(cfg.summary)
 			if err != nil {
-				return err
+				return fmt.Errorf("creating summary: %w", err)
 			}
 
 			out = f
@@ -512,7 +518,7 @@ func buildAll(ctx context.Context, cfg *Global, args []string) error {
 	eg.Go(func() error {
 		var err error
 		stuff, err = walkConfigs(ctx, cfg)
-		return err
+		return fmt.Errorf("walking config: %w", err)
 	})
 
 	var mu sync.Mutex
@@ -535,7 +541,7 @@ func buildAll(ctx context.Context, cfg *Global, args []string) error {
 		eg.Go(func() error {
 			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
-				return err
+				return fmt.Errorf("fetching index from destination repo %s for arch %s; %w", cfg.DestinationRepo, arch, err)
 			}
 
 			mu.Lock()
@@ -679,7 +685,7 @@ type Global struct {
 	PurlNamespace string
 	cacheSource   string
 	cacheDir      string
-	outDir        string
+	OutDir        string
 
 	summary string
 
@@ -706,10 +712,14 @@ type Global struct {
 	ServiceAccount string
 	MachineFamily  string
 	GVisor         bool
+
+	ProjectID       string
+	ClusterLocation string
+	ClusterName     string
 }
 
 func (g *Global) logdir(arch string) string {
-	return filepath.Join(g.outDir, arch, "buildlogs")
+	return filepath.Join(g.OutDir, arch, "buildlogs")
 }
 
 // wrapper around the writeLimiter so this is accounted for in traces
@@ -881,12 +891,12 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 		build.WithSourceDir(sdir),
 		build.WithCacheSource(t.cfg.cacheSource),
 		build.WithCacheDir(t.cfg.cacheDir),
-		build.WithOutDir(t.cfg.outDir),
+		build.WithOutDir(t.cfg.OutDir),
 		build.WithBuildDate(sde.Format(time.RFC3339)),
 		build.WithRemove(true),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("creating build: %w", err)
 	}
 	defer func() {
 		// We Close() with the original context if we're cancelled so we get cleanup logs to stderr.
@@ -933,7 +943,7 @@ func (t *task) signedURL(object string) (string, error) {
 
 func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context error: %w", err)
 	}
 
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, arch)
@@ -951,7 +961,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	log.Debugf("created signed URL for %s", object)
 	u, err := t.signedURL(object)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting signed url: %w", err)
 	}
 
 	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
@@ -959,13 +969,34 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		Value: u,
 	})
 
-	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
-	if err != nil {
-		return nil, err
+	var cfg *rest.Config
+
+	if t.cfg.ClusterName != "" {
+		kubeConfig, err := getK8sClusterConfig(ctx, t.cfg.ProjectID, t.cfg.ClusterLocation, t.cfg.ClusterName)
+		if err != nil {
+			return nil, fmt.Errorf("getting gke cluster config: %w", err)
+		}
+
+		if len(kubeConfig.Clusters) != 1 {
+			return nil, fmt.Errorf("got %d clusters in config, expected 1", len(kubeConfig.Clusters))
+		}
+
+		clusterName := maps.Keys(kubeConfig.Clusters)[0]
+		config, err := clientcmd.NewNonInteractiveClientConfig(*kubeConfig, clusterName, &clientcmd.ConfigOverrides{}, nil).ClientConfig()
+		if err != nil {
+			return nil, fmt.Errorf("creating k8s config cluster=%s: %w", clusterName, err)
+		}
+		cfg = config
+	} else {
+		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
+		if err != nil {
+			return nil, fmt.Errorf("creating default k8s config: %w", err)
+		}
+		cfg = config
 	}
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating k8s client: %w", err)
 	}
 
 	log.Infof("creating pod for %s", t.pkgver())
@@ -1027,7 +1058,7 @@ func (t *task) build(ctx context.Context) error {
 
 	for _, arch := range t.archs {
 		apkFile := t.pkgver() + ".apk"
-		apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
+		apkPath := filepath.Join(t.cfg.OutDir, arch, apkFile)
 
 		// See if we already have the package indexed.
 		if _, ok := t.cfg.exists[arch][apkFile]; ok {
@@ -1089,12 +1120,12 @@ func (t *task) build(ctx context.Context) error {
 
 		arch := types.ParseArchitecture(arch).ToAPK()
 		indexGroup.Go(func() error {
-			packageDir := filepath.Join(t.cfg.outDir, arch)
+			packageDir := filepath.Join(t.cfg.OutDir, arch)
 			log.Infof("Generating apk index from packages in %s", packageDir)
 
 			cfg := t.config.Configuration
 			apkFile := t.pkgver() + ".apk"
-			apkPath := filepath.Join(t.cfg.outDir, arch, apkFile)
+			apkPath := filepath.Join(t.cfg.OutDir, arch, apkFile)
 
 			var apkFiles []string
 			apkFiles = append(apkFiles, apkPath)
@@ -1220,7 +1251,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 	err := buildGroup.Wait()
 	t.duration = time.Since(start)
 	if err != nil {
-		return err
+		return fmt.Errorf("building group: %w", err)
 	}
 
 	if len(needsBuild) != 0 {
@@ -1256,7 +1287,7 @@ func (t *task) buildBundle(ctx context.Context) error {
 		pkgGroup.Go(func() error {
 			files, err := t.uploadBundle(ctx, arch, results, tmpdir)
 			if err != nil {
-				return err
+				return fmt.Errorf("uploading bundle: %w", err)
 			}
 
 			filemu.Lock()
@@ -1326,7 +1357,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 
 	packageDir := filepath.Join(tmpdir, arch)
 	if err := os.MkdirAll(packageDir, os.ModePerm); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to mkdir: %s; %w", packageDir, err)
 	}
 
 	apkFiles := make([]string, 0, len(t.bundle.Subpackages)+1)
@@ -1367,7 +1398,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 		apkFiles = append(apkFiles, apkPath)
 
 		if err := t.uploadAPKs(ctx, arch, apkFiles); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("uploading apk: %w", err)
 		}
 	} else {
 		for _, subName := range t.bundle.Subpackages {
@@ -1379,14 +1410,14 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 					log.Warnf("Skipping subpackage %s (was not built): %v", subpkgApk, err)
 					continue
 				}
-				return nil, err
+				return nil, fmt.Errorf("downloading subpackage apk: %s; %w", subpkgApk, err)
 			}
 
 			apkFiles = append(apkFiles, subpkgFileName)
 		}
 
 		if err := t.downloadAPK(ctx, arch, packageDir, apkFile); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("downloading apk: %s; %w", apkFile, err)
 		}
 
 		apkFiles = append(apkFiles, apkPath)
@@ -1400,7 +1431,7 @@ func (t *task) indexBundle(ctx context.Context, arch string, apkFiles []string) 
 		index.WithPackageFiles(apkFiles),
 		index.WithSigningKey(t.cfg.signingKey),
 		index.WithMergeIndexFileFlag(true),
-		index.WithIndexFile(filepath.Join(t.cfg.outDir, arch, "APKINDEX.tar.gz")),
+		index.WithIndexFile(filepath.Join(t.cfg.OutDir, arch, "APKINDEX.tar.gz")),
 	}
 
 	idx, err := index.New(opts...)
@@ -1522,7 +1553,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 
 		f, err := os.Open(apkFile)
 		if err != nil {
-			return err
+			return fmt.Errorf("opening apk: %s; %w", apkFile, err)
 		}
 		defer f.Close()
 
@@ -1549,7 +1580,7 @@ func (t *task) uploadIndex(ctx context.Context, arch string) error {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadIndex")
 	defer span.End()
 
-	filename := filepath.Join(t.cfg.outDir, arch, "APKINDEX.tar.gz")
+	filename := filepath.Join(t.cfg.OutDir, arch, "APKINDEX.tar.gz")
 
 	f, err := os.Open(filename)
 	if err != nil {
@@ -1657,4 +1688,62 @@ func (t *task) sourceDir() (string, error) {
 	}
 
 	return sdir, nil
+}
+
+func getK8sClusterConfig(ctx context.Context, projectID, clusterLocation, clusterName string) (*api.Config, error) {
+	// get a token
+	ts, err := google.DefaultTokenSource(ctx, "https://www.googleapis.com/auth/cloud-platform")
+	if err != nil {
+		return nil, fmt.Errorf("getting google default token: %w", err)
+	}
+	tok, err := ts.Token()
+	if err != nil {
+		return nil, fmt.Errorf("extracting token: %w", err)
+	}
+
+	// Call out to google to get cluster information
+	svc, err := gcontainer.NewService(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("container.NewService: %w", err)
+	}
+
+	cName := fmt.Sprintf("projects/%s/locations/%s/clusters/%s", projectID, clusterLocation, clusterName)
+	cluster, err := svc.Projects.Locations.Clusters.Get(cName).Context(ctx).Do()
+	if err != nil {
+		return nil, fmt.Errorf("clusters get name=%s: %w", cName, err)
+	}
+
+	// Basic config structure
+	ret := api.Config{
+		APIVersion: "v1",
+		Kind:       "Config",
+		Clusters:   map[string]*api.Cluster{},  // Clusters is a map of referencable names to cluster configs
+		AuthInfos:  map[string]*api.AuthInfo{}, // AuthInfos is a map of referencable names to user configs
+		Contexts:   map[string]*api.Context{},  // Contexts is a map of referencable names to context configs
+	}
+
+	// Craft kubeconfig
+	// example: gke_my-project_us-central1-b_cluster-1 => https://XX.XX.XX.XX
+	kName := fmt.Sprintf("gke_%s_%s_%s", projectID, cluster.Location, cluster.Name)
+	cert, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClusterCaCertificate)
+	if err != nil {
+		return nil, fmt.Errorf("invalid certificate cluster=%s cert=%s: %w", kName, cluster.MasterAuth.ClusterCaCertificate, err)
+	}
+	ret.Clusters[kName] = &api.Cluster{
+		CertificateAuthorityData: cert,
+		Server:                   "https://" + cluster.Endpoint,
+	}
+	// Just reuse the context name as an auth name.
+	ret.Contexts[kName] = &api.Context{
+		Cluster:  kName,
+		AuthInfo: kName,
+	}
+	// GCP specific configation; use cloud platform scope.
+	ret.AuthInfos[kName] = &api.AuthInfo{
+		Token: tok.AccessToken,
+	}
+
+	ret.CurrentContext = kName
+
+	return &ret, nil
 }

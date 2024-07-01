@@ -55,8 +55,8 @@ func cmdBundle() *cobra.Command {
 			if cfg.PipelineDir == "" {
 				cfg.PipelineDir = filepath.Join(cfg.dir, "pipelines")
 			}
-			if cfg.outDir == "" {
-				cfg.outDir = filepath.Join(cfg.dir, "packages")
+			if cfg.OutDir == "" {
+				cfg.OutDir = filepath.Join(cfg.dir, "packages")
 			}
 
 			if bcfg.baseRef != "" {
@@ -99,7 +99,7 @@ func cmdBundle() *cobra.Command {
 	cmd.Flags().StringSliceVar(&cfg.fuses, "gcsfuse", []string{}, "list of gcsfuse mounts to make available to the build environment (e.g. gs://my-bucket/subdir:/mnt/my-bucket)")
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
 	cmd.Flags().StringVar(&cfg.PurlNamespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
-	cmd.Flags().StringVar(&cfg.outDir, "out-dir", "", "directory where packages will be output")
+	cmd.Flags().StringVar(&cfg.OutDir, "out-dir", "", "directory where packages will be output")
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
