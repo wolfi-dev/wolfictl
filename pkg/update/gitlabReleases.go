@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/Masterminds/semver/v3"
 	"github.com/wolfi-dev/wolfictl/pkg/melange"
 	"github.com/xanzy/go-gitlab"
 )
@@ -71,7 +72,7 @@ func (o GitLabReleaseOptions) getLatestGitLabVersions() (map[string]NewVersionRe
 			}
 			releases, resp, err := o.gitlabClient.Releases.ListReleases(identifier, listReleaseOption)
 			if err != nil || resp.StatusCode != 200 {
-				o.ErrorMessages[packageName] = fmt.Sprintf("Failed to list releases for %s: %v", packageName, err)
+				o.ErrorMessages[packageName] = fmt.Sprintf("failed to list releases for %s: %v", packageName, err)
 				continue
 			}
 			if len(releases) == 0 {
@@ -146,55 +147,62 @@ func (o GitLabReleaseOptions) getLatestGitLabVersions() (map[string]NewVersionRe
 
 func prepareLatestVersion(versionList []VersionComit, packageConfig *config.Configuration) (latestVersion, commit string, err error) {
 	if len(versionList) == 0 {
-		return latestVersion, commit, errors.New("No versions found, empty list of tags/releases")
+		return "", "", errors.New("no versions found, empty list of tags/releases")
 	}
 
 	glm := packageConfig.Update.GitLabMonitor
 	if glm == nil {
-		return latestVersion, commit, errors.New("No GitLab update configuration found for package")
+		return "", "", errors.New("no gitlab update configuration found for package")
 	}
 
+	var highestVersion *semver.Version
 	for _, vc := range versionList {
+		// Check if version should be ignored based on regex patterns
 		ignore, err := ignoreVersions(packageConfig.Update.IgnoreRegexPatterns, vc.Version)
 		if err != nil {
-			return latestVersion, commit, err
+			return "", "", err
 		}
 		if ignore {
 			continue
 		}
-		if shouldSkipVersion(vc.Version) {
+
+		// filters
+		if shouldSkipVersion(vc.Version) || (glm.TagFilterPrefix != "" && !strings.HasPrefix(vc.Version, glm.TagFilterPrefix)) || (glm.TagFilterContains != "" && !strings.Contains(vc.Version, glm.TagFilterContains)) {
 			continue
 		}
-		if glm.TagFilterPrefix != "" {
-			if !strings.HasPrefix(vc.Version, glm.TagFilterPrefix) {
-				continue
-			}
-		}
-		if glm.TagFilterContains != "" {
-			if !strings.Contains(vc.Version, glm.TagFilterContains) {
-				continue
-			}
+
+		// Parse the version for comparison
+		currentVersion, err := semver.NewVersion(vc.Version)
+		if err != nil {
+			continue // Skip versions that cannot be parsed
 		}
 
-		latestVersion = vc.Version
-		commit = vc.Commit
-		if glm.StripPrefix != "" {
-			latestVersion = strings.TrimPrefix(latestVersion, glm.StripPrefix)
+		// Compare and find the highest version
+		if highestVersion == nil || currentVersion.GreaterThan(highestVersion) {
+			highestVersion = currentVersion
+			latestVersion = vc.Version
+			commit = vc.Commit
 		}
-		if glm.StripSuffix != "" {
-			latestVersion = strings.TrimSuffix(latestVersion, glm.StripSuffix)
-		}
+	}
 
-		latestVersion, er := transformVersion(packageConfig.Update, latestVersion)
-		if er != nil {
-			return latestVersion, commit, fmt.Errorf("Failed to apply version transforms to %s.  Error: %s", latestVersion, er)
-		}
-		break
+	if highestVersion == nil {
+		return "", "", errors.New("no latest version found")
 	}
-	if latestVersion == "" {
-		return latestVersion, commit, errors.New("No latest version found")
+
+	// Apply transformations
+	if glm.StripPrefix != "" {
+		latestVersion = strings.TrimPrefix(latestVersion, glm.StripPrefix)
 	}
-	return latestVersion, commit, nil
+	if glm.StripSuffix != "" {
+		latestVersion = strings.TrimSuffix(latestVersion, glm.StripSuffix)
+	}
+
+	transformedVersion, err := transformVersion(packageConfig.Update, latestVersion)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to apply version transforms to %s. error: %s", latestVersion, err)
+	}
+
+	return transformedVersion, commit, nil
 }
 
 func (o GitLabReleaseOptions) getSeparateRepoLists() (releaseRepoList, tagRepoList map[string]string) {

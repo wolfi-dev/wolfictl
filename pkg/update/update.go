@@ -245,7 +245,6 @@ func (o *Options) GetLatestVersions(ctx context.Context, dir string, packageName
 		if err != nil {
 			return latestVersions, fmt.Errorf("failed getting github releases: %w", err)
 		}
-		fmt.Println("v", v)
 		maps.Copy(o.ErrorMessages, errorMessages)
 		maps.Copy(latestVersions, v)
 	}
