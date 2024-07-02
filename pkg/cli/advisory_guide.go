@@ -258,6 +258,10 @@ func cmdAdvisoryGuide() *cobra.Command {
 
 					vaPicker = vaPickerCtrlC.Unwrap()
 				}
+				if vaPicker.Error != nil {
+					return fmt.Errorf("vulnerability picker error: %w", vaPicker.Error)
+				}
+
 				vaPicked := vaPicker.Picked()
 				if vaPicked == nil {
 					// The user selected a custom action that quit the picker. Nothing was picked.
