@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chainguard-dev/clog"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cli/browser"
@@ -29,6 +30,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	"github.com/wolfi-dev/wolfictl/pkg/internal"
 	question2 "github.com/wolfi-dev/wolfictl/pkg/question"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
@@ -180,6 +182,9 @@ func cmdAdvisoryGuide() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to create vulnerability scanner: %w", err)
 			}
+
+			// We don't want logging, it's unnecessary and interrupts the flow of the guide.
+			ctx = clog.WithLogger(ctx, clog.NewLogger(internal.NopLogger()))
 
 			results, err := bg.Scan(ctx, scanner, distroID)
 			if err != nil {
