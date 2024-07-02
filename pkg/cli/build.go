@@ -518,7 +518,10 @@ func buildAll(ctx context.Context, cfg *Global, args []string) error {
 	eg.Go(func() error {
 		var err error
 		stuff, err = walkConfigs(ctx, cfg)
-		return fmt.Errorf("walking config: %w", err)
+		if err != nil {
+			return fmt.Errorf("walking config: %w", err)
+		}
+		return nil
 	})
 
 	var mu sync.Mutex
