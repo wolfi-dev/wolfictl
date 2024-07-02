@@ -3,7 +3,6 @@ package update
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -226,11 +225,7 @@ func TestGitHubReleaseOptions_isVersionPreRelease(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.version, func(t *testing.T) {
-			o := GitHubReleaseOptions{
-				Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
-			}
-
-			assert.Equalf(t, tt.skip, o.shouldSkipVersion(tt.version), "isVersionPreRelease(%v)", tt.version)
+			assert.Equalf(t, tt.skip, shouldSkipVersion(tt.version), "isVersionPreRelease(%v)", tt.version)
 		})
 	}
 }
