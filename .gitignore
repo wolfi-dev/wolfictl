@@ -4,6 +4,7 @@ wolfictl
 .vscode
 
 dist/
+bin/
 
 packages/*
 melange-cache/*

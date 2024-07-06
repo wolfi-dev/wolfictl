@@ -68,17 +68,14 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 	documentErrs := lo.Map(
 		opts.AdvisoryDocs.Select().Configurations(),
 		func(doc v2.Document, _ int) error {
-			if len(opts.SelectedPackages) > 0 {
-				if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
-					// Skip this document, since it's not in the set of selected packages.
-					return nil
-				}
-			}
-
-			return doc.Validate()
+			return opts.validateDocument(doc)
 		},
 	)
-	errs = append(errs, errorhelpers.LabelError("basic validation failure(s)", errors.Join(documentErrs...)))
+
+	errs = append(errs,
+		errorhelpers.LabelError("basic validation failure(s)", errors.Join(documentErrs...)),
+		errorhelpers.LabelError("document file name validation failure(s)", opts.validateDocumentNameMatchesPackageName()),
+	)
 
 	if opts.BaseAdvisoryDocs != nil {
 		diff := IndexDiff(opts.BaseAdvisoryDocs, opts.AdvisoryDocs)
@@ -99,6 +96,27 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 		log.Info("skipping validation of alias set completeness, no alias finder provided")
 	}
 
+	return errors.Join(errs...)
+}
+
+func (opts ValidateOptions) validateDocument(doc v2.Document) error {
+	if len(opts.SelectedPackages) > 0 {
+		if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
+			// Skip this document, since it's not in the set of selected packages.
+			return nil
+		}
+	}
+
+	return doc.Validate()
+}
+
+func (opts ValidateOptions) validateDocumentNameMatchesPackageName() error {
+	var errs []error
+	for _, e := range opts.AdvisoryDocs.Select().Entries() {
+		if e.Path() != e.Configuration().Package.Name+".advisories.yaml" {
+			errs = append(errs, fmt.Errorf("document file name %q does not match package name %q", strings.TrimSuffix(e.Path(), ".advisories.yaml"), e.Configuration().Package.Name))
+		}
+	}
 	return errors.Join(errs...)
 }
 
