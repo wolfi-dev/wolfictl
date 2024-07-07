@@ -30,15 +30,15 @@ func NewYAMLUpdateFunc[T Configuration](yamlASTMutater YAMLASTMutater[T]) EntryU
 			return err
 		}
 
-		file, err := i.fsys.OpenAsWritable(e.getPath())
+		file, err := i.fsys.OpenAsWritable(e.Path())
 		if err != nil {
-			return fmt.Errorf("unable to update %q: %w", e.getPath(), err)
+			return fmt.Errorf("unable to update %q: %w", e.Path(), err)
 		}
 		defer file.Close()
 
-		err = i.fsys.Truncate(e.getPath(), 0)
+		err = i.fsys.Truncate(e.Path(), 0)
 		if err != nil {
-			return fmt.Errorf("unable to update %q: %w", e.getPath(), err)
+			return fmt.Errorf("unable to update %q: %w", e.Path(), err)
 		}
 
 		encoder := formatted.NewEncoder(file).AutomaticConfig()
