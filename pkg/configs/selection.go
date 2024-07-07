@@ -33,7 +33,7 @@ func (s Selection[T]) WhereName(name string) Selection[T] {
 // path match the given parameter.
 func (s Selection[T]) WhereFilePath(p string) Selection[T] {
 	return s.Where(func(e Entry[T]) bool {
-		return p == e.getPath()
+		return p == e.Path()
 	})
 }
 

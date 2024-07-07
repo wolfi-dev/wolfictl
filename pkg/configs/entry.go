@@ -19,7 +19,7 @@ type Entry[T Configuration] interface {
 	yamlASTRoot() *yaml.Node
 
 	// Path returns the path of the configuration file that underlies this index entry.
-	getPath() string
+	Path() string
 
 	// Update applies the given entryUpdater to the entry.
 	Update(ctx context.Context, updater EntryUpdater[T]) error
@@ -48,7 +48,7 @@ func (e entry[T]) yamlASTRoot() *yaml.Node {
 	return e.yamlRoot
 }
 
-func (e entry[T]) getPath() string {
+func (e entry[T]) Path() string {
 	return e.path
 }
 

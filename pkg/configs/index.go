@@ -203,7 +203,7 @@ func (i *Index[T]) update(ctx context.Context, entry Entry[T], entryUpdater Entr
 	}
 
 	id := entry.id()
-	err = i.processAndUpdate(ctx, entry.getPath(), i.byID[id])
+	err = i.processAndUpdate(ctx, entry.Path(), i.byID[id])
 	if err != nil {
 		return fmt.Errorf("unable to process and update index entry for %q: %w", id, err)
 	}
@@ -299,7 +299,7 @@ func (i *Index[T]) updateAtIndex(e *entry[T], entryIndex int) {
 	i.cfgs[entryIndex] = e.cfg
 	i.byID[e.id()] = entryIndex
 	i.byName[(*e.Configuration()).Name()] = entryIndex
-	i.byPath[e.getPath()] = entryIndex
+	i.byPath[e.Path()] = entryIndex
 }
 
 func (i *Index[T]) entry(idx int) Entry[T] {
