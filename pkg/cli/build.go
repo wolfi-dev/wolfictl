@@ -779,9 +779,6 @@ func (t *task) gitSDE(ctx context.Context) (time.Time, error) {
 }
 
 func (t *task) start(ctx context.Context) {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "start "+t.pkg)
-	defer span.End()
-
 	defer func() {
 		// When we finish, wake up any goroutines that are waiting on us.
 		t.cond.L.Lock()
@@ -800,7 +797,7 @@ func (t *task) start(ctx context.Context) {
 	}
 
 	for _, dep := range t.deps {
-		if err := dep.wait(ctx); err != nil {
+		if err := dep.wait(); err != nil {
 			t.err = fmt.Errorf("waiting on %s: %w", dep.pkg, err)
 			return
 		}
@@ -1641,10 +1638,7 @@ func (t *task) maybeStart(ctx context.Context) {
 }
 
 // Park the calling goroutine until this task finishes.
-func (t *task) wait(ctx context.Context) error {
-	_, span := otel.Tracer("wolfictl").Start(ctx, "waiting on "+t.pkg)
-	defer span.End()
-
+func (t *task) wait() error {
 	t.cond.L.Lock()
 	for !t.done {
 		t.cond.Wait()
