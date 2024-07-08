@@ -81,6 +81,11 @@ of the event to now. The command will not copy events of type "detection", "fixe
 				}
 			}
 
+			// Remove the old non-version-streamed file.
+			if err := os.Remove(old + ".advisories.yaml"); err != nil {
+				return fmt.Errorf("unable to remove old file %q: %w", old+".advisories.yaml", err)
+			}
+
 			return advisoryCfgs.Create(ctx, path, out)
 		},
 	}
