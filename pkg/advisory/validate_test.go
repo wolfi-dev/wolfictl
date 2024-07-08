@@ -14,6 +14,7 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
+//nolint:gocyclo // Current cyclomatic complexity is 31 and > 30.
 func TestValidate(t *testing.T) {
 	// The diff validation tests use the test fixtures for advisory.IndexDiff.
 
@@ -392,6 +393,37 @@ func TestValidate(t *testing.T) {
 			{
 				name:          "no-duplicates",
 				shouldBeValid: true,
+			},
+		}
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				dir := filepath.Join("testdata", "validate", tt.name)
+				fsys := rwos.DirFS(dir)
+				index, err := v2.NewIndex(context.Background(), fsys)
+				require.NoError(t, err)
+
+				err = Validate(context.Background(), ValidateOptions{
+					AdvisoryDocs: index,
+				})
+				if tt.shouldBeValid && err != nil {
+					t.Errorf("should be valid but got error: %v", err)
+				}
+				if !tt.shouldBeValid && err == nil {
+					t.Error("shouldn't be valid but got no error")
+				}
+			})
+		}
+	})
+
+	t.Run("package name invalid", func(t *testing.T) {
+		cases := []struct {
+			name          string
+			shouldBeValid bool
+		}{
+			{
+				name:          "file-package-name-mismatch",
+				shouldBeValid: false,
 			},
 		}
 
