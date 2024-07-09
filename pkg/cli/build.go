@@ -22,10 +22,19 @@ import (
 	"sync"
 	"time"
 
+	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
+	"chainguard.dev/apko/pkg/build/types"
+	"chainguard.dev/melange/pkg/build"
+	"chainguard.dev/melange/pkg/container"
+	"chainguard.dev/melange/pkg/container/docker"
+	"chainguard.dev/melange/pkg/index"
+	"chainguard.dev/melange/pkg/sign"
 	"cloud.google.com/go/storage"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/dominikbraun/graph"
 	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -44,25 +53,20 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
 	"github.com/wolfi-dev/wolfictl/pkg/private/bundle"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
-
-	"chainguard.dev/apko/pkg/apk/apk"
-	"chainguard.dev/apko/pkg/build/types"
-	"chainguard.dev/melange/pkg/build"
-	"chainguard.dev/melange/pkg/container"
-	"chainguard.dev/melange/pkg/container/docker"
-	"chainguard.dev/melange/pkg/index"
-	"chainguard.dev/melange/pkg/sign"
-	"github.com/chainguard-dev/clog"
 )
 
 func cmdBuild() *cobra.Command {
 	var jobs int
 	var traceFile string
+	var anns []string // string list annotations
 
-	cfg := Global{}
+	cfg := Global{
+		BuildID: uuid.New(),
+	}
 
 	// TODO: buildworld bool (build deps vs get them from package repo)
 	// TODO: builddownstream bool (build things that depend on listed packages)
@@ -71,6 +75,15 @@ func cmdBuild() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+
+			cfg.Annotations = map[string]string{}
+			for _, ann := range anns {
+				k, v, ok := strings.Cut(ann, "=")
+				if !ok {
+					return fmt.Errorf("invalid annotation: %q", ann)
+				}
+				cfg.Annotations[k] = v
+			}
 
 			if traceFile != "" {
 				w, err := os.Create(traceFile)
@@ -158,7 +171,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
 	cmd.Flags().StringVar(&cfg.MachineFamily, "machine-family", "", "machine family for amd64 builds")
 	cmd.Flags().StringVar(&cfg.ServiceAccount, "service-account", "default", "service-account to run pods as.")
-	cmd.Flags().BoolVar(&cfg.GVisor, "gvisor", false, "enable gVisor (GKE Sandbox) for builds")
+	cmd.Flags().StringSliceVarP(&anns, "annotations", "a", []string{}, "key=value pairs to add to the pod spec annotations. The keys will be prefixed with 'melange.chainguard.dev/' on the pod.")
 
 	return cmd
 }
@@ -292,7 +305,7 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 	if err != nil {
 		return nil, err
 	}
-	addAuth(req)
+	auth.DefaultAuthenticators.AddAuth(ctx, req)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -668,6 +681,8 @@ func buildAll(ctx context.Context, cfg *Global, args []string) error {
 }
 
 type Global struct {
+	BuildID uuid.UUID
+
 	dryrun bool
 
 	jobch  chan struct{}
@@ -714,7 +729,7 @@ type Global struct {
 	K8sNamespace   string
 	ServiceAccount string
 	MachineFamily  string
-	GVisor         bool
+	Annotations    map[string]string
 
 	ProjectID       string
 	ClusterLocation string
@@ -951,7 +966,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	log := clog.FromContext(ctx)
 
-	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.GVisor)
+	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.Annotations)
 	if err != nil {
 		return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
 	}

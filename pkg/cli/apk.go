@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
 	"cloud.google.com/go/storage"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
@@ -88,7 +89,7 @@ func cmdCp() *cobra.Command {
 						if err != nil {
 							return err
 						}
-						addAuth(req)
+						auth.DefaultAuthenticators.AddAuth(ctx, req)
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
 							return err
@@ -295,7 +296,7 @@ func fetchAPKIndex(ctx context.Context, indexURL string) (*apk.APKIndex, string,
 		if err != nil {
 			return nil, "", fmt.Errorf("GET %q: %w", u.Redacted(), err)
 		}
-		addAuth(req)
+		auth.DefaultAuthenticators.AddAuth(ctx, req)
 		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
 		if err != nil {
 			return nil, "", fmt.Errorf("GET %q: %w", u.Redacted(), err)
@@ -313,17 +314,6 @@ func fetchAPKIndex(ctx context.Context, indexURL string) (*apk.APKIndex, string,
 		return nil, "", fmt.Errorf("parsing %q: %w", indexURL, err)
 	}
 	return index, arch, nil
-}
-
-func addAuth(req *http.Request) {
-	env := os.Getenv("HTTP_AUTH")
-	parts := strings.Split(env, ":")
-	if len(parts) != 4 || parts[0] != "basic" {
-		return
-	}
-	if req.URL.Host == parts[1] {
-		req.SetBasicAuth(parts[2], parts[3])
-	}
 }
 
 func onlyLatest(packages []*apk.Package) []*apk.Package {
