@@ -62,6 +62,7 @@ import (
 func cmdBuild() *cobra.Command {
 	var jobs int
 	var traceFile string
+	var anns []string // string list annotations
 
 	cfg := Global{
 		BuildID: uuid.New(),
@@ -74,6 +75,15 @@ func cmdBuild() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+
+			cfg.Annotations = map[string]string{}
+			for _, ann := range anns {
+				k, v, ok := strings.Cut(ann, "=")
+				if !ok {
+					return fmt.Errorf("invalid annotation: %q", ann)
+				}
+				cfg.Annotations[k] = v
+			}
 
 			if traceFile != "" {
 				w, err := os.Create(traceFile)
@@ -161,7 +171,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
 	cmd.Flags().StringVar(&cfg.MachineFamily, "machine-family", "", "machine family for amd64 builds")
 	cmd.Flags().StringVar(&cfg.ServiceAccount, "service-account", "default", "service-account to run pods as.")
-	cmd.Flags().StringSliceVarP(&cfg.Annotations, "annotations", "a", []string{}, "key=value pairs to add to the pod spec annotations.")
+	cmd.Flags().StringSliceVarP(&anns, "annotations", "a", []string{}, "key=value pairs to add to the pod spec annotations.")
 
 	return cmd
 }
@@ -719,7 +729,7 @@ type Global struct {
 	K8sNamespace   string
 	ServiceAccount string
 	MachineFamily  string
-	Annotations    []string
+	Annotations    map[string]string
 
 	ProjectID       string
 	ClusterLocation string

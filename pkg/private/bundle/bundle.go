@@ -350,7 +350,7 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, anns []string) (*corev1.Pod, error) {
+func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, anns map[string]string) (*corev1.Pod, error) {
 	goarch := types.ParseArchitecture(arch).String()
 
 	// Set some sane default resource requests if none are specified by flag or config.
@@ -484,11 +484,7 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, anns [
 		},
 	}
 
-	for _, a := range anns {
-		k, v, ok := strings.Cut(a, "=")
-		if !ok {
-			return nil, fmt.Errorf("annotation %q should be in the form 'key=value'", a)
-		}
+	for k, v := range anns {
 		if _, ok := pod.Annotations[k]; ok {
 			return nil, fmt.Errorf("annotation %q already set", k)
 		}
