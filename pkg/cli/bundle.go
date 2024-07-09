@@ -38,8 +38,8 @@ import (
 
 func cmdBundle() *cobra.Command {
 	cfg := Global{}
-	bcfg := bundleConfig{
-		base: empty.Index,
+	bcfg := BundleConfig{
+		Base: empty.Index,
 	}
 
 	cmd := &cobra.Command{
@@ -53,43 +53,46 @@ func cmdBundle() *cobra.Command {
 				log.Infof("no signing key specified, not signing")
 			}
 			if cfg.PipelineDir == "" {
-				cfg.PipelineDir = filepath.Join(cfg.dir, "pipelines")
+				cfg.PipelineDir = filepath.Join(cfg.Dir, "pipelines")
 			}
 			if cfg.OutDir == "" {
-				cfg.OutDir = filepath.Join(cfg.dir, "packages")
+				cfg.OutDir = filepath.Join(cfg.Dir, "packages")
 			}
 
-			if bcfg.baseRef != "" {
-				ref, err := name.ParseReference(bcfg.baseRef, name.Insecure)
+			if bcfg.BaseRef != "" {
+				ref, err := name.ParseReference(bcfg.BaseRef, name.Insecure)
 				if err != nil {
 					return err
 				}
-				bcfg.base, err = remote.Index(ref)
+				bcfg.Base, err = remote.Index(ref)
 				if err != nil {
 					return err
 				}
 			}
 
-			if bcfg.repo != "" {
+			if bcfg.Repo != "" {
 				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithUserAgent("wolfictl bundle"))
 				if err != nil {
 					return err
 				}
-				bcfg.pusher = pusher
+				bcfg.Pusher = pusher
 
-				bcfg.dirfs = os.DirFS(cfg.dir)
+				bcfg.Dirfs = os.DirFS(cfg.Dir)
 
-				bcfg.commonFiles, err = commonFS(bcfg.dirfs)
+				bcfg.CommonFiles, err = CommonFS(bcfg.Dirfs)
 				if err != nil {
 					return err
 				}
 			}
 
-			return bundleAll(ctx, &cfg, &bcfg, args)
+			if _, err := BundleAll(ctx, &cfg, &bcfg, args); err != nil {
+				return err
+			}
+			return nil
 		},
 	}
 
-	cmd.Flags().StringVarP(&cfg.dir, "dir", "d", ".", "directory to search for melange configs")
+	cmd.Flags().StringVarP(&cfg.Dir, "dir", "d", ".", "directory to search for melange configs")
 	cmd.Flags().StringVar(&cfg.PipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	cmd.Flags().StringVar(&cfg.Runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
 	cmd.Flags().StringSliceVar(&cfg.Archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
@@ -104,25 +107,25 @@ func cmdBundle() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
 	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
-	cmd.Flags().StringVar(&bcfg.baseRef, "bundle-base", "", "base image used for melange build bundles")
-	cmd.Flags().StringVar(&bcfg.repo, "bundle-repo", "", "where to push the bundles")
+	cmd.Flags().StringVar(&bcfg.BaseRef, "bundle-base", "", "base image used for melange build bundles")
+	cmd.Flags().StringVar(&bcfg.Repo, "bundle-repo", "", "where to push the bundles")
 	cmd.Flags().StringToStringVarP(&bcfg.annotations, "annotation", "a", nil, "New annotations to add")
 
 	return cmd
 }
 
-type bundleConfig struct {
-	baseRef     string
-	base        v1.ImageIndex
-	repo        string
-	commonFiles fs.FS
-	pusher      *remote.Pusher
+type BundleConfig struct {
+	BaseRef     string
+	Base        v1.ImageIndex
+	Repo        string
+	CommonFiles fs.FS
+	Pusher      *remote.Pusher
 	annotations map[string]string
 
-	dirfs fs.FS
+	Dirfs fs.FS
 }
 
-func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []string) error { //nolint:gocyclo
+func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []string) (*name.Digest, error) { //nolint:gocyclo
 	var eg errgroup.Group
 
 	var stuff *configStuff
@@ -155,7 +158,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 	}
 
 	if err := eg.Wait(); err != nil {
-		return err
+		return nil, err
 	}
 
 	newTask := func(pkg string) *task {
@@ -204,7 +207,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 	}
 
 	if len(tasks) == 0 {
-		return fmt.Errorf("no packages to build")
+		return nil, fmt.Errorf("no packages to build")
 	}
 
 	todos := tasks
@@ -214,7 +217,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 		for _, arg := range args {
 			t, ok := tasks[arg]
 			if !ok {
-				return fmt.Errorf("constraint %q does not exist", arg)
+				return nil, fmt.Errorf("constraint %q does not exist", arg)
 			}
 			todos[arg] = t
 		}
@@ -235,7 +238,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 
 	if len(errs) != 0 {
 		log.Errorf("Failed to bundle %d builds", len(errs))
-		return errors.Join(errs...)
+		return nil, errors.Join(errs...)
 	}
 
 	needed, err := stuff.g.Filter(func(pkg dag.Package) bool {
@@ -243,23 +246,23 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 		return ok
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	m, err := needed.Graph.AdjacencyMap()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	log.Infof("bundle contains %d builds", len(m))
 
 	b, err := json.Marshal(m)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	layer := static.NewLayer(b, ggcrtypes.MediaType("application/vnd.dev.wolfi.graph+json"))
 	depgraph, err := mutate.AppendLayers(mutate.MediaType(empty.Image, ggcrtypes.OCIManifestSchema1), layer)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// First is dependency graph.
@@ -274,7 +277,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 
 	epochs, err := getEpochs(ctx, maps.Values(built))
 	if err != nil {
-		return fmt.Errorf("computing build date epochs: %w", err)
+		return nil, fmt.Errorf("computing build date epochs: %w", err)
 	}
 	log.Infof("saw %d epochs from git", len(epochs))
 
@@ -288,7 +291,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 
 		bde, ok := epochs[t.config.Path]
 		if !ok {
-			return fmt.Errorf("missing buildDateEpoch: %s", t.pkg)
+			return nil, fmt.Errorf("missing buildDateEpoch: %s", t.pkg)
 		}
 
 		bundleTasks = append(bundleTasks, &bundle.Task{
@@ -297,7 +300,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 			Version:        t.config.Package.Version,
 			Epoch:          t.config.Package.Epoch,
 			Path:           t.config.Path,
-			SourceDir:      filepath.Join(t.cfg.dir, t.pkg),
+			SourceDir:      filepath.Join(t.cfg.Dir, t.pkg),
 			Architectures:  t.archs,
 			Subpackages:    subpkgs,
 			Resources:      t.config.Package.Resources,
@@ -312,12 +315,12 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 
 	tb, err := json.Marshal(bundleTasks)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	tlayer := static.NewLayer(tb, ggcrtypes.MediaType("application/vnd.dev.wolfi.tasks+json"))
 	taskimg, err := mutate.AppendLayers(mutate.MediaType(empty.Image, ggcrtypes.OCIManifestSchema1), tlayer)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	addendums = append(addendums, mutate.IndexAddendum{
@@ -329,7 +332,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 		},
 	})
 
-	if bcfg.repo != "" {
+	if bcfg.Repo != "" {
 		entrypoints := map[types.Architecture]*bundle.Entrypoint{}
 
 		for _, arch := range cfg.Archs {
@@ -363,7 +366,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 			for _, f := range cfg.fuses {
 				mount, err := bundle.ParseGCSFuseMount(f)
 				if err != nil {
-					return err
+					return nil, err
 				}
 				mounts = append(mounts, mount)
 			}
@@ -375,9 +378,9 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 			}
 		}
 
-		bundled, err := bundle.New(bcfg.base, entrypoints, bcfg.commonFiles, srcfs)
+		bundled, err := bundle.New(bcfg.Base, entrypoints, bcfg.CommonFiles, srcfs)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		addendums = append(addendums, mutate.IndexAddendum{
@@ -396,26 +399,27 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 		idx = mutate.Annotations(idx, bcfg.annotations).(v1.ImageIndex) //nolint:errcheck
 	}
 
-	dst, err := name.ParseReference(fmt.Sprintf("%s/%s", bcfg.repo, "bundle"), name.Insecure)
+	dst, err := name.ParseReference(fmt.Sprintf("%s/%s", bcfg.Repo, "bundle"), name.Insecure)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Infof("pushing bundle to %s", dst.String())
 
-	if err := bcfg.pusher.Push(ctx, dst, idx); err != nil {
-		return fmt.Errorf("pushing %s: %w", dst, err)
+	if err := bcfg.Pusher.Push(ctx, dst, idx); err != nil {
+		return nil, fmt.Errorf("pushing %s: %w", dst, err)
 	}
 
 	digest, err := idx.Digest()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	log.Infof("pushed bundle to %s", dst.Context().Digest(digest.String()).String())
-	fmt.Println(dst.Context().Digest(digest.String()).String())
+	d := dst.Context().Digest(digest.String())
+	log.Infof("pushed bundle to %s", d.String())
+	fmt.Println(d.String())
 
-	return nil
+	return &d, nil
 }
 
 func (t *task) addBundle(ctx context.Context, srcfs fstest.MapFS, built map[string]*task) error {
@@ -445,7 +449,7 @@ func (t *task) addBundle(ctx context.Context, srcfs fstest.MapFS, built map[stri
 		return nil
 	}
 
-	if err := t.addSourceFS(srcfs, t.bcfg.dirfs); err != nil {
+	if err := t.addSourceFS(srcfs, t.bcfg.Dirfs); err != nil {
 		return fmt.Errorf("addSourceFS %s: %w", t.pkg, err)
 	}
 
@@ -511,7 +515,7 @@ func (t *task) addSourceFS(mapfs fstest.MapFS, dirfs fs.FS) error {
 	return nil
 }
 
-func commonFS(dirfs fs.FS) (fs.FS, error) {
+func CommonFS(dirfs fs.FS) (fs.FS, error) {
 	mapfs := fstest.MapFS{}
 
 	// melange reads these files to get the commit info
