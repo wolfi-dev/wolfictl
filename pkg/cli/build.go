@@ -116,13 +116,13 @@ func cmdBuild() *cobra.Command {
 			cfg.donech = make(chan *task, jobs)
 
 			if cfg.signingKey == "" {
-				cfg.signingKey = filepath.Join(cfg.dir, "local-melange.rsa")
+				cfg.signingKey = filepath.Join(cfg.Dir, "local-melange.rsa")
 			}
 			if cfg.PipelineDir == "" {
-				cfg.PipelineDir = filepath.Join(cfg.dir, "pipelines")
+				cfg.PipelineDir = filepath.Join(cfg.Dir, "pipelines")
 			}
 			if cfg.OutDir == "" {
-				cfg.OutDir = filepath.Join(cfg.dir, "packages")
+				cfg.OutDir = filepath.Join(cfg.Dir, "packages")
 			}
 
 			// Used to track expected generation of index file to allow idempotent writes.
@@ -146,7 +146,7 @@ func cmdBuild() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&cfg.dir, "dir", "d", ".", "directory to search for melange configs")
+	cmd.Flags().StringVarP(&cfg.Dir, "dir", "d", ".", "directory to search for melange configs")
 	cmd.Flags().StringVar(&cfg.PipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
 	cmd.Flags().StringVar(&cfg.Runner, "runner", "docker", "which runner to use to enable running commands, default is based on your platform.")
 	cmd.Flags().StringSliceVar(&cfg.Archs, "arch", []string{"x86_64", "aarch64"}, "arch of package to build")
@@ -190,8 +190,8 @@ func walkConfigs(ctx context.Context, cfg *Global) (*configStuff, error) {
 	log := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
 	ctx = clog.WithLogger(ctx, log)
 
-	// Walk all the melange configs in cfg.dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
-	pkgs, err := dag.NewPackages(ctx, os.DirFS(cfg.dir), cfg.dir, cfg.PipelineDir)
+	// Walk all the melange configs in cfg.Dir, parses them, and builds the dependency graph of environment + pipelines (build time deps).
+	pkgs, err := dag.NewPackages(ctx, os.DirFS(cfg.Dir), cfg.Dir, cfg.PipelineDir)
 	if err != nil {
 		return nil, err
 	}
@@ -350,11 +350,11 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
 	}
 
-	if cfg.dir == "" {
-		cfg.dir = "."
+	if cfg.Dir == "" {
+		cfg.Dir = "."
 	}
 	if cfg.OutDir == "" {
-		cfg.OutDir = filepath.Join(cfg.dir, "packages")
+		cfg.OutDir = filepath.Join(cfg.Dir, "packages")
 	}
 
 	jobs := runtime.GOMAXPROCS(0)
@@ -688,7 +688,7 @@ type Global struct {
 	jobch  chan struct{}
 	donech chan *task
 
-	dir             string
+	Dir             string
 	DestinationRepo string
 	PipelineDir     string
 	Runner          string
@@ -775,7 +775,7 @@ type task struct {
 
 	// TODO: This is a hack, refactor the task execution out from the graph walking.
 	ref  *name.Digest
-	bcfg *bundleConfig
+	bcfg *BundleConfig
 }
 
 func (t *task) gitSDE(ctx context.Context) (time.Time, error) {
@@ -873,7 +873,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 	flog := clog.New(slog.NewTextHandler(f, nil)).With("pkg", t.pkg)
 	fctx := clog.WithLogger(ctx, flog)
 
-	sdir := filepath.Join(t.cfg.dir, t.pkg)
+	sdir := filepath.Join(t.cfg.Dir, t.pkg)
 	if _, err := os.Stat(sdir); os.IsNotExist(err) {
 		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
 			return fmt.Errorf("creating source directory %s: %v", sdir, err)
@@ -901,7 +901,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 		build.WithExtraRepos(t.cfg.ExtraRepos),
 		build.WithSigningKey(t.cfg.signingKey),
 		build.WithRunner(runner),
-		build.WithEnvFile(filepath.Join(t.cfg.dir, envFile(arch))),
+		build.WithEnvFile(filepath.Join(t.cfg.Dir, envFile(arch))),
 		build.WithNamespace(t.cfg.PurlNamespace),
 		build.WithSourceDir(sdir),
 		build.WithCacheSource(t.cfg.cacheSource),
@@ -1690,7 +1690,7 @@ func logs(fname string) error {
 
 // TODO: I think this is probably wrong, actually.
 func (t *task) sourceDir() (string, error) {
-	sdir := filepath.Join(t.cfg.dir, t.pkg)
+	sdir := filepath.Join(t.cfg.Dir, t.pkg)
 	if _, err := os.Stat(sdir); os.IsNotExist(err) {
 		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
 			return "", fmt.Errorf("creating source directory %s: %v", sdir, err)
