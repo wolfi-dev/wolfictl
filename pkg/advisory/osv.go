@@ -148,8 +148,9 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 					continue
 				}
 
-				// Note: The OSV data should include our advisory ID itself among the listed aliases.
-				aliases := append([]string{adv.ID}, adv.Aliases...)
+				// Note: The OSV data should include our advisory ID itself among the listed
+				// related vulnerability IDs.
+				related := append([]string{adv.ID}, adv.Aliases...)
 
 				affecteds := make([]models.Affected, 0, len(affectedPackages))
 				for _, pkg := range affectedPackages {
@@ -161,7 +162,7 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 
 				entry := models.Vulnerability{
 					ID:       adv.ID,
-					Aliases:  aliases,
+					Related:  related,
 					Affected: affecteds,
 					Modified: advisoryLastUpdated,
 				}
