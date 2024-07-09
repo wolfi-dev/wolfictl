@@ -485,10 +485,11 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, anns m
 	}
 
 	for k, v := range anns {
-		if _, ok := pod.Annotations[k]; ok {
-			return nil, fmt.Errorf("annotation %q already set", k)
+		kk := "melange.chainguard.dev/" + k
+		if _, ok := pod.Annotations[kk]; ok {
+			return nil, fmt.Errorf("annotation %q already set", kk)
 		}
-		pod.Annotations["melange.chainguard.dev/"+k] = v
+		pod.Annotations[kk] = v
 	}
 
 	if mf != "" {
