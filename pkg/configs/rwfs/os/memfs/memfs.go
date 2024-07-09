@@ -124,6 +124,14 @@ func (m *memWriteFS) Truncate(name string, size int64) error {
 	return nil
 }
 
+func (m *memWriteFS) Remove(name string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	delete(m.data, name)
+	return nil
+}
+
 func (m *memWriteFS) Create(name string) (rwfs.File, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

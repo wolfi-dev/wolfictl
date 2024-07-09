@@ -36,6 +36,11 @@ func (fsys FS) Truncate(name string, size int64) error {
 	return os.Truncate(p, size)
 }
 
+func (fsys FS) Remove(name string) error {
+	p := fsys.fullPath(name)
+	return os.Remove(p)
+}
+
 func (fsys FS) fullPath(name string) string {
 	return filepath.Join(fsys.rootDir, name)
 }

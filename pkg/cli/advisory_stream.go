@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -32,12 +31,12 @@ of the event to now. The command will not copy events of type "detection", "fixe
 		Args:          cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			old, new := args[0], args[1]
+			have, want := args[0], args[1]
 
-			old = strings.TrimSuffix(old, ".advisories.yaml")
-			new = strings.TrimSuffix(new, ".advisories.yaml")
+			have = strings.TrimSuffix(have, ".advisories.yaml")
+			want = strings.TrimSuffix(want, ".advisories.yaml")
 
-			if err := checkPackageHasVersionStreamSuffix(new); err != nil {
+			if err := checkPackageHasVersionStreamSuffix(want); err != nil {
 				return err
 			}
 
@@ -47,20 +46,20 @@ of the event to now. The command will not copy events of type "detection", "fixe
 				return err
 			}
 
-			oldEntry, err := advisoryCfgs.Select().WhereName(old).First()
+			oldEntry, err := advisoryCfgs.Select().WhereName(have).First()
 			if err != nil {
-				return fmt.Errorf("unable to find advisory for package %q: %w", old, err)
+				return fmt.Errorf("unable to find advisory for package %q: %w", have, err)
 			}
 			oldDoc := oldEntry.Configuration()
 
 			shouldMergeExistings := false
-			newEntry, err := advisoryCfgs.Select().WhereName(new).First()
+			newEntry, err := advisoryCfgs.Select().WhereName(want).First()
 			if err == nil && len(newEntry.Configuration().Advisories) > 0 {
 				shouldMergeExistings = true
 			}
 
 			out := *oldDoc
-			out.Package.Name = new
+			out.Package.Name = want
 			out.Advisories = nil
 
 			for _, adv := range oldDoc.Advisories {
@@ -69,24 +68,33 @@ of the event to now. The command will not copy events of type "detection", "fixe
 				}
 			}
 
-			path := new + ".advisories.yaml"
+			havePath := have + ".advisories.yaml"
+			wantPath := want + ".advisories.yaml"
 
+			// If automation already created the new advisory file before manual version streaming,
+			// respect the existing file and merge the advisories to it.
 			if shouldMergeExistings {
 				newDoc := newEntry.Configuration()
-				out.Advisories = mergeExistingAdvisories(out.Advisories, newDoc.Advisories)
 
-				// Remove the existing file to re-create it.
-				if err := os.Remove(path); err != nil {
-					return fmt.Errorf("unable to remove existing file %q: %w", path, err)
+				updater := v2.NewAdvisoriesSectionUpdater(func(_ v2.Document) (v2.Advisories, error) {
+					return mergeExistingAdvisories(out.Advisories, newDoc.Advisories), nil
+				})
+
+				if err := newEntry.Update(ctx, updater); err != nil {
+					return fmt.Errorf("unable to update %q: %w", wantPath, err)
+				}
+
+				// Remove the existing file to re-create it since it's already existed.
+				if err := advisoryCfgs.Remove(wantPath); err != nil {
+					return fmt.Errorf("unable to remove old file %q: %w", wantPath, err)
 				}
 			}
 
-			// Remove the old non-version-streamed file.
-			if err := os.Remove(old + ".advisories.yaml"); err != nil {
-				return fmt.Errorf("unable to remove old file %q: %w", old+".advisories.yaml", err)
+			if err := advisoryCfgs.Remove(havePath); err != nil {
+				return fmt.Errorf("unable to remove old file %q: %w", havePath, err)
 			}
 
-			return advisoryCfgs.Create(ctx, path, out)
+			return advisoryCfgs.Create(ctx, wantPath, out)
 		},
 	}
 	cmd.PersistentFlags().StringVarP(&dir, "dir", "d", ".", "directory containing the advisories to copy")
