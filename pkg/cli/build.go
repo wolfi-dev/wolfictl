@@ -171,7 +171,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
 	cmd.Flags().StringVar(&cfg.MachineFamily, "machine-family", "", "machine family for amd64 builds")
 	cmd.Flags().StringVar(&cfg.ServiceAccount, "service-account", "default", "service-account to run pods as.")
-	cmd.Flags().StringSliceVarP(&anns, "annotations", "a", []string{}, "key=value pairs to add to the pod spec annotations.")
+	cmd.Flags().StringSliceVarP(&anns, "annotations", "a", []string{}, "key=value pairs to add to the pod spec annotations. The keys will be prefixed with 'melange.chainguard.dev/' on the pod.")
 
 	return cmd
 }
