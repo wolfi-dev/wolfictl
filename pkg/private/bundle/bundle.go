@@ -28,6 +28,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/google/go-containerregistry/pkg/v1/tarball"
 	ggcrtypes "github.com/google/go-containerregistry/pkg/v1/types"
+	"github.com/google/uuid"
 	"golang.org/x/exp/maps"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -349,7 +350,7 @@ func escapeRFC1123(s string) string {
 
 // Podspec returns bytes of yaml representing a podspec.
 // This is a terrible API that we should change.
-func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor bool) (*corev1.Pod, error) {
+func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string) (*corev1.Pod, error) {
 	goarch := types.ParseArchitecture(arch).String()
 
 	// Set some sane default resource requests if none are specified by flag or config.
@@ -408,21 +409,6 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 		"kubernetes.io/arch": goarch,
 	}
 
-	if gvisor {
-		// Override the default, so we dont consider normal bundle-builder
-		t = []corev1.Toleration{{
-			Effect:   "NoSchedule",
-			Key:      "chainguard.dev/runner",
-			Operator: "Equal",
-			Value:    "gvisor-builder",
-		}, {
-			Effect:   "NoSchedule",
-			Key:      "sandbox.gke.io/runtime",
-			Operator: "Equal",
-			Value:    "gvisor",
-		}}
-	}
-
 	mf := mFamily
 	if goarch == "arm64" {
 		mf = "t2a"
@@ -444,10 +430,11 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 			GenerateName: fmt.Sprintf("%s-%s-", escapeRFC1123(task.Package), goarch),
 			Namespace:    ns,
 			Labels: map[string]string{
-				"kubernetes.io/arch":             goarch,
-				"app.kubernetes.io/component":    task.Package,
-				"melange.chainguard.dev/arch":    goarch,
-				"melange.chainguard.dev/package": task.Package,
+				"kubernetes.io/arch":              goarch,
+				"app.kubernetes.io/component":     task.Package,
+				"melange.chainguard.dev/arch":     goarch,
+				"melange.chainguard.dev/package":  task.Package,
+				"melange.chainguard.dev/build-id": task.BuildID.String(),
 			},
 			Annotations: map[string]string{},
 		},
@@ -495,11 +482,6 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, gvisor
 				},
 			},
 		},
-	}
-
-	if gvisor {
-		c := "gvisor"
-		pod.Spec.RuntimeClassName = &c
 	}
 
 	if mf != "" {
@@ -566,6 +548,7 @@ func tarAddFS(tw *tar.Writer, fsys fs.FS) error {
 }
 
 type Task struct {
+	BuildID        uuid.UUID         `json:"buildID"`
 	Package        string            `json:"package"`
 	Version        string            `json:"version"`
 	Epoch          uint64            `json:"epoch"`

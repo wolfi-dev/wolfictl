@@ -292,6 +292,7 @@ func bundleAll(ctx context.Context, cfg *Global, bcfg *bundleConfig, args []stri
 		}
 
 		bundleTasks = append(bundleTasks, &bundle.Task{
+			BuildID:        cfg.BuildID,
 			Package:        pkg,
 			Version:        t.config.Package.Version,
 			Epoch:          t.config.Package.Epoch,
