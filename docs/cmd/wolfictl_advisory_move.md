@@ -1,23 +1,26 @@
-## wolfictl advisory stream
+## wolfictl advisory move
 
-Start version streaming for a package by moving its advisories into a new package.
+Move a package's advisories into a new package.
 
-***Aliases**: stream*
+***Aliases**: mv*
 
 ### Usage
 
 ```
-wolfictl advisory stream <package-name> <version-streamed-package-name>
+wolfictl advisory move <old-package-name> <new-package-name>
 ```
 
 ### Synopsis
 
-Start version streaming for a package by moving its advisories into a new package.
+Move a package's advisories into a new package.
 
 This command will move most advisories for the given package into a new package. And rename the
 package to the new package name. (i.e., from foo.advisories.yaml to foo-X.Y.advisories.yaml) If the
 target file already exists, the command will try to merge the advisories. To ensure the advisories
 are up-to-date, the command will start a scan for the new package.
+
+This command is also useful to start version streaming for an existing package that has not been
+version streamed before. Especially that requires manual intervention to move the advisories.
 
 The command will move the latest event for each advisory, and will update the timestamp
 of the event to now. The command will not copy events of type "detection", "fixed",
@@ -28,7 +31,7 @@ of the event to now. The command will not copy events of type "detection", "fixe
 
 ```
   -d, --dir string   directory containing the advisories to copy (default ".")
-  -h, --help         help for stream
+  -h, --help         help for move
 ```
 
 ### Options inherited from parent commands

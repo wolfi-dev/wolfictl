@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -10,18 +9,21 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
-func cmdAdvisoryStream() *cobra.Command {
+func cmdAdvisoryMove() *cobra.Command {
 	var dir string
 	cmd := &cobra.Command{
-		Use:     "stream <package-name> <version-streamed-package-name>",
-		Aliases: []string{"stream"},
-		Short:   "Start version streaming for a package by moving its advisories into a new package.",
-		Long: `Start version streaming for a package by moving its advisories into a new package.
+		Use:     "move <old-package-name> <new-package-name>",
+		Aliases: []string{"mv"},
+		Short:   "Move a package's advisories into a new package.",
+		Long: `Move a package's advisories into a new package.
 
 This command will move most advisories for the given package into a new package. And rename the
 package to the new package name. (i.e., from foo.advisories.yaml to foo-X.Y.advisories.yaml) If the
 target file already exists, the command will try to merge the advisories. To ensure the advisories
 are up-to-date, the command will start a scan for the new package.
+
+This command is also useful to start version streaming for an existing package that has not been
+version streamed before. Especially that requires manual intervention to move the advisories.
 
 The command will move the latest event for each advisory, and will update the timestamp
 of the event to now. The command will not copy events of type "detection", "fixed",
@@ -35,10 +37,6 @@ of the event to now. The command will not copy events of type "detection", "fixe
 
 			have = strings.TrimSuffix(have, ".advisories.yaml")
 			want = strings.TrimSuffix(want, ".advisories.yaml")
-
-			if err := checkPackageHasVersionStreamSuffix(want); err != nil {
-				return err
-			}
 
 			advisoryFsys := rwos.DirFS(dir)
 			advisoryCfgs, err := v2.NewIndex(ctx, advisoryFsys)
@@ -71,8 +69,7 @@ of the event to now. The command will not copy events of type "detection", "fixe
 			havePath := have + ".advisories.yaml"
 			wantPath := want + ".advisories.yaml"
 
-			// If automation already created the new advisory file before manual version streaming,
-			// respect the existing file and merge the advisories to it.
+			// If the new file already exists, merge the old advisories to it and re-create.
 			if shouldMergeExistings {
 				newDoc := newEntry.Configuration()
 
@@ -100,16 +97,6 @@ of the event to now. The command will not copy events of type "detection", "fixe
 	cmd.PersistentFlags().StringVarP(&dir, "dir", "d", ".", "directory containing the advisories to copy")
 
 	return cmd
-}
-
-// checkPackageHasVersionStreamSuffix ensures the package name has the "-X" or "-X.Y" suffix.
-// X and Y are positive integers.
-func checkPackageHasVersionStreamSuffix(pkg string) error {
-	re := regexp.MustCompile(`-\d+(\.\d+)?$`)
-	if re.MatchString(pkg) {
-		return nil
-	}
-	return fmt.Errorf("new package name %q does not have the version stream suffix", pkg)
 }
 
 // mergeExistingAdvisories merges the current advisories with the existing advisories.
