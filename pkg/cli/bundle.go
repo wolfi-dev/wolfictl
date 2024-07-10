@@ -345,6 +345,11 @@ func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []stri
 	if bcfg.Repo != "" {
 		entrypoints := map[types.Architecture]*bundle.Entrypoint{}
 
+		pipelineDir, err := filepath.Rel(cfg.Dir, cfg.PipelineDir)
+		if err != nil {
+			return nil, err
+		}
+
 		for _, arch := range cfg.Archs {
 			flags := []string{
 				"--arch=" + arch,
@@ -352,14 +357,14 @@ func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []stri
 				"--runner=" + cfg.Runner,
 				"--namespace=" + cfg.PurlNamespace,
 				"--signing-key=" + cfg.signingKey,
-				"--pipeline-dir=" + cfg.PipelineDir,
+				"--pipeline-dir=" + pipelineDir,
 			}
 
 			testflags := []string{
 				"--arch=" + arch,
 				"--env-file=" + envFile(arch),
 				"--runner=" + cfg.Runner,
-				"--pipeline-dirs=" + cfg.PipelineDir,
+				"--pipeline-dirs=" + pipelineDir,
 			}
 
 			for _, k := range cfg.ExtraKeys {
