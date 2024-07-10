@@ -105,7 +105,7 @@ func (o *DiffOptions) Diff() error {
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
-		cmd := exec.Command(path, "-diff", "-format=markdown", "-min-file-level=3", dirExistingApk, dirNewApk)
+		cmd := exec.Command(path, "-diff", "-quantity-increases-risk=false", "-format=markdown", "-min-file-level=3", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("bincapz execution failed with error %w: %s", err, result)
