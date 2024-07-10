@@ -275,7 +275,7 @@ func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []stri
 		},
 	}}
 
-	epochs, err := getEpochs(ctx, maps.Values(built))
+	epochs, err := getEpochs(ctx, cfg.Dir, maps.Values(built))
 	if err != nil {
 		return nil, fmt.Errorf("computing build date epochs: %w", err)
 	}
@@ -289,9 +289,19 @@ func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []stri
 			subpkgs = append(subpkgs, t.config.Subpackages[i].Name)
 		}
 
-		bde, ok := epochs[t.config.Path]
+		filename, err := filepath.Rel(t.cfg.Dir, t.config.Path)
+		if err != nil {
+			return nil, err
+		}
+
+		bde, ok := epochs[filename]
 		if !ok {
 			return nil, fmt.Errorf("missing buildDateEpoch: %s", t.pkg)
+		}
+
+		sourceDir, err := t.sourceDir()
+		if err != nil {
+			return nil, err
 		}
 
 		bundleTasks = append(bundleTasks, &bundle.Task{
@@ -299,8 +309,8 @@ func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []stri
 			Package:        pkg,
 			Version:        t.config.Package.Version,
 			Epoch:          t.config.Package.Epoch,
-			Path:           t.config.Path,
-			SourceDir:      filepath.Join(t.cfg.Dir, t.pkg),
+			Path:           filename,
+			SourceDir:      sourceDir,
 			Architectures:  t.archs,
 			Subpackages:    subpkgs,
 			Resources:      t.config.Package.Resources,
@@ -471,7 +481,10 @@ func (t *task) addSourceFS(mapfs fstest.MapFS, dirfs fs.FS) error {
 		return err
 	}
 
-	filename := t.config.Path
+	filename, err := filepath.Rel(t.cfg.Dir, t.config.Path)
+	if err != nil {
+		return err
+	}
 
 	data, err := fs.ReadFile(dirfs, filename)
 	if err != nil {
@@ -488,7 +501,10 @@ func (t *task) addSourceFS(mapfs fstest.MapFS, dirfs fs.FS) error {
 		ModTime: info.ModTime(),
 	}
 
-	if err := fs.WalkDir(dirfs, sdir, func(p string, d fs.DirEntry, _ error) error {
+	if err := fs.WalkDir(dirfs, sdir, func(p string, d fs.DirEntry, werr error) error {
+		if werr != nil {
+			return werr
+		}
 		info, err := d.Info()
 		if err != nil {
 			return err
@@ -589,17 +605,22 @@ func envFile(arch string) string {
 }
 
 // this is faster than calling task.gitSDE() for every task
-func getEpochs(ctx context.Context, tasks []*task) (map[string]time.Time, error) {
+func getEpochs(ctx context.Context, dir string, tasks []*task) (map[string]time.Time, error) {
 	times := make(map[string]time.Time, len(tasks))
 
 	// Set of files we care about.
 	need := make(map[string]struct{}, len(tasks))
 	for _, t := range tasks {
-		need[t.config.Path] = struct{}{}
+		filename, err := filepath.Rel(dir, t.config.Path)
+		if err != nil {
+			return nil, err
+		}
+		need[filename] = struct{}{}
 	}
 
 	// Shell out to git to generate a list of commit timestamps with their changed files.
 	cmd := exec.CommandContext(ctx, "git", "--no-pager", "log", "--pretty=format:%ct", "--name-only", "--no-merges")
+	cmd.Dir = dir
 	cmd.Stderr = os.Stderr
 
 	pipe, err := cmd.StdoutPipe()

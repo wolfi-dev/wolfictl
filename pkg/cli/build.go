@@ -1688,7 +1688,7 @@ func logs(fname string) error {
 	return nil
 }
 
-// TODO: I think this is probably wrong, actually.
+// returns the sourceDir _relative_ to the --dir flag
 func (t *task) sourceDir() (string, error) {
 	sdir := filepath.Join(t.cfg.Dir, t.pkg)
 	if _, err := os.Stat(sdir); os.IsNotExist(err) {
@@ -1696,10 +1696,15 @@ func (t *task) sourceDir() (string, error) {
 			return "", fmt.Errorf("creating source directory %s: %v", sdir, err)
 		}
 	} else if err != nil {
-		return "", fmt.Errorf("creating source directory: %v", err)
+		return "", fmt.Errorf("statting source directory: %v", err)
 	}
 
-	return sdir, nil
+	rel, err := filepath.Rel(t.cfg.Dir, sdir)
+	if err != nil {
+		return "", err
+	}
+
+	return rel, nil
 }
 
 func getK8sClusterConfig(ctx context.Context, projectID, clusterLocation, clusterName string) (*api.Config, error) {
