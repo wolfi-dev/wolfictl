@@ -33,7 +33,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-containerregistry v0.20.0
 	github.com/google/go-github/v58 v58.0.0
-	github.com/google/osv-scanner v1.8.1
+	github.com/google/osv-scanner v1.8.2
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
@@ -285,7 +285,7 @@ require (
 	github.com/skeema/knownhosts v1.2.2 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/spdx/tools-golang v0.5.4 // indirect
+	github.com/spdx/tools-golang v0.5.5 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
