@@ -60,7 +60,6 @@ import (
 )
 
 func cmdBuild() *cobra.Command {
-	var jobs int
 	var traceFile string
 	var anns []string // string list annotations
 
@@ -109,11 +108,11 @@ func cmdBuild() *cobra.Command {
 				ctx = tctx
 			}
 
-			if jobs == 0 {
-				jobs = runtime.GOMAXPROCS(0)
+			if cfg.Jobs == 0 {
+				cfg.Jobs = runtime.GOMAXPROCS(0)
 			}
-			cfg.jobch = make(chan struct{}, jobs)
-			cfg.donech = make(chan *task, jobs)
+			cfg.jobch = make(chan struct{}, cfg.Jobs)
+			cfg.donech = make(chan *task, cfg.Jobs)
 
 			if cfg.signingKey == "" {
 				cfg.signingKey = filepath.Join(cfg.Dir, "local-melange.rsa")
@@ -165,7 +164,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.Bundle, "bundle", "", "bundle of work to do (experimental)")
 	cmd.Flags().StringVar(&cfg.StagingBucket, "bucket", "", "gcs bucket to upload results (experimental)")
 
-	cmd.Flags().IntVarP(&jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
+	cmd.Flags().IntVarP(&cfg.Jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
 
 	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
@@ -357,9 +356,11 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		cfg.OutDir = filepath.Join(cfg.Dir, "packages")
 	}
 
-	jobs := runtime.GOMAXPROCS(0)
-	cfg.jobch = make(chan struct{}, jobs)
-	cfg.donech = make(chan *task, jobs)
+	if cfg.Jobs == 0 {
+		cfg.Jobs = runtime.GOMAXPROCS(0)
+	}
+	cfg.jobch = make(chan struct{}, cfg.Jobs)
+	cfg.donech = make(chan *task, cfg.Jobs)
 
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
@@ -685,6 +686,7 @@ type Global struct {
 
 	dryrun bool
 
+	Jobs   int
 	jobch  chan struct{}
 	donech chan *task
 
