@@ -20,7 +20,7 @@ import (
 
 	"chainguard.dev/apko/pkg/build/types"
 	"github.com/chainguard-dev/clog"
-	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/gcrane"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/empty"
@@ -71,7 +71,7 @@ func cmdBundle() *cobra.Command {
 			}
 
 			if bcfg.Repo != "" {
-				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithUserAgent("wolfictl bundle"))
+				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(gcrane.Keychain), remote.WithUserAgent("wolfictl bundle"))
 				if err != nil {
 					return err
 				}
