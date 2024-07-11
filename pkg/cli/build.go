@@ -709,7 +709,7 @@ type Global struct {
 
 	summary string
 
-	fuses []string
+	Fuses []string
 
 	// arch -> foo.apk -> exists in APKINDEX
 	exists map[string]map[string]struct{}

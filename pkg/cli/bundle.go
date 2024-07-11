@@ -20,7 +20,7 @@ import (
 
 	"chainguard.dev/apko/pkg/build/types"
 	"github.com/chainguard-dev/clog"
-	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/gcrane"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/empty"
@@ -71,7 +71,7 @@ func cmdBundle() *cobra.Command {
 			}
 
 			if bcfg.Repo != "" {
-				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithUserAgent("wolfictl bundle"))
+				pusher, err := remote.NewPusher(remote.WithAuthFromKeychain(gcrane.Keychain), remote.WithUserAgent("wolfictl bundle"))
 				if err != nil {
 					return err
 				}
@@ -99,7 +99,7 @@ func cmdBundle() *cobra.Command {
 	cmd.Flags().BoolVar(&cfg.dryrun, "dry-run", false, "print commands instead of executing them")
 	cmd.Flags().StringSliceVarP(&cfg.ExtraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")
 	cmd.Flags().StringSliceVarP(&cfg.ExtraRepos, "repository-append", "r", []string{"https://packages.wolfi.dev/os"}, "path to extra repositories to include in the build environment")
-	cmd.Flags().StringSliceVar(&cfg.fuses, "gcsfuse", []string{}, "list of gcsfuse mounts to make available to the build environment (e.g. gs://my-bucket/subdir:/mnt/my-bucket)")
+	cmd.Flags().StringSliceVar(&cfg.Fuses, "gcsfuse", []string{}, "list of gcsfuse mounts to make available to the build environment (e.g. gs://my-bucket/subdir:/mnt/my-bucket)")
 	cmd.Flags().StringVar(&cfg.signingKey, "signing-key", "", "key to use for signing")
 	cmd.Flags().StringVar(&cfg.PurlNamespace, "namespace", "wolfi", "namespace to use in package URLs in SBOM (eg wolfi, alpine)")
 	cmd.Flags().StringVar(&cfg.OutDir, "out-dir", "", "directory where packages will be output")
@@ -377,8 +377,8 @@ func BundleAll(ctx context.Context, cfg *Global, bcfg *BundleConfig, args []stri
 				testflags = append(testflags, "--repository-append="+r)
 			}
 
-			mounts := make([]*bundle.GCSFuseMount, 0, len(cfg.fuses))
-			for _, f := range cfg.fuses {
+			mounts := make([]*bundle.GCSFuseMount, 0, len(cfg.Fuses))
+			for _, f := range cfg.Fuses {
 				mount, err := bundle.ParseGCSFuseMount(f)
 				if err != nil {
 					return nil, err
