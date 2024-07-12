@@ -11,3 +11,5 @@ package:
 pipeline:
   - runs: |
       cat $pkgdir
+update:
+  enabled: true

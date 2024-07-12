@@ -13,3 +13,5 @@ environment:
     packages:
       - foo
       - bar
+update:
+  enabled: true

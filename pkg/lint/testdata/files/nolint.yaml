@@ -3,7 +3,9 @@ package:
   name: nolint
   version: 1.0.0rc1
   epoch: 0
-  description: "a package that fails (but skips) two lint checks, and fails (and doesn't skip) one"
+  description:
+    "a package that fails (but skips) two lint checks, and fails (and doesn't
+    skip) one"
   # also no copyright
 environment:
   contents:
@@ -15,3 +17,5 @@ environment:
 test:
   pipeline:
     - runs: "echo 'test'"
+update:
+  enabled: true

@@ -15,3 +15,5 @@ pipeline:
       uri: https://test.com/missing-copyright/${{package.version}}.tar.gz
       branch: main
       expected-commit: 9c5cfe0525dc7415cec482342ca674875c1e9115
+update:
+  enabled: true

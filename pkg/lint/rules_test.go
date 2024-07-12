@@ -397,6 +397,24 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 			matches: 0,
 		},
+		{
+			file:        "update-disabled.yaml",
+			minSeverity: SeverityInfo,
+			want: EvalResult{
+				File: "update-disabled",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "update-disabled-reason",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[update-disabled-reason]: auto-update is disabled but no reason is provided (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
 	}
 
 	for _, tt := range tests {

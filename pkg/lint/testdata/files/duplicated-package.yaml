@@ -14,3 +14,5 @@ environment:
       - foo
       - bar
       - foo
+update:
+  enabled: true

@@ -20,3 +20,5 @@ subpackages:
       - runs: |
           # CHECK-WHEN-VERSION-CHANGES: 0.8.0
           echo "this should be checked each time the version is bumped"
+update:
+  enabled: true

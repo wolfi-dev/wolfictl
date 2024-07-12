@@ -13,3 +13,5 @@ pipeline:
 test:
   pipeline:
     - runs: "echo 'test'"
+update:
+  enabled: true

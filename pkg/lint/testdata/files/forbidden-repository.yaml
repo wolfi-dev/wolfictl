@@ -22,3 +22,5 @@ pipeline:
       expected-sha512: 6d8e828fa406518b4b3f55b0e5f62bbd5cf25cb5782d1884b9d5eaf61fb0614deaacad4236ab7420fa5b3868c79df226ae1aa5193bb136c556aa52853eeca553
   - runs: |
       go build .
+update:
+  enabled: true
