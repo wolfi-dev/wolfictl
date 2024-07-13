@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/charmbracelet/lipgloss"
@@ -25,7 +26,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
@@ -357,6 +357,7 @@ type scanParams struct {
 	disableSBOMCache      bool
 	triageWithGoVulnCheck bool
 	remoteScanning        bool
+	remoteRepository      string
 	useCPEMatching        bool
 	verbosity             int
 }
@@ -374,6 +375,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
 	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
 	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
+	cmd.Flags().StringVar(&p.remoteRepository, "repository", "https://packages.wolfi.dev/os", "URL of the APK package repository")
 	cmd.Flags().BoolVar(&p.useCPEMatching, "use-cpes", false, "turn on all CPE matching in Grype")
 	addVerboseFlag(&p.verbosity, cmd)
 }
@@ -403,7 +405,7 @@ func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (in
 		}
 
 		for _, arg := range args {
-			targetPaths, cleanup, err := resolveInputForRemoteTarget(ctx, arg)
+			targetPaths, cleanup, err := resolveInputForRemoteTarget(ctx, arg, p.remoteRepository)
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to resolve input %q for remote scanning: %w", arg, err)
 			}
@@ -606,6 +608,18 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 	}
 }
 
+// getAPKIndexURL returns the URL of the APKINDEX.tar.gz file for the given
+// repository and architecture. If the repository URL already points to an
+// APKINDEX.tar.gz file, it will be returned as-is. User input may or may not
+// have included the architecture or the APKINDEX.tar.gz suffix, so construct
+// the full URL to provide better UX.
+func getAPKIndexURL(repositoryURL, arch string) string {
+	if strings.HasSuffix(repositoryURL, "/x86_64/APKINDEX.tar.gz") || strings.HasSuffix(repositoryURL, "/aarch64/APKINDEX.tar.gz") {
+		return repositoryURL
+	}
+	return fmt.Sprintf("%s/%s/APKINDEX.tar.gz", repositoryURL, arch)
+}
+
 // resolveInputForRemoteTarget takes the given input string, which is expected
 // to be the name of a Wolfi package (or subpackage), and it queries the Wolfi
 // APK repository to find the latest version of the package for each
@@ -615,13 +629,14 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 // For example, given the input value "calico", this function will find the
 // latest version of the package (e.g. "calico-3.26.3-r3.apk") and download it
 // for each architecture.
-func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedAPKFilePaths []string, cleanup func() error, err error) {
+func resolveInputForRemoteTarget(ctx context.Context, input, repository string) (downloadedAPKFilePaths []string, cleanup func() error, err error) {
 	logger := clog.FromContext(ctx)
 
 	archesFound := 0
 	for _, arch := range []string{"x86_64", "aarch64"} {
-		const apkRepositoryURL = "https://packages.wolfi.dev/os"
-		apkindex, err := index.Index(arch, apkRepositoryURL)
+		// Since index.Index function doesn't respect the `$HTTP_AUTH`, use
+		// fetchAPKIndex function instead.
+		apkindex, _, err := fetchAPKIndex(ctx, getAPKIndexURL(repository, arch))
 		if err != nil {
 			return nil, nil, fmt.Errorf("getting APKINDEX: %w", err)
 		}
@@ -651,7 +666,7 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedA
 				break
 			}
 		}
-		downloadURL := fmt.Sprintf("%s/%s/%s", apkRepositoryURL, arch, latestPkg.Filename())
+		downloadURL := fmt.Sprintf("%s/%s/%s", repository, arch, latestPkg.Filename())
 
 		apkTempFileName := fmt.Sprintf("%s-%s-%s-*.apk", arch, input, latestVersion)
 		tmpFile, err := os.CreateTemp("", apkTempFileName)
@@ -665,6 +680,7 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedA
 			return nil, nil, fmt.Errorf("creating request for %q: %w", downloadURL, err)
 		}
 
+		auth.DefaultAuthenticators.AddAuth(ctx, req)
 		logger.Debug("downloading APK", "url", downloadURL)
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
