@@ -1,0 +1,24 @@
+package:
+  name: version-stream-missing-update-tagfilter-1.2
+  version: 1.2.3
+  epoch: 0
+  description: "a version-streamed package with no dependencies.provides"
+  dependencies:
+    provides:
+      - version-stream-missing-update-tagfilter=${{package.full-version}}
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://test.com/version-stream-missing-update-tagfilter/${{package.version}}.tar.gz
+      expected-sha256: ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269
+
+test:
+  pipeline:
+    - runs: "echo 'test'"
+
+update:
+  enabled: true
+  github:
+    identifier: test/version-stream-missing-update-tagfilter
+    use-tag: true

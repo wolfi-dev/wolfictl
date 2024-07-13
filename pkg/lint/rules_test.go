@@ -412,6 +412,58 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			file:        "version-stream-missing-provides-1.2.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File: "version-stream-missing-provides-1.2",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-version-stream",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but version-stream-missing-provides=${{package.full-version}} is missing on dependencies.provides (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "version-stream-missing-update-tagfilter-1.2.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File: "version-stream-missing-update-tagfilter-1.2",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-version-stream",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but tag filter 1.2 is missing on update.github (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "version-stream-missing-update-tagfilter-1.2-999.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File: "version-stream-missing-update-tagfilter-1.2",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-version-stream",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but tag filter 1.2 is missing on update.github (ERROR)"),
+					},
+				},
+			},
 			wantErr: false,
 			matches: 1,
 		},
