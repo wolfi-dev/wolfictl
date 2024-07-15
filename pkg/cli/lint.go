@@ -62,7 +62,19 @@ func (o lintOptions) LintCmd(ctx context.Context) error {
 	}
 	if result.HasErrors() {
 		linter.Print(ctx, result)
-		return errors.New("linting failed")
+		// only count errors as failures, not warnings.
+		failed := false
+		for _, res := range result {
+			for _, e := range res.Errors {
+				if e.Rule.Severity.Value == lint.SeverityErrorLevel {
+					failed = true
+					break
+				}
+			}
+		}
+		if failed {
+			return errors.New("linting failed")
+		}
 	}
 	return nil
 }
