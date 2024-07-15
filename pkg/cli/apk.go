@@ -89,7 +89,9 @@ func cmdCp() *cobra.Command {
 						if err != nil {
 							return err
 						}
-						auth.DefaultAuthenticators.AddAuth(ctx, req)
+						if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+							return err
+						}
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
 							return err
@@ -296,7 +298,9 @@ func fetchAPKIndex(ctx context.Context, indexURL string) (*apk.APKIndex, string,
 		if err != nil {
 			return nil, "", fmt.Errorf("GET %q: %w", u.Redacted(), err)
 		}
-		auth.DefaultAuthenticators.AddAuth(ctx, req)
+		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+			return nil, "", fmt.Errorf("error adding auth: %w", err)
+		}
 		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
 		if err != nil {
 			return nil, "", fmt.Errorf("GET %q: %w", u.Redacted(), err)
