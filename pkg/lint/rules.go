@@ -497,12 +497,19 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					return fmt.Errorf("package is version streamed but package.version %s starts with different than given version stream %s", c.Package.Version, versionStream)
 				}
 
-				providesList := []string{
-					fmt.Sprintf("%s=%s-r%d", packageName, c.Package.Version, c.Package.Epoch),
-					fmt.Sprintf("%s=%s-r%d", packageName, versionStream, c.Package.Epoch),
-					fmt.Sprintf("%s=%s", packageName, c.Package.Version),
-					fmt.Sprintf("%s=%s", packageName, versionStream),
-					fmt.Sprintf("%s=%s.999", packageName, versionStream),
+				var providesList []string
+				addToProvidesList := func(key string) {
+					providesList = append(providesList, fmt.Sprintf("%s=%s-r%d", key, c.Package.Version, c.Package.Epoch))
+					providesList = append(providesList, fmt.Sprintf("%s=%s-r%d", key, versionStream, c.Package.Epoch))
+					providesList = append(providesList, fmt.Sprintf("%s=%s", key, c.Package.Version))
+					providesList = append(providesList, fmt.Sprintf("%s=%s", key, versionStream))
+					providesList = append(providesList, fmt.Sprintf("%s=%s.999", key, versionStream))
+				}
+				addToProvidesList(packageName)
+
+				// Some packages have different provides for package name, i.e. python-3 instead of python.
+				if majorMinor := strings.Split(versionStream, "."); len(majorMinor) > 1 {
+					addToProvidesList(fmt.Sprintf("%s-%s", packageName, majorMinor[0]))
 				}
 
 				anyMatch := false
@@ -518,7 +525,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				}
 
 				if c.Update.Enabled && !c.Update.Manual && c.Update.GitHubMonitor != nil {
-					prefixesToCheck := []string{"", "v", packageName, "release"}
+					prefixesToCheck := []string{"", "v", packageName, "release", strings.ReplaceAll(packageName, "-fips", ""), c.Update.GitHubMonitor.StripPrefix}
 					separators := []string{"", ".", "-", "_"}
 					versionsToCheck := []string{versionStream, strings.ReplaceAll(versionStream, ".", "-"), strings.ReplaceAll(versionStream, ".", "_")}
 
@@ -534,7 +541,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					}
 
 					if !slices.Contains(filtersToCheck, c.Update.GitHubMonitor.TagFilter) && !slices.Contains(filtersToCheck, c.Update.GitHubMonitor.TagFilterPrefix) {
-						return fmt.Errorf("package is version streamed but tag filter %s is missing on update.github", versionStream)
+						return fmt.Errorf("package is version streamed but tag filter %s is mismatch on update.github", versionStream)
 					}
 				}
 				return nil
