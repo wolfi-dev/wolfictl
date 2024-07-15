@@ -493,17 +493,45 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				packageName := matches[1]
 				versionStream := matches[2]
 
-				// package-name=${{package.full-version}}
-				provides := fmt.Sprintf("%s=%s-r%d", packageName, c.Package.Version, c.Package.Epoch)
-				// Some packages does not have ${{package.full-version}}, instead they have PACKAGE=VERSION.999. This is for backward compatibility.
-				provides999 := fmt.Sprintf("%s=%s.999", packageName, versionStream)
-				if !slices.Contains(c.Package.Dependencies.Provides, provides) && !slices.Contains(c.Package.Dependencies.Provides, provides999) {
+				if !strings.HasPrefix(c.Package.Version, versionStream) {
+					return fmt.Errorf("package is version streamed but package.version %s starts with different than given version stream %s", c.Package.Version, versionStream)
+				}
+
+				providesList := []string{
+					fmt.Sprintf("%s=%s-r%d", packageName, c.Package.Version, c.Package.Epoch),
+					fmt.Sprintf("%s=%s-r%d", packageName, versionStream, c.Package.Epoch),
+					fmt.Sprintf("%s=%s", packageName, c.Package.Version),
+					fmt.Sprintf("%s=%s", packageName, versionStream),
+					fmt.Sprintf("%s=%s.999", packageName, versionStream),
+				}
+
+				anyMatch := false
+				for _, provides := range providesList {
+					if slices.Contains(c.Package.Dependencies.Provides, provides) {
+						anyMatch = true
+						break
+					}
+				}
+
+				if !anyMatch {
 					return fmt.Errorf("package is version streamed but %s=${{package.full-version}} is missing on dependencies.provides", packageName)
 				}
 
 				if c.Update.Enabled && !c.Update.Manual && c.Update.GitHubMonitor != nil {
-					// package-name-X.Y, package-name-X.Y., X.Y, vX.Y, X.Y., vX.Y., release-X.Y, release-X.Y.
-					filtersToCheck := []string{c.Package.Name, c.Package.Name + ".", versionStream, "v" + versionStream, versionStream + ".", "v" + versionStream + ".", "release-" + versionStream, "release-" + versionStream + "."}
+					prefixesToCheck := []string{"", "v", packageName, "release"}
+					separators := []string{"", ".", "-", "_"}
+					versionsToCheck := []string{versionStream, strings.ReplaceAll(versionStream, ".", "-"), strings.ReplaceAll(versionStream, ".", "_")}
+
+					var filtersToCheck []string
+					for _, prefix := range prefixesToCheck {
+						for _, separator := range separators {
+							for _, version := range versionsToCheck {
+								for _, suffix := range separators {
+									filtersToCheck = append(filtersToCheck, prefix+separator+version+suffix)
+								}
+							}
+						}
+					}
 
 					if !slices.Contains(filtersToCheck, c.Update.GitHubMonitor.TagFilter) && !slices.Contains(filtersToCheck, c.Update.GitHubMonitor.TagFilterPrefix) {
 						return fmt.Errorf("package is version streamed but tag filter %s is missing on update.github", versionStream)

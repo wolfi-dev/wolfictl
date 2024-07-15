@@ -482,6 +482,22 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			file:        "version-stream-mismatch-version-1.2.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File: "version-stream-mismatch-version-1.2",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-version-stream",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but package.version 1.7 starts with different than given version stream 1.2 (ERROR)"),
+					},
+				},
+			},
 			wantErr: false,
 			matches: 1,
 		},
