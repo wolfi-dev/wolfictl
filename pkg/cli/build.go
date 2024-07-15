@@ -304,7 +304,9 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 	if err != nil {
 		return nil, err
 	}
-	auth.DefaultAuthenticators.AddAuth(ctx, req)
+	if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+		return nil, fmt.Errorf("error adding auth: %w", err)
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

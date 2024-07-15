@@ -439,6 +439,23 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return fmt.Errorf("no main package or subpackage test found")
 			},
 		},
+		{
+			Name:        "update-disabled-reason",
+			Description: "packages with auto-update disabled should have a reason",
+			// TODO: Change to SeverityError when current packages are compliant.
+			Severity: SeverityWarning,
+			LintFunc: func(c config.Configuration) error {
+				cfg := c.Update
+				if cfg.Enabled {
+					return nil
+				}
+
+				if !cfg.Enabled && cfg.ExcludeReason != "" {
+					return nil
+				}
+				return fmt.Errorf("auto-update is disabled but no reason is provided")
+			},
+		},
 	}
 }
 

@@ -7,3 +7,5 @@ package:
         - "*"
       attestation: TODO
       license: GPL-2.0-only
+update:
+  enabled: true
