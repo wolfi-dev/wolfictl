@@ -7,7 +7,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
 	chainguard.dev/apko v0.16.1-0.20240713221352-fee7d7cfad9b
-	chainguard.dev/melange v0.10.5-0.20240715135602-8a118ebaea95
+	chainguard.dev/melange v0.11.0
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.79.2
@@ -351,5 +351,3 @@ require (
 )
 
 replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
-
-replace github.com/github/go-spdx/v2 v2.2.0 => github.com/darsh12/go-spdx/v2 v2.0.0-20240506204000-9af17522cc6e
