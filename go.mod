@@ -7,7 +7,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
 	chainguard.dev/apko v0.16.1-0.20240713221352-fee7d7cfad9b
-	chainguard.dev/melange v0.11.1
+	chainguard.dev/melange v0.11.2
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.79.2
