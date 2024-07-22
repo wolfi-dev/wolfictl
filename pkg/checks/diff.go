@@ -144,7 +144,7 @@ type diffResult struct {
 func diffDirectories(dir1, dir2 string) (diffResult, error) {
 	result := diffResult{}
 
-	err := filepath.Walk(dir1, func(path1 string, info1 os.FileInfo, err error) error {
+	err := filepath.WalkDir(dir1, func(path1 string, info1 os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -203,7 +203,7 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 		return diffResult{}, err
 	}
 
-	err = filepath.Walk(dir2, func(path2 string, info2 os.FileInfo, err error) error {
+	err = filepath.WalkDir(dir2, func(path2 string, info2 os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
