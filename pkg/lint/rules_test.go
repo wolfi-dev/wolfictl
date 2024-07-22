@@ -412,19 +412,21 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+			wantErr: false,
+			matches: 1,
 		},
 		{
 			file:        "version-stream-missing-provides-1.2.yaml",
-			minSeverity: SeverityError,
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "version-stream-missing-provides-1.2",
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{
 							Name:     "valid-version-stream",
-							Severity: SeverityError,
+							Severity: SeverityWarning,
 						},
-						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but version-stream-missing-provides=${{package.full-version}} is missing on dependencies.provides (ERROR)"),
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but version-stream-missing-provides=${{package.full-version}} is missing on dependencies.provides (WARNING)"),
 					},
 				},
 			},
@@ -433,16 +435,16 @@ func TestLinter_Rules(t *testing.T) {
 		},
 		{
 			file:        "version-stream-missing-update-tagfilter-1.2.yaml",
-			minSeverity: SeverityError,
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "version-stream-missing-update-tagfilter-1.2",
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{
 							Name:     "valid-version-stream",
-							Severity: SeverityError,
+							Severity: SeverityWarning,
 						},
-						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but tag filter 1.2 is mismatch on update.github (ERROR)"),
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but tag filter 1.2 is mismatch on update.github (WARNING)"),
 					},
 				},
 			},
@@ -451,16 +453,16 @@ func TestLinter_Rules(t *testing.T) {
 		},
 		{
 			file:        "version-stream-missing-update-tagfilter-1.2-999.yaml",
-			minSeverity: SeverityError,
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "version-stream-missing-update-tagfilter-1.2",
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{
 							Name:     "valid-version-stream",
-							Severity: SeverityError,
+							Severity: SeverityWarning,
 						},
-						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but tag filter 1.2 is mismatch on update.github (ERROR)"),
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but tag filter 1.2 is mismatch on update.github (WARNING)"),
 					},
 				},
 			},
@@ -485,16 +487,16 @@ func TestLinter_Rules(t *testing.T) {
 		},
 		{
 			file:        "version-stream-mismatch-version-1.2.yaml",
-			minSeverity: SeverityError,
+			minSeverity: SeverityWarning,
 			want: EvalResult{
 				File: "version-stream-mismatch-version-1.2",
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{
 							Name:     "valid-version-stream",
-							Severity: SeverityError,
+							Severity: SeverityWarning,
 						},
-						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but package.version 1.7 starts with different than given version stream 1.2 (ERROR)"),
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but package.version 1.7 starts with different than given version stream 1.2 (WARNING)"),
 					},
 				},
 			},

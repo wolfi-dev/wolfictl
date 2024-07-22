@@ -471,7 +471,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 		{
 			Name:        "valid-version-stream",
 			Description: "check the provides and tag filter if version stream suffix is passed to package name",
-			Severity:    SeverityError,
+			Severity:    SeverityWarning,
 			LintFunc: func(c config.Configuration) error {
 				// This regex captures a string that ends with a semantic version (semver) suffix.
 				// It returns two groups:
