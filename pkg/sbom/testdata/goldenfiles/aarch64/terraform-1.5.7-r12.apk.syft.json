@@ -2449,12 +2449,8 @@
       "language": "go",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:hashicorp:go-retryablehttp:v0.7.2:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:hashicorp:go_retryablehttp:v0.7.2:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:hashicorp:retryablehttp:v0.7.2:*:*:*:*:go:*:*",
+          "source": "nvd-cpe-dictionary"
         }
       ],
       "purl": "pkg:golang/github.com/hashicorp/go-retryablehttp@v0.7.2",
