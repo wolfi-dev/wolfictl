@@ -10,7 +10,7 @@ require (
 	chainguard.dev/melange v0.11.2
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
-	github.com/anchore/grype v0.79.2
+	github.com/anchore/grype v0.79.3
 	github.com/anchore/stereoscope v0.0.3-0.20240705165118-e46739e21796
 	github.com/anchore/syft v1.9.0
 	github.com/chainguard-dev/clog v1.4.0
@@ -336,7 +336,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/gorm v1.25.10 // indirect
+	gorm.io/gorm v1.25.11 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240709000822-3c01b740850f // indirect
 	k8s.io/utils v0.0.0-20240711033017-18e509b52bc8 // indirect
