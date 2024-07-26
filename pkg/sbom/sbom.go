@@ -25,6 +25,7 @@ import (
 	"github.com/anchore/syft/syft/source/directorysource"
 	"github.com/chainguard-dev/clog"
 	"github.com/package-url/packageurl-go"
+	"github.com/wolfi-dev/wolfictl/pkg/sbom/catalogers"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
@@ -103,6 +104,8 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		).WithRemovals(
 			"sbom",
 		),
+	).WithCatalogers(
+		catalogers.AngularJSReference,
 	)
 
 	createdSBOM, err := syft.CreateSBOM(ctx, src, cfg)
