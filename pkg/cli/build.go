@@ -158,6 +158,7 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
 	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo used to check for (and skip) existing packages")
 	cmd.Flags().StringVar(&cfg.UploadRepo, "upload-repository", "", "repo where packages will be uploaded")
+	cmd.Flags().BoolVar(&cfg.Dedupe, "dedupe", false, "attempt (best effort) to avoid multiple build pods per APK")
 	cmd.Flags().StringVar(&cfg.Bundle, "bundle", "", "bundle of work to do (experimental)")
 	cmd.Flags().StringVar(&cfg.StagingBucket, "bucket", "", "gcs bucket to upload results (experimental)")
 
@@ -270,6 +271,10 @@ type buildResult struct {
 }
 
 func BuildBundles(ctx context.Context, cfg *Global) error {
+	log := clog.FromContext(ctx)
+
+	log.Infof("building bundle %s", cfg.BuildID.String())
+
 	var eg errgroup.Group
 
 	bundles, err := bundle.Pull(cfg.Bundle)
@@ -378,9 +383,6 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		t.maybeStart(ctx)
 	}
 	count := len(todos)
-
-	// We're ok with Info level from here on.
-	log := clog.FromContext(ctx)
 
 	report := make([]*buildResult, 0, count)
 
@@ -618,6 +620,7 @@ type Global struct {
 	UploadRepo      string
 	PipelineDir     string
 	Runner          string
+	Dedupe          bool
 
 	Archs      []string
 	ExtraKeys  []string
@@ -879,41 +882,83 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, arch)
 	defer span.End()
 
-	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.Annotations)
-	if err != nil {
-		return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
-	}
-
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
-	u, err := t.signedURL(object)
-	if err != nil {
-		return nil, fmt.Errorf("creating signed url: %w", err)
-	}
-	log.Debugf("created signed URL for %s", object)
+	var (
+		pod       *corev1.Pod
+		lastPhase = corev1.PodUnknown
+	)
 
-	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
-		Name:  "PACKAGES_UPLOAD_URL",
-		Value: u,
-	})
+	if t.cfg.Dedupe {
+		// See if there is already a pod scheduled for this package.
+		goarch := types.ParseArchitecture(arch).String()
+		selectors := []string{
+			fmt.Sprintf("melange.chainguard.dev/package=%s", t.pkg),
+			fmt.Sprintf("melange.chainguard.dev/arch=%s", goarch),
+			fmt.Sprintf("melange.chainguard.dev/version=%s-r%d", t.ver, t.epoch),
+		}
 
-	log.Debugf("creating pod for %s", t.pkgver())
-	pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("creating pod: %w", err)
+		pods, err := t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).List(ctx, metav1.ListOptions{
+			LabelSelector: strings.Join(selectors, ","),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("listing pods: %w", err)
+		}
+
+		for i := range pods.Items {
+			p := &pods.Items[i]
+			if p.Status.Phase == corev1.PodFailed {
+				continue
+			}
+			pod = p
+			lastPhase = p.Status.Phase
+
+			// Pull out the object so we can adopt this pod.
+			object = pod.ObjectMeta.Annotations["melange.chainguard.dev/object"]
+
+			log.Infof("found already %s pod %s for %s", p.Status.Phase, pod.ObjectMeta.Name, t.pkgver())
+
+			break
+		}
 	}
-	log.Infof("created pod for %s: %s", t.pkgver(), pod.ObjectMeta.Name)
+
+	if pod == nil {
+		var err error
+		pod, err = bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.Annotations)
+		if err != nil {
+			return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
+		}
+
+		u, err := t.signedURL(object)
+		if err != nil {
+			return nil, fmt.Errorf("getting signed url: %w", err)
+		}
+		log.Debugf("created signed URL for %s", object)
+
+		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
+			Name:  "PACKAGES_UPLOAD_URL",
+			Value: u,
+		})
+
+		// Include the object URL so this pod can be adopted by other runners if necessary.
+		pod.ObjectMeta.Annotations["melange.chainguard.dev/object"] = object
+
+		log.Infof("creating pod for %s", t.pkgver())
+		pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("creating pod: %w", err)
+		}
+	}
 
 	// Needed for report output.
 	t.mupods.Lock()
 	t.pods = append(t.pods, pod.ObjectMeta.Name)
 	t.mupods.Unlock()
 
-	lastPhase := corev1.PodUnknown
-
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
 	defer cancel()
 	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
+		var err error
 		pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
 		if err != nil {
 			return false, err

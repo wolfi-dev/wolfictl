@@ -434,6 +434,7 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, anns m
 				"app.kubernetes.io/component":     task.Package,
 				"melange.chainguard.dev/arch":     goarch,
 				"melange.chainguard.dev/package":  task.Package,
+				"melange.chainguard.dev/version":  fmt.Sprintf("%s-r%d", task.Version, task.Epoch),
 				"melange.chainguard.dev/build-id": task.BuildID.String(),
 			},
 			Annotations: map[string]string{},
