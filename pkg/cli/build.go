@@ -11,6 +11,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -29,7 +30,6 @@ import (
 	"chainguard.dev/melange/pkg/container"
 	"chainguard.dev/melange/pkg/container/docker"
 	"chainguard.dev/melange/pkg/index"
-	"chainguard.dev/melange/pkg/sign"
 	"cloud.google.com/go/storage"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/dominikbraun/graph"
@@ -42,7 +42,6 @@ import (
 	"golang.org/x/exp/maps"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/sync/errgroup"
-	"golang.org/x/time/rate"
 	gcontainer "google.golang.org/api/container/v1"
 	"google.golang.org/api/option"
 	corev1 "k8s.io/api/core/v1"
@@ -124,9 +123,6 @@ func cmdBuild() *cobra.Command {
 				cfg.OutDir = filepath.Join(cfg.Dir, "packages")
 			}
 
-			// Used to track expected generation of index file to allow idempotent writes.
-			cfg.generations = map[string]int64{}
-
 			if cfg.Bundle != "" {
 				if cfg.StagingBucket == "" {
 					return fmt.Errorf("need --bucket with --bundle")
@@ -159,8 +155,8 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.cacheDir, "cache-dir", "./melange-cache/", "directory used for cached inputs")
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
-	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo where packages will eventually be uploaded, used to skip existing packages (currently only supports http)")
-	cmd.Flags().StringVar(&cfg.DestinationBucket, "destination-bucket", "", "bucket where packages are uploaded (experimental)")
+	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo used to check for (and skip) existing packages")
+	cmd.Flags().StringVar(&cfg.UploadRepo, "upload-repository", "", "repo where packages will be uploaded")
 	cmd.Flags().StringVar(&cfg.Bundle, "bundle", "", "bundle of work to do (experimental)")
 	cmd.Flags().StringVar(&cfg.StagingBucket, "bucket", "", "gcs bucket to upload results (experimental)")
 
@@ -225,67 +221,6 @@ func walkConfigs(ctx context.Context, cfg *Global) (*configStuff, error) {
 	}, nil
 }
 
-func (g *Global) fetchIndexFromBucket(ctx context.Context, arch string) (map[string]struct{}, error) {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchIndexFromBucket")
-	defer span.End()
-
-	exist := map[string]struct{}{}
-
-	if g.DestinationBucket == "" {
-		return exist, nil
-	}
-
-	obj := path.Join(arch, "APKINDEX.tar.gz")
-	out := filepath.Join(g.OutDir, arch, "APKINDEX.tar.gz")
-
-	bucket, dir, ok := strings.Cut(g.DestinationBucket, "/")
-	if ok {
-		obj = path.Join(dir, obj)
-	}
-
-	rc, err := g.GCS.Bucket(bucket).Object(obj).NewReader(ctx)
-	if err != nil {
-		if errors.Is(err, storage.ErrObjectNotExist) {
-			return exist, nil
-		}
-		return nil, fmt.Errorf("failed to create gcs reader for bucket %s with obj %s; %w", bucket, obj, err)
-	}
-	defer rc.Close()
-
-	// Set this for conditional requests on upload.
-	g.genmu.Lock()
-	g.generations[arch] = rc.Attrs.Generation
-	g.genmu.Unlock()
-
-	clog.FromContext(ctx).Debugf("downloading %s to %s", obj, out)
-
-	f, err := os.Create(out)
-	if err != nil {
-		return nil, err
-	}
-
-	tee := io.TeeReader(rc, f)
-
-	idx, err := apk.IndexFromArchive(io.NopCloser(tee))
-	if err != nil {
-		return nil, fmt.Errorf("parsing index %s: %w", obj, err)
-	}
-
-	for _, pkg := range idx.Packages {
-		exist[pkg.Filename()] = struct{}{}
-	}
-
-	if _, err := io.Copy(io.Discard, tee); err != nil {
-		return nil, err
-	}
-
-	if err := f.Close(); err != nil {
-		return nil, f.Close()
-	}
-
-	return exist, nil
-}
-
 func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, error) {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchIndex")
 	defer span.End()
@@ -295,7 +230,6 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 		return exist, nil
 	}
 
-	// TODO: Support file paths. This is janky but we assume http for now because we need a better interface from go-apk.
 	repo := apk.Repository{
 		URI: fmt.Sprintf("%s/%s/%s", dst, arch, "APKINDEX.tar.gz"),
 	}
@@ -342,15 +276,6 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 		return fmt.Errorf("failed to pull bundle: %w", err)
 	}
 
-	// Trying to avoid this error:
-	// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
-	// Please reduce your request rate.
-	// See https://cloud.google.com/storage/docs/gcs429.
-	cfg.writeLimiters = map[string]*rate.Limiter{}
-	for _, arch := range cfg.Archs {
-		cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
-	}
-
 	if cfg.Dir == "" {
 		cfg.Dir = "."
 	}
@@ -374,19 +299,19 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 			return fmt.Errorf("creating arch directory: %w", err)
 		}
 
-		// If --destination-repository or --destination-bucket is set, we want to fetch and parse the APKINDEXes concurrently with walking all the configs.
+		// If --destination-repository or --upload-repository is set, we want to fetch and parse the APKINDEXes concurrently with walking all the configs.
 		eg.Go(func() error {
 			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
 			if err != nil {
 				return fmt.Errorf("failed to fetch index from destination repo %s for arch %s; %w", cfg.DestinationRepo, arch, err)
 			}
 
-			existBucket, err := cfg.fetchIndexFromBucket(ctx, arch)
+			existRepo, err := fetchIndex(ctx, cfg.UploadRepo, arch)
 			if err != nil {
-				return fmt.Errorf("fetching index from bucket for arch %s; %w", arch, err)
+				return fmt.Errorf("fetching index from UploadRepo %s for arch %s; %w", cfg.UploadRepo, arch, err)
 			}
 
-			for k, v := range existBucket {
+			for k, v := range existRepo {
 				exist[k] = v
 			}
 
@@ -520,15 +445,6 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 
 func buildAll(ctx context.Context, cfg *Global, args []string) error {
 	var eg errgroup.Group
-
-	// Trying to avoid this error:
-	// The object <object> exceeded the rate limit for object mutation operations (create, update, and delete).
-	// Please reduce your request rate.
-	// See https://cloud.google.com/storage/docs/gcs429.
-	cfg.writeLimiters = map[string]*rate.Limiter{}
-	for _, arch := range cfg.Archs {
-		cfg.writeLimiters[arch] = rate.NewLimiter(rate.Every(1*time.Second), 1)
-	}
 
 	var stuff *configStuff
 	eg.Go(func() error {
@@ -694,6 +610,7 @@ type Global struct {
 
 	Dir             string
 	DestinationRepo string
+	UploadRepo      string
 	PipelineDir     string
 	Runner          string
 
@@ -720,15 +637,8 @@ type Global struct {
 
 	Bundle string
 
-	// per arch rate limiter (for APKINDEX)
-	writeLimiters map[string]*rate.Limiter
-
-	genmu       sync.Mutex
-	generations map[string]int64
-
-	GCS               *storage.Client
-	StagingBucket     string
-	DestinationBucket string
+	GCS           *storage.Client
+	StagingBucket string
 
 	K8sNamespace   string
 	ServiceAccount string
@@ -742,14 +652,6 @@ type Global struct {
 
 func (g *Global) logdir(arch string) string {
 	return filepath.Join(g.OutDir, arch, "buildlogs")
-}
-
-// wrapper around the writeLimiter so this is accounted for in traces
-func (g *Global) wait(ctx context.Context, arch string) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "wait")
-	defer span.End()
-
-	return g.writeLimiters[arch].Wait(ctx)
 }
 
 type task struct {
@@ -1203,11 +1105,9 @@ func (t *task) buildBundle(ctx context.Context) error {
 	log := clog.FromContext(ctx)
 
 	needsBuild := map[string]bool{}
-	needsIndex := map[string]bool{}
 
 	for _, arch := range t.archs {
 		apkFile := t.pkgver() + ".apk"
-		apkPath := filepath.Join(arch, apkFile)
 
 		// See if we already have the package indexed.
 		if _, ok := t.cfg.exists[arch][apkFile]; ok {
@@ -1215,25 +1115,10 @@ func (t *task) buildBundle(ctx context.Context) error {
 			continue
 		}
 
-		needsIndex[arch] = true
-
-		if t.cfg.DestinationBucket != "" {
-			bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
-			if ok {
-				apkPath = path.Join(dir, apkPath)
-			}
-
-			// See if we already have the package built.
-			if _, err := t.cfg.GCS.Bucket(bucket).Object(apkPath).Attrs(ctx); err == nil {
-				log.Debugf("Skipping %s, already built", apkPath)
-				continue
-			}
-		}
-
 		needsBuild[arch] = true
 	}
 
-	if len(needsBuild) == 0 && len(needsIndex) == 0 {
+	if len(needsBuild) == 0 {
 		t.skipped = true
 		return nil
 	}
@@ -1293,26 +1178,22 @@ func (t *task) buildBundle(ctx context.Context) error {
 	}
 	defer os.RemoveAll(tmpdir)
 
-	var filemu sync.Mutex
-	filesByArch := map[string][]string{}
+	if t.cfg.UploadRepo == "" {
+		clog.FromContext(ctx).Warnf("Skipping uploading packages because --upload-repository is not set")
+		return nil
+	}
 
 	var pkgGroup errgroup.Group
-	for arch, need := range needsIndex {
+	for arch, need := range needsBuild {
 		if !need {
 			continue
 		}
 
 		arch := types.ParseArchitecture(arch).ToAPK()
 		pkgGroup.Go(func() error {
-			files, err := t.uploadBundle(ctx, arch, results, tmpdir)
-			if err != nil {
+			if err := t.uploadBundle(ctx, arch, results, tmpdir); err != nil {
 				return fmt.Errorf("uploading bundle: %w", err)
 			}
-
-			filemu.Lock()
-			defer filemu.Unlock()
-
-			filesByArch[arch] = files
 
 			return nil
 		})
@@ -1322,53 +1203,10 @@ func (t *task) buildBundle(ctx context.Context) error {
 		return fmt.Errorf("uploading bundles: %w", err)
 	}
 
-	t.cfg.mu.Lock()
-	defer t.cfg.mu.Unlock()
-
-	var indexGroup errgroup.Group
-	for arch, need := range needsIndex {
-		if !need {
-			continue
-		}
-
-		arch := types.ParseArchitecture(arch).ToAPK()
-		indexGroup.Go(func() error {
-			return t.indexBundle(ctx, arch, filesByArch[arch])
-		})
-	}
-
-	if err := indexGroup.Wait(); err != nil {
-		return fmt.Errorf("failed to regenerate index: %w", err)
-	}
-
-	if t.cfg.DestinationBucket == "" {
-		clog.FromContext(ctx).Warnf("Skipping uploading indexes because --destination-bucket is not set")
-		return nil
-	}
-
-	log.Infof("Uploading APKINDEX: %s", t.pkg)
-
-	// We do this after indexGroup because we only want to upload them if all archs succeeded.
-	var uploadGroup errgroup.Group
-	for arch, need := range needsIndex {
-		if !need {
-			continue
-		}
-
-		arch := types.ParseArchitecture(arch).ToAPK()
-		uploadGroup.Go(func() error {
-			return t.uploadIndex(ctx, arch)
-		})
-	}
-
-	if err := uploadGroup.Wait(); err != nil {
-		return fmt.Errorf("uploading indexes: %w", err)
-	}
-
 	return nil
 }
 
-func (t *task) uploadBundle(ctx context.Context, arch string, results map[string]*bundleResult, tmpdir string) ([]string, error) {
+func (t *task) uploadBundle(ctx context.Context, arch string, results map[string]*bundleResult, tmpdir string) error {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "indexBundle")
 	defer span.End()
 
@@ -1376,7 +1214,7 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 
 	packageDir := filepath.Join(tmpdir, arch)
 	if err := os.MkdirAll(packageDir, os.ModePerm); err != nil {
-		return nil, fmt.Errorf("failed to mkdir: %s; %w", packageDir, err)
+		return fmt.Errorf("failed to mkdir: %s; %w", packageDir, err)
 	}
 
 	apkFiles := make([]string, 0, len(t.bundle.Subpackages)+1)
@@ -1385,121 +1223,32 @@ func (t *task) uploadBundle(ctx context.Context, arch string, results map[string
 	apkPath := filepath.Join(packageDir, apkFile)
 
 	res, ok := results[arch]
-	if ok {
-		if err := t.fetchResult(ctx, res, tmpdir); err != nil {
-			return nil, fmt.Errorf("fetching bundle output: %w", err)
+	if !ok {
+		return nil
+	}
+
+	if err := t.fetchResult(ctx, res, tmpdir); err != nil {
+		return fmt.Errorf("fetching bundle output: %w", err)
+	}
+
+	for _, subName := range t.bundle.Subpackages {
+		subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, t.ver, t.epoch)
+		subpkgFileName := filepath.Join(packageDir, subpkgApk)
+		if _, err := os.Stat(subpkgFileName); err != nil {
+			log.Warnf("Skipping subpackage %s (was not built): %v", subpkgFileName, err)
+			continue
 		}
 
-		for _, subName := range t.bundle.Subpackages {
-			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, t.ver, t.epoch)
-			subpkgFileName := filepath.Join(packageDir, subpkgApk)
-			if _, err := os.Stat(subpkgFileName); err != nil {
-				log.Warnf("Skipping subpackage %s (was not built): %v", subpkgFileName, err)
-				continue
-			}
-
-			log.Debugf("re-signing %s", subpkgApk)
-			if err := sign.APK(ctx, subpkgFileName, t.cfg.signingKey); err != nil {
-				return nil, fmt.Errorf("signing %s: %w", subpkgApk, err)
-			}
-
-			apkFiles = append(apkFiles, subpkgFileName)
-		}
-
-		// Note that the primary APK here is intentionally last.
-		// When we check if a package has already been uploaded (needsBuild above), we use this file.
-		// It's important that we upload it last so that we know all the other APKs were also uploaded.
-		log.Debugf("re-signing %s", apkFile)
-		if err := sign.APK(ctx, apkPath, t.cfg.signingKey); err != nil {
-			return nil, fmt.Errorf("signing %s: %w", apkFile, err)
-		}
-
-		apkFiles = append(apkFiles, apkPath)
-
-		if err := t.uploadAPKs(ctx, arch, apkFiles); err != nil {
-			return nil, fmt.Errorf("uploading apk: %w", err)
-		}
-	} else {
-		for _, subName := range t.bundle.Subpackages {
-			subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, t.ver, t.epoch)
-			subpkgFileName := filepath.Join(packageDir, subpkgApk)
-
-			if err := t.downloadAPK(ctx, arch, packageDir, subpkgApk); err != nil {
-				if errors.Is(err, storage.ErrObjectNotExist) {
-					log.Warnf("Skipping subpackage %s (was not built): %v", subpkgApk, err)
-					continue
-				}
-				return nil, fmt.Errorf("downloading subpackage apk: %s; %w", subpkgApk, err)
-			}
-
-			apkFiles = append(apkFiles, subpkgFileName)
-		}
-
-		if err := t.downloadAPK(ctx, arch, packageDir, apkFile); err != nil {
-			return nil, fmt.Errorf("downloading apk: %s; %w", apkFile, err)
-		}
-
-		apkFiles = append(apkFiles, apkPath)
+		apkFiles = append(apkFiles, subpkgFileName)
 	}
 
-	return apkFiles, nil
-}
+	// Note that the primary APK here is intentionally last.
+	// When we check if a package has already been uploaded (needsBuild above), we use this file.
+	// It's important that we upload it last so that we know all the other APKs were also uploaded.
+	apkFiles = append(apkFiles, apkPath)
 
-func (t *task) indexBundle(ctx context.Context, arch string, apkFiles []string) error {
-	opts := []index.Option{
-		index.WithPackageFiles(apkFiles),
-		index.WithSigningKey(t.cfg.signingKey),
-		index.WithMergeIndexFileFlag(true),
-		index.WithIndexFile(filepath.Join(t.cfg.OutDir, arch, "APKINDEX.tar.gz")),
-	}
-
-	idx, err := index.New(opts...)
-	if err != nil {
-		return fmt.Errorf("unable to create index: %w", err)
-	}
-
-	// GenerateIndex is a little too chatty for my liking, so only log warnings and up.
-	quiet := clog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.WarnLevel}))
-	qctx := clog.WithLogger(ctx, quiet)
-
-	if err := idx.GenerateIndex(qctx); err != nil {
-		return fmt.Errorf("unable to generate index: %w", err)
-	}
-
-	return nil
-}
-
-func (t *task) downloadAPK(ctx context.Context, arch, pkgdir, apkfile string) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "downloadAPK")
-	defer span.End()
-
-	log := clog.FromContext(ctx)
-
-	obj := path.Join(arch, apkfile)
-	bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
-	if ok {
-		obj = path.Join(dir, obj)
-	}
-
-	log.Debugf("Downloading previously uploaded %s", obj)
-
-	rc, err := t.cfg.GCS.Bucket(bucket).Object(obj).NewReader(ctx)
-	if err != nil {
-		return err
-	}
-	defer rc.Close()
-
-	f, err := os.Create(filepath.Join(pkgdir, apkfile))
-	if err != nil {
-		return err
-	}
-
-	if _, err := io.Copy(f, rc); err != nil {
-		return err
-	}
-
-	if err := f.Close(); err != nil {
-		return err
+	if err := t.uploadAPKs(ctx, arch, apkFiles); err != nil {
+		return fmt.Errorf("uploading apks: %w", err)
 	}
 
 	return nil
@@ -1514,7 +1263,7 @@ func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string
 	log.Debugf("fetching object %s", res.object)
 	rc, err := t.cfg.GCS.Bucket(t.cfg.StagingBucket).Object(res.object).NewReader(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("fetching %q: %w", res.object, err)
 	}
 	defer rc.Close()
 
@@ -1556,91 +1305,40 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadAPKs")
 	defer span.End()
 
-	if t.cfg.DestinationBucket == "" {
-		clog.FromContext(ctx).Warnf("Skipping uploading packages because --destination-bucket is not set")
-		return nil
-	}
-
 	for _, apkFile := range apkFiles {
 		base := path.Base(apkFile)
 		obj := path.Join(arch, base)
 
-		bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
-		if ok {
-			obj = path.Join(dir, obj)
+		uploadURL := path.Join(t.cfg.UploadRepo, obj)
+		u, err := url.Parse(uploadURL)
+		if err != nil {
+			return fmt.Errorf("parsing %q: %w", uploadURL, err)
 		}
 
 		f, err := os.Open(apkFile)
 		if err != nil {
 			return fmt.Errorf("opening apk: %s; %w", apkFile, err)
 		}
-		defer f.Close()
 
-		// The gcs client will only retry wc.Close() errors if the upload is idempotent.
-		// Using this DoesNotExist condition causes the upload to be idempotent.
-		// This is fine because these objects should only ever be written once.
-		cond := storage.Conditions{DoesNotExist: true}
-
-		wc := t.cfg.GCS.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
-
-		if _, err := io.Copy(wc, f); err != nil {
-			return fmt.Errorf("uploading %s: %w", obj, err)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), f)
+		if err != nil {
+			return fmt.Errorf("creating POST request for %q: %w", u.Redacted(), err)
 		}
 
-		if err := wc.Close(); err != nil {
-			return fmt.Errorf("finalizing uploading of %s: %w", obj, err)
+		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+			return fmt.Errorf("error adding auth: %w", err)
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return fmt.Errorf("POST %q: %w", u.Redacted(), err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusAccepted {
+			return fmt.Errorf("POST %q: %s", u.Redacted(), resp.Status)
 		}
 	}
-
-	return nil
-}
-
-func (t *task) uploadIndex(ctx context.Context, arch string) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadIndex")
-	defer span.End()
-
-	filename := filepath.Join(t.cfg.OutDir, arch, "APKINDEX.tar.gz")
-
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-
-	obj := path.Join(arch, "APKINDEX.tar.gz")
-	bucket, dir, ok := strings.Cut(t.cfg.DestinationBucket, "/")
-	if ok {
-		obj = path.Join(dir, obj)
-	}
-
-	if err := t.cfg.wait(ctx, arch); err != nil {
-		return fmt.Errorf("waiting for rate limit: %w", err)
-	}
-
-	// The gcs client will only retry wc.Close() errors if the upload is idempotent.
-	// Using this GenerationMatch condition causes the upload to be idempotent.
-	// We expect to be the only writer of these objects, so this is fine.
-	// If we allow multiple concurrent index uploaders, we can also use this to safely retry.
-	cond := storage.Conditions{GenerationMatch: t.cfg.generations[arch]}
-	if cond.GenerationMatch == 0 {
-		// This fails with "NewWriter: empty conditions" if generation is 0,
-		// so set DoesNotExist instead.
-		cond.DoesNotExist = true
-	}
-
-	wc := t.cfg.GCS.Bucket(bucket).Object(obj).If(cond).NewWriter(ctx)
-
-	if _, err := io.Copy(wc, f); err != nil {
-		return fmt.Errorf("uploading %s: %w", obj, err)
-	}
-
-	if err := wc.Close(); err != nil {
-		return fmt.Errorf("finalizing upload of %s: %w", obj, err)
-	}
-
-	// Update this arch's generation so we can use it for idempotency above.
-	t.cfg.genmu.Lock()
-	t.cfg.generations[arch] = wc.Attrs().Generation
-	t.cfg.genmu.Unlock()
 
 	return nil
 }
