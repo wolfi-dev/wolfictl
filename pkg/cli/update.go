@@ -15,6 +15,7 @@ type options struct {
 	pullRequestTitle       string
 	dryRun                 bool
 	githubReleaseQuery     bool
+	gitlabReleaseQuery     bool
 	releaseMonitoringQuery bool
 	useGitSign             bool
 	createIssues           bool
@@ -38,6 +39,7 @@ func cmdUpdate() *cobra.Command {
 
 	cmd.Flags().BoolVar(&o.dryRun, "dry-run", false, "prints proposed package updates rather than creating a pull request")
 	cmd.Flags().BoolVar(&o.githubReleaseQuery, "github-release-query", true, "query the GitHub graphql API for latest releases")
+	cmd.Flags().BoolVar(&o.gitlabReleaseQuery, "gitlab-release-query", true, "query the GitLab REST API for latest releases version")
 	cmd.Flags().BoolVar(&o.releaseMonitoringQuery, "release-monitoring-query", true, "query https://release-monitoring.org/ API for latest releases")
 	cmd.Flags().StringArrayVar(&o.packageNames, "package-name", []string{}, "Optional: provide a specific package name to check for updates rather than searching all packages in a repo URI")
 	cmd.Flags().StringVar(&o.pullRequestBaseBranch, "pull-request-base-branch", "main", "base branch to create a pull request against")
@@ -74,6 +76,7 @@ func (o options) UpdateCmd(ctx context.Context, repoURI string) error {
 	updateContext.PullRequestTitle = o.pullRequestTitle
 	updateContext.ReleaseMonitoringQuery = o.releaseMonitoringQuery
 	updateContext.GithubReleaseQuery = o.githubReleaseQuery
+	updateContext.GitlabReleaseQuery = o.gitlabReleaseQuery
 	updateContext.UseGitSign = o.useGitSign
 	updateContext.CreateIssues = o.createIssues
 	updateContext.IssueLabels = o.issueLabels

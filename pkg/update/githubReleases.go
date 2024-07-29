@@ -555,7 +555,7 @@ func (o GitHubReleaseOptions) getLatestVersion(packageNameHash string, versionRe
 	return nil
 }
 
-func (o GitHubReleaseOptions) shouldSkipVersion(v string) bool {
+func shouldSkipVersion(v string) bool {
 	invalid := []string{"alpha", "beta", "rc", "pre"}
 	for _, i := range invalid {
 		if strings.Contains(strings.ToLower(v), i) {
@@ -639,7 +639,7 @@ func (o GitHubReleaseOptions) prepareVersion(nameHash, v, id string) (string, er
 		v = strings.ReplaceAll(v, c.Update.VersionSeparator, ".")
 	}
 
-	if o.shouldSkipVersion(v) {
+	if shouldSkipVersion(v) {
 		return "", nil
 	}
 
