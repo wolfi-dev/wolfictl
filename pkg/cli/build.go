@@ -1292,7 +1292,7 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 		base := path.Base(apkFile)
 		obj := path.Join(arch, base)
 
-		uploadURL := path.Join(t.cfg.UploadRepo, obj)
+		uploadURL := fmt.Sprintf("%s/%s", t.cfg.UploadRepo, obj)
 		u, err := url.Parse(uploadURL)
 		if err != nil {
 			return fmt.Errorf("parsing %q: %w", uploadURL, err)
@@ -1303,10 +1303,16 @@ func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) e
 			return fmt.Errorf("opening apk: %s; %w", apkFile, err)
 		}
 
+		info, err := f.Stat()
+		if err != nil {
+			return fmt.Errorf("statting %s: %w", apkFile, err)
+		}
+
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), f)
 		if err != nil {
 			return fmt.Errorf("creating POST request for %q: %w", u.Redacted(), err)
 		}
+		req.ContentLength = info.Size()
 
 		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
 			return fmt.Errorf("error adding auth: %w", err)
