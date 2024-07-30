@@ -456,6 +456,85 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return fmt.Errorf("auto-update is disabled but no reason is provided")
 			},
 		},
+		{
+			Name:        "valid-version-stream",
+			Description: "check the provides and tag filter if version stream suffix is passed to package name",
+			Severity:    SeverityWarning,
+			LintFunc: func(c config.Configuration) error {
+				// This regex captures a string that ends with a semantic version (semver) suffix.
+				// It returns two groups:
+				// - Group 1: The prefix part of the string before the semver.
+				// - Group 2: The semver (major.minor or major.minor.patch).
+				// If there is no semver suffix, the string will not match.
+				re := regexp.MustCompile(`^(.*?)-(\d+\.\d+(?:\.\d+)?)$`)
+
+				// It means that the package is not a version streamed, so early return.
+				if !re.MatchString(c.Package.Name) {
+					return nil
+				}
+
+				matches := re.FindStringSubmatch(c.Package.Name)
+				if len(matches) != 3 {
+					return fmt.Errorf("invalid package name %s for version stream, regex matches %+v", c.Package.Name, matches)
+				}
+
+				packageName := matches[1]
+				versionStream := matches[2]
+
+				if !strings.HasPrefix(c.Package.Version, versionStream) {
+					return fmt.Errorf("package is version streamed but package.version %s starts with different than given version stream %s", c.Package.Version, versionStream)
+				}
+
+				var providesList []string
+				addToProvidesList := func(key string) {
+					providesList = append(providesList, fmt.Sprintf("%s=%s-r%d", key, c.Package.Version, c.Package.Epoch))
+					providesList = append(providesList, fmt.Sprintf("%s=%s-r%d", key, versionStream, c.Package.Epoch))
+					providesList = append(providesList, fmt.Sprintf("%s=%s", key, c.Package.Version))
+					providesList = append(providesList, fmt.Sprintf("%s=%s", key, versionStream))
+					providesList = append(providesList, fmt.Sprintf("%s=%s.999", key, versionStream))
+				}
+				addToProvidesList(packageName)
+
+				// Some packages have different provides for package name, i.e. python-3 instead of python.
+				if majorMinor := strings.Split(versionStream, "."); len(majorMinor) > 1 {
+					addToProvidesList(fmt.Sprintf("%s-%s", packageName, majorMinor[0]))
+				}
+
+				anyMatch := false
+				for _, provides := range providesList {
+					if slices.Contains(c.Package.Dependencies.Provides, provides) {
+						anyMatch = true
+						break
+					}
+				}
+
+				if !anyMatch {
+					return fmt.Errorf("package is version streamed but %s=${{package.full-version}} is missing on dependencies.provides", packageName)
+				}
+
+				if c.Update.Enabled && !c.Update.Manual && c.Update.GitHubMonitor != nil {
+					prefixesToCheck := []string{"", "v", packageName, "release", strings.ReplaceAll(packageName, "-fips", ""), c.Update.GitHubMonitor.StripPrefix}
+					separators := []string{"", ".", "-", "_"}
+					versionsToCheck := []string{versionStream, strings.ReplaceAll(versionStream, ".", "-"), strings.ReplaceAll(versionStream, ".", "_")}
+
+					var filtersToCheck []string
+					for _, prefix := range prefixesToCheck {
+						for _, separator := range separators {
+							for _, version := range versionsToCheck {
+								for _, suffix := range separators {
+									filtersToCheck = append(filtersToCheck, prefix+separator+version+suffix)
+								}
+							}
+						}
+					}
+
+					if !slices.Contains(filtersToCheck, c.Update.GitHubMonitor.TagFilter) && !slices.Contains(filtersToCheck, c.Update.GitHubMonitor.TagFilterPrefix) {
+						return fmt.Errorf("package is version streamed but tag filter %s is mismatch on update.github", versionStream)
+					}
+				}
+				return nil
+			},
+		},
 	}
 }
 
