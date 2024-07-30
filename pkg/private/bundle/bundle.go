@@ -481,6 +481,7 @@ func Podspec(task Task, ref name.Reference, arch, mFamily, sa, ns string, anns m
 					},
 				},
 			},
+			ActiveDeadlineSeconds: ptr.Int64(12 * 60 * 60),
 		},
 	}
 
