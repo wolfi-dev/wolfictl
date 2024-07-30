@@ -444,7 +444,7 @@ func (t *task) addBundle(ctx context.Context, srcfs fstest.MapFS, built map[stri
 
 	log := clog.FromContext(ctx)
 
-	log.Infof("bundle(%q)", t.pkg)
+	log.Debugf("bundle(%q)", t.pkg)
 
 	needsIndex := map[string]bool{}
 
