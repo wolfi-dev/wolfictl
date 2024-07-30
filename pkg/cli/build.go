@@ -290,6 +290,10 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	cfg.jobch = make(chan struct{}, cfg.Jobs)
 	cfg.donech = make(chan *task, cfg.Jobs)
 
+	if err := cfg.initK8s(ctx); err != nil {
+		return fmt.Errorf("initializing k8s: %w", err)
+	}
+
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
@@ -641,6 +645,8 @@ type Global struct {
 	GCS           *storage.Client
 	StagingBucket string
 
+	clientset *kubernetes.Clientset
+
 	K8sNamespace   string
 	ServiceAccount string
 	MachineFamily  string
@@ -891,61 +897,8 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		Value: u,
 	})
 
-	var cfg *rest.Config
-
-	if t.cfg.ClusterName != "" {
-		kubeConfig, err := getK8sClusterConfig(ctx, t.cfg.ProjectID, t.cfg.ClusterLocation, t.cfg.ClusterName)
-		if err != nil {
-			return nil, fmt.Errorf("getting gke cluster config: %w", err)
-		}
-
-		if len(kubeConfig.Clusters) != 1 {
-			return nil, fmt.Errorf("got %d clusters in config, expected 1", len(kubeConfig.Clusters))
-		}
-
-		clusterName := maps.Keys(kubeConfig.Clusters)[0]
-		config, err := clientcmd.NewNonInteractiveClientConfig(*kubeConfig, clusterName, &clientcmd.ConfigOverrides{}, nil).ClientConfig()
-		if err != nil {
-			return nil, fmt.Errorf("creating k8s config cluster=%s: %w", clusterName, err)
-		}
-		cfg = config
-	} else {
-		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
-		if err != nil {
-			return nil, fmt.Errorf("creating default k8s config: %w", err)
-		}
-		cfg = config
-	}
-	clientset, err := kubernetes.NewForConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("creating k8s client: %w", err)
-	}
-
-	log.Debugf("ensuring namespace %s exists", t.cfg.K8sNamespace)
-	if _, err := clientset.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: t.cfg.K8sNamespace,
-		},
-	}, metav1.CreateOptions{}); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			return nil, fmt.Errorf("creating namespace: %w", err)
-		}
-	}
-
-	log.Debugf("ensuring service account %s exists", t.cfg.ServiceAccount)
-	if _, err := clientset.CoreV1().ServiceAccounts(t.cfg.K8sNamespace).Create(ctx, &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      t.cfg.ServiceAccount,
-			Namespace: t.cfg.K8sNamespace,
-		},
-	}, metav1.CreateOptions{}); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			return nil, fmt.Errorf("creating service account: %w", err)
-		}
-	}
-
 	log.Debugf("creating pod for %s", t.pkgver())
-	pod, err = clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
+	pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("creating pod: %w", err)
 	}
@@ -961,7 +914,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
 	defer cancel()
 	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
-		pod, err = clientset.CoreV1().Pods(t.cfg.K8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
+		pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
 		if err != nil {
 			return false, err
 		}
@@ -1495,4 +1448,64 @@ func getK8sClusterConfig(ctx context.Context, projectID, clusterLocation, cluste
 	ret.CurrentContext = kName
 
 	return &ret, nil
+}
+
+func (g *Global) initK8s(ctx context.Context) error {
+	log := clog.FromContext(ctx)
+
+	var cfg *rest.Config
+	if g.ClusterName != "" {
+		kubeConfig, err := getK8sClusterConfig(ctx, g.ProjectID, g.ClusterLocation, g.ClusterName)
+		if err != nil {
+			return fmt.Errorf("getting gke cluster config: %w", err)
+		}
+
+		if len(kubeConfig.Clusters) != 1 {
+			return fmt.Errorf("got %d clusters in config, expected 1", len(kubeConfig.Clusters))
+		}
+
+		clusterName := maps.Keys(kubeConfig.Clusters)[0]
+		config, err := clientcmd.NewNonInteractiveClientConfig(*kubeConfig, clusterName, &clientcmd.ConfigOverrides{}, nil).ClientConfig()
+		if err != nil {
+			return fmt.Errorf("creating k8s config cluster=%s: %w", clusterName, err)
+		}
+		cfg = config
+	} else {
+		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
+		if err != nil {
+			return fmt.Errorf("creating default k8s config: %w", err)
+		}
+		cfg = config
+	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("creating k8s client: %w", err)
+	}
+
+	log.Debugf("ensuring namespace %s exists", g.K8sNamespace)
+	if _, err := clientset.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: g.K8sNamespace,
+		},
+	}, metav1.CreateOptions{}); err != nil {
+		if !k8serrors.IsAlreadyExists(err) {
+			return fmt.Errorf("creating namespace: %w", err)
+		}
+	}
+
+	log.Debugf("ensuring service account %s exists", g.ServiceAccount)
+	if _, err := clientset.CoreV1().ServiceAccounts(g.K8sNamespace).Create(ctx, &corev1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      g.ServiceAccount,
+			Namespace: g.K8sNamespace,
+		},
+	}, metav1.CreateOptions{}); err != nil {
+		if !k8serrors.IsAlreadyExists(err) {
+			return fmt.Errorf("creating service account: %w", err)
+		}
+	}
+
+	g.clientset = clientset
+
+	return nil
 }
