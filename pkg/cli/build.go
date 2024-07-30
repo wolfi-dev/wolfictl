@@ -932,6 +932,18 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		}
 	}
 
+	log.Debugf("ensuring service account %s exists", t.cfg.ServiceAccount)
+	if _, err := clientset.CoreV1().ServiceAccounts(t.cfg.K8sNamespace).Create(ctx, &corev1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      t.cfg.ServiceAccount,
+			Namespace: t.cfg.K8sNamespace,
+		},
+	}, metav1.CreateOptions{}); err != nil {
+		if !k8serrors.IsAlreadyExists(err) {
+			return nil, fmt.Errorf("creating service account: %w", err)
+		}
+	}
+
 	log.Debugf("creating pod for %s", t.pkgver())
 	pod, err = clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
