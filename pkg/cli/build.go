@@ -45,6 +45,7 @@ import (
 	gcontainer "google.golang.org/api/container/v1"
 	"google.golang.org/api/option"
 	corev1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
@@ -397,7 +398,7 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 			result.Error = err
 			result.Status = "error"
 			errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
-			log.Errorf("Failed to build %s (%d/%d)", t.pkg, len(errs), count)
+			log.Errorf("Failed to build %s (%d/%d): %v", t.pkg, len(errs), count, err)
 			continue
 		}
 
@@ -879,7 +880,7 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
-	log.Debugf("created signed URL for %s", object)
+	log.Infof("created signed URL for %s", object)
 	u, err := t.signedURL(object)
 	if err != nil {
 		return nil, fmt.Errorf("getting signed url: %w", err)
@@ -920,11 +921,23 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 		return nil, fmt.Errorf("creating k8s client: %w", err)
 	}
 
-	log.Infof("creating pod for %s", t.pkgver())
+	log.Debugf("ensuring namespace %s exists", t.cfg.K8sNamespace)
+	if _, err := clientset.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: t.cfg.K8sNamespace,
+		},
+	}, metav1.CreateOptions{}); err != nil {
+		if !k8serrors.IsAlreadyExists(err) {
+			return nil, fmt.Errorf("creating namespace: %w", err)
+		}
+	}
+
+	log.Debugf("creating pod for %s", t.pkgver())
 	pod, err = clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("creating pod: %w", err)
 	}
+	log.Infof("created pod for %s: %s", t.pkgver(), pod.ObjectMeta.Name)
 
 	// Needed for report output.
 	t.mupods.Lock()
