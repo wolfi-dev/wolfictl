@@ -979,7 +979,12 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 			}
 			return true, nil
 		case corev1.PodFailed:
-			return false, fmt.Errorf("pod failed: %s", pod.Status.Message)
+			log.With("status", pod.Status).Errorf("pod failed")
+			msg := "unknown termination message"
+			if pod.Status.ContainerStatuses[0].State.Terminated != nil {
+				msg = pod.Status.ContainerStatuses[0].State.Terminated.Message
+			}
+			return false, fmt.Errorf("pod failed: %s", msg)
 		}
 		return false, nil
 	})); err != nil {
