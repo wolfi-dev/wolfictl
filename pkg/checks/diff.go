@@ -254,11 +254,14 @@ func writeDiffLog(diff diffResult, bcz []byte, filename string, newPackages map[
 
 		builder.WriteString("Package " + packageName + ":\n")
 
+		var cmpdiff string
 		if len(diff.pkginfos) == 1 {
-			fmt.Fprintf(&builder, "\n`.PKGINFO` metadata:\n```\n%s\n```\n", diff.pkginfos[0])
+			cmpdiff = diff.pkginfos[0]
 		} else if len(diff.pkginfos) == 2 {
-			cmpdiff := cmp.Diff(diff.pkginfos[0], diff.pkginfos[1])
-			fmt.Fprintf(&builder, "\n`.PKGINFO` metadata:\n```\n%s\n```\n", cmpdiff)
+			cmpdiff = cmp.Diff(diff.pkginfos[0], diff.pkginfos[1])
+		}
+		if cmpdiff != "" {
+			fmt.Fprintf(&builder, "\n`.PKGINFO` metadata:\n```diff\n%s\n```\n", cmpdiff)
 		}
 
 		changes := []string{}
