@@ -84,14 +84,14 @@ melange build $1 \
  --gcplog \
  --source-dir $2 \
 {{ range .Flags }} {{.}} \
-{{ end }}
+{{ end }} || echo "build failed" > /dev/termination-log
 
 melange test $1 \
  --gcplog \
  --source-dir $2 \
  --test-package-append wolfi-base \
 {{ range .TestFlags }} {{.}} \
-{{ end }}
+{{ end }} || echo "test failed" > /dev/termination-log
 
 tar -C packages -czvf packages.tar.gz .
 

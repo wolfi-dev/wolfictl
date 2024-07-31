@@ -453,7 +453,7 @@ func (t *task) addBundle(ctx context.Context, srcfs fstest.MapFS, built map[stri
 
 		// See if we already have the package indexed.
 		if _, ok := t.cfg.exists[arch][apkFile]; ok {
-			log.Infof("Skipping %s/%s, already indexed", arch, apkFile)
+			log.Debugf("Skipping %s/%s, already indexed", arch, apkFile)
 			continue
 		}
 
