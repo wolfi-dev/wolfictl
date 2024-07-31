@@ -290,10 +290,6 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 	cfg.jobch = make(chan struct{}, cfg.Jobs)
 	cfg.donech = make(chan *task, cfg.Jobs)
 
-	if err := cfg.initK8s(ctx); err != nil {
-		return fmt.Errorf("initializing k8s: %w", err)
-	}
-
 	var mu sync.Mutex
 	cfg.exists = map[string]map[string]struct{}{}
 
@@ -371,6 +367,11 @@ func BuildBundles(ctx context.Context, cfg *Global) error {
 
 	if len(tasks) == 0 {
 		return fmt.Errorf("no packages to build")
+	}
+
+	// Wait until just before we start pods to initialize k8s stuff to give metadata server time to come up.
+	if err := cfg.initK8s(ctx); err != nil {
+		return fmt.Errorf("initializing k8s: %w", err)
 	}
 
 	todos := tasks
