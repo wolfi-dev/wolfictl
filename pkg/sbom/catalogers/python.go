@@ -13,8 +13,6 @@ import (
 	"github.com/chainguard-dev/clog"
 )
 
-const PipVendorPkg = "pip-vendor-file"
-
 // https://pip.pypa.io/en/stable/development/vendoring-policy/
 type PipVendor struct{}
 
@@ -57,7 +55,7 @@ func (a PipVendor) Catalog(ctx context.Context, resolver file.Resolver) ([]pkg.P
 				FoundBy:   a.Name(),
 				Locations: file.NewLocationSet(l),
 				Language:  pkg.Python,
-				Type:      PipVendorPkg,
+				Type:      pkg.PythonPkg,
 			})
 		}
 	}
