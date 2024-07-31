@@ -52,7 +52,7 @@ func TestPipVendor(t *testing.T) {
 		if p.Version == "" {
 			t.Errorf("missing package version")
 		}
-		if p.Type != PipVendorPkg {
+		if p.Type != pkg.PythonPkg {
 			t.Errorf("unexpected package type: %s", p.Type)
 		}
 		if p.Language != pkg.Python {
