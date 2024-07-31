@@ -23,17 +23,8 @@ var (
 func TestGenerate(t *testing.T) {
 	testTargets := []TestTarget{
 		"crane-0.19.1-r6.apk",
-
-		// TODO: Syft is producing nondeterministic results for these APKs, so the tests
-		//  aren't stable. Filed an issue with Syft:
-		//
-		//  https://github.com/anchore/syft/issues/2967.
-		//
-		//  Uncomment these test cases when the issue is resolved!
-		//
-		// "jenkins-2.461-r0.apk",
-		// "jruby-9.4-9.4.7.0-r0.apk",
-
+		"jenkins-2.461-r0.apk",
+		"jruby-9.4-9.4.7.0-r0.apk",
 		"openjdk-21-21.0.3-r3.apk",
 		"openssl-3.3.0-r8.apk",
 		"perl-yaml-syck-1.34-r3.apk",
