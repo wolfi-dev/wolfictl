@@ -10,7 +10,7 @@ require (
 	chainguard.dev/melange v0.11.3-0.20240730150751-5beea3ebd216
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
-	github.com/anchore/grype v0.79.3
+	github.com/anchore/grype v0.79.4
 	github.com/anchore/stereoscope v0.0.3-0.20240725180315-50ce3be7aa1f
 	github.com/anchore/syft v1.10.0
 	github.com/chainguard-dev/clog v1.4.0
@@ -155,7 +155,7 @@ require (
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/glebarez/sqlite v1.11.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
