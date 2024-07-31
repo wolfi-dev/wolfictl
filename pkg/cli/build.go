@@ -773,7 +773,7 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 		return err
 	}
 
-	log := clog.FromContext(ctx)
+	log := clog.FromContext(ctx).With("arch", arch)
 	logDir := t.cfg.logdir(arch)
 	logfile := filepath.Join(logDir, t.pkgver()) + ".log"
 
@@ -870,14 +870,14 @@ func (t *task) signedURL(object string) (string, error) {
 }
 
 func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult, error) {
+	log := clog.FromContext(ctx).With("arch", arch)
+
 	if err := ctx.Err(); err != nil {
 		return nil, fmt.Errorf("context error: %w", err)
 	}
 
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, arch)
 	defer span.End()
-
-	log := clog.FromContext(ctx)
 
 	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.Annotations)
 	if err != nil {
@@ -886,11 +886,11 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 
 	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
 
-	log.Infof("created signed URL for %s", object)
 	u, err := t.signedURL(object)
 	if err != nil {
-		return nil, fmt.Errorf("getting signed url: %w", err)
+		return nil, fmt.Errorf("creating signed url: %w", err)
 	}
+	log.Debugf("created signed URL for %s", object)
 
 	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
 		Name:  "PACKAGES_UPLOAD_URL",
@@ -955,7 +955,8 @@ func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult,
 }
 
 func (t *task) build(ctx context.Context) error {
-	log := clog.FromContext(ctx)
+	log := clog.FromContext(ctx).With("pkg", t.pkg, "pkgver", t.pkgver())
+	ctx = clog.WithLogger(ctx, log)
 
 	needsBuild := map[string]bool{}
 	needsIndex := map[string]bool{}
@@ -979,7 +980,7 @@ func (t *task) build(ctx context.Context) error {
 			continue
 		}
 
-		log.Infof("Checking if %q already exists: %v", apkPath, err)
+		log.Debugf("Checking if %q already exists: %v", apkPath, err)
 
 		needsBuild[arch] = true
 	}
@@ -1085,7 +1086,8 @@ func (t *task) buildBundle(ctx context.Context) error {
 	ctx, span := otel.Tracer("wolfictl").Start(ctx, "build "+t.pkg)
 	defer span.End()
 
-	log := clog.FromContext(ctx)
+	log := clog.FromContext(ctx).With("pkg", t.pkg, "pkgver", t.pkgver())
+	ctx = clog.WithLogger(ctx, log)
 
 	needsBuild := map[string]bool{}
 
