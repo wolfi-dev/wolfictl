@@ -11,8 +11,8 @@ require (
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.79.3
-	github.com/anchore/stereoscope v0.0.3-0.20240705165118-e46739e21796
-	github.com/anchore/syft v1.9.0
+	github.com/anchore/stereoscope v0.0.3-0.20240725180315-50ce3be7aa1f
+	github.com/anchore/syft v1.10.0
 	github.com/chainguard-dev/clog v1.4.0
 	github.com/chainguard-dev/yam v0.0.12
 	github.com/charmbracelet/bubbles v0.18.0
@@ -237,7 +237,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/locker v1.0.1 // indirect
-	github.com/moby/sys/mountinfo v0.7.1 // indirect
+	github.com/moby/sys/mountinfo v0.7.2 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/signal v0.7.0 // indirect
 	github.com/moby/sys/user v0.1.0 // indirect
@@ -291,7 +291,7 @@ require (
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/sylabs/sif/v2 v2.17.1 // indirect
-	github.com/sylabs/squashfs v0.6.1 // indirect
+	github.com/sylabs/squashfs v1.0.0 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
@@ -340,10 +340,10 @@ require (
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240730131305-7a9a4e85957e // indirect
 	k8s.io/utils v0.0.0-20240711033017-18e509b52bc8 // indirect
-	modernc.org/libc v1.52.1 // indirect
+	modernc.org/libc v1.55.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.30.1 // indirect
+	modernc.org/sqlite v1.31.1 // indirect
 	mvdan.cc/sh/v3 v3.8.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
