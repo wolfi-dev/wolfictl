@@ -29,9 +29,7 @@ func New() *cobra.Command {
 	cmd.AddCommand(
 		cmdAdvisory(),
 		cmdApk(),
-		cmdBuild(),
 		cmdBump(),
-		cmdBundle(),
 		cmdCheck(),
 		cmdGh(),
 		cmdImage(),
