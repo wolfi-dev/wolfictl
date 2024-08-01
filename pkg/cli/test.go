@@ -12,8 +12,6 @@ import (
 
 	"chainguard.dev/apko/pkg/build/types"
 	"chainguard.dev/melange/pkg/build"
-	"chainguard.dev/melange/pkg/container"
-	"chainguard.dev/melange/pkg/container/docker"
 	"github.com/chainguard-dev/clog"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
@@ -218,17 +216,6 @@ func testAll(ctx context.Context, cfg *testConfig, packages []string) error {
 	}
 
 	return nil
-}
-
-func newRunner(ctx context.Context, runner string) (container.Runner, error) {
-	switch runner {
-	case "docker":
-		return docker.NewRunner(ctx)
-	case "bubblewrap":
-		return container.BubblewrapRunner(), nil
-	}
-
-	return nil, fmt.Errorf("runner %q not supported", runner)
 }
 
 func testArch(ctx context.Context, cfg *testConfig, pkgCfg *dag.Configuration, arch types.Architecture) error {
