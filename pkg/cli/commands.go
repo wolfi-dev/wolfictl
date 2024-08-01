@@ -31,7 +31,6 @@ func New() *cobra.Command {
 		cmdApk(),
 		cmdBuild(),
 		cmdBump(),
-		cmdBundle(),
 		cmdCheck(),
 		cmdGh(),
 		cmdImage(),

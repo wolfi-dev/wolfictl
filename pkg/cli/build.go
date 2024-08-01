@@ -2,19 +2,13 @@ package cli
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -30,38 +24,22 @@ import (
 	"chainguard.dev/melange/pkg/container"
 	"chainguard.dev/melange/pkg/container/docker"
 	"chainguard.dev/melange/pkg/index"
-	"cloud.google.com/go/storage"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/dominikbraun/graph"
-	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/exp/maps"
-	"golang.org/x/oauth2/google"
 	"golang.org/x/sync/errgroup"
-	gcontainer "google.golang.org/api/container/v1"
-	"google.golang.org/api/option"
-	corev1 "k8s.io/api/core/v1"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/dag"
-	"github.com/wolfi-dev/wolfictl/pkg/private/bundle"
-	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
 func cmdBuild() *cobra.Command {
 	var traceFile string
-	var anns []string // string list annotations
 
 	cfg := Global{
 		BuildID: uuid.New(),
@@ -74,15 +52,6 @@ func cmdBuild() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
-			cfg.Annotations = map[string]string{}
-			for _, ann := range anns {
-				k, v, ok := strings.Cut(ann, "=")
-				if !ok {
-					return fmt.Errorf("invalid annotation: %q", ann)
-				}
-				cfg.Annotations[k] = v
-			}
 
 			if traceFile != "" {
 				w, err := os.Create(traceFile)
@@ -124,20 +93,6 @@ func cmdBuild() *cobra.Command {
 				cfg.OutDir = filepath.Join(cfg.Dir, "packages")
 			}
 
-			if cfg.Bundle != "" {
-				if cfg.StagingBucket == "" {
-					return fmt.Errorf("need --bucket with --bundle")
-				}
-
-				client, err := storage.NewClient(ctx, option.WithTelemetryDisabled())
-				if err != nil {
-					return fmt.Errorf("creating gcs client: %w", err)
-				}
-				cfg.GCS = client
-
-				return BuildBundles(ctx, &cfg)
-			}
-
 			return buildAll(ctx, &cfg, args)
 		},
 	}
@@ -158,17 +113,9 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
 	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo used to check for (and skip) existing packages")
 	cmd.Flags().StringVar(&cfg.UploadRepo, "upload-repository", "", "repo where packages will be uploaded")
-	cmd.Flags().StringVar(&cfg.Bundle, "bundle", "", "bundle of work to do (experimental)")
-	cmd.Flags().StringVar(&cfg.StagingBucket, "bucket", "", "gcs bucket to upload results (experimental)")
 
 	cmd.Flags().IntVarP(&cfg.Jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
-
-	cmd.Flags().StringVar(&cfg.K8sNamespace, "k8s-namespace", "default", "namespace to deploy pods into for builds.")
-	cmd.Flags().StringVar(&cfg.MachineFamily, "machine-family", "", "machine family for amd64 builds")
-	cmd.Flags().StringVar(&cfg.ServiceAccount, "service-account", "default", "service-account to run pods as.")
-	cmd.Flags().StringSliceVarP(&anns, "annotations", "a", []string{}, "key=value pairs to add to the pod spec annotations. The keys will be prefixed with 'melange.chainguard.dev/' on the pod.")
-
 	return cmd
 }
 
@@ -259,194 +206,6 @@ func fetchIndex(ctx context.Context, dst, arch string) (map[string]struct{}, err
 	}
 
 	return exist, nil
-}
-
-type buildResult struct {
-	Package  string        `json:"package"`
-	Pods     []string      `json:"pods,omitempty"`
-	Duration time.Duration `json:"duration,omitempty"`
-	Status   string        `json:"status,omitempty"`
-	Error    error         `json:"error,omitempty"`
-}
-
-func BuildBundles(ctx context.Context, cfg *Global) error {
-	var eg errgroup.Group
-
-	bundles, err := bundle.Pull(cfg.Bundle)
-	if err != nil {
-		return fmt.Errorf("failed to pull bundle: %w", err)
-	}
-
-	if cfg.Dir == "" {
-		cfg.Dir = "."
-	}
-	if cfg.OutDir == "" {
-		cfg.OutDir = filepath.Join(cfg.Dir, "packages")
-	}
-
-	if cfg.Jobs == 0 {
-		cfg.Jobs = runtime.GOMAXPROCS(0)
-	}
-	cfg.jobch = make(chan struct{}, cfg.Jobs)
-	cfg.donech = make(chan *task, cfg.Jobs)
-
-	var mu sync.Mutex
-	cfg.exists = map[string]map[string]struct{}{}
-
-	for _, arch := range cfg.Archs {
-		arch := types.ParseArchitecture(arch).ToAPK()
-
-		if err := os.MkdirAll(filepath.Join(cfg.OutDir, arch), os.ModePerm); err != nil {
-			return fmt.Errorf("creating arch directory: %w", err)
-		}
-
-		// If --destination-repository or --upload-repository is set, we want to fetch and parse the APKINDEXes concurrently with walking all the configs.
-		eg.Go(func() error {
-			exist, err := fetchIndex(ctx, cfg.DestinationRepo, arch)
-			if err != nil {
-				return fmt.Errorf("failed to fetch index from destination repo %s for arch %s; %w", cfg.DestinationRepo, arch, err)
-			}
-
-			existRepo, err := fetchIndex(ctx, cfg.UploadRepo, arch)
-			if err != nil {
-				return fmt.Errorf("fetching index from UploadRepo %s for arch %s; %w", cfg.UploadRepo, arch, err)
-			}
-
-			for k, v := range existRepo {
-				exist[k] = v
-			}
-
-			mu.Lock()
-			defer mu.Unlock()
-
-			cfg.exists[arch] = exist
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return fmt.Errorf("failed wait: %w", err)
-	}
-
-	newTask := func(pkg string, bundle bundle.Task, ref name.Digest) *task {
-		return &task{
-			cfg:    cfg,
-			pkg:    pkg,
-			ver:    bundle.Version,
-			epoch:  bundle.Epoch,
-			bundle: &bundle,
-			ref:    &ref,
-			archs:  filterArchs(cfg.Archs, bundle.Architectures),
-			cond:   sync.NewCond(&sync.Mutex{}),
-			deps:   map[string]*task{},
-		}
-	}
-
-	tasks := map[string]*task{}
-	for _, btask := range bundles.Tasks { //nolint:gocritic
-		tasks[btask.Package] = newTask(btask.Package, btask, bundles.Runtime)
-	}
-
-	for k, v := range bundles.Graph {
-		// The package list is in the form of "pkg:version", but we only care about the package name.
-		pkg, _, ok := strings.Cut(k, ":")
-		if !ok {
-			return fmt.Errorf("unexpected key: %q", k)
-		}
-
-		for _, dep := range v {
-			d, _, ok := strings.Cut(dep.Target, ":")
-			if !ok {
-				return fmt.Errorf("unexpected dep: %q", dep)
-			}
-
-			tasks[pkg].deps[d] = tasks[d]
-		}
-	}
-
-	if len(tasks) == 0 {
-		return fmt.Errorf("no packages to build")
-	}
-
-	// Wait until just before we start pods to initialize k8s stuff to give metadata server time to come up.
-	if err := cfg.initK8s(ctx); err != nil {
-		return fmt.Errorf("initializing k8s: %w", err)
-	}
-
-	todos := tasks
-	for _, t := range todos {
-		t.maybeStart(ctx)
-	}
-	count := len(todos)
-
-	// We're ok with Info level from here on.
-	log := clog.FromContext(ctx)
-
-	report := make([]*buildResult, 0, count)
-
-	errs := []error{}
-	skipped := 0
-
-	for len(todos) != 0 {
-		t := <-cfg.donech
-		delete(todos, t.pkg)
-
-		result := &buildResult{
-			Package:  t.pkgver(),
-			Pods:     t.pods,
-			Duration: t.duration,
-		}
-		report = append(report, result)
-
-		if err := t.err; err != nil {
-			result.Error = err
-			result.Status = "error"
-			errs = append(errs, fmt.Errorf("failed to build %s: %w", t.pkg, err))
-			log.Errorf("Failed to build %s (%d/%d): %v", t.pkg, len(errs), count, err)
-			continue
-		}
-
-		// Logging every skipped package is too noisy, so we just print a summary
-		// of the number of packages we skipped between actual builds.
-		if t.skipped {
-			result.Status = "skipped"
-			skipped++
-			continue
-		} else if skipped != 0 {
-			log.Infof("Skipped building %d packages", skipped)
-			skipped = 0
-		}
-
-		result.Status = "ok"
-		log.Infof("Finished building %s (%d/%d)", t.pkg, count-(len(todos)+len(errs)), count)
-	}
-
-	if skipped != 0 {
-		log.Infof("Skipped building %d packages", skipped)
-	}
-
-	if cfg.summary != "" {
-		out := os.Stdout
-		if cfg.summary != "-" {
-			f, err := os.Create(cfg.summary)
-			if err != nil {
-				return fmt.Errorf("creating summary: %w", err)
-			}
-
-			out = f
-		}
-		if err := json.NewEncoder(out).Encode(report); err != nil {
-			return fmt.Errorf("writing report: %w", err)
-		}
-	}
-
-	// If the context is cancelled, it's not useful to print everything, just summarize the count.
-	if err := ctx.Err(); err != nil {
-		return fmt.Errorf("failed to build %d packages: %w", len(errs), err)
-	}
-
-	return errors.Join(errs...)
 }
 
 func buildAll(ctx context.Context, cfg *Global, args []string) error {
@@ -640,22 +399,6 @@ type Global struct {
 	exists map[string]map[string]struct{}
 
 	mu sync.Mutex
-
-	Bundle string
-
-	GCS           *storage.Client
-	StagingBucket string
-
-	clientset *kubernetes.Clientset
-
-	K8sNamespace   string
-	ServiceAccount string
-	MachineFamily  string
-	Annotations    map[string]string
-
-	ProjectID       string
-	ClusterLocation string
-	ClusterName     string
 }
 
 func (g *Global) logdir(arch string) string {
@@ -670,8 +413,7 @@ type task struct {
 	epoch  uint64
 	config *dag.Configuration
 
-	bundle *bundle.Task
-	archs  []string
+	archs []string
 
 	err  error
 	deps map[string]*task
@@ -680,16 +422,6 @@ type task struct {
 	started bool
 	done    bool
 	skipped bool
-
-	mupods sync.Mutex
-	pods   []string
-
-	// How long the actual builds took, including pod scheduling.
-	duration time.Duration
-
-	// TODO: This is a hack, refactor the task execution out from the graph walking.
-	ref  *name.Digest
-	bcfg *BundleConfig
 }
 
 func (t *task) gitSDE(ctx context.Context) (time.Time, error) {
@@ -737,11 +469,7 @@ func (t *task) start(ctx context.Context) {
 	defer func() { <-t.cfg.jobch }()
 
 	// all deps are done and we're clear to launch.
-	if t.ref != nil {
-		t.err = t.buildBundle(ctx)
-	} else {
-		t.err = t.build(ctx)
-	}
+	t.err = t.build(ctx)
 }
 
 // return intersection of global archs flag and explicit target architectures
@@ -858,101 +586,6 @@ func (t *task) buildArch(ctx context.Context, arch string) error {
 	}
 
 	return nil
-}
-
-func (t *task) signedURL(object string) (string, error) {
-	bucket := t.cfg.GCS.Bucket(t.cfg.StagingBucket)
-	opts := &storage.SignedURLOptions{
-		Method:      "PUT",
-		Expires:     time.Now().Add(12 * time.Hour),
-		ContentType: "application/octet-stream",
-	}
-	return bucket.SignedURL(object, opts)
-}
-
-func (t *task) buildBundleArch(ctx context.Context, arch string) (*bundleResult, error) {
-	log := clog.FromContext(ctx).With("arch", arch)
-
-	if err := ctx.Err(); err != nil {
-		return nil, fmt.Errorf("context error: %w", err)
-	}
-
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, arch)
-	defer span.End()
-
-	pod, err := bundle.Podspec(*t.bundle, t.ref, arch, t.cfg.MachineFamily, t.cfg.ServiceAccount, t.cfg.K8sNamespace, t.cfg.Annotations)
-	if err != nil {
-		return nil, fmt.Errorf("creating podspec for %s: %w", t.pkg, err)
-	}
-
-	object := fmt.Sprintf("%s/%d-%s-%s-r%d.tar.gz", arch, time.Now().UnixNano(), t.pkg, t.ver, t.epoch)
-
-	u, err := t.signedURL(object)
-	if err != nil {
-		return nil, fmt.Errorf("creating signed url: %w", err)
-	}
-	log.Debugf("created signed URL for %s", object)
-
-	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
-		Name:  "PACKAGES_UPLOAD_URL",
-		Value: u,
-	})
-
-	log.Debugf("creating pod for %s", t.pkgver())
-	pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Create(ctx, pod, metav1.CreateOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("creating pod: %w", err)
-	}
-	log.Infof("created pod for %s: %s", t.pkgver(), pod.ObjectMeta.Name)
-
-	// Needed for report output.
-	t.mupods.Lock()
-	t.pods = append(t.pods, pod.ObjectMeta.Name)
-	t.mupods.Unlock()
-
-	lastPhase := corev1.PodUnknown
-
-	dctx, cancel := context.WithDeadline(ctx, time.Now().Add(6*time.Hour))
-	defer cancel()
-	if err := wait.PollUntilContextCancel(dctx, 5*time.Second, true, wait.ConditionWithContextFunc(func(ctx context.Context) (bool, error) {
-		pod, err = t.cfg.clientset.CoreV1().Pods(t.cfg.K8sNamespace).Get(ctx, pod.ObjectMeta.Name, metav1.GetOptions{})
-		if err != nil {
-			return false, err
-		}
-
-		// Only log when stuff actually changes.
-		if pod.Status.Phase != lastPhase {
-			log.Infof("pod %s phase changed: %s -> %s", pod.ObjectMeta.Name, lastPhase, pod.Status.Phase)
-		}
-		lastPhase = pod.Status.Phase
-
-		switch pod.Status.Phase {
-		case corev1.PodSucceeded:
-			if pod.Status.ContainerStatuses[0].State.Terminated == nil {
-				return false, nil
-			}
-			return true, nil
-		case corev1.PodFailed:
-			log.With("status", pod.Status).Errorf("pod failed")
-			msg := "unknown termination message"
-			if pod.Status.ContainerStatuses[0].State.Terminated != nil {
-				msg = pod.Status.ContainerStatuses[0].State.Terminated.Message
-			}
-			return false, fmt.Errorf("pod failed: %s", msg)
-		}
-		return false, nil
-	})); err != nil {
-		return nil, fmt.Errorf("waiting for pod: %w", err)
-	}
-
-	want := strings.TrimSpace(pod.Status.ContainerStatuses[0].State.Terminated.Message)
-
-	log.Debugf("want hash: %s", want)
-
-	return &bundleResult{
-		object: object,
-		hash:   want,
-	}, nil
 }
 
 func (t *task) build(ctx context.Context) error {
@@ -1078,263 +711,6 @@ func (t *task) build(ctx context.Context) error {
 	return nil
 }
 
-type bundleResult struct {
-	object string
-	hash   string
-}
-
-func (t *task) buildBundle(ctx context.Context) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "build "+t.pkg)
-	defer span.End()
-
-	log := clog.FromContext(ctx).With("pkg", t.pkg, "pkgver", t.pkgver())
-	ctx = clog.WithLogger(ctx, log)
-
-	needsBuild := map[string]bool{}
-
-	for _, arch := range t.archs {
-		apkFile := t.pkgver() + ".apk"
-
-		// See if we already have the package indexed.
-		if _, ok := t.cfg.exists[arch][apkFile]; ok {
-			log.Debugf("Skipping %s, already indexed", apkFile)
-			continue
-		}
-
-		needsBuild[arch] = true
-	}
-
-	if len(needsBuild) == 0 {
-		t.skipped = true
-		return nil
-	}
-
-	var (
-		buildGroup errgroup.Group
-	)
-
-	var mu sync.Mutex
-	results := map[string]*bundleResult{}
-
-	start := time.Now()
-	for arch, need := range needsBuild {
-		if !need {
-			continue
-		}
-
-		arch := types.ParseArchitecture(arch).ToAPK()
-		buildGroup.Go(func() error {
-			res, err := t.buildBundleArch(ctx, arch)
-			if err != nil {
-				return err
-			}
-
-			mu.Lock()
-			defer mu.Unlock()
-
-			results[arch] = res
-
-			return nil
-		})
-	}
-
-	err := buildGroup.Wait()
-	t.duration = time.Since(start)
-	if err != nil {
-		return fmt.Errorf("building group: %w", err)
-	}
-
-	if len(needsBuild) != 0 {
-		log.Infof("Pods finished: %s", t.pkg)
-	}
-
-	if t.cfg.dryrun {
-		return nil
-	}
-
-	if !t.cfg.generateIndex {
-		return nil
-	}
-
-	log.Infof("Processing results: %s", t.pkg)
-
-	tmpdir, err := os.MkdirTemp("", "")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tmpdir)
-
-	if t.cfg.UploadRepo == "" {
-		clog.FromContext(ctx).Warnf("Skipping uploading packages because --upload-repository is not set")
-		return nil
-	}
-
-	var pkgGroup errgroup.Group
-	for arch, need := range needsBuild {
-		if !need {
-			continue
-		}
-
-		arch := types.ParseArchitecture(arch).ToAPK()
-		pkgGroup.Go(func() error {
-			if err := t.uploadBundle(ctx, arch, results, tmpdir); err != nil {
-				return fmt.Errorf("uploading bundle: %w", err)
-			}
-
-			return nil
-		})
-	}
-
-	if err := pkgGroup.Wait(); err != nil {
-		return fmt.Errorf("uploading bundles: %w", err)
-	}
-
-	return nil
-}
-
-func (t *task) uploadBundle(ctx context.Context, arch string, results map[string]*bundleResult, tmpdir string) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "indexBundle")
-	defer span.End()
-
-	log := clog.FromContext(ctx)
-
-	packageDir := filepath.Join(tmpdir, arch)
-	if err := os.MkdirAll(packageDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to mkdir: %s; %w", packageDir, err)
-	}
-
-	apkFiles := make([]string, 0, len(t.bundle.Subpackages)+1)
-
-	apkFile := t.pkgver() + ".apk"
-	apkPath := filepath.Join(packageDir, apkFile)
-
-	res, ok := results[arch]
-	if !ok {
-		return nil
-	}
-
-	if err := t.fetchResult(ctx, res, tmpdir); err != nil {
-		return fmt.Errorf("fetching bundle output: %w", err)
-	}
-
-	for _, subName := range t.bundle.Subpackages {
-		subpkgApk := fmt.Sprintf("%s-%s-r%d.apk", subName, t.ver, t.epoch)
-		subpkgFileName := filepath.Join(packageDir, subpkgApk)
-		if _, err := os.Stat(subpkgFileName); err != nil {
-			log.Warnf("Skipping subpackage %s (was not built): %v", subpkgFileName, err)
-			continue
-		}
-
-		apkFiles = append(apkFiles, subpkgFileName)
-	}
-
-	// Note that the primary APK here is intentionally last.
-	// When we check if a package has already been uploaded (needsBuild above), we use this file.
-	// It's important that we upload it last so that we know all the other APKs were also uploaded.
-	apkFiles = append(apkFiles, apkPath)
-
-	if err := t.uploadAPKs(ctx, arch, apkFiles); err != nil {
-		return fmt.Errorf("uploading apks: %w", err)
-	}
-
-	return nil
-}
-
-func (t *task) fetchResult(ctx context.Context, res *bundleResult, tmpdir string) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "fetchResult")
-	defer span.End()
-
-	log := clog.FromContext(ctx)
-
-	log.Debugf("fetching object %s", res.object)
-	rc, err := t.cfg.GCS.Bucket(t.cfg.StagingBucket).Object(res.object).NewReader(ctx)
-	if err != nil {
-		return fmt.Errorf("fetching %q: %w", res.object, err)
-	}
-	defer rc.Close()
-
-	tmp, err := os.CreateTemp("", "")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(tmp.Name())
-
-	h := sha256.New()
-	mw := io.MultiWriter(tmp, h)
-
-	log.Debugf("downloading %s to %s", res.object, tmp.Name())
-	if _, err := io.Copy(mw, rc); err != nil {
-		return err
-	}
-
-	got := hex.EncodeToString(h.Sum(nil))
-	if got != res.hash {
-		return fmt.Errorf("hashing %s got != want; %q != %q", res.object, got, res.hash)
-	}
-
-	log.Debugf("hashes matched %s", res.hash)
-
-	// Seek to the start so we can untar it.
-	if _, err := tmp.Seek(0, io.SeekStart); err != nil {
-		return err
-	}
-
-	log.Debugf("untarring %s", tmp.Name())
-	if err := tar.Untar(tmp, tmpdir); err != nil {
-		return fmt.Errorf("untarring %s: %w", tmp.Name(), err)
-	}
-
-	return nil
-}
-
-func (t *task) uploadAPKs(ctx context.Context, arch string, apkFiles []string) error {
-	ctx, span := otel.Tracer("wolfictl").Start(ctx, "uploadAPKs")
-	defer span.End()
-
-	for _, apkFile := range apkFiles {
-		base := path.Base(apkFile)
-		obj := path.Join(arch, base)
-
-		uploadURL := fmt.Sprintf("%s/%s", t.cfg.UploadRepo, obj)
-		u, err := url.Parse(uploadURL)
-		if err != nil {
-			return fmt.Errorf("parsing %q: %w", uploadURL, err)
-		}
-
-		f, err := os.Open(apkFile)
-		if err != nil {
-			return fmt.Errorf("opening apk: %s; %w", apkFile, err)
-		}
-
-		info, err := f.Stat()
-		if err != nil {
-			return fmt.Errorf("statting %s: %w", apkFile, err)
-		}
-
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), f)
-		if err != nil {
-			return fmt.Errorf("creating POST request for %q: %w", u.Redacted(), err)
-		}
-		req.ContentLength = info.Size()
-
-		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
-			return fmt.Errorf("error adding auth: %w", err)
-		}
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return fmt.Errorf("POST %q: %w", u.Redacted(), err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusAccepted {
-			return fmt.Errorf("POST %q: %s", u.Redacted(), resp.Status)
-		}
-	}
-
-	return nil
-}
-
 // If this task hasn't already been started, start it.
 func (t *task) maybeStart(ctx context.Context) {
 	t.cond.L.Lock()
@@ -1382,139 +758,6 @@ func logs(fname string) error {
 	return nil
 }
 
-// returns the sourceDir _relative_ to the --dir flag
-func (t *task) sourceDir() (string, error) {
-	sdir := filepath.Join(t.cfg.Dir, t.pkg)
-	if _, err := os.Stat(sdir); os.IsNotExist(err) {
-		if err := os.MkdirAll(sdir, os.ModePerm); err != nil {
-			return "", fmt.Errorf("creating source directory %s: %v", sdir, err)
-		}
-	} else if err != nil {
-		return "", fmt.Errorf("statting source directory: %v", err)
-	}
-
-	rel, err := filepath.Rel(t.cfg.Dir, sdir)
-	if err != nil {
-		return "", err
-	}
-
-	return rel, nil
-}
-
-func getK8sClusterConfig(ctx context.Context, projectID, clusterLocation, clusterName string) (*api.Config, error) {
-	// get a token
-	ts, err := google.DefaultTokenSource(ctx, "https://www.googleapis.com/auth/cloud-platform")
-	if err != nil {
-		return nil, fmt.Errorf("getting google default token: %w", err)
-	}
-	tok, err := ts.Token()
-	if err != nil {
-		return nil, fmt.Errorf("extracting token: %w", err)
-	}
-
-	// Call out to google to get cluster information
-	svc, err := gcontainer.NewService(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("container.NewService: %w", err)
-	}
-
-	cName := fmt.Sprintf("projects/%s/locations/%s/clusters/%s", projectID, clusterLocation, clusterName)
-	cluster, err := svc.Projects.Locations.Clusters.Get(cName).Context(ctx).Do()
-	if err != nil {
-		return nil, fmt.Errorf("clusters get name=%s: %w", cName, err)
-	}
-
-	// Basic config structure
-	ret := api.Config{
-		APIVersion: "v1",
-		Kind:       "Config",
-		Clusters:   map[string]*api.Cluster{},  // Clusters is a map of referencable names to cluster configs
-		AuthInfos:  map[string]*api.AuthInfo{}, // AuthInfos is a map of referencable names to user configs
-		Contexts:   map[string]*api.Context{},  // Contexts is a map of referencable names to context configs
-	}
-
-	// Craft kubeconfig
-	// example: gke_my-project_us-central1-b_cluster-1 => https://XX.XX.XX.XX
-	kName := fmt.Sprintf("gke_%s_%s_%s", projectID, cluster.Location, cluster.Name)
-	cert, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClusterCaCertificate)
-	if err != nil {
-		return nil, fmt.Errorf("invalid certificate cluster=%s cert=%s: %w", kName, cluster.MasterAuth.ClusterCaCertificate, err)
-	}
-	ret.Clusters[kName] = &api.Cluster{
-		CertificateAuthorityData: cert,
-		Server:                   "https://" + cluster.Endpoint,
-	}
-	// Just reuse the context name as an auth name.
-	ret.Contexts[kName] = &api.Context{
-		Cluster:  kName,
-		AuthInfo: kName,
-	}
-	// GCP specific configation; use cloud platform scope.
-	ret.AuthInfos[kName] = &api.AuthInfo{
-		Token: tok.AccessToken,
-	}
-
-	ret.CurrentContext = kName
-
-	return &ret, nil
-}
-
-func (g *Global) initK8s(ctx context.Context) error {
-	log := clog.FromContext(ctx)
-
-	var cfg *rest.Config
-	if g.ClusterName != "" {
-		kubeConfig, err := getK8sClusterConfig(ctx, g.ProjectID, g.ClusterLocation, g.ClusterName)
-		if err != nil {
-			return fmt.Errorf("getting gke cluster config: %w", err)
-		}
-
-		if len(kubeConfig.Clusters) != 1 {
-			return fmt.Errorf("got %d clusters in config, expected 1", len(kubeConfig.Clusters))
-		}
-
-		clusterName := maps.Keys(kubeConfig.Clusters)[0]
-		config, err := clientcmd.NewNonInteractiveClientConfig(*kubeConfig, clusterName, &clientcmd.ConfigOverrides{}, nil).ClientConfig()
-		if err != nil {
-			return fmt.Errorf("creating k8s config cluster=%s: %w", clusterName, err)
-		}
-		cfg = config
-	} else {
-		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
-		if err != nil {
-			return fmt.Errorf("creating default k8s config: %w", err)
-		}
-		cfg = config
-	}
-	clientset, err := kubernetes.NewForConfig(cfg)
-	if err != nil {
-		return fmt.Errorf("creating k8s client: %w", err)
-	}
-
-	log.Debugf("ensuring namespace %s exists", g.K8sNamespace)
-	if _, err := clientset.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: g.K8sNamespace,
-		},
-	}, metav1.CreateOptions{}); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			return fmt.Errorf("creating namespace: %w", err)
-		}
-	}
-
-	log.Debugf("ensuring service account %s exists", g.ServiceAccount)
-	if _, err := clientset.CoreV1().ServiceAccounts(g.K8sNamespace).Create(ctx, &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      g.ServiceAccount,
-			Namespace: g.K8sNamespace,
-		},
-	}, metav1.CreateOptions{}); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			return fmt.Errorf("creating service account: %w", err)
-		}
-	}
-
-	g.clientset = clientset
-
-	return nil
+func envFile(arch string) string {
+	return fmt.Sprintf("build-%s.env", arch)
 }
