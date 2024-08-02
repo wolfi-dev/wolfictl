@@ -11,7 +11,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -27,7 +28,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -43,7 +45,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -59,7 +62,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -75,7 +79,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -91,7 +96,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -107,7 +113,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -123,7 +130,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -139,7 +147,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -155,7 +164,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -171,7 +181,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -187,7 +198,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -203,7 +215,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -219,7 +232,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -235,7 +249,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -251,7 +266,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -267,7 +283,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -283,7 +300,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -299,7 +317,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -315,7 +334,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -331,7 +351,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -347,7 +368,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39318",
@@ -363,7 +385,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -379,7 +402,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -395,7 +419,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -411,7 +436,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -427,7 +453,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -443,7 +470,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -459,7 +487,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -475,7 +504,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -491,7 +521,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -507,7 +538,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -523,7 +555,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -539,7 +572,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -555,7 +589,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -571,7 +606,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -587,7 +623,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -603,7 +640,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -619,7 +657,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -635,7 +674,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -651,7 +691,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -667,7 +708,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -683,7 +725,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -699,7 +742,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39319",
@@ -715,7 +759,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -731,7 +776,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -747,7 +793,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -763,7 +810,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -779,7 +827,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -795,7 +844,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -811,7 +861,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -827,7 +878,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -843,7 +895,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -859,7 +912,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -875,7 +929,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -891,7 +946,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -907,7 +963,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -923,7 +980,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -939,7 +997,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -955,7 +1014,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -971,7 +1031,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -987,7 +1048,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -1003,7 +1065,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -1019,7 +1082,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -1035,7 +1099,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -1051,7 +1116,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39320",
@@ -1067,7 +1133,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1083,7 +1150,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1099,7 +1167,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1115,7 +1184,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1131,7 +1201,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1147,7 +1218,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1163,7 +1235,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1179,7 +1252,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1195,7 +1269,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1211,7 +1286,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1227,7 +1303,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1243,7 +1320,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1259,7 +1337,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1275,7 +1354,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1291,7 +1371,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1307,7 +1388,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1323,7 +1405,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1339,7 +1422,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1355,7 +1439,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1371,7 +1456,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1387,7 +1473,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1403,7 +1490,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39321",
@@ -1419,7 +1507,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1435,7 +1524,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1451,7 +1541,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1467,7 +1558,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1483,7 +1575,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1499,7 +1592,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1515,7 +1609,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1531,7 +1626,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1547,7 +1643,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1563,7 +1660,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1579,7 +1677,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1595,7 +1694,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1611,7 +1711,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1627,7 +1728,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1643,7 +1745,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1659,7 +1762,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1675,7 +1779,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1691,7 +1796,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1707,7 +1813,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1723,7 +1830,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1739,7 +1847,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1755,7 +1864,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39322",
@@ -1771,7 +1881,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1787,7 +1898,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1803,7 +1915,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1819,7 +1932,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1835,7 +1949,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1851,7 +1966,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1867,7 +1983,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1883,7 +2000,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1899,7 +2017,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1915,7 +2034,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1931,7 +2051,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1947,7 +2068,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1963,7 +2085,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1979,7 +2102,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -1995,7 +2119,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2011,7 +2136,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2027,7 +2153,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2043,7 +2170,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2059,7 +2187,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2075,7 +2204,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2091,7 +2221,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2107,7 +2238,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39323",
@@ -2123,7 +2255,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2141,7 +2274,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2157,7 +2291,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2173,7 +2308,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2189,7 +2325,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2205,7 +2342,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2221,7 +2359,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2237,7 +2376,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2253,7 +2393,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2269,7 +2410,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2285,7 +2427,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2301,7 +2444,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2317,7 +2461,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2333,7 +2478,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2349,7 +2495,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2365,7 +2512,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2381,7 +2529,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2397,7 +2546,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2413,7 +2563,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2429,7 +2580,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2445,7 +2597,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2461,7 +2614,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39325",
@@ -2477,7 +2631,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2493,7 +2648,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2509,7 +2665,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2525,7 +2682,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2541,7 +2699,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2557,7 +2716,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2573,7 +2733,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2589,7 +2750,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2605,7 +2767,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2621,7 +2784,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2637,7 +2801,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2653,7 +2818,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2669,7 +2835,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2685,7 +2852,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2701,7 +2869,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2717,7 +2886,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2733,7 +2903,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2749,7 +2920,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2765,7 +2937,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2781,7 +2954,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2797,7 +2971,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-39326",
@@ -2813,7 +2988,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2829,7 +3005,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2845,7 +3022,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2861,7 +3039,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2877,7 +3056,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2893,7 +3073,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2909,7 +3090,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2925,7 +3107,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2941,7 +3124,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2957,7 +3141,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2973,7 +3158,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -2989,7 +3175,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3005,7 +3192,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3021,7 +3209,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3037,7 +3226,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3053,7 +3243,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3069,7 +3260,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3085,7 +3277,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3101,7 +3294,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3117,7 +3311,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3133,7 +3328,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3149,7 +3345,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-44487",
@@ -3165,7 +3362,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45283",
@@ -3183,7 +3381,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3199,7 +3398,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3215,7 +3415,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3231,7 +3432,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3247,7 +3449,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3263,7 +3466,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3279,7 +3483,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3295,7 +3500,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3311,7 +3517,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3327,7 +3534,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3343,7 +3551,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3359,7 +3568,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3375,7 +3585,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3391,7 +3602,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3407,7 +3619,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3423,7 +3636,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3439,7 +3653,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3455,7 +3670,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3471,7 +3687,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3487,7 +3704,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3503,7 +3721,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45285",
@@ -3519,7 +3738,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3537,7 +3757,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3553,7 +3774,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3569,7 +3791,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3585,7 +3808,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3601,7 +3825,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3617,7 +3842,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3633,7 +3859,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3649,7 +3876,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3665,7 +3893,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3681,7 +3910,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3697,7 +3927,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3713,7 +3944,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3729,7 +3961,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3745,7 +3978,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3761,7 +3995,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3777,7 +4012,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3793,7 +4029,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3809,7 +4046,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3825,7 +4063,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3841,7 +4080,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3857,7 +4097,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -3873,7 +4114,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3889,7 +4131,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3905,7 +4148,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3921,7 +4165,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3937,7 +4182,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3953,7 +4199,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3969,7 +4216,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -3985,7 +4233,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4001,7 +4250,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4017,7 +4267,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4033,7 +4284,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4049,7 +4301,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4065,7 +4318,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4081,7 +4335,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4097,7 +4352,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4113,7 +4369,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4129,7 +4386,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4145,7 +4403,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4161,7 +4420,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4177,7 +4437,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4193,7 +4454,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4209,7 +4471,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -4225,7 +4488,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4241,7 +4505,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4257,7 +4522,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4273,7 +4539,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4289,7 +4556,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4305,7 +4573,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4321,7 +4590,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4337,7 +4607,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4353,7 +4624,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4369,7 +4641,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4385,7 +4658,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4401,7 +4675,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4417,7 +4692,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4433,7 +4709,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4449,7 +4726,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4465,7 +4743,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4481,7 +4760,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4497,7 +4777,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4513,7 +4794,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4529,7 +4811,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4545,7 +4828,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4561,7 +4845,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -4577,7 +4862,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4593,7 +4879,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4609,7 +4896,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4625,7 +4913,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4641,7 +4930,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4657,7 +4947,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4673,7 +4964,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4689,7 +4981,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4705,7 +4998,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4721,7 +5015,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4737,7 +5032,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4753,7 +5049,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4769,7 +5066,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4785,7 +5083,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4801,7 +5100,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4817,7 +5117,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4833,7 +5134,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4849,7 +5151,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4865,7 +5168,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4881,7 +5185,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4897,7 +5202,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4913,7 +5219,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -4929,7 +5236,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -4945,7 +5253,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -4961,7 +5270,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -4977,7 +5287,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -4993,7 +5304,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5009,7 +5321,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5025,7 +5338,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5041,7 +5355,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5057,7 +5372,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5073,7 +5389,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5089,7 +5406,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5105,7 +5423,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5121,7 +5440,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5137,7 +5457,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5153,7 +5474,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5169,7 +5491,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5185,7 +5508,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5201,7 +5525,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5217,7 +5542,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5233,7 +5559,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5249,7 +5576,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5265,7 +5593,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -5281,7 +5610,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5297,7 +5627,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5313,7 +5644,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5329,7 +5661,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5345,7 +5678,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5361,7 +5695,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5377,7 +5712,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5393,7 +5729,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5409,7 +5746,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5425,7 +5763,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5441,7 +5780,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5457,7 +5797,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5473,7 +5814,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5489,7 +5831,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5505,7 +5848,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5521,7 +5865,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5537,7 +5882,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5553,7 +5899,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5569,7 +5916,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5585,7 +5933,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5601,7 +5950,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5617,7 +5967,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -5633,7 +5984,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5651,7 +6003,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5667,7 +6020,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5683,7 +6037,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5699,7 +6054,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5715,7 +6071,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5731,7 +6088,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5747,7 +6105,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5763,7 +6122,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5779,7 +6139,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5795,7 +6156,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5811,7 +6173,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5827,7 +6190,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5843,7 +6207,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5859,7 +6224,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5875,7 +6241,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5891,7 +6258,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5907,7 +6275,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5923,7 +6292,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5939,7 +6309,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5955,7 +6326,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5971,7 +6343,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -5987,7 +6360,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6005,7 +6379,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6021,7 +6396,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6037,7 +6413,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6053,7 +6430,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6069,7 +6447,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6085,7 +6464,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6101,7 +6481,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6117,7 +6498,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6133,7 +6515,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6149,7 +6532,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6165,7 +6549,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6181,7 +6566,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6197,7 +6583,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6213,7 +6600,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6229,7 +6617,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6245,7 +6634,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6261,7 +6651,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6277,7 +6668,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6293,7 +6685,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6309,7 +6702,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6325,7 +6719,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -6341,7 +6736,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6359,7 +6755,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go"
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6375,7 +6772,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/bin/gofmt"
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6391,7 +6789,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6407,7 +6806,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6423,7 +6823,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6439,7 +6840,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6455,7 +6857,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6471,7 +6874,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6487,7 +6891,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6503,7 +6908,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6519,7 +6925,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6535,7 +6942,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6551,7 +6959,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6567,7 +6976,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6583,7 +6993,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6599,7 +7010,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6615,7 +7027,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6631,7 +7044,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6647,7 +7061,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6663,7 +7078,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6679,7 +7095,8 @@
         "Name": "stdlib",
         "Version": "go1.21.0",
         "Type": "go-module",
-        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet"
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -6695,7 +7112,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "GHSA-236w-p7wf-5ph8",
@@ -6711,7 +7129,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "GHSA-4374-p667-p6c8",
@@ -6727,7 +7146,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "GHSA-49gw-vxvf-fc2g",
@@ -6743,7 +7163,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "GHSA-4v7x-pqxf-cx7m",
@@ -6759,7 +7180,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "GHSA-5fq7-4mxc-535h",
@@ -6775,7 +7197,8 @@
         "Name": "go-1.21",
         "Version": "1.21.0-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
       },
       "Vulnerability": {
         "ID": "GHSA-vvjp-q62m-2vph",
