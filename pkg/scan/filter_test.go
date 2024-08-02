@@ -207,6 +207,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 						// Fixed advisories only work for type "apk"
 						Package: Package{
 							Type: "apk",
+							PURL: "purl-value",
 						},
 					},
 				},
@@ -342,6 +343,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 						},
 						Package: Package{
 							Type: "go-module",
+							PURL: "purl-value",
 						},
 					},
 					{
@@ -360,6 +362,7 @@ func TestFilterWithAdvisories(t *testing.T) {
 					},
 					Package: Package{
 						Type: "go-module",
+						PURL: "purl-value",
 					},
 				},
 				{

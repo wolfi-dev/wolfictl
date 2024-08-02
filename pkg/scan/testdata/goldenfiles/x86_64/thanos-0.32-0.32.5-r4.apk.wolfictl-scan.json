@@ -11,7 +11,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
@@ -27,7 +28,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
@@ -43,7 +45,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
@@ -59,7 +62,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
@@ -75,7 +79,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
@@ -91,7 +96,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -107,7 +113,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
@@ -123,7 +130,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
@@ -139,7 +147,8 @@
         "Name": "stdlib",
         "Version": "go1.21.5",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
@@ -155,7 +164,8 @@
         "Name": "golang.org/x/net",
         "Version": "v0.17.0",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/net@v0.17.0"
       },
       "Vulnerability": {
         "ID": "GHSA-4v7x-pqxf-cx7m",
@@ -173,7 +183,8 @@
         "Name": "google.golang.org/protobuf",
         "Version": "v1.31.0",
         "Type": "go-module",
-        "Location": "/usr/bin/thanos"
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/google.golang.org/protobuf@v1.31.0"
       },
       "Vulnerability": {
         "ID": "GHSA-8r3f-844c-mc37",

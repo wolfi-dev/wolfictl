@@ -25,6 +25,7 @@ type Package struct {
 	Version  string
 	Type     string
 	Location string
+	PURL     string
 }
 
 type Vulnerability struct {
@@ -81,6 +82,7 @@ func mapMatchToFinding(m match.Match, datastore *store.Store) (*Finding, error) 
 			Version:  m.Package.Version,
 			Type:     string(m.Package.Type),
 			Location: strings.Join(locations, ", "),
+			PURL:     m.Package.PURL,
 		},
 		Vulnerability: Vulnerability{
 			ID:           m.Vulnerability.ID,

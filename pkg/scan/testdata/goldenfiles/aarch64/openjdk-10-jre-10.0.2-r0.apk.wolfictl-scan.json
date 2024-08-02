@@ -11,7 +11,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21930",
@@ -27,7 +28,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21937",
@@ -43,7 +45,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21938",
@@ -59,7 +62,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21939",
@@ -75,7 +79,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21954",
@@ -91,7 +96,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21967",
@@ -107,7 +113,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-21968",
@@ -123,7 +130,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-22041",
@@ -139,7 +147,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2023-25193",
@@ -155,7 +164,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-20918",
@@ -171,7 +181,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-20919",
@@ -187,7 +198,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-20921",
@@ -203,7 +215,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-20926",
@@ -219,7 +232,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-20945",
@@ -235,7 +249,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-20952",
@@ -251,7 +266,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-21011",
@@ -267,7 +283,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-21012",
@@ -283,7 +300,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-21068",
@@ -299,7 +317,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-21085",
@@ -315,7 +334,8 @@
         "Name": "openjdk-10-jre",
         "Version": "10.0.2-r0",
         "Type": "apk",
-        "Location": "/.PKGINFO"
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=aarch64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
         "ID": "CVE-2024-21094",
