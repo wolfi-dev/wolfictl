@@ -191,15 +191,13 @@ func generateVersions(soname, input string) []string {
 	return sonames
 }
 
-func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string) error {
+func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []string, currentPackage string) error {
 	if len(existingSonameFiles) == 0 {
 		o.Logger.Printf("no existing soname files, skipping")
 		return nil
 	}
 
 	// regex to match version and optional qualifier
-	// \d+(\.\d+)* captures version numbers that may have multiple parts separated by dots
-	// ([a-zA-Z0-9-_]*) captures optional alphanumeric (including hyphens and underscores) qualifiers
 	r := regexp.MustCompile(`(\d+(\.\d+)*)([a-zA-Z0-9-_]*)`)
 
 	// first turn the existing soname files into a map so it is easier to match with
@@ -255,6 +253,9 @@ func (o *SoNameOptions) checkSonamesMatch(existingSonameFiles, newSonameFiles []
 		if newVersionMajor > existingVersionMajor {
 			sonames := generateVersions(name, existingVersionStr)
 			for _, pkg := range o.ExistingPackages {
+				if pkg.Origin == currentPackage {
+					continue
+				}
 				for _, soname := range sonames {
 					if slices.Contains(pkg.Dependencies, soname) {
 						toBump[pkg.Origin] = struct{}{}
