@@ -58,7 +58,7 @@ require (
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/sync v0.8.0
 	golang.org/x/term v0.23.0
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.17.0
 	golang.org/x/time v0.6.0
 	golang.org/x/vuln v1.1.0
 	gopkg.in/yaml.v3 v3.0.1
