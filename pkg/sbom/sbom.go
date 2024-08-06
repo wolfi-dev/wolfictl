@@ -107,6 +107,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	).WithCatalogers(
 		catalogers.AngularJSReference,
 		catalogers.PipVendorReference,
+		catalogers.WheelReference,
 	)
 
 	createdSBOM, err := syft.CreateSBOM(ctx, src, cfg)

@@ -146,6 +146,44 @@
         "FixedVersion": "3.11.8-r0"
       },
       "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "e65bf8c01f6ac635",
+        "Name": "pip",
+        "Version": "22.3.1",
+        "Type": "python",
+        "Location": "/usr/lib/python3.11/ensurepip/_bundled/pip-22.3.1-py3-none-any.whl",
+        "PURL": "pkg:pypi/pip@22.3.1"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-mq26-g339-26xf",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-5752"
+        ],
+        "FixedVersion": "23.3"
+      },
+      "TriageAssessments": null
+    },
+    {
+      "Package": {
+        "ID": "a145349ac56ab1b1",
+        "Name": "setuptools",
+        "Version": "65.5.0",
+        "Type": "python",
+        "Location": "/usr/lib/python3.11/ensurepip/_bundled/setuptools-65.5.0-py3-none-any.whl",
+        "PURL": "pkg:pypi/setuptools@65.5.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-r9hx-vwmv-q579",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2022-40897"
+        ],
+        "FixedVersion": "65.5.1"
+      },
+      "TriageAssessments": null
     }
   ],
   "GrypeDBStatus": {
