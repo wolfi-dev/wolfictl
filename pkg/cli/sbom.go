@@ -95,7 +95,7 @@ type sbomParams struct {
 func (p *sbomParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", sbomFormatOutline, "output format (outline, syft-json)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to report in SBOM")
-	cmd.Flags().BoolVar(&p.disableSBOMCache, "disable-sbom-cache", false, "don't use the SBOM cache")
+	cmd.Flags().BoolVarP(&p.disableSBOMCache, "disable-sbom-cache", "D", false, "don't use the SBOM cache")
 	addVerboseFlag(&p.verbosity, cmd)
 }
 

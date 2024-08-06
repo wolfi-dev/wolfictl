@@ -31,6 +31,7 @@ func TestGenerate(t *testing.T) {
 		"powershell-7.4.1-r0.apk",
 		"php-odbc-8.2.11-r1.apk",
 		"py3-poetry-core-1.9.0-r1.apk",
+		"python-3.11-base-3.11.9-r6.apk",
 		"terraform-1.5.7-r12.apk",
 		"thanos-0.32-0.32.5-r4.apk",
 	}
