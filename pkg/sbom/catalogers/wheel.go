@@ -21,7 +21,7 @@ func (w Wheel) Name() string {
 	return "wheel-cataloger"
 }
 
-func (w Wheel) Catalog(ctx context.Context, resolver file.Resolver) ([]pkg.Package, []artifact.Relationship, error) {
+func (w Wheel) Catalog(_ context.Context, resolver file.Resolver) ([]pkg.Package, []artifact.Relationship, error) {
 	locations, err := resolver.FilesByGlob("**/*.whl")
 	if err != nil {
 		return nil, nil, fmt.Errorf("finding wheel files: %w", err)
@@ -38,6 +38,7 @@ func (w Wheel) Catalog(ctx context.Context, resolver file.Resolver) ([]pkg.Packa
 		if err != nil {
 			return nil, nil, fmt.Errorf("extracting wheel metadata: %w", err)
 		}
+		wheelFile.Close()
 
 		licenses := pkg.NewLicenseSet()
 		if license, ok := metadata["License"]; ok {
@@ -75,29 +76,31 @@ func extractWheelMetadata(wheelFile io.Reader) (map[string]string, error) {
 	metadata := make(map[string]string)
 
 	for _, file := range zipReader.File {
-		if strings.HasSuffix(file.Name, ".dist-info/METADATA") {
-			rc, err := file.Open()
-			if err != nil {
-				return nil, fmt.Errorf("opening METADATA file: %w", err)
-			}
-			defer rc.Close()
+		if !strings.HasSuffix(file.Name, ".dist-info/METADATA") {
+			continue
+		}
 
-			scanner := bufio.NewScanner(rc)
-			for scanner.Scan() {
-				line := scanner.Text()
-				if line == "" {
-					continue
-				}
-				parts := strings.SplitN(line, ": ", 2)
-				if len(parts) == 2 {
-					key, value := parts[0], parts[1]
-					metadata[key] = value
-				}
+		rc, err := file.Open()
+		if err != nil {
+			return nil, fmt.Errorf("opening METADATA file: %w", err)
+		}
+
+		scanner := bufio.NewScanner(rc)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if line == "" {
+				continue
 			}
-			if err := scanner.Err(); err != nil {
-				return nil, fmt.Errorf("scanning METADATA file: %w", err)
+			parts := strings.SplitN(line, ": ", 2)
+			if len(parts) == 2 {
+				key, value := parts[0], parts[1]
+				metadata[key] = value
 			}
 		}
+		if err := scanner.Err(); err != nil {
+			return nil, fmt.Errorf("scanning METADATA file: %w", err)
+		}
+		rc.Close()
 	}
 
 	return metadata, nil
