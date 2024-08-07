@@ -95816,8 +95816,8 @@
       "language": "",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:jenkins:jenkins:2.461-r0:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:jenkins:jenkins:2.461:*:*:*:*:*:*:*",
+          "source": "wolfictl"
         }
       ],
       "purl": "pkg:apk/wolfi/jenkins@2.461-r0?arch=aarch64&origin=jenkins",

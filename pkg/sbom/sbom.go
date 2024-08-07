@@ -9,7 +9,6 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/cataloging/pkgcataloging"
@@ -192,22 +191,28 @@ func newAPKPackage(r io.Reader, distroID string, includedFiles []string) (*pkg.P
 		Files:         files,
 	}
 
-	p := pkg.Package{
-		Name:      pkginfo.PkgName,
-		Version:   pkginfo.PkgVer,
+	p := baseSyftPkgFromPkgInfo(*pkginfo, metadata)
+
+	p.PURL = generatePURL(*pkginfo, distroID)
+	p.CPEs = generateSyftCPEs(*pkginfo, p)
+
+	return &p, nil
+}
+
+func baseSyftPkgFromPkgInfo(p pkgInfo, metadata any) pkg.Package {
+	syftPkg := pkg.Package{
+		Name:      p.PkgName,
+		Version:   p.PkgVer,
 		FoundBy:   "wolfictl",
 		Locations: file.NewLocationSet(file.NewLocation(pkginfoPath)),
-		Licenses:  pkg.NewLicenseSet(pkg.NewLicense(pkginfo.License)),
+		Licenses:  pkg.NewLicenseSet(pkg.NewLicense(p.License)),
 		Type:      pkg.ApkPkg,
 		Metadata:  metadata,
 	}
 
-	p.PURL = generatePURL(*pkginfo, distroID)
-	p.CPEs = generateCPEs(p)
+	syftPkg.SetID()
 
-	p.SetID()
-
-	return &p, nil
+	return syftPkg
 }
 
 func generatePURL(info pkgInfo, distroID string) string {
@@ -221,33 +226,16 @@ func generatePURL(info pkgInfo, distroID string) string {
 	return packageurl.NewPackageURL(packageurl.TypeApk, distroID, info.PkgName, info.PkgVer, purlQualifiers, "").String()
 }
 
-func generateCPEs(p pkg.Package) []cpe.CPE {
-	dictionaryCPE, ok := cpegen.DictionaryFind(p)
-	if ok {
+func generateSyftCPEs(apk pkgInfo, syftPkg pkg.Package) []cpe.CPE {
+	if attr := generateWfnAttributesForAPK(apk); attr != nil {
+		return []cpe.CPE{{Attributes: cpe.Attributes(*attr), Source: cpeSourceWolfictl}}
+	}
+
+	if dictionaryCPE, ok := cpegen.DictionaryFind(syftPkg); ok {
 		return dictionaryCPE
 	}
 
-	// TODO: This is a workaround for Syft not coming up with this CPE for OpenJDK
-	// 	packages. Some thought would be needed on the "right" way to implement this
-	// 	upstream, but it's more obvious how we can address this in wolfictl for our
-	// 	purposes.
-	//
-	//  Potentially related: https://github.com/anchore/syft/issues/2422
-	if strings.HasPrefix(p.Name, "openjdk-") {
-		return []cpe.CPE{
-			{
-				Attributes: cpe.Attributes{
-					Part:    "a",
-					Vendor:  "oracle",
-					Product: "jdk",
-					Version: p.Version,
-				},
-				Source: cpeSourceWolfictl,
-			},
-		}
-	}
-
-	return cpegen.Generate(p)
+	return cpegen.Generate(syftPkg)
 }
 
 // ToSyftJSON returns the SBOM as a reader of the Syft JSON format.
