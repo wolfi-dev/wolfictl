@@ -335,7 +335,8 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 	}
 
 	tagValue := p.With["tag"]
-	if tagValue == "" && p.With["branch"] == "" {
+	branch := p.With["branch"]
+	if tagValue == "" && branch == "" {
 		return fmt.Errorf("no tag to checkout")
 	}
 
@@ -359,8 +360,8 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 		Depth:             1,
 		NoCheckout:        true,
 	}
-	if p.With["branch"] != "" {
-		cloneOpts.ReferenceName = plumbing.ReferenceName(p.With["branch"])
+	if branch != "" {
+		cloneOpts.ReferenceName = plumbing.ReferenceName(branch)
 	}
 
 	o.Logger.Printf("cloning sources from %s tag %s into a temporary directory, this may take a while", repoValue, evaluatedTag)

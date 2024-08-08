@@ -28,9 +28,9 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 	if repoValue == "" {
 		return fmt.Errorf("no repository to checkout")
 	}
-
+	branch := p.With["branch"]
 	tagValue := p.With["tag"]
-	if tagValue == "" && p.With["branch"] == "" {
+	if tagValue == "" && branch == "" {
 		return fmt.Errorf("no tag to checkout")
 	}
 
@@ -47,8 +47,8 @@ func gitCheckout(p *config.Pipeline, dir string, mutations map[string]string) er
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		Depth:             1,
 	}
-	if p.With["branch"] != "" {
-		cloneOpts.ReferenceName = plumbing.ReferenceName(p.With["branch"])
+	if branch != "" {
+		cloneOpts.ReferenceName = plumbing.ReferenceName(branch)
 	}
 
 	log.Printf("cloning sources from %s tag %s into a temporary directory '%s', this may take a while", repoValue, evaluatedTag, dir)
