@@ -51,6 +51,9 @@ func TestCleanupDeps(t *testing.T) {
 	}, {
 		name:     "multiple gobump blocks deleted",
 		filename: "config-10",
+	}, {
+		name:     "multiple git-checkout steps, one with branch",
+		filename: "config-11",
 	}}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
