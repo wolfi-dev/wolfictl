@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/samber/lo"
 
@@ -26,18 +27,21 @@ func (req Request) Validate() error {
 		return errors.New("package cannot be empty")
 	}
 
-	if len(req.Aliases) == 0 {
+	aliases := req.Aliases
+	if id := req.VulnerabilityID; id != "" {
+		if strings.HasPrefix(id, "CGA-") {
+			return errors.New("vulnerability should be empty (or not start with CGA)")
+		}
+		aliases = append(aliases, id)
+	}
+	if len(aliases) == 0 {
 		return errors.New("aliases should have at least one vulnerability ID")
 	}
 
-	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
+	if err := errors.Join(lo.Map(aliases, func(alias string, _ int) error {
 		return vuln.ValidateID(alias)
 	})...); err != nil {
 		return err
-	}
-
-	if req.VulnerabilityID != "" {
-		return errors.New("vulnerability should be empty")
 	}
 
 	if req.Event.IsZero() {
