@@ -36,9 +36,9 @@ func (req Request) Validate() error {
 		return err
 	}
 
-	if req.VulnerabilityID != "" {
-		return errors.New("vulnerability should be empty")
-	}
+	// if req.VulnerabilityID != "" {
+	// 	 return errors.New("vulnerability should be empty")
+	// }
 
 	if req.Event.IsZero() {
 		return errors.New("event cannot be zero")

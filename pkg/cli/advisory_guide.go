@@ -34,6 +34,7 @@ import (
 	question2 "github.com/wolfi-dev/wolfictl/pkg/question"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	"gopkg.in/yaml.v3"
 )
 
 //nolint:gocyclo
@@ -237,7 +238,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 					actions = append(actions, customActionBrowser)
 				}
 				if sess.Modified() {
-					actions = append(actions, newCustomActionPR(ctx, sess))
+					actions = append(actions, newCustomActionPR(ctx, sess), newCustomActionOut(ctx, sess))
 				}
 
 				vaPickerOpts := picker.Options[resultWithAPKs]{
@@ -386,6 +387,24 @@ var (
 
 				_ = browser.OpenURL(pr.URL) //nolint:errcheck
 				return tea.Quit
+			},
+		}
+	}
+
+	newCustomActionOut = func(_ context.Context, sess *advisory.DataSession) picker.CustomAction[resultWithAPKs] {
+		return picker.CustomAction[resultWithAPKs]{
+			Key:         "o",
+			Description: "print changes to stdout",
+			Do: func(_ resultWithAPKs) tea.Cmd {
+				o := []string{}
+				for name, doc := range sess.ModifiedPackages() {
+					b, err := yaml.Marshal(doc.Configuration())
+					if err != nil {
+						return picker.ErrCmd(fmt.Errorf("marshalling yaml for %s: %w", name, err))
+					}
+					o = append(o, fmt.Sprintf("# %s.advisories.yaml\n%s\n\n", name, string(b)))
+				}
+				return tea.Printf(strings.Join(o, "\n"))
 			},
 		}
 	}
