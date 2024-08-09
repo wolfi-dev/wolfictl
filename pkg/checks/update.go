@@ -267,7 +267,7 @@ func verifyPipelines(ctx context.Context, o CheckUpdateOptions, updated *config.
 			err = o.verifyFetch(ctx, &pipeline, mutations)
 		}
 		if pipeline.Uses == "git-checkout" {
-			err = o.verifyGitCheckout(&pipeline, mutations)
+			err = o.verifyGitCheckout(ctx, &pipeline, mutations)
 		}
 		if err != nil {
 			addCheckError(checkErrors, err)
@@ -328,7 +328,7 @@ func (o *CheckUpdateOptions) updateGoBumpDeps(updated *config.Configuration, dir
 	return nil
 }
 
-func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]string) error {
+func (o CheckUpdateOptions) verifyGitCheckout(ctx context.Context, p *config.Pipeline, m map[string]string) error {
 	repoValue := p.With["repository"]
 	if repoValue == "" {
 		return fmt.Errorf("no repository to checkout")
@@ -366,7 +366,7 @@ func (o CheckUpdateOptions) verifyGitCheckout(p *config.Pipeline, m map[string]s
 
 	o.Logger.Printf("cloning sources from %s tag %s into a temporary directory, this may take a while", repoValue, evaluatedTag)
 
-	r, err := git.PlainClone(tempDir, false, cloneOpts)
+	r, err := git.PlainCloneContext(ctx, tempDir, false, cloneOpts)
 	if err != nil {
 		return fmt.Errorf("failed to clone %s ref %s: %w", repoValue, evaluatedTag, err)
 	}
