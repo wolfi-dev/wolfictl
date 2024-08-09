@@ -131,6 +131,15 @@ func (fsys *FS) Truncate(string, int64) error {
 	return nil
 }
 
+func (fsys *FS) Remove(name string) error {
+	if _, ok := fsys.fixtures[name]; ok {
+		delete(fsys.fixtures, name)
+		return nil
+	}
+
+	return os.ErrNotExist
+}
+
 func (fsys *FS) Diff(name string) string {
 	if tf, ok := fsys.fixtures[name]; ok {
 		want := tf.expectedRead

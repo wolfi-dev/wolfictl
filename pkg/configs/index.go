@@ -157,6 +157,28 @@ func (i *Index[T]) Create(ctx context.Context, filepath string, cfg T) error {
 	return nil
 }
 
+// Delete deletes the configuration file at the given path. The configuration is
+// also removed from the Index.
+func (i *Index[T]) Remove(filepath string) error {
+	idx, ok := i.byPath[filepath]
+	if !ok {
+		return fmt.Errorf("unable to remove configuration: no configuration found at %q", filepath)
+	}
+
+	if err := i.fsys.Remove(filepath); err != nil {
+		return err
+	}
+
+	delete(i.byPath, filepath)
+	delete(i.byName, i.cfgs[idx].Name())
+
+	i.paths = append(i.paths[:idx], i.paths[idx+1:]...)
+	i.yamlRoots = append(i.yamlRoots[:idx], i.yamlRoots[idx+1:]...)
+	i.cfgs = append(i.cfgs[:idx], i.cfgs[idx+1:]...)
+
+	return nil
+}
+
 // Path returns the path to the configuration file for the given name.
 func (i *Index[T]) Path(name string) string {
 	idx, ok := i.byName[name]

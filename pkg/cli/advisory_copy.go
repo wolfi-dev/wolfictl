@@ -49,39 +49,9 @@ of the event to now. The command will not copy events of type "detection", "fixe
 			out.Advisories = nil
 
 			for _, adv := range hdoc.Advisories {
-				evts := make([]v2.Event, 0, len(adv.Events))
-
-				for _, evt := range adv.Events {
-					switch evt.Type {
-					case v2.EventTypeDetection, v2.EventTypeFixed, v2.EventTypeAnalysisNotPlanned, v2.EventTypeFixNotPlanned:
-						// Don't carry these over.
-						continue
-
-					case v2.EventTypePendingUpstreamFix, v2.EventTypeFalsePositiveDetermination, v2.EventTypeTruePositiveDetermination:
-						// Carry these over as-is.
-						evts = append(evts, evt)
-
-					default:
-						// A new type was added and we don't know how to handle it. Default to not carrying it over.
-					}
+				if carried, ok := carryAdvisory(adv); ok {
+					out.Advisories = append(out.Advisories, carried)
 				}
-
-				if len(evts) == 0 {
-					// No events to carry over.
-					continue
-				}
-
-				// Sort events by timestamp and only take the latest event.
-				sort.Slice(evts, func(i, j int) bool {
-					return evts[i].Timestamp.Before(evts[j].Timestamp)
-				})
-				evts = []v2.Event{evts[len(evts)-1]}
-
-				// Update the timestamp to now.
-				evts[0].Timestamp = v2.Now()
-
-				adv.Events = evts
-				out.Advisories = append(out.Advisories, adv)
 			}
 
 			return advisoryCfgs.Create(ctx, want+".advisories.yaml", out)
@@ -90,4 +60,43 @@ of the event to now. The command will not copy events of type "detection", "fixe
 	cmd.PersistentFlags().StringVarP(&dir, "dir", "d", ".", "directory containing the advisories to copy")
 
 	return cmd
+}
+
+// carryAdvisory decides whether to carry over an advisory and its events.
+// Returns true with the updated advisory if it should be carried over. Otherwise, returns false
+// and the current advisory.
+func carryAdvisory(advisory v2.Advisory) (v2.Advisory, bool) {
+	evts := make([]v2.Event, 0, len(advisory.Events))
+
+	for _, evt := range advisory.Events {
+		switch evt.Type {
+		case v2.EventTypeDetection, v2.EventTypeFixed, v2.EventTypeAnalysisNotPlanned, v2.EventTypeFixNotPlanned:
+			// Don't carry these over.
+			continue
+
+		case v2.EventTypePendingUpstreamFix, v2.EventTypeFalsePositiveDetermination, v2.EventTypeTruePositiveDetermination:
+			// Carry these over as-is.
+			evts = append(evts, evt)
+
+		default:
+			// A new type was added and we don't know how to handle it. Default to not carrying it over.
+		}
+	}
+
+	if len(evts) == 0 {
+		// No events to carry over.
+		return advisory, false
+	}
+
+	// Sort events by timestamp and only take the latest event.
+	sort.Slice(evts, func(i, j int) bool {
+		return evts[i].Timestamp.Before(evts[j].Timestamp)
+	})
+	evts = []v2.Event{evts[len(evts)-1]}
+
+	// Update the timestamp to now.
+	evts[0].Timestamp = v2.Now()
+
+	advisory.Events = evts
+	return advisory, true
 }
