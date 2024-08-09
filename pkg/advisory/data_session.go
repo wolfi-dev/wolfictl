@@ -192,6 +192,15 @@ func (ds DataSession) Push(ctx context.Context) error {
 	return nil
 }
 
+// ModifiedPackages returns a map of package name o=to document for all modified packages
+func (ds DataSession) ModifiedPackages() map[string]configs.Entry[v2.Document] {
+	modified := map[string]configs.Entry[v2.Document]{}
+	for _, n := range slices.Compact(ds.modifiedPackages) {
+		modified[n] = ds.index.Select().WhereName(n).Entries()[0]
+	}
+	return modified
+}
+
 // OpenPullRequest opens a pull request for the changes made during the session.
 func (ds DataSession) OpenPullRequest(ctx context.Context) (*PullRequest, error) {
 	slices.Sort(ds.modifiedPackages)
