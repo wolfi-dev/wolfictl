@@ -271,13 +271,19 @@ func cmdAdvisoryGuide() *cobra.Command {
 				// Interview the user about the selected vulnerability match to derive an
 				// advisory request.
 
+				findingVulnID := vaPicked.Result.Findings[0].Vulnerability.ID
 				req := advisory.Request{
-					Package:         vaPicked.APKs[0],
-					VulnerabilityID: vaPicked.Result.Findings[0].Vulnerability.ID,
+					Package: vaPicked.APKs[0],
 				}
+				if vuln.RegexCGA.MatchString(findingVulnID) {
+					req.AdvisoryID = findingVulnID
+				} else {
+					req.Aliases = []string{findingVulnID}
+				}
+
 				resolvedReq, err := req.ResolveAliases(ctx, af)
 				if err != nil {
-					return fmt.Errorf("resolving aliases for advisory request: %w", err)
+					clog.FromContext(ctx).Warnf("resolving aliases for advisory request: %v", err)
 				}
 				req = *resolvedReq
 
@@ -307,20 +313,23 @@ func cmdAdvisoryGuide() *cobra.Command {
 
 					return fmt.Errorf("getting data back from interview: %w", err)
 				}
+				if len(req.Aliases) == 0 {
+					return fmt.Errorf("no aliases found for advisory request, please report this")
+				}
 
 				err = sess.Append(ctx, req)
 				if err != nil {
 					return fmt.Errorf("adding advisory data: %w", err)
 				}
 
-				aka := ""
-				if len(req.Aliases) > 0 {
-					aka = fmt.Sprintf(" (%s)", strings.Join(req.Aliases, ", "))
+				vuln := req.Aliases[0]
+				if len(req.Aliases) > 1 {
+					vuln += fmt.Sprintf(" (%s)", strings.Join(req.Aliases[1:], ", "))
 				}
 
 				wrapped.Println(fmt.Sprintf(
 					"🙌 Nice! We've marked %s in %s as %s.\n",
-					styles.Bold().Render(req.VulnerabilityID+aka),
+					styles.Bold().Render(vuln),
 					styles.Bold().Render(req.Package),
 					styles.Bold().Render(humanizeAdvisoryEventType(req.Event.Type)),
 				))

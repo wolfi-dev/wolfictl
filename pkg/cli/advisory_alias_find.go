@@ -46,7 +46,7 @@ hyperlinked to the relevant webpage from the upstream data source.
 			for i, arg := range args {
 				aliases, err := findAliases(cmd.Context(), af, arg)
 				if err != nil {
-					return fmt.Errorf("unable to find aliases for vulnerability %q: %w", arg, err)
+					return fmt.Errorf("finding aliases for %q: %w", arg, err)
 				}
 
 				fmt.Printf("Aliases for %s:\n", hyperlinkVulnerabilityID(arg))

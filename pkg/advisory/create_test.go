@@ -168,8 +168,8 @@ func TestCreate(t *testing.T) {
 		{
 			name: "no events",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CGA-xoxo-xoxo-xoxo",
+				Package:    "brotli",
+				AdvisoryID: "CGA-xoxo-xoxo-xoxo",
 			},
 			wantErr: true,
 		},

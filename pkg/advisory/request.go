@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -14,68 +15,98 @@ import (
 
 // Request specifies the parameters for creating a new advisory or updating an existing advisory.
 type Request struct {
-	Package         string
-	VulnerabilityID string
-	Aliases         []string
-	Event           v2.Event
+	// Package is the name of the distro package for which the advisory is being
+	// created.
+	Package string
+
+	// AdvisoryID is the ID for the advisory being updated. If this Request is for
+	// creating a new advisory, this should be empty. If a value is provided, it
+	// should be of the form "CGA-xxxx-xxxx-xxxx".
+	AdvisoryID string
+
+	// Aliases is a list of vulnerability IDs that are known aliases for the
+	// advisory.
+	Aliases []string
+
+	// Event is the event to add to the advisory.
+	Event v2.Event
+}
+
+// VulnerabilityIDs returns the list of vulnerability IDs for the Request. This
+// is a combination of the Aliases and the AdvisoryID.
+func (req Request) VulnerabilityIDs() []string {
+	ids := slices.Clone(req.Aliases)
+
+	if req.AdvisoryID != "" {
+		ids = append(ids, req.AdvisoryID)
+	}
+
+	return slices.Compact(ids)
 }
 
 // Validate returns an error if the Request is invalid.
 func (req Request) Validate() error {
-	if req.Package == "" {
-		return errors.New("package cannot be empty")
-	}
+	var errs []error
 
-	if len(req.Aliases) == 0 {
-		return errors.New("aliases should have at least one vulnerability ID")
+	if req.Package == "" {
+		errs = append(errs, errors.New("package cannot be empty"))
 	}
 
 	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
 		return vuln.ValidateID(alias)
 	})...); err != nil {
-		return err
+		errs = append(errs, err)
 	}
 
-	if req.VulnerabilityID != "" {
-		return errors.New("vulnerability should be empty")
+	if req.AdvisoryID != "" && !vuln.RegexCGA.MatchString(req.AdvisoryID) {
+		errs = append(errs, errors.New("advisory ID must be a valid CGA ID when provided"))
 	}
 
 	if req.Event.IsZero() {
-		return errors.New("event cannot be zero")
+		errs = append(errs, errors.New("event cannot be zero"))
 	}
 
-	return req.Event.Validate()
+	errs = append(errs, req.Event.Validate())
+
+	return errors.Join(errs...)
 }
 
-// ResolveAliases ensures that the request ID is a CVE and that any known GHSA
-// IDs are discovered and stored as Aliases.
+// ResolveAliases ensures that any CVE IDs and GHSA IDs for the request's
+// vulnerability are discovered and stored as Aliases, based on the initial set
+// of known aliases.
 func (req Request) ResolveAliases(ctx context.Context, af AliasFinder) (*Request, error) {
-	switch {
-	case vuln.RegexGHSA.MatchString(req.VulnerabilityID):
-		cve, err := af.CVEForGHSA(ctx, req.VulnerabilityID)
-		if err != nil {
-			return nil, fmt.Errorf("resolving GHSA %q: %w", req.VulnerabilityID, err)
+	logger := clog.FromContext(ctx)
+
+	var newAliases []string
+
+	for _, alias := range req.Aliases {
+		switch {
+		case vuln.RegexGHSA.MatchString(alias):
+			cve, err := af.CVEForGHSA(ctx, alias)
+			if err != nil {
+				return nil, fmt.Errorf("resolving GHSA %q: %w", alias, err)
+			}
+
+			newAliases = append(newAliases, cve)
+			continue
+
+		case vuln.RegexCVE.MatchString(alias):
+			ghsas, err := af.GHSAsForCVE(ctx, alias)
+			if err != nil {
+				return nil, fmt.Errorf("resolving CVE %q: %w", alias, err)
+			}
+
+			newAliases = append(newAliases, ghsas...)
+			continue
+
+		default:
+			logger.Warnf("not resolving aliases for unknown vulnerability ID format: %q", alias)
 		}
-
-		req.Aliases = append(req.Aliases, req.VulnerabilityID)
-		slices.Sort(req.Aliases)
-		req.Aliases = slices.Compact(req.Aliases)
-
-		req.VulnerabilityID = cve
-		return &req, nil
-
-	case vuln.RegexCVE.MatchString(req.VulnerabilityID):
-		ghsas, err := af.GHSAsForCVE(ctx, req.VulnerabilityID)
-		if err != nil {
-			return nil, fmt.Errorf("resolving CVE %q: %w", req.VulnerabilityID, err)
-		}
-
-		req.Aliases = append(req.Aliases, ghsas...)
-		slices.Sort(req.Aliases)
-		req.Aliases = slices.Compact(req.Aliases)
-
-		return &req, nil
 	}
 
-	return nil, fmt.Errorf("unsupported vulnerability ID format: %q", req.VulnerabilityID)
+	req.Aliases = append(req.Aliases, newAliases...)
+	slices.Sort(req.Aliases)
+	req.Aliases = slices.Compact(req.Aliases)
+
+	return &req, nil
 }

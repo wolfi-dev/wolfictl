@@ -60,8 +60,6 @@ func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
 	}
 }
 
-var validCVEID = field.TextValidationRule(vuln.ValidateID)
-
 func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 	allowedValues := m.allowedVulnerabilitiesFunc(m.Request.Package)
 
@@ -75,7 +73,7 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 		EmptyValueHelpMsg: "Provide a valid vulnerability ID.",
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
-			validCVEID,
+			vuln.ValidateID,
 		},
 		AllowedValues: allowedValues,
 	}
@@ -284,7 +282,7 @@ func (m Model) addMissingFields() (Model, bool) {
 		return m, true
 	}
 
-	if len(m.Request.Aliases) == 0 {
+	if len(m.Request.VulnerabilityIDs()) == 0 {
 		f := field.NewTextField(m.newVulnerabilityFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true

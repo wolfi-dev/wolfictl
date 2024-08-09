@@ -4,7 +4,7 @@ package:
   name: brotli
 
 advisories:
-  - id: CGA-xoxo-xoxo-xoxo
+  - id: CGA-xxxx-xxxx-xxxx
     aliases:
       - CVE-2020-8927
     events:

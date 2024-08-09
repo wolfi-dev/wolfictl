@@ -17,8 +17,8 @@ func cmdAdvisoryGuideGraph() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			sampleReq := advisory.Request{
-				Package:         "foo",
-				VulnerabilityID: "CVE-2024-12345",
+				Package:    "foo",
+				AdvisoryID: "CGA-xxxx-xxxx-xxxx",
 			}
 
 			dot, err := graph.Dot(cmd.Context(), question.IsFalsePositive, sampleReq)

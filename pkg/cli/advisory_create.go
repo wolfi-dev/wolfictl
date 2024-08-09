@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -91,6 +92,10 @@ newly created advisory and any other advisories for the same package.`,
 				return err
 			}
 
+			if req.AdvisoryID != "" {
+				return fmt.Errorf("cannot create advisory: %q is an advisory ID, which the user is not allowed to assign", req.AdvisoryID)
+			}
+
 			var apkindexes []*apk.APKIndex
 			for _, arch := range archs {
 				idx, err := index.Index(arch, packageRepositoryURL)
@@ -100,7 +105,12 @@ newly created advisory and any other advisories for the same package.`,
 				apkindexes = append(apkindexes, idx)
 			}
 
-			if err := req.Validate(); err != nil {
+			var noAliasesErr error
+			if len(req.Aliases) == 0 {
+				noAliasesErr = fmt.Errorf("at least one alias (non-CGA vulnerability ID) is required")
+			}
+
+			if err := errors.Join(req.Validate(), noAliasesErr); err != nil {
 				if p.doNotPrompt {
 					return fmt.Errorf("not enough information to create advisory: %w", err)
 				}

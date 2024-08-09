@@ -81,9 +81,9 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "updating existing advisory using the CGA ID",
 			req: Request{
-				Package:         "brotli",
-				VulnerabilityID: "CGA-xoxo-xoxo-xoxo",
-				Aliases:         []string{"CVE-2020-8927"},
+				Package:    "brotli",
+				AdvisoryID: "CGA-xxxx-xxxx-xxxx",
+				Aliases:    []string{"CVE-2020-8927"},
 				Event: v2.Event{
 					Timestamp: testTime,
 					Type:      v2.EventTypeDetection,
