@@ -90501,7 +90501,7 @@
       }
     },
     {
-      "id": "d610ded5e5484fbd",
+      "id": "6034ce017f127564",
       "name": "jruby-core",
       "version": "9.4.7.0",
       "type": "java-archive",
@@ -90569,9 +90569,9 @@
             "artifactId": "jruby-parent",
             "version": "9.4.7.0"
           },
-          "groupId": "",
+          "groupId": "org.jruby",
           "artifactId": "jruby-core",
-          "version": "",
+          "version": "9.4.7.0",
           "name": "JRuby Core"
         }
       }

@@ -375,7 +375,7 @@
       }
     },
     {
-      "id": "f007206820ce1c2e",
+      "id": "46635c7fa37f04c4",
       "name": "angus-core",
       "version": "2.0.3",
       "type": "java-archive",
@@ -471,9 +471,9 @@
             "artifactId": "all",
             "version": "2.0.3"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.angus",
           "artifactId": "angus-core",
-          "version": "",
+          "version": "2.0.3",
           "name": "Angus Mail Core"
         }
       }
@@ -2202,7 +2202,7 @@
       }
     },
     {
-      "id": "24b7a905c35796bd",
+      "id": "1c469a8da107be20",
       "name": "args4j",
       "version": "2.33",
       "type": "java-archive",
@@ -2242,9 +2242,9 @@
             "artifactId": "args4j-site",
             "version": "2.33"
           },
-          "groupId": "",
+          "groupId": "args4j",
           "artifactId": "args4j",
-          "version": "",
+          "version": "2.33",
           "name": "args4j"
         }
       }
@@ -74947,7 +74947,7 @@
       }
     },
     {
-      "id": "b254a685cbe9a1cf",
+      "id": "6d606cdb3c141441",
       "name": "cli",
       "version": "2.461",
       "type": "java-archive",
@@ -74963,12 +74963,40 @@
       ],
       "licenses": [
         {
-          "value": "The MIT license",
-          "spdxExpression": "",
-          "type": "declared",
-          "urls": [
-            "https://opensource.org/licenses/MIT"
-          ],
+          "value": "Apache-2.0",
+          "spdxExpression": "Apache-2.0",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/cli-2.461.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "EPL-2.0",
+          "spdxExpression": "EPL-2.0",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/cli-2.461.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "GPL-2.0",
+          "spdxExpression": "GPL-2.0-only",
+          "type": "concluded",
+          "urls": [],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -83412,7 +83440,7 @@
       }
     },
     {
-      "id": "260d64e92c2c6e04",
+      "id": "1045f1e356531622",
       "name": "http2-common",
       "version": "10.0.20",
       "type": "java-archive",
@@ -83520,15 +83548,15 @@
             "artifactId": "http2-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.http2",
           "artifactId": "http2-common",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: HTTP2 :: Common"
         }
       }
     },
     {
-      "id": "b63e201ee1e49a0d",
+      "id": "02e0b2afd4c6d0e3",
       "name": "http2-hpack",
       "version": "10.0.20",
       "type": "java-archive",
@@ -83636,15 +83664,15 @@
             "artifactId": "http2-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.http2",
           "artifactId": "http2-hpack",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: HTTP2 :: HPACK"
         }
       }
     },
     {
-      "id": "def4571c6bac3976",
+      "id": "b0dfbf4ef0e0b657",
       "name": "http2-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -83752,9 +83780,9 @@
             "artifactId": "http2-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.http2",
           "artifactId": "http2-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: HTTP2 :: Server"
         }
       }
@@ -84586,7 +84614,7 @@
       }
     },
     {
-      "id": "6d4e214808840d34",
+      "id": "8f843f1590413547",
       "name": "imap",
       "version": "2.0.3",
       "type": "java-archive",
@@ -84640,7 +84668,7 @@
           },
           "groupId": "org.eclipse.angus",
           "artifactId": "imap",
-          "version": "",
+          "version": "2.0.3",
           "name": "Angus Mail imap provider"
         }
       }
@@ -85470,7 +85498,7 @@
       }
     },
     {
-      "id": "033960fcf1ce49b0",
+      "id": "caf11945241ba50b",
       "name": "istack-commons-runtime",
       "version": "3.0.12",
       "type": "java-archive",
@@ -85590,9 +85618,9 @@
             "artifactId": "istack-commons",
             "version": "3.0.12"
           },
-          "groupId": "",
+          "groupId": "com.sun.istack",
           "artifactId": "istack-commons-runtime",
-          "version": "",
+          "version": "3.0.12",
           "name": "istack common utility code runtime"
         }
       }
@@ -90942,7 +90970,7 @@
       }
     },
     {
-      "id": "10ada5932cbe4848",
+      "id": "dbd1faf1403107a0",
       "name": "jakarta.websocket-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -91002,9 +91030,9 @@
             "artifactId": "jakarta.websocket-all",
             "version": "2.1.1"
           },
-          "groupId": "",
+          "groupId": "jakarta.websocket",
           "artifactId": "jakarta.websocket-api",
-          "version": "",
+          "version": "2.1.1",
           "name": "Jakarta WebSocket - Server API",
           "description": "Jakarta WebSocket - Server API",
           "url": "https://projects.eclipse.org/projects/ee4j.websocket"
@@ -91012,7 +91040,7 @@
       }
     },
     {
-      "id": "5cd3e64011ec2c00",
+      "id": "df3fe34b1134ae5a",
       "name": "jakarta.websocket-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -91072,9 +91100,9 @@
             "artifactId": "jakarta.websocket-all",
             "version": "2.1.1"
           },
-          "groupId": "",
+          "groupId": "jakarta.websocket",
           "artifactId": "jakarta.websocket-api",
-          "version": "",
+          "version": "2.1.1",
           "name": "Jakarta WebSocket - Server API",
           "description": "Jakarta WebSocket - Server API",
           "url": "https://projects.eclipse.org/projects/ee4j.websocket"
@@ -91082,7 +91110,7 @@
       }
     },
     {
-      "id": "8c66c7d5d34924e2",
+      "id": "18a0ba5bba0dde83",
       "name": "jakarta.websocket-client-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -91158,9 +91186,9 @@
             "artifactId": "jakarta.websocket-all",
             "version": "2.1.1"
           },
-          "groupId": "",
+          "groupId": "jakarta.websocket",
           "artifactId": "jakarta.websocket-client-api",
-          "version": "",
+          "version": "2.1.1",
           "name": "Jakarta WebSocket - Client API",
           "description": "Jakarta WebSocket - Client API",
           "url": "https://projects.eclipse.org/projects/ee4j.websocket"
@@ -91168,7 +91196,7 @@
       }
     },
     {
-      "id": "64a64656f08b07f0",
+      "id": "410ac1690300da0b",
       "name": "jakarta.websocket-client-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -91244,9 +91272,9 @@
             "artifactId": "jakarta.websocket-all",
             "version": "2.1.1"
           },
-          "groupId": "",
+          "groupId": "jakarta.websocket",
           "artifactId": "jakarta.websocket-client-api",
-          "version": "",
+          "version": "2.1.1",
           "name": "Jakarta WebSocket - Client API",
           "description": "Jakarta WebSocket - Client API",
           "url": "https://projects.eclipse.org/projects/ee4j.websocket"
@@ -91432,7 +91460,7 @@
       }
     },
     {
-      "id": "86944c0b7c14f846",
+      "id": "5c934acc2daa78bc",
       "name": "jansi-native",
       "version": "1.5",
       "type": "java-archive",
@@ -91561,9 +91589,9 @@
           "groupId": "org.fusesource.jansi",
           "artifactId": "jansi-native",
           "version": "1.5",
-          "name": "${project.artifactId}",
+          "name": "jansi-native",
           "description": "Jansi is a java library for generating and interpreting ANSI escape sequences.",
-          "url": "http://${forge-project-id}.fusesource.org"
+          "url": "http://jansi.fusesource.org"
         }
       }
     },
@@ -94006,7 +94034,7 @@
       }
     },
     {
-      "id": "0991ee40f863b817",
+      "id": "9e0c9db72ec2b042",
       "name": "jaxb-runtime",
       "version": "2.3.9",
       "type": "java-archive",
@@ -94164,7 +94192,7 @@
           },
           "groupId": "org.glassfish.jaxb",
           "artifactId": "jaxb-runtime",
-          "version": "",
+          "version": "2.3.9",
           "name": "JAXB Runtime",
           "description": "JAXB (JSR 222) Reference Implementation",
           "url": "https://eclipse-ee4j.github.io/jaxb-ri/"
@@ -94963,7 +94991,7 @@
       }
     },
     {
-      "id": "a75181276fe46034",
+      "id": "d9afdfb0f0a55383",
       "name": "jcl-over-slf4j",
       "version": "2.0.13",
       "type": "java-archive",
@@ -95073,9 +95101,9 @@
             "artifactId": "slf4j-parent",
             "version": "2.0.13"
           },
-          "groupId": "",
+          "groupId": "org.slf4j",
           "artifactId": "jcl-over-slf4j",
-          "version": "",
+          "version": "2.0.13",
           "name": "JCL 1.2 implemented over SLF4J",
           "description": "JCL 1.2 implemented over SLF4J",
           "url": "http://www.slf4j.org"
@@ -96340,7 +96368,7 @@
       }
     },
     {
-      "id": "1a1d7dda5d546923",
+      "id": "fe0e4c44b1fc0ea6",
       "name": "jetty-alpn-java-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -96484,15 +96512,15 @@
             "artifactId": "jetty-alpn-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-alpn-java-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: ALPN :: JDK9 Server Implementation"
         }
       }
     },
     {
-      "id": "2a6a131734c7d219",
+      "id": "5dd266a764866e3a",
       "name": "jetty-alpn-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -96612,15 +96640,15 @@
             "artifactId": "jetty-alpn-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-alpn-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: ALPN :: Server"
         }
       }
     },
     {
-      "id": "5548bac77880dabd",
+      "id": "b994df2cd4692513",
       "name": "jetty-http",
       "version": "10.0.20",
       "type": "java-archive",
@@ -96716,15 +96744,15 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-http",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Http Utility"
         }
       }
     },
     {
-      "id": "f99d5b05e8ba1759",
+      "id": "2a9c1649ffb6a46d",
       "name": "jetty-io",
       "version": "10.0.20",
       "type": "java-archive",
@@ -96820,15 +96848,15 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-io",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: IO Utility"
         }
       }
     },
     {
-      "id": "3e9637f993a3fb31",
+      "id": "18c9812482d1df54",
       "name": "jetty-jmx",
       "version": "10.0.20",
       "type": "java-archive",
@@ -96924,16 +96952,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-jmx",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: JMX Management",
           "description": "JMX management artifact for jetty."
         }
       }
     },
     {
-      "id": "439c099527a15225",
+      "id": "5a7b8b481d937ebe",
       "name": "jetty-security",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97029,16 +97057,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-security",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Security",
           "description": "Jetty security infrastructure"
         }
       }
     },
     {
-      "id": "e72814b1c5065162",
+      "id": "f168b872ce58c987",
       "name": "jetty-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97134,16 +97162,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Server Core",
           "description": "The core jetty server artifact."
         }
       }
     },
     {
-      "id": "18338eb0dfcd3e32",
+      "id": "9e9369bc5b832f9b",
       "name": "jetty-servlet",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97239,16 +97267,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-servlet",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Servlet Handling",
           "description": "Jetty Servlet Container"
         }
       }
     },
     {
-      "id": "db69813fe413461a",
+      "id": "9a3781d356c185d8",
       "name": "jetty-unixdomain-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97368,16 +97396,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-unixdomain-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Unix-Domain Sockets :: Server",
           "description": "Jetty Unix-Domain Sockets Server"
         }
       }
     },
     {
-      "id": "bce1a3e7bb42017d",
+      "id": "8886743f9b327a05",
       "name": "jetty-util",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97473,16 +97501,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-util",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Utilities",
           "description": "Utility classes for Jetty"
         }
       }
     },
     {
-      "id": "a4b9c517cd032f6d",
+      "id": "89e3c771cc8e4980",
       "name": "jetty-webapp",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97578,16 +97606,16 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-webapp",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Webapp Application Support",
           "description": "Jetty web application support"
         }
       }
     },
     {
-      "id": "093e15224fc5d1be",
+      "id": "43a1c6d6ab0c9189",
       "name": "jetty-xml",
       "version": "10.0.20",
       "type": "java-archive",
@@ -97683,9 +97711,9 @@
             "artifactId": "jetty-project",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty",
           "artifactId": "jetty-xml",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: XML utilities",
           "description": "The jetty xml utilities."
         }
@@ -99608,7 +99636,7 @@
       }
     },
     {
-      "id": "5390d614450a377f",
+      "id": "f28fd43a95aa5176",
       "name": "localizer",
       "version": "1.31",
       "type": "java-archive",
@@ -99656,9 +99684,9 @@
             "artifactId": "localizer-parent",
             "version": "1.31"
           },
-          "groupId": "",
+          "groupId": "org.jvnet.localizer",
           "artifactId": "localizer",
-          "version": "",
+          "version": "1.31",
           "name": "Localizer"
         }
       }
@@ -99924,7 +99952,7 @@
       }
     },
     {
-      "id": "de922feeeecf13d2",
+      "id": "27ccb370b3b66610",
       "name": "logging-mailhandler",
       "version": "2.0.3",
       "type": "java-archive",
@@ -100010,7 +100038,7 @@
           },
           "groupId": "org.eclipse.angus",
           "artifactId": "logging-mailhandler",
-          "version": "",
+          "version": "2.0.3",
           "name": "Angus Mail logging handler"
         }
       }
@@ -102880,7 +102908,7 @@
       }
     },
     {
-      "id": "d8281c8fee363ff8",
+      "id": "1a255dba4eaec6a9",
       "name": "pop3",
       "version": "2.0.3",
       "type": "java-archive",
@@ -102934,7 +102962,7 @@
           },
           "groupId": "org.eclipse.angus",
           "artifactId": "pop3",
-          "version": "",
+          "version": "2.0.3",
           "name": "Angus Mail pop3 provider"
         }
       }
@@ -103015,7 +103043,7 @@
       }
     },
     {
-      "id": "071ec12669494b5a",
+      "id": "74a88ccbf4f5f83e",
       "name": "remoting",
       "version": "3248.v65ecb_254c298",
       "type": "java-archive",
@@ -103031,12 +103059,10 @@
       ],
       "licenses": [
         {
-          "value": "Apache License 2.0",
-          "spdxExpression": "",
-          "type": "declared",
-          "urls": [
-            "http://www.apache.org/licenses/LICENSE-2.0.txt"
-          ],
+          "value": "EPL-2.0",
+          "spdxExpression": "EPL-2.0",
+          "type": "concluded",
+          "urls": [],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -103048,12 +103074,25 @@
           ]
         },
         {
-          "value": "The MIT license",
-          "spdxExpression": "",
-          "type": "declared",
-          "urls": [
-            "https://opensource.org/licenses/MIT"
-          ],
+          "value": "GPL-2.0",
+          "spdxExpression": "GPL-2.0-only",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/remoting-3248.v65ecb_254c298.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "MIT",
+          "spdxExpression": "MIT",
+          "type": "concluded",
+          "urls": [],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -104126,7 +104165,7 @@
       }
     },
     {
-      "id": "c9c46b3771eea85e",
+      "id": "06516832cc0e1356",
       "name": "slf4j-api",
       "version": "2.0.13",
       "type": "java-archive",
@@ -104194,9 +104233,9 @@
             "artifactId": "slf4j-parent",
             "version": "2.0.13"
           },
-          "groupId": "",
+          "groupId": "org.slf4j",
           "artifactId": "slf4j-api",
-          "version": "",
+          "version": "2.0.13",
           "name": "SLF4J API Module",
           "description": "The slf4j API",
           "url": "http://www.slf4j.org"
@@ -104374,7 +104413,7 @@
       }
     },
     {
-      "id": "b2117561ee3afddc",
+      "id": "dc4ac008f11b7a44",
       "name": "slf4j-api",
       "version": "2.0.13",
       "type": "java-archive",
@@ -104442,9 +104481,9 @@
             "artifactId": "slf4j-parent",
             "version": "2.0.13"
           },
-          "groupId": "",
+          "groupId": "org.slf4j",
           "artifactId": "slf4j-api",
-          "version": "",
+          "version": "2.0.13",
           "name": "SLF4J API Module",
           "description": "The slf4j API",
           "url": "http://www.slf4j.org"
@@ -104452,7 +104491,7 @@
       }
     },
     {
-      "id": "916e68f711fdae12",
+      "id": "c3e72a68883efadf",
       "name": "slf4j-jdk14",
       "version": "2.0.13",
       "type": "java-archive",
@@ -104520,9 +104559,9 @@
             "artifactId": "slf4j-parent",
             "version": "2.0.13"
           },
-          "groupId": "",
+          "groupId": "org.slf4j",
           "artifactId": "slf4j-jdk14",
-          "version": "",
+          "version": "2.0.13",
           "name": "SLF4J JDK14 Provider",
           "description": "SLF4J JDK14 Provider",
           "url": "http://www.slf4j.org"
@@ -104708,7 +104747,7 @@
       }
     },
     {
-      "id": "55243d6a2a1bc9e8",
+      "id": "0c979e1af0ab7935",
       "name": "slf4j-jdk14",
       "version": "2.0.13",
       "type": "java-archive",
@@ -104776,9 +104815,9 @@
             "artifactId": "slf4j-parent",
             "version": "2.0.13"
           },
-          "groupId": "",
+          "groupId": "org.slf4j",
           "artifactId": "slf4j-jdk14",
-          "version": "",
+          "version": "2.0.13",
           "name": "SLF4J JDK14 Provider",
           "description": "SLF4J JDK14 Provider",
           "url": "http://www.slf4j.org"
@@ -104786,7 +104825,7 @@
       }
     },
     {
-      "id": "9fa14a2f24191f02",
+      "id": "184ab5aacfc1d4a4",
       "name": "smtp",
       "version": "2.0.3",
       "type": "java-archive",
@@ -104840,7 +104879,7 @@
           },
           "groupId": "org.eclipse.angus",
           "artifactId": "smtp",
-          "version": "",
+          "version": "2.0.3",
           "name": "Angus Mail smtp provider"
         }
       }
@@ -107450,7 +107489,7 @@
       }
     },
     {
-      "id": "6a0fa70b92bac6dc",
+      "id": "236eac47288fb32a",
       "name": "sshd-common",
       "version": "2.12.1",
       "type": "java-archive",
@@ -107498,9 +107537,9 @@
             "artifactId": "sshd",
             "version": "2.12.1"
           },
-          "groupId": "",
+          "groupId": "org.apache.sshd",
           "artifactId": "sshd-common",
-          "version": "",
+          "version": "2.12.1",
           "name": "Apache Mina SSHD :: Common support utilities"
         }
       }
@@ -107624,7 +107663,7 @@
       }
     },
     {
-      "id": "e3b0616220e69259",
+      "id": "40fb5fae82ddaef2",
       "name": "sshd-core",
       "version": "2.12.1",
       "type": "java-archive",
@@ -107672,9 +107711,9 @@
             "artifactId": "sshd",
             "version": "2.12.1"
           },
-          "groupId": "",
+          "groupId": "org.apache.sshd",
           "artifactId": "sshd-core",
-          "version": "",
+          "version": "2.12.1",
           "name": "Apache Mina SSHD :: Core"
         }
       }
@@ -110168,7 +110207,7 @@
       }
     },
     {
-      "id": "c21fc1adee42f360",
+      "id": "3ea9a84f0b9efd3a",
       "name": "txw2",
       "version": "2.3.9",
       "type": "java-archive",
@@ -110242,7 +110281,7 @@
           },
           "groupId": "org.glassfish.jaxb",
           "artifactId": "txw2",
-          "version": "",
+          "version": "2.3.9",
           "name": "TXW2 Runtime",
           "description": "TXW is a library that allows you to write XML documents.",
           "url": "https://eclipse-ee4j.github.io/jaxb-ri/"
@@ -110328,7 +110367,7 @@
       }
     },
     {
-      "id": "a61ff6fa239fe33d",
+      "id": "9a6b7c05956ed75c",
       "name": "tyrus-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -110424,15 +110463,15 @@
             "artifactId": "tyrus-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-client",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Client"
         }
       }
     },
     {
-      "id": "9fbecda444a80b11",
+      "id": "16a17b013b2d1e4b",
       "name": "tyrus-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -110528,15 +110567,15 @@
             "artifactId": "tyrus-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-client",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Client"
         }
       }
     },
     {
-      "id": "bc5eba0068a5532c",
+      "id": "559fef1c75000074",
       "name": "tyrus-container-jdk-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -110680,15 +110719,15 @@
             "artifactId": "tyrus-containers-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-container-jdk-client",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus JDK Client Container"
         }
       }
     },
     {
-      "id": "6ff8ad7c4a3d99ff",
+      "id": "e92110fb5df31696",
       "name": "tyrus-container-jdk-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -110832,15 +110871,15 @@
             "artifactId": "tyrus-containers-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-container-jdk-client",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus JDK Client Container"
         }
       }
     },
     {
-      "id": "b97315dfc8fb52d3",
+      "id": "b943739be7da2647",
       "name": "tyrus-core",
       "version": "2.1.5",
       "type": "java-archive",
@@ -110936,15 +110975,15 @@
             "artifactId": "tyrus-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-core",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Core"
         }
       }
     },
     {
-      "id": "765468ddf076fea4",
+      "id": "0ade144e201a48f5",
       "name": "tyrus-core",
       "version": "2.1.5",
       "type": "java-archive",
@@ -111040,15 +111079,15 @@
             "artifactId": "tyrus-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-core",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Core"
         }
       }
     },
     {
-      "id": "38409186c95fdeb9",
+      "id": "203c20f2323ea967",
       "name": "tyrus-spi",
       "version": "2.1.5",
       "type": "java-archive",
@@ -111144,15 +111183,15 @@
             "artifactId": "tyrus-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-spi",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Container SPI"
         }
       }
     },
     {
-      "id": "14060c3e10bd5ab6",
+      "id": "9d6a0074dc311e51",
       "name": "tyrus-spi",
       "version": "2.1.5",
       "type": "java-archive",
@@ -111248,15 +111287,15 @@
             "artifactId": "tyrus-project",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus",
           "artifactId": "tyrus-spi",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Container SPI"
         }
       }
     },
     {
-      "id": "4bf99fc8efa841ab",
+      "id": "6ac10420edd2695e",
       "name": "tyrus-standalone-client-jdk",
       "version": "2.1.5",
       "type": "java-archive",
@@ -111412,15 +111451,15 @@
             "artifactId": "tyrus-bundles",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus.bundles",
           "artifactId": "tyrus-standalone-client-jdk",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Standalone Client - JDK"
         }
       }
     },
     {
-      "id": "0fa630495d3405d9",
+      "id": "9065f13faf84c16b",
       "name": "tyrus-standalone-client-jdk",
       "version": "2.1.5",
       "type": "java-archive",
@@ -111576,9 +111615,9 @@
             "artifactId": "tyrus-bundles",
             "version": "2.1.5"
           },
-          "groupId": "",
+          "groupId": "org.glassfish.tyrus.bundles",
           "artifactId": "tyrus-standalone-client-jdk",
-          "version": "",
+          "version": "2.1.5",
           "name": "Tyrus Standalone Client - JDK"
         }
       }
@@ -111712,7 +111751,7 @@
       }
     },
     {
-      "id": "12b81ccb1e10b99c",
+      "id": "6730eefb16501780",
       "name": "websocket-core-common",
       "version": "10.0.20",
       "type": "java-archive",
@@ -111844,15 +111883,15 @@
             "artifactId": "websocket-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.websocket",
           "artifactId": "websocket-core-common",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Websocket :: Core :: Common"
         }
       }
     },
     {
-      "id": "427a0a54bf43c7db",
+      "id": "152f309684afa304",
       "name": "websocket-core-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -111984,15 +112023,15 @@
             "artifactId": "websocket-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.websocket",
           "artifactId": "websocket-core-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Websocket :: Core :: Server"
         }
       }
     },
     {
-      "id": "cd0c6b25278d75d4",
+      "id": "ad0cda5912b3ec30",
       "name": "websocket-jetty-api",
       "version": "10.0.20",
       "type": "java-archive",
@@ -112124,15 +112163,15 @@
             "artifactId": "websocket-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.websocket",
           "artifactId": "websocket-jetty-api",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Websocket :: org.eclipse.jetty.websocket :: API"
         }
       }
     },
     {
-      "id": "1bdd8a708ed7fcc4",
+      "id": "0f9cc66205678a49",
       "name": "websocket-jetty-common",
       "version": "10.0.20",
       "type": "java-archive",
@@ -112264,15 +112303,15 @@
             "artifactId": "websocket-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.websocket",
           "artifactId": "websocket-jetty-common",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Websocket :: org.eclipse.jetty.websocket :: Common"
         }
       }
     },
     {
-      "id": "a70955f26c20ed92",
+      "id": "7cd1bfaa9a771f77",
       "name": "websocket-jetty-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -112404,9 +112443,9 @@
             "artifactId": "websocket-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.websocket",
           "artifactId": "websocket-jetty-server",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Websocket :: org.eclipse.jetty.websocket :: Server"
         }
       }
@@ -112568,7 +112607,7 @@
       }
     },
     {
-      "id": "66eccf250b05e2d4",
+      "id": "b9de694298573274",
       "name": "websocket-servlet",
       "version": "10.0.20",
       "type": "java-archive",
@@ -112676,9 +112715,9 @@
             "artifactId": "websocket-parent",
             "version": "10.0.20"
           },
-          "groupId": "",
+          "groupId": "org.eclipse.jetty.websocket",
           "artifactId": "websocket-servlet",
-          "version": "",
+          "version": "10.0.20",
           "name": "Jetty :: Websocket :: Servlet"
         }
       }
@@ -113054,7 +113093,7 @@
       }
     },
     {
-      "id": "898c563c19230f5d",
+      "id": "5d52248b692c6f86",
       "name": "winstone",
       "version": "6.19",
       "type": "java-archive",
@@ -113070,12 +113109,10 @@
       ],
       "licenses": [
         {
-          "value": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0",
-          "spdxExpression": "",
-          "type": "declared",
-          "urls": [
-            "https://opensource.org/licenses/CDDL-1.0"
-          ],
+          "value": "Apache-2.0",
+          "spdxExpression": "Apache-2.0",
+          "type": "concluded",
+          "urls": [],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -113087,12 +113124,40 @@
           ]
         },
         {
-          "value": "GNU Lesser General Public License version 2.1",
-          "spdxExpression": "",
-          "type": "declared",
-          "urls": [
-            "https://opensource.org/licenses/LGPL-2.1"
-          ],
+          "value": "EPL-2.0",
+          "spdxExpression": "EPL-2.0",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:executable/winstone.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "GPL-2.0",
+          "spdxExpression": "GPL-2.0-only",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:executable/winstone.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "MIT",
+          "spdxExpression": "MIT",
+          "type": "concluded",
+          "urls": [],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
