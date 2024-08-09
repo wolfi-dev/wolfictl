@@ -53,8 +53,8 @@ By default, the command will print all vulnerabilities found in the package(s)
 to stdout. You can filter the vulnerabilities shown using existing local
 advisory data. To do this, you must first clone the advisory data from the
 advisories repository for the distro whose packages you are scanning. You
-specify the path to each local advisories repository using the
-\-\-advisories\-repo\-dir flag for each repository. Then, you can use the
+specify the path to the local advisories repository using the
+\-\-advisories\-repo\-dir flag for the repository. Then, you can use the
 "\-\-advisory\-filter" flag to specify which set of advisories to use for
 filtering. The following sets of advisories are available:
 
@@ -130,8 +130,8 @@ found and the \-\-require\-zero flag is specified.
 
 .SH OPTIONS
 .PP
-\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=[]
-    local directory for advisory data
+\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
+    directory containing the advisories repository
 
 .PP
 \fB\-f\fP, \fB\-\-advisory\-filter\fP=""
@@ -166,6 +166,11 @@ found and the \-\-require\-zero flag is specified.
     treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of
 
 .PP
+\fB\-\-repository\fP="
+\[la]https://packages.wolfi.dev/os"\[ra]
+    URL of the APK package repository
+
+.PP
 \fB\-\-require\-zero\fP[=false]
     exit 1 if any vulnerabilities are found
 
@@ -176,6 +181,20 @@ found and the \-\-require\-zero flag is specified.
 .PP
 \fB\-\-use\-cpes\fP[=false]
     turn on all CPE matching in Grype
+
+.PP
+\fB\-v\fP, \fB\-\-verbose\fP[=0]
+    logging verbosity (v = info, vv = debug, default is none)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+.PP
+\fB\-\-log\-level\fP="info"
+    log level (e.g. debug, info, warn, error)
+
+.PP
+\fB\-\-log\-policy\fP=[builtin:stderr]
+    log policy (e.g. builtin:stderr, /tmp/log/foo)
 
 
 .SH EXAMPLE
