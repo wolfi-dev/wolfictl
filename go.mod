@@ -13,7 +13,7 @@ require (
 	github.com/anchore/grype v0.79.4
 	github.com/anchore/stereoscope v0.0.3-0.20240725180315-50ce3be7aa1f
 	github.com/anchore/syft v1.10.0
-	github.com/chainguard-dev/clog v1.4.0
+	github.com/chainguard-dev/clog v1.5.0
 	github.com/chainguard-dev/yam v0.0.13
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.6
