@@ -148,7 +148,7 @@ func (ds *DataSession) Append(ctx context.Context, req Request) error {
 		return ds.Create(ctx, req)
 	}
 
-	if _, exists := packageSelection.Configurations()[0].Advisories.GetByVulnerability(req.VulnerabilityID); !exists {
+	if _, exists := packageSelection.Configurations()[0].Advisories.GetByAnyVulnerability(req.VulnerabilityIDs()...); !exists {
 		return ds.Create(ctx, req)
 	}
 
@@ -233,7 +233,7 @@ func (ds DataSession) commit(_ context.Context, req Request, operation string) e
 		"%s: %s advisory %s",
 		req.Package,
 		operation,
-		req.VulnerabilityID,
+		req.AdvisoryID,
 	)
 
 	wt, err := ds.repo.Worktree()

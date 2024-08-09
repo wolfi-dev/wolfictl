@@ -75,6 +75,30 @@ func (adv Advisory) Resolved() bool {
 	}
 }
 
+// MergeInAliases adds the input aliases to the advisory's list of aliases and
+// returns the updated Advisory. The list of aliases is sorted and duplicates
+// are removed.
+func (adv Advisory) MergeInAliases(aliases ...string) Advisory {
+	adv.Aliases = append(adv.Aliases, aliases...)
+	slices.Sort(adv.Aliases)
+	adv.Aliases = slices.Compact(adv.Aliases)
+
+	return adv
+}
+
+// VulnerabilityIDs returns the list of vulnerability IDs for the advisory. This
+// is a combination of the advisory's ID and its aliases.
+func (adv Advisory) VulnerabilityIDs() []string {
+	ids := slices.Clone(adv.Aliases)
+
+	if adv.ID != "" {
+		ids = append(ids, adv.ID)
+	}
+
+	slices.Sort(ids)
+	return slices.Compact(ids)
+}
+
 // ResolvedAtVersion returns true if the advisory indicates that the
 // vulnerability does not affect the distro package at the given package
 // version, or that no further investigation is planned.

@@ -21,7 +21,12 @@ type CreateOptions struct {
 func Create(ctx context.Context, req Request, opts CreateOptions) error {
 	err := req.Validate()
 	if err != nil {
-		return err
+		return fmt.Errorf("invalid request: %w", err)
+	}
+
+	// In addition, validate that the request's AdvisoryID is empty.
+	if req.AdvisoryID != "" {
+		return fmt.Errorf("advisory ID must be empty for creating a new advisory, got %q", req.AdvisoryID)
 	}
 
 	documents := opts.AdvisoryDocs.Select().WhereName(req.Package)

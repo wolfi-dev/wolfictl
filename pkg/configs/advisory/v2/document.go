@@ -161,6 +161,36 @@ func (advs Advisories) GetByVulnerability(id string) (Advisory, bool) {
 	return Advisory{}, false
 }
 
+// GetByAnyVulnerability returns the first advisory that references any of the
+// given vulnerability IDs as its advisory ID or as one of the advisory's
+// aliases. This allows the caller to look up a particular advisory of interest
+// if the caller knows the underlying vulnerability by multiple IDs (e.g. both a
+// CVE ID and a GHSA ID), and the advisory itself has recorded at least one of
+// those IDs.
+//
+// If such an advisory does not exist in the collection, the second return value
+// will be false; otherwise it will be true.
+func (advs Advisories) GetByAnyVulnerability(ids ...string) (Advisory, bool) {
+	for _, adv := range advs {
+		for _, id := range ids {
+			if adv.ID == id {
+				return adv, true
+			}
+
+			for _, alias := range adv.Aliases {
+				if alias == id {
+					return adv, true
+				}
+			}
+		}
+	}
+
+	return Advisory{}, false
+}
+
+// Update returns a new Advisories slice with the advisory with the given ID
+// replaced with the given advisory. If no advisory with the given ID exists in
+// the slice, the original slice is returned.
 func (advs Advisories) Update(id string, advisory Advisory) Advisories {
 	for i, adv := range advs {
 		if adv.ID == id {

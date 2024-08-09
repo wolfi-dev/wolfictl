@@ -19,6 +19,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/internal"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 const (
@@ -113,13 +114,20 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 	}
 
 	req := advisory.Request{
-		Package:         p.packageName,
-		VulnerabilityID: p.vuln,
+		Package: p.packageName,
 		Event: v2.Event{
 			Timestamp: timestamp,
 			Type:      p.eventType,
 			Data:      nil,
 		},
+	}
+
+	if p.vuln != "" {
+		if vuln.RegexCGA.MatchString(p.vuln) {
+			req.AdvisoryID = p.vuln
+		} else {
+			req.Aliases = []string{p.vuln}
+		}
 	}
 
 	switch req.Event.Type {

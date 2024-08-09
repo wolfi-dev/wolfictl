@@ -105,10 +105,9 @@ func (opts DiscoverOptions) discoverMatchesForPackage(ctx context.Context, pkg s
 	for i := range matches {
 		match := matches[i]
 		err := Create(ctx, Request{
-			Package:         pkg,
-			VulnerabilityID: match.Vulnerability.ID,
-			Aliases:         nil,
-			Event:           advisoryEventForNewDiscovery(match),
+			Package: pkg,
+			Aliases: []string{match.Vulnerability.ID},
+			Event:   advisoryEventForNewDiscovery(match),
 		}, CreateOptions{opts.AdvisoryDocs})
 		if err != nil {
 			return err
