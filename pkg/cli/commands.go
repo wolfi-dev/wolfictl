@@ -4,15 +4,14 @@ import (
 	"log/slog"
 	"os"
 
-	"chainguard.dev/apko/pkg/log"
+	"github.com/chainguard-dev/clog/slag"
 	charmlog "github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/release-utils/version"
 )
 
 func New() *cobra.Command {
-	var logPolicy []string
-	var level log.CharmLogLevel
+	var level slag.Level
 	cmd := &cobra.Command{
 		Use:               "wolfictl",
 		DisableAutoGenTag: true,
@@ -23,7 +22,6 @@ func New() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.PersistentFlags().StringSliceVar(&logPolicy, "log-policy", []string{"builtin:stderr"}, "log policy (e.g. builtin:stderr, /tmp/log/foo)")
 	cmd.PersistentFlags().Var(&level, "log-level", "log level (e.g. debug, info, warn, error)")
 
 	cmd.AddCommand(
