@@ -2,11 +2,13 @@ module github.com/wolfi-dev/wolfictl
 
 go 1.22.5
 
+replace chainguard.dev/apko => ../apko
+
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
-	chainguard.dev/apko v0.17.1-0.20240811194755-18b1016880e0
+	chainguard.dev/apko v0.17.1-0.20240812132303-37ab83ede50b
 	chainguard.dev/melange v0.11.3-0.20240811233057-c9a2064b95f8
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
@@ -301,6 +303,8 @@ require (
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/theupdateframework/go-tuf v0.7.0 // indirect
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399 // indirect
+	github.com/u-root/u-root v0.14.0 // indirect
+	github.com/u-root/uio v0.0.0-20240209044354-b3d14b93376a // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/vbatts/go-mtree v0.5.4 // indirect
 	github.com/vbatts/tar-split v0.11.5 // indirect
