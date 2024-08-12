@@ -112,7 +112,6 @@ func cmdBuild() *cobra.Command {
 	cmd.Flags().StringVar(&cfg.cacheSource, "cache-source", "", "directory or bucket used for preloading the cache")
 	cmd.Flags().BoolVar(&cfg.generateIndex, "generate-index", true, "whether to generate APKINDEX.tar.gz")
 	cmd.Flags().StringVar(&cfg.DestinationRepo, "destination-repository", "", "repo used to check for (and skip) existing packages")
-	cmd.Flags().StringVar(&cfg.UploadRepo, "upload-repository", "", "repo where packages will be uploaded")
 
 	cmd.Flags().IntVarP(&cfg.Jobs, "jobs", "j", 0, "number of jobs to run concurrently (default is GOMAXPROCS)")
 	cmd.Flags().StringVar(&traceFile, "trace", "", "where to write trace output")
@@ -375,7 +374,6 @@ type Global struct {
 
 	Dir             string
 	DestinationRepo string
-	UploadRepo      string
 	PipelineDir     string
 	Runner          string
 
