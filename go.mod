@@ -62,7 +62,7 @@ require (
 	golang.org/x/time v0.6.0
 	golang.org/x/vuln v1.1.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.30.3
+	k8s.io/apimachinery v0.31.0
 	sigs.k8s.io/release-utils v0.8.4
 )
 
