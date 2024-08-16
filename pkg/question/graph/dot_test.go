@@ -63,14 +63,14 @@ func TestDot(t *testing.T) {
 		expected = `digraph interview {
 Done;
 "What is your favorite dessert?";
-"START" -> "What is your favorite dessert?"  [ label="" ]
+"START" -> "What is your favorite dessert?" [ label="" ]
 "What flavor of ice cream do you like?";
-"What is your favorite dessert?" -> "What flavor of ice cream do you like?"  [ label="Ice cream" ]
-"What flavor of ice cream do you like?" -> Done  [ label=Vanilla ]
-"What flavor of ice cream do you like?" -> Done  [ label=Chocolate ]
+"What is your favorite dessert?" -> "What flavor of ice cream do you like?" [ label="Ice cream" ]
+"What flavor of ice cream do you like?" -> Done [ label=Vanilla ]
+"What flavor of ice cream do you like?" -> Done [ label=Chocolate ]
 "What kind of cookie do you like?";
-"What is your favorite dessert?" -> "What kind of cookie do you like?"  [ label=Cookie ]
-"What kind of cookie do you like?" -> Done  [ label="Chocolate chip" ]
+"What is your favorite dessert?" -> "What kind of cookie do you like?" [ label=Cookie ]
+"What kind of cookie do you like?" -> Done [ label="Chocolate chip" ]
 }
 `
 	)

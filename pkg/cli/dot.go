@@ -82,7 +82,7 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 				if err := out.Set("rankdir", "LR"); err != nil {
 					return nil, err
 				}
-				out.SetType(dot.DIGRAPH)
+				out.SetType(dot.DIGRAPH) //nolint:errcheck
 
 				renderNode := func(node string) error {
 					var byName []dag.Package
@@ -119,7 +119,7 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 								return err
 							}
 						}
-						out.AddNode(n)
+						out.AddNode(n) //nolint:errcheck
 
 						dependencies, ok := amap[h]
 						if !ok {
@@ -160,8 +160,8 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 									return err
 								}
 							}
-							out.AddNode(d)
-							out.AddEdge(dot.NewEdge(n, d))
+							out.AddNode(d)                 //nolint:errcheck
+							out.AddEdge(dot.NewEdge(n, d)) //nolint:errcheck
 						}
 
 						if !showDependents {
@@ -192,8 +192,8 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 									}
 								}
 							}
-							out.AddNode(d)
-							out.AddEdge(dot.NewEdge(d, n))
+							out.AddNode(d)                 //nolint:errcheck
+							out.AddEdge(dot.NewEdge(d, n)) //nolint:errcheck
 						}
 					}
 

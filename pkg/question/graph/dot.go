@@ -14,11 +14,11 @@ import (
 // and choices in the interview.
 func Dot[T any](ctx context.Context, root question.Question[T], initialState T) (string, error) {
 	g := dot.NewGraph("interview")
-	g.SetType(dot.DIGRAPH)
+	g.SetType(dot.DIGRAPH) //nolint:errcheck
 
 	// Create a "Done" node
 	doneNode := dot.NewNode("Done")
-	g.AddNode(doneNode)
+	g.AddNode(doneNode) //nolint:errcheck
 
 	startNode := dot.NewNode(fmt.Sprintf(`"%+v"`, initialState))
 
@@ -44,13 +44,13 @@ func traverse[T any](
 
 	// Add this question as a node in the graph
 	node := dot.NewNode(id)
-	g.AddNode(node)
+	g.AddNode(node) //nolint:errcheck
 
 	// If this question has a parent, add an edge from the parent to this question
 	if parentNode != nil {
 		edge := dot.NewEdge(parentNode, node)
 		_ = edge.Set("label", edgeLabel) //nolint:errcheck
-		g.AddEdge(edge)
+		g.AddEdge(edge)                  //nolint:errcheck
 	}
 
 	switch a := q.Answer.(type) {
@@ -78,7 +78,7 @@ func traverse[T any](
 		// If the choice leads to a nil question, create an edge to the "Done" node
 		edge := dot.NewEdge(node, doneNode)
 		_ = edge.Set("label", answer) //nolint:errcheck
-		g.AddEdge(edge)
+		g.AddEdge(edge)               //nolint:errcheck
 
 	case question.MultipleChoice[T]:
 		// Iterate over the choices for this question
@@ -108,7 +108,7 @@ func traverse[T any](
 			// If the choice leads to a nil question, create an edge to the "Done" node
 			edge := dot.NewEdge(node, doneNode)
 			_ = edge.Set("label", choice.Text) //nolint:errcheck
-			g.AddEdge(edge)
+			g.AddEdge(edge)                    //nolint:errcheck
 		}
 
 	case question.MessageOnly[T]:
@@ -133,7 +133,7 @@ func traverse[T any](
 		// If the choice leads to a nil question, create an edge to the "Done" node
 		edge := dot.NewEdge(node, doneNode)
 		_ = edge.Set("label", edgeLabel) //nolint:errcheck
-		g.AddEdge(edge)
+		g.AddEdge(edge)                  //nolint:errcheck
 	}
 
 	return nil
@@ -141,10 +141,10 @@ func traverse[T any](
 
 func connectToTerminatedNode(g *dot.Graph, node *dot.Node, edgeLabel string) {
 	term := terminatedNode()
-	g.AddNode(term)
+	g.AddNode(term) //nolint:errcheck
 	edge := dot.NewEdge(node, term)
 	_ = edge.Set("label", edgeLabel) //nolint:errcheck
-	g.AddEdge(edge)
+	g.AddEdge(edge)                  //nolint:errcheck
 }
 func terminatedNode() *dot.Node {
 	return dot.NewNode(`"<EXIT WITH NO RESULT>"`)
