@@ -6,7 +6,7 @@ go 1.22.5
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
-	chainguard.dev/apko v0.17.1-0.20240812132303-37ab83ede50b
+	chainguard.dev/apko v0.17.1-0.20240815195935-c0bb6a91d28a
 	chainguard.dev/melange v0.11.3-0.20240811233057-c9a2064b95f8
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
@@ -70,7 +70,7 @@ require (
 	chainguard.dev/go-grpc-kit v0.17.6-0.20240806174745-03f612c201b4 // indirect
 	chainguard.dev/sdk v0.1.23 // indirect
 	cloud.google.com/go v0.115.0 // indirect
-	cloud.google.com/go/auth v0.8.0 // indirect
+	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.1.13 // indirect
@@ -335,7 +335,7 @@ require (
 	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/api v0.191.0 // indirect
+	google.golang.org/api v0.192.0 // indirect
 	google.golang.org/genproto v0.0.0-20240808171019-573a1156607a // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240808171019-573a1156607a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240808171019-573a1156607a // indirect
