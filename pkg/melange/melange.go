@@ -151,7 +151,6 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 			NoLint:   nolint,
 		}
 	}
-	fmt.Printf("found %[1]d packages\n", len(p))
 	return p, nil
 }
 
