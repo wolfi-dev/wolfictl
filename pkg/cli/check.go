@@ -14,7 +14,6 @@ func cmdCheck() *cobra.Command {
 	}
 	cmd.AddCommand(
 		Diff(),
-		CheckUpdate(),
 		SoName(),
 	)
 	return cmd
