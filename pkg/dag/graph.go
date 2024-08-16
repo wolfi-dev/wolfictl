@@ -18,6 +18,7 @@ import (
 	"go.lsp.dev/uri"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
 	"github.com/chainguard-dev/clog"
 )
 
@@ -35,6 +36,8 @@ type Graph struct {
 	opts      *graphOptions
 	resolvers map[string]*apk.PkgResolver // maintains a listing of all resolvers by key
 	byName    map[string][]string         // maintains a listing of all known hashes for a given name
+
+	discovered map[string]struct{} // For each repo we encounter, we want to attempt to discover keys for it only once
 }
 
 // PackageHash given anything that implements Package, return the hash to be used
@@ -65,11 +68,12 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 		}
 	}
 	g := &Graph{
-		Graph:     newGraph(),
-		packages:  pkgs,
-		opts:      opts,
-		resolvers: make(map[string]*apk.PkgResolver),
-		byName:    map[string][]string{},
+		Graph:      newGraph(),
+		packages:   pkgs,
+		opts:       opts,
+		resolvers:  make(map[string]*apk.PkgResolver),
+		byName:     map[string][]string{},
+		discovered: map[string]struct{}{},
 	}
 
 	// indexes is a cache of all repositories. Only some might be used for each package.
@@ -174,6 +178,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 // returning the resolverKey to look it up.
 // Adds the local repository if provided.
 func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo apk.NamedIndex, indexes map[string]apk.NamedIndex, allKeys map[string][]byte, addRepos, addKeys []string) (resolverKey string, err error) {
+	log := clog.FromContext(ctx)
 	var (
 		repos       []string
 		lookupRepos = []apk.NamedIndex{}
@@ -206,6 +211,28 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 		}
 	}
 	if len(repos) > 0 {
+		// Do chainguard-style key discovery for any repositories we haven't seen before.
+		for _, repo := range repos {
+			if _, ok := g.discovered[repo]; ok {
+				continue
+			}
+
+			if scheme, _, ok := strings.Cut(repo, "://"); !ok || !strings.HasPrefix(scheme, "http") {
+				continue
+			}
+
+			keys, err := apk.DiscoverKeys(ctx, http.DefaultClient, auth.DefaultAuthenticators, repo)
+			if err != nil {
+				log.Warnf("unable to discover keys for %s: %v", repo, err)
+			}
+
+			for keyName, key := range keys {
+				allKeys[keyName] = key
+			}
+
+			g.discovered[repo] = struct{}{}
+		}
+
 		loadedRepos, err := apk.GetRepositoryIndexes(ctx, repos, allKeys, arch, apk.WithHTTPClient(http.DefaultClient))
 		if err != nil {
 			return "", err
