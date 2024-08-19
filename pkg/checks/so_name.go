@@ -73,7 +73,7 @@ func (o *SoNameOptions) CheckSoName() error {
 
 		if err != nil {
 			soNameErrors = append(soNameErrors, lint.EvalRuleError{
-				Error: fmt.Errorf(err.Error()),
+				Error: fmt.Errorf("%s", err.Error()),
 			})
 		}
 	}

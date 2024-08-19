@@ -91,7 +91,7 @@ func (l *Linter) Lint(ctx context.Context, minSeverity Severity) (Result, error)
 
 					failedRules = append(failedRules, EvalRuleError{
 						Rule:  rule,
-						Error: fmt.Errorf(msg),
+						Error: fmt.Errorf("%s", msg),
 					})
 				}
 			}
