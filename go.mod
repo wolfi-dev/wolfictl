@@ -1,13 +1,13 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.22.5
+go 1.23.0
 
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 
 require (
-	chainguard.dev/apko v0.17.1-0.20240816170113-ee5c9573b17d
-	chainguard.dev/melange v0.11.3-0.20240819203609-7b7967307930
+	chainguard.dev/apko v0.17.1-0.20240816230314-6534e9c0f291
+	chainguard.dev/melange v0.11.3-0.20240819231553-2dbb223df3be
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.79.6
@@ -68,12 +68,12 @@ require (
 	chainguard.dev/go-grpc-kit v0.17.6-0.20240806174745-03f612c201b4 // indirect
 	chainguard.dev/sdk v0.1.23 // indirect
 	cloud.google.com/go v0.115.0 // indirect
-	cloud.google.com/go/auth v0.8.1 // indirect
+	cloud.google.com/go/auth v0.9.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.1.13 // indirect
 	dagger.io/dagger v0.12.5 // indirect
-	dario.cat/mergo v1.0.0 // indirect
+	dario.cat/mergo v1.0.1 // indirect
 	github.com/99designs/gqlgen v0.17.49 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20231105174938-2b5cbb29f3e2 // indirect
@@ -115,7 +115,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chainguard-dev/git-urls v1.0.2 // indirect
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 // indirect
-	github.com/charmbracelet/x/ansi v0.1.4 // indirect
+	github.com/charmbracelet/x/ansi v0.2.1 // indirect
 	github.com/charmbracelet/x/input v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.1.0 // indirect
@@ -188,7 +188,7 @@ require (
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20210315223345-82c243799c99 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -218,7 +218,7 @@ require (
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.1.1 // indirect
 	github.com/kubescape/go-git-url v0.0.30 // indirect
-	github.com/letsencrypt/boulder v0.0.0-20240815230817-14c0b2c3bb46 // indirect
+	github.com/letsencrypt/boulder v0.0.0-20240819180303-9b08fa52ca51 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/masahiro331/go-mvn-version v0.0.0-20210429150710-d3157d602a08 // indirect
@@ -300,7 +300,7 @@ require (
 	github.com/theupdateframework/go-tuf v0.7.0 // indirect
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399 // indirect
 	github.com/u-root/u-root v0.14.0 // indirect
-	github.com/u-root/uio v0.0.0-20240209044354-b3d14b93376a // indirect
+	github.com/u-root/uio v0.0.0-20240224005618-d2acac8f3701 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/vbatts/go-mtree v0.5.4 // indirect
 	github.com/vbatts/tar-split v0.11.5 // indirect
