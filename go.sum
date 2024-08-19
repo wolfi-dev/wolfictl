@@ -1,9 +1,13 @@
+al.essio.dev/pkg/shellescape v1.5.0 h1:7oTvSsQ5kg9WksA9O58y9wjYnY4jP0CL82/Q8WLUGKk=
+al.essio.dev/pkg/shellescape v1.5.0/go.mod h1:6sIqp7X2P6mThCQ7twERpZTuigpr6KbZWtls1U8I890=
 chainguard.dev/apko v0.17.1-0.20240816170113-ee5c9573b17d h1:M5rvev5B1KazlhcK18oO8qL4bzDpA3nluuTiUH4r1Is=
 chainguard.dev/apko v0.17.1-0.20240816170113-ee5c9573b17d/go.mod h1:Ip+XpQmlODlt6IzsfEoj5E1K9E0Pedk9IfdkwHVhPg8=
 chainguard.dev/go-grpc-kit v0.17.6-0.20240806174745-03f612c201b4 h1:E7bXqdge6YDZb9tIKTOrpbBzFE2JmMFW1SHNATVLCfk=
 chainguard.dev/go-grpc-kit v0.17.6-0.20240806174745-03f612c201b4/go.mod h1:Buvc77A8JVM08r+gXIzhm7mQc+/PjwjR8jn26SCaL3c=
 chainguard.dev/melange v0.11.3-0.20240811233057-c9a2064b95f8 h1:NGHWwNxQNXlTGWtd8lHbrOiaSfvY+u09wng0AmjPsUg=
 chainguard.dev/melange v0.11.3-0.20240811233057-c9a2064b95f8/go.mod h1:cemMKyKlMQkIlSRVd5ObZEnTzVUJGnszjOdAHgkvnx4=
+chainguard.dev/melange v0.11.3-0.20240819203609-7b7967307930 h1:FRk5mAFonx71lqNu7MqGEA2XE6ANVa8GHzvicEN4h3A=
+chainguard.dev/melange v0.11.3-0.20240819203609-7b7967307930/go.mod h1:pUMQ5mVdoNPiQ6S4GSC0OMmI2HxT5s2BKDxv3/+EAzY=
 chainguard.dev/sdk v0.1.23 h1:k4hEYYCJ1PTXPam4+ULxIip/DkoVfH7Pu3rnktar/Zo=
 chainguard.dev/sdk v0.1.23/go.mod h1:TojPLtaHmy1TThjHjvPQbwKRDCusBPpQWSBZ2EkQFFk=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -200,6 +204,8 @@ cloud.google.com/go/workflows v1.6.0/go.mod h1:6t9F5h/unJz41YqfBmqSASJSXccBLtD1V
 cloud.google.com/go/workflows v1.7.0/go.mod h1:JhSrZuVZWuiDfKEFxU0/F1PQjmpnpcoISEXH2bcHC3M=
 dagger.io/dagger v0.12.4 h1:PeAsBs0dgMrV4TN8prVqeDDEvg8qOMMjdQiXHe9q2uc=
 dagger.io/dagger v0.12.4/go.mod h1:e5Xuvu+FnswwG28nMk7ZcDtT+p9vadvONowzLKf/0dA=
+dagger.io/dagger v0.12.5 h1:K4ghFL/j+zqk6RqN7nAus1hfjP9lbQXRb3MGz8Ys/f4=
+dagger.io/dagger v0.12.5/go.mod h1:e5Xuvu+FnswwG28nMk7ZcDtT+p9vadvONowzLKf/0dA=
 dario.cat/mergo v1.0.0 h1:AGCNq9Evsj31mOgNPcLyXc+4PNABt905YmuqPYYpBWk=
 dario.cat/mergo v1.0.0/go.mod h1:uNxQE+84aUszobStD9th8a29P2fMDhsBdgRYvZOxGmk=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
@@ -1157,6 +1163,10 @@ github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399/go.mod h1:LdwHT
 github.com/tmc/dot v0.2.0 h1:AoRmIMCseJd6oA9SAo2FnPzYShe22cmV9bzCpBLym0E=
 github.com/tmc/dot v0.2.0/go.mod h1:kKjiVNmuiZAXsD+lzpvIt/USiPhA5UhKjWKVWFDjWZA=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
+github.com/u-root/u-root v0.14.0 h1:Ka4T10EEML7dQ5XDvO9c3MBN8z4nuSnGjcd1jmU2ivg=
+github.com/u-root/u-root v0.14.0/go.mod h1:hAyZorapJe4qzbLWlAkmSVCJGbfoU9Pu4jpJ1WMluqE=
+github.com/u-root/uio v0.0.0-20240209044354-b3d14b93376a h1:BH1SOPEvehD2kVrndDnGJiUF0TrBpNs+iyYocu6h0og=
+github.com/u-root/uio v0.0.0-20240209044354-b3d14b93376a/go.mod h1:P3a5rG4X7tI17Nn3aOIAYr5HbIMukwXG0urG0WuL8OA=
 github.com/ulikunitz/xz v0.5.8/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
 github.com/ulikunitz/xz v0.5.9/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
 github.com/ulikunitz/xz v0.5.10/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
