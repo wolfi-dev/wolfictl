@@ -50,7 +50,16 @@ func Untar(src io.Reader, dst string) error {
 			if err := os.MkdirAll(filepath.Dir(target), os.ModePerm); err != nil {
 				return err
 			}
-			fileToWrite, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+
+			mode := header.Mode
+
+			// Check if mode is within the range of a uint32
+			if mode < 0 || mode > int64(^uint32(0)) {
+				return fmt.Errorf("file mode out of range: %d", mode)
+			}
+
+			//nolint:gosec // mode is checked above
+			fileToWrite, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(mode))
 			if err != nil {
 				return err
 			}
