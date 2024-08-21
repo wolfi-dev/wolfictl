@@ -87,7 +87,16 @@ var (
 )
 
 func getTerminalWidth() int {
-	w, _, err := term.GetSize(int(os.Stdout.Fd()))
+	fd := os.Stdout.Fd()
+
+	// Check if the conversion is safe
+	if fd > uintptr(int(^uint(0)>>1)) {
+		// file descriptor too large to convert to int safely
+		return fallbackLineLength
+	}
+
+	//nolint:gosec // The file descriptor is checked above
+	w, _, err := term.GetSize(int(fd))
 	if err != nil {
 		return fallbackLineLength
 	}
