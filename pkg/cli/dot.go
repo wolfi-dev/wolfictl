@@ -64,6 +64,11 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 				return fmt.Errorf("building graph: %w", err)
 			}
 
+			g, err = g.Targets()
+			if err != nil {
+				return fmt.Errorf("targets: %w", err)
+			}
+
 			amap, err := g.Graph.AdjacencyMap()
 			if err != nil {
 				return err

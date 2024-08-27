@@ -161,7 +161,7 @@ func TestNewGraph(t *testing.T) {
 			// the external dependencies should be dangling, i.e. unresolved
 			for _, dep := range externalDeps {
 				assert.Contains(t, deps, dep)
-				assert.Equal(t, deps[dep].Source, PackageHash(conf))
+				assert.Equal(t, deps[dep].Source, PackageHash(conf), "for %s", dep)
 				assert.Equal(t, deps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
@@ -170,7 +170,7 @@ func TestNewGraph(t *testing.T) {
 			// the internal dependencies should be resolved
 			for _, dep := range internalDeps {
 				assert.Contains(t, deps, dep)
-				assert.Equal(t, deps[dep].Source, PackageHash(conf))
+				assert.Equal(t, deps[dep].Source, PackageHash(conf), "for %s", dep)
 				assert.Equal(t, deps[dep].Target, dep)
 				vertex, err := graph.Graph.Vertex(dep)
 				require.NoError(t, err)
@@ -281,6 +281,7 @@ func TestTargets(t *testing.T) {
 		"two:4.5.6-r1@local":   {"one:1.2.3-r1@local"},
 		"three:4.5.6-r1@local": {"two:4.5.6-r1@local"},
 	}
+
 	// the direct dependencies from environment.contents.packages should be dangling, i.e. unresolved
 	for k, want := range expectedDeps {
 		got, ok := amap[k]
@@ -292,6 +293,6 @@ func TestTargets(t *testing.T) {
 		}
 
 		keys := maps.Keys(got)
-		assert.ElementsMatch(t, want, keys)
+		assert.ElementsMatch(t, want, keys, "unexpected dependencies for %s", k)
 	}
 }
