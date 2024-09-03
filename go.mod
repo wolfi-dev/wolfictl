@@ -58,7 +58,7 @@ require (
 	golang.org/x/term v0.23.0
 	golang.org/x/text v0.17.0
 	golang.org/x/time v0.6.0
-	golang.org/x/vuln v1.1.0
+	golang.org/x/vuln v1.1.3
 	gopkg.in/yaml.v3 v3.0.1
 	sigs.k8s.io/release-utils v0.8.4
 )
