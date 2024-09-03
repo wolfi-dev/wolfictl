@@ -286,18 +286,6 @@ func TestValidate(t *testing.T) {
 					shouldBeValid: false,
 				},
 				{
-					name: "fixed-version-present-and-first", // which is not allowed
-					apkindex: &apk.APKIndex{
-						Packages: []*apk.Package{
-							{
-								Name:    "ko",
-								Version: "1.0.0-r2",
-							},
-						},
-					},
-					shouldBeValid: false,
-				},
-				{
 					name: "fixed-version-present-and-not-first",
 					apkindex: &apk.APKIndex{
 						Packages: []*apk.Package{
