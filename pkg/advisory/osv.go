@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/clog"
 	"github.com/google/osv-scanner/pkg/models"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -61,7 +62,11 @@ const OSVEcosystem models.Ecosystem = "Chainguard"
 
 // BuildOSVDataset produces an OSV dataset from Chainguard advisory data, using
 // the given set of options.
-func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
+func BuildOSVDataset(ctx context.Context, opts OSVOptions) error {
+	logger := clog.FromContext(ctx)
+
+	logger.Info("building OSV dataset", "advisoryDocIndices", len(opts.AdvisoryDocIndices), "packageConfigIndices", len(opts.PackageConfigIndices), "outputDirectory", opts.OutputDirectory, "addedEcosystems", opts.AddedEcosystems)
+
 	if len(opts.AdvisoryDocIndices) != len(opts.AddedEcosystems) {
 		return fmt.Errorf("length of AdvisoryDocIndices and AddedEcosystems must be equal: use an empty string to signal no added ecosystem")
 	}
@@ -117,6 +122,8 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 			pkgName := doc.Package.Name
 			pkgs := append([]string{pkgName}, pkgNameToSubpackages[pkgName]...)
 
+			logger.Debug("processing advisories document", "name", pkgName, "packages", pkgs)
+
 			var affectedPackages []models.Package
 			for _, pkg := range pkgs {
 				for _, ecosystem := range ecosystems {
@@ -145,6 +152,7 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 					affectedRange = rangeForFalsePositive()
 				default:
 					// We don't yet produce OSV data for other event types.
+					logger.Debug("skipping advisory with unsupported event type", "advisoryID", adv.ID, "eventType", latestEvent.Type)
 					continue
 				}
 
@@ -176,6 +184,7 @@ func BuildOSVDataset(_ context.Context, opts OSVOptions) error {
 	sort.Strings(ids)
 
 	// write the all.json ("the index") and individual advisory files
+	logger.Info("generating all.json index file", "outputDirectory", opts.OutputDirectory, "advisoryCount", len(ids))
 
 	var indexEntries []models.Vulnerability
 

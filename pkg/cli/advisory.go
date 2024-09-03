@@ -10,6 +10,7 @@ import (
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
+	charmlog "github.com/charmbracelet/log"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -194,17 +195,22 @@ func addVerboseFlag(val *int, cmd *cobra.Command) {
 }
 
 func newLogger(verbosity int) *slog.Logger {
-	var h slog.Handler
+	var level charmlog.Level
 	switch {
 	case verbosity == 1:
-		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})
+		level = charmlog.InfoLevel
 	case verbosity >= 2:
-		h = slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})
+		level = charmlog.DebugLevel
 	default:
 		return internal.NopLogger()
 	}
 
-	return slog.New(h)
+	cl := charmlog.NewWithOptions(os.Stderr, charmlog.Options{
+		Level:           level,
+		ReportTimestamp: true,
+	})
+
+	return slog.New(cl)
 }
 
 func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {
