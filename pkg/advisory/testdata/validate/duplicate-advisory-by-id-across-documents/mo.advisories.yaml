@@ -1,14 +1,10 @@
 schema-version: 2.0.1
 
 package:
-  name: ko
+  name: mo
 
 advisories:
   - id: CGA-2222-2222-2222
-    aliases:
-      - GHSA-2222-2222-2222
     events:
       - timestamp: 1970-01-01T00:00:00Z
-        type: fixed
-        data:
-          fixed-version: 1.0.0-r2
+        type: true-positive-determination
