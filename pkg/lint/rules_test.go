@@ -335,7 +335,7 @@ func TestLinter_Rules(t *testing.T) {
 							Name:     "git-checkout-must-use-github-updates",
 							Severity: SeverityError,
 						},
-						Error: fmt.Errorf("[git-checkout-must-use-github-updates]: configure update.github when using git-checkout (ERROR)"),
+						Error: fmt.Errorf("[git-checkout-must-use-github-updates]: configure update.github/update.git when using git-checkout (ERROR)"),
 					},
 				},
 			},
