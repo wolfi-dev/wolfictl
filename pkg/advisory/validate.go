@@ -75,6 +75,7 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 	errs = append(errs,
 		errorhelpers.LabelError("basic validation failure(s)", errors.Join(documentErrs...)),
 		errorhelpers.LabelError("document file name validation failure(s)", opts.validateDocumentNameMatchesPackageName()),
+		errorhelpers.LabelError("advisory ID uniqueness validation failure(s)", opts.validateAdvisoryIDUniqueness()),
 	)
 
 	if opts.BaseAdvisoryDocs != nil {
@@ -94,6 +95,32 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
 	} else {
 		log.Info("skipping validation of alias set completeness, no alias finder provided")
+	}
+
+	return errors.Join(errs...)
+}
+
+func (opts ValidateOptions) validateAdvisoryIDUniqueness() error {
+	seen := make(map[string][]string)
+	var errs []error
+
+	for _, e := range opts.AdvisoryDocs.Select().Entries() {
+		cfg := e.Configuration()
+
+		if len(opts.SelectedPackages) > 0 {
+			if _, ok := opts.SelectedPackages[cfg.Package.Name]; !ok {
+				// Skip this document, since it's not in the set of selected packages.
+				continue
+			}
+		}
+
+		for _, adv := range cfg.Advisories {
+			p := e.Path()
+			if _, ok := seen[adv.ID]; ok {
+				errs = append(errs, fmt.Errorf("duplicate advisory ID %q (found in %s, but already seen in: %s)", adv.ID, p, strings.Join(seen[adv.ID], ", ")))
+			}
+			seen[adv.ID] = append(seen[adv.ID], p)
+		}
 	}
 
 	return errors.Join(errs...)

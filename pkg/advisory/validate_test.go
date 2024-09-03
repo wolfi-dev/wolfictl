@@ -394,6 +394,10 @@ func TestValidate(t *testing.T) {
 				name:          "no-duplicates",
 				shouldBeValid: true,
 			},
+			{
+				name:          "duplicate-advisory-by-id-across-documents",
+				shouldBeValid: false,
+			},
 		}
 
 		for _, tt := range cases {
