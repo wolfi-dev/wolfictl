@@ -389,13 +389,13 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 		},
 		{
 			Name:        "git-checkout-must-use-github-updates",
-			Description: "when using git-checkout, must use github updates so we can get the expected-commit",
+			Description: "when using git-checkout, must use github/git updates so we can get the expected-commit",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == gitCheckout && strings.HasPrefix(p.With["repository"], "https://github.com/") {
-						if config.Update.Enabled && config.Update.GitHubMonitor == nil {
-							return fmt.Errorf("configure update.github when using git-checkout")
+						if config.Update.Enabled && config.Update.GitHubMonitor == nil && config.Update.GitMonitor == nil {
+							return fmt.Errorf("configure update.github/update.git when using git-checkout")
 						}
 					}
 				}
