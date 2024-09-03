@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"chainguard.dev/melange/pkg/config"
+	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -39,7 +40,8 @@ directory must already exist before running the command.
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			ctx := cmd.Context()
+			logger := clog.NewLogger(newLogger(p.verbosity))
+			ctx := clog.WithLogger(cmd.Context(), logger)
 
 			if len(p.advisoriesRepoDirs) == 0 {
 				return fmt.Errorf("at least one advisory repository directory must be specified")
@@ -108,10 +110,12 @@ type osvParams struct {
 	advisoriesRepoDirs []string
 	packagesRepoDirs   []string
 	outputDirectory    string
+	verbosity          int
 }
 
 func (p *osvParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVarP(&p.advisoriesRepoDirs, "advisories-repo-dir", "a", nil, "path to the directory(ies) containing Chainguard advisory data")
 	cmd.Flags().StringSliceVarP(&p.packagesRepoDirs, "packages-repo-dir", "p", nil, "path to the directory(ies) containing Chainguard package data")
 	cmd.Flags().StringVarP(&p.outputDirectory, "output", "o", "", "path to a local directory in which the OSV dataset will be written")
+	addVerboseFlag(&p.verbosity, cmd)
 }
