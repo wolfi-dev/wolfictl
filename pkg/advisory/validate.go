@@ -5,11 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"sort"
 	"strings"
 	"time"
-
-	goapkversion "github.com/knqyf263/go-apk-version"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
@@ -238,7 +235,6 @@ func (opts ValidateOptions) validateFixedVersions(ctx context.Context) error {
 
 				eventErrs := []error{
 					opts.validatePackageVersionExistsInAPKINDEX(ctx, doc.Name(), fixedVersion),
-					opts.validateFixedVersionIsNotFirstVersionInAPKINDEX(ctx, doc.Name(), fixedVersion),
 				}
 
 				advErrs = append(advErrs, errorhelpers.LabelError(
@@ -332,56 +328,6 @@ func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(ctx context.C
 				"version",
 				version,
 			)
-			return nil
-		}
-	}
-
-	return fmt.Errorf("package version %q not found in APKINDEX", version)
-}
-
-func (opts ValidateOptions) validateFixedVersionIsNotFirstVersionInAPKINDEX(ctx context.Context, pkgName, version string) error {
-	log := clog.FromContext(ctx)
-	if opts.APKIndex == nil {
-		// Not enough input information to drive this validation check.
-		log.Warn("not validating fixed version is not first version, no APKINDEX provided")
-		return nil
-	}
-
-	if len(opts.SelectedPackages) > 0 {
-		if _, ok := opts.SelectedPackages[pkgName]; !ok {
-			// Skip this document, since it's not in the set of selected packages.
-			return nil
-		}
-	}
-
-	var packageVersions []*apk.Package
-	var ok bool
-	if packageVersions, ok = opts.apkIndexPackageMap[pkgName]; !ok {
-		return errors.New("package not found in APKINDEX")
-	}
-
-	sort.Slice(packageVersions, func(i, j int) bool {
-		iVer, err := goapkversion.NewVersion(packageVersions[i].Version)
-		if err != nil {
-			return true
-		}
-		jVer, err := goapkversion.NewVersion(packageVersions[j].Version)
-		if err != nil {
-			return false
-		}
-		return iVer.LessThan(jVer)
-	})
-
-	for i, pkg := range packageVersions {
-		if pkg.Version == version {
-			if i == 0 {
-				return fmt.Errorf(
-					"%q is the first version of the package listed in the APKINDEX, so it cannot be used as a fixed-version (consider switching type to %q)",
-					version,
-					v2.EventTypeFalsePositiveDetermination,
-				)
-			}
-
 			return nil
 		}
 	}
