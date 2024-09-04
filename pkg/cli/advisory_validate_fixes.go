@@ -210,6 +210,7 @@ func findInvalidFixedAdvisoriesForAPK(
 	if err != nil {
 		return nil, fmt.Errorf("creating scanner: %w", err)
 	}
+	defer scanner.Close()
 
 	// TODO: Scanning needs a better interface, this is a hack to seek to the start of the file.
 	//  Consider using io.ReaderAt.

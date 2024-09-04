@@ -182,6 +182,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to create vulnerability scanner: %w", err)
 			}
+			defer scanner.Close()
 
 			// We don't want logging, it's unnecessary and interrupts the flow of the guide.
 			ctx = clog.WithLogger(ctx, clog.NewLogger(internal.NopLogger()))

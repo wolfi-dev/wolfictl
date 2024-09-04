@@ -94,6 +94,7 @@ func TestScanner_ScanAPK(t *testing.T) {
 	if err != nil {
 		t.Fatalf("creating new scanner: %v", err)
 	}
+	t.Cleanup(scanner.Close)
 
 	for _, tt := range testTargets {
 		for _, arch := range []string{"x86_64", "aarch64"} {

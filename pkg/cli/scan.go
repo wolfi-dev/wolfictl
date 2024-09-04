@@ -271,6 +271,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 		if err != nil {
 			return fmt.Errorf("failed to create scanner: %w", err)
 		}
+		defer scanner.Close()
 
 		for i, ch := range done {
 			select {
