@@ -11,6 +11,7 @@ import (
 	"github.com/adrg/xdg"
 	"github.com/anchore/grype/grype"
 	"github.com/anchore/grype/grype/db"
+	v5 "github.com/anchore/grype/grype/db/v5"
 	"github.com/anchore/grype/grype/matcher"
 	"github.com/anchore/grype/grype/matcher/dotnet"
 	"github.com/anchore/grype/grype/matcher/golang"
@@ -83,6 +84,7 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 type Scanner struct {
 	datastore            *store.Store
 	dbStatus             *db.Status
+	dbCloser             v5.DBCloser
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
 	disableSBOMCache     bool
 }
@@ -158,13 +160,13 @@ func NewScanner(opts Options) (*Scanner, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
 	}
-	defer dbCloser.Close()
 
 	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(*datastore, opts.UseCPEs)
 
 	return &Scanner{
 		datastore:            datastore,
 		dbStatus:             dbStatus,
+		dbCloser:             dbCloser,
 		vulnerabilityMatcher: vulnerabilityMatcher,
 		disableSBOMCache:     opts.DisableSBOMCache,
 	}, nil
@@ -246,6 +248,13 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	}
 
 	return result, nil
+}
+
+// Close closes the scanner's database connection.
+func (s *Scanner) Close() {
+	if s.dbCloser != nil {
+		s.dbCloser.Close()
+	}
 }
 
 func NewGrypeVulnerabilityMatcher(datastore store.Store, useCPEs bool) *grype.VulnerabilityMatcher {
