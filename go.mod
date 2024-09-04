@@ -10,7 +10,7 @@ require (
 	chainguard.dev/melange v0.11.3-0.20240819231553-2dbb223df3be
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
-	github.com/anchore/grype v0.79.6
+	github.com/anchore/grype v0.80.0
 	github.com/anchore/stereoscope v0.0.3
 	github.com/anchore/syft v1.11.1
 	github.com/chainguard-dev/clog v1.5.1-0.20240811185937-4c523ae4593f
@@ -190,7 +190,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-getter v1.7.5 // indirect
+	github.com/hashicorp/go-getter v1.7.6 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
