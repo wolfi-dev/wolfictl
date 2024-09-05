@@ -10,6 +10,7 @@ type FS interface {
 	OpenAsWritable(name string) (File, error)
 	Truncate(name string, size int64) error
 	Create(name string) (File, error)
+	Remove(name string) error
 }
 
 type File interface {
