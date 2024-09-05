@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
@@ -49,6 +50,14 @@ of the event to now. The command will not copy events of type "detection", "fixe
 			out.Advisories = nil
 
 			for _, adv := range hdoc.Advisories {
+				// We can't re-use the same CGA ID because these must be unique per
+				// package-vulnerability pair. Create a new one.
+				newID, err := advisory.GenerateCGAID()
+				if err != nil {
+					return fmt.Errorf("generating new CGA ID: %w", err)
+				}
+				adv.ID = newID
+
 				evts := make([]v2.Event, 0, len(adv.Events))
 
 				for _, evt := range adv.Events {
@@ -62,7 +71,7 @@ of the event to now. The command will not copy events of type "detection", "fixe
 						evts = append(evts, evt)
 
 					default:
-						// A new type was added and we don't know how to handle it. Default to not carrying it over.
+						// A new type was added, and we don't know how to handle it. Default to not carrying it over.
 					}
 				}
 
