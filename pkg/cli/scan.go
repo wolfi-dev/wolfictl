@@ -8,12 +8,15 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
+	"sync"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/charmbracelet/lipgloss"
@@ -312,12 +315,22 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 		return nil
 	})
 
+	tmpdir, err := os.MkdirTemp("", "wolfictl-scan-")
+	if err != nil {
+		return nil, nil, err
+	}
+	defer os.RemoveAll(tmpdir)
+
+	// TODO: This is a bit of a hack because MultiAuthenticator uses Basic auth to
+	// determine when it should quit. so it's important that gcloudAuth goes last.
+	auth.DefaultAuthenticators = auth.MultiAuthenticator(auth.DefaultAuthenticators, &gcloudAuth{})
+
 	for i, input := range inputs {
 		i, input := i, input
 
 		g.Go(func() error {
 			f := func() error {
-				inputFile, err := resolveInputFileFromArg(input)
+				inputFile, err := resolveInputFileFromArg(ctx, tmpdir, input)
 				if err != nil {
 					return fmt.Errorf("failed to open input file: %w", err)
 				}
@@ -553,18 +566,18 @@ func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
 // 2. If the path starts with "https://", download the remote file into a temp file and return that.
 //
 // 3. Otherwise, open the file at the given path and return that.
-func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
+func resolveInputFileFromArg(ctx context.Context, tmpdir, inputFilePath string) (*os.File, error) {
 	switch {
 	case inputFilePath == "-":
 		// Read stdin into a temp file.
-		t, err := os.CreateTemp("", "wolfictl-scan-")
+		t, err := os.CreateTemp(tmpdir, "wolfictl-scan-")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create temp file for stdin: %w", err)
 		}
 		if _, err := io.Copy(t, os.Stdin); err != nil {
 			return nil, err
 		}
-		if err := t.Close(); err != nil {
+		if _, err := t.Seek(0, io.SeekStart); err != nil {
 			return nil, err
 		}
 
@@ -572,11 +585,19 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 
 	case strings.HasPrefix(inputFilePath, "https://"):
 		// Fetch the remote URL into a temp file.
-		t, err := os.CreateTemp("", "wolfictl-scan-")
+		t, err := os.CreateTemp(tmpdir, "wolfictl-scan-")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create temp file for remote: %w", err)
 		}
-		resp, err := http.Get(inputFilePath) //nolint:gosec
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, inputFilePath, nil)
+		if err != nil {
+			return nil, err
+		}
+		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+			return nil, fmt.Errorf("adding auth: %w", err)
+		}
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("failed to download from remote: %w", err)
 		}
@@ -591,7 +612,7 @@ func resolveInputFileFromArg(inputFilePath string) (*os.File, error) {
 		if _, err := io.Copy(t, resp.Body); err != nil {
 			return nil, err
 		}
-		if err := t.Close(); err != nil {
+		if _, err := t.Seek(0, io.SeekStart); err != nil {
 			return nil, err
 		}
 
@@ -680,7 +701,9 @@ func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedA
 			return nil, nil, fmt.Errorf("saving contents of %q to %q: %w", downloadURL, apkTmpFilePath, err)
 		}
 		resp.Body.Close()
-		tmpFile.Close()
+		if err := tmpFile.Close(); err != nil {
+			return nil, nil, fmt.Errorf("closing %s: %w", apkTempFileName, err)
+		}
 
 		logger.Info("downloaded APK", "path", apkTmpFilePath)
 
@@ -895,3 +918,35 @@ var (
 	styleHigh       = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff9900"))
 	styleCritical   = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000"))
 )
+
+type gcloudAuth struct {
+	once sync.Once
+	tok  string
+	err  error
+}
+
+func (g *gcloudAuth) AddAuth(ctx context.Context, req *http.Request) error {
+	if req.Host != "packages.cgr.dev" {
+		return nil
+	}
+
+	g.once.Do(func() {
+		cmd := exec.CommandContext(ctx, "gcloud", "auth", "print-access-token")
+		cmd.Stderr = os.Stderr
+
+		out, err := cmd.Output()
+		if err != nil {
+			g.err = err
+		} else {
+			g.tok = strings.TrimSpace(string(out))
+		}
+	})
+
+	if g.err != nil {
+		return g.err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+g.tok)
+
+	return nil
+}
