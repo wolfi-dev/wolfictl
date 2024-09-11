@@ -144,6 +144,20 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 		if len(addErrs) > 0 {
 			errs = append(errs, addErrs...)
 		}
+
+		for _, subpkg := range c.Subpackages { //nolint:gocritic
+			parent := Configuration{
+				Configuration: c.Configuration,
+				Path:          c.Path,
+				name:          subpkg.Name,
+				version:       c.version,
+				pkg:           subpkg.Name,
+			}
+			addErrs := g.resolvePackages(ctx, parent, "runtime", localRepoSource, resolverKey, subpkg.Dependencies.Runtime, true)
+			if len(addErrs) > 0 {
+				errs = append(errs, addErrs...)
+			}
+		}
 	}
 
 	for _, c := range pkgs.Packages() {
@@ -273,11 +287,11 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 // Optionally, can allow self to resolve dependencies or not. This is policy driven/
 // In general, wolfi/os does *not* allow self to resolve for build environment,
 // and *does* allow self to resolve for runtime environment.
-func (g *Graph) resolvePackages(ctx context.Context, parent *Configuration, source, localRepoSource, resolverKey string, pkgs []string, allowSelf bool) (errs []error) {
+func (g *Graph) resolvePackages(ctx context.Context, parent Package, source, localRepoSource, resolverKey string, pkgs []string, allowSelf bool) (errs []error) {
 	log := clog.FromContext(ctx)
 	for _, buildDep := range pkgs {
 		if buildDep == "" {
-			errs = append(errs, fmt.Errorf("empty package name in %s packages for %q", source, parent.Package.Name))
+			errs = append(errs, fmt.Errorf("empty package name in %s packages for %q", source, parent.Name()))
 			continue
 		}
 		// handle the negative for a package
@@ -300,6 +314,7 @@ func (g *Graph) resolvePackages(ctx context.Context, parent *Configuration, sour
 			}
 		}
 	}
+
 	return
 }
 
@@ -433,6 +448,7 @@ func (g *Graph) resolveCycle(c *cycle, dep string) ([]string, error) {
 		sp    = origSp
 		found bool
 	)
+
 	for {
 		var loop bool
 		// start with the last one
@@ -907,7 +923,7 @@ func singlePackageResolver(ctx context.Context, pkg *Configuration, arch string)
 }
 
 // Targets returns a subgraph that flattens subpackages into their origins.
-func (g Graph) Targets() (*Graph, error) {
+func (g Graph) Targets() (*Graph, error) { //nolint:gocyclo
 	subgraph := &Graph{
 		Graph:    newGraph(),
 		packages: g.packages,
@@ -926,6 +942,10 @@ func (g Graph) Targets() (*Graph, error) {
 	originByPath := map[string]string{}
 	for pkg, configs := range g.packages.packages {
 		for _, cfg := range configs {
+			if cfg.Source() != Local {
+				continue
+			}
+
 			if cfg.Name() == pkg {
 				originByPath[cfg.Path] = pkg
 			}
@@ -954,6 +974,13 @@ func (g Graph) Targets() (*Graph, error) {
 		vertex, err := g.Graph.Vertex(node)
 		if err != nil {
 			return nil, err
+		}
+
+		if vertex.Source() != Local {
+			if err := subgraph.addVertex(vertex); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
+				return nil, err
+			}
+			continue
 		}
 
 		origin, ok := originByName[vertex.Name()]
@@ -986,19 +1013,13 @@ func (g Graph) Targets() (*Graph, error) {
 				return nil, err
 			}
 
+			if source.Source() != Local {
+				continue
+			}
+
 			sourceOrigin, ok := originByName[source.Name()]
 			if !ok {
 				return nil, fmt.Errorf("unexpected source: %q", edge.Source)
-			}
-
-			targetOrigin, ok := originByName[target.Name()]
-			if !ok {
-				return nil, fmt.Errorf("unexpected target: %q", edge.Target)
-			}
-
-			// Packages within the same origin don't have any dependency order.
-			if sourceOrigin == targetOrigin {
-				continue
 			}
 
 			if sourceOrigin != source.Name() {
@@ -1008,11 +1029,28 @@ func (g Graph) Targets() (*Graph, error) {
 				}
 			}
 
+			if target.Source() != Local {
+				if err := subgraph.Graph.AddEdge(PackageHash(source), PackageHash(target)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
+					return nil, fmt.Errorf("%q (%q) -> %q (%q): %w", source, edge.Source, target, edge.Target, err)
+				}
+				continue
+			}
+
+			targetOrigin, ok := originByName[target.Name()]
+			if !ok {
+				return nil, fmt.Errorf("unexpected target: %q", edge.Target)
+			}
+
 			if targetOrigin != target.Name() {
 				target, err = g.Graph.Vertex(PackageHash(g.packages.PkgConfig(targetOrigin)))
 				if err != nil {
 					return nil, err
 				}
+			}
+
+			// Packages within the same origin don't have any dependency order.
+			if sourceOrigin == targetOrigin {
+				continue
 			}
 
 			if err := subgraph.Graph.AddEdge(PackageHash(source), PackageHash(target)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {

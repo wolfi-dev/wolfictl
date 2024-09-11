@@ -27,17 +27,12 @@ pipeline:
 
 subpackages:
   - name: one-sub1
-    dependencies:
-      runtime:
-        - gettext-static
     description: one static
   - name: one-sub2
     pipeline:
       - runs: |
           echo "Hello, world!"
     dependencies:
-      runtime:
-        - bzip2-dev
       provides:
         - one-subp-provides-implicit
         - one-subp-provides-explicit=10.10.11
