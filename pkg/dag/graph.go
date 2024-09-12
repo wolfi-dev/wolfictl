@@ -240,8 +240,8 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 				log.Warnf("unable to discover keys for %s: %v", repo, err)
 			}
 
-			for keyName, key := range keys {
-				allKeys[keyName] = key
+			for _, key := range keys {
+				allKeys[key.ID] = key.Bytes
 			}
 
 			g.discovered[repo] = struct{}{}
