@@ -2,8 +2,13 @@ module github.com/wolfi-dev/wolfictl
 
 go 1.23.1
 
+// https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
+
+// https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
+// this is a breaking change, so we need to pin the version until glebarez/go-sqlite is updated to use internal/libc
+replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.18.1-0.20240912154450-47bf15c68e6a
