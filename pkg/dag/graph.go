@@ -935,6 +935,9 @@ func (g Graph) Targets() (*Graph, error) { //nolint:gocyclo
 	for name, configs := range g.packages.configs {
 		for _, cfg := range configs {
 			if cfg.pkg == name {
+				if got, ok := pathByName[name]; ok {
+					return nil, fmt.Errorf("duplicate package: %q exists in both %q and %q", name, got, cfg.Path)
+				}
 				pathByName[name] = cfg.Path
 			}
 		}
