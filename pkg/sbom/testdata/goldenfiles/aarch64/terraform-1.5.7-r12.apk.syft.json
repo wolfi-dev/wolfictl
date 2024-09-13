@@ -5766,7 +5766,7 @@
       "name": "stdlib",
       "version": "go1.22.4",
       "type": "go-module",
-      "foundBy": "",
+      "foundBy": "go-module-binary-cataloger",
       "locations": [
         {
           "path": "usr/bin/terraform",

@@ -7602,7 +7602,7 @@
       "name": "stdlib",
       "version": "go1.21.5",
       "type": "go-module",
-      "foundBy": "",
+      "foundBy": "go-module-binary-cataloger",
       "locations": [
         {
           "path": "usr/bin/thanos",
