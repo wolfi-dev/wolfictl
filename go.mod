@@ -15,9 +15,9 @@ require (
 	chainguard.dev/melange v0.12.0
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
-	github.com/anchore/grype v0.80.0
+	github.com/anchore/grype v0.80.1
 	github.com/anchore/stereoscope v0.0.3
-	github.com/anchore/syft v1.11.1
+	github.com/anchore/syft v1.12.2
 	github.com/chainguard-dev/clog v1.5.1-0.20240811185937-4c523ae4593f
 	github.com/chainguard-dev/yam v0.1.1
 	github.com/charmbracelet/bubbles v0.20.0
@@ -349,14 +349,14 @@ require (
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gorm.io/gorm v1.25.11 // indirect
+	gorm.io/gorm v1.25.12 // indirect
 	k8s.io/apimachinery v0.31.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240808142205-8e686545bdb8 // indirect
 	k8s.io/utils v0.0.0-20240711033017-18e509b52bc8 // indirect
 	modernc.org/libc v1.55.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.32.0 // indirect
+	modernc.org/sqlite v1.33.0 // indirect
 	mvdan.cc/sh/v3 v3.8.0 // indirect
 )
 
