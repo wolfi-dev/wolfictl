@@ -14,7 +14,6 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
-//nolint:gocyclo // Current cyclomatic complexity is 31 and > 30.
 func TestValidate(t *testing.T) {
 	// The diff validation tests use the test fixtures for advisory.IndexDiff.
 
