@@ -178,6 +178,27 @@ func TestValidate(t *testing.T) {
 					apkindex:        &apk.APKIndex{},
 					shouldBeValid:   false,
 				},
+				{
+					name:            "added-event-fixed",
+					subcase:         "fixed version in APKINDEX but not distro",
+					packageCfgsFunc: distroWithNothing,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "0.19.2-r7",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+				{
+					name:            "added-event-fixed",
+					subcase:         "fixed version not in distro or APKINDEX",
+					packageCfgsFunc: distroWithNothing,
+					apkindex:        &apk.APKIndex{},
+					shouldBeValid:   false,
+				},
 			}
 
 			for _, tt := range cases {
