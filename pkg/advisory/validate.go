@@ -82,12 +82,6 @@ func Validate(ctx context.Context, opts ValidateOptions) error {
 		log.Info("skipping validation of index diff, no comparison basis provided")
 	}
 
-	if opts.APKIndex != nil {
-		errs = append(errs, opts.validateFixedVersions(ctx))
-	} else {
-		log.Info("skipping validation of fixed versions, no APKINDEX provided")
-	}
-
 	if opts.AliasFinder != nil {
 		errs = append(errs, opts.validateAliasSetCompleteness(ctx))
 	} else {
@@ -174,84 +168,6 @@ func (opts ValidateOptions) createAPKIndexPackageMap() map[string][]*apk.Package
 	return pkgMap
 }
 
-func (opts ValidateOptions) validateFixedVersions(ctx context.Context) error {
-	log := clog.FromContext(ctx)
-	if opts.APKIndex == nil {
-		// Not enough input information to drive this validation check.
-		log.Warn("not validating fixed versions, no APKINDEX provided")
-		return nil
-	}
-
-	var errs []error
-
-	documents := opts.AdvisoryDocs.Select().Configurations()
-	log.Debug(
-		"validating fixed versions",
-		"indexPackageCount",
-		len(opts.APKIndex.Packages),
-		"documentCount",
-		len(documents),
-	)
-	log.Info("validating fixed versions")
-	for i := range documents {
-		doc := documents[i]
-
-		if len(opts.SelectedPackages) > 0 {
-			if _, ok := opts.SelectedPackages[doc.Name()]; !ok {
-				// Skip this document, since it's not in the set of selected packages.
-				continue
-			}
-		}
-
-		var docErrs []error
-
-		log.Debug(
-			"checking advisories",
-			"documentName",
-			doc.Name(),
-			"advisoryCount",
-			len(doc.Advisories),
-		)
-		for i := range doc.Advisories {
-			adv := doc.Advisories[i]
-			var advErrs []error
-
-			log.Debug("checking events", "advisory", adv.ID, "eventCount", len(adv.Events))
-			for i := range adv.Events {
-				event := adv.Events[i]
-
-				if event.Type != v2.EventTypeFixed {
-					continue
-				}
-
-				fixed, ok := event.Data.(v2.Fixed)
-				if !ok {
-					// This should've been caught by basic validation!
-					advErrs = append(advErrs, fmt.Errorf("event data is not of type Fixed"))
-					continue
-				}
-
-				fixedVersion := fixed.FixedVersion
-
-				eventErrs := []error{
-					opts.validatePackageVersionExistsInAPKINDEX(ctx, doc.Name(), fixedVersion),
-				}
-
-				advErrs = append(advErrs, errorhelpers.LabelError(
-					fmt.Sprintf("event %d (type: %s)", i+1, event.Type),
-					errors.Join(eventErrs...)),
-				)
-			}
-
-			docErrs = append(docErrs, errorhelpers.LabelError(adv.ID, errors.Join(advErrs...)))
-		}
-
-		errs = append(errs, errorhelpers.LabelError(doc.Name(), errors.Join(docErrs...)))
-	}
-
-	return errorhelpers.LabelError("fixed version validation failure(s)", errors.Join(errs...))
-}
-
 func (opts ValidateOptions) validateBuildConfigurationExistence(pkgName string) error {
 	if opts.PackageConfigurations == nil {
 		// Not enough input information to drive this validation check.
@@ -266,11 +182,6 @@ func (opts ValidateOptions) validateBuildConfigurationExistence(pkgName string) 
 	}
 
 	if _, ok := opts.distroPackageMap[pkgName]; !ok {
-		// Double check if the package is in index and move on
-		if _, ok := opts.apkIndexPackageMap[pkgName]; ok {
-			// the package build configuration has moved out but not removed from the index or apks
-			return nil
-		}
 		return errors.New("package build configuration not found in the distro")
 	}
 
@@ -301,12 +212,12 @@ func (opts ValidateOptions) validateBuildConfigurationOrAPKIndexEntryExistence(p
 
 func (opts ValidateOptions) validatePackageVersionExistsInAPKINDEX(ctx context.Context, pkgName, version string) error {
 	log := clog.FromContext(ctx)
-	log.Debug("validating package version existence in APKINDEX", "package", pkgName, "version", version)
 	if opts.APKIndex == nil {
 		// Not enough input information to drive this validation check.
 		log.Warn("not validating package version existence, no APKINDEX provided")
 		return nil
 	}
+	log.Debug("validating package version existence in APKINDEX", "package", pkgName, "version", version)
 
 	if len(opts.SelectedPackages) > 0 {
 		if _, ok := opts.SelectedPackages[pkgName]; !ok {
@@ -407,9 +318,9 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 	})
 	errs = append(errs, docRemovedErrs...)
 
-	for _, documentAdvisories := range diff.Modified {
+	for _, docAdvs := range diff.Modified {
 		if len(opts.SelectedPackages) > 0 {
-			if _, ok := opts.SelectedPackages[documentAdvisories.Name]; !ok {
+			if _, ok := opts.SelectedPackages[docAdvs.Name]; !ok {
 				// Skip this document, since it's not in the set of selected packages.
 				continue
 			}
@@ -418,15 +329,15 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 		var docErrs []error
 
 		// Modified documents must be for packages that are currently defined in the repo or still exist in APKINDEX entries.
-		docErrs = append(docErrs, opts.validateBuildConfigurationOrAPKIndexEntryExistence(documentAdvisories.Name))
+		docErrs = append(docErrs, opts.validateBuildConfigurationOrAPKIndexEntryExistence(docAdvs.Name))
 
-		advsRemovedErrs := lo.Map(documentAdvisories.Removed, func(adv v2.Advisory, _ int) error {
+		advsRemovedErrs := lo.Map(docAdvs.Removed, func(adv v2.Advisory, _ int) error {
 			return errorhelpers.LabelError(adv.ID, errors.New("advisory was removed"))
 		})
 		docErrs = append(docErrs, advsRemovedErrs...)
 
-		for i := range documentAdvisories.Modified {
-			adv := documentAdvisories.Modified[i]
+		for i := range docAdvs.Modified {
+			adv := docAdvs.Modified[i]
 
 			var advErrs []error
 			if len(adv.RemovedEvents) > 0 {
@@ -439,9 +350,7 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 				}
 			}
 
-			for i, event := range adv.AddedEvents {
-				advErrs = append(advErrs, errorhelpers.LabelError(fmt.Sprintf("event %d (just added)", i+1), opts.validateRecency(event)))
-			}
+			advErrs = append(advErrs, opts.validateIndexDiffForAddedEvents(adv.AddedEvents, docAdvs.Name))
 
 			docErrs = append(
 				docErrs,
@@ -452,30 +361,26 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 			)
 		}
 
-		for i := range documentAdvisories.Added {
-			adv := documentAdvisories.Added[i]
+		for i := range docAdvs.Added {
+			adv := docAdvs.Added[i]
 
 			if len(opts.SelectedPackages) > 0 {
-				if _, ok := opts.SelectedPackages[documentAdvisories.Name]; !ok {
+				if _, ok := opts.SelectedPackages[docAdvs.Name]; !ok {
 					// Skip this document, since it's not in the set of selected packages.
 					continue
 				}
 			}
 
-			var advErrs []error
-			for i, event := range adv.Events {
-				advErrs = append(advErrs, errorhelpers.LabelError(fmt.Sprintf("event %d (just added)", i+1), opts.validateRecency(event)))
-			}
 			docErrs = append(
 				docErrs,
 				errorhelpers.LabelError(
 					adv.ID,
-					errors.Join(advErrs...),
+					opts.validateIndexDiffForAddedEvents(adv.Events, docAdvs.Name),
 				),
 			)
 		}
 
-		errs = append(errs, errorhelpers.LabelError(documentAdvisories.Name, errors.Join(docErrs...)))
+		errs = append(errs, errorhelpers.LabelError(docAdvs.Name, errors.Join(docErrs...)))
 	}
 
 	for i := range diff.Added {
@@ -491,22 +396,16 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 		var docErrs []error
 
 		// Net new documents must be for packages that are currently defined in the repo.
-		// This would change from March 13,2024 as package yamls would be deleted for EOL and non latest versions
-		// Only the package (apk) versions would exists in wolfi and wolfi index but no build config
 		docErrs = append(docErrs, opts.validateBuildConfigurationExistence(doc.Name()))
 
 		for advIndex := range doc.Advisories {
 			adv := doc.Advisories[advIndex]
 
-			var advErrs []error
-			for i, event := range adv.Events {
-				advErrs = append(advErrs, errorhelpers.LabelError(fmt.Sprintf("event %d (just added)", i+1), opts.validateRecency(event)))
-			}
 			docErrs = append(
 				docErrs,
 				errorhelpers.LabelError(
 					adv.ID,
-					errors.Join(advErrs...),
+					opts.validateIndexDiffForAddedEvents(adv.Events, doc.Name()),
 				),
 			)
 		}
@@ -515,6 +414,25 @@ func (opts ValidateOptions) validateIndexDiff(ctx context.Context, diff IndexDif
 	}
 
 	return errorhelpers.LabelError("invalid change(s) in diff", errors.Join(errs...))
+}
+
+func (opts ValidateOptions) validateIndexDiffForAddedEvents(events []v2.Event, packageName string) error {
+	var errs []error
+	for i := range events {
+		e := events[i]
+		errs = append(errs, errorhelpers.LabelError(fmt.Sprintf("event %d (just added)", i+1), opts.validateRecency(e)))
+
+		if e.Type == v2.EventTypeFixed {
+			fixed, ok := e.Data.(v2.Fixed)
+			if !ok {
+				errs = append(errs, fmt.Errorf("event %d (just added) data is not of type Fixed", i+1))
+				continue
+			}
+
+			errs = append(errs, opts.validatePackageVersionExistsInAPKINDEX(context.Background(), packageName, fixed.FixedVersion))
+		}
+	}
+	return errors.Join(errs...)
 }
 
 const eventMaxValidAgeInDays = 3
