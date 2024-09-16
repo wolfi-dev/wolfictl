@@ -206,6 +206,10 @@ wolfictl scan package1 package2 --remote
 				advisoryDocumentIndex = index
 			}
 
+			// TODO: This is a bit of a hack because MultiAuthenticator uses Basic auth to
+			// determine when it should quit. so it's important that gcloudAuth goes last.
+			auth.DefaultAuthenticators = auth.MultiAuthenticator(auth.DefaultAuthenticators, &gcloudAuth{})
+
 			inputs, cleanup, err := p.resolveInputsToScan(ctx, args)
 			if err != nil {
 				return err
@@ -321,10 +325,6 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 	}
 	defer os.RemoveAll(tmpdir)
 
-	// TODO: This is a bit of a hack because MultiAuthenticator uses Basic auth to
-	// determine when it should quit. so it's important that gcloudAuth goes last.
-	auth.DefaultAuthenticators = auth.MultiAuthenticator(auth.DefaultAuthenticators, &gcloudAuth{})
-
 	for i, input := range inputs {
 		i, input := i, input
 
@@ -395,7 +395,6 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (inputs []string, cleanup func() error, err error) {
 	logger := clog.FromContext(ctx)
 
-	var cleanupFuncs []func() error
 	switch {
 	case p.packageBuildLogInput:
 		if len(args) != 1 {
@@ -416,33 +415,13 @@ func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (in
 			fmt.Println("📡 Finding remote packages")
 		}
 
-		for _, arg := range args {
-			targetPaths, cleanup, err := resolveInputForRemoteTarget(ctx, arg)
-			if err != nil {
-				return nil, nil, fmt.Errorf("failed to resolve input %q for remote scanning: %w", arg, err)
-			}
-			inputs = append(inputs, targetPaths...)
-			cleanupFuncs = append(cleanupFuncs, cleanup)
-		}
+		return resolveInputsForRemoteTarget(ctx, args)
 
 	default:
 		inputs = args
 	}
 
-	cleanup = func() error {
-		var errs []error
-		for _, f := range cleanupFuncs {
-			if f == nil {
-				continue
-			}
-			if err := f(); err != nil {
-				errs = append(errs, err)
-			}
-		}
-		return errors.Join(errs...)
-	}
-
-	return inputs, cleanup, nil
+	return inputs, nil, nil
 }
 
 func (p *scanParams) doScanCommandForSingleInput(
@@ -629,89 +608,196 @@ func resolveInputFileFromArg(ctx context.Context, tmpdir, inputFilePath string) 
 }
 
 // resolveInputForRemoteTarget takes the given input string, which is expected
-// to be the name of a Wolfi package (or subpackage), and it queries the Wolfi
-// APK repository to find the latest version of the package for each
-// architecture. It then downloads each APK and returns a slice of file paths to
-// the downloaded APKs.
-//
-// For example, given the input value "calico", this function will find the
-// latest version of the package (e.g. "calico-3.26.3-r3.apk") and download it
-// for each architecture.
-func resolveInputForRemoteTarget(ctx context.Context, input string) (downloadedAPKFilePaths []string, cleanup func() error, err error) {
+// to be the name of a  package (or subpackage), and it queries the indices
+// to find the latest version of the package for the given architecture.
+func resolveInputForRemoteTarget(ctx context.Context, indices map[string]map[string]*apk.APKIndex, arch, input string) (string, error) {
 	logger := clog.FromContext(ctx)
 
-	archesFound := 0
-	for _, arch := range []string{"x86_64", "aarch64"} {
-		const apkRepositoryURL = "https://packages.wolfi.dev/os"
-		apkindex, err := index.Index(arch, apkRepositoryURL)
-		if err != nil {
-			return nil, nil, fmt.Errorf("getting APKINDEX: %w", err)
-		}
+	var (
+		latestPkg     *apk.Package
+		downloadURL   string
+		latestVersion string
+	)
 
+	for apkRepositoryURL, byArch := range indices {
+		apkindex, ok := byArch[arch]
+		if !ok {
+			return "", fmt.Errorf("missing arch %q for %q", arch, apkRepositoryURL)
+		}
 		nameMatches := lo.Filter(apkindex.Packages, func(pkg *apk.Package, _ int) bool {
 			return pkg != nil && pkg.Name == input
 		})
 
 		if len(nameMatches) == 0 {
-			logger.Warnf("no Wolfi package found with name %q in arch %q but will continue, it might not have a package built for this arch.", input, arch)
 			continue
 		}
-		// we found a package for this arch
-		archesFound++
 
 		vers := lo.Map(nameMatches, func(pkg *apk.Package, _ int) string {
 			return pkg.Version
 		})
 
 		sort.Sort(versions.ByLatestStrings(vers))
-		latestVersion := vers[0]
 
-		var latestPkg *apk.Package
+		// Use this latest version iff we haven't seen a greater version yet.
+		got := vers[0]
+
+		next, err := versions.NewVersion(got)
+		if err != nil {
+			logger.Warnf("invalid version %q: %v", got, err)
+			continue
+		}
+
+		prev, err := versions.NewVersion(latestVersion)
+		if err != nil {
+			if latestVersion != "" {
+				logger.Warnf("invalid version %q: %v", latestVersion, err)
+			}
+		} else if next.LessThanOrEqual(prev) {
+			continue
+		}
+
+		latestVersion = got
+
 		for _, pkg := range nameMatches {
 			if pkg.Version == latestVersion {
 				latestPkg = pkg
+				downloadURL = fmt.Sprintf("%s/%s/%s", apkRepositoryURL, arch, latestPkg.Filename())
 				break
 			}
 		}
-		downloadURL := fmt.Sprintf("%s/%s/%s", apkRepositoryURL, arch, latestPkg.Filename())
-
-		apkTempFileName := fmt.Sprintf("%s-%s-%s-*.apk", arch, input, latestVersion)
-		tmpFile, err := os.CreateTemp("", apkTempFileName)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating temp dir: %w", err)
-		}
-		apkTmpFilePath := tmpFile.Name()
-
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating request for %q: %w", downloadURL, err)
-		}
-
-		logger.Debug("downloading APK", "url", downloadURL)
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return nil, nil, fmt.Errorf("downloading %q: %w", downloadURL, err)
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			return nil, nil, fmt.Errorf("downloading %q (status: %d): %w", downloadURL, resp.StatusCode, err)
-		}
-		_, err = io.Copy(tmpFile, resp.Body)
-		if err != nil {
-			return nil, nil, fmt.Errorf("saving contents of %q to %q: %w", downloadURL, apkTmpFilePath, err)
-		}
-		resp.Body.Close()
-		if err := tmpFile.Close(); err != nil {
-			return nil, nil, fmt.Errorf("closing %s: %w", apkTempFileName, err)
-		}
-
-		logger.Info("downloaded APK", "path", apkTmpFilePath)
-
-		downloadedAPKFilePaths = append(downloadedAPKFilePaths, apkTmpFilePath)
 	}
 
-	if archesFound == 0 {
-		return nil, nil, fmt.Errorf("no packages found with name %q in any arch", input)
+	if downloadURL == "" {
+		logger.Warnf("no package found with name %q in arch %q but will continue, it might not have a package built for this arch.", input, arch)
+		return "", nil
+	}
+
+	_, apkTempFileName, _ := strings.Cut(downloadURL, "://")
+	apkTempFileName = strings.ReplaceAll(apkTempFileName, "/", "-")
+
+	tmpFile, err := os.CreateTemp("", apkTempFileName)
+	if err != nil {
+		return "", fmt.Errorf("creating temp dir: %w", err)
+	}
+	apkTmpFilePath := tmpFile.Name()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("creating request for %q: %w", downloadURL, err)
+	}
+
+	if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+		return "", fmt.Errorf("adding auth: %w", err)
+	}
+
+	logger.Debug("downloading APK", "url", downloadURL)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("downloading %q: %w", downloadURL, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusForbidden || resp.StatusCode == http.StatusUnauthorized {
+			// TODO: Change this once we completely move over to apk.cgr.dev.
+			return "", fmt.Errorf("downloading %q (status: %d) you may need to run 'gcloud auth login' to scan this package", downloadURL, resp.StatusCode)
+		}
+		return "", fmt.Errorf("downloading %q (status: %d)", downloadURL, resp.StatusCode)
+	}
+	_, err = io.Copy(tmpFile, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("saving contents of %q to %q: %w", downloadURL, apkTmpFilePath, err)
+	}
+	resp.Body.Close()
+	if err := tmpFile.Close(); err != nil {
+		return "", fmt.Errorf("closing %s: %w", apkTempFileName, err)
+	}
+
+	logger.Info("downloaded APK", "path", apkTmpFilePath)
+
+	return apkTmpFilePath, nil
+}
+
+// resolveInputsForRemoteTarget takes the given input strings, which are expected
+// to be the name of a package (or subpackage), and it queries the APK repositories
+// to find the latest version of the packages for each architecture.
+// It then downloads each APK and returns a slice of file paths to the downloaded APKs.
+//
+// For example, given the input value []string{"calico"}, this function will find the
+// latest version of the package (e.g. "calico-3.26.3-r3.apk") and download it
+// for each architecture.
+func resolveInputsForRemoteTarget(ctx context.Context, inputs []string) (downloadedAPKFilePaths []string, cleanup func() error, err error) {
+	var (
+		mu sync.Mutex
+		ig errgroup.Group
+	)
+
+	indices := map[string]map[string]*apk.APKIndex{}
+	for _, apkRepositoryURL := range []string{
+		"https://packages.wolfi.dev/os",
+		"https://packages.cgr.dev/os",
+		"https://packages.cgr.dev/extras",
+	} {
+		byArch := map[string]*apk.APKIndex{}
+		for _, arch := range []string{"x86_64", "aarch64"} {
+			ig.Go(func() error {
+				apkindex, err := index.Index(arch, apkRepositoryURL)
+				if err != nil {
+					return fmt.Errorf("getting APKINDEX: %w", err)
+				}
+
+				mu.Lock()
+				defer mu.Unlock()
+
+				byArch[arch] = apkindex
+
+				return nil
+			})
+		}
+
+		indices[apkRepositoryURL] = byArch
+	}
+
+	if err := ig.Wait(); err != nil {
+		return nil, nil, err
+	}
+
+	var (
+		ag          errgroup.Group
+		archesFound = map[string]int{}
+	)
+
+	for _, input := range inputs {
+		for _, arch := range []string{"x86_64", "aarch64"} {
+			ag.Go(func() error {
+				apkTmpFilePath, err := resolveInputForRemoteTarget(ctx, indices, arch, input)
+				if err != nil {
+					return err
+				}
+
+				if apkTmpFilePath == "" {
+					return nil
+				}
+
+				mu.Lock()
+				defer mu.Unlock()
+
+				// we found a package for this arch
+				archesFound[input]++
+				downloadedAPKFilePaths = append(downloadedAPKFilePaths, apkTmpFilePath)
+
+				return nil
+			})
+		}
+	}
+
+	if err := ag.Wait(); err != nil {
+		return nil, nil, err
+	}
+
+	for input, archesFound := range archesFound {
+		if archesFound == 0 {
+			return nil, nil, fmt.Errorf("no packages found with name %q in any arch", input)
+		}
 	}
 
 	cleanup = func() error {
