@@ -214,14 +214,16 @@ wolfictl scan package1 package2 --remote
 			if err != nil {
 				return err
 			}
-			defer func() {
-				if err := cleanup(); err != nil {
-					logger.Error("failed to clean up", "error", err)
-					return
-				}
+			if cleanup != nil {
+				defer func() {
+					if err := cleanup(); err != nil {
+						logger.Error("failed to clean up", "error", err)
+						return
+					}
 
-				logger.Debug("cleaned up after scan")
-			}()
+					logger.Debug("cleaned up after scan")
+				}()
+			}
 
 			scans, inputPathsFailingRequireZero, err := scanEverything(ctx, p, inputs, advisoryDocumentIndex)
 			if err != nil {
