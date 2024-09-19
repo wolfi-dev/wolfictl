@@ -456,6 +456,18 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return fmt.Errorf("auto-update is disabled but no reason is provided")
 			},
 		},
+		{
+			Name:        "valid-update-schedule",
+			Description: "update schedule config should contain a valid period",
+			Severity:    SeverityError,
+			LintFunc: func(config config.Configuration) error {
+				if config.Update.Schedule == nil {
+					return nil
+				}
+				_, err := config.Update.Schedule.GetScheduleMessage()
+				return err
+			},
+		},
 	}
 }
 
