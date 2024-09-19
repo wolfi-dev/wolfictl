@@ -415,6 +415,24 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 			matches: 1,
 		},
+		{
+			file:        "valid-update-schedule.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "valid-update-schedule",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-update-schedule",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-update-schedule]: unsupported period: hourly (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
 	}
 
 	for _, tt := range tests {

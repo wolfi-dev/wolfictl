@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.18.1
-	chainguard.dev/melange v0.12.0
+	chainguard.dev/melange v0.12.1-0.20240919122119-49686de911d1
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.80.1
@@ -77,7 +77,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.2.0 // indirect
-	dagger.io/dagger v0.12.7 // indirect
+	dagger.io/dagger v0.13.0 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/99designs/gqlgen v0.17.49 // indirect
