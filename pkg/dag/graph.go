@@ -1034,7 +1034,11 @@ func (g Graph) Targets() (*Graph, error) { //nolint:gocyclo
 
 			if target.Source() != Local {
 				if err := subgraph.Graph.AddEdge(PackageHash(source), PackageHash(target)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
-					return nil, fmt.Errorf("%q (%q) -> %q (%q): %w", source, edge.Source, target, edge.Target, err)
+					if !errors.Is(err, graph.ErrEdgeCreatesCycle) {
+						return nil, fmt.Errorf("%q (%q) -> %q (%q): %w", source, edge.Source, target, edge.Target, err)
+					}
+
+					return nil, cycleError(subgraph.Graph, PackageHash(source), PackageHash(target))
 				}
 				continue
 			}
@@ -1057,10 +1061,23 @@ func (g Graph) Targets() (*Graph, error) { //nolint:gocyclo
 			}
 
 			if err := subgraph.Graph.AddEdge(PackageHash(source), PackageHash(target)); err != nil && !errors.Is(err, graph.ErrEdgeAlreadyExists) {
-				return nil, fmt.Errorf("%q (%q) -> %q (%q): %w", source, edge.Source, target, edge.Target, err)
+				if !errors.Is(err, graph.ErrEdgeCreatesCycle) {
+					return nil, fmt.Errorf("%q (%q) -> %q (%q): %w", source, edge.Source, target, edge.Target, err)
+				}
+
+				return nil, cycleError(subgraph.Graph, PackageHash(source), PackageHash(target))
 			}
 		}
 	}
 
 	return subgraph, nil
+}
+
+func cycleError(g graph.Graph[string, Package], src, target string) error {
+	sp, err := graph.ShortestPath(g, target, src)
+	if err != nil {
+		return err
+	}
+
+	return fmt.Errorf("cycle detected: %s -> %s, caused by: %s", src, target, strings.Join(sp, " -> "))
 }
