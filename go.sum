@@ -1,7 +1,7 @@
 al.essio.dev/pkg/shellescape v1.5.0 h1:7oTvSsQ5kg9WksA9O58y9wjYnY4jP0CL82/Q8WLUGKk=
 al.essio.dev/pkg/shellescape v1.5.0/go.mod h1:6sIqp7X2P6mThCQ7twERpZTuigpr6KbZWtls1U8I890=
-chainguard.dev/apko v0.18.1 h1:LHPleCJWqZKKwZJzkGl75dGGuV4zCVb5cuatmgx7WmM=
-chainguard.dev/apko v0.18.1/go.mod h1:hT8z3/TJNHDhZVNBXKH6XzUuff4xgBU84QryWEGsW+8=
+chainguard.dev/apko v0.19.0 h1:lHjfHTOy1jzzA5N3xzY+eXpSZuKm4pGrthCt03r0yd4=
+chainguard.dev/apko v0.19.0/go.mod h1:OSO8O6qqSC2Z6mHM3aXVnL1F6VJQOTzVrnYJ7d7p+m0=
 chainguard.dev/go-grpc-kit v0.17.6 h1:lwIs9LmSnm8jwrH1QmigCwMP6MYkIBENq/0xGduYZss=
 chainguard.dev/go-grpc-kit v0.17.6/go.mod h1:ZNaXn2KEO++2u2WveHs65krYiHmAEGjYLeEtfaQaOWU=
 chainguard.dev/melange v0.12.1-0.20240919122119-49686de911d1 h1:c+Luvvx7NmycRbaR79qWekIcYtIBLdRFXGKcFcIBhCs=
