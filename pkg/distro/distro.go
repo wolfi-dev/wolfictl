@@ -121,7 +121,7 @@ var (
 		DistroRepoOwner:      "chainguard-dev",
 		DistroPackagesRepo:   "enterprise-packages",
 		DistroAdvisoriesRepo: "enterprise-advisories",
-		APKRepositoryURL:     "https://packages.cgr.dev/os",
+		APKRepositoryURL:     "https://apk.cgr.dev/chainguard-private",
 		SupportedArchitectures: []string{
 			"x86_64",
 			"aarch64",
@@ -133,7 +133,7 @@ var (
 		DistroRepoOwner:      "chainguard-dev",
 		DistroPackagesRepo:   "extra-packages",
 		DistroAdvisoriesRepo: "extra-advisories",
-		APKRepositoryURL:     "https://packages.cgr.dev/extras",
+		APKRepositoryURL:     "https://apk.cgr.dev/extra-packages",
 		SupportedArchitectures: []string{
 			"x86_64",
 			"aarch64",
