@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -333,5 +334,6 @@ func link(args []string, pkgver string) string {
 			filtered = append(filtered, a)
 		}
 	}
-	return "/?node=" + pkgver + "&node=" + strings.Join(filtered, "&node=")
+
+	return "/?" + url.PathEscape("node="+pkgver+"&node="+strings.Join(filtered, "&node="))
 }
