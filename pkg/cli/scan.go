@@ -736,8 +736,8 @@ func resolveInputsForRemoteTarget(ctx context.Context, inputs []string) (downloa
 	indices := map[string]map[string]*apk.APKIndex{}
 	for _, apkRepositoryURL := range []string{
 		"https://packages.wolfi.dev/os",
-		"https://packages.cgr.dev/os",
-		"https://packages.cgr.dev/extras",
+		"https://apk.cgr.dev/chainguard-private",
+		"https://apk.cgr.dev/extra-packages",
 	} {
 		byArch := map[string]*apk.APKIndex{}
 		for _, arch := range []string{"x86_64", "aarch64"} {
