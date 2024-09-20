@@ -165,7 +165,7 @@ print an error message that specifies where and how the data is invalid.`,
 				return fmt.Errorf("unable to create index of advisories repo: %w", err)
 			}
 
-			apkIndex, err := index.Index("x86_64", apkRepositoryURL)
+			apkIndex, err := index.Index(ctx, "x86_64", apkRepositoryURL)
 			if err != nil {
 				return fmt.Errorf("unable to load APKINDEX: %w", err)
 			}

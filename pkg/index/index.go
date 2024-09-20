@@ -13,18 +13,18 @@ import (
 	"chainguard.dev/apko/pkg/apk/auth"
 )
 
-func Index(arch, repo string) (*apk.APKIndex, error) {
+func Index(ctx context.Context, arch, repo string) (*apk.APKIndex, error) {
 	var rc io.ReadCloser
 	if strings.HasPrefix(repo, "http://") || strings.HasPrefix(repo, "https://") {
 		u, err := url.Parse(fmt.Sprintf("%s/%s/APKINDEX.tar.gz", repo, arch))
 		if err != nil {
 			return nil, err
 		}
-		req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, u.String(), nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 		if err != nil {
 			return nil, err
 		}
-		if err := auth.DefaultAuthenticators.AddAuth(context.TODO(), req); err != nil {
+		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
 			return nil, err
 		}
 		resp, err := http.DefaultClient.Do(req)

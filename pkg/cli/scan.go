@@ -742,7 +742,7 @@ func resolveInputsForRemoteTarget(ctx context.Context, inputs []string) (downloa
 		byArch := map[string]*apk.APKIndex{}
 		for _, arch := range []string{"x86_64", "aarch64"} {
 			ig.Go(func() error {
-				apkindex, err := index.Index(arch, apkRepositoryURL)
+				apkindex, err := index.Index(ctx, arch, apkRepositoryURL)
 				if err != nil {
 					return fmt.Errorf("getting APKINDEX: %w", err)
 				}

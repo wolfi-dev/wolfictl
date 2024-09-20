@@ -57,7 +57,7 @@ func Discover(ctx context.Context, opts DiscoverOptions) error {
 
 		var apkindexes []*apk.APKIndex
 		for _, arch := range opts.Arches {
-			apkindex, err := index.Index(arch, packageRepositoryURL)
+			apkindex, err := index.Index(ctx, arch, packageRepositoryURL)
 			if err != nil {
 				return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
 			}

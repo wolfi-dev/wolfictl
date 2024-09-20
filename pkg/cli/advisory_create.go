@@ -98,7 +98,7 @@ newly created advisory and any other advisories for the same package.`,
 
 			var apkindexes []*apk.APKIndex
 			for _, arch := range archs {
-				idx, err := index.Index(arch, packageRepositoryURL)
+				idx, err := index.Index(cmd.Context(), arch, packageRepositoryURL)
 				if err != nil {
 					return fmt.Errorf("unable to load APKINDEX for %s: %w", arch, err)
 				}
