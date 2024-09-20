@@ -1,6 +1,7 @@
 package apk
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"sort"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
@@ -26,6 +28,9 @@ func New(client *http.Client, indexURL string) Context {
 func (c Context) GetApkPackages() (map[string]*apk.Package, error) {
 	req, err := http.NewRequest("GET", c.indexURL, nil)
 	if err != nil {
+		return nil, err
+	}
+	if err := auth.DefaultAuthenticators.AddAuth(context.Background(), req); err != nil {
 		return nil, err
 	}
 	resp, err := c.client.Do(req)
