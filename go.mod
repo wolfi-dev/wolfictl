@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.19.1
-	chainguard.dev/melange v0.12.1-0.20240919122119-49686de911d1
+	chainguard.dev/melange v0.12.1
 	cloud.google.com/go/storage v1.43.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.80.1
@@ -77,7 +77,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.1 // indirect
 	cloud.google.com/go/iam v1.2.0 // indirect
-	dagger.io/dagger v0.13.0 // indirect
+	dagger.io/dagger v0.13.1 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/99designs/gqlgen v0.17.49 // indirect
@@ -140,9 +140,9 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/deitch/magic v0.0.0-20230404182410-1ff89d7342da // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/cli v27.2.1+incompatible // indirect
+	github.com/docker/cli v27.3.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v27.2.1+incompatible // indirect
+	github.com/docker/docker v27.3.0+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.2 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
