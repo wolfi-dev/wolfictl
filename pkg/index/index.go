@@ -1,20 +1,33 @@
 package index
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/auth"
 )
 
-func Index(arch, repo string) (*apk.APKIndex, error) {
+func Index(ctx context.Context, arch, repo string) (*apk.APKIndex, error) {
 	var rc io.ReadCloser
 	if strings.HasPrefix(repo, "http://") || strings.HasPrefix(repo, "https://") {
-		url := fmt.Sprintf("%s/%s/APKINDEX.tar.gz", repo, arch)
-		resp, err := http.Get(url) //nolint:gosec
+		u, err := url.Parse(fmt.Sprintf("%s/%s/APKINDEX.tar.gz", repo, arch))
+		if err != nil {
+			return nil, err
+		}
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+		if err != nil {
+			return nil, err
+		}
+		if err := auth.DefaultAuthenticators.AddAuth(ctx, req); err != nil {
+			return nil, err
+		}
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return nil, err
 		}
@@ -24,7 +37,7 @@ func Index(arch, repo string) (*apk.APKIndex, error) {
 			if err != nil {
 				return nil, err
 			}
-			return nil, fmt.Errorf("GET %s (%d): %s", url, resp.StatusCode, b)
+			return nil, fmt.Errorf("GET %s (%d): %s", u.String(), resp.StatusCode, b)
 		}
 		rc = resp.Body
 	} else {
