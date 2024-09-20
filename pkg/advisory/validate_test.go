@@ -14,7 +14,6 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
-//nolint:gocyclo // Current cyclomatic complexity is 31 and > 30.
 func TestValidate(t *testing.T) {
 	// The diff validation tests use the test fixtures for advisory.IndexDiff.
 
@@ -179,6 +178,27 @@ func TestValidate(t *testing.T) {
 					apkindex:        &apk.APKIndex{},
 					shouldBeValid:   false,
 				},
+				{
+					name:            "added-event-fixed",
+					subcase:         "fixed version in APKINDEX but not distro",
+					packageCfgsFunc: distroWithNothing,
+					apkindex: &apk.APKIndex{
+						Packages: []*apk.Package{
+							{
+								Name:    "ko",
+								Version: "0.19.2-r7",
+							},
+						},
+					},
+					shouldBeValid: true,
+				},
+				{
+					name:            "added-event-fixed",
+					subcase:         "fixed version not in distro or APKINDEX",
+					packageCfgsFunc: distroWithNothing,
+					apkindex:        &apk.APKIndex{},
+					shouldBeValid:   false,
+				},
 			}
 
 			for _, tt := range cases {
@@ -257,112 +277,6 @@ func TestValidate(t *testing.T) {
 				}
 			})
 		}
-	})
-
-	t.Run("fixed versions", func(t *testing.T) {
-		t.Run("must exist in APKINDEX", func(t *testing.T) {
-			cases := []struct {
-				name          string
-				apkindex      *apk.APKIndex
-				shouldBeValid bool
-			}{
-				{
-					name: "package-missing",
-					apkindex: &apk.APKIndex{
-						Packages: nil,
-					},
-					shouldBeValid: false,
-				},
-				{
-					name: "fixed-version-missing",
-					apkindex: &apk.APKIndex{
-						Packages: []*apk.Package{
-							{
-								Name:    "ko",
-								Version: "1.0.0-r1",
-							},
-						},
-					},
-					shouldBeValid: false,
-				},
-				{
-					name: "fixed-version-present-and-not-first",
-					apkindex: &apk.APKIndex{
-						Packages: []*apk.Package{
-							{
-								Name:    "ko",
-								Version: "1.0.0-r1",
-							},
-							{
-								Name:    "ko",
-								Version: "1.0.0-r2",
-							},
-							{
-								Name:    "mo",
-								Version: "1.0.0-r8",
-							},
-							{
-								Name:    "mo",
-								Version: "1.0.0-r9",
-							},
-							{
-								Name:    "mo",
-								Version: "1.0.0-r10",
-							},
-						},
-					},
-					shouldBeValid: true,
-				},
-				{
-					name: "fixed-version-present-and-not-first-missing-rs",
-					apkindex: &apk.APKIndex{
-						Packages: []*apk.Package{
-							{
-								Name:    "ko",
-								Version: "1.0.0-r1",
-							},
-							{
-								Name:    "ko",
-								Version: "1.0.0-r2",
-							},
-							{
-								Name:    "mo",
-								Version: "1.0.0-r8",
-							},
-							{
-								Name:    "mo",
-								Version: "1.0.0-r9",
-							},
-							{
-								Name:    "mo",
-								Version: "1.0.0-r10",
-							},
-						},
-					},
-					shouldBeValid: true,
-				},
-			}
-
-			for _, tt := range cases {
-				t.Run(tt.name, func(t *testing.T) {
-					dir := filepath.Join("testdata", "validate", "fixed-version")
-					fsys := rwos.DirFS(dir)
-					index, err := v2.NewIndex(context.Background(), fsys)
-					require.NoError(t, err)
-
-					err = Validate(context.Background(), ValidateOptions{
-						AdvisoryDocs: index,
-						APKIndex:     tt.apkindex,
-					})
-					if tt.shouldBeValid && err != nil {
-						t.Errorf("should be valid but got error: %v", err)
-					}
-					if !tt.shouldBeValid && err == nil {
-						t.Error("shouldn't be valid but got no error")
-					}
-				})
-			}
-		})
 	})
 
 	t.Run("duplicate advisories", func(t *testing.T) {
