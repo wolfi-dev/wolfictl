@@ -98,19 +98,19 @@ func (o *DiffOptions) Diff() error {
 		return err
 	}
 
-	// If bincapz is on the path, then run it to get a capability diff.
+	// If malcontent is on the path, then run it to get a capability diff.
 	var result []byte
-	if path, err := exec.LookPath("bincapz"); err == nil {
+	if path, err := exec.LookPath("malcontent"); err == nil {
 		o.Logger.Printf("starting bincapz for %d packages", len(newPackages))
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
-		cmd := exec.Command(path, "-diff", "-quantity-increases-risk=false", "-format=markdown", "-min-file-level=3", dirExistingApk, dirNewApk)
+		cmd := exec.Command(path, "-quantity-increases-risk=false", "-format=markdown", "-min-file-level=3", "diff", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
-			return fmt.Errorf("bincapz execution failed with error %w: %s", err, result)
+			return fmt.Errorf("malcontent execution failed with error %w: %s", err, result)
 		}
-		o.Logger.Printf("finished bincapz")
+		o.Logger.Printf("finished malcontent")
 	}
 
 	diffFile := filepath.Join(o.Dir, "diff.log")
@@ -244,7 +244,7 @@ func shouldSkipFile(path string) bool {
 		strings.HasSuffix(path, ".spdx.json")
 }
 
-func writeDiffLog(diff diffResult, bcz []byte, filename string, newPackages map[string]NewApkPackage) error {
+func writeDiffLog(diff diffResult, mal []byte, filename string, newPackages map[string]NewApkPackage) error {
 	var builder strings.Builder
 
 	for packageName := range newPackages {
@@ -293,10 +293,10 @@ func writeDiffLog(diff diffResult, bcz []byte, filename string, newPackages map[
 		builder.WriteString("\n</details>\n\n")
 	}
 
-	if len(bcz) > 0 {
+	if len(mal) > 0 {
 		builder.WriteString("<details>\n")
-		builder.WriteString("  <summary>bincapz found differences: Click to expand/collapse</summary>\n\n")
-		builder.Write(bcz)
+		builder.WriteString("  <summary>malcontent found differences: Click to expand/collapse</summary>\n\n")
+		builder.Write(mal)
 		builder.WriteString("\n</details>\n\n")
 	}
 
