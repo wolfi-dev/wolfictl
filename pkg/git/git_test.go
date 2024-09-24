@@ -123,9 +123,24 @@ func TestGetGitAuth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			const envVarName = "GITHUB_TOKEN"
+
+			// Important: Don't affect or be affected by the actual environment. This helps
+			// to make the test less flaky, and avoids disrupting the developer's local
+			// setup.
+
+			originalEnvValue, ok := os.LookupEnv(envVarName)
+			if ok {
+				os.Unsetenv(envVarName) // Don't leak the original value into the test.
+				defer os.Setenv(envVarName, originalEnvValue)
+			}
+
 			if tt.envToken != "" {
-				os.Setenv("GITHUB_TOKEN", tt.envToken)
-				defer os.Unsetenv("GITHUB_TOKEN")
+				os.Setenv(envVarName, tt.envToken)
+
+				if !ok {
+					defer os.Unsetenv(envVarName)
+				}
 			}
 
 			auth, err := GetGitAuth(tt.gitURL)
