@@ -1,7 +1,6 @@
 package git
 
 import (
-	"os"
 	"testing"
 
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -123,25 +122,10 @@ func TestGetGitAuth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			const envVarName = "GITHUB_TOKEN"
-
 			// Important: Don't affect or be affected by the actual environment. This helps
 			// to make the test less flaky, and avoids disrupting the developer's local
 			// setup.
-
-			originalEnvValue, ok := os.LookupEnv(envVarName)
-			if ok {
-				os.Unsetenv(envVarName) // Don't leak the original value into the test.
-				defer os.Setenv(envVarName, originalEnvValue)
-			}
-
-			if tt.envToken != "" {
-				os.Setenv(envVarName, tt.envToken)
-
-				if !ok {
-					defer os.Unsetenv(envVarName)
-				}
-			}
+			t.Setenv("GITHUB_TOKEN", tt.envToken)
 
 			auth, err := GetGitAuth(tt.gitURL)
 
