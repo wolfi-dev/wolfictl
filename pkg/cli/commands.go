@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"log/slog"
+	"math"
 	"os"
 
 	"github.com/chainguard-dev/clog/slag"
@@ -20,7 +21,7 @@ func New() *cobra.Command {
 		Short:             "A CLI helper for developing Wolfi",
 		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 			// Ensure level is within the int32 range
-			if int(level) < int(^int32(0)+1) || int(level) > int(int32(^uint32(0)>>1)) {
+			if int(level) < math.MinInt32 || int(level) > math.MaxInt32 {
 				return fmt.Errorf("log level out of range: %d", level)
 			}
 
