@@ -466,13 +466,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	findings := result.Findings
 	if p.outputFormat == outputFormatOutline {
 		// Print output immediately
-
-		if len(findings) == 0 {
-			fmt.Println("✅ No vulnerabilities found")
-		} else {
-			tree := newFindingsTree(findings)
-			fmt.Println(tree.render())
-		}
+		fmt.Println(NewFindingsTree(findings).Render())
 	}
 
 	return result, nil
@@ -818,12 +812,12 @@ func resolveInputsForRemoteTarget(ctx context.Context, inputs []string) (downloa
 	return downloadedAPKFilePaths, cleanup, nil
 }
 
-type findingsTree struct {
+type FindingsTree struct {
 	findingsByPackageByLocation map[string]map[string][]scan.Finding
 	packagesByID                map[string]scan.Package
 }
 
-func newFindingsTree(findings []scan.Finding) *findingsTree {
+func NewFindingsTree(findings []scan.Finding) *FindingsTree {
 	tree := make(map[string]map[string][]scan.Finding)
 	packagesByID := make(map[string]scan.Package)
 
@@ -840,13 +834,17 @@ func newFindingsTree(findings []scan.Finding) *findingsTree {
 		tree[loc][packageID] = append(tree[loc][packageID], f)
 	}
 
-	return &findingsTree{
+	return &FindingsTree{
 		findingsByPackageByLocation: tree,
 		packagesByID:                packagesByID,
 	}
 }
 
-func (t findingsTree) render() string {
+func (t FindingsTree) Render() string {
+	if len(t.findingsByPackageByLocation) == 0 {
+		return "✅ No vulnerabilities found"
+	}
+
 	locations := lo.Keys(t.findingsByPackageByLocation)
 	sort.Strings(locations)
 
