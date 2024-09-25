@@ -78625,9 +78625,9 @@
       }
     },
     {
-      "id": "106310365876c470",
+      "id": "760d1ba6329640fb",
       "name": "cparse-jruby",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
@@ -79275,53 +79275,6 @@
       }
     },
     {
-      "id": "19e93616954a9a2d",
-      "name": "digest",
-      "version": "",
-      "type": "java-archive",
-      "foundBy": "java-archive-cataloger",
-      "locations": [
-        {
-          "path": "usr/share/jruby/lib/ruby/stdlib/digest.jar",
-          "accessPath": "usr/share/jruby/lib/ruby/stdlib/digest.jar",
-          "annotations": {
-            "evidence": "primary"
-          }
-        }
-      ],
-      "licenses": [],
-      "language": "java",
-      "cpes": [
-        {
-          "cpe": "cpe:2.3:a:digest:digest:*:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        }
-      ],
-      "purl": "pkg:maven/digest/digest",
-      "metadataType": "java-archive",
-      "metadata": {
-        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/digest.jar",
-        "manifest": {
-          "main": [
-            {
-              "key": "Manifest-Version",
-              "value": "1.0"
-            },
-            {
-              "key": "Created-By",
-              "value": "17.0.1 (Amazon.com Inc.)"
-            }
-          ]
-        },
-        "digest": [
-          {
-            "algorithm": "sha1",
-            "value": "ec9fc8554da4b74cba72c8074d4dd42db3e3b734"
-          }
-        ]
-      }
-    },
-    {
       "id": "b4054c389ed2bb42",
       "name": "digest",
       "version": "3.1.0",
@@ -79425,6 +79378,53 @@
           "Akinori MUSHA"
         ],
         "homepage": "https://github.com/ruby/digest"
+      }
+    },
+    {
+      "id": "ca3b1fc509a28bf6",
+      "name": "digest",
+      "version": "UNKNOWN",
+      "type": "java-archive",
+      "foundBy": "java-archive-cataloger",
+      "locations": [
+        {
+          "path": "usr/share/jruby/lib/ruby/stdlib/digest.jar",
+          "accessPath": "usr/share/jruby/lib/ruby/stdlib/digest.jar",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "java",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:digest:digest:*:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:maven/digest/digest",
+      "metadataType": "java-archive",
+      "metadata": {
+        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/digest.jar",
+        "manifest": {
+          "main": [
+            {
+              "key": "Manifest-Version",
+              "value": "1.0"
+            },
+            {
+              "key": "Created-By",
+              "value": "17.0.1 (Amazon.com Inc.)"
+            }
+          ]
+        },
+        "digest": [
+          {
+            "algorithm": "sha1",
+            "value": "ec9fc8554da4b74cba72c8074d4dd42db3e3b734"
+          }
+        ]
       }
     },
     {
@@ -79940,9 +79940,9 @@
       }
     },
     {
-      "id": "a1b57ddd770cfda2",
+      "id": "53180d1afd5d5ed6",
       "name": "escape",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
@@ -80733,9 +80733,9 @@
       }
     },
     {
-      "id": "c6d3e65f1533f651",
+      "id": "06cb34f206cd0768",
       "name": "generator",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
@@ -83530,9 +83530,9 @@
       }
     },
     {
-      "id": "b00b32272b07e23a",
+      "id": "0690fc6ad7e28850",
       "name": "jopenssl",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
@@ -92520,53 +92520,6 @@
       }
     },
     {
-      "id": "0b0a2fb9aaeab649",
-      "name": "nkf",
-      "version": "",
-      "type": "java-archive",
-      "foundBy": "java-archive-cataloger",
-      "locations": [
-        {
-          "path": "usr/share/jruby/lib/ruby/stdlib/nkf.jar",
-          "accessPath": "usr/share/jruby/lib/ruby/stdlib/nkf.jar",
-          "annotations": {
-            "evidence": "primary"
-          }
-        }
-      ],
-      "licenses": [],
-      "language": "java",
-      "cpes": [
-        {
-          "cpe": "cpe:2.3:a:nkf:nkf:*:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        }
-      ],
-      "purl": "pkg:maven/nkf/nkf",
-      "metadataType": "java-archive",
-      "metadata": {
-        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/nkf.jar",
-        "manifest": {
-          "main": [
-            {
-              "key": "Manifest-Version",
-              "value": "1.0"
-            },
-            {
-              "key": "Created-By",
-              "value": "21.0.2 (Oracle Corporation)"
-            }
-          ]
-        },
-        "digest": [
-          {
-            "algorithm": "sha1",
-            "value": "51a6ba20192182ec383995cc939dd5093a6f109c"
-          }
-        ]
-      }
-    },
-    {
       "id": "9cdc6c85fac71dd9",
       "name": "nkf",
       "version": "0.2.0",
@@ -92717,6 +92670,53 @@
           "Charles Oliver Nutter"
         ],
         "homepage": "https://github.com/ruby/nkf"
+      }
+    },
+    {
+      "id": "e92dbf6abeb30a01",
+      "name": "nkf",
+      "version": "UNKNOWN",
+      "type": "java-archive",
+      "foundBy": "java-archive-cataloger",
+      "locations": [
+        {
+          "path": "usr/share/jruby/lib/ruby/stdlib/nkf.jar",
+          "accessPath": "usr/share/jruby/lib/ruby/stdlib/nkf.jar",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "java",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:nkf:nkf:*:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:maven/nkf/nkf",
+      "metadataType": "java-archive",
+      "metadata": {
+        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/nkf.jar",
+        "manifest": {
+          "main": [
+            {
+              "key": "Manifest-Version",
+              "value": "1.0"
+            },
+            {
+              "key": "Created-By",
+              "value": "21.0.2 (Oracle Corporation)"
+            }
+          ]
+        },
+        "digest": [
+          {
+            "algorithm": "sha1",
+            "value": "51a6ba20192182ec383995cc939dd5093a6f109c"
+          }
+        ]
       }
     },
     {
@@ -93391,9 +93391,9 @@
       }
     },
     {
-      "id": "9da9c74ecda2d460",
+      "id": "0574714b5d2a9798",
       "name": "parser",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
@@ -93935,53 +93935,6 @@
       }
     },
     {
-      "id": "af51807098de394f",
-      "name": "psych",
-      "version": "",
-      "type": "java-archive",
-      "foundBy": "java-archive-cataloger",
-      "locations": [
-        {
-          "path": "usr/share/jruby/lib/ruby/stdlib/psych.jar",
-          "accessPath": "usr/share/jruby/lib/ruby/stdlib/psych.jar",
-          "annotations": {
-            "evidence": "primary"
-          }
-        }
-      ],
-      "licenses": [],
-      "language": "java",
-      "cpes": [
-        {
-          "cpe": "cpe:2.3:a:psych:psych:*:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        }
-      ],
-      "purl": "pkg:maven/psych/psych",
-      "metadataType": "java-archive",
-      "metadata": {
-        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/psych.jar",
-        "manifest": {
-          "main": [
-            {
-              "key": "Manifest-Version",
-              "value": "1.0"
-            },
-            {
-              "key": "Created-By",
-              "value": "21 (Oracle Corporation)"
-            }
-          ]
-        },
-        "digest": [
-          {
-            "algorithm": "sha1",
-            "value": "13ebf81dcbc1614859ba188c9fa2fad0f12ae759"
-          }
-        ]
-      }
-    },
-    {
       "id": "1baa05755baebc54",
       "name": "psych",
       "version": "5.1.1.1",
@@ -94127,6 +94080,53 @@
           "Charles Oliver Nutter"
         ],
         "homepage": "https://github.com/ruby/psych"
+      }
+    },
+    {
+      "id": "07451d4a303dd21b",
+      "name": "psych",
+      "version": "UNKNOWN",
+      "type": "java-archive",
+      "foundBy": "java-archive-cataloger",
+      "locations": [
+        {
+          "path": "usr/share/jruby/lib/ruby/stdlib/psych.jar",
+          "accessPath": "usr/share/jruby/lib/ruby/stdlib/psych.jar",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "java",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:psych:psych:*:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:maven/psych/psych",
+      "metadataType": "java-archive",
+      "metadata": {
+        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/psych.jar",
+        "manifest": {
+          "main": [
+            {
+              "key": "Manifest-Version",
+              "value": "1.0"
+            },
+            {
+              "key": "Created-By",
+              "value": "21 (Oracle Corporation)"
+            }
+          ]
+        },
+        "digest": [
+          {
+            "algorithm": "sha1",
+            "value": "13ebf81dcbc1614859ba188c9fa2fad0f12ae759"
+          }
+        ]
       }
     },
     {
@@ -94717,9 +94717,9 @@
       }
     },
     {
-      "id": "403ffc19181cde90",
+      "id": "94b80ad56435c328",
       "name": "readline",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
@@ -96772,53 +96772,6 @@
       }
     },
     {
-      "id": "6bc183a7c32b8947",
-      "name": "stringio",
-      "version": "",
-      "type": "java-archive",
-      "foundBy": "java-archive-cataloger",
-      "locations": [
-        {
-          "path": "usr/share/jruby/lib/ruby/stdlib/stringio.jar",
-          "accessPath": "usr/share/jruby/lib/ruby/stdlib/stringio.jar",
-          "annotations": {
-            "evidence": "primary"
-          }
-        }
-      ],
-      "licenses": [],
-      "language": "java",
-      "cpes": [
-        {
-          "cpe": "cpe:2.3:a:stringio:stringio:*:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        }
-      ],
-      "purl": "pkg:maven/stringio/stringio",
-      "metadataType": "java-archive",
-      "metadata": {
-        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/stringio.jar",
-        "manifest": {
-          "main": [
-            {
-              "key": "Manifest-Version",
-              "value": "1.0"
-            },
-            {
-              "key": "Created-By",
-              "value": "11.0.19 (Eclipse Adoptium)"
-            }
-          ]
-        },
-        "digest": [
-          {
-            "algorithm": "sha1",
-            "value": "0603a32873b48561dbfec7a67360cfebde2049b2"
-          }
-        ]
-      }
-    },
-    {
       "id": "958fb66d0b577041",
       "name": "stringio",
       "version": "3.0.8",
@@ -96918,15 +96871,15 @@
       }
     },
     {
-      "id": "c58cdce4bab391b4",
-      "name": "strscan",
-      "version": "",
+      "id": "071fec914e5d69a3",
+      "name": "stringio",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
         {
-          "path": "usr/share/jruby/lib/ruby/stdlib/strscan.jar",
-          "accessPath": "usr/share/jruby/lib/ruby/stdlib/strscan.jar",
+          "path": "usr/share/jruby/lib/ruby/stdlib/stringio.jar",
+          "accessPath": "usr/share/jruby/lib/ruby/stdlib/stringio.jar",
           "annotations": {
             "evidence": "primary"
           }
@@ -96936,14 +96889,14 @@
       "language": "java",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:strscan:strscan:*:*:*:*:*:*:*:*",
+          "cpe": "cpe:2.3:a:stringio:stringio:*:*:*:*:*:*:*:*",
           "source": "syft-generated"
         }
       ],
-      "purl": "pkg:maven/strscan/strscan",
+      "purl": "pkg:maven/stringio/stringio",
       "metadataType": "java-archive",
       "metadata": {
-        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/strscan.jar",
+        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/stringio.jar",
         "manifest": {
           "main": [
             {
@@ -96952,14 +96905,14 @@
             },
             {
               "key": "Created-By",
-              "value": "11.0.22 (Eclipse Adoptium)"
+              "value": "11.0.19 (Eclipse Adoptium)"
             }
           ]
         },
         "digest": [
           {
             "algorithm": "sha1",
-            "value": "e65bde79c9b76fdcd3739aee7cabbd578415bfad"
+            "value": "0603a32873b48561dbfec7a67360cfebde2049b2"
           }
         ]
       }
@@ -97071,6 +97024,53 @@
           "Charles Oliver Nutter"
         ],
         "homepage": "https://github.com/ruby/strscan"
+      }
+    },
+    {
+      "id": "99dd0533f450d0ea",
+      "name": "strscan",
+      "version": "UNKNOWN",
+      "type": "java-archive",
+      "foundBy": "java-archive-cataloger",
+      "locations": [
+        {
+          "path": "usr/share/jruby/lib/ruby/stdlib/strscan.jar",
+          "accessPath": "usr/share/jruby/lib/ruby/stdlib/strscan.jar",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "java",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:strscan:strscan:*:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:maven/strscan/strscan",
+      "metadataType": "java-archive",
+      "metadata": {
+        "virtualPath": "usr/share/jruby/lib/ruby/stdlib/strscan.jar",
+        "manifest": {
+          "main": [
+            {
+              "key": "Manifest-Version",
+              "value": "1.0"
+            },
+            {
+              "key": "Created-By",
+              "value": "11.0.22 (Eclipse Adoptium)"
+            }
+          ]
+        },
+        "digest": [
+          {
+            "algorithm": "sha1",
+            "value": "e65bde79c9b76fdcd3739aee7cabbd578415bfad"
+          }
+        ]
       }
     },
     {
@@ -97966,9 +97966,9 @@
       }
     },
     {
-      "id": "99500c056b40985a",
+      "id": "d51bfd47d9abf7bb",
       "name": "wait",
-      "version": "",
+      "version": "UNKNOWN",
       "type": "java-archive",
       "foundBy": "java-archive-cataloger",
       "locations": [
