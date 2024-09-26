@@ -121,6 +121,10 @@ var pkgNameToWfnAttributes = map[string]wfn.Attributes{
 		Vendor:  "oracle",
 		Product: "openjdk",
 	},
+	"openssl-provider-fips": {
+		Vendor:  "openssl",
+		Product: "openssl",
+	},
 	"php": {
 		Vendor:  "php",
 		Product: "php",
