@@ -416,6 +416,24 @@ func TestLinter_Rules(t *testing.T) {
 			matches: 1,
 		},
 		{
+			file:        "test-disabled.yaml",
+			minSeverity: SeverityInfo,
+			want: EvalResult{
+				File: "test-disabled",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "test-disabled-reason",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[test-disabled-reason]: test is disabled but no reason is provided (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
 			file:        "valid-update-schedule.yaml",
 			minSeverity: SeverityWarning,
 			want: EvalResult{
