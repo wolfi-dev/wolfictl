@@ -100,7 +100,7 @@ func (o *DiffOptions) Diff() error {
 
 	// If malcontent is on the path, then run it to get a capability diff.
 	var result []byte
-	if path, err := exec.LookPath("malcontent"); err == nil {
+	if path, err := exec.LookPath("mal"); err == nil {
 		o.Logger.Printf("starting bincapz for %d packages", len(newPackages))
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
