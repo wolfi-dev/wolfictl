@@ -47,6 +47,14 @@ func generateWfnAttributesForAPK(p pkgInfo) *wfn.Attributes {
 		return &attr
 	}
 
+	if strings.HasPrefix(name, "gitlab-") {
+		attr.Vendor = "gitlab"
+		attr.Product = "gitlab"
+		attr.SWEdition = "community"
+
+		return &attr
+	}
+
 	return nil
 }
 
