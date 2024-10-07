@@ -19,7 +19,7 @@ require (
 	github.com/anchore/stereoscope v0.0.3
 	github.com/anchore/syft v1.13.0
 	github.com/chainguard-dev/clog v1.5.1-0.20240811185937-4c523ae4593f
-	github.com/chainguard-dev/yam v0.2.0
+	github.com/chainguard-dev/yam v0.2.1
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.1.1
 	github.com/charmbracelet/lipgloss v0.13.0
