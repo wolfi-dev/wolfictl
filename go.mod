@@ -1,6 +1,6 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.23.1
+go 1.23.2
 
 // https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.19.2
-	chainguard.dev/melange v0.13.0
+	chainguard.dev/melange v0.13.1
 	cloud.google.com/go/storage v1.44.0
 	github.com/adrg/xdg v0.5.0
 	github.com/anchore/grype v0.81.0
@@ -347,7 +347,7 @@ require (
 	go.step.sm/crypto v0.52.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
