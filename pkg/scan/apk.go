@@ -10,7 +10,7 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/anchore/grype/grype"
-	"github.com/anchore/grype/grype/db"
+	db "github.com/anchore/grype/grype/db/legacy/distribution"
 	v5 "github.com/anchore/grype/grype/db/v5"
 	"github.com/anchore/grype/grype/matcher"
 	"github.com/anchore/grype/grype/matcher/dotnet"
