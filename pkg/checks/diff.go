@@ -105,7 +105,7 @@ func (o *DiffOptions) Diff() error {
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
-		cmd := exec.Command(path, "-file-risk-increase", "-quantity-increases-risk=false", "-format=markdown", "-min-risk=critical", "diff", dirExistingApk, dirNewApk)
+		cmd := exec.Command(path, "-file-risk-increase=true", "-quantity-increases-risk=false", "-format=markdown", "-min-risk=critical", "diff", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("malcontent execution failed with error %w: %s", err, result)
