@@ -25,7 +25,7 @@ require (
 	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/cli/browser v1.3.0
-	github.com/cli/go-gh/v2 v2.10.0
+	github.com/cli/go-gh/v2 v2.11.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dominikbraun/graph v0.23.0
 	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097
