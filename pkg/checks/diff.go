@@ -101,11 +101,11 @@ func (o *DiffOptions) Diff() error {
 	// If malcontent is on the path, then run it to get a capability diff.
 	var result []byte
 	if path, err := exec.LookPath("mal"); err == nil {
-		o.Logger.Printf("starting bincapz for %d packages", len(newPackages))
+		o.Logger.Printf("starting malcontent for %d packages", len(newPackages))
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
-		cmd := exec.Command(path, "-quantity-increases-risk=false", "-format=markdown", "-min-file-level=3", "diff", dirExistingApk, dirNewApk)
+		cmd := exec.Command(path, "-file-risk-increase=true", "-quantity-increases-risk=false", "-format=markdown", "-min-risk=critical", "diff", dirExistingApk, dirNewApk)
 		result, err = cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("malcontent execution failed with error %w: %s", err, result)
