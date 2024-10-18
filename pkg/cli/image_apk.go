@@ -30,7 +30,7 @@ func cmdImageAPK() *cobra.Command {
   wolfictl image apk cgr.dev/chainguard/bash
 
   # Show all APKs in an image that own a component (based on a Syft analysis)
-  wolfictl image apk cgr.dev/chainguard/coredns -c 'github.com/aws/aws-sdk-go'
+  wolfictl image apk cgr.dev/chainguard/cosign -c 'github.com/aws/aws-sdk-go'
 
   # Show all APKs in an image that own a component, and show the path to the
   # Melange configuration file for each APK, within the given directory
