@@ -17,8 +17,14 @@ Lint the code
 ```
   -h, --help                    help for lint
   -l, --list                    prints the all of available rules and exits
+  -s, --severity string         minimum severity level to report (error, warning, info) (default "warning")
       --skip-rule stringArray   list of rules to skip
-  -v, --verbose                 verbose output
+```
+
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO

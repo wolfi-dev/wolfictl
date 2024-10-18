@@ -25,6 +25,12 @@ wolfictl gc issues https://github.com/wolfi-dev/versions --match "version-stream
       --match string   pattern to match issues against
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl gh gc](wolfictl_gh_gc.md)	 - Garbage collection commands used with GitHub

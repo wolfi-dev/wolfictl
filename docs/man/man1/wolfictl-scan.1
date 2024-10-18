@@ -53,8 +53,8 @@ By default, the command will print all vulnerabilities found in the package(s)
 to stdout. You can filter the vulnerabilities shown using existing local
 advisory data. To do this, you must first clone the advisory data from the
 advisories repository for the distro whose packages you are scanning. You
-specify the path to each local advisories repository using the
-\-\-advisories\-repo\-dir flag for each repository. Then, you can use the
+specify the path to the local advisories repository using the
+\-\-advisories\-repo\-dir flag for the repository. Then, you can use the
 "\-\-advisory\-filter" flag to specify which set of advisories to use for
 filtering. The following sets of advisories are available:
 
@@ -130,8 +130,8 @@ found and the \-\-require\-zero flag is specified.
 
 .SH OPTIONS
 .PP
-\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=[]
-    local directory for advisory data
+\fB\-a\fP, \fB\-\-advisories\-repo\-dir\fP=""
+    directory containing the advisories repository
 
 .PP
 \fB\-f\fP, \fB\-\-advisory\-filter\fP=""
@@ -142,7 +142,7 @@ found and the \-\-require\-zero flag is specified.
     treat input as a package build log file (or a directory that contains a packages.log file)
 
 .PP
-\fB\-\-disable\-sbom\-cache\fP[=false]
+\fB\-D\fP, \fB\-\-disable\-sbom\-cache\fP[=false]
     don't use the SBOM cache
 
 .PP
@@ -176,6 +176,16 @@ found and the \-\-require\-zero flag is specified.
 .PP
 \fB\-\-use\-cpes\fP[=false]
     turn on all CPE matching in Grype
+
+.PP
+\fB\-v\fP, \fB\-\-verbose\fP[=0]
+    logging verbosity (v = info, vv = debug, default is none)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+.PP
+\fB\-\-log\-level\fP="INFO"
+    log level (e.g. debug, info, warn, error)
 
 
 .SH EXAMPLE

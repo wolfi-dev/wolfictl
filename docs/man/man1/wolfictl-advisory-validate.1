@@ -108,7 +108,7 @@ print an error message that specifies where and how the data is invalid.
     URL of the APK package repository
 
 .PP
-\fB\-\-skip\-alias\fP[=false]
+\fB\-\-skip\-alias\fP[=true]
     skip alias completeness validation
 
 .PP
@@ -124,6 +124,12 @@ print an error message that specifies where and how the data is invalid.
     logging verbosity (v = info, vv = debug, default is none)
 
 
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+.PP
+\fB\-\-log\-level\fP="INFO"
+    log level (e.g. debug, info, warn, error)
+
+
 .SH SEE ALSO
 .PP
-\fBwolfictl\-advisory(1)\fP
+\fBwolfictl\-advisory(1)\fP, \fBwolfictl\-advisory\-validate\-fixes(1)\fP

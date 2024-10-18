@@ -36,8 +36,8 @@ By default, the command will print all vulnerabilities found in the package(s)
 to stdout. You can filter the vulnerabilities shown using existing local
 advisory data. To do this, you must first clone the advisory data from the
 advisories repository for the distro whose packages you are scanning. You
-specify the path to each local advisories repository using the
---advisories-repo-dir flag for each repository. Then, you can use the
+specify the path to the local advisories repository using the
+--advisories-repo-dir flag for the repository. Then, you can use the
 "--advisory-filter" flag to specify which set of advisories to use for
 filtering. The following sets of advisories are available:
 
@@ -113,18 +113,25 @@ wolfictl scan package1 package2 --remote
 ### Options
 
 ```
-  -a, --advisories-repo-dir strings   local directory for advisory data
-  -f, --advisory-filter string        exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all|concluded)
-      --build-log                     treat input as a package build log file (or a directory that contains a packages.log file)
-      --disable-sbom-cache            don't use the SBOM cache
-      --distro string                 distro to use during vulnerability matching (default "wolfi")
-  -h, --help                          help for scan
-      --local-file-grype-db string    import a local grype db file
-  -o, --output string                 output format (outline|json), defaults to outline
-  -r, --remote                        treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of
-      --require-zero                  exit 1 if any vulnerabilities are found
-  -s, --sbom                          treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)
-      --use-cpes                      turn on all CPE matching in Grype
+  -a, --advisories-repo-dir string   directory containing the advisories repository
+  -f, --advisory-filter string       exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all|concluded)
+      --build-log                    treat input as a package build log file (or a directory that contains a packages.log file)
+  -D, --disable-sbom-cache           don't use the SBOM cache
+      --distro string                distro to use during vulnerability matching (default "wolfi")
+  -h, --help                         help for scan
+      --local-file-grype-db string   import a local grype db file
+  -o, --output string                output format (outline|json), defaults to outline
+  -r, --remote                       treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of
+      --require-zero                 exit 1 if any vulnerabilities are found
+  -s, --sbom                         treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)
+      --use-cpes                     turn on all CPE matching in Grype
+  -v, --verbose count                logging verbosity (v = info, vv = debug, default is none)
+```
+
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO

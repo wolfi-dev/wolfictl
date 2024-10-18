@@ -31,6 +31,12 @@ wolfictl gh release --bump-prerelease-with-prefix rc
   -h, --help                                 help for release
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl gh](wolfictl_gh.md)	 - Commands used to interact with GitHub

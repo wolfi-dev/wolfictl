@@ -2,12 +2,6 @@
 
 
 
-### Usage
-
-```
-wolfictl apk
-```
-
 ### Synopsis
 
 
@@ -15,12 +9,18 @@ wolfictl apk
 ### Options
 
 ```
-      --arch string   arch of package to get (default "x86_64")
-  -h, --help          help for apk
-      --repo string   repo to get packages from (default "wolfi")
+  -h, --help   help for apk
+```
+
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO
 
 * [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi
+* [wolfictl apk cp](wolfictl_apk_cp.md)	 - 
+* [wolfictl apk ls](wolfictl_apk_ls.md)	 - 
 

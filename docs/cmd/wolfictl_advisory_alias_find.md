@@ -44,6 +44,12 @@ hyperlinked to the relevant webpage from the upstream data source.
   -h, --help   help for find
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl advisory alias](wolfictl_advisory_alias.md)	 - Commands for discovering vulnerability aliases
