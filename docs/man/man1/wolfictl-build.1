@@ -21,12 +21,28 @@ wolfictl\-build \-
     arch of package to build
 
 .PP
+\fB\-\-cache\-dir\fP="./melange\-cache/"
+    directory used for cached inputs
+
+.PP
+\fB\-\-cache\-source\fP=""
+    directory or bucket used for preloading the cache
+
+.PP
+\fB\-\-destination\-repository\fP=""
+    repo used to check for (and skip) existing packages
+
+.PP
 \fB\-d\fP, \fB\-\-dir\fP="."
     directory to search for melange configs
 
 .PP
 \fB\-\-dry\-run\fP[=false]
     print commands instead of executing them
+
+.PP
+\fB\-\-generate\-index\fP[=true]
+    whether to generate APKINDEX.tar.gz
 
 .PP
 \fB\-h\fP, \fB\-\-help\fP[=false]
@@ -42,8 +58,12 @@ wolfictl\-build \-
     path to extra keys to include in the build environment keyring
 
 .PP
-\fB\-\-log\-dir\fP="buildlogs"
-    subdirectory where buildlogs will be written when specified (packages/$arch/buildlogs/$apk.log)
+\fB\-\-namespace\fP="wolfi"
+    namespace to use in package URLs in SBOM (eg wolfi, alpine)
+
+.PP
+\fB\-\-out\-dir\fP=""
+    directory where packages will be output
 
 .PP
 \fB\-\-pipeline\-dir\fP=""
@@ -57,6 +77,24 @@ wolfictl\-build \-
 .PP
 \fB\-\-runner\fP="docker"
     which runner to use to enable running commands, default is based on your platform.
+
+.PP
+\fB\-\-signing\-key\fP=""
+    key to use for signing
+
+.PP
+\fB\-\-summary\fP=""
+    file to write build summary
+
+.PP
+\fB\-\-trace\fP=""
+    where to write trace output
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+.PP
+\fB\-\-log\-level\fP="INFO"
+    log level (e.g. debug, info, warn, error)
 
 
 .SH SEE ALSO

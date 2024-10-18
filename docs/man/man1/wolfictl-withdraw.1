@@ -10,7 +10,7 @@ wolfictl\-withdraw \- Withdraw packages from an APKINDEX.tar.gz
 
 .SH SYNOPSIS
 .PP
-\fBwolfictl withdraw [flags] example\-pkg\-1.2.3\-r4\fP
+\fBwolfictl withdraw example\-pkg\-1.2.3\-r4\fP
 
 
 .SH DESCRIPTION
@@ -26,6 +26,12 @@ Withdraw packages from an APKINDEX.tar.gz
 .PP
 \fB\-\-signing\-key\fP="melange.rsa"
     the signing key to use
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+.PP
+\fB\-\-log\-level\fP="INFO"
+    log level (e.g. debug, info, warn, error)
 
 
 .SH EXAMPLE

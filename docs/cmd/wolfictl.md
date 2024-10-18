@@ -9,7 +9,8 @@ A CLI helper for developing Wolfi
 ### Options
 
 ```
-  -h, --help   help for wolfictl
+  -h, --help               help for wolfictl
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO
@@ -22,11 +23,11 @@ A CLI helper for developing Wolfi
 * [wolfictl dot](wolfictl_dot.md)	 - Generate graphviz .dot output
 * [wolfictl gh](wolfictl_gh.md)	 - Commands used to interact with GitHub
 * [wolfictl image](wolfictl_image.md)	 - (Experimental) Commands for working with container images that use Wolfi
-* [wolfictl index](wolfictl_index.md)	 - 
 * [wolfictl lint](wolfictl_lint.md)	 - Lint the code
+* [wolfictl ruby](wolfictl_ruby.md)	 - Work with ruby packages
 * [wolfictl scan](wolfictl_scan.md)	 - Scan a package for vulnerabilities
+* [wolfictl test](wolfictl_test.md)	 - 
 * [wolfictl text](wolfictl_text.md)	 - Print a sorted list of downstream dependent packages
-* [wolfictl update](wolfictl_update.md)	 - Proposes melange package update(s) via a pull request
 * [wolfictl version](wolfictl_version.md)	 - Prints the version
 * [wolfictl withdraw](wolfictl_withdraw.md)	 - Withdraw packages from an APKINDEX.tar.gz
 

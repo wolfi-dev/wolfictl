@@ -19,7 +19,7 @@ Show APK(s) in a container image
   wolfictl image apk cgr.dev/chainguard/bash
 
   # Show all APKs in an image that own a component (based on a Syft analysis)
-  wolfictl image apk cgr.dev/chainguard/coredns -c 'github.com/aws/aws-sdk-go'
+  wolfictl image apk cgr.dev/chainguard/cosign -c 'github.com/aws/aws-sdk-go'
 
   # Show all APKs in an image that own a component, and show the path to the
   # Melange configuration file for each APK, within the given directory
@@ -32,6 +32,12 @@ Show APK(s) in a container image
   -c, --component string     show only APKs containing the given component
   -d, --distro-dir strings   path to a directory containing Melange build configuration files
   -h, --help                 help for apk
+```
+
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO

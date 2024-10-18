@@ -5,7 +5,7 @@ Bumps the epoch field in melange configuration files
 ### Usage
 
 ```
-wolfictl bump [flags] config[.yaml] [config[.yaml]...]
+wolfictl bump config[.yaml] [config[.yaml]...]
 ```
 
 ### Synopsis
@@ -41,6 +41,12 @@ wolfictl bump openssh.yaml perl lib*.yaml
       --epoch         bump the package epoch (default true)
   -h, --help          help for bump
       --repo string   path to the wolfi/os repository (default ".")
+```
+
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO

@@ -22,6 +22,12 @@ Create a diff comparing proposed apk changes following a melange build, to the l
       --packages-dir string        directory containing new packages (default "packages")
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl check](wolfictl_check.md)	 - Subcommands used for CI checks in Wolfi

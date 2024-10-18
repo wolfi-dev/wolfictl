@@ -48,6 +48,12 @@ than attempting any kind of merge of the separate advisories.
   -p, --package strings              packages to operate on
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl advisory alias](wolfictl_advisory_alias.md)	 - Commands for discovering vulnerability aliases

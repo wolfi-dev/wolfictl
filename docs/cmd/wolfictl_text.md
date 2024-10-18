@@ -24,6 +24,12 @@ Print a sorted list of downstream dependent packages
   -t, --type string                 What type of text to emit; values can be one of: [target makefile name version name-version] (default "target")
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl](wolfictl.md)	 - A CLI helper for developing Wolfi

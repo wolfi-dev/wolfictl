@@ -26,6 +26,12 @@ Build an Alpine-style security database from advisory data
       --url-prefix string             URL scheme and hostname for the package repository (default "https://packages.wolfi.dev")
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl advisory](wolfictl_advisory.md)	 - Commands for consuming and maintaining security advisory data

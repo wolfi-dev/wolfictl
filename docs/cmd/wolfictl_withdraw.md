@@ -5,7 +5,7 @@ Withdraw packages from an APKINDEX.tar.gz
 ### Usage
 
 ```
-wolfictl withdraw [flags] example-pkg-1.2.3-r4
+wolfictl withdraw example-pkg-1.2.3-r4
 ```
 
 ### Synopsis
@@ -21,6 +21,12 @@ withdraw --signing-key ./foo.rsa example-pkg-1.2.3-r4 also-bad-2.3.4-r1 <old/APK
 ```
   -h, --help                 help for withdraw
       --signing-key string   the signing key to use (default "melange.rsa")
+```
+
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
 ```
 
 ### SEE ALSO

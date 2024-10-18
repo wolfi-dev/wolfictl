@@ -10,7 +10,7 @@ wolfictl\-bump \- Bumps the epoch field in melange configuration files
 
 .SH SYNOPSIS
 .PP
-\fBwolfictl bump [flags] config[.yaml] [config[.yaml]...]\fP
+\fBwolfictl bump config[.yaml] [config[.yaml]...]\fP
 
 
 .SH DESCRIPTION
@@ -60,6 +60,12 @@ modifying anything in the filesystem.
 .PP
 \fB\-\-repo\fP="."
     path to the wolfi/os repository
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+.PP
+\fB\-\-log\-level\fP="INFO"
+    log level (e.g. debug, info, warn, error)
 
 
 .SH EXAMPLE

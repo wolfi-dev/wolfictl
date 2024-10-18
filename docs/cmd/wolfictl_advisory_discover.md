@@ -24,6 +24,12 @@ Automatically create advisories by matching distro packages to vulnerabilities i
   -r, --package-repo-url string      URL of the APK package repository
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl advisory](wolfictl_advisory.md)	 - Commands for consuming and maintaining security advisory data

@@ -57,13 +57,20 @@ print an error message that specifies where and how the data is invalid.
       --no-distro-detection                do not attempt to auto-detect the distro
   -p, --package strings                    packages to validate
   -r, --package-repo-url string            URL of the APK package repository
-      --skip-alias                         skip alias completeness validation
+      --skip-alias                         skip alias completeness validation (default true)
       --skip-diff                          skip diff-based validations
       --skip-existence                     skip package configuration existence validation
   -v, --verbose count                      logging verbosity (v = info, vv = debug, default is none)
 ```
 
+### Options inherited from parent commands
+
+```
+      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+```
+
 ### SEE ALSO
 
 * [wolfictl advisory](wolfictl_advisory.md)	 - Commands for consuming and maintaining security advisory data
+* [wolfictl advisory validate fixes](wolfictl_advisory_validate_fixes.md)	 - Validate fixes recorded in advisories
 
