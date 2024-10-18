@@ -19,6 +19,7 @@ import (
 	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg"
 	cpegen "github.com/anchore/syft/syft/pkg/cataloger/common/cpe"
+	"github.com/anchore/syft/syft/pkg/cataloger/golang"
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
 	"github.com/anchore/syft/syft/source/directorysource"
@@ -102,11 +103,19 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 			pkgcataloging.ImageTag,
 		).WithRemovals(
 			"sbom",
+			"golang",
 		),
 	).WithCatalogers(
 		catalogers.AngularJSReference,
 		catalogers.PipVendorReference,
 		catalogers.WheelReference,
+		pkgcataloging.CatalogerReference{
+			Cataloger: golang.NewGoModuleBinaryCataloger(
+				// Disable "FromContents" which buffers the entire Go binary and runs a regexp over it.
+				golang.DefaultCatalogerConfig().WithMainModuleVersion(golang.DefaultMainModuleVersionConfig().WithFromContents(false)),
+			),
+			AlwaysEnabled: true,
+		},
 	)
 
 	createdSBOM, err := syft.CreateSBOM(ctx, src, cfg)

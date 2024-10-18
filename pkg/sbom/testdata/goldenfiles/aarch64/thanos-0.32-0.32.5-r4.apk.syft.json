@@ -5486,9 +5486,9 @@
       }
     },
     {
-      "id": "d61a445e77ba94c1",
+      "id": "6dbba5a32aa60057",
       "name": "github.com/thanos-io/thanos",
-      "version": "v0.32.5",
+      "version": "v0.0.0-20231019035001-750e8a94eed5",
       "type": "go-module",
       "foundBy": "go-module-binary-cataloger",
       "locations": [
@@ -5504,19 +5504,19 @@
       "language": "go",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:thanos-io:thanos:v0.32.5:*:*:*:*:*:*:*",
+          "cpe": "cpe:2.3:a:thanos-io:thanos:v0.0.0-20231019035001-750e8a94eed5:*:*:*:*:*:*:*",
           "source": "syft-generated"
         },
         {
-          "cpe": "cpe:2.3:a:thanos_io:thanos:v0.32.5:*:*:*:*:*:*:*",
+          "cpe": "cpe:2.3:a:thanos_io:thanos:v0.0.0-20231019035001-750e8a94eed5:*:*:*:*:*:*:*",
           "source": "syft-generated"
         },
         {
-          "cpe": "cpe:2.3:a:thanos:thanos:v0.32.5:*:*:*:*:*:*:*",
+          "cpe": "cpe:2.3:a:thanos:thanos:v0.0.0-20231019035001-750e8a94eed5:*:*:*:*:*:*:*",
           "source": "syft-generated"
         }
       ],
-      "purl": "pkg:golang/github.com/thanos-io/thanos@v0.32.5",
+      "purl": "pkg:golang/github.com/thanos-io/thanos@v0.0.0-20231019035001-750e8a94eed5",
       "metadataType": "go-module-buildinfo-entry",
       "metadata": {
         "goBuildSettings": [
