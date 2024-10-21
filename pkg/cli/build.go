@@ -736,7 +736,7 @@ func newRunner(ctx context.Context, runner string) (container.Runner, error) {
 	case "docker":
 		return docker.NewRunner(ctx)
 	case "bubblewrap":
-		return container.BubblewrapRunner(), nil
+		return container.BubblewrapRunner(false), nil
 	}
 
 	return nil, fmt.Errorf("runner %q not supported", runner)
