@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.19.2
-	chainguard.dev/melange v0.13.6
+	chainguard.dev/melange v0.13.7
 	cloud.google.com/go/storage v1.45.0
 	github.com/adrg/xdg v0.5.1
 	github.com/anchore/grype v0.82.1
@@ -73,7 +73,7 @@ require (
 	cel.dev/expr v0.16.1 // indirect
 	chainguard.dev/go-grpc-kit v0.17.6 // indirect
 	chainguard.dev/sdk v0.1.25 // indirect
-	cloud.google.com/go v0.115.1 // indirect
+	cloud.google.com/go v0.116.0 // indirect
 	cloud.google.com/go/auth v0.9.8 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
@@ -356,7 +356,7 @@ require (
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/api v0.200.0 // indirect
+	google.golang.org/api v0.201.0 // indirect
 	google.golang.org/genproto v0.0.0-20241007155032-5fefd90f89a9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240930140551-af27646dc61f // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9 // indirect
