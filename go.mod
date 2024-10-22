@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.19.2
-	chainguard.dev/melange v0.14.1
+	chainguard.dev/melange v0.14.2
 	cloud.google.com/go/storage v1.45.0
 	github.com/adrg/xdg v0.5.1
 	github.com/anchore/grype v0.82.2
