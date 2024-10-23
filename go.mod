@@ -22,7 +22,7 @@ require (
 	github.com/chainguard-dev/yam v0.2.2
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.1.1
-	github.com/charmbracelet/lipgloss v0.13.0
+	github.com/charmbracelet/lipgloss v0.13.1
 	github.com/charmbracelet/log v0.4.0
 	github.com/cli/browser v1.3.0
 	github.com/cli/go-gh/v2 v2.11.0
@@ -127,7 +127,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chainguard-dev/git-urls v1.0.2 // indirect
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 // indirect
-	github.com/charmbracelet/x/ansi v0.3.0 // indirect
+	github.com/charmbracelet/x/ansi v0.3.2 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cloudflare/circl v1.4.0 // indirect
