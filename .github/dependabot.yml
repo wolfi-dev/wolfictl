@@ -13,3 +13,11 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      chainguard:
+        patterns:
+          - "chainguard.dev/*"
+          - "github.com/chainguard-dev/*"
+        update-types:
+          - "minor"
+          - "patch"
