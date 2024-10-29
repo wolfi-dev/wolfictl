@@ -349,8 +349,12 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 			pkgs      = make([]Package, 0, len(resolved))
 		)
 		for _, r := range resolved {
+			// we only care about self-providing packages if it's a locally defined package,
+			// else it's fine that the remote repo just happens to provide the same version
+			isLocal := r.Repository().IndexURI() == localRepo
+
 			// if we allow self, and our name or origin is the same as dep, and the version is the same, then we are done
-			isSelf := r.Version == c.Version() && (dep == c.Name() || r.Origin == c.Name())
+			isSelf := r.Version == c.Version() && (dep == c.Name() || r.Origin == c.Name()) && isLocal
 			if allowSelf && isSelf {
 				return nil, nil
 			}
@@ -358,8 +362,7 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 			if isSelf {
 				continue
 			}
-			resolvedSource := r.Repository().IndexURI()
-			if resolvedSource == localRepo {
+			if isLocal {
 				// it's in our own packages list, so find the package that is an actual match
 				configs := g.packages.Config(r.Name, false)
 				if len(configs) == 0 {
