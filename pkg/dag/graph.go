@@ -384,6 +384,12 @@ func (g *Graph) addAppropriatePackageFromResolver(resolverKey string, c Package,
 			pkgs = append(pkgs, pkg)
 			matchList = append(matchList, PackageHash(pkg))
 		}
+
+		// Couldn't find any candidates for this package, exit early.
+		if len(matchList) == 0 {
+			return nil, fmt.Errorf("no matches for %q", dep)
+		}
+
 		var (
 			allPkgs = strings.Join(matchList, " ")
 			attrs   = map[string]string{
