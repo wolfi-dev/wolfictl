@@ -14,7 +14,7 @@ require (
 	chainguard.dev/apko v0.19.5
 	chainguard.dev/melange v0.14.11
 	cloud.google.com/go/storage v1.45.0
-	github.com/adrg/xdg v0.5.1
+	github.com/adrg/xdg v0.5.2
 	github.com/anchore/grype v0.82.2
 	github.com/anchore/stereoscope v0.0.5
 	github.com/anchore/syft v1.15.0
