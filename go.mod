@@ -15,7 +15,7 @@ require (
 	chainguard.dev/melange v0.14.11
 	cloud.google.com/go/storage v1.45.0
 	github.com/adrg/xdg v0.5.2
-	github.com/anchore/grype v0.82.2
+	github.com/anchore/grype v0.83.0
 	github.com/anchore/stereoscope v0.0.5
 	github.com/anchore/syft v1.15.0
 	github.com/chainguard-dev/clog v1.5.1-0.20240811185937-4c523ae4593f
@@ -102,7 +102,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
 	github.com/anchore/clio v0.0.0-20241015191535-f538a9016e10 // indirect
-	github.com/anchore/fangs v0.0.0-20241014201141-b6e4b3469f10 // indirect
+	github.com/anchore/fangs v0.0.0-20241014225144-4e1713cafd77 // indirect
 	github.com/anchore/go-collections v0.0.0-20240216214351-5baf374cca6f // indirect
 	github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect

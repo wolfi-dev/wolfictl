@@ -276,8 +276,8 @@ github.com/anchore/archiver/v3 v3.5.2 h1:Bjemm2NzuRhmHy3m0lRe5tNoClB9A4zYyDV58Pa
 github.com/anchore/archiver/v3 v3.5.2/go.mod h1:e3dqJ7H78uzsRSEACH1joayhuSyhnonssnDhppzS1L4=
 github.com/anchore/clio v0.0.0-20241015191535-f538a9016e10 h1:3xmanFdoQEH0REvPA+gLm3Km0/981F4z2a/7ADTlv8k=
 github.com/anchore/clio v0.0.0-20241015191535-f538a9016e10/go.mod h1:h6Ly2hlKjQoPtI3rA8oB5afSmB/XimhcY55xbuW4Dwo=
-github.com/anchore/fangs v0.0.0-20241014201141-b6e4b3469f10 h1:w+HibE+e/heP6ysADh7sWxg5LhYdVqrpB1A4Hmgjyx8=
-github.com/anchore/fangs v0.0.0-20241014201141-b6e4b3469f10/go.mod h1:s0L1//Sxn6Rq0Dcxx+dmT/RRmD9HhsaJjJkPUJHLJLM=
+github.com/anchore/fangs v0.0.0-20241014225144-4e1713cafd77 h1:h7+GCqazHVS5GDJYYS6wjjglYi8xFnVWMdSUukoImTM=
+github.com/anchore/fangs v0.0.0-20241014225144-4e1713cafd77/go.mod h1:qbev5czQeyDO74fPNThiEKYkgt0mx1axb+5wQcxDPFY=
 github.com/anchore/go-collections v0.0.0-20240216214351-5baf374cca6f h1:6XOqdySEfZC90kgx95CuAj7olASfl895cHjX091vv6U=
 github.com/anchore/go-collections v0.0.0-20240216214351-5baf374cca6f/go.mod h1:1aiktV46ATCkuVg0O573ZrH56BUawTECPETbZyBcqT8=
 github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f h1:qRQCz19ioRN2FtAct4j6Lb3Nl0VolFiuHtYMezGYBn0=
@@ -291,8 +291,8 @@ github.com/anchore/go-testutils v0.0.0-20200925183923-d5f45b0d3c04 h1:VzprUTpc0v
 github.com/anchore/go-testutils v0.0.0-20200925183923-d5f45b0d3c04/go.mod h1:6dK64g27Qi1qGQZ67gFmBFvEHScy0/C8qhQhNe5B5pQ=
 github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 h1:rmZG77uXgE+o2gozGEBoUMpX27lsku+xrMwlmBZJtbg=
 github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4/go.mod h1:Bkc+JYWjMCF8OyZ340IMSIi2Ebf3uwByOk6ho4wne1E=
-github.com/anchore/grype v0.82.2 h1:vsP2azKQFCHNQS0pPXfIa7yPk7BcrGIGCN/juOmlNiM=
-github.com/anchore/grype v0.82.2/go.mod h1:SpDbj2f9w5ue2gp8yDro63VwT66gCZgjhw6iRtX4QWM=
+github.com/anchore/grype v0.83.0 h1:x46WD9Wmlk1/lKvxH4PEzMZvVoLT+OtKbZf8ElnoIks=
+github.com/anchore/grype v0.83.0/go.mod h1:NpnNGjTnDcUVj8oY69PMJ2NC0YNDHDo6ZCARbeQRJvI=
 github.com/anchore/packageurl-go v0.1.1-0.20241018175412-5c22e6360c4f h1:dAQPIrQ3a5PBqZeZ+B9NGZsGmodk4NO9OjDIsQmQyQM=
 github.com/anchore/packageurl-go v0.1.1-0.20241018175412-5c22e6360c4f/go.mod h1:KoYIv7tdP5+CC9VGkeZV4/vGCKsY55VvoG+5dadg4YI=
 github.com/anchore/stereoscope v0.0.5 h1:PILlvsQS3+dT5rNsDudRhi91jukR65y2itG1lQOLn0s=
