@@ -470,6 +470,24 @@ func TestLinter_Rules(t *testing.T) {
 			matches: 1,
 		},
 		{
+			file:        "version-stream-wrong-subpackage-naming-1.2.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "version-stream-wrong-subpackage-naming-1.2",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-version-stream",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[valid-version-stream]: package is version streamed but version-stream-wrong-subpackage-naming=${{package.full-version}} is missing on dependencies.provides (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
 			file:        "valid-update-schedule.yaml",
 			minSeverity: SeverityWarning,
 			want: EvalResult{
@@ -484,6 +502,8 @@ func TestLinter_Rules(t *testing.T) {
 					},
 				},
 			},
+			wantErr: false,
+			matches: 1,
 		},
 		{
 			file:        "version-stream-mismatch-version-1.2.yaml",

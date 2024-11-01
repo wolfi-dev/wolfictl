@@ -524,6 +524,15 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					return fmt.Errorf("package is version streamed but %s=${{package.full-version}} is missing on dependencies.provides", packageName)
 				}
 
+				// Any subpackage that contains the package name, should follow `${{package.name}}-xyz` format.
+				for _, s := range c.Subpackages {
+					if strings.Contains(s.Name, c.Package.Name) {
+						if !strings.HasPrefix(s.Name, c.Package.Name) {
+							return fmt.Errorf("subpackage %s should be in format ${{package.name}}-XYZ-SUBPACKAGENAME for a valid version stream", s.Name)
+						}
+					}
+				}
+
 				if c.Update.Enabled && !c.Update.Manual && c.Update.GitHubMonitor != nil {
 					prefixesToCheck := []string{"", "v", packageName, "release", strings.ReplaceAll(packageName, "-fips", ""), c.Update.GitHubMonitor.StripPrefix}
 					separators := []string{"", ".", "-", "_"}
