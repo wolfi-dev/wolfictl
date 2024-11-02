@@ -526,7 +526,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 
 				// Any subpackage that contains the package name, should follow `${{package.name}}-xyz` format.
 				for _, s := range c.Subpackages {
-					if strings.Contains(s.Name, c.Package.Name) {
+					if strings.Contains(s.Name, packageName) {
 						if !strings.HasPrefix(s.Name, c.Package.Name) {
 							return fmt.Errorf("subpackage %s should be in format ${{package.name}}-XYZ-SUBPACKAGENAME for a valid version stream", s.Name)
 						}

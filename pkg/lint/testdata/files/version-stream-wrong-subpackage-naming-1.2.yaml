@@ -15,6 +15,10 @@ subpackages:
     description: "a package with incorrect subpackage prefix"
     pipeline:
       - runs: exit 0
+  - name: subpackage-of-version-stream-wrong-subpackage-naming-foo-bar-baz-1.2
+    description: "a package with incorrect subpackage prefix"
+    pipeline:
+      - runs: exit 0
 
 test:
   pipeline:
