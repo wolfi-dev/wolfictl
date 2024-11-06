@@ -3,7 +3,6 @@ package checks
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -18,7 +17,6 @@ import (
 
 type DiffOptions struct {
 	Client           *http.Client
-	Logger           *log.Logger
 	Dir              string
 	PackagesDir      string
 	ApkIndexURL      string
