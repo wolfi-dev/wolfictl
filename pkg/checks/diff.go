@@ -1,8 +1,8 @@
 package checks
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -10,32 +10,31 @@ import (
 	"strings"
 
 	goapk "chainguard.dev/apko/pkg/apk/apk"
+	"github.com/chainguard-dev/clog"
 	"github.com/google/go-cmp/cmp"
-	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
 type DiffOptions struct {
-	Client              *http.Client
-	Logger              *log.Logger
-	PackageListFilename string
-	Dir                 string
-	PackagesDir         string
-	ApkIndexURL         string
-	ExistingPackages    map[string]*goapk.Package
+	Client           *http.Client
+	Dir              string
+	PackagesDir      string
+	ApkIndexURL      string
+	ExistingPackages map[string]*goapk.Package
 }
 
 func NewDiff() *DiffOptions {
 	o := &DiffOptions{
 		Client: http.DefaultClient,
-		Logger: log.New(log.Writer(), "wolfictl check diff: ", log.LstdFlags|log.Lmsgprefix),
 	}
 
 	return o
 }
 
 // Diff compare a newly built apk with the latest in an APK repository, writing the differences to a file diff.log
-func (o *DiffOptions) Diff() error {
+func (o *DiffOptions) Diff(ctx context.Context, existingPackages map[string]*goapk.Package, newPackages map[string]NewApkPackage) error {
+	log := clog.FromContext(ctx)
+
 	// create two temp folders we can use to explode the apks and compare their contents
 	dirExistingApk, err := os.MkdirTemp("", "wolfictl-apk-*")
 	if err != nil {
@@ -49,22 +48,9 @@ func (o *DiffOptions) Diff() error {
 	}
 	defer os.RemoveAll(dirNewApk)
 
-	// get the latest APKINDEX
-	apkContext := apk.New(o.Client, o.ApkIndexURL)
-	o.ExistingPackages, err = apkContext.GetApkPackages()
-	if err != nil {
-		return fmt.Errorf("failed to get APK packages from URL %s: %w", o.ApkIndexURL, err)
-	}
-
-	// get a list of new package names that have recently been built
-	newPackages, err := getNewPackages(o.PackageListFilename)
-	if err != nil {
-		return fmt.Errorf("failed to get new packages from file %s: %w", o.PackageListFilename, err)
-	}
-
 	// for each new package being built grab the latest existing one
 	for newPackageName, newAPK := range newPackages {
-		o.Logger.Printf("checking %s", newPackageName)
+		log.Infof("checking %s", newPackageName)
 		// read new apk
 		filename := filepath.Join(o.PackagesDir, newAPK.Arch, fmt.Sprintf("%s-%s-r%s.apk", newPackageName, newAPK.Version, newAPK.Epoch))
 		newFile, err := os.Open(filename)
@@ -77,18 +63,16 @@ func (o *DiffOptions) Diff() error {
 		}
 
 		// fetch current latest apk
-		p, ok := o.ExistingPackages[newPackageName]
+		p, ok := existingPackages[newPackageName]
 		if !ok {
-			err = os.Mkdir(filepath.Join(dirExistingApk, newAPK.Name), os.ModePerm)
-			if err != nil {
+			if err := os.Mkdir(filepath.Join(dirExistingApk, newAPK.Name), os.ModePerm); err != nil {
 				return fmt.Errorf("failed to mkdir %s", filepath.Join(dirExistingApk, newAPK.Name))
 			}
 			continue
 		}
 
 		existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
-		err = downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, filepath.Join(dirExistingApk, newPackageName))
-		if err != nil {
+		if err := downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, filepath.Join(dirExistingApk, newPackageName)); err != nil {
 			return fmt.Errorf("failed to download %s using base URL %s: %w", newPackageName, existingFilename, err)
 		}
 	}
@@ -101,21 +85,20 @@ func (o *DiffOptions) Diff() error {
 	// If malcontent is on the path, then run it to get a capability diff.
 	var result []byte
 	if path, err := exec.LookPath("mal"); err == nil {
-		o.Logger.Printf("starting malcontent for %d packages", len(newPackages))
+		log.Infof("starting malcontent for %d packages", len(newPackages))
 		// --min-file-level=3 filters out lower-risk changes in lower-risk files.
 		//
 		// As we get more comfortable with the output, we should decrease this value from 3 (HIGH) to 2 (MEDIUM).
 		cmd := exec.Command(path, "-quantity-increases-risk=false", "-format=markdown", "-min-risk=critical", "diff", "-file-risk-increase=true", dirExistingApk, dirNewApk)
-		result, err = cmd.CombinedOutput()
+		result, err := cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("malcontent execution failed with error %w: %s", err, result)
 		}
-		o.Logger.Printf("finished malcontent")
+		log.Infof("finished malcontent")
 	}
 
 	diffFile := filepath.Join(o.Dir, "diff.log")
-	err = writeDiffLog(rs, result, diffFile, newPackages)
-	if err != nil {
+	if err := writeDiffLog(rs, result, diffFile, newPackages); err != nil {
 		return fmt.Errorf("failed writing to file: %w", err)
 	}
 
@@ -203,7 +186,7 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 		return diffResult{}, err
 	}
 
-	err = filepath.WalkDir(dir2, func(path2 string, info2 os.DirEntry, err error) error {
+	if err := filepath.WalkDir(dir2, func(path2 string, info2 os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -229,9 +212,7 @@ func diffDirectories(dir1, dir2 string) (diffResult, error) {
 		}
 
 		return nil
-	})
-
-	if err != nil {
+	}); err != nil {
 		return diffResult{}, err
 	}
 

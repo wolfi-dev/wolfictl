@@ -95,7 +95,7 @@ func getTerminalWidth() int {
 		return fallbackLineLength
 	}
 
-	//nolint:gosec // The file descriptor is checked above
+	// The file descriptor is checked above
 	w, _, err := term.GetSize(int(fd))
 	if err != nil {
 		return fallbackLineLength

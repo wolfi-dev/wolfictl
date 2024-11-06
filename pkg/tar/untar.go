@@ -58,7 +58,6 @@ func Untar(src io.Reader, dst string) error {
 				return fmt.Errorf("file mode out of range: %d", mode)
 			}
 
-			//nolint:gosec // mode is checked above
 			fileToWrite, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(mode))
 			if err != nil {
 				return err

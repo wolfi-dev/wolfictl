@@ -2,11 +2,12 @@ package checks
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
 
+	goapk "chainguard.dev/apko/pkg/apk/apk"
+	"github.com/chainguard-dev/clog/slogtest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,6 +71,7 @@ func TestChecks_getSonameFiles(t *testing.T) {
 }
 
 func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
+	ctx := slogtest.Context(t)
 	tests := []struct {
 		name                string
 		existingSonameFiles []string
@@ -135,10 +137,9 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			o := SoNameOptions{
-				Logger: log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
-			}
-			tt.wantErr(t, o.checkSonamesMatch(tt.existingSonameFiles, tt.newSonameFiles), fmt.Sprintf("checkSonamesMatch(%v, %v)", tt.existingSonameFiles, tt.newSonameFiles))
+			o := SoNameOptions{}
+			existingPackages := map[string]*goapk.Package{}
+			tt.wantErr(t, o.checkSonamesMatch(ctx, existingPackages, tt.existingSonameFiles, tt.newSonameFiles), fmt.Sprintf("checkSonamesMatch(%v, %v)", tt.existingSonameFiles, tt.newSonameFiles))
 		})
 	}
 }

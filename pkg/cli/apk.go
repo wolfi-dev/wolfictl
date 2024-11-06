@@ -163,7 +163,7 @@ func cmdCp() *cobra.Command {
 					return err
 				}
 
-				pkg, err := apk.ParsePackage(ctx, f, uint64(stat.Size()))
+				pkg, err := apk.ParsePackage(ctx, f, uint64(stat.Size())) //nolint:gosec
 				if err != nil {
 					return err
 				}
