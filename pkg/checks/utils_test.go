@@ -26,7 +26,7 @@ func TestChecks_ParsePackages(t *testing.T) {
 	err = os.WriteFile(filepath.Join(dir, "bind.yaml"), melangeData, os.ModePerm) //nolint: gosec
 	assert.NoError(t, err)
 
-	packages, err := getNewPackages(filepath.Join("testdata", "packages.log"))
+	packages, err := GetNewPackages(filepath.Join("testdata", "packages.log"))
 	assert.NoError(t, err)
 
 	assert.Equal(t, "3.7.8", packages["gnutls-c++"].Version)

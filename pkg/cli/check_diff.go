@@ -6,19 +6,21 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/checks"
 )
 
 func Diff() *cobra.Command {
 	o := checks.NewDiff()
-	var apkIndexURL string
+	var packageListFile string
 	cmd := &cobra.Command{
 		Use:               "diff",
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 		Short:             "Create a diff comparing proposed apk changes following a melange build, to the latest available in an APKINDEX",
-		RunE: func(_ *cobra.Command, _ []string) error {
+		Args:              cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			arch := ""
 			switch runtime.GOARCH {
 			case "amd64":
@@ -28,9 +30,21 @@ func Diff() *cobra.Command {
 			default:
 				return fmt.Errorf("architecture %s not supported", runtime.GOARCH)
 			}
-			o.ApkIndexURL = fmt.Sprintf(apkIndexURL, arch)
+			o.ApkIndexURL = fmt.Sprintf(o.ApkIndexURL, arch)
 
-			return o.Diff()
+			apkContext := apk.New(o.Client, o.ApkIndexURL)
+			existingPackages, err := apkContext.GetApkPackages()
+			if err != nil {
+				return fmt.Errorf("failed to get APK packages from URL %s: %w", o.ApkIndexURL, err)
+			}
+
+			// get a list of new package names that have recently been built
+			newPackages, err := checks.GetNewPackages(packageListFile)
+			if err != nil {
+				return fmt.Errorf("failed to get new packages: %w", err)
+			}
+
+			return o.Diff(cmd.Context(), existingPackages, newPackages)
 		},
 	}
 
@@ -38,8 +52,8 @@ func Diff() *cobra.Command {
 
 	cmd.Flags().StringVar(&o.Dir, "dir", cwd, "directory the command is executed from and will contain the resulting diff.log file")
 	cmd.Flags().StringVar(&o.PackagesDir, "packages-dir", filepath.Join(cwd, "packages"), "directory containing new packages")
-	cmd.Flags().StringVarP(&o.PackageListFilename, "package-list-file", "", "packages.log", "name of the package to compare")
-	cmd.Flags().StringVarP(&apkIndexURL, "apk-index-url", "", "https://packages.wolfi.dev/os/%s/APKINDEX.tar.gz", "apk-index-url used to get existing apks.  Defaults to wolfi")
+	cmd.Flags().StringVarP(&packageListFile, "package-list-file", "", "packages.log", "name of the package to compare")
+	cmd.Flags().StringVarP(&o.ApkIndexURL, "apk-index-url", "", "https://packages.wolfi.dev/os/%s/APKINDEX.tar.gz", "apk-index-url used to get existing apks.  Defaults to wolfi")
 
 	return cmd
 }

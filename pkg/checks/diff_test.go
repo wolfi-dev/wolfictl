@@ -1,18 +1,20 @@
 package checks
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/chainguard-dev/clog/slogtest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/wolfi-dev/wolfictl/pkg/apk"
 )
 
 func TestDiff(t *testing.T) {
+	ctx := slogtest.Context(t)
 	resultDir := t.TempDir()
 
 	dir := filepath.Join("testdata", "diff")
@@ -40,15 +42,21 @@ func TestDiff(t *testing.T) {
 		}
 	}))
 
+	newPackages, err := GetNewPackages(filepath.Join(dir, "packages.log"))
+	require.NoError(t, err)
+
 	diffOpts := DiffOptions{
-		ApkIndexURL:         server.URL + apkindexEndpoint,
-		Client:              server.Client(),
-		PackageListFilename: filepath.Join(dir, "packages.log"),
-		Dir:                 resultDir,
-		PackagesDir:         dir,
-		Logger:              log.New(log.Writer(), "test: ", log.LstdFlags|log.Lmsgprefix),
+		ApkIndexURL: server.URL + apkindexEndpoint,
+		Client:      server.Client(),
+		Dir:         resultDir,
+		PackagesDir: dir,
 	}
-	err = diffOpts.Diff()
+
+	apkContext := apk.New(diffOpts.Client, diffOpts.ApkIndexURL)
+	existingPackages, err := apkContext.GetApkPackages()
+	assert.NoError(t, err)
+
+	err = diffOpts.Diff(ctx, existingPackages, newPackages)
 	require.NoError(t, err)
 
 	diffLogFile := filepath.Join(resultDir, "diff.log")

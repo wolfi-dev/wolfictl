@@ -12,7 +12,7 @@ import (
 
 // the wolfi package repo CI will write a file entry for every new .apk package that's been built
 // in the form $ARCH|$PACKAGE_NAME|$VERSION_r$EPOCH
-func getNewPackages(packageListFile string) (map[string]NewApkPackage, error) {
+func GetNewPackages(packageListFile string) (map[string]NewApkPackage, error) {
 	rs := make(map[string]NewApkPackage)
 	original, err := os.Open(packageListFile)
 	if err != nil {
