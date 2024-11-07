@@ -32,7 +32,7 @@ func NewDiff() *DiffOptions {
 }
 
 // Diff compare a newly built apk with the latest in an APK repository, writing the differences to a file diff.log
-func (o *DiffOptions) Diff(ctx context.Context, existingPackages map[string]*goapk.Package, newPackages map[string]NewApkPackage) error {
+func (o *DiffOptions) Diff(ctx context.Context, existingPackages, newPackages map[string]*goapk.Package) error {
 	log := clog.FromContext(ctx)
 
 	// create two temp folders we can use to explode the apks and compare their contents
@@ -49,21 +49,21 @@ func (o *DiffOptions) Diff(ctx context.Context, existingPackages map[string]*goa
 	defer os.RemoveAll(dirNewApk)
 
 	// for each new package being built grab the latest existing one
-	for newPackageName, newAPK := range newPackages {
-		log.Infof("checking %s", newPackageName)
+	for _, newAPK := range newPackages {
+		log.Infof("checking %s", newAPK.PackageName())
 		// read new apk
-		filename := filepath.Join(o.PackagesDir, newAPK.Arch, fmt.Sprintf("%s-%s-r%s.apk", newPackageName, newAPK.Version, newAPK.Epoch))
+		filename := filepath.Join(o.PackagesDir, newAPK.Arch, newAPK.PackageName())
 		newFile, err := os.Open(filename)
 		if err != nil {
 			return fmt.Errorf("failed to read %s: %w", filename, err)
 		}
 
-		if err := tar.Untar(newFile, filepath.Join(dirNewApk, newPackageName)); err != nil {
+		if err := tar.Untar(newFile, filepath.Join(dirNewApk, newAPK.PackageName())); err != nil {
 			return fmt.Errorf("failed to untar new apk: %w", err)
 		}
 
 		// fetch current latest apk
-		p, ok := existingPackages[newPackageName]
+		p, ok := existingPackages[newAPK.PackageName()]
 		if !ok {
 			if err := os.Mkdir(filepath.Join(dirExistingApk, newAPK.Name), os.ModePerm); err != nil {
 				return fmt.Errorf("failed to mkdir %s", filepath.Join(dirExistingApk, newAPK.Name))
@@ -72,8 +72,8 @@ func (o *DiffOptions) Diff(ctx context.Context, existingPackages map[string]*goa
 		}
 
 		existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
-		if err := downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, filepath.Join(dirExistingApk, newPackageName)); err != nil {
-			return fmt.Errorf("failed to download %s using base URL %s: %w", newPackageName, existingFilename, err)
+		if err := downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, filepath.Join(dirExistingApk, newAPK.PackageName())); err != nil {
+			return fmt.Errorf("failed to download %s using base URL %s: %w", newAPK.PackageName(), existingFilename, err)
 		}
 	}
 
@@ -225,7 +225,7 @@ func shouldSkipFile(path string) bool {
 		strings.HasSuffix(path, ".spdx.json")
 }
 
-func writeDiffLog(diff diffResult, mal []byte, filename string, newPackages map[string]NewApkPackage) error {
+func writeDiffLog(diff diffResult, mal []byte, filename string, newPackages map[string]*goapk.Package) error {
 	var builder strings.Builder
 
 	for packageName := range newPackages {

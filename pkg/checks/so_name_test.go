@@ -1,71 +1,88 @@
 package checks
 
 import (
+	"archive/tar"
+	"bytes"
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
 	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/chainguard-dev/clog/slogtest"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestChecks_getSonameFiles(t *testing.T) {
-	tests := []struct {
+	for _, tt := range []struct {
 		name        string
 		sonameFiles []string
 		dtSoname    []string
-		match       bool
-		wantErr     assert.ErrorAssertionFunc
-	}{
-		{
-			name: "match", sonameFiles: []string{
-				"foo.so",
-				"foo.so.1",
-				"foo.so.11",
-				"foo.so.1.1",
-				"libstdc++.so.6.0.30-gdb.py",
-			}, dtSoname: []string{"cheese.so.1.1"}, match: true,
-			wantErr: assert.NoError,
+		want        []string
+	}{{
+		name: "match",
+		sonameFiles: []string{
+			"foo.so", // should not match
+			"foo.so.1",
+			"foo.so.11",
+			"foo.so.1.1",
+			"libstdc++.so.6.0.30-gdb.py",
 		},
-		{
-			name: "dont_match", sonameFiles: []string{
-				"foo",
-				"XIDefineCursor.3",
-				"README.solaris2",
-			}, match: false,
-			wantErr: assert.NoError,
+		dtSoname: []string{"cheese.so.1.1"},
+		want: []string{
+			"foo.so.1",
+			"foo.so.11",
+			"foo.so.1.1",
+			"libstdc++.so.6.0.30-gdb.py",
+			"cheese.so.1.1",
 		},
-	}
-	for _, tt := range tests {
+	}, {
+		name: "dont_match",
+		sonameFiles: []string{
+			"foo",
+			"XIDefineCursor.3",
+			"README.solaris2",
+		},
+		want: nil,
+	}} {
 		t.Run(tt.name, func(t *testing.T) {
 			o := SoNameOptions{}
 
-			dir := t.TempDir()
-
+			var buf bytes.Buffer
+			tw := tar.NewWriter(&buf)
 			for _, f := range tt.sonameFiles {
-				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm) //nolint: gosec
+				hdr := &tar.Header{
+					Name: "dir/" + f,
+					Mode: 0o644,
+					Size: int64(len("test")),
+				}
+				err := tw.WriteHeader(hdr)
+				assert.NoError(t, err)
+				_, err = tw.Write([]byte("test"))
 				assert.NoError(t, err)
 			}
 
 			// simulate DT_SONAME
 			for _, f := range tt.dtSoname {
-				err := os.WriteFile(filepath.Join(dir, f), []byte("test"), os.ModePerm) //nolint: gosec
+				hdr := &tar.Header{
+					Name: "dir/" + f,
+					Mode: 0o644,
+					Size: int64(len("test")),
+				}
+				err := tw.WriteHeader(hdr)
 				assert.NoError(t, err)
-				err = os.Link(filepath.Join(dir, f), filepath.Join(dir, "cheese.so.1"))
+				_, err = tw.Write([]byte("test"))
 				assert.NoError(t, err)
 			}
+			assert.NoError(t, tw.Close())
 
-			got, err := o.getSonameFiles(dir)
+			tr := tar.NewReader(&buf)
+
+			got, err := o.getSonameFiles(tr)
 			assert.NoError(t, err)
 
-			expectedCount := 0
-			if tt.match {
-				expectedCount = len(tt.sonameFiles) + len(tt.dtSoname)
+			if d := cmp.Diff(got, tt.want); d != "" {
+				t.Errorf("getSonameFiles() mismatch (-got +want):\n%s", d)
 			}
-
-			assert.Equal(t, expectedCount, len(got))
 		})
 	}
 }
@@ -146,19 +163,21 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 
 func TestSoNameOptions_checkSonamesSubFolders(t *testing.T) {
 	o := SoNameOptions{}
-	dir := t.TempDir()
-	subDir := filepath.Join(dir, "foo")
-	err := os.Mkdir(subDir, os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	err = os.WriteFile(filepath.Join(subDir, "bar.so.1.2.3"), []byte("test"), os.ModePerm) //nolint: gosec
-	if err != nil {
-		t.Fatal(err)
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+	hdr := &tar.Header{
+		Name: "foo/bar/baz/bar.so.1.2.3",
+		Mode: 0o644,
+		Size: int64(len("test")),
 	}
+	err := tw.WriteHeader(hdr)
+	assert.NoError(t, err)
+	_, err = tw.Write([]byte("test"))
+	assert.NoError(t, err)
 
-	got, err := o.getSonameFiles(dir)
+	tr := tar.NewReader(&buf)
+	got, err := o.getSonameFiles(tr)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "bar.so.1.2.3", got[0])

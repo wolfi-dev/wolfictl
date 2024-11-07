@@ -32,7 +32,11 @@ func SoName() *cobra.Command {
 				return fmt.Errorf("failed to get new packages: %w", err)
 			}
 
-			return o.CheckSoName(cmd.Context(), existingPackages, newPackages)
+			report := o.CheckSoName(cmd.Context(), existingPackages, newPackages)
+			if len(report) > 0 {
+				return fmt.Errorf("so name check failed")
+			}
+			return nil
 		},
 	}
 

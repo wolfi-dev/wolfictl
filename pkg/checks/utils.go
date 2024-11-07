@@ -7,13 +7,14 @@ import (
 	"os"
 	"strings"
 
+	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
 
 // the wolfi package repo CI will write a file entry for every new .apk package that's been built
 // in the form $ARCH|$PACKAGE_NAME|$VERSION_r$EPOCH
-func GetNewPackages(packageListFile string) (map[string]NewApkPackage, error) {
-	rs := make(map[string]NewApkPackage)
+func GetNewPackages(packageListFile string) (map[string]*goapk.Package, error) {
+	rs := make(map[string]*goapk.Package)
 	original, err := os.Open(packageListFile)
 	if err != nil {
 		return rs, fmt.Errorf("opening file %s: %w", packageListFile, err)
@@ -41,13 +42,8 @@ func GetNewPackages(packageListFile string) (map[string]NewApkPackage, error) {
 		packageName := parts[2]
 		version := versionParts[0]
 
-		epoch := versionParts[1]
-		epoch = strings.TrimPrefix(epoch, "r")
-		epoch = strings.TrimSuffix(epoch, ".apk")
-
-		rs[packageName] = NewApkPackage{
+		rs[packageName] = &goapk.Package{
 			Version: version,
-			Epoch:   epoch,
 			Arch:    arch,
 			Name:    packageName,
 		}

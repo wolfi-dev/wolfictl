@@ -1,10 +1,13 @@
 package checks
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"debug/elf"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,7 +17,6 @@ import (
 
 	goapk "chainguard.dev/apko/pkg/apk/apk"
 	"github.com/chainguard-dev/clog"
-	"github.com/wolfi-dev/wolfictl/pkg/tar"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"golang.org/x/exp/maps"
 )
@@ -24,13 +26,6 @@ type SoNameOptions struct {
 	Dir         string
 	PackagesDir string
 	ApkIndexURL string
-}
-
-type NewApkPackage struct {
-	Name    string
-	Arch    string
-	Epoch   string
-	Version string
 }
 
 func NewSoName() *SoNameOptions {
@@ -45,24 +40,32 @@ func NewSoName() *SoNameOptions {
 CheckSoName will check if a new APK contains a foo.so file, then compares it with the latest version in an APKINDEX to check
 if there are differences.
 */
-func (o *SoNameOptions) CheckSoName(ctx context.Context, existingPackages map[string]*goapk.Package, newPackages map[string]NewApkPackage) error {
+func (o *SoNameOptions) CheckSoName(ctx context.Context, existingPackages, newPackages map[string]*goapk.Package) map[string]SoCheckReport {
 	log := clog.FromContext(ctx)
 
-	var errs []error
+	report := map[string]SoCheckReport{}
 	// for every new package built lets compare *.so names with the previous released version
-	for packageName, newAPK := range newPackages {
-		log.Infof("checking %s", packageName)
+	for _, newAPK := range newPackages {
+		log.Infof("checking %s", newAPK.Name)
 
-		if err := o.diff(ctx, existingPackages, packageName, newAPK); err != nil {
-			errs = append(errs, err)
+		if err := o.diff(ctx, existingPackages, newAPK); err != nil {
+			report[newAPK.Name] = SoCheckReport{
+				Package: newAPK,
+				Error:   err,
+			}
 		}
 	}
 
-	return errors.Join(errs...)
+	return report
+}
+
+type SoCheckReport struct {
+	Package *goapk.Package
+	Error   error
 }
 
 // diff will compare the so name versions between the latest existing apk in a APKINDEX with a newly built local apk
-func (o *SoNameOptions) diff(ctx context.Context, existingPackages map[string]*goapk.Package, newPackageName string, newAPK NewApkPackage) error {
+func (o *SoNameOptions) diff(ctx context.Context, existingPackages map[string]*goapk.Package, newAPK *goapk.Package) error {
 	log := clog.FromContext(ctx)
 
 	dirExistingApk, err := os.MkdirTemp("", "wolfictl-apk-*")
@@ -78,17 +81,15 @@ func (o *SoNameOptions) diff(ctx context.Context, existingPackages map[string]*g
 	defer os.RemoveAll(dirNewApk)
 
 	// read new apk
-	filename := filepath.Join(o.PackagesDir, newAPK.Arch, fmt.Sprintf("%s-%s-r%s.apk", newPackageName, newAPK.Version, newAPK.Epoch))
+	filename := filepath.Join(o.PackagesDir, newAPK.Arch, newAPK.PackageName())
 	newFile, err := os.Open(filename)
 	if err != nil {
 		return fmt.Errorf("failed to read %s: %w", filename, err)
 	}
 
-	if err := tar.Untar(newFile, dirNewApk); err != nil {
-		return fmt.Errorf("failed to untar new apk: %w", err)
-	}
+	tr := tar.NewReader(newFile)
 
-	newSonameFiles, err := o.getSonameFiles(dirNewApk)
+	newSonameFiles, err := o.getSonameFiles(tr)
 	if err != nil {
 		return fmt.Errorf("error when looking for soname files in new apk: %w", err)
 	}
@@ -98,19 +99,19 @@ func (o *SoNameOptions) diff(ctx context.Context, existingPackages map[string]*g
 	}
 
 	// fetch current latest apk
-	p := existingPackages[newPackageName]
+	p := existingPackages[newAPK.Name]
 
 	if p == nil {
-		log.Infof("no existing package found for %s, skipping so name check", newPackageName)
+		log.Infof("no existing package found for %s, skipping so name check", newAPK.Name)
 		return nil
 	}
 	existingFilename := fmt.Sprintf("%s-%s.apk", p.Name, p.Version)
 	if err := downloadCurrentAPK(o.Client, o.ApkIndexURL, existingFilename, dirExistingApk); err != nil {
-		return fmt.Errorf("failed to download %s using base URL %s: %w", newPackageName, o.ApkIndexURL, err)
+		return fmt.Errorf("failed to download %s using base URL %s: %w", newAPK.Name, o.ApkIndexURL, err)
 	}
 
 	// get any existing so names
-	existingSonameFiles, err := o.getSonameFiles(dirExistingApk)
+	existingSonameFiles, err := o.getSonameFiles(tr)
 	if err != nil {
 		return fmt.Errorf("error when looking for soname files in existing apk: %w", err)
 	}
@@ -122,40 +123,48 @@ func (o *SoNameOptions) diff(ctx context.Context, existingPackages map[string]*g
 	return nil
 }
 
-func (o *SoNameOptions) getSonameFiles(dir string) ([]string, error) {
-	reg := regexp.MustCompile(`\.so.(\d+\.)?(\d+\.)?(\*|\d+)`)
+var soFileRE = regexp.MustCompile(`\.so.(\d+\.)?(\d+\.)?(\*|\d+)`)
 
+func (o *SoNameOptions) getSonameFiles(tr *tar.Reader) ([]string, error) {
 	var fileList []string
-	err := filepath.WalkDir(dir, func(path string, _ os.DirEntry, err error) error {
-		if err != nil {
-			return err
+	for {
+		th, err := tr.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, fmt.Errorf("failed to read tar file: %w", err)
 		}
-		basePath := filepath.Base(path)
-		s := reg.FindString(basePath)
+
+		basePath := filepath.Base(th.Name)
+		s := soFileRE.FindString(basePath)
 		if s != "" {
 			fileList = append(fileList, basePath)
 		}
 
 		// also check for DT_SONAME
-		ef, err := elf.Open(filepath.Join(dir, basePath))
+		// TODO(jason): Don't buffer this whole file in memory.
+		all, err := io.ReadAll(tr)
 		if err != nil {
-			return nil
+			return nil, fmt.Errorf("failed to read file: %w", err)
+		}
+		ef, err := elf.NewFile(bytes.NewReader(all))
+		if err != nil {
+			continue
 		}
 		defer ef.Close()
 
 		sonames, err := ef.DynString(elf.DT_SONAME)
 		// most likely SONAME is not set on this object
 		if err != nil {
-			return nil
+			continue
 		}
 
 		if len(sonames) > 0 {
 			fileList = append(fileList, sonames...)
 		}
-		return nil
-	})
+	}
 
-	return fileList, err
+	return fileList, nil
 }
 
 // ("foo", "1.2.3") -> ["so:foo.so.1", "so:foo.so.1.2", "so:foo.so.1.2.3"]
