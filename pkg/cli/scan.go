@@ -17,6 +17,7 @@ import (
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/apk/auth"
+	"chainguard.dev/apko/pkg/apk/client"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/charmbracelet/lipgloss"
@@ -28,7 +29,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
@@ -727,6 +727,7 @@ func resolveInputsForRemoteTarget(ctx context.Context, inputs []string) (downloa
 		ig errgroup.Group
 	)
 
+	c := client.New(http.DefaultClient)
 	indices := map[string]map[string]*apk.APKIndex{}
 	for _, apkRepositoryURL := range []string{
 		"https://packages.wolfi.dev/os",
@@ -736,7 +737,7 @@ func resolveInputsForRemoteTarget(ctx context.Context, inputs []string) (downloa
 		byArch := map[string]*apk.APKIndex{}
 		for _, arch := range []string{"x86_64", "aarch64"} {
 			ig.Go(func() error {
-				apkindex, err := index.Index(ctx, arch, apkRepositoryURL)
+				apkindex, err := c.GetRemoteIndex(ctx, apkRepositoryURL, arch)
 				if err != nil {
 					return fmt.Errorf("getting APKINDEX: %w", err)
 				}

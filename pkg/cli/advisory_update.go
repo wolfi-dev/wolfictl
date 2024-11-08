@@ -2,10 +2,12 @@ package cli
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/client"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -15,7 +17,6 @@ import (
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
 )
 
 func cmdAdvisoryUpdate() *cobra.Command {
@@ -87,11 +88,12 @@ required fields are missing.`,
 				return err
 			}
 
+			c := client.New(http.DefaultClient)
 			var apkindexes []*apk.APKIndex
 			for _, arch := range archs {
-				idx, err := index.Index(cmd.Context(), arch, packageRepositoryURL)
+				idx, err := c.GetRemoteIndex(cmd.Context(), packageRepositoryURL, arch)
 				if err != nil {
-					return fmt.Errorf("unable to load APKINDEX for %s: %w", arch, err)
+					return fmt.Errorf("getting APKINDEX for %s: %w", arch, err)
 				}
 				apkindexes = append(apkindexes, idx)
 			}

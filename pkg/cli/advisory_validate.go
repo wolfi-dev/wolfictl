@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"chainguard.dev/apko/pkg/apk/client"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
@@ -18,7 +19,6 @@ import (
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/git"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
 )
 
 func cmdAdvisoryValidate() *cobra.Command {
@@ -165,7 +165,8 @@ print an error message that specifies where and how the data is invalid.`,
 				return fmt.Errorf("unable to create index of advisories repo: %w", err)
 			}
 
-			apkIndex, err := index.Index(ctx, "x86_64", apkRepositoryURL)
+			c := client.New(http.DefaultClient)
+			apkIndex, err := c.GetRemoteIndex(ctx, apkRepositoryURL, "x86_64")
 			if err != nil {
 				return fmt.Errorf("unable to load APKINDEX: %w", err)
 			}
