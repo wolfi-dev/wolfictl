@@ -3,14 +3,15 @@ package advisory
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"sort"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/client"
 	"chainguard.dev/melange/pkg/config"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
@@ -55,13 +56,14 @@ func Discover(ctx context.Context, opts DiscoverOptions) error {
 			return fmt.Errorf("package repository URL must be specified")
 		}
 
+		c := client.New(http.DefaultClient)
 		var apkindexes []*apk.APKIndex
 		for _, arch := range opts.Arches {
-			apkindex, err := index.Index(ctx, arch, packageRepositoryURL)
+			idx, err := c.GetRemoteIndex(ctx, packageRepositoryURL, arch)
 			if err != nil {
-				return fmt.Errorf("unable to get APKINDEX for arch %q: %w", arch, err)
+				return fmt.Errorf("getting APKINDEX for %s: %w", arch, err)
 			}
-			apkindexes = append(apkindexes, apkindex)
+			apkindexes = append(apkindexes, idx)
 		}
 
 		packagesToLookup = uniquePackageNamesFromAPKINDEXes(apkindexes)

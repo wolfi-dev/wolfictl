@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	"chainguard.dev/apko/pkg/apk/client"
 	"chainguard.dev/melange/pkg/config"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
@@ -17,7 +18,6 @@ import (
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
-	"github.com/wolfi-dev/wolfictl/pkg/index"
 )
 
 func cmdAdvisoryCreate() *cobra.Command {
@@ -96,11 +96,12 @@ newly created advisory and any other advisories for the same package.`,
 				return fmt.Errorf("cannot create advisory: %q is an advisory ID, which the user is not allowed to assign", req.AdvisoryID)
 			}
 
+			c := client.New(http.DefaultClient)
 			var apkindexes []*apk.APKIndex
 			for _, arch := range archs {
-				idx, err := index.Index(cmd.Context(), arch, packageRepositoryURL)
+				idx, err := c.GetRemoteIndex(cmd.Context(), packageRepositoryURL, arch)
 				if err != nil {
-					return fmt.Errorf("unable to load APKINDEX for %s: %w", arch, err)
+					return fmt.Errorf("getting APKINDEX for %s: %w", arch, err)
 				}
 				apkindexes = append(apkindexes, idx)
 			}
