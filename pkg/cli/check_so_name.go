@@ -25,6 +25,7 @@ func SoName() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get APK packages from URL %s: %w", apkIndexURL, err)
 			}
+			o.ApkIndexURL = apkIndexURL
 
 			// get a list of new package names that have recently been built
 			newPackages, err := checks.GetNewPackages(packageListFile)
