@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/hashicorp/go-retryablehttp"
+
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/apk/auth"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
@@ -19,8 +21,10 @@ type Context struct {
 }
 
 func New(client *http.Client, indexURL string) Context {
+	rc := retryablehttp.NewClient()
+	rc.HTTPClient = client
 	return Context{
-		client:   client,
+		client:   rc.StandardClient(),
 		indexURL: indexURL,
 	}
 }
