@@ -12,7 +12,6 @@ import (
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/apk/auth"
-	"github.com/hashicorp/go-retryablehttp"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
