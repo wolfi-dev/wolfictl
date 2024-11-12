@@ -94,7 +94,7 @@ func resolveTimestamp(ts string) (v2.Timestamp, error) {
 }
 
 type advisoryRequestParams struct {
-	packageName, vuln, eventType, truePositiveNote, falsePositiveNote, falsePositiveType, timestamp, fixedVersion string
+	packageName, vuln, eventType, truePositiveNote, falsePositiveNote, falsePositiveType, timestamp, fixedVersion, note string
 }
 
 func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
@@ -102,8 +102,11 @@ func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
 	addVulnFlag(&p.vuln, cmd)
 
 	cmd.Flags().StringVarP(&p.eventType, "type", "t", "", fmt.Sprintf("type of event [%s]", strings.Join(v2.EventTypes, ", ")))
+	cmd.Flags().StringVar(&p.note, "note", "", "prose explanation to attach to the event data (can be used with any event type)")
 	cmd.Flags().StringVar(&p.truePositiveNote, "tp-note", "", "prose explanation of the true positive (used only for true positives)")
+	_ = cmd.Flags().MarkDeprecated("tp-note", "use --note instead") //nolint:errcheck
 	cmd.Flags().StringVar(&p.falsePositiveNote, "fp-note", "", "prose explanation of the false positive (used only for false positives)")
+	_ = cmd.Flags().MarkDeprecated("fp-note", "use --note instead") //nolint:errcheck
 	cmd.Flags().StringVar(&p.falsePositiveType, "fp-type", "", fmt.Sprintf("type of false positive [%s]", strings.Join(v2.FPTypes, ", ")))
 	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp of the event (RFC3339 format)")
 	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for 'fixed' event type)")
@@ -132,6 +135,9 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 		}
 	}
 
+	// For now, introduce p.note as a fallback value for event-specific notes. Then
+	// in the future, we could deprecate and remove the event-specific note flags.
+
 	switch req.Event.Type {
 	case v2.EventTypeFixed:
 		req.Event.Data = v2.Fixed{
@@ -139,14 +145,37 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 		}
 
 	case v2.EventTypeFalsePositiveDetermination:
+		note := p.falsePositiveNote
+		if note == "" {
+			note = p.note
+		}
 		req.Event.Data = v2.FalsePositiveDetermination{
 			Type: p.falsePositiveType,
-			Note: p.falsePositiveNote,
+			Note: note,
 		}
 
 	case v2.EventTypeTruePositiveDetermination:
+		note := p.truePositiveNote
+		if note == "" {
+			note = p.note
+		}
 		req.Event.Data = v2.TruePositiveDetermination{
-			Note: p.truePositiveNote,
+			Note: note,
+		}
+
+	case v2.EventTypeAnalysisNotPlanned:
+		req.Event.Data = v2.AnalysisNotPlanned{
+			Note: p.note,
+		}
+
+	case v2.EventTypeFixNotPlanned:
+		req.Event.Data = v2.FixNotPlanned{
+			Note: p.note,
+		}
+
+	case v2.EventTypePendingUpstreamFix:
+		req.Event.Data = v2.PendingUpstreamFix{
+			Note: p.note,
 		}
 	}
 
