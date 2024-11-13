@@ -374,7 +374,7 @@ func (r advisoryListRenderer) String() string {
 		sb.WriteString(stylePkg.Render(row.pkg))
 		sb.WriteString(strings.Repeat(" ", pkgWidth-len(row.pkg)+1))
 
-		sb.WriteString(styleAdvID.Render(row.advID))
+		sb.WriteString(styleAdvID.Render(hyperlinkVulnerabilityID(row.advID)))
 		sb.WriteString(strings.Repeat(" ", advIDWidth-len(row.advID)+1))
 
 		if r.showAliases {

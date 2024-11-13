@@ -959,6 +959,9 @@ func hyperlinkVulnerabilityID(id string) string {
 
 	case strings.HasPrefix(id, "GHSA-"):
 		return termlink.Link(id, fmt.Sprintf("https://github.com/advisories/%s", id))
+
+	case strings.HasPrefix(id, "CGA-"):
+		return termlink.Link(id, fmt.Sprintf("https://images.chainguard.dev/security/%s", id))
 	}
 
 	return id
