@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/apk/client"
@@ -44,19 +45,44 @@ required fields are missing.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			// Get initial values for distro-related parameters.
 			archs := p.archs
 			packageRepositoryURL := p.packageRepositoryURL
 			distroRepoDir := resolveDistroDir(p.distroRepoDir)
 			advisoriesRepoDir := resolveAdvisoriesDirInput(p.advisoriesRepoDir)
-			if distroRepoDir == "" || advisoriesRepoDir == "" {
-				if p.doNotDetectDistro {
-					return fmt.Errorf("distro repo dir and/or advisories repo dir was left unspecified")
-				}
 
+			// If we're not using auto-detection, we need to fail fast on any missing
+			// parameter values.
+			if p.doNotDetectDistro {
+				var missingParamWarnings []string
+
+				if distroRepoDir == "" {
+					missingParamWarnings = append(missingParamWarnings, fmt.Sprintf("  - distro repository directory (specify using --%s)", flagNameDistroRepoDir))
+				}
+				if advisoriesRepoDir == "" {
+					missingParamWarnings = append(missingParamWarnings, fmt.Sprintf("  - advisories repository directory (specify using --%s)", flagNameAdvisoriesRepoDir))
+				}
+				if packageRepositoryURL == "" {
+					missingParamWarnings = append(missingParamWarnings, fmt.Sprintf("  - package repository URL (specify using --%s)", flagNamePackageRepoURL))
+				}
+				if len(missingParamWarnings) > 0 {
+					return fmt.Errorf(
+						"one or more distro configuration values was left unspecified and couldn't be automatically resolved because distro auto-detection was disabled by user:\n%v",
+						strings.Join(missingParamWarnings, "\n"),
+					)
+				}
+			}
+
+			// If we made it this far, we either have all the values, or we'll be able to
+			// use auto-detection to resolve the rest.
+
+			if distroRepoDir == "" || advisoriesRepoDir == "" || packageRepositoryURL == "" {
 				d, err := distro.Detect()
 				if err != nil {
 					return fmt.Errorf("distro repo dir and/or advisories repo dir was left unspecified, and distro auto-detection failed: %w", err)
 				}
+
+				// Replace only the values that are still empty.
 
 				if len(archs) == 0 {
 					archs = d.Absolute.SupportedArchitectures
@@ -66,8 +92,14 @@ required fields are missing.`,
 					packageRepositoryURL = d.Absolute.APKRepositoryURL
 				}
 
-				distroRepoDir = d.Local.PackagesRepo.Dir
-				advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
+				if distroRepoDir == "" {
+					distroRepoDir = d.Local.PackagesRepo.Dir
+				}
+
+				if advisoriesRepoDir == "" {
+					advisoriesRepoDir = d.Local.AdvisoriesRepo.Dir
+				}
+
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
