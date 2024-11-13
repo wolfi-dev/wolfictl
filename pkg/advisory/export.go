@@ -45,25 +45,25 @@ func ExportCSV(opts ExportOptions) (io.Reader, error) {
 					switch event.Type {
 					case v2.EventTypeTruePositiveDetermination:
 						if event.Data != nil {
-							note = event.Data.(v2.TruePositiveDetermination).Note
+							note = event.Data.(v2.TruePositiveDetermination).Note //nolint:errcheck // We're confident in this type assertion
 						}
 
 					case v2.EventTypeFalsePositiveDetermination:
-						fp, _ := event.Data.(v2.FalsePositiveDetermination) //nolint:errcheck
+						fp, _ := event.Data.(v2.FalsePositiveDetermination) //nolint:errcheck // We're confident in this type assertion
 						falsePositiveType = fp.Type
 						note = fp.Note
 
 					case v2.EventTypeFixed:
-						fixedVersion = event.Data.(v2.Fixed).FixedVersion
+						fixedVersion = event.Data.(v2.Fixed).FixedVersion //nolint:errcheck // We're confident in this type assertion
 
 					case v2.EventTypeFixNotPlanned:
-						note = event.Data.(v2.FixNotPlanned).Note
+						note = event.Data.(v2.FixNotPlanned).Note //nolint:errcheck // We're confident in this type assertion
 
 					case v2.EventTypeAnalysisNotPlanned:
-						note = event.Data.(v2.AnalysisNotPlanned).Note
+						note = event.Data.(v2.AnalysisNotPlanned).Note //nolint:errcheck // We're confident in this type assertion
 
 					case v2.EventTypePendingUpstreamFix:
-						note = event.Data.(v2.PendingUpstreamFix).Note
+						note = event.Data.(v2.PendingUpstreamFix).Note //nolint:errcheck // We're confident in this type assertion
 					}
 
 					row := []string{

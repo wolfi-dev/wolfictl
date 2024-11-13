@@ -108,7 +108,7 @@ func (m Model[T]) updateForMessage(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Update the state.
 	var nextQuestion *question.Question[T]
 	var err error
-	m.state, nextQuestion, err = m.stack[m.stackTopIndex()].Answer.(question.MessageOnly[T])(m.state)
+	m.state, nextQuestion, err = m.stack[m.stackTopIndex()].Answer.(question.MessageOnly[T])(m.state) //nolint:errcheck // We're confident in this type assertion
 	if err != nil {
 		if errors.Is(err, question.ErrTerminate) {
 			// Exit the interview without a resulting state.
@@ -151,12 +151,12 @@ func (m Model[T]) updateForTextInput(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			// The user has submitted a text answer.
 			// Update the state.
-			val := m.answerComponentStackTop().(textinput.Model).Inner.Value()
+			val := m.answerComponentStackTop().(textinput.Model).Inner.Value() //nolint:errcheck // We're confident in this type assertion
 
 			// Update the state.
 			var nextQuestion *question.Question[T]
 			var err error
-			m.state, nextQuestion, err = m.stack[m.stackTopIndex()].Answer.(question.AcceptText[T])(m.state, val)
+			m.state, nextQuestion, err = m.stack[m.stackTopIndex()].Answer.(question.AcceptText[T])(m.state, val) //nolint:errcheck // We're confident in this type assertion
 			if err != nil {
 				if errors.Is(err, question.ErrTerminate) {
 					// Exit the interview without a resulting state.

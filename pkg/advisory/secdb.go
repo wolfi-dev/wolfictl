@@ -66,7 +66,7 @@ func BuildSecurityDatabase(ctx context.Context, opts BuildSecurityDatabaseOption
 				addVulnToPkgVersion := func(vulnID string) {
 					switch latest.Type {
 					case v2.EventTypeFixed:
-						version := latest.Data.(v2.Fixed).FixedVersion
+						version := latest.Data.(v2.Fixed).FixedVersion //nolint:errcheck // We're confident in this type assertion
 						secfixes[version] = append(secfixes[version], vulnID)
 						sort.Strings(secfixes[version])
 					case v2.EventTypeFalsePositiveDetermination:

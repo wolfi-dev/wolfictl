@@ -73,7 +73,9 @@ GOLANGCI_LINT_BIN = $(GOLANGCI_LINT_DIR)/golangci-lint
 golangci-lint:
 	rm -f $(GOLANGCI_LINT_BIN) || :
 	set -e ;\
-	GOBIN=$(GOLANGCI_LINT_DIR) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.2 ;\
+
+	# Please keep the installed version in sync with .github/workflows/golangci-lint.yaml
+	GOBIN=$(GOLANGCI_LINT_DIR) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.0 ;\
 
 .PHONY: fmt
 fmt: ## Format all go files
@@ -99,7 +101,7 @@ log-%:
 
 .PHONY: lint
 lint: checkfmt golangci-lint ## Run linters and checks like golangci-lint
-	$(GOLANGCI_LINT_BIN) run -n
+	$(GOLANGCI_LINT_BIN) run
 
 .PHONY: test
 test: integration ## Run go test
