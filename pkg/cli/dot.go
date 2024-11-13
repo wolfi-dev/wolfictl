@@ -276,7 +276,7 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 				})
 
 				g.Go(func() error {
-					return open.Run(fmt.Sprintf("http://localhost:%d", l.Addr().(*net.TCPAddr).Port))
+					return open.Run(fmt.Sprintf("http://localhost:%d", l.Addr().(*net.TCPAddr).Port)) //nolint:errcheck // We're confident in this type assertion
 				})
 
 				g.Go(func() error {

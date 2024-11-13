@@ -101,7 +101,7 @@ log-%:
 
 .PHONY: lint
 lint: checkfmt golangci-lint ## Run linters and checks like golangci-lint
-	$(GOLANGCI_LINT_BIN) run -n
+	$(GOLANGCI_LINT_BIN) run
 
 .PHONY: test
 test: integration ## Run go test
