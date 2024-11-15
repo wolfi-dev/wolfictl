@@ -1,11 +1,11 @@
 cel.dev/expr v0.16.1 h1:NR0+oFYzR1CqLFhTAqg3ql59G9VfN8fKq1TCHJ6gq1g=
 cel.dev/expr v0.16.1/go.mod h1:AsGA5zb3WruAEQeQng1RZdGEXmBj0jvMWh6l5SnNuC8=
-chainguard.dev/apko v0.19.9 h1:WDfluorfIb+adj+4C/LZxeeoyE22/b88eYUDS/6FfwY=
-chainguard.dev/apko v0.19.9/go.mod h1:8LqyoqrdBeWUoJ+kIl32CJdK5Ut1tM+OKww9nhIwgl8=
+chainguard.dev/apko v0.20.0 h1:9ZZnhlgCw5kXZRRIKlRPy09e/YpP5XRoM1C85G/qjtg=
+chainguard.dev/apko v0.20.0/go.mod h1:2Q0DTccFj92gJuJzjYXD56HDhY7sjEJTuantQd9OfbU=
 chainguard.dev/go-grpc-kit v0.17.6 h1:lwIs9LmSnm8jwrH1QmigCwMP6MYkIBENq/0xGduYZss=
 chainguard.dev/go-grpc-kit v0.17.6/go.mod h1:ZNaXn2KEO++2u2WveHs65krYiHmAEGjYLeEtfaQaOWU=
-chainguard.dev/melange v0.15.7 h1:Amn8z51mt1aj8awoI5OVE6EoxSN9zq4AR+zu7FjW9jA=
-chainguard.dev/melange v0.15.7/go.mod h1:ygQHNtC0eVNt+CZMQEXcEWxGsNfnqS4bl9iwumKFL7w=
+chainguard.dev/melange v0.15.8 h1:kdC21Xe0kEk01T5vUCvfzi+wbohV3HqbWfc2rvli0RQ=
+chainguard.dev/melange v0.15.8/go.mod h1:ygQHNtC0eVNt+CZMQEXcEWxGsNfnqS4bl9iwumKFL7w=
 chainguard.dev/sdk v0.1.28 h1:xLQv0JxiGhqVKOL059DmTReTjrKFhUsP5U1W6cgr+jQ=
 chainguard.dev/sdk v0.1.28/go.mod h1:9EvGI9GY5UPDbZ5AhGbMO8865ixNu36afQYCZ5M95NM=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -1288,8 +1288,8 @@ go.opentelemetry.io/otel/trace v1.32.0/go.mod h1:+i4rkvCraA+tG6AzwloGaCtkx53Fa+L
 go.opentelemetry.io/proto/otlp v0.7.0/go.mod h1:PqfVotwruBrMGOCsRd/89rSnXhoiJIqeYNgFYFoEGnI=
 go.opentelemetry.io/proto/otlp v1.3.1 h1:TrMUixzpM0yuc/znrFTP9MMRh8trP93mkCiDVeXrui0=
 go.opentelemetry.io/proto/otlp v1.3.1/go.mod h1:0X1WI4de4ZsLrrJNLAQbFeLCm3T7yBkR0XqQ7niQU+8=
-go.step.sm/crypto v0.54.0 h1:V8p+12Ld0NRA/RBMYoKXA0dWmVKZSdCwP56IwzweT9g=
-go.step.sm/crypto v0.54.0/go.mod h1:vQJyTngfZDW+UyZdFzOMCY/txWDAmcwViEUC7Gn4YfU=
+go.step.sm/crypto v0.54.2 h1:3LSA5nYDQvcd484OSx7xsS3XDqQ7/WZjVqvq0+a0fWc=
+go.step.sm/crypto v0.54.2/go.mod h1:1+OjUozd5aA3TkBJfr5Aobd6vNt9F70n1DagcoBh3Pc=
 go.uber.org/atomic v1.7.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
 go.uber.org/goleak v1.1.10/go.mod h1:8a7PlsEVH3e/a/GLqe5IIrQx6GzcnRmZEufDUTk4A7A=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
