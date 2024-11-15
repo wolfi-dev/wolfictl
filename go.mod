@@ -21,7 +21,7 @@ require (
 	github.com/chainguard-dev/clog v1.5.1-0.20240811185937-4c523ae4593f
 	github.com/chainguard-dev/yam v0.2.3
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.2.0
+	github.com/charmbracelet/bubbletea v1.2.2
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/cli/browser v1.3.0
@@ -128,7 +128,7 @@ require (
 	github.com/chainguard-dev/git-urls v1.0.2 // indirect
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 // indirect
 	github.com/charmbracelet/x/ansi v0.4.5 // indirect
-	github.com/charmbracelet/x/term v0.2.0 // indirect
+	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cloudflare/circl v1.5.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20240905190251-b4127c9b8d78 // indirect
