@@ -471,7 +471,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 		if err != nil {
 			return nil, err
 		}
-		fmt.Print(render)
+		fmt.Println(render)
 	}
 
 	return result, nil
