@@ -19,6 +19,35 @@ type Finding struct {
 	TriageAssessments []TriageAssessment
 }
 
+type Findings []Finding
+
+func (f Findings) Len() int {
+	return len(f)
+}
+
+func (f Findings) Less(i, j int) bool {
+	fi := f[i]
+	fj := f[j]
+
+	if fi.Package.Location != fj.Package.Location {
+		return fi.Package.Location < fj.Package.Location
+	}
+
+	if fi.Package.Name != fj.Package.Name {
+		return fi.Package.Name < fj.Package.Name
+	}
+
+	if fi.Vulnerability.ID != fj.Vulnerability.ID {
+		return fi.Vulnerability.ID < fj.Vulnerability.ID
+	}
+
+	return true
+}
+
+func (f Findings) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
 type Package struct {
 	ID       string
 	Name     string
