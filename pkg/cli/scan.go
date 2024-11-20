@@ -25,6 +25,7 @@ import (
 	"github.com/savioxavier/termlink"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/buildlog"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/scanfindings"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -466,7 +467,11 @@ func (p *scanParams) doScanCommandForSingleInput(
 	findings := result.Findings
 	if p.outputFormat == outputFormatOutline {
 		// Print output immediately
-		fmt.Println(NewFindingsTree(findings).Render())
+		render, err := scanfindings.Render(findings)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Print(render)
 	}
 
 	return result, nil
