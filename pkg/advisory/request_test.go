@@ -17,7 +17,7 @@ func TestRequest_Validate(t *testing.T) {
 			req: Request{
 				Package: "",
 			},
-			errorAssertion: func(t assert.TestingT, err error, i ...interface{}) bool {
+			errorAssertion: func(t assert.TestingT, err error, _ ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrEmptyPackage)
 			},
 		},
@@ -27,7 +27,7 @@ func TestRequest_Validate(t *testing.T) {
 				Package:    "foo",
 				AdvisoryID: "foo",
 			},
-			errorAssertion: func(t assert.TestingT, err error, i ...interface{}) bool {
+			errorAssertion: func(t assert.TestingT, err error, _ ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrInvalidAdvisoryID)
 			},
 		},
@@ -37,8 +37,18 @@ func TestRequest_Validate(t *testing.T) {
 				Package: "foo",
 				Aliases: []string{"foo", "bar", "baz"},
 			},
-			errorAssertion: func(t assert.TestingT, err error, i ...interface{}) bool {
+			errorAssertion: func(t assert.TestingT, err error, _ ...interface{}) bool {
 				return assert.ErrorIs(t, err, ErrInvalidVulnerabilityID)
+			},
+		},
+		{
+			name: "CGA ID as alias",
+			req: Request{
+				Package: "foo",
+				Aliases: []string{"CGA-xxxx-xxxx-xxxx"},
+			},
+			errorAssertion: func(t assert.TestingT, err error, _ ...interface{}) bool {
+				return assert.ErrorIs(t, err, ErrCGAIDAsAlias)
 			},
 		},
 	}

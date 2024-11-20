@@ -55,6 +55,9 @@ var (
 	// ErrInvalidVulnerabilityID is returned when an alias is not a valid vulnerability ID.
 	ErrInvalidVulnerabilityID = errors.New("alias must be a valid vulnerability ID")
 
+	// ErrCGAIDAsAlias is returned when a CGA ID is used as an alias.
+	ErrCGAIDAsAlias = errors.New("CGA ID cannot be used as an alias")
+
 	// ErrZeroEvent is returned when the Event field is zero.
 	ErrZeroEvent = errors.New("event cannot be zero")
 )
@@ -68,6 +71,10 @@ func (req Request) Validate() error {
 	}
 
 	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
+		if vuln.RegexCGA.MatchString(alias) {
+			return ErrCGAIDAsAlias
+		}
+
 		if err := vuln.ValidateID(alias); err != nil {
 			return fmt.Errorf("%q: %w", alias, ErrInvalidVulnerabilityID)
 		}
