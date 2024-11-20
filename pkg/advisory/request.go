@@ -44,26 +44,44 @@ func (req Request) VulnerabilityIDs() []string {
 	return slices.Compact(ids)
 }
 
+var (
+	// ErrEmptyPackage is returned when the Package field is empty.
+	ErrEmptyPackage = errors.New("package cannot be empty")
+
+	// ErrInvalidAdvisoryID is returned when the AdvisoryID field value is not a
+	// valid CGA ID.
+	ErrInvalidAdvisoryID = errors.New("advisory ID must be a valid CGA ID when provided")
+
+	// ErrInvalidVulnerabilityID is returned when an alias is not a valid vulnerability ID.
+	ErrInvalidVulnerabilityID = errors.New("alias must be a valid vulnerability ID")
+
+	// ErrZeroEvent is returned when the Event field is zero.
+	ErrZeroEvent = errors.New("event cannot be zero")
+)
+
 // Validate returns an error if the Request is invalid.
 func (req Request) Validate() error {
 	var errs []error
 
 	if req.Package == "" {
-		errs = append(errs, errors.New("package cannot be empty"))
+		errs = append(errs, ErrEmptyPackage)
 	}
 
 	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
-		return vuln.ValidateID(alias)
+		if err := vuln.ValidateID(alias); err != nil {
+			return fmt.Errorf("%q: %w", alias, ErrInvalidVulnerabilityID)
+		}
+		return nil
 	})...); err != nil {
 		errs = append(errs, err)
 	}
 
 	if req.AdvisoryID != "" && !vuln.RegexCGA.MatchString(req.AdvisoryID) {
-		errs = append(errs, errors.New("advisory ID must be a valid CGA ID when provided"))
+		errs = append(errs, ErrInvalidAdvisoryID)
 	}
 
 	if req.Event.IsZero() {
-		errs = append(errs, errors.New("event cannot be zero"))
+		errs = append(errs, ErrZeroEvent)
 	}
 
 	errs = append(errs, req.Event.Validate())
