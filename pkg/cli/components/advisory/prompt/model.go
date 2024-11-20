@@ -67,6 +67,10 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 		ID:     fieldIDVulnerability,
 		Prompt: "Vulnerability: ",
 		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
+			if vuln.RegexCGA.MatchString(value) {
+				req.AdvisoryID = value
+				return req
+			}
 			req.Aliases = append(req.Aliases, value)
 			return req
 		},
