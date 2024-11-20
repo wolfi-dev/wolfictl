@@ -10,13 +10,17 @@ import (
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/file"
 	"github.com/samber/lo"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // Finding represents a vulnerability finding for a single package.
 type Finding struct {
-	Package           Package
-	Vulnerability     Vulnerability
-	TriageAssessments []TriageAssessment
+	Package       Package
+	Vulnerability Vulnerability
+	Advisory      *v2.Advisory `json:",omitempty"`
+
+	// Deprecated: This field will be removed soon.
+	TriageAssessments []TriageAssessment `json:",omitempty"`
 }
 
 type Findings []Finding
@@ -64,6 +68,7 @@ type Vulnerability struct {
 	FixedVersion string
 }
 
+// Deprecated: This type will be removed soon.
 type TriageAssessment struct {
 	// Source is the name of the source of the triage assessment, e.g.
 	// "govulncheck".

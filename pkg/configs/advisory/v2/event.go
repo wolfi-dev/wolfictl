@@ -141,6 +141,38 @@ func (e Event) Validate() error {
 	)
 }
 
+// Note returns the note associated with the event-specific data, if any.
+func (e Event) Note() string {
+	switch e.Type {
+	case EventTypeTruePositiveDetermination:
+		if event, ok := e.Data.(TruePositiveDetermination); ok {
+			return event.Note
+		}
+
+	case EventTypeFalsePositiveDetermination:
+		if event, ok := e.Data.(FalsePositiveDetermination); ok {
+			return event.Note
+		}
+
+	case EventTypeAnalysisNotPlanned:
+		if event, ok := e.Data.(AnalysisNotPlanned); ok {
+			return event.Note
+		}
+
+	case EventTypeFixNotPlanned:
+		if event, ok := e.Data.(FixNotPlanned); ok {
+			return event.Note
+		}
+
+	case EventTypePendingUpstreamFix:
+		if event, ok := e.Data.(PendingUpstreamFix); ok {
+			return event.Note
+		}
+	}
+
+	return ""
+}
+
 func (e Event) validateTimestamp() error {
 	if e.Timestamp.IsZero() {
 		return fmt.Errorf("timestamp must not be zero")

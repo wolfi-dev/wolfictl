@@ -21,8 +21,7 @@
           "CVE-2023-27043"
         ],
         "FixedVersion": "3.11.8-r1"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -38,8 +37,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -55,8 +53,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -74,8 +71,7 @@
           "CVE-2023-6597"
         ],
         "FixedVersion": "3.11.8-r0"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -93,8 +89,7 @@
           "CVE-2024-0450"
         ],
         "FixedVersion": "3.11.8-r0"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -110,8 +105,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "3.11.8-r1"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -127,8 +121,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "3.11.8-r0"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -144,8 +137,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "3.11.8-r0"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -163,8 +155,7 @@
           "CVE-2023-5752"
         ],
         "FixedVersion": "23.3"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -182,8 +173,7 @@
           "CVE-2022-40897"
         ],
         "FixedVersion": "65.5.1"
-      },
-      "TriageAssessments": null
+      }
     }
   ],
   "GrypeDBStatus": {

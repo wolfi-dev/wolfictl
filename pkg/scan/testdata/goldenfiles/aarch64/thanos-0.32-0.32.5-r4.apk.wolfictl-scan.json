@@ -19,8 +19,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -36,8 +35,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -53,8 +51,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -70,8 +67,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -87,8 +83,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -104,8 +99,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -121,8 +115,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -138,8 +131,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -155,8 +147,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -174,8 +165,7 @@
           "CVE-2023-45288"
         ],
         "FixedVersion": "0.23.0"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -193,8 +183,7 @@
           "CVE-2024-24786"
         ],
         "FixedVersion": "1.33.0"
-      },
-      "TriageAssessments": null
+      }
     }
   ],
   "GrypeDBStatus": {
