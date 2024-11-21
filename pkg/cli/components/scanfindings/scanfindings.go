@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/tree"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
@@ -15,10 +14,6 @@ import (
 )
 
 const noVulnerabilitiesFound = "✅ No vulnerabilities found"
-
-var (
-	styleSubtle = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
-)
 
 func renderSeverity(severity string) string {
 	switch severity {
@@ -55,7 +50,7 @@ func renderVulnerabilityID(vuln scan.Vulnerability) string {
 		"%s %s",
 		vulnid.Hyperlink(cveID),
 
-		styleSubtle.Render(vulnid.Hyperlink(vuln.ID)),
+		styles.Faint().Render(vulnid.Hyperlink(vuln.ID)),
 	)
 }
 
@@ -83,7 +78,7 @@ func renderAdvisoryPathParts(adv *v2.Advisory) []string {
 			vulnid.Hyperlink(adv.ID),
 			styles.Bold().Render(latest.Type),
 			da,
-			styleSubtle.Render("@ "+ts),
+			styles.Faint().Render("@ "+ts),
 		),
 	}
 
@@ -116,7 +111,7 @@ func Render(findings []scan.Finding) (string, error) {
 				"📦 %s %s %s",
 				f.Package.Name,
 				f.Package.Version,
-				styleSubtle.Render("("+f.Package.Type+")"),
+				styles.Faint().Render("("+f.Package.Type+")"),
 			),
 			fmt.Sprintf(
 				"%s %s%s",
