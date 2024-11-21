@@ -516,7 +516,7 @@ func renderBuildGroup(bg builds.BuildGroup) string {
 		bg.Origin.PkgInfo.Name,
 		bg.Origin.PkgInfo.Version,
 		subpackages,
-		styleSubtle.Render(humanize.Time(bg.Origin.FileInfo.ModTime())),
+		styles.Faint().Render(humanize.Time(bg.Origin.FileInfo.ModTime())),
 	)
 }
 

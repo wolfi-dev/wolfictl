@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
@@ -49,10 +50,10 @@ hyperlinked to the relevant webpage from the upstream data source.
 					return fmt.Errorf("finding aliases for %q: %w", arg, err)
 				}
 
-				fmt.Printf("Aliases for %s:\n", hyperlinkVulnerabilityID(arg))
+				fmt.Printf("Aliases for %s:\n", vulnid.Hyperlink(arg))
 
 				for _, alias := range aliases {
-					fmt.Printf("  - %s\n", hyperlinkVulnerabilityID(alias))
+					fmt.Printf("  - %s\n", vulnid.Hyperlink(alias))
 				}
 
 				// Add a blank line between queries.

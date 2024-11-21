@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -374,7 +375,7 @@ func (r advisoryListRenderer) String() string {
 		sb.WriteString(stylePkg.Render(row.pkg))
 		sb.WriteString(strings.Repeat(" ", pkgWidth-len(row.pkg)+1))
 
-		sb.WriteString(styleAdvID.Render(hyperlinkVulnerabilityID(row.advID)))
+		sb.WriteString(styleAdvID.Render(vulnid.Hyperlink(row.advID)))
 		sb.WriteString(strings.Repeat(" ", advIDWidth-len(row.advID)+1))
 
 		if r.showAliases {
@@ -389,7 +390,7 @@ func (r advisoryListRenderer) String() string {
 
 				asb.WriteString(styleAliases.Render("("))
 				for i, alias := range row.aliases {
-					asb.WriteString(styleAliases.Render(hyperlinkVulnerabilityID(alias)))
+					asb.WriteString(styleAliases.Render(vulnid.Hyperlink(alias)))
 
 					if i < len(row.aliases)-1 {
 						asb.WriteString(styleAliases.Render(", "))

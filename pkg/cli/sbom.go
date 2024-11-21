@@ -13,6 +13,7 @@ import (
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"golang.org/x/exp/slices"
 )
@@ -150,7 +151,7 @@ func (t *packageTree) render() string {
 				verticalLine,
 				p.Name,
 				p.Version,
-				styleSubtle.Render("("+string(p.Type)+")"),
+				styles.Faint().Render("("+string(p.Type)+")"),
 			)
 			lines = append(lines, line)
 		}
