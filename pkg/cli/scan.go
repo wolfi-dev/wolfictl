@@ -444,15 +444,16 @@ func (p *scanParams) doScanCommandForSingleInput(
 		entry, err := advisoryDocumentIndex.Select().WhereName(result.TargetAPK.Origin()).First()
 		if err != nil {
 			log.Warnf("failed to get advisory document for package %q: %v", result.TargetAPK.Origin(), err)
-		}
-		doc := entry.Configuration()
+		} else {
+			doc := entry.Configuration()
 
-		// If requested, add advisory data to the scan results
-		for i := range result.Findings {
-			f := &result.Findings[i]
-			if adv, ok := doc.Advisories.GetByAnyVulnerability(f.Vulnerability.Aliases...); ok {
-				f.Advisory = &adv
-				result.Findings[i] = *f
+			// If requested, add advisory data to the scan results
+			for i := range result.Findings {
+				f := &result.Findings[i]
+				if adv, ok := doc.Advisories.GetByAnyVulnerability(f.Vulnerability.Aliases...); ok {
+					f.Advisory = &adv
+					result.Findings[i] = *f
+				}
 			}
 		}
 	}
