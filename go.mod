@@ -15,9 +15,9 @@ require (
 	chainguard.dev/melange v0.15.12
 	cloud.google.com/go/storage v1.47.0
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/grype v0.84.0
-	github.com/anchore/stereoscope v0.0.8
-	github.com/anchore/syft v1.16.0
+	github.com/anchore/grype v0.85.0
+	github.com/anchore/stereoscope v0.0.9
+	github.com/anchore/syft v1.17.0
 	github.com/chainguard-dev/clog v1.5.1-0.20240811185937-4c523ae4593f
 	github.com/chainguard-dev/yam v0.2.3
 	github.com/charmbracelet/bubbles v0.20.0
@@ -99,9 +99,10 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Microsoft/hcsshim v0.12.4 // indirect
+	github.com/OneOfOne/xxhash v1.2.8 // indirect
 	github.com/ProtonMail/go-crypto v1.1.2 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
-	github.com/anchore/clio v0.0.0-20241015191535-f538a9016e10 // indirect
+	github.com/anchore/clio v0.0.0-20241115144204-29e89f9fa837 // indirect
 	github.com/anchore/fangs v0.0.0-20241014225144-4e1713cafd77 // indirect
 	github.com/anchore/go-collections v0.0.0-20240216214351-5baf374cca6f // indirect
 	github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f // indirect
@@ -167,7 +168,7 @@ require (
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/glebarez/sqlite v1.11.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
@@ -287,7 +288,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
-	github.com/saferwall/pe v1.5.4 // indirect
+	github.com/saferwall/pe v1.5.5 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
@@ -311,7 +312,7 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/sylabs/sif/v2 v2.19.2 // indirect
+	github.com/sylabs/sif/v2 v2.20.0 // indirect
 	github.com/sylabs/squashfs v1.0.0 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/theupdateframework/go-tuf v0.7.0 // indirect
@@ -374,7 +375,7 @@ require (
 	modernc.org/libc v1.55.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.33.1 // indirect
+	modernc.org/sqlite v1.34.1 // indirect
 	mvdan.cc/sh/v3 v3.8.0 // indirect
 )
 
