@@ -4,16 +4,12 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 
-	"github.com/anchore/syft/syft/file"
-	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
-	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/components/sbompackages"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"golang.org/x/exp/slices"
 )
@@ -63,8 +59,11 @@ func cmdSBOM() *cobra.Command {
 
 			switch p.outputFormat {
 			case sbomFormatOutline:
-				tree := newPackageTree(s.Artifacts.Packages.Sorted())
-				fmt.Println(tree.render())
+				tree, err := sbompackages.Render(s.Artifacts.Packages.Sorted())
+				if err != nil {
+					return fmt.Errorf("rendering package tree: %w", err)
+				}
+				fmt.Println(tree)
 
 			case sbomFormatSyftJSON:
 				jsonReader, err := sbom.ToSyftJSON(s)
@@ -98,66 +97,4 @@ func (p *sbomParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to report in SBOM")
 	cmd.Flags().BoolVarP(&p.disableSBOMCache, "disable-sbom-cache", "D", false, "don't use the SBOM cache")
 	addVerboseFlag(&p.verbosity, cmd)
-}
-
-type packageTree struct {
-	packagesByLocation map[string][]pkg.Package
-}
-
-func newPackageTree(packages []pkg.Package) *packageTree {
-	packagesByLocation := map[string][]pkg.Package{}
-	for i := range packages {
-		p := packages[i]
-		locs := lo.Map(p.Locations.ToSlice(), func(l file.Location, _ int) string {
-			return "/" + l.RealPath
-		})
-
-		location := strings.Join(locs, ", ")
-		packagesByLocation[location] = append(packagesByLocation[location], p)
-	}
-	return &packageTree{
-		packagesByLocation: packagesByLocation,
-	}
-}
-
-func (t *packageTree) render() string {
-	locations := lo.Keys(t.packagesByLocation)
-	sort.Strings(locations)
-
-	var lines []string
-	for i, location := range locations {
-		var treeStem, verticalLine string
-		if i == len(locations)-1 {
-			treeStem = "└── "
-			verticalLine = " "
-		} else {
-			treeStem = "├── "
-			verticalLine = "│"
-		}
-
-		line := treeStem + fmt.Sprintf("📄 %s", location)
-		lines = append(lines, line)
-
-		packages := t.packagesByLocation[location]
-
-		sort.SliceStable(packages, func(i, j int) bool {
-			return packages[i].Name < packages[j].Name
-		})
-
-		for i := range packages {
-			p := packages[i]
-			line := fmt.Sprintf(
-				"%s       📦 %s %s %s",
-				verticalLine,
-				p.Name,
-				p.Version,
-				styles.Faint().Render("("+string(p.Type)+")"),
-			)
-			lines = append(lines, line)
-		}
-
-		lines = append(lines, verticalLine)
-	}
-
-	return strings.Join(lines, "\n")
 }
