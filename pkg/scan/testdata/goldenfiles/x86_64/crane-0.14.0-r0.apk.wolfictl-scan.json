@@ -19,8 +19,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -36,8 +35,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -53,8 +51,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -70,8 +67,7 @@
         "Severity": "Critical",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -87,8 +83,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -104,8 +99,7 @@
         "Severity": "Critical",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -121,8 +115,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -138,8 +131,7 @@
         "Severity": "Critical",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -155,8 +147,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -172,8 +163,7 @@
         "Severity": "Critical",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -189,8 +179,7 @@
         "Severity": "Critical",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -206,8 +195,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -223,8 +211,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -240,8 +227,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -257,8 +243,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -274,8 +259,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -291,8 +275,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -308,8 +291,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -325,8 +307,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -342,8 +323,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -361,8 +341,7 @@
           "CVE-2023-45288"
         ],
         "FixedVersion": "0.19.1-r3"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -378,8 +357,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -395,8 +373,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -412,8 +389,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -431,8 +407,7 @@
           "CVE-2024-24557"
         ],
         "FixedVersion": "0.19.1-r1"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -448,8 +423,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -465,8 +439,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -482,8 +455,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -501,8 +473,7 @@
           "CVE-2024-24787"
         ],
         "FixedVersion": "0.19.1-r5"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -518,8 +489,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -537,8 +507,7 @@
           "CVE-2024-24788"
         ],
         "FixedVersion": "0.19.1-r5"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -556,8 +525,7 @@
           "CVE-2024-24789"
         ],
         "FixedVersion": "0.19.1-r6"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -573,8 +541,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -592,8 +559,7 @@
           "CVE-2024-24790"
         ],
         "FixedVersion": "0.19.1-r6"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -609,8 +575,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -628,8 +593,7 @@
           "CVE-2023-28840"
         ],
         "FixedVersion": "23.0.3"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -645,8 +609,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "0.19.1-r6"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -662,8 +625,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "0.19.1-r5"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -681,8 +643,7 @@
           "CVE-2023-28841"
         ],
         "FixedVersion": "23.0.3"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -698,8 +659,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "0.19.1-r6"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -715,8 +675,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "0.19.1-r3"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -732,8 +691,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "0.19.1-r5"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -751,8 +709,7 @@
           "CVE-2023-28842"
         ],
         "FixedVersion": "23.0.3"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -770,8 +727,7 @@
           "CVE-2023-2253"
         ],
         "FixedVersion": "2.8.2-beta.1"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -787,8 +743,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": "23.0.8"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -806,8 +761,7 @@
           "CVE-2024-29018"
         ],
         "FixedVersion": "23.0.11"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -823,8 +777,7 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "0.19.1-r1"
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -842,8 +795,7 @@
           "CVE-2024-24557"
         ],
         "FixedVersion": "24.0.9"
-      },
-      "TriageAssessments": null
+      }
     }
   ],
   "GrypeDBStatus": {

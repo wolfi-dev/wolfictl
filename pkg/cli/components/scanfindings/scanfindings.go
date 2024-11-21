@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/tree"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
+	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 )
 
@@ -70,6 +73,40 @@ func renderFixedIn(vuln scan.Vulnerability) string {
 	return fmt.Sprintf(" fixed in %s", vuln.FixedVersion)
 }
 
+func renderAdvisoryPathParts(adv *v2.Advisory) []string {
+	if adv == nil {
+		return nil
+	}
+
+	latest := adv.Latest()
+	t := time.Time(latest.Timestamp)
+	ts := t.Format("2006-01-02T15:04:05Z")
+
+	da := daysAgo(t)
+
+	parts := []string{
+		fmt.Sprintf("📝 %s: set to %s %d days ago %s",
+			vulnid.Hyperlink(adv.ID),
+			styles.Bold().Render(latest.Type),
+			da,
+			styleSubtle.Render("@ "+ts),
+		),
+	}
+
+	if note := latest.Note(); note != "" {
+		parts = append(parts, styles.Italic().Render(note))
+	}
+
+	return parts
+}
+
+func daysAgo(t time.Time) int {
+	now := time.Now()
+	duration := now.Sub(t)
+	days := int(duration.Hours() / 24)
+	return days
+}
+
 func Render(findings []scan.Finding) (string, error) {
 	if len(findings) == 0 {
 		return noVulnerabilitiesFound, nil
@@ -78,7 +115,7 @@ func Render(findings []scan.Finding) (string, error) {
 	sort.Stable(scan.Findings(findings))
 
 	t, err := tree.New(findings, func(f scan.Finding) []string {
-		return []string{
+		pathParts := []string{
 			"",
 			fmt.Sprintf("📄 %s", f.Package.Location),
 			fmt.Sprintf(
@@ -94,6 +131,12 @@ func Render(findings []scan.Finding) (string, error) {
 				renderFixedIn(f.Vulnerability),
 			),
 		}
+
+		if f.Advisory != nil {
+			pathParts = append(pathParts, renderAdvisoryPathParts(f.Advisory)...)
+		}
+
+		return pathParts
 	})
 	if err != nil {
 		return "", err

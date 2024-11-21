@@ -26,7 +26,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/buildlog"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/scanfindings"
-	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
@@ -88,25 +87,6 @@ filtering. The following sets of advisories are available:
 
 - "concluded": Only filter out all vulnerabilities that have been fixed, or those
   where no change is planned to fix the vulnerability.
-
-## AUTO-TRIAGING
-
-Wolfictl now supports auto-triaging vulnerabilities found in Go binaries using
-govulncheck. To enable this feature, use the "--govulncheck" flag. Note that
-this feature is experimental and may not work in all cases. For more
-information on the govulncheck utility, see
-https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck. Using this feature does
-not require you to install govulncheck on your system (the functionality
-required is included in wolfictl as a library).
-
-For vulnerabilities known to govulncheck, this feature annotates each
-vulnerability with a "true positive" or "false positive" designation. The JSON
-output mode shows more information about the govulncheck triage results than
-the default outline output mode.
-
-This feature does not filter out any results from the scan output.
-
-This feature is only supported when scanning APKs, not when scanning SBOMs.
 
 ## OUTPUT
 
@@ -194,10 +174,6 @@ wolfictl scan package1 package2 --remote
 			var advisoryDocumentIndex *configs.Index[v2.Document]
 
 			if p.advisoriesRepoDir != "" {
-				if p.advisoryFilterSet == "" {
-					return errors.New("advisories repo dir provided, but no advisory filter set was specified (see -f/--advisory-filter)")
-				}
-
 				dir := p.advisoriesRepoDir
 				advisoryFsys := rwos.DirFS(dir)
 				index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
@@ -434,6 +410,8 @@ func (p *scanParams) doScanCommandForSingleInput(
 	apkSBOM *sbomSyft.SBOM,
 	advisoryDocumentIndex *configs.Index[v2.Document],
 ) (*scan.Result, error) {
+	log := clog.FromContext(ctx)
+
 	result, err := scanner.APKSBOM(ctx, apkSBOM)
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan APK: %w", err)
@@ -460,6 +438,25 @@ func (p *scanParams) doScanCommandForSingleInput(
 		}
 
 		result.Findings = findings
+	}
+
+	if advisoryDocumentIndex != nil {
+		log.Debug("advisory data available for adding context to findings")
+
+		entry, err := advisoryDocumentIndex.Select().WhereName(result.TargetAPK.Origin()).First()
+		if err != nil {
+			log.Warnf("failed to get advisory document for package %q: %v", result.TargetAPK.Origin(), err)
+		}
+		doc := entry.Configuration()
+
+		// If requested, add advisory data to the scan results
+		for i := range result.Findings {
+			f := &result.Findings[i]
+			if adv, ok := doc.Advisories.GetByAnyVulnerability(f.Vulnerability.Aliases...); ok {
+				f.Advisory = &adv
+				result.Findings[i] = *f
+			}
+		}
 	}
 
 	// Handle CLI options
@@ -895,12 +892,11 @@ func (t FindingsTree) Render() string {
 			for i := range findings {
 				f := findings[i]
 				line := fmt.Sprintf(
-					"%s           %s %s%s%s",
+					"%s           %s %s%s",
 					verticalLine,
 					renderSeverity(f.Vulnerability.Severity),
 					renderVulnerabilityID(f.Vulnerability),
 					renderFixedIn(f.Vulnerability),
-					renderTriaging(verticalLine, f.TriageAssessments),
 				)
 				lines = append(lines, line)
 			}
@@ -978,30 +974,6 @@ func renderFixedIn(vuln scan.Vulnerability) string {
 	}
 
 	return fmt.Sprintf(" fixed in %s", vuln.FixedVersion)
-}
-
-func renderTriaging(verticalLine string, trs []scan.TriageAssessment) string {
-	if len(trs) == 0 {
-		return ""
-	}
-
-	// Only show one line per triage source
-	seen := make(map[string]struct{})
-	var lines []string
-	for _, tr := range trs {
-		if _, ok := seen[tr.Source]; ok {
-			continue
-		}
-		seen[tr.Source] = struct{}{}
-		lines = append(lines, renderTriageAssessment(verticalLine, tr))
-	}
-
-	return "\n" + strings.Join(lines, "\n")
-}
-
-func renderTriageAssessment(verticalLine string, tr scan.TriageAssessment) string {
-	label := styles.Bold().Render(fmt.Sprintf("%t positive", tr.TruePositive))
-	return fmt.Sprintf("%s             ⚖️  %s according to %s", verticalLine, label, tr.Source)
 }
 
 var (

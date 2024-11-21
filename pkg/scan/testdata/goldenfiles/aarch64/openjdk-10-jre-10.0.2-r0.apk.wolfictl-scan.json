@@ -19,8 +19,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -36,8 +35,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -53,8 +51,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -70,8 +67,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -87,8 +83,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -104,8 +99,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -121,8 +115,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -138,8 +131,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -155,8 +147,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -172,8 +163,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -189,8 +179,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -206,8 +195,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -223,8 +211,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -240,8 +227,7 @@
         "Severity": "Medium",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -257,8 +243,7 @@
         "Severity": "High",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -274,8 +259,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -291,8 +275,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -308,8 +291,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -325,8 +307,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     },
     {
       "Package": {
@@ -342,8 +323,7 @@
         "Severity": "Low",
         "Aliases": [],
         "FixedVersion": ""
-      },
-      "TriageAssessments": null
+      }
     }
   ],
   "GrypeDBStatus": {
