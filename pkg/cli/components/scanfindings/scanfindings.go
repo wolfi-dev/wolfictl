@@ -18,26 +18,20 @@ const noVulnerabilitiesFound = "✅ No vulnerabilities found"
 
 var (
 	styleSubtle = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
-
-	styleNegligible = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
-	styleLow        = lipgloss.NewStyle().Foreground(lipgloss.Color("#00ff00"))
-	styleMedium     = lipgloss.NewStyle().Foreground(lipgloss.Color("#ffff00"))
-	styleHigh       = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff9900"))
-	styleCritical   = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000"))
 )
 
 func renderSeverity(severity string) string {
 	switch severity {
 	case "Negligible":
-		return styleNegligible.Render(severity)
+		return styles.SeverityNegligible().Render(severity)
 	case "Low":
-		return styleLow.Render(severity)
+		return styles.SeverityLow().Render(severity)
 	case "Medium":
-		return styleMedium.Render(severity)
+		return styles.SeverityMedium().Render(severity)
 	case "High":
-		return styleHigh.Render(severity)
+		return styles.SeverityHigh().Render(severity)
 	case "Critical":
-		return styleCritical.Render(severity)
+		return styles.SeverityCritical().Render(severity)
 	default:
 		return severity
 	}
