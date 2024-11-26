@@ -12,7 +12,7 @@ package:
 pipeline:
   - uses: git-checkout
     with:
-      uri: https://test.com/missing-copyright/${{package.version}}.tar.gz
+      repository: https://test.com/missing-copyright/${{package.version}}.tar.gz
       tag: v1.2.3
       expected-commit: inv@l1d!~
 update:

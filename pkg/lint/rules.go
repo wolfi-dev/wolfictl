@@ -150,19 +150,19 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
-					if p.Uses == "fetch" {
-						uri, ok := p.With["uri"]
-						if !ok {
-							return fmt.Errorf("uri is missing in fetch pipeline")
-						}
-						u, err := url.ParseRequestURI(uri)
-						if err != nil {
-							return fmt.Errorf("uri is invalid URL structure")
-						}
-						if !reValidHostname.MatchString(u.Host) {
-							return fmt.Errorf("uri hostname %q is invalid", u.Host)
-						}
-
+					uri, err := extractURI(p)
+					if err != nil {
+						return err
+					}
+					if uri == "" {
+						continue
+					}
+					u, err := url.ParseRequestURI(uri)
+					if err != nil {
+						return fmt.Errorf("uri is invalid URL structure")
+					}
+					if !reValidHostname.MatchString(u.Host) {
+						return fmt.Errorf("uri hostname %q is invalid", u.Host)
 					}
 				}
 				return nil
@@ -480,4 +480,27 @@ func containsKey(parentNode *yaml.Node, key string) error {
 	}
 
 	return fmt.Errorf("key '%s' not found in mapping", key)
+}
+
+func extractURI(p config.Pipeline) (string, error) {
+	if p.Uses == "fetch" {
+		uri, ok := p.With["uri"]
+		if !ok {
+			return "", fmt.Errorf("uri is missing in fetch pipeline")
+		}
+
+		return uri, nil
+	}
+
+	if p.Uses == "git-checkout" {
+		repo, ok := p.With["repository"]
+		if !ok {
+			return "", fmt.Errorf("repository is missing in git-checkout pipeline")
+		}
+
+		return repo, nil
+	}
+
+	// Most pipelines won't have a URI.
+	return "", nil
 }
