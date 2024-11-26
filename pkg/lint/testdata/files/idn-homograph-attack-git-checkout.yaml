@@ -1,8 +1,8 @@
 package:
-  name: wrong-pipeline-git-checkout-tag
+  name: idn-homograph-attack-git-checkout
   version: 1.0.0
   epoch: 0
-  description: "a package with missing pipeline git-checkout tag"
+  description: "a package with an IDN homograph attack"
   copyright:
     - paths:
         - "*"
@@ -12,8 +12,8 @@ package:
 pipeline:
   - uses: git-checkout
     with:
-      repository: https://test.com/missing-copyright/${{package.version}}.tar.gz
-      branch: main
+      repository: https://downloads.xⅰph.org/releases/cdparanoia/cdparanoia-III
+      tag: 1.0.0
       expected-commit: 9c5cfe0525dc7415cec482342ca674875c1e9115
 update:
   enabled: true

@@ -128,6 +128,24 @@ func TestLinter_Rules(t *testing.T) {
 			matches: 1,
 		},
 		{
+			file:        "idn-homograph-attack-git-checkout.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "idn-homograph-attack-git-checkout",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-pipeline-fetch-uri",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-pipeline-fetch-uri]: uri hostname \"downloads.xⅰph.org\" is invalid (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
 			file:        "wrong-pipeline-fetch-digest.yaml",
 			minSeverity: SeverityWarning,
 			want: EvalResult{
