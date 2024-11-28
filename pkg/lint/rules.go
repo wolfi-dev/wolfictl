@@ -457,6 +457,21 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			},
 		},
 		{
+			Name:        "test-disabled-reason",
+			Description: "packages with test disabled should have a reason",
+			// TODO: Change to SeverityError when current packages are compliant.
+			Severity: SeverityWarning,
+			LintFunc: func(c config.Configuration) error {
+				if c.Test != nil && c.Test.Enabled {
+					return nil
+				}
+				if c.Test != nil && !c.Test.Enabled && c.Test.ExcludeReason != "" {
+					return nil
+				}
+				return fmt.Errorf("test is disabled but no reason is provided")
+			},
+		},
+		{
 			Name:        "valid-update-schedule",
 			Description: "update schedule config should contain a valid period",
 			Severity:    SeverityError,
