@@ -78,7 +78,7 @@ func cmdImageAPK() *cobra.Command {
 			if len(p.distroDirPaths) == 0 {
 				for i := range apks {
 					apk := apks[i]
-					fmt.Println(apk.Name)
+					fmt.Printf("%s (%s)\n", apk.Name, apk.Version)
 				}
 
 				return nil
