@@ -257,7 +257,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("walking filesystem: %w", err)
 	}
 
 	if err := g.Wait(); err != nil {

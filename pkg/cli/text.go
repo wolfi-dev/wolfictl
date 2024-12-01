@@ -29,14 +29,14 @@ func cmdText() *cobra.Command {
 
 			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
 			if err != nil {
-				return err
+				return fmt.Errorf("constructing new package set from directory %q: %w", dir, err)
 			}
 			g, err := dag.NewGraph(ctx, pkgs,
 				dag.WithKeys(extraKeys...),
 				dag.WithRepos(extraRepos...),
 				dag.WithArch(arch))
 			if err != nil {
-				return err
+				return fmt.Errorf("creating graph: %w", err)
 			}
 
 			return text(g, pkgs, arch, textType(t), os.Stdout)
