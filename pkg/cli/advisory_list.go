@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"slices"
 	"strings"
 	"time"
@@ -64,6 +66,12 @@ Using the --history flag, you can list advisory events instead of just
 advisories' latest states. This is useful for viewing a summary of an 
 investigation over time for a given package/vulnerability match.'
 
+OUTPUT FORMAT
+
+Using the --output (-o) flag, you can select the output format used to render
+the results. By default, results are rendered as a "table"; however, you can
+also select "json".
+
 COUNT
 
 You get a count of the advisories that match the criteria by using the --count
@@ -87,6 +95,18 @@ flag. This will report just the count, not the full list of advisories.
 
 			if p.typ != "" && !slices.Contains(v2.EventTypes, p.typ) {
 				return fmt.Errorf("invalid event type: %s", p.typ)
+			}
+
+			if p.outputFormat == "" {
+				p.outputFormat = outputFormatTable
+			}
+
+			if !slices.Contains(validAdvListOutputFormats, p.outputFormat) {
+				return fmt.Errorf(
+					"invalid output format %q, must be one of [%s]",
+					p.outputFormat,
+					strings.Join(validAdvListOutputFormats, ", "),
+				)
 			}
 
 			if p.advisoriesRepoDir == "" {
@@ -151,12 +171,17 @@ flag. This will report just the count, not the full list of advisories.
 				docs = index.Select().Configurations()
 			}
 
-			table := advisoryListTableRenderer{
-				showHistory: p.history,
-				showAliases: p.showAliases,
+			var table *advisoryListTableRenderer
+			if p.outputFormat == outputFormatTable {
+				table = &advisoryListTableRenderer{
+					showHistory: p.history,
+					showAliases: p.showAliases,
+				}
 			}
 
+			var resultDocs []v2.Document
 			for _, doc := range docs {
+				var resultAdvs []v2.Advisory
 				for _, adv := range doc.Advisories {
 					sortedEvents := adv.SortedEvents()
 
@@ -205,9 +230,16 @@ flag. This will report just the count, not the full list of advisories.
 
 					if p.history {
 						// user wants the full history
-						for i, event := range sortedEvents {
-							isLatest := i == len(sortedEvents)-1 // last event is the latest
-							table.add(doc.Package.Name, adv.ID, adv.Aliases, event, isLatest)
+
+						switch p.outputFormat {
+						case outputFormatTable:
+							for i, event := range sortedEvents {
+								isLatest := i == len(sortedEvents)-1 // last event is the latest
+								table.add(doc.Package.Name, adv.ID, adv.Aliases, event, isLatest)
+							}
+
+						case outputFormatJSON:
+							resultAdvs = append(resultAdvs, adv)
 						}
 
 						continue
@@ -220,7 +252,29 @@ flag. This will report just the count, not the full list of advisories.
 						continue
 					}
 
-					table.add(doc.Package.Name, adv.ID, adv.Aliases, latest, true)
+					switch p.outputFormat {
+					case outputFormatTable:
+						table.add(doc.Package.Name, adv.ID, adv.Aliases, latest, true)
+
+					case outputFormatJSON:
+						// Since full history wasn't requested, filter the advisory's event list to just
+						// the latest.
+						prunedAdv := v2.Advisory{
+							ID:      adv.ID,
+							Aliases: adv.Aliases,
+							Events:  []v2.Event{latest},
+						}
+						resultAdvs = append(resultAdvs, prunedAdv)
+					}
+				}
+
+				if len(resultAdvs) >= 1 {
+					resultDoc := v2.Document{
+						SchemaVersion: doc.SchemaVersion,
+						Package:       doc.Package,
+						Advisories:    resultAdvs,
+					}
+					resultDocs = append(resultDocs, resultDoc)
 				}
 			}
 
@@ -230,7 +284,20 @@ flag. This will report just the count, not the full list of advisories.
 				return nil
 			}
 
-			fmt.Printf("%s\n", table)
+			switch p.outputFormat {
+			case outputFormatTable:
+				fmt.Printf("%s\n", table)
+
+			case outputFormatJSON:
+				if resultDocs == nil {
+					resultDocs = []v2.Document{}
+				}
+
+				if err := json.NewEncoder(os.Stdout).Encode(resultDocs); err != nil {
+					return fmt.Errorf("encoding JSON: %w", err)
+				}
+			}
+
 			return nil
 		},
 	}
@@ -254,7 +321,11 @@ type listParams struct {
 	updatedSince  string
 	updatedBefore string
 	count         bool
+
+	outputFormat string
 }
+
+var validAdvListOutputFormats = []string{outputFormatTable, outputFormatJSON}
 
 func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
@@ -272,6 +343,7 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.updatedSince, "updated-since", "", "filter advisories updated since a given date")
 	cmd.Flags().StringVar(&p.updatedBefore, "updated-before", "", "filter advisories updated before a given date")
 	cmd.Flags().BoolVar(&p.count, "count", false, "show only the count of advisories that match the criteria")
+	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validAdvListOutputFormats, "|"), outputFormatTable))
 }
 
 func advHasDetectedComponentType(adv v2.Advisory, componentType string) bool {

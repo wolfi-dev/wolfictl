@@ -30,10 +30,10 @@ var (
 // detected for a distro package.
 type Detection struct {
 	// Type is the type of detection used to identify the vulnerability match.
-	Type string `yaml:"type"`
+	Type string `yaml:"type" json:"type"`
 
 	// Data is the data associated with the detection type.
-	Data interface{} `yaml:"data,omitempty"`
+	Data interface{} `yaml:"data,omitempty" json:"data,omitempty"`
 }
 
 // Validate returns an error if the Detection data is invalid.

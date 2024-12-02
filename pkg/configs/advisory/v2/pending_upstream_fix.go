@@ -13,7 +13,7 @@ import "errors"
 // changes that should be managed by the upstream maintainers.
 type PendingUpstreamFix struct {
 	// Note should explain why an upstream fix is anticipated or necessary.
-	Note string `yaml:"note"`
+	Note string `yaml:"note" json:"note"`
 }
 
 // Validate returns an error if the PendingUpstreamFix data is invalid.

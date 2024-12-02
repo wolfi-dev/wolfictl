@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -16,6 +17,11 @@ func Now() Timestamp {
 }
 
 const yamlTagTimestamp = "!!timestamp" // see https://yaml.org/type/timestamp.html
+
+// MarshalJSON implements json.Marshaler.
+func (t Timestamp) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.String())
+}
 
 // MarshalYAML implements yaml.Marshaler.
 func (t Timestamp) MarshalYAML() (interface{}, error) {
