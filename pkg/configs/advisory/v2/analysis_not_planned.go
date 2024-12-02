@@ -7,7 +7,7 @@ import "errors"
 // analyzed further by the distro maintainers.
 type AnalysisNotPlanned struct {
 	// Note should explain why there is no plan to analyze the vulnerability match.
-	Note string `yaml:"note"`
+	Note string `yaml:"note" json:"note"`
 }
 
 // Validate returns an error if the AnalysisNotPlanned data is invalid.

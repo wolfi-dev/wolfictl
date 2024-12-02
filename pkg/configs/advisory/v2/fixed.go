@@ -11,7 +11,7 @@ import (
 type Fixed struct {
 	// FixedVersion is the version of the distribution package that contains
 	// the fix to the vulnerability.
-	FixedVersion string `yaml:"fixed-version"`
+	FixedVersion string `yaml:"fixed-version" json:"fixedVersion"`
 }
 
 // Validate returns an error if the Fixed data is invalid.

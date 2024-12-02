@@ -36,10 +36,11 @@ import (
 
 const (
 	outputFormatOutline = "outline"
+	outputFormatTable   = "table"
 	outputFormatJSON    = "json"
 )
 
-var validOutputFormats = []string{outputFormatOutline, outputFormatJSON}
+var validScanOutputFormats = []string{outputFormatOutline, outputFormatJSON}
 
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
@@ -135,11 +136,11 @@ wolfictl scan package1 package2 --remote
 
 			// Validate inputs
 
-			if !slices.Contains(validOutputFormats, p.outputFormat) {
+			if !slices.Contains(validScanOutputFormats, p.outputFormat) {
 				return fmt.Errorf(
 					"invalid output format %q, must be one of [%s]",
 					p.outputFormat,
-					strings.Join(validOutputFormats, ", "),
+					strings.Join(validScanOutputFormats, ", "),
 				)
 			}
 
@@ -355,7 +356,7 @@ type scanParams struct {
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.requireZeroFindings, "require-zero", false, "exit 1 if any vulnerabilities are found")
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
-	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validOutputFormats, "|"), outputFormatOutline))
+	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validScanOutputFormats, "|"), outputFormatOutline))
 	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
 	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")

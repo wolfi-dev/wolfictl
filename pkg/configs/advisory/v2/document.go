@@ -18,9 +18,9 @@ import (
 const SchemaVersion = "2.0.2"
 
 type Document struct {
-	SchemaVersion string     `yaml:"schema-version"`
-	Package       Package    `yaml:"package"`
-	Advisories    Advisories `yaml:"advisories,omitempty"`
+	SchemaVersion string     `yaml:"schema-version" json:"schemaVersion"`
+	Package       Package    `yaml:"package" json:"package"`
+	Advisories    Advisories `yaml:"advisories,omitempty" json:"advisories"`
 }
 
 func (doc Document) Name() string {
@@ -79,7 +79,7 @@ func decodeDocument(r io.Reader) (*Document, error) {
 }
 
 type Package struct {
-	Name string `yaml:"name"`
+	Name string `yaml:"name" json:"name"`
 }
 
 func (p Package) Validate() error {

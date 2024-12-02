@@ -47,15 +47,15 @@ var (
 // and resolution of a potential vulnerability match.
 type Event struct {
 	// Timestamp is the time at which the event occurred.
-	Timestamp Timestamp `yaml:"timestamp"`
+	Timestamp Timestamp `yaml:"timestamp" json:"timestamp"`
 
 	// Type is a string that identifies the kind of event. This field is used to
 	// determine how to unmarshal the Data field.
-	Type string `yaml:"type"`
+	Type string `yaml:"type" json:"type"`
 
 	// Data is the event-specific data. The type of this field is determined by the
 	// Type field.
-	Data interface{} `yaml:"data,omitempty"`
+	Data interface{} `yaml:"data,omitempty" json:"data,omitempty"`
 }
 
 type partialEvent struct {

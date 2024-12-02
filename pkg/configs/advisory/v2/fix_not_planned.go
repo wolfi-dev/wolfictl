@@ -6,7 +6,7 @@ import "errors"
 // not to receive a fix for the vulnerability.
 type FixNotPlanned struct {
 	// Note should explain why there is no plan to fix the vulnerability.
-	Note string `yaml:"note"`
+	Note string `yaml:"note" json:"note"`
 }
 
 // Validate returns an error if the FixNotPlanned data is invalid.

@@ -13,14 +13,14 @@ import (
 )
 
 type Advisory struct {
-	ID string `yaml:"id"`
+	ID string `yaml:"id" json:"id"`
 
 	// Aliases lists any known IDs of this vulnerability in databases.
-	Aliases []string `yaml:"aliases,omitempty"`
+	Aliases []string `yaml:"aliases,omitempty" json:"aliases"`
 
 	// Events is a list of timestamped events that occurred during the investigation
 	// and resolution of the vulnerability.
-	Events []Event `yaml:"events"`
+	Events []Event `yaml:"events" json:"events"`
 }
 
 // IsZero returns true if the advisory has no data.

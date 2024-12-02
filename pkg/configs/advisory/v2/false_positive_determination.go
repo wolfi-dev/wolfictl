@@ -81,8 +81,8 @@ var FPTypes = []string{
 // FalsePositiveDetermination is an event that indicates that a previously
 // detected vulnerability was determined to be a false positive.
 type FalsePositiveDetermination struct {
-	Type string `yaml:"type"`
-	Note string `yaml:"note,omitempty"`
+	Type string `yaml:"type" json:"type"`
+	Note string `yaml:"note,omitempty" json:"note"`
 }
 
 func (fp FalsePositiveDetermination) Validate() error {
