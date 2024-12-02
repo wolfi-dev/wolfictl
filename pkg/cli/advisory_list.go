@@ -93,8 +93,7 @@ flag. This will report just the count, not the full list of advisories.
 				p.advisoriesRepoDir = "." // default to current working directory
 			}
 
-			advisoriesFsys := rwos.DirFS(p.advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoriesFsys)
+			index, err := v2.NewIndex(cmd.Context(), rwos.DirFS(p.advisoriesRepoDir))
 			if err != nil {
 				return err
 			}
@@ -141,24 +140,24 @@ flag. This will report just the count, not the full list of advisories.
 				updatedBefore = &ts
 			}
 
-			if advisoryCfgs.Select().Len() == 0 {
+			if index.Select().Len() == 0 {
 				return fmt.Errorf("no advisory data found in %q; cd to an advisories directory, or use -a flag", p.advisoriesRepoDir)
 			}
 
-			var cfgs []v2.Document
+			var docs []v2.Document
 			if pkg := p.packageName; pkg != "" {
-				cfgs = advisoryCfgs.Select().WhereName(pkg).Configurations()
+				docs = index.Select().WhereName(pkg).Configurations()
 			} else {
-				cfgs = advisoryCfgs.Select().Configurations()
+				docs = index.Select().Configurations()
 			}
 
-			list := advisoryListRenderer{
+			table := advisoryListTableRenderer{
 				showHistory: p.history,
 				showAliases: p.showAliases,
 			}
 
-			for _, cfg := range cfgs {
-				for _, adv := range cfg.Advisories {
+			for _, doc := range docs {
+				for _, adv := range doc.Advisories {
 					sortedEvents := adv.SortedEvents()
 
 					if len(sortedEvents) == 0 {
@@ -208,7 +207,7 @@ flag. This will report just the count, not the full list of advisories.
 						// user wants the full history
 						for i, event := range sortedEvents {
 							isLatest := i == len(sortedEvents)-1 // last event is the latest
-							list.add(cfg.Package.Name, adv.ID, adv.Aliases, event, isLatest)
+							table.add(doc.Package.Name, adv.ID, adv.Aliases, event, isLatest)
 						}
 
 						continue
@@ -221,17 +220,17 @@ flag. This will report just the count, not the full list of advisories.
 						continue
 					}
 
-					list.add(cfg.Package.Name, adv.ID, adv.Aliases, latest, true)
+					table.add(doc.Package.Name, adv.ID, adv.Aliases, latest, true)
 				}
 			}
 
 			if p.count {
 				// Just show the count and then exit.
-				fmt.Printf("%d\n", list.len())
+				fmt.Printf("%d\n", table.len())
 				return nil
 			}
 
-			fmt.Printf("%s\n", list)
+			fmt.Printf("%s\n", table)
 			return nil
 		},
 	}
@@ -299,7 +298,7 @@ type advisoryListTableRow struct {
 	isLatestInHistory bool
 }
 
-type advisoryListRenderer struct {
+type advisoryListTableRenderer struct {
 	// configuration values
 	showHistory bool
 	showAliases bool
@@ -309,11 +308,11 @@ type advisoryListRenderer struct {
 	currentPkg, currentAdvID string
 }
 
-func (r advisoryListRenderer) len() int {
+func (r advisoryListTableRenderer) len() int {
 	return len(r.rows)
 }
 
-func (r *advisoryListRenderer) add(pkg, advID string, aliases []string, event v2.Event, isLatest bool) {
+func (r *advisoryListTableRenderer) add(pkg, advID string, aliases []string, event v2.Event, isLatest bool) {
 	row := advisoryListTableRow{}
 
 	// Don't show the package name again if it's the same as for the prior row
@@ -342,7 +341,7 @@ func (r *advisoryListRenderer) add(pkg, advID string, aliases []string, event v2
 	r.rows = append(r.rows, row)
 }
 
-func (r advisoryListRenderer) String() string {
+func (r advisoryListTableRenderer) String() string {
 	var (
 		stylePkg            = styles.Bold().Foreground(lipgloss.Color("#3ba0f7"))
 		styleAdvID          = lipgloss.NewStyle().Foreground(lipgloss.Color("#bc85ff"))
