@@ -63,3 +63,40 @@ func TestValidateID(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateCGAID(t *testing.T) {
+	tests := []struct {
+		name    string
+		id      string
+		wantErr bool
+	}{
+		{
+			name:    "valid CGA",
+			id:      "CGA-xg8w-q25p-9gcc",
+			wantErr: false,
+		},
+		{
+			name:    "invalid characters",
+			id:      "CGA-4aj9-honk-9j91",
+			wantErr: true,
+		},
+		{
+			name:    "valid CVE (but not CGA)",
+			id:      "CVE-2018-9999",
+			wantErr: true,
+		},
+		{
+			name:    "empty",
+			id:      "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := ValidateCGAID(tt.id); (err != nil) != tt.wantErr {
+				t.Errorf("ValidateCGAID() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
