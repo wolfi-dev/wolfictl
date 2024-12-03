@@ -167,7 +167,7 @@ func (adv Advisory) isFixedVersion(version, packageType string, latest Event) bo
 func (adv Advisory) Validate() error {
 	return errorhelpers.LabelError(adv.ID,
 		errors.Join(
-			vuln.ValidateID(adv.ID),
+			vuln.ValidateCGAID(adv.ID),
 			adv.validateAliases(),
 			adv.validateEvents(),
 		),
