@@ -60,9 +60,9 @@ require (
 	go.opentelemetry.io/otel/sdk v1.32.0
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 	golang.org/x/oauth2 v0.24.0
-	golang.org/x/sync v0.9.0
+	golang.org/x/sync v0.10.0
 	golang.org/x/term v0.27.0
-	golang.org/x/text v0.20.0
+	golang.org/x/text v0.21.0
 	golang.org/x/time v0.8.0
 	golang.org/x/vuln v1.1.3
 	gopkg.in/yaml.v3 v3.0.1
