@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.20.1
-	chainguard.dev/melange v0.17.3
+	chainguard.dev/melange v0.17.4
 	cloud.google.com/go/storage v1.47.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.85.0
@@ -353,7 +353,7 @@ require (
 	go.step.sm/crypto v0.54.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.29.0 // indirect
+	golang.org/x/crypto v0.30.0 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
