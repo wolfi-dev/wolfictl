@@ -35,15 +35,14 @@ required fields are missing.
       --arch strings                 package architectures to find published versions for (default [x86_64,aarch64])
   -d, --distro-repo-dir string       directory containing the distro repository
       --fixed-version string         package version where fix was applied (used only for 'fixed' event type)
-      --fp-note string               prose explanation of the false positive (used only for false positives)
       --fp-type string               type of false positive [vulnerability-record-analysis-contested, component-vulnerability-mismatch, vulnerable-code-version-not-used, vulnerable-code-not-included-in-package, vulnerable-code-not-in-execution-path, vulnerable-code-cannot-be-controlled-by-adversary, inline-mitigations-exist]
   -h, --help                         help for update
       --no-distro-detection          do not attempt to auto-detect the distro
       --no-prompt                    do not prompt the user for input
+      --note string                  prose explanation to attach to the event data (can be used with any event type)
   -p, --package string               package name
   -r, --package-repo-url string      URL of the APK package repository
       --timestamp string             timestamp of the event (RFC3339 format) (default "now")
-      --tp-note string               prose explanation of the true positive (used only for true positives)
   -t, --type string                  type of event [detection, true-positive-determination, fixed, false-positive-determination, analysis-not-planned, fix-not-planned, pending-upstream-fix]
   -V, --vuln string                  vulnerability ID for advisory
 ```

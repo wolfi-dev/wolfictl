@@ -39,7 +39,6 @@ func New() *cobra.Command {
 	cmd.AddCommand(
 		cmdAdvisory(),
 		cmdApk(),
-		cmdBuild(),
 		cmdBump(),
 		cmdCheck(),
 		cmdGh(),
@@ -48,7 +47,6 @@ func New() *cobra.Command {
 		cmdRuby(),
 		cmdLs(),
 		cmdSVG(),
-		cmdTest(),
 		cmdText(),
 		cmdSBOM(),
 		cmdScan(),

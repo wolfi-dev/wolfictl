@@ -55,6 +55,12 @@ Using the --history flag, you can list advisory events instead of just
 advisories' latest states. This is useful for viewing a summary of an 
 investigation over time for a given package/vulnerability match.'
 
+OUTPUT FORMAT
+
+Using the --output (-o) flag, you can select the output format used to render
+the results. By default, results are rendered as a "table"; however, you can
+also select "json".
+
 COUNT
 
 You get a count of the advisories that match the criteria by using the --count
@@ -75,6 +81,7 @@ flag. This will report just the count, not the full list of advisories.
       --created-since string         filter advisories created since a given date
   -h, --help                         help for list
       --history                      show full history for advisories
+  -o, --output string                output format (table|json), defaults to table
   -p, --package string               package name
   -t, --type string                  filter advisories by event type
       --unresolved                   only show advisories considered to be unresolved

@@ -15,25 +15,16 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/wolfi-dev/wolfictl/pkg/cli"
 )
 
-const descriptionSourcePath = "docs/reference/cmd/"
-
 func generateCliYaml(opts *options) error {
 	root := cli.New()
 	disableFlagsInUseLine(root)
-	source := filepath.Join(opts.source, descriptionSourcePath)
-	if err := loadLongDescription(root, source); err != nil {
-		return err
-	}
 
 	switch opts.kind {
 	case "markdown":
@@ -65,34 +56,6 @@ func visitAll(root *cobra.Command, fn func(*cobra.Command)) {
 	fn(root)
 }
 
-func loadLongDescription(cmd *cobra.Command, path ...string) error {
-	for _, c := range cmd.Commands() {
-		if c.Name() == "" {
-			continue
-		}
-		fullpath := filepath.Join(path[0], strings.Join(append(path[1:], c.Name()), "_")+markdownExtension)
-		if c.HasSubCommands() {
-			if err := loadLongDescription(c, path[0], c.Name()); err != nil {
-				return err
-			}
-		}
-
-		if _, err := os.Stat(fullpath); err != nil {
-			log.Printf("WARN: %s does not exist, skipping\n", fullpath)
-			continue
-		}
-
-		content, err := os.ReadFile(fullpath)
-		if err != nil {
-			return err
-		}
-		description, examples := parseMDContent(string(content))
-		c.Long = description
-		c.Example = examples
-	}
-	return nil
-}
-
 type options struct {
 	source string
 	target string
@@ -113,19 +76,6 @@ func parseArgs() (*options, error) {
 		return nil, fmt.Errorf("parsing arguments: %w", err)
 	}
 	return opts, nil
-}
-
-func parseMDContent(mdString string) (description, examples string) {
-	parsedContent := strings.Split(mdString, "\n## ")
-	for _, s := range parsedContent {
-		if strings.Index(s, "Description") == 0 {
-			description = strings.TrimSpace(strings.TrimPrefix(s, "Description"))
-		}
-		if strings.Index(s, "Examples") == 0 {
-			examples = strings.TrimSpace(strings.TrimPrefix(s, "Examples"))
-		}
-	}
-	return description, examples
 }
 
 func main() {

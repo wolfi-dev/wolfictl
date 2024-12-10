@@ -50,25 +50,6 @@ filtering. The following sets of advisories are available:
 - "concluded": Only filter out all vulnerabilities that have been fixed, or those
   where no change is planned to fix the vulnerability.
 
-## AUTO-TRIAGING
-
-Wolfictl now supports auto-triaging vulnerabilities found in Go binaries using
-govulncheck. To enable this feature, use the "--govulncheck" flag. Note that
-this feature is experimental and may not work in all cases. For more
-information on the govulncheck utility, see
-https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck. Using this feature does
-not require you to install govulncheck on your system (the functionality
-required is included in wolfictl as a library).
-
-For vulnerabilities known to govulncheck, this feature annotates each
-vulnerability with a "true positive" or "false positive" designation. The JSON
-output mode shows more information about the govulncheck triage results than
-the default outline output mode.
-
-This feature does not filter out any results from the scan output.
-
-This feature is only supported when scanning APKs, not when scanning SBOMs.
-
 ## OUTPUT
 
 When a scan finishes, the command will print the results to stdout. There are
