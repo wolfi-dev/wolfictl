@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	v5 "github.com/anchore/grype/grype/db/v5"
 	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/grype/grype/vulnerability"
@@ -130,7 +129,7 @@ func mapMatchToFinding(m match.Match, datastore *store.Store) (*Finding, error) 
 }
 
 func getFixedVersion(vuln vulnerability.Vulnerability) string {
-	if vuln.Fix.State != v5.FixedState {
+	if vuln.Fix.State != vulnerability.FixStateFixed {
 		return ""
 	}
 
