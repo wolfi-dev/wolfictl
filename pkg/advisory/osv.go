@@ -156,9 +156,9 @@ func BuildOSVDataset(ctx context.Context, opts OSVOptions) error {
 					continue
 				}
 
-				// Note: The OSV data should include our advisory ID itself among the listed
-				// related vulnerability IDs.
-				related := append([]string{adv.ID}, adv.Aliases...)
+				// TODO: Use the 'upstream' field instead of 'related'. See https://github.com/ossf/osv-schema/pull/312.
+				//  Make sure to communicate to data consumers ahead of this change, though!
+				related := adv.Aliases
 
 				affecteds := make([]models.Affected, 0, len(affectedPackages))
 				for _, pkg := range affectedPackages {
