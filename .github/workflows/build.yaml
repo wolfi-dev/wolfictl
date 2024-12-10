@@ -58,11 +58,17 @@ jobs:
         with:
           repository: 'wolfi-dev/os'
           path: 'wolfi-os'
+
+      # This command is not itself used by Wolfi directly, but it demonstrates that we're able to construct a graph of packages
+      # without cycles or unsatisfied deps, which prevents a class of build failures.
+      # This check is here to ensure that graph construction changes in this repo don't break graph resolution on the Wolfi OS repo.
       - name: Test Wolfi OS repo
         run: |
           ./wolfictl text -d wolfi-os \
             --type=name \
             --pipeline-dir=wolfi-os/pipelines/ \
+            --repository-append=https://packages.wolfi.dev/os \
+            --keyring-append=https://packages.wolfi.dev/os/wolfi-signing.rsa.pub \
             --keyring-append=https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub \
             --repository-append=https://packages.wolfi.dev/bootstrap/stage3
 

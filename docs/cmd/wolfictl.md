@@ -25,7 +25,6 @@ A CLI helper for developing Wolfi
 * [wolfictl lint](wolfictl_lint.md)	 - Lint the code
 * [wolfictl ruby](wolfictl_ruby.md)	 - Work with ruby packages
 * [wolfictl scan](wolfictl_scan.md)	 - Scan a package for vulnerabilities
-* [wolfictl text](wolfictl_text.md)	 - Print a sorted list of downstream dependent packages
 * [wolfictl version](wolfictl_version.md)	 - Prints the version
 * [wolfictl withdraw](wolfictl_withdraw.md)	 - Withdraw packages from an APKINDEX.tar.gz
 

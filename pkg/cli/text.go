@@ -18,7 +18,13 @@ func cmdText() *cobra.Command {
 	text := &cobra.Command{
 		Use:   "text",
 		Short: "Print a sorted list of downstream dependent packages",
-		Args:  cobra.NoArgs,
+		Long: `This command prints a list of packages, sorted in the order they would need to be built.
+
+If this command is successful, it means there is a solveable dependency graph and the packages can be built in the order they are printed.
+
+If this fails, there may be an unsatisfiable dependency or a cycle in the graph.`,
+		Args:   cobra.NoArgs,
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
 			if pipelineDir == "" {
