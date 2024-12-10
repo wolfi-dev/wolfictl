@@ -5,7 +5,7 @@ Performs a GitHub release using git tags to calculate the release version
 ### Usage
 
 ```
-wolfictl gh release
+wolfictl gh release [flags]
 ```
 
 ### Synopsis

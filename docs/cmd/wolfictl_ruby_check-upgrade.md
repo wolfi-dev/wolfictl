@@ -7,7 +7,7 @@ Check if gemspec for restricts a gem from upgrading to a specified ruby version.
 ### Usage
 
 ```
-wolfictl ruby check-upgrade
+wolfictl ruby check-upgrade [flags]
 ```
 
 ### Synopsis

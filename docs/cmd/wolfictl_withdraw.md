@@ -5,7 +5,7 @@ Withdraw packages from an APKINDEX.tar.gz
 ### Usage
 
 ```
-wolfictl withdraw example-pkg-1.2.3-r4
+wolfictl withdraw example-pkg-1.2.3-r4 [flags]
 ```
 
 ### Synopsis

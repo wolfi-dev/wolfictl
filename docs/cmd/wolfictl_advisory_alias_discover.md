@@ -5,7 +5,7 @@ Discover new aliases for vulnerabilities in the advisory data
 ### Usage
 
 ```
-wolfictl advisory alias discover
+wolfictl advisory alias discover [flags]
 ```
 
 ### Synopsis

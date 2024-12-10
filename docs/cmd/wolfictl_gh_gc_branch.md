@@ -5,7 +5,7 @@ Branch garbage collection commands used with GitHub
 ### Usage
 
 ```
-wolfictl gh gc branch
+wolfictl gh gc branch [flags]
 ```
 
 ### Synopsis

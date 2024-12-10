@@ -71,3 +71,27 @@ jobs:
           ./wolfictl text -d testdata/text/ | grep foo-0.0.2-r0
           ./wolfictl text -d testdata/text/ | grep bar-0.0.1-r0
           ./wolfictl text -d testdata/text/ | grep root-0.0.1-r0
+
+
+  docs:
+    permissions:
+      contents: read
+
+    name: check generated docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+
+      - run: rm -rf docs/**/*.md docs/**/*.1
+      - run: make docs
+      - run: git diff --exit-code

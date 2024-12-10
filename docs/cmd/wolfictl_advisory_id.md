@@ -5,7 +5,7 @@ Generate a new advisory ID
 ### Usage
 
 ```
-wolfictl advisory id
+wolfictl advisory id [flags]
 ```
 
 ### Synopsis

@@ -5,7 +5,7 @@ Work with ruby packages
 ### Usage
 
 ```
-wolfictl ruby
+wolfictl ruby [flags]
 ```
 
 ### Synopsis

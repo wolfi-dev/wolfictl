@@ -5,7 +5,7 @@
 ### Usage
 
 ```
-wolfictl lint yam [file]...
+wolfictl lint yam [file]... [flags]
 ```
 
 ### Synopsis

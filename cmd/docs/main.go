@@ -14,131 +14,33 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/wolfi-dev/wolfictl/pkg/cli"
 )
 
-const descriptionSourcePath = "docs/reference/cmd/"
-
-func generateCliYaml(opts *options) error {
-	root := cli.New()
-	disableFlagsInUseLine(root)
-	source := filepath.Join(opts.source, descriptionSourcePath)
-	if err := loadLongDescription(root, source); err != nil {
-		return err
-	}
-
-	switch opts.kind {
-	case "markdown":
-		return GenMarkdownTree(root, opts.target)
-	case "man":
-		header := &GenManHeader{
-			Section: "1",
-		}
-		return GenManTree(root, header, opts.target)
-	default:
-		return fmt.Errorf("invalid docs kind : %s", opts.kind)
-	}
-}
-
-func disableFlagsInUseLine(cmd *cobra.Command) {
-	visitAll(cmd, func(ccmd *cobra.Command) {
-		// do not add a `[flags]` to the end of the usage line.
-		ccmd.DisableFlagsInUseLine = true
-	})
-}
-
-// visitAll will traverse all commands from the root.
-// This is different from the VisitAll of cobra.Command where only parents
-// are checked.
-func visitAll(root *cobra.Command, fn func(*cobra.Command)) {
-	for _, c := range root.Commands() {
-		visitAll(c, fn)
-	}
-	fn(root)
-}
-
-func loadLongDescription(cmd *cobra.Command, path ...string) error {
-	for _, c := range cmd.Commands() {
-		if c.Name() == "" {
-			continue
-		}
-		fullpath := filepath.Join(path[0], strings.Join(append(path[1:], c.Name()), "_")+markdownExtension)
-		if c.HasSubCommands() {
-			if err := loadLongDescription(c, path[0], c.Name()); err != nil {
-				return err
-			}
-		}
-
-		if _, err := os.Stat(fullpath); err != nil {
-			log.Printf("WARN: %s does not exist, skipping\n", fullpath)
-			continue
-		}
-
-		content, err := os.ReadFile(fullpath)
-		if err != nil {
-			return err
-		}
-		description, examples := parseMDContent(string(content))
-		c.Long = description
-		c.Example = examples
-	}
-	return nil
-}
-
-type options struct {
-	source string
-	target string
-	kind   string
-}
-
-func parseArgs() (*options, error) {
-	opts := &options{}
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("getting cwd: %w", err)
-	}
-	flags := pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
-	flags.StringVar(&opts.source, "root", cwd, "Path to project root")
-	flags.StringVar(&opts.target, "target", "/tmp", "Target path for generated yaml files")
-	flags.StringVar(&opts.kind, "kind", "markdown", "Kind of docs to generate (supported: man, markdown)")
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		return nil, fmt.Errorf("parsing arguments: %w", err)
-	}
-	return opts, nil
-}
-
-func parseMDContent(mdString string) (description, examples string) {
-	parsedContent := strings.Split(mdString, "\n## ")
-	for _, s := range parsedContent {
-		if strings.Index(s, "Description") == 0 {
-			description = strings.TrimSpace(strings.TrimPrefix(s, "Description"))
-		}
-		if strings.Index(s, "Examples") == 0 {
-			examples = strings.TrimSpace(strings.TrimPrefix(s, "Examples"))
-		}
-	}
-	return description, examples
-}
-
 func main() {
-	opts, err := parseArgs()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-	}
-	if opts != nil {
-		fmt.Printf("Project root: %s\n", opts.source)
-		fmt.Printf("Generating yaml files into %s\n", opts.target)
+	var target string
+	var kind string
+	flag.StringVar(&target, "target", "/tmp", "Target path for generated yaml files")
+	flag.StringVar(&kind, "kind", "markdown", "Kind of docs to generate (supported: man, markdown)")
+	flag.Parse()
 
-		if err := generateCliYaml(opts); err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to generate yaml files: %s\n", err.Error())
+	log.Printf("Generating files into %s\n", target)
+
+	root := cli.New()
+
+	switch kind {
+	case "markdown":
+		if err := GenMarkdownTree(root, target); err != nil {
+			log.Fatalf("Error generating markdown: %v\n", err)
 		}
+	case "man":
+		if err := GenManTree(root, &GenManHeader{Section: "1"}, target); err != nil {
+			log.Fatalf("Error generating man: %v\n", err)
+		}
+	default:
+		log.Fatalf("invalid docs kind : %s", kind)
 	}
 }

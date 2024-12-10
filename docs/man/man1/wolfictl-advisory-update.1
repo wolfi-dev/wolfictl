@@ -10,7 +10,7 @@ wolfictl\-advisory\-update \- Update an existing advisory with a new event
 
 .SH SYNOPSIS
 .PP
-\fBwolfictl advisory update\fP
+\fBwolfictl advisory update [flags]\fP
 
 
 .SH DESCRIPTION
@@ -56,10 +56,6 @@ required fields are missing.
     package version where fix was applied (used only for 'fixed' event type)
 
 .PP
-\fB\-\-fp\-note\fP=""
-    prose explanation of the false positive (used only for false positives)
-
-.PP
 \fB\-\-fp\-type\fP=""
     type of false positive [vulnerability\-record\-analysis\-contested, component\-vulnerability\-mismatch, vulnerable\-code\-version\-not\-used, vulnerable\-code\-not\-included\-in\-package, vulnerable\-code\-not\-in\-execution\-path, vulnerable\-code\-cannot\-be\-controlled\-by\-adversary, inline\-mitigations\-exist]
 
@@ -76,6 +72,10 @@ required fields are missing.
     do not prompt the user for input
 
 .PP
+\fB\-\-note\fP=""
+    prose explanation to attach to the event data (can be used with any event type)
+
+.PP
 \fB\-p\fP, \fB\-\-package\fP=""
     package name
 
@@ -86,10 +86,6 @@ required fields are missing.
 .PP
 \fB\-\-timestamp\fP="now"
     timestamp of the event (RFC3339 format)
-
-.PP
-\fB\-\-tp\-note\fP=""
-    prose explanation of the true positive (used only for true positives)
 
 .PP
 \fB\-t\fP, \fB\-\-type\fP=""

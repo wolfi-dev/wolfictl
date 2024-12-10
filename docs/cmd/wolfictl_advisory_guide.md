@@ -5,7 +5,7 @@ Launch an interactive guide to help you enter advisory data for a package
 ### Usage
 
 ```
-wolfictl advisory guide
+wolfictl advisory guide [flags]
 ```
 
 ### Synopsis

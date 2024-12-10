@@ -7,7 +7,7 @@ Run Github search queries for ruby packages.
 ### Usage
 
 ```
-wolfictl ruby code-search
+wolfictl ruby code-search [flags]
 ```
 
 ### Synopsis

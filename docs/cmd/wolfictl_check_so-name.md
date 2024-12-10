@@ -5,7 +5,7 @@ Check so name files have not changed in upgrade
 ### Usage
 
 ```
-wolfictl check so-name
+wolfictl check so-name [flags]
 ```
 
 ### Synopsis
@@ -19,7 +19,6 @@ Check so name files have not changed in upgrade
   -d, --directory string           directory containing melange configs (default ".")
   -h, --help                       help for so-name
       --package-list-file string   name of the package to compare (default "packages.log")
-      --package-name stringArray   override using package-list-file and specify a single package name to compare
       --packages-dir string        directory containing new packages (default "packages")
 ```
 

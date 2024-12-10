@@ -5,7 +5,7 @@ Prints the version
 ### Usage
 
 ```
-wolfictl version
+wolfictl version [flags]
 ```
 
 ### Synopsis

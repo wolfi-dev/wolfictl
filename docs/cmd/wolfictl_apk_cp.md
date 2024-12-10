@@ -7,7 +7,7 @@
 ### Usage
 
 ```
-wolfictl apk cp
+wolfictl apk cp [flags]
 ```
 
 ### Synopsis

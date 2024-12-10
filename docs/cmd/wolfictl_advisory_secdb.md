@@ -7,7 +7,7 @@ Build an Alpine-style security database from advisory data
 ### Usage
 
 ```
-wolfictl advisory secdb
+wolfictl advisory secdb [flags]
 ```
 
 ### Synopsis

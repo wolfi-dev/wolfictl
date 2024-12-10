@@ -7,7 +7,7 @@ Copy a package's advisories into a new package.
 ### Usage
 
 ```
-wolfictl advisory copy <source-package-name> <destination-package-name>
+wolfictl advisory copy <source-package-name> <destination-package-name> [flags]
 ```
 
 ### Synopsis

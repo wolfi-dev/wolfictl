@@ -5,7 +5,7 @@ Generate graphviz .dot output
 ### Usage
 
 ```
-wolfictl dot
+wolfictl dot [flags]
 ```
 
 ### Synopsis
