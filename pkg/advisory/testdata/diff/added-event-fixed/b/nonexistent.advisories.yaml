@@ -4,7 +4,9 @@ package:
   name: nonexistent
 
 advisories:
-  - id: CVE-2023-33333
+  - id: CGA-2323-2323-2323
+    aliases:
+      - CVE-2023-33333
     events:
       - timestamp: 1970-01-01T00:00:00Z
         type: true-positive-determination

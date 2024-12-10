@@ -269,25 +269,39 @@ func (opts ValidateOptions) validateAliasSetCompleteness(ctx context.Context) er
 			adv := doc.Advisories[i]
 			var advErrs []error
 
-			switch {
-			case strings.HasPrefix(adv.ID, "CVE-"):
-				ghsas, err := opts.AliasFinder.GHSAsForCVE(ctx, adv.ID)
-				if err != nil {
-					return fmt.Errorf("failed to query GHSA aliases for CVE %q: %w", adv.ID, err)
-				}
-				for _, ghsa := range ghsas {
-					if !slices.Contains(adv.Aliases, ghsa) {
-						advErrs = append(advErrs, fmt.Errorf("missing GHSA alias %q from set [%s]", ghsa, strings.Join(adv.Aliases, ", ")))
+			for _, a := range adv.Aliases {
+				switch {
+				case strings.HasPrefix(a, "CVE-"):
+					cve := a
+					ghsas, err := opts.AliasFinder.GHSAsForCVE(ctx, cve)
+					if err != nil {
+						return fmt.Errorf("querying GHSA aliases for CVE %q: %w", cve, err)
 					}
-				}
+					for _, ghsa := range ghsas {
+						if !slices.Contains(adv.Aliases, ghsa) {
+							advErrs = append(advErrs, fmt.Errorf(
+								"missing %q (an alias of %q) from set [%s]",
+								ghsa,
+								cve,
+								strings.Join(adv.Aliases, ", "),
+							))
+						}
+					}
 
-			case strings.HasPrefix(adv.ID, "GHSA-"):
-				cve, err := opts.AliasFinder.CVEForGHSA(ctx, adv.ID)
-				if err != nil {
-					return fmt.Errorf("failed to query CVE alias for GHSA %q: %w", adv.ID, err)
-				}
-				if cve != "" {
-					advErrs = append(advErrs, fmt.Errorf("%q should be listed as an alias, and %q should be the advisory ID", adv.ID, cve))
+				case strings.HasPrefix(a, "GHSA-"):
+					ghsa := a
+					cve, err := opts.AliasFinder.CVEForGHSA(ctx, ghsa)
+					if err != nil {
+						return fmt.Errorf("querying CVE alias for GHSA %q: %w", ghsa, err)
+					}
+					if cve != "" && !slices.Contains(adv.Aliases, cve) {
+						advErrs = append(advErrs, fmt.Errorf(
+							"missing %q (an alias of %q) from set [%s]",
+							cve,
+							ghsa,
+							strings.Join(adv.Aliases, ", "),
+						))
+					}
 				}
 			}
 

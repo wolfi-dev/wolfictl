@@ -4,7 +4,9 @@ package:
   name: ko
 
 advisories:
-  - id: CVE-2023-24535
+  - id: CGA-3333-3333-3333
+    aliases:
+      - CVE-2023-24535
     events:
       - timestamp: 2023-11-11T00:00:00Z
         type: true-positive-determination

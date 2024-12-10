@@ -21,3 +21,12 @@ func ValidateID(id string) error {
 
 	return nil
 }
+
+// ValidateCGAID returns an error if the given ID is not a valid CGA ID.
+func ValidateCGAID(id string) error {
+	if !RegexCGA.MatchString(id) {
+		return fmt.Errorf("%q is not a valid CGA ID", id)
+	}
+
+	return nil
+}
