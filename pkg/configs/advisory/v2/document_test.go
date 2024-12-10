@@ -19,7 +19,8 @@ import (
 func TestDocument_Validate(t *testing.T) {
 	testTime := Timestamp(time.Date(2022, 9, 26, 0, 0, 0, 0, time.UTC))
 	testValidAdvisory := Advisory{
-		ID: "CVE-2020-0001",
+		ID:      "CGA-2222-2222-2222",
+		Aliases: []string{"CVE-2020-0001"},
 		Events: []Event{
 			{
 				Timestamp: testTime,
@@ -122,8 +123,9 @@ func TestDocument_full_coverage(t *testing.T) {
 		},
 		Advisories: Advisories{
 			{
-				ID: "CVE-2000-0001",
+				ID: "CGA-2222-2222-2222",
 				Aliases: []string{
+					"CVE-2000-0001",
 					"GHSA-xxxx-xxxx-xxx9",
 					"GO-2000-0001",
 				},

@@ -16,7 +16,8 @@ func TestAdvisory_Validate(t *testing.T) {
 		{
 			name: "valid",
 			adv: Advisory{
-				ID: "CVE-2020-0001",
+				ID:      "CGA-2222-2222-2222",
+				Aliases: []string{"CVE-2020-0001"},
 				Events: []Event{
 					{
 						Timestamp: testTime,
@@ -32,8 +33,9 @@ func TestAdvisory_Validate(t *testing.T) {
 		{
 			name: "valid with aliases",
 			adv: Advisory{
-				ID: "CVE-2020-0001",
+				ID: "CGA-2222-2222-2222",
 				Aliases: []string{
+					"CVE-2020-0001",
 					"GHSA-5j9q-4xjw-3j3q",
 					"GO-2023-0001",
 				},
@@ -68,8 +70,9 @@ func TestAdvisory_Validate(t *testing.T) {
 		{
 			name: "invalid alias",
 			adv: Advisory{
-				ID: "CVE-2020-0001",
+				ID: "CGA-2222-2222-2222",
 				Aliases: []string{
+					"CVE-2020-0001",
 					"DSA-12345678",
 				},
 				Events: []Event{
@@ -87,7 +90,7 @@ func TestAdvisory_Validate(t *testing.T) {
 		{
 			name: "duplicate aliases",
 			adv: Advisory{
-				ID: "CVE-2020-0001",
+				ID: "CGA-2222-2222-2222",
 				Aliases: []string{
 					"GHSA-5j9q-4xjw-3j3q",
 					"GHSA-5j9q-4xjw-3j3q",
@@ -126,8 +129,9 @@ func TestAdvisory_Validate(t *testing.T) {
 		{
 			name: "CGA ID in alias instead of advisory CVE/GHSA ID",
 			adv: Advisory{
-				ID: "CGA-3j9q-4fjf-3jsq",
+				ID: "CGA-2222-2222-2222",
 				Aliases: []string{
+					"CGA-3j9q-4fjf-3jsq",
 					"CVE-2020-0001",
 					"GHSA-5j9q-4xjw-3j3q",
 				},

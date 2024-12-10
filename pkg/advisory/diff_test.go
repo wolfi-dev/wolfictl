@@ -40,7 +40,8 @@ func TestIndexDiff(t *testing.T) {
 						},
 						Advisories: v2.Advisories{
 							{
-								ID: "CVE-2023-24535",
+								ID:      "CGA-3333-3333-3333",
+								Aliases: []string{"CVE-2023-24535"},
 								Events: []v2.Event{
 									{
 										Timestamp: v2.Timestamp(now),
@@ -85,7 +86,8 @@ func TestIndexDiff(t *testing.T) {
 						Name: "ko",
 						Added: v2.Advisories{
 							{
-								ID: "CVE-2023-11111",
+								ID:      "CGA-3333-3333-3333",
+								Aliases: []string{"CVE-2023-1111"},
 								Events: []v2.Event{
 									{
 										Timestamp: v2.Timestamp(now),
@@ -127,9 +129,10 @@ func TestIndexDiff(t *testing.T) {
 						Name: "ko",
 						Modified: []DiffResult{
 							{
-								ID: "CVE-2023-24535",
+								ID: "CGA-2222-2222-2222",
 								Added: v2.Advisory{
-									ID: "CVE-2023-24535",
+									ID:      "CGA-2222-2222-2222",
+									Aliases: []string{"CVE-2023-24535"},
 									Events: []v2.Event{
 										{
 											Timestamp: unixEpochTimestamp,
@@ -138,8 +141,9 @@ func TestIndexDiff(t *testing.T) {
 									},
 								},
 								Removed: v2.Advisory{
-									ID: "CVE-2023-24535",
+									ID: "CGA-2222-2222-2222",
 									Aliases: []string{
+										"CVE-2023-24535",
 										"GHSA-2222-2222-2222",
 									},
 									Events: []v2.Event{
@@ -163,9 +167,10 @@ func TestIndexDiff(t *testing.T) {
 						Name: "ko",
 						Modified: []DiffResult{
 							{
-								ID: "CVE-2023-11111",
+								ID: "CGA-3333-3333-3333",
 								Added: v2.Advisory{
-									ID: "CVE-2023-11111",
+									ID:      "CGA-3333-3333-3333",
+									Aliases: []string{"CVE-2023-11111"},
 									Events: []v2.Event{
 										{
 											Timestamp: unixEpochTimestamp,
@@ -178,7 +183,8 @@ func TestIndexDiff(t *testing.T) {
 									},
 								},
 								Removed: v2.Advisory{
-									ID: "CVE-2023-11111",
+									ID:      "CGA-3333-3333-3333",
+									Aliases: []string{"CVE-2023-11111"},
 									Events: []v2.Event{
 										{
 											Timestamp: unixEpochTimestamp,

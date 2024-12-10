@@ -4,8 +4,9 @@ package:
   name: future
 
 advisories:
-  - id: CVE-2000-0001
+  - id: CGA-2222-2222-2222
     aliases:
+      - CVE-2000-0001
       - GHSA-xxxx-xxxx-xxx9
       - GO-2000-0001
       - DSA-2000-0001
@@ -27,4 +28,3 @@ advisories:
         data:
           type: future-false-positive-type
           note: Something something false positive.
-

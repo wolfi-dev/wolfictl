@@ -289,10 +289,6 @@ func TestValidate(t *testing.T) {
 				shouldBeValid: false,
 			},
 			{
-				name:          "duplicate-advisory-by-id-and-alias",
-				shouldBeValid: false,
-			},
-			{
 				name:          "no-duplicates",
 				shouldBeValid: true,
 			},

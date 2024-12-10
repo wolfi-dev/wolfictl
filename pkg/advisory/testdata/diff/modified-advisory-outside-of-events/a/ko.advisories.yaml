@@ -4,8 +4,9 @@ package:
   name: ko
 
 advisories:
-  - id: CVE-2023-24535
+  - id: CGA-2222-2222-2222
     aliases:
+      - CVE-2023-24535
       - GHSA-2222-2222-2222
     events:
       - timestamp: 1970-01-01T00:00:00Z

@@ -4,8 +4,9 @@ package:
   name: kaf
 
 advisories:
-  - id: CVE-2023-39325
+  - id: CGA-2222-2222-2222
     aliases:
+      - CVE-2023-39325
       - GHSA-4374-p667-p6c8
     events:
       - timestamp: 2023-10-25T23:52:38Z
