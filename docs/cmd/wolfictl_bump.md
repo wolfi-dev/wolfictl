@@ -5,7 +5,7 @@ Bumps the epoch field in melange configuration files
 ### Usage
 
 ```
-wolfictl bump config[.yaml] [config[.yaml]...]
+wolfictl bump config[.yaml] [config[.yaml]...] [flags]
 ```
 
 ### Synopsis

@@ -5,7 +5,7 @@ Check so name files have not changed in upgrade
 ### Usage
 
 ```
-wolfictl check so-name
+wolfictl check so-name [flags]
 ```
 
 ### Synopsis

@@ -5,7 +5,7 @@ See the advisory data differences introduced by your local changes
 ### Usage
 
 ```
-wolfictl advisory diff
+wolfictl advisory diff [flags]
 ```
 
 ### Synopsis

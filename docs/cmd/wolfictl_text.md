@@ -5,7 +5,7 @@ Print a sorted list of downstream dependent packages
 ### Usage
 
 ```
-wolfictl text
+wolfictl text [flags]
 ```
 
 ### Synopsis

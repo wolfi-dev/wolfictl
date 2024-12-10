@@ -5,7 +5,7 @@ Validate fixes recorded in advisories
 ### Usage
 
 ```
-wolfictl advisory validate fixes
+wolfictl advisory validate fixes [flags]
 ```
 
 ### Synopsis

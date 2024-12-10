@@ -5,7 +5,7 @@ Show APK(s) in a container image
 ### Usage
 
 ```
-wolfictl image apk <image>
+wolfictl image apk <image> [flags]
 ```
 
 ### Synopsis

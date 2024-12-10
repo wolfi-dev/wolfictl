@@ -5,7 +5,7 @@ Create a diff comparing proposed apk changes following a melange build, to the l
 ### Usage
 
 ```
-wolfictl check diff
+wolfictl check diff [flags]
 ```
 
 ### Synopsis

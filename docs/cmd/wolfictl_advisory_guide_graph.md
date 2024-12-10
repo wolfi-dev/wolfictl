@@ -5,7 +5,7 @@ Generate a DOT graph of the advisory guide interview questions
 ### Usage
 
 ```
-wolfictl advisory guide graph
+wolfictl advisory guide graph [flags]
 ```
 
 ### Synopsis

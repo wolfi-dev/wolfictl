@@ -5,7 +5,7 @@ Validate the state of advisory data
 ### Usage
 
 ```
-wolfictl advisory validate
+wolfictl advisory validate [flags]
 ```
 
 ### Synopsis

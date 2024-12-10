@@ -5,7 +5,7 @@ Build an OSV dataset from Chainguard advisory data
 ### Usage
 
 ```
-wolfictl advisory osv
+wolfictl advisory osv [flags]
 ```
 
 ### Synopsis

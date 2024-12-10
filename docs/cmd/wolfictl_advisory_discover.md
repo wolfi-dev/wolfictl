@@ -5,7 +5,7 @@ Automatically create advisories by matching distro packages to vulnerabilities i
 ### Usage
 
 ```
-wolfictl advisory discover
+wolfictl advisory discover [flags]
 ```
 
 ### Synopsis

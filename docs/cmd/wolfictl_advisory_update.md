@@ -5,7 +5,7 @@ Update an existing advisory with a new event
 ### Usage
 
 ```
-wolfictl advisory update
+wolfictl advisory update [flags]
 ```
 
 ### Synopsis

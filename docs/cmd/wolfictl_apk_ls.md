@@ -5,7 +5,7 @@
 ### Usage
 
 ```
-wolfictl apk ls
+wolfictl apk ls [flags]
 ```
 
 ### Synopsis

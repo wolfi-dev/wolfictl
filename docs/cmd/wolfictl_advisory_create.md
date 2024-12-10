@@ -5,7 +5,7 @@ Create a new advisory
 ### Usage
 
 ```
-wolfictl advisory create
+wolfictl advisory create [flags]
 ```
 
 ### Synopsis

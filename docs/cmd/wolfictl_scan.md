@@ -5,7 +5,7 @@ Scan a package for vulnerabilities
 ### Usage
 
 ```
-wolfictl scan [ --sbom | --build-log | --remote ] [ --advisory-filter <type> --advisories-repo-dir <path> ] target...
+wolfictl scan [ --sbom | --build-log | --remote ] [ --advisory-filter <type> --advisories-repo-dir <path> ] target... [flags]
 ```
 
 ### Synopsis

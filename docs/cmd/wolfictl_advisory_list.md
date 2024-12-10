@@ -7,7 +7,7 @@ List advisories for specific packages, vulnerabilities, or the entire data set
 ### Usage
 
 ```
-wolfictl advisory list
+wolfictl advisory list [flags]
 ```
 
 ### Synopsis

@@ -5,7 +5,7 @@ Query upstream data sources for aliases for the given vulnerability ID(s)
 ### Usage
 
 ```
-wolfictl advisory alias find <vulnerability ID> [<vulnerability ID>...]
+wolfictl advisory alias find <vulnerability ID> [<vulnerability ID>...] [flags]
 ```
 
 ### Synopsis

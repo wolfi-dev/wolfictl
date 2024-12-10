@@ -5,7 +5,7 @@ Lint the code
 ### Usage
 
 ```
-wolfictl lint
+wolfictl lint [flags]
 ```
 
 ### Synopsis

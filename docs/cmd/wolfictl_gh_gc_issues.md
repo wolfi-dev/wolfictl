@@ -5,7 +5,7 @@ Issues garbage collection commands used with GitHub
 ### Usage
 
 ```
-wolfictl gh gc issues
+wolfictl gh gc issues [flags]
 ```
 
 ### Synopsis
