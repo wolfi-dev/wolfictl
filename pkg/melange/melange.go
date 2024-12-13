@@ -146,7 +146,7 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 		
 		name := packageConfig.Package.Name
 		
-		// check that package config name is unique
+		// check that the package config name is unique
 		_, exists := p[name]
 		if exists {
 			return p, fmt.Errorf("Package config names must be unique. Found duplicate '%s'", name)
