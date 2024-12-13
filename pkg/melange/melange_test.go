@@ -30,6 +30,13 @@ func TestMelange_readAllPackages(t *testing.T) {
 	assert.Equal(t, 4, len(packages))
 }
 
+func TestMelange_readAllPackagesErrorOnDuplicate(t *testing.T) {
+	
+	ctx := context.Background()
+	_, err := ReadAllPackagesFromRepo(ctx, filepath.Join("testdata", "duplicates_dir"))
+	assert.Error(t, err, "Package config names must be unique. Found duplicate 'foo'")
+}
+
 func TestMelange_readPackageConfigForBar(t *testing.T) {
 	ctx := context.Background()
 	packages, err := ReadPackageConfigs(ctx, []string{"bar"}, filepath.Join("testdata", "melange_dir"))
