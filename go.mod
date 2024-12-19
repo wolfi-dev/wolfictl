@@ -10,6 +10,9 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 // this is a breaking change, so we need to pin the version until glebarez/go-sqlite is updated to use internal/libc
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
+// Fork of the golang vuln to make private method public.
+replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.1.3
+
 require (
 	chainguard.dev/apko v0.22.2
 	chainguard.dev/melange v0.18.1
@@ -380,5 +383,3 @@ require (
 	modernc.org/sqlite v1.34.2 // indirect
 	mvdan.cc/sh/v3 v3.10.0 // indirect
 )
-
-replace golang.org/x/vuln => github.com/luhring/golang-vuln v1.0.2-0.20231029212121-c364fd4725dc
