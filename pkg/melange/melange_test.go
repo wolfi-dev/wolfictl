@@ -30,11 +30,10 @@ func TestMelange_readAllPackages(t *testing.T) {
 	assert.Equal(t, 4, len(packages))
 }
 
-func TestMelange_readAllPackagesErrorOnDuplicate(t *testing.T) {
-	
+func TestMelange_readAllPackagesErrorOnDuplicate(t *testing.T) {	
 	ctx := context.Background()
 	_, err := ReadAllPackagesFromRepo(ctx, filepath.Join("testdata", "duplicates_dir"))
-	assert.Error(t, err, "Package config names must be unique. Found duplicate 'foo'")
+	assert.Error(t, err, "package name does not match file name in 'foo1.yaml': 'foo' != 'foo1")
 }
 
 func TestMelange_readPackageConfigForBar(t *testing.T) {
