@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	v5 "github.com/anchore/grype/grype/db/v5"
 	"github.com/anchore/grype/grype/match"
-	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/file"
 	"github.com/samber/lo"
@@ -82,15 +82,15 @@ type TriageAssessment struct {
 	Reason string
 }
 
-func mapMatchToFinding(m match.Match, datastore *store.Store) (*Finding, error) {
-	metadata, err := datastore.MetadataProvider.GetMetadata(m.Vulnerability.ID, m.Vulnerability.Namespace)
+func mapMatchToFinding(m match.Match, datastore *v5.ProviderStore) (*Finding, error) {
+	metadata, err := datastore.VulnerabilityMetadataProvider.GetMetadata(m.Vulnerability.ID, m.Vulnerability.Namespace)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get metadata for vulnerability %s: %w", m.Vulnerability.ID, err)
 	}
 
 	var relatedMetadatas []*vulnerability.Metadata
 	for _, relatedRef := range m.Vulnerability.RelatedVulnerabilities {
-		relatedMetadata, err := datastore.MetadataProvider.GetMetadata(relatedRef.ID, relatedRef.Namespace)
+		relatedMetadata, err := datastore.VulnerabilityMetadataProvider.GetMetadata(relatedRef.ID, relatedRef.Namespace)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get metadata for related vulnerability %s: %w", relatedRef.ID, err)
 		}

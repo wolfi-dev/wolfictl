@@ -11,17 +11,17 @@ import (
 	"github.com/adrg/xdg"
 	"github.com/anchore/grype/grype"
 	db "github.com/anchore/grype/grype/db/legacy/distribution"
-	"github.com/anchore/grype/grype/matcher"
-	"github.com/anchore/grype/grype/matcher/dotnet"
-	"github.com/anchore/grype/grype/matcher/golang"
-	"github.com/anchore/grype/grype/matcher/java"
-	"github.com/anchore/grype/grype/matcher/javascript"
-	"github.com/anchore/grype/grype/matcher/python"
-	"github.com/anchore/grype/grype/matcher/ruby"
-	"github.com/anchore/grype/grype/matcher/rust"
-	"github.com/anchore/grype/grype/matcher/stock"
+	v5 "github.com/anchore/grype/grype/db/v5"
+	"github.com/anchore/grype/grype/db/v5/matcher"
+	"github.com/anchore/grype/grype/db/v5/matcher/dotnet"
+	"github.com/anchore/grype/grype/db/v5/matcher/golang"
+	"github.com/anchore/grype/grype/db/v5/matcher/java"
+	"github.com/anchore/grype/grype/db/v5/matcher/javascript"
+	"github.com/anchore/grype/grype/db/v5/matcher/python"
+	"github.com/anchore/grype/grype/db/v5/matcher/ruby"
+	"github.com/anchore/grype/grype/db/v5/matcher/rust"
+	"github.com/anchore/grype/grype/db/v5/matcher/stock"
 	grypePkg "github.com/anchore/grype/grype/pkg"
-	"github.com/anchore/grype/grype/store"
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
@@ -81,7 +81,7 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 }
 
 type Scanner struct {
-	datastore            *store.Store
+	datastore            *v5.ProviderStore
 	dbStatus             *db.Status
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
 	disableSBOMCache     bool
@@ -258,7 +258,7 @@ func (s *Scanner) Close() {
 	}
 }
 
-func NewGrypeVulnerabilityMatcher(datastore store.Store, useCPEs bool) *grype.VulnerabilityMatcher {
+func NewGrypeVulnerabilityMatcher(datastore v5.ProviderStore, useCPEs bool) *grype.VulnerabilityMatcher {
 	return &grype.VulnerabilityMatcher{
 		Store:    datastore,
 		Matchers: createMatchers(useCPEs),
