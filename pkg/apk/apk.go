@@ -22,7 +22,7 @@ type Context struct {
 
 func New(client *http.Client, indexURL string) Context {
 	rc := retryablehttp.NewClient()
-	//	rc.Logger = log.New(io.Discard, "", 0) // Don't log requests at all.
+	rc.Logger = log.New(io.Discard, "", 0) // Don't log requests at all.
 	rc.HTTPClient = client
 	return Context{
 		client:   rc.StandardClient(),
