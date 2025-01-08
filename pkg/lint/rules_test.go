@@ -328,7 +328,7 @@ func TestLinter_Rules(t *testing.T) {
 			file:        "check-subpipeline-version-matches.yaml",
 			minSeverity: SeverityWarning,
 			want: EvalResult{
-				File: "check-version-matches",
+				File: "check-subpipeline-version-matches",
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{

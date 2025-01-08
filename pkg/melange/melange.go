@@ -144,7 +144,19 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 			return p, fmt.Errorf("failed to read package config %s: %w", fi, err)
 		}
 
-		p[packageConfig.Package.Name] = &Packages{
+		// check that the package name matches the file name
+		name := packageConfig.Package.Name
+		fiBase := strings.TrimSuffix(filepath.Base(fi), filepath.Ext(fi))
+		if name != fiBase {
+			return p, fmt.Errorf("package name does not match file name in '%s': '%s' != '%s'", fi, name, fiBase)
+		}
+
+		// check that the package config name is unique
+		_, exists := p[name]
+		if exists {
+			return p, fmt.Errorf("package config names must be unique. Found a package called '%s' in '%s' and '%s'", name, fi, p[name].Filename)
+		}
+		p[name] = &Packages{
 			Config:   *packageConfig,
 			Filename: relativeFilename,
 			Dir:      dir,
