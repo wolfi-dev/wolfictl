@@ -1,5 +1,5 @@
 package:
-  name: check-version-matches
+  name: check-subpipeline-version-matches
   version: 0.9.0
   epoch: 0
   description: "a package with an out of date comment"
