@@ -112,7 +112,7 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 
 	// guarantee a consistent sort order for test comparisons
 	sort.Strings(fileList)
-	
+
 	for _, fi := range fileList {
 		data, err := os.ReadFile(fi)
 		if err != nil {
@@ -143,14 +143,14 @@ func ReadAllPackagesFromRepo(ctx context.Context, dir string) (map[string]*Packa
 		if err != nil {
 			return p, fmt.Errorf("failed to read package config %s: %w", fi, err)
 		}
-			
+
 		// check that the package name matches the file name
 		name := packageConfig.Package.Name
 		fiBase := strings.TrimSuffix(filepath.Base(fi), filepath.Ext(fi))
 		if name != fiBase {
 			return p, fmt.Errorf("package name does not match file name in '%s': '%s' != '%s'", fi, name, fiBase)
 		}
-		
+
 		// check that the package config name is unique
 		_, exists := p[name]
 		if exists {
