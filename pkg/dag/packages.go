@@ -172,11 +172,8 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			return fs.SkipDir
 		}
 
-		// Skip .yam.yaml and .melange.k8s.yaml
-		if d.Type().IsRegular() && path == ".yam.yaml" {
-			return nil
-		}
-		if d.Type().IsRegular() && path == ".melange.k8s.yaml" {
+		// .yam.yaml, .melange.k8s.yaml, .golangci.yaml, .pre-commit-config.yaml, etc.
+		if d.Type().IsRegular() && strings.HasPrefix(filepath.Base(path), ".") {
 			return nil
 		}
 
