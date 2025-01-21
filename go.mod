@@ -19,7 +19,7 @@ require (
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.86.1
-	github.com/anchore/stereoscope v0.0.12
+	github.com/anchore/stereoscope v0.0.13
 	github.com/anchore/syft v1.18.1
 	github.com/chainguard-dev/clog v1.5.1
 	github.com/chainguard-dev/yam v0.2.5
@@ -306,7 +306,7 @@ require (
 	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spdx/tools-golang v0.5.5 // indirect
-	github.com/spf13/afero v1.11.0 // indirect
+	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
