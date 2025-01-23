@@ -13,7 +13,7 @@ import (
 
 const (
 	packageRepo = "testdata/packages"
-	key         = "testdata/packages/key.rsa.pub"
+	key         = "testdata/packages/wolfi-signing.rsa.pub"
 )
 
 func TestNewGraph(t *testing.T) {
