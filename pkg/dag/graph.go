@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"reflect"
 	"sort"
 	"strings"
@@ -196,9 +197,6 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 	var (
 		repos       []string
 		lookupRepos = []apk.NamedIndex{}
-		// validKeys contains list of keys valid for this package; as opposed to
-		// keys, which is the master list of all keys we have encountered
-		validKeys = map[string][]byte{}
 	)
 	for _, repo := range addRepos {
 		key := apk.IndexURL(repo, arch)
@@ -210,8 +208,8 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 	}
 	// ensure any keys listed in this package are in the master map of keys
 	for _, key := range addKeys {
-		if _, ok := allKeys[key]; ok {
-			validKeys[key] = allKeys[key]
+		keyname := path.Base(key)
+		if _, ok := allKeys[keyname]; ok {
 			continue
 		}
 		b, err := getKeyMaterial(key)
@@ -220,8 +218,7 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 		}
 		// we can have no error, but still no bytes, as we ignore missing files
 		if b != nil {
-			allKeys[key] = b
-			validKeys[key] = b
+			allKeys[keyname] = b
 		}
 	}
 	if len(repos) > 0 {
