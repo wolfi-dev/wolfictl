@@ -19,7 +19,6 @@ Validate fixes recorded in advisories
   -b, --built-packages-dir string    directory containing built packages
       --distro string                distro to use during vulnerability matching (default "wolfi")
   -h, --help                         help for fixes
-  -v, --verbose count                logging verbosity (v = info, vv = debug, default is none)
 ```
 
 ### Options inherited from parent commands
