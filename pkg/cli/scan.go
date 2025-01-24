@@ -127,8 +127,8 @@ wolfictl scan package1 package2 --remote
 		Args:          cobra.MinimumNArgs(1),
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := clog.NewLogger(newLogger(p.verbosity))
-			ctx := clog.WithLogger(cmd.Context(), logger)
+			ctx := cmd.Context()
+			logger := clog.FromContext(ctx)
 
 			if p.outputFormat == "" {
 				p.outputFormat = outputFormatOutline
@@ -350,7 +350,6 @@ type scanParams struct {
 	triageWithGoVulnCheck bool
 	remoteScanning        bool
 	useCPEMatching        bool
-	verbosity             int
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -367,7 +366,6 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
 	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
 	cmd.Flags().BoolVar(&p.useCPEMatching, "use-cpes", false, "turn on all CPE matching in Grype")
-	addVerboseFlag(&p.verbosity, cmd)
 }
 
 func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (inputs []string, cleanup func() error, err error) {

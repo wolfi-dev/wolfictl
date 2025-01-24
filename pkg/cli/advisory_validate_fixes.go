@@ -27,8 +27,8 @@ func cmdAdvisoryValidateFixes() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			logger := clog.NewLogger(newLogger(p.verbosity))
-			ctx := clog.WithLogger(cmd.Context(), logger)
+			ctx := cmd.Context()
+			logger := clog.FromContext(ctx)
 
 			if p.advisoriesRepoDir == "" {
 				return fmt.Errorf("need --%s", flagNameAdvisoriesRepoDir)
@@ -107,13 +107,11 @@ func cmdAdvisoryValidateFixes() *cobra.Command {
 type validateFixesParams struct {
 	advisoriesRepoDir string
 	builtPackagesDir  string
-	verbosity         int
 	distro            string
 }
 
 func (p *validateFixesParams) addFlagsToCommand(cmd *cobra.Command) {
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
-	addVerboseFlag(&p.verbosity, cmd)
 
 	cmd.Flags().StringVarP(&p.builtPackagesDir, flagNameBuiltPackagesDir, "b", "", "directory containing built packages")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")

@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	sbomSyft "github.com/anchore/syft/syft/sbom"
-	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/sbompackages"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
@@ -28,8 +27,7 @@ func cmdSBOM() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := clog.NewLogger(newLogger(p.verbosity))
-			ctx := clog.WithLogger(cmd.Context(), logger)
+			ctx := cmd.Context()
 
 			if !slices.Contains([]string{sbomFormatOutline, sbomFormatSyftJSON}, p.outputFormat) {
 				return fmt.Errorf("invalid output format %q, must be one of [%s]", p.outputFormat, strings.Join([]string{sbomFormatOutline, sbomFormatSyftJSON}, ", "))
@@ -89,12 +87,10 @@ type sbomParams struct {
 	outputFormat     string
 	distro           string
 	disableSBOMCache bool
-	verbosity        int
 }
 
 func (p *sbomParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", sbomFormatOutline, "output format (outline, syft-json)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to report in SBOM")
 	cmd.Flags().BoolVarP(&p.disableSBOMCache, "disable-sbom-cache", "D", false, "don't use the SBOM cache")
-	addVerboseFlag(&p.verbosity, cmd)
 }

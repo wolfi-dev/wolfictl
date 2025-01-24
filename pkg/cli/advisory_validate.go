@@ -64,14 +64,14 @@ print an error message that specifies where and how the data is invalid.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			logger := clog.FromContext(cmd.Context())
 			var advisoriesRepoDir string
 			var advisoriesRepoUpstreamHTTPSURL string
 			var advisoriesRepoForkPoint string
 			var packagesRepoDir string
 			var apkRepositoryURL string
 
-			logger := clog.NewLogger(newLogger(p.verbosity))
-			ctx := clog.WithLogger(cmd.Context(), logger)
+			ctx := cmd.Context()
 
 			if p.doNotDetectDistro {
 				logger.Debug("distro auto-detection disabled")
@@ -232,7 +232,6 @@ type validateParams struct {
 	skipAliasCompletenessValidation bool
 	skipPackageExistenceValidation  bool
 	packageRepositoryURL            string
-	verbosity                       int
 }
 
 const (
@@ -246,7 +245,6 @@ const (
 func (p *validateParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
-	addVerboseFlag(&p.verbosity, cmd)
 	cmd.Flags().StringVar(&p.advisoriesRepoUpstreamHTTPSURL, flagNameAdvisoriesRepoURL, "", "HTTPS URL of the upstream Git remote for the advisories repo")
 	cmd.Flags().StringVar(&p.advisoriesRepoBaseHash, flagNameAdvisoriesRepoBaseHash, "", "commit hash of the upstream repo to which the current state will be compared in the diff")
 	addDistroDirFlag(&p.packagesRepoDir, cmd)
