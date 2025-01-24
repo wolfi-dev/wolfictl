@@ -37,7 +37,6 @@ directory must already exist before running the command.
   -h, --help                          help for osv
   -o, --output string                 path to a local directory in which the OSV dataset will be written
   -p, --packages-repo-dir strings     path to the directory(ies) containing Chainguard package data
-  -v, --verbose count                 logging verbosity (v = info, vv = debug, default is none)
 ```
 
 ### Options inherited from parent commands

@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"sort"
 	"strings"
@@ -10,7 +9,6 @@ import (
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
-	charmlog "github.com/charmbracelet/log"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -18,7 +16,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
-	"github.com/wolfi-dev/wolfictl/pkg/internal"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
@@ -218,29 +215,6 @@ func addNoDistroDetectionFlag(val *bool, cmd *cobra.Command) {
 
 func addPackageRepoURLFlag(val *string, cmd *cobra.Command) {
 	cmd.Flags().StringVarP(val, flagNamePackageRepoURL, "r", "", "URL of the APK package repository")
-}
-
-func addVerboseFlag(val *int, cmd *cobra.Command) {
-	cmd.Flags().CountVarP(val, "verbose", "v", "logging verbosity (v = info, vv = debug, default is none)")
-}
-
-func newLogger(verbosity int) *slog.Logger {
-	var level charmlog.Level
-	switch {
-	case verbosity == 1:
-		level = charmlog.InfoLevel
-	case verbosity >= 2:
-		level = charmlog.DebugLevel
-	default:
-		return internal.NopLogger()
-	}
-
-	cl := charmlog.NewWithOptions(os.Stderr, charmlog.Options{
-		Level:           level,
-		ReportTimestamp: true,
-	})
-
-	return slog.New(cl)
 }
 
 func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.Index[config.Configuration]) func(packageName string) []string {

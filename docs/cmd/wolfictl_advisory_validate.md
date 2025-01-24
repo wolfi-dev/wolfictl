@@ -60,7 +60,6 @@ print an error message that specifies where and how the data is invalid.
       --skip-alias                         skip alias completeness validation (default true)
       --skip-diff                          skip diff-based validations
       --skip-existence                     skip package configuration existence validation
-  -v, --verbose count                      logging verbosity (v = info, vv = debug, default is none)
 ```
 
 ### Options inherited from parent commands

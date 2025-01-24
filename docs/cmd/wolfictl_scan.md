@@ -106,7 +106,6 @@ wolfictl scan package1 package2 --remote
       --require-zero                 exit 1 if any vulnerabilities are found
   -s, --sbom                         treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)
       --use-cpes                     turn on all CPE matching in Grype
-  -v, --verbose count                logging verbosity (v = info, vv = debug, default is none)
 ```
 
 ### Options inherited from parent commands
