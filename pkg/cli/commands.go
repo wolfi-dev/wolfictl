@@ -1,9 +1,7 @@
 package cli
 
 import (
-	"fmt"
 	"log/slog"
-	"math"
 	"os"
 
 	"github.com/chainguard-dev/clog/slag"
@@ -19,19 +17,8 @@ func New() *cobra.Command {
 		DisableAutoGenTag: true,
 		SilenceUsage:      true,
 		Short:             "A CLI helper for developing Wolfi",
-		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-			// Ensure level is within the int32 range
-			if int(level) < math.MinInt32 || int(level) > math.MaxInt32 {
-				return fmt.Errorf("log level out of range: %d", level)
-			}
-
-			// TODO: This is done to ensure no overflows, but remove this nonsense once
-			//  charmlog.Level uses the same type as slog.Level. See
-			//  https://github.com/charmbracelet/log/pull/141.
-
-			l := charmlog.Level(level) //nolint:gosec // level is checked above
-			slog.SetDefault(slog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: l})))
-			return nil
+		PersistentPreRun: func(*cobra.Command, []string) {
+			slog.SetDefault(slog.New(charmlog.NewWithOptions(os.Stderr, charmlog.Options{ReportTimestamp: true, Level: charmlog.Level(level)})))
 		},
 	}
 	cmd.PersistentFlags().Var(&level, "log-level", "log level (e.g. debug, info, warn, error)")
