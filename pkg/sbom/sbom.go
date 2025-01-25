@@ -102,6 +102,8 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 			pkgcataloging.ImageTag,
 		).WithRemovals(
 			"sbom",
+			// TODO consider how to turn it on https://github.com/chainguard-dev/internal-dev/issues/8731
+			"elf-package",
 		),
 	).WithCatalogers(
 		catalogers.AngularJSReference,
