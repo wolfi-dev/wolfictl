@@ -43,7 +43,7 @@ wolfictl ruby check-upgrade . --ruby-version 3.2 --ruby-upgrade-version 3.3
 ### Options inherited from parent commands
 
 ```
-      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+      --log-level string   log level (e.g. debug, info, warn, error) (default "WARN")
 ```
 
 ### SEE ALSO

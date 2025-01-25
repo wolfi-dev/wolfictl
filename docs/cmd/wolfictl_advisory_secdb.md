@@ -29,7 +29,7 @@ Build an Alpine-style security database from advisory data
 ### Options inherited from parent commands
 
 ```
-      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+      --log-level string   log level (e.g. debug, info, warn, error) (default "WARN")
 ```
 
 ### SEE ALSO

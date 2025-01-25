@@ -10,7 +10,7 @@ A CLI helper for developing Wolfi
 
 ```
   -h, --help               help for wolfictl
-      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+      --log-level string   log level (e.g. debug, info, warn, error) (default "WARN")
 ```
 
 ### SEE ALSO

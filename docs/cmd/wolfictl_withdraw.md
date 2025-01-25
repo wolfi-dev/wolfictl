@@ -26,7 +26,7 @@ withdraw --signing-key ./foo.rsa example-pkg-1.2.3-r4 also-bad-2.3.4-r1 <old/APK
 ### Options inherited from parent commands
 
 ```
-      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+      --log-level string   log level (e.g. debug, info, warn, error) (default "WARN")
 ```
 
 ### SEE ALSO
