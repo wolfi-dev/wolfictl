@@ -30,7 +30,7 @@ wolfictl apk ls https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz
 ### Options inherited from parent commands
 
 ```
-      --log-level string   log level (e.g. debug, info, warn, error) (default "INFO")
+      --log-level string   log level (e.g. debug, info, warn, error) (default "WARN")
 ```
 
 ### SEE ALSO

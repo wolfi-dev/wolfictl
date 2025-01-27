@@ -11,7 +11,8 @@ import (
 )
 
 func New() *cobra.Command {
-	var level slag.Level
+	var level = slag.Level(slog.LevelWarn)
+
 	cmd := &cobra.Command{
 		Use:               "wolfictl",
 		DisableAutoGenTag: true,
