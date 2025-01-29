@@ -18,7 +18,7 @@ require (
 	chainguard.dev/melange v0.19.3
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/grype v0.87.0
+	github.com/anchore/grype v0.87.1-0.20250128180623-27bcc7a9e9e8 // tracking main/27bcc7a9e9e8 until https://github.com/anchore/grype/pull/2397 is released
 	github.com/anchore/stereoscope v0.0.13
 	github.com/anchore/syft v1.19.0
 	github.com/chainguard-dev/clog v1.6.1
@@ -154,7 +154,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v27.5.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v27.5.0+incompatible // indirect
+	github.com/docker/docker v27.5.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.2 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
