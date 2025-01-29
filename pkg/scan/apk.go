@@ -278,6 +278,7 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 				ExternalSearchConfig: java.ExternalSearchConfig{
 					SearchMavenUpstream: true,
 					MavenBaseURL:        mavenSearchBaseURL,
+					MavenRateLimit:      400 * time.Millisecond, // increased from the default of 300ms to avoid rate limiting with extremely large set of java packages such as druid
 				},
 				UseCPEs: useCPEs,
 			},
