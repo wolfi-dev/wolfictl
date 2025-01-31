@@ -40,6 +40,13 @@ func generateWfnAttributesForAPK(p pkgInfo) *wfn.Attributes {
 		return &attr
 	}
 
+	if strings.HasPrefix(name, "corretto-") {
+		attr.Vendor = "oracle"
+		attr.Product = "jdk"
+
+		return &attr
+	}
+
 	if strings.HasPrefix(name, "dotnet-") {
 		attr.Vendor = "microsoft"
 		attr.Product = ".net"
