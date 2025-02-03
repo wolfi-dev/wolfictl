@@ -92,7 +92,7 @@ func resolveTimestamp(ts string) (v2.Timestamp, error) {
 	return v2.Timestamp(t), nil
 }
 
-// Add this function at the package level
+// getMultiLineInput is a helper function to get multi-line input from the user
 func getMultiLineInput(prompt string) (string, error) {
 	fmt.Print(prompt)
 
@@ -151,9 +151,9 @@ func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.eventType, "type", "t", "", fmt.Sprintf("type of event [%s]", strings.Join(v2.EventTypes, ", ")))
 	cmd.Flags().StringVar(&p.note, "note", "", "prose explanation to attach to the event data (can be used with any event type)")
 	cmd.Flags().StringVar(&p.truePositiveNote, "tp-note", "", "prose explanation of the true positive (used only for true positives)")
-	_ = cmd.Flags().MarkDeprecated("tp-note", "use --note instead")
+	_ = cmd.Flags().MarkDeprecated("tp-note", "use --note instead") //nolint:errcheck
 	cmd.Flags().StringVar(&p.falsePositiveNote, "fp-note", "", "prose explanation of the false positive (used only for false positives)")
-	_ = cmd.Flags().MarkDeprecated("fp-note", "use --note instead")
+	_ = cmd.Flags().MarkDeprecated("fp-note", "use --note instead") //nolint:errcheck
 	cmd.Flags().StringVar(&p.falsePositiveType, "fp-type", "", fmt.Sprintf("type of false positive [%s]", strings.Join(v2.FPTypes, ", ")))
 	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp of the event (RFC3339 format)")
 	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for 'fixed' event type)")
