@@ -32,20 +32,20 @@ func NewYAMLUpdateFunc[T Configuration](yamlASTMutater YAMLASTMutater[T]) EntryU
 
 		file, err := i.fsys.OpenAsWritable(e.Path())
 		if err != nil {
-			return fmt.Errorf("unable to update %q: %w", e.Path(), err)
+			return fmt.Errorf("opening %q as writeable: %w", e.Path(), err)
 		}
 		defer file.Close()
 
 		err = i.fsys.Truncate(e.Path(), 0)
 		if err != nil {
-			return fmt.Errorf("unable to update %q: %w", e.Path(), err)
+			return fmt.Errorf("truncating %q: %w", e.Path(), err)
 		}
 
 		encoder := formatted.NewEncoder(file).AutomaticConfig()
 
 		err = encoder.Encode(root)
 		if err != nil {
-			return fmt.Errorf("unable to encode updated YAML: %w", err)
+			return fmt.Errorf("encoding updated YAML: %w", err)
 		}
 
 		return nil

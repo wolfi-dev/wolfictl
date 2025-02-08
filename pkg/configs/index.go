@@ -135,23 +135,23 @@ func (i *Index[T]) Select() Selection[T] {
 func (i *Index[T]) Create(ctx context.Context, filepath string, cfg T) error {
 	file, err := i.fsys.Create(filepath)
 	if err != nil {
-		return err
+		return fmt.Errorf("creating file %q: %w", filepath, err)
 	}
 
 	err = yaml.NewEncoder(file).Encode(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("encoding configuration %q to YAML: %w", filepath, err)
 	}
 	_ = file.Close()
 
 	err = i.format(filepath) // i.e. using yam
 	if err != nil {
-		return err
+		return fmt.Errorf("formatting configuration file %q: %w", filepath, err)
 	}
 
 	err = i.processAndAdd(ctx, filepath)
 	if err != nil {
-		return err
+		return fmt.Errorf("processing and adding index entry for %q: %w", filepath, err)
 	}
 
 	return nil

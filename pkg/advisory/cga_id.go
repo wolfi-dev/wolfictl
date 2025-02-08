@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+var DefaultIDGenerator IDGenerator = &RandomIDGenerator{}
+
+type IDGenerator interface {
+	GenerateCGAID() (string, error)
+}
+
+func GenerateCGAID() (string, error) {
+	return DefaultIDGenerator.GenerateCGAID()
+}
+
 func GenerateCGAIDWithSeed(seed int64) (string, error) {
 	// Allowed characters [23456789cfghjmpqrvwx]
 	allowedChars := "23456789cfghjmpqrvwx"
@@ -33,8 +43,20 @@ func GenerateCGAIDWithSeed(seed int64) (string, error) {
 	return formattedID, nil
 }
 
-func GenerateCGAID() (string, error) {
-	seed := time.Now().UnixNano()
+// RandomIDGenerator generates a random CGA ID that uses the current time as the
+// seed.
+type RandomIDGenerator struct{}
 
+func (g RandomIDGenerator) GenerateCGAID() (string, error) {
+	seed := time.Now().UnixNano()
 	return GenerateCGAIDWithSeed(seed)
+}
+
+type StaticIDGenerator struct {
+	// The ID to return every time.
+	ID string
+}
+
+func (s StaticIDGenerator) GenerateCGAID() (string, error) {
+	return s.ID, nil
 }

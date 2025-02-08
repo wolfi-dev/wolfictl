@@ -55,7 +55,7 @@ func (e entry[T]) Path() string {
 func (e entry[T]) Update(ctx context.Context, updater EntryUpdater[T]) error {
 	err := e.getIndex().update(ctx, e, updater)
 	if err != nil {
-		return fmt.Errorf("unable to update %q: %w", e.id(), err)
+		return fmt.Errorf("updating index entry %q: %w", e.id(), err)
 	}
 
 	return nil

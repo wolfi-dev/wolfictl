@@ -32,6 +32,7 @@ Commands for consuming and maintaining security advisory data
 * [wolfictl advisory id](wolfictl_advisory_id.md)	 - Generate a new advisory ID
 * [wolfictl advisory list](wolfictl_advisory_list.md)	 - List advisories for specific packages, vulnerabilities, or the entire data set
 * [wolfictl advisory osv](wolfictl_advisory_osv.md)	 - Build an OSV dataset from Chainguard advisory data
+* [wolfictl advisory rebase](wolfictl_advisory_rebase.md)	 - Apply a package’s latest advisory events to advisory data in another directory
 * [wolfictl advisory secdb](wolfictl_advisory_secdb.md)	 - Build an Alpine-style security database from advisory data
 * [wolfictl advisory update](wolfictl_advisory_update.md)	 - Update an existing advisory with a new event
 * [wolfictl advisory validate](wolfictl_advisory_validate.md)	 - Validate the state of advisory data
