@@ -23,6 +23,6 @@ advisories:
         data:
           type: manual
       - timestamp: 2023-01-02T00:00:00Z
-        type: pending-upstream-fix
+        type: fixed
         data:
-          note: Upstream is working on a fix.
+          fixed-version: 1.0.9-r0

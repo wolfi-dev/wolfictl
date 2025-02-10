@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -73,10 +74,20 @@ func Rebase(ctx context.Context, opts RebaseOptions) error {
 		srcLatestEvent := srcAdv.Latest()
 		log := log.With("srcAdvID", srcAdv.ID, "srcAdvLatestEventType", srcLatestEvent.Type)
 
-		// Only update advisories where the latest event of the source advisory is not
-		// "detection".
-		if srcLatestEvent.Type == v2.EventTypeDetection {
-			log.Infof("skipping advisory with latest event of type %s", v2.EventTypeDetection)
+		// Only update advisories where the latest event of the source advisory is not:
+		//
+		// — "detection" (we'll rely on the automated APK scanning for the new
+		// repository to provide up-to-date data for detection events), or
+		//
+		// — "fixed" (values for "fixed version" would be incorrect since they describe
+		// a separate APK repository; additionally, we don't consider a package's first
+		// version to "fix" any vulnerabilities, since those vulnerabilities were never
+		// present in the current package's lineage).
+		if slices.Contains(
+			[]string{v2.EventTypeDetection, v2.EventTypeFixed},
+			srcLatestEvent.Type,
+		) {
+			log.Infof("skipping advisory with latest event of type %s", srcLatestEvent.Type)
 			continue
 		}
 

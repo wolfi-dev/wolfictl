@@ -7,6 +7,6 @@ advisories:
       - CVE-2023-1234
     events:
       - timestamp: 2024-01-01T00:00:00Z
-        type: fixed
+        type: pending-upstream-fix
         data:
-          fixed-version: 1.0.9-r0
+          note: Upstream is working on a fix.

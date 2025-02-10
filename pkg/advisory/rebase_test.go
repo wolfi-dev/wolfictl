@@ -56,6 +56,11 @@ func TestRebase(t *testing.T) {
 			assertErr: assert.NoError,
 		},
 		{
+			name:      "single src adv selected but it's a fixed",
+			vulnID:    "CVE-2023-1234",
+			assertErr: assert.NoError,
+		},
+		{
 			name:      "nonexistent src adv selected",
 			vulnID:    "CVE-9999-9999",
 			assertErr: assert.Error,

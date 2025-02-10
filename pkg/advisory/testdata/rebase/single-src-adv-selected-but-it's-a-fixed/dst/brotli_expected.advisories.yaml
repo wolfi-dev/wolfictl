@@ -10,7 +10,3 @@ advisories:
         type: detection
         data:
           type: manual
-      - timestamp: 2023-01-02T00:00:00Z
-        type: pending-upstream-fix
-        data:
-          note: Upstream is working on a fix.
