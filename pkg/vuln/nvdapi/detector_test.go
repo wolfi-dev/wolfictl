@@ -71,7 +71,6 @@ func TestDetector_VulnerabilitiesForPackages(t *testing.T) {
 	}
 }
 
-//nolint:gocritic // hugeParam
 func vulnMatchToCVE(vuln vuln.Match, _ int) string {
 	return vuln.Vulnerability.ID
 }
