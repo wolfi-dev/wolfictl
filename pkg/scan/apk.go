@@ -25,6 +25,7 @@ import (
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
+	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
 
@@ -205,6 +206,8 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	if err != nil {
 		return nil, err
 	}
+
+	grype.SetLogger(anchorelogger.NewSlogAdapter(logger.Base()))
 
 	syftPkgs := ssbom.Artifacts.Packages.Sorted()
 	grypePkgs := grypePkg.FromPackages(syftPkgs, grypePkg.SynthesisConfig{GenerateMissingCPEs: false})

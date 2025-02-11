@@ -24,6 +24,7 @@ import (
 	"github.com/anchore/syft/syft/source/directorysource"
 	"github.com/chainguard-dev/clog"
 	"github.com/package-url/packageurl-go"
+	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom/catalogers"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
 )
@@ -96,6 +97,8 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		return nil, fmt.Errorf("failed to create source from directory: %w", err)
 	}
 	logger.Debug("created Syft source from directory", "description", src.Describe())
+
+	syft.SetLogger(anchorelogger.NewSlogAdapter(logger.Base()))
 
 	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
 		pkgcataloging.NewSelectionRequest().WithDefaults(
