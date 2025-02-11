@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/hashicorp/go-version"
 	"github.com/samber/lo"
@@ -20,7 +21,7 @@ const SchemaVersion = "2.0.2"
 type Document struct {
 	SchemaVersion string     `yaml:"schema-version" json:"schemaVersion"`
 	Package       Package    `yaml:"package" json:"package"`
-	Advisories    Advisories `yaml:"advisories,omitempty" json:"advisories"`
+	Advisories    Advisories `yaml:"advisories" json:"advisories"`
 }
 
 func (doc Document) Name() string {
@@ -199,6 +200,22 @@ func (advs Advisories) Update(id string, advisory Advisory) Advisories {
 		}
 	}
 
+	return advs
+}
+
+// Upsert returns a new Advisories slice with the advisory with the given ID
+// replaced with the given advisory. If no advisory with the given ID exists in
+// the slice, the advisory is appended to the slice, and the slice is sorted.
+func (advs Advisories) Upsert(id string, advisory Advisory) Advisories {
+	for i, adv := range advs {
+		if adv.ID == id {
+			advs[i] = advisory
+			return advs
+		}
+	}
+
+	advs = append(advs, advisory)
+	sort.Sort(advs)
 	return advs
 }
 

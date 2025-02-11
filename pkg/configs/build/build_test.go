@@ -2,11 +2,12 @@ package build
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/stretchr/testify/require"
-	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/tester"
+	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/testerfs"
 )
 
 func TestBuildConfigsIndex(t *testing.T) {
@@ -15,8 +16,8 @@ func TestBuildConfigsIndex(t *testing.T) {
 		"config-2.yaml",
 	}
 
-	fsys, err := tester.NewFSWithRoot(
-		"testdata/rwfs-index",
+	fsys, err := testerfs.NewWithFileMask(
+		os.DirFS("testdata/rwfs-index"),
 		testfiles...,
 	)
 	require.NoError(t, err)
@@ -47,8 +48,8 @@ func TestBuildConfigsIndexUpdatePipelines(t *testing.T) {
 		"config-3.yaml",
 	}
 
-	fsys, err := tester.NewFSWithRoot(
-		"testdata/rwfs-index",
+	fsys, err := testerfs.NewWithFileMask(
+		os.DirFS("testdata/rwfs-index"),
 		testfiles...,
 	)
 	require.NoError(t, err)
@@ -76,8 +77,8 @@ func TestBuildConfigsIndexUpdateSubpackages(t *testing.T) {
 		"config-4.yaml",
 	}
 
-	fsys, err := tester.NewFSWithRoot(
-		"testdata/rwfs-index",
+	fsys, err := testerfs.NewWithFileMask(
+		os.DirFS("testdata/rwfs-index"),
 		testfiles...,
 	)
 	require.NoError(t, err)

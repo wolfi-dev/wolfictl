@@ -1,0 +1,16 @@
+schema-version: 2.0.2
+package:
+  name: brotli
+advisories:
+  - id: CGA-xxxx-xxxx-xxxx
+    aliases:
+      - CVE-2023-1234
+    events:
+      - timestamp: 2023-01-01T00:00:00Z
+        type: detection
+        data:
+          type: manual
+      - timestamp: 2024-01-01T00:00:00Z
+        type: pending-upstream-fix
+        data:
+          note: Upstream is working on a fix.
