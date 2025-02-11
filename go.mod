@@ -24,7 +24,7 @@ require (
 	github.com/chainguard-dev/clog v1.6.1
 	github.com/chainguard-dev/yam v0.2.7
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.2.4
+	github.com/charmbracelet/bubbletea v1.3.3
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/charmbracelet/log v0.4.1-0.20241125144537-1e6353e3ca79
 	github.com/cli/browser v1.3.0
@@ -69,6 +69,8 @@ require (
 	sigs.k8s.io/release-utils v0.11.0
 )
 
+require github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f
+
 require (
 	cel.dev/expr v0.19.2 // indirect
 	chainguard.dev/go-grpc-kit v0.17.7 // indirect
@@ -107,7 +109,6 @@ require (
 	github.com/anchore/clio v0.0.0-20241115144204-29e89f9fa837 // indirect
 	github.com/anchore/fangs v0.0.0-20241014225144-4e1713cafd77 // indirect
 	github.com/anchore/go-collections v0.0.0-20240216214351-5baf374cca6f // indirect
-	github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
 	github.com/anchore/go-struct-converter v0.0.0-20230627203149-c72ef8859ca9 // indirect
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
