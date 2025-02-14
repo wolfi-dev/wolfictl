@@ -1,6 +1,6 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.23.4
+go 1.24.0
 
 // https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
@@ -14,8 +14,8 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 
 require (
-	chainguard.dev/apko v0.24.0
-	chainguard.dev/melange v0.19.5
+	chainguard.dev/apko v0.25.0
+	chainguard.dev/melange v0.20.0
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.87.1-0.20250128180623-27bcc7a9e9e8 // tracking main/27bcc7a9e9e8 until https://github.com/anchore/grype/pull/2397 is released
@@ -58,13 +58,13 @@ require (
 	github.com/texttheater/golang-levenshtein/levenshtein v0.0.0-20200805054039-cae8b0eaed6c
 	github.com/tmc/dot v0.2.0
 	go.lsp.dev/uri v0.3.0
-	golang.org/x/exp v0.0.0-20250207012021-f9890c6ad9f3
+	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac
 	golang.org/x/oauth2 v0.26.0
 	golang.org/x/sync v0.11.0
 	golang.org/x/term v0.29.0
 	golang.org/x/text v0.22.0
 	golang.org/x/time v0.10.0
-	golang.org/x/vuln v1.1.3
+	golang.org/x/vuln v1.1.4
 	gopkg.in/yaml.v3 v3.0.1
 	sigs.k8s.io/release-utils v0.11.0
 )
@@ -72,7 +72,7 @@ require (
 require github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f
 
 require (
-	cel.dev/expr v0.19.2 // indirect
+	cel.dev/expr v0.20.0 // indirect
 	chainguard.dev/go-grpc-kit v0.17.7 // indirect
 	chainguard.dev/sdk v0.1.31 // indirect
 	cloud.google.com/go v0.118.2 // indirect
@@ -234,7 +234,7 @@ require (
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d // indirect
 	github.com/knqyf263/go-rpmdb v0.1.1 // indirect
-	github.com/letsencrypt/boulder v0.0.0-20250206233249-f6c748c1c3d0 // indirect
+	github.com/letsencrypt/boulder v0.0.0-20250210202657-64f4aabbf33f // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/masahiro331/go-mvn-version v0.0.0-20210429150710-d3157d602a08 // indirect
@@ -361,9 +361,9 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/tools v0.29.0 // indirect
+	golang.org/x/tools v0.30.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/api v0.220.0 // indirect
 	google.golang.org/genproto v0.0.0-20250207221924-e9438ea467c6 // indirect
