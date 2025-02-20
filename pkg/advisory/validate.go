@@ -17,6 +17,8 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/internal/errorhelpers"
 )
 
+const eventMaxValidAgeInDays = 30
+
 type ValidateOptions struct {
 	// AdvisoryDocs is the Index of advisories on which to operate.
 	AdvisoryDocs *configs.Index[v2.Document]
@@ -448,8 +450,6 @@ func (opts ValidateOptions) validateIndexDiffForAddedEvents(events []v2.Event, p
 	}
 	return errors.Join(errs...)
 }
-
-const eventMaxValidAgeInDays = 3
 
 func (opts ValidateOptions) isRecent(t time.Time) bool {
 	const maxAge = eventMaxValidAgeInDays * 24 * time.Hour // 3 days
