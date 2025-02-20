@@ -15,7 +15,7 @@ replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 
 require (
 	chainguard.dev/apko v0.25.1
-	chainguard.dev/melange v0.20.1
+	chainguard.dev/melange v0.21.0
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.87.1-0.20250128180623-27bcc7a9e9e8 // tracking main/27bcc7a9e9e8 until https://github.com/anchore/grype/pull/2397 is released
