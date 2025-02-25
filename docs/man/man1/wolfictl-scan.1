@@ -10,7 +10,7 @@ wolfictl\-scan \- Scan a package for vulnerabilities
 
 .SH SYNOPSIS
 .PP
-\fBwolfictl scan [ \-\-sbom | \-\-build\-log | \-\-remote ] [ \-\-advisory\-filter <type> \-\-advisories\-repo\-dir <path> ] target... [flags]\fP
+\fBwolfictl scan [ \-\-sbom | \-\-remote ] [ \-\-advisory\-filter <type> \-\-advisories\-repo\-dir <path> ] target... [flags]\fP
 
 
 .SH DESCRIPTION
@@ -115,10 +115,6 @@ found and the \-\-require\-zero flag is specified.
     exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all|concluded)
 
 .PP
-\fB\-\-build\-log\fP[=false]
-    treat input as a package build log file (or a directory that contains a packages.log file)
-
-.PP
 \fB\-D\fP, \fB\-\-disable\-sbom\-cache\fP[=false]
     don't use the SBOM cache
 
@@ -176,11 +172,6 @@ wolfictl scan /path/to/package1.apk /path/to/package2.apk
 .SH Scan a single SBOM file
 .PP
 wolfictl scan /path/to/package.sbom \-\-sbom
-
-
-.SH Scan a directory containing a build log file
-.PP
-wolfictl scan /path/to/build/log/dir \-\-build\-log
 
 
 .SH Scan a single package in the Wolfi package repository

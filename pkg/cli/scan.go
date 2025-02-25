@@ -45,7 +45,7 @@ var validScanOutputFormats = []string{outputFormatOutline, outputFormatJSON}
 func cmdScan() *cobra.Command {
 	p := &scanParams{}
 	cmd := &cobra.Command{
-		Use:   "scan [ --sbom | --build-log | --remote ] [ --advisory-filter <type> --advisories-repo-dir <path> ] target...",
+		Use:   "scan [ --sbom | --remote ] [ --advisory-filter <type> --advisories-repo-dir <path> ] target...",
 		Short: "Scan a package for vulnerabilities",
 		Long: `This command scans one or more distro packages for vulnerabilities.
 
@@ -115,9 +115,6 @@ wolfictl scan /path/to/package1.apk /path/to/package2.apk
 # Scan a single SBOM file
 wolfictl scan /path/to/package.sbom --sbom
 
-# Scan a directory containing a build log file
-wolfictl scan /path/to/build/log/dir --build-log
-
 # Scan a single package in the Wolfi package repository
 wolfictl scan package-name --remote
 
@@ -144,10 +141,8 @@ wolfictl scan package1 package2 --remote
 				)
 			}
 
-			if p.packageBuildLogInput && p.sbomInput ||
-				p.packageBuildLogInput && p.remoteScanning ||
-				p.sbomInput && p.remoteScanning {
-				return errors.New("cannot specify more than one of [--build-log, --sbom, --remote]")
+			if p.sbomInput && p.remoteScanning {
+				return errors.New("cannot specify more than one of [--sbom, --remote]")
 			}
 
 			if p.triageWithGoVulnCheck && p.sbomInput {
@@ -342,7 +337,6 @@ type scanParams struct {
 	localDBFilePath       string
 	outputFormat          string
 	sbomInput             bool
-	packageBuildLogInput  bool
 	distro                string
 	advisoryFilterSet     string
 	advisoriesRepoDir     string
@@ -357,7 +351,6 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&p.localDBFilePath, "local-file-grype-db", "", "import a local grype db file")
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validScanOutputFormats, "|"), outputFormatOutline))
 	cmd.Flags().BoolVarP(&p.sbomInput, "sbom", "s", false, "treat input(s) as SBOM(s) of APK(s) instead of as actual APK(s)")
-	cmd.Flags().BoolVar(&p.packageBuildLogInput, "build-log", false, "treat input as a package build log file (or a directory that contains a packages.log file)")
 	cmd.Flags().StringVar(&p.distro, "distro", "wolfi", "distro to use during vulnerability matching")
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
@@ -369,35 +362,15 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 }
 
 func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (inputs []string, cleanup func() error, err error) {
-	logger := clog.FromContext(ctx)
-
-	switch {
-	case p.packageBuildLogInput:
-		if len(args) != 1 {
-			return nil, nil, fmt.Errorf("must specify exactly one build log file (or a directory that contains a %q build log file)", buildlog.DefaultName)
-		}
-
-		var err error
-		inputs, err = resolveInputFilePathsFromBuildLog(args[0])
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to resolve scan inputs from build log: %w", err)
-		}
-		logger.Debug("resolved inputs from build log", "inputs", strings.Join(inputs, ", "))
-
-	case p.remoteScanning:
+	if p.remoteScanning {
 		// For each input, download the APK from the Wolfi package repository and update `inputs` to point to the downloaded APKs
-
 		if p.outputFormat == outputFormatOutline {
 			fmt.Println("📡 Finding remote packages")
 		}
-
 		return resolveInputsForRemoteTarget(ctx, args)
-
-	default:
-		inputs = args
 	}
 
-	return inputs, nil, nil
+	return args, nil, nil
 }
 
 func (p *scanParams) doScanCommandForSingleInput(

@@ -5,7 +5,7 @@ Scan a package for vulnerabilities
 ### Usage
 
 ```
-wolfictl scan [ --sbom | --build-log | --remote ] [ --advisory-filter <type> --advisories-repo-dir <path> ] target... [flags]
+wolfictl scan [ --sbom | --remote ] [ --advisory-filter <type> --advisories-repo-dir <path> ] target... [flags]
 ```
 
 ### Synopsis
@@ -81,9 +81,6 @@ wolfictl scan /path/to/package1.apk /path/to/package2.apk
 # Scan a single SBOM file
 wolfictl scan /path/to/package.sbom --sbom
 
-# Scan a directory containing a build log file
-wolfictl scan /path/to/build/log/dir --build-log
-
 # Scan a single package in the Wolfi package repository
 wolfictl scan package-name --remote
 
@@ -96,7 +93,6 @@ wolfictl scan package1 package2 --remote
 ```
   -a, --advisories-repo-dir string   directory containing the advisories repository
   -f, --advisory-filter string       exclude vulnerability matches that are referenced from the specified set of advisories (resolved|all|concluded)
-      --build-log                    treat input as a package build log file (or a directory that contains a packages.log file)
   -D, --disable-sbom-cache           don't use the SBOM cache
       --distro string                distro to use during vulnerability matching (default "wolfi")
   -h, --help                         help for scan
