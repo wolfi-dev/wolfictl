@@ -13,6 +13,7 @@ import (
 	"path"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/dominikbraun/graph"
@@ -904,20 +905,36 @@ func getKeyMaterial(key string) ([]byte, error) {
 	return b, nil
 }
 
+func getPriority(pkg *Configuration) uint64 {
+	val := pkg.Package.Dependencies.ProviderPriority
+	if val == "" {
+		return 0
+	}
+	priority, err := strconv.ParseUint(val, 10, 64)
+	if err != nil {
+		// I don't care to plumb this error around, sorry everyone.
+		// There are other places that will catch this not being an integer.
+		return 0
+	}
+	return priority
+}
+
 func singlePackageResolver(ctx context.Context, pkg *Configuration, arch string) *apk.PkgResolver {
 	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
+
 	packages := []*apk.Package{
 		{
-			Arch:         arch,
-			Name:         pkg.Package.Name,
-			Version:      fullVersion(&pkg.Package),
-			Description:  pkg.Package.Description,
-			License:      pkg.Package.LicenseExpression(),
-			Origin:       pkg.Package.Name,
-			URL:          pkg.Package.URL,
-			Dependencies: pkg.Environment.Contents.Packages,
-			Provides:     pkg.Package.Dependencies.Provides,
-			RepoCommit:   pkg.Package.Commit,
+			Arch:             arch,
+			Name:             pkg.Package.Name,
+			Version:          fullVersion(&pkg.Package),
+			Description:      pkg.Package.Description,
+			License:          pkg.Package.LicenseExpression(),
+			Origin:           pkg.Package.Name,
+			URL:              pkg.Package.URL,
+			Dependencies:     pkg.Environment.Contents.Packages,
+			ProviderPriority: getPriority(pkg),
+			Provides:         pkg.Package.Dependencies.Provides,
+			RepoCommit:       pkg.Package.Commit,
 		},
 	}
 	index := &apk.APKIndex{
