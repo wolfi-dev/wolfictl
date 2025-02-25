@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -22,7 +21,6 @@ import (
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/buildlog"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/scanfindings"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
@@ -455,51 +453,6 @@ func (p *scanParams) generateSBOM(ctx context.Context, f *os.File) (*sbomSyft.SB
 	}
 
 	return sbom.CachedGenerate(ctx, f.Name(), f, p.distro)
-}
-
-// resolveInputFilePathsFromBuildLog takes the given path to a Melange build log
-// file (or a directory that contains the build log as a "packages.log" file).
-// Once it finds the build log, it parses it, and returns a slice of file paths
-// to APKs to be scanned. Each APK path is created with the assumption that the
-// APKs are located at "$BASE/packages/$ARCH/$PACKAGE-$VERSION.apk", where $BASE
-// is the buildLogPath if it's a directory, or the directory containing the
-// buildLogPath if it's a file.
-func resolveInputFilePathsFromBuildLog(buildLogPath string) ([]string, error) {
-	pathToFileOrDirectory := filepath.Clean(buildLogPath)
-
-	info, err := os.Stat(pathToFileOrDirectory)
-	if err != nil {
-		return nil, fmt.Errorf("failed to stat build log input: %w", err)
-	}
-
-	var pathToFile, packagesBaseDir string
-	if info.IsDir() {
-		pathToFile = filepath.Join(pathToFileOrDirectory, buildlog.DefaultName)
-		packagesBaseDir = pathToFileOrDirectory
-	} else {
-		pathToFile = pathToFileOrDirectory
-		packagesBaseDir = filepath.Dir(pathToFile)
-	}
-
-	file, err := os.Open(pathToFile)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open build log: %w", err)
-	}
-	defer file.Close()
-
-	buildLogEntries, err := buildlog.Parse(file)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse build log: %w", err)
-	}
-
-	scanInputs := make([]string, 0, len(buildLogEntries))
-	for _, entry := range buildLogEntries {
-		apkName := fmt.Sprintf("%s-%s.apk", entry.Package, entry.FullVersion)
-		apkPath := filepath.Join(packagesBaseDir, "packages", entry.Arch, apkName)
-		scanInputs = append(scanInputs, apkPath)
-	}
-
-	return scanInputs, nil
 }
 
 // resolveInputFileFromArg figures out how to interpret the given input file path
