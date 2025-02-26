@@ -952,7 +952,7 @@
       }
     },
     {
-      "id": "1ba6145e2fe6a892",
+      "id": "ad4e8051a777c486",
       "name": "ant",
       "version": "1.10.14",
       "type": "java-archive",
@@ -966,7 +966,23 @@
           }
         }
       ],
-      "licenses": [],
+      "licenses": [
+        {
+          "value": "UNKNOWN",
+          "spdxExpression": "UNKNOWN_6d62d1dd52f932865d6f1e28920d53d0a6f9730ef6b8e02c48d99f470e160a0d",
+          "type": "declared",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/ant-1.10.14.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        }
+      ],
       "language": "java",
       "cpes": [
         {
@@ -1043,7 +1059,7 @@
       }
     },
     {
-      "id": "2b4374eb9b978099",
+      "id": "ba520e76c3778b05",
       "name": "ant-launcher",
       "version": "1.10.14",
       "type": "java-archive",
@@ -1057,7 +1073,23 @@
           }
         }
       ],
-      "licenses": [],
+      "licenses": [
+        {
+          "value": "UNKNOWN",
+          "spdxExpression": "UNKNOWN_6d62d1dd52f932865d6f1e28920d53d0a6f9730ef6b8e02c48d99f470e160a0d",
+          "type": "declared",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/ant-launcher-1.10.14.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        }
+      ],
       "language": "java",
       "cpes": [
         {
@@ -97934,7 +97966,7 @@
       }
     },
     {
-      "id": "f35ed2d9ac508951",
+      "id": "2416975f2d28cebd",
       "name": "jna",
       "version": "5.14.0",
       "type": "java-archive",
@@ -97968,6 +98000,21 @@
           "value": "LGPL-2.1",
           "spdxExpression": "LGPL-2.1-only",
           "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/jna-5.14.0.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "UNKNOWN",
+          "spdxExpression": "UNKNOWN_521bb271ac56e0e29a1b1b688b94af17d00d378fc8e63478d8c8b2a7c4a229d0",
+          "type": "declared",
           "urls": [],
           "locations": [
             {
