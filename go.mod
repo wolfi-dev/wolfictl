@@ -15,14 +15,14 @@ replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 
 require (
 	chainguard.dev/apko v0.25.1
-	chainguard.dev/melange v0.21.0
+	chainguard.dev/melange v0.21.1
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.87.1-0.20250128180623-27bcc7a9e9e8 // tracking main/27bcc7a9e9e8 until https://github.com/anchore/grype/pull/2397 is released
 	github.com/anchore/stereoscope v0.0.13
 	github.com/anchore/syft v1.20.0
 	github.com/chainguard-dev/clog v1.6.1
-	github.com/chainguard-dev/yam v0.2.8
+	github.com/chainguard-dev/yam v0.2.9
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.0.0
