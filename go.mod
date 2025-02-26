@@ -24,7 +24,7 @@ require (
 	github.com/chainguard-dev/clog v1.6.1
 	github.com/chainguard-dev/yam v0.2.8
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.3.3
+	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/charmbracelet/log v0.4.1-0.20241125144537-1e6353e3ca79
 	github.com/cli/browser v1.3.0
