@@ -9,7 +9,9 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"strings"
 
+	"chainguard.dev/melange/pkg/config"
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/cataloging/pkgcataloging"
 	"github.com/anchore/syft/syft/cpe"
@@ -23,13 +25,19 @@ import (
 	"github.com/anchore/syft/syft/source"
 	"github.com/anchore/syft/syft/source/directorysource"
 	"github.com/chainguard-dev/clog"
+	"github.com/charmbracelet/log"
+	"github.com/facebookincubator/nvdtools/wfn"
 	"github.com/package-url/packageurl-go"
 	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom/catalogers"
 	"github.com/wolfi-dev/wolfictl/pkg/tar"
+	"gopkg.in/yaml.v3"
 )
 
-const cpeSourceWolfictl cpe.Source = "wolfictl"
+const (
+	cpeSourceWolfictl             cpe.Source = "wolfictl"
+	cpeSourceMelangeConfiguration cpe.Source = "melange-configuration"
+)
 
 // Generate creates an SBOM for the given APK file.
 func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
@@ -79,12 +87,24 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	// Analyze the APK metadata
 	pkginfo, err := os.Open(path.Join(tempDir, pkginfoPath))
 	if err != nil {
-		return nil, fmt.Errorf("failed to read %s: %w", pkginfoPath, err)
+		return nil, fmt.Errorf("opening %q: %w", pkginfoPath, err)
 	}
 	defer pkginfo.Close()
-	apkPackage, err := newAPKPackage(pkginfo, distroID, includedFiles)
+
+	var melangeConfiguration io.Reader
+	{
+		cfg, err := os.Open(path.Join(tempDir, melangeConfigurationPath))
+		if err != nil {
+			// This is okay, older APKs don't have this file.
+			log.Info(melangeConfigurationPath+" couldn't be opened, so CPEs will be generated not extracted", "error", err)
+		} else {
+			log.Debug("opened melange configuration file within APK", "path", melangeConfigurationPath)
+			melangeConfiguration = cfg
+		}
+	}
+	apkPackage, err := newAPKPackage(ctx, pkginfo, melangeConfiguration, distroID, includedFiles)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create APK package: %w", err)
+		return nil, fmt.Errorf("creating APK package: %w", err)
 	}
 	logger.Debug("synthesized APK package for SBOM", "name", apkPackage.Name, "version", apkPackage.Version, "id", string(apkPackage.ID()))
 
@@ -168,10 +188,25 @@ func getDeterministicSourceDescription(src source.Source, inputFilePath, apkName
 	return description
 }
 
-func newAPKPackage(r io.Reader, distroID string, includedFiles []string) (*pkg.Package, error) {
-	pkginfo, err := parsePkgInfo(r)
+func newAPKPackage(
+	ctx context.Context,
+	pkginfoReader io.Reader,
+	melangeConfigurationReader io.Reader,
+	distroID string,
+	includedFiles []string,
+) (*pkg.Package, error) {
+	log := clog.FromContext(ctx)
+	pkginfo, err := parsePkgInfo(pkginfoReader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse APK metadata: %w", err)
+		return nil, fmt.Errorf("parsing APK metadata: %w", err)
+	}
+	var attr *wfn.Attributes
+	if melangeConfigurationReader != nil {
+		c, err := extractCPEFromMelangeConfiguration(melangeConfigurationReader)
+		if err != nil {
+			return nil, fmt.Errorf("extracting CPE from melange configuration: %w", err)
+		}
+		attr = c
 	}
 
 	files := make([]pkg.ApkFileRecord, 0, len(includedFiles))
@@ -199,7 +234,26 @@ func newAPKPackage(r io.Reader, distroID string, includedFiles []string) (*pkg.P
 	p := baseSyftPkgFromPkgInfo(*pkginfo, metadata)
 
 	p.PURL = generatePURL(*pkginfo, distroID)
-	p.CPEs = generateSyftCPEs(*pkginfo, p)
+
+	if attr != nil {
+		// The APK package is providing its own CPE data, so we'll use that instead of
+		// trying to determine the CPE on its behalf.
+
+		// Don't forget to use the package's version!
+		attr.Version = pkginfo.PkgVer
+
+		p.CPEs = []cpe.CPE{{Attributes: cpe.Attributes(*attr), Source: cpeSourceMelangeConfiguration}}
+		log.Debug("using CPE from melange configuration", "cpe", attr.BindToFmtString())
+	} else {
+		p.CPEs = generateSyftCPEs(*pkginfo, p)
+
+		fmtStrs := make([]string, len(p.CPEs))
+		for i := range p.CPEs {
+			attr := p.CPEs[i].Attributes
+			fmtStrs[i] = attr.BindToFmtString()
+		}
+		log.Debug("no CPEs found in melange configuration, generated CPEs", "cpes", strings.Join(fmtStrs, ";"))
+	}
 
 	return &p, nil
 }
@@ -218,6 +272,46 @@ func baseSyftPkgFromPkgInfo(p pkgInfo, metadata any) pkg.Package {
 	syftPkg.SetID()
 
 	return syftPkg
+}
+
+type minimalMelangeConfiguration struct {
+	Package config.Package `yaml:"package"`
+}
+
+// extractCPEFromMelangeConfiguration extracts the CPE from a melange
+// configuration file. If the melange configuration file does not contain a CPE,
+// this function returns nil.
+//
+// NOTE: This function DOES NOT set the CPE version field; this MUST be set by
+// the caller.
+func extractCPEFromMelangeConfiguration(melangeConfigurationReader io.Reader) (*wfn.Attributes, error) {
+	var cfg minimalMelangeConfiguration
+	if err := yaml.NewDecoder(melangeConfigurationReader).Decode(&cfg); err != nil {
+		return nil, fmt.Errorf("minimal decode of melange configuration: %w", err)
+	}
+
+	c := cfg.Package.CPE
+	if c.IsZero() {
+		return nil, nil
+	}
+
+	if c.Part == "" {
+		c.Part = "a"
+	}
+
+	return &wfn.Attributes{
+		Part:      c.Part,
+		Vendor:    c.Vendor,
+		Product:   c.Product,
+		Version:   "", // Should be set by the caller, preferably using data from .PKGINFO.
+		Update:    "", // We intentionally don't set this. We can revisit this if we ever have a need for this field.
+		Edition:   c.Edition,
+		SWEdition: c.SWEdition,
+		TargetSW:  c.TargetSW,
+		TargetHW:  c.TargetHW,
+		Other:     c.Other,
+		Language:  c.Language,
+	}, nil
 }
 
 func generatePURL(info pkgInfo, distroID string) string {
