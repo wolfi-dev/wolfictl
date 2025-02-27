@@ -241,7 +241,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			// .environment.contents.packages so the next block can include those as build deps.
 			build := &build.Build{
 				PipelineDirs:  []string{pipelineDir},
-				Configuration: *c.Configuration,
+				Configuration: c.Configuration,
 			}
 			if err := build.Compile(ctx); err != nil {
 				return fmt.Errorf("compiling build: %w", err)
