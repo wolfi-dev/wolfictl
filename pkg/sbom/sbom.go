@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -25,7 +26,6 @@ import (
 	"github.com/anchore/syft/syft/source"
 	"github.com/anchore/syft/syft/source/directorysource"
 	"github.com/chainguard-dev/clog"
-	"github.com/charmbracelet/log"
 	"github.com/facebookincubator/nvdtools/wfn"
 	"github.com/package-url/packageurl-go"
 	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
@@ -41,9 +41,9 @@ const (
 
 // Generate creates an SBOM for the given APK file.
 func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID string) (*sbom.SBOM, error) {
-	logger := clog.FromContext(ctx)
+	log := clog.FromContext(ctx)
 
-	logger.Info("generating SBOM for APK file", "path", inputFilePath, "distroID", distroID)
+	log.Info("generating SBOM for APK file", "path", inputFilePath, "distroID", distroID)
 
 	// Create a temp directory to house the unpacked APK file
 	tempDir, err := os.MkdirTemp("", "wolfictl-sbom-*")
@@ -51,17 +51,17 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		return nil, fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer func() {
-		logger.Debug("cleaning up temp directory", "path", tempDir)
+		log.Debug("cleaning up temp directory", "path", tempDir)
 		_ = os.RemoveAll(tempDir)
 	}()
 
-	logger.Debug("created temp directory to unpack APK", "path", tempDir)
+	log.Debug("created temp directory to unpack APK", "path", tempDir)
 
 	// Unpack apk to temp directory
 	if err := tar.Untar(f, tempDir); err != nil {
 		return nil, fmt.Errorf("failed to unpack apk file: %w", err)
 	}
-	logger.Debug("unpacked APK file to temp directory", "apkFilePath", inputFilePath)
+	log.Debug("unpacked APK file to temp directory", "apkFilePath", inputFilePath)
 
 	// Sanity check: count the number of files in the temp directory. Create an
 	// fs.FS and walk it. We'll also use this to attach a list of files to the APK
@@ -75,7 +75,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 			return err
 		}
 
-		logger.Debug("apk temp directory item", "path", path)
+		log.Debug("apk temp directory item", "path", path)
 		includedFiles = append(includedFiles, path)
 
 		return nil
@@ -95,18 +95,24 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	{
 		cfg, err := os.Open(path.Join(tempDir, melangeConfigurationPath))
 		if err != nil {
+			if !errors.Is(err, os.ErrNotExist) {
+				// Seeing a different error here would be unexpected — bubble it up.
+				return nil, fmt.Errorf("opening melange configuration file: %w", err)
+			}
+
 			// This is okay, older APKs don't have this file.
-			log.Info(melangeConfigurationPath+" couldn't be opened, so CPEs will be generated not extracted", "error", err)
+			log.Info("melange configuration not found in APK", "inputFilePath", inputFilePath)
 		} else {
 			log.Debug("opened melange configuration file within APK", "path", melangeConfigurationPath)
 			melangeConfiguration = cfg
 		}
 	}
+
 	apkPackage, err := newAPKPackage(ctx, pkginfo, melangeConfiguration, distroID, includedFiles)
 	if err != nil {
 		return nil, fmt.Errorf("creating APK package: %w", err)
 	}
-	logger.Debug("synthesized APK package for SBOM", "name", apkPackage.Name, "version", apkPackage.Version, "id", string(apkPackage.ID()))
+	log.Debug("synthesized APK package for SBOM", "name", apkPackage.Name, "version", apkPackage.Version, "id", string(apkPackage.ID()))
 
 	src, err := directorysource.New(
 		directorysource.Config{
@@ -116,9 +122,9 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	if err != nil {
 		return nil, fmt.Errorf("failed to create source from directory: %w", err)
 	}
-	logger.Debug("created Syft source from directory", "description", src.Describe())
+	log.Debug("created Syft source from directory", "description", src.Describe())
 
-	syft.SetLogger(anchorelogger.NewSlogAdapter(logger.Base()))
+	syft.SetLogger(anchorelogger.NewSlogAdapter(log.Base()))
 
 	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
 		pkgcataloging.NewSelectionRequest().WithDefaults(
@@ -151,12 +157,12 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		binaryPkgs := packageCollection.Sorted(pkg.BinaryPkg)
 		for i := range binaryPkgs {
 			p := binaryPkgs[i]
-			logger.Info("removing binary package from SBOM", "name", p.Name, "version", p.Version, "location", p.Locations.CoordinateSet().ToSlice())
+			log.Info("removing binary package from SBOM", "name", p.Name, "version", p.Version, "location", p.Locations.CoordinateSet().ToSlice())
 			packageCollection.Delete(p.ID())
 		}
 	}
 
-	logger.Info("finished Syft SBOM generation", "packageCount", packageCollection.PackageCount())
+	log.Info("finished Syft SBOM generation", "packageCount", packageCollection.PackageCount())
 
 	s := sbom.SBOM{
 		Artifacts: sbom.Artifacts{
@@ -206,6 +212,7 @@ func newAPKPackage(
 		if err != nil {
 			return nil, fmt.Errorf("extracting CPE from melange configuration: %w", err)
 		}
+		log.Info("extracted CPE from melange configuration", "cpe", c.BindToFmtString())
 		attr = c
 	}
 
