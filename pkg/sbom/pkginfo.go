@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-const pkginfoPath = ".PKGINFO"
+const (
+	pkginfoPath              = ".PKGINFO"
+	melangeConfigurationPath = ".melange.yaml"
+)
 
 type pkgInfo struct {
 	PkgName   string
