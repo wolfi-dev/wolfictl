@@ -212,7 +212,6 @@ func newAPKPackage(
 		if err != nil {
 			return nil, fmt.Errorf("extracting CPE from melange configuration: %w", err)
 		}
-		log.Info("extracted CPE from melange configuration", "cpe", c.BindToFmtString())
 		attr = c
 	}
 
