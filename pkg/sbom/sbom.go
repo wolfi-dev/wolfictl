@@ -14,6 +14,7 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/anchore/syft/syft"
+	"github.com/anchore/syft/syft/cataloging/filecataloging"
 	"github.com/anchore/syft/syft/cataloging/pkgcataloging"
 	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/file"
@@ -129,6 +130,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
 		pkgcataloging.NewSelectionRequest().WithDefaults(
 			pkgcataloging.ImageTag,
+			filecataloging.FileTag, // see https://github.com/anchore/syft/pull/3505 for context
 		).WithRemovals(
 			"sbom",
 			// TODO consider how to turn it on https://github.com/chainguard-dev/internal-dev/issues/8731
