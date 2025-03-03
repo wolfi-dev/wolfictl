@@ -16,6 +16,7 @@ replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 require (
 	chainguard.dev/apko v0.25.2-0.20250225192758-581904a29f4a
 	chainguard.dev/melange v0.22.1
+	chainguard.dev/sdk v0.1.31
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.87.1-0.20250128180623-27bcc7a9e9e8 // tracking main/27bcc7a9e9e8 until https://github.com/anchore/grype/pull/2397 is released
@@ -74,7 +75,6 @@ require github.com/anchore/go-logger v0.0.0-20240217160628-ee28a485904f
 require (
 	cel.dev/expr v0.19.2 // indirect
 	chainguard.dev/go-grpc-kit v0.17.7 // indirect
-	chainguard.dev/sdk v0.1.31 // indirect
 	cloud.google.com/go v0.118.2 // indirect
 	cloud.google.com/go/auth v0.15.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.7 // indirect
@@ -125,6 +125,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bitnami/go-version v0.0.0-20250131085805-b1f57a8634ef // indirect
+	github.com/bits-and-blooms/bitset v1.15.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/bmatcuk/doublestar/v2 v2.0.4 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
