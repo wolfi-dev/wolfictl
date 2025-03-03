@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"sort"
@@ -18,6 +19,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
 	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	"golang.org/x/term"
 )
 
 const (
@@ -91,6 +93,54 @@ func resolveTimestamp(ts string) (v2.Timestamp, error) {
 	return v2.Timestamp(t), nil
 }
 
+// getMultiLineInput is a helper function to get multi-line input from the user
+func getMultiLineInput(prompt string) (string, error) {
+	fmt.Print(prompt)
+
+	// Get terminal width
+	width, _, err := term.GetSize(int(os.Stdin.Fd()))
+	if err != nil {
+		width = 80 // fallback width
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	var input strings.Builder
+	var currentLine strings.Builder
+	promptWidth := len(prompt)
+	maxWidth := width - promptWidth
+
+	for {
+		char, _, err := reader.ReadRune()
+		if err != nil {
+			break
+		}
+
+		if char == '\n' {
+			break
+		}
+
+		currentLine.WriteRune(char)
+
+		// If we reach the width limit, wrap to next line
+		if currentLine.Len() >= maxWidth {
+			input.WriteString(currentLine.String())
+			input.WriteRune('\n')
+			fmt.Printf("\n%s", strings.Repeat(" ", promptWidth))
+			currentLine.Reset()
+		} else {
+			fmt.Printf("%c", char)
+		}
+	}
+
+	// Add any remaining content
+	if currentLine.Len() > 0 {
+		input.WriteString(currentLine.String())
+	}
+
+	fmt.Println() // Final newline
+	return strings.TrimSpace(input.String()), nil
+}
+
 type advisoryRequestParams struct {
 	packageName, vuln, eventType, truePositiveNote, falsePositiveNote, falsePositiveType, timestamp, fixedVersion, note string
 }
@@ -114,6 +164,15 @@ func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
 	timestamp, err := resolveTimestamp(p.timestamp)
 	if err != nil {
 		return advisory.Request{}, fmt.Errorf("unable to process timestamp: %w", err)
+	}
+
+	// If note is empty and we need input, get it via terminal
+	if p.note == "" {
+		note, err := getMultiLineInput("Note: ")
+		if err != nil {
+			return advisory.Request{}, fmt.Errorf("failed to get note input: %w", err)
+		}
+		p.note = note
 	}
 
 	req := advisory.Request{
