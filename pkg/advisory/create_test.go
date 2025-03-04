@@ -18,8 +18,8 @@ func TestCreate(t *testing.T) {
 	testTime := v2.Timestamp(time.Date(2022, 9, 26, 0, 0, 0, 0, time.UTC))
 	brotliExistingEventTime := v2.Timestamp(time.Date(2022, 9, 15, 2, 40, 18, 0, time.UTC))
 
-	goodCGAID := "CGA-xoxo-xoxo-xoxo"
-	usedCGAID := "CGA-abcd-abcd-abcd"
+	goodCGAID := "CGA-cfgh-jmpq-rvwx"
+	usedCGAID := "CGA-2345-6789-xwvr"
 
 	advisoryClient := apitest.MockSecurityAdvisoryClient{
 		OnListDocuments: []apitest.DocumentsOnList{{
@@ -256,7 +256,7 @@ func TestCreate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sg := &StaticListIDGenerator{IDs: []string{goodCGAID}}
+			sg := &staticListIDGenerator{IDs: []string{goodCGAID}}
 			// Use the test case CGA IDs, if provided.
 			if len(tt.cgaIDs) > 0 {
 				sg.IDs = tt.cgaIDs

@@ -97,9 +97,9 @@ func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Docum
 			return fmt.Errorf("generating CGA ID: %w", err)
 		}
 
-		exists, err := CGAIDExists(ctx, id)
+		exists, err := cgaIDExists(ctx, id)
 		if err != nil {
-			return fmt.Errorf("checking existence of %s: %w", id, err)
+			return fmt.Errorf("checking existence of ID %q: %w", id, err)
 		}
 		if !exists {
 			newAdvisoryID = id

@@ -9,8 +9,8 @@ import (
 	advisoryapi "chainguard.dev/sdk/proto/platform/advisory/v1"
 )
 
-// ChainguardAPIURL is the public Chainguard API.
-const ChainguardAPIURL = "https://console-api.enforce.dev"
+// chainguardAPIURL is the public Chainguard API.
+const chainguardAPIURL = "https://console-api.enforce.dev"
 
 var DefaultIDGenerator IDGenerator = &RandomIDGenerator{}
 
@@ -67,7 +67,7 @@ func (s StaticIDGenerator) GenerateCGAID() (string, error) {
 	return s.ID, nil
 }
 
-type StaticListIDGenerator struct {
+type staticListIDGenerator struct {
 	// The set of IDs to return sequentially.
 	IDs []string
 
@@ -75,7 +75,7 @@ type StaticListIDGenerator struct {
 	idx int
 }
 
-func (s *StaticListIDGenerator) GenerateCGAID() (string, error) {
+func (s *staticListIDGenerator) GenerateCGAID() (string, error) {
 	if len(s.IDs) == 0 {
 		return "", fmt.Errorf("IDs list is empty")
 	}
@@ -88,13 +88,13 @@ func realGetAdvisoryClients(ctx context.Context) (advisoryapi.Clients, error) {
 	// Create a GRPC client to communicate with the Chainguard API.
 	// Passing an empty string for the token creates an anonymous client,
 	// which is acceptable in this case since the ListDocuments endpoint is unauthenticated.
-	return advisoryapi.NewClients(ctx, ChainguardAPIURL, "")
+	return advisoryapi.NewClients(ctx, chainguardAPIURL, "")
 }
 
 var getAdvisoryClients = realGetAdvisoryClients
 
-// CGAIDExists checks if the given CGA ID has already been assigned to an advisory.
-func CGAIDExists(ctx context.Context, id string) (bool, error) {
+// cgaIDExists checks if the given CGA ID has already been assigned to an advisory.
+func cgaIDExists(ctx context.Context, id string) (bool, error) {
 	clients, err := getAdvisoryClients(ctx)
 	if err != nil {
 		return false, fmt.Errorf("constructing chainguard api client: %w", err)
