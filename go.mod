@@ -21,7 +21,7 @@ require (
 	github.com/anchore/grype v0.87.1-0.20250128180623-27bcc7a9e9e8 // tracking main/27bcc7a9e9e8 until https://github.com/anchore/grype/pull/2397 is released
 	github.com/anchore/stereoscope v0.0.13
 	github.com/anchore/syft v1.20.0
-	github.com/chainguard-dev/clog v1.6.1
+	github.com/chainguard-dev/clog v1.7.0
 	github.com/chainguard-dev/yam v0.2.10
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.4
