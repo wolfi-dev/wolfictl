@@ -148,6 +148,9 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	}
 
 	packageCollection := createdSBOM.Artifacts.Packages
+	if err := refineGoModuleCPEs(packageCollection); err != nil {
+		return nil, fmt.Errorf("refining CPE data for Go modules: %w", err)
+	}
 	packageCollection.Add(*apkPackage)
 
 	if cfg.Relationships.ExcludeBinaryPackagesWithFileOwnershipOverlap {
@@ -180,6 +183,45 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	}
 
 	return &s, nil
+}
+
+// refineGoModuleCPEs mutates the given collection to replace some Go module
+// (Syft) packages' lists of CPEs when we believe we have a better way to assign
+// CPEs. All updated CPEs cite their wolfictl as their source.
+func refineGoModuleCPEs(collection *pkg.Collection) error {
+	goModulePkgs := collection.Sorted(pkg.GoModulePkg)
+	for i := range goModulePkgs {
+		p := goModulePkgs[i]
+
+		if !strings.HasPrefix(p.Name, "golang.org/x/") {
+			continue
+		}
+
+		refinedCPEs := cpesFromGolangOrgXModule(p.Name)
+		if len(refinedCPEs) == 0 {
+			// Nothing learned
+			continue
+		}
+
+		// Remove it, modify our local copy, and then add it back.
+
+		collection.Delete(p.ID())
+
+		var cpes []cpe.CPE
+		for _, refinedCPE := range refinedCPEs {
+			c, err := cpe.New(refinedCPE, cpeSourceWolfictl)
+			if err != nil {
+				return fmt.Errorf("creating CPE for %q: %w", refinedCPE, err)
+			}
+			c.Attributes.Version = p.Version
+			cpes = append(cpes, c)
+		}
+		p.CPEs = cpes
+
+		collection.Add(p)
+	}
+
+	return nil
 }
 
 func getDeterministicSourceDescription(src source.Source, inputFilePath, apkName, apkVersion string) source.Description {

@@ -6892,8 +6892,24 @@
       "language": "go",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:golang:x\\/crypto:v0.17.0:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:golang:crypto:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:bcrypt:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:openpgp:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:scrypt:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:ssh:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
         }
       ],
       "purl": "pkg:golang/golang.org/x/crypto@v0.17.0",
@@ -6963,7 +6979,27 @@
       "cpes": [
         {
           "cpe": "cpe:2.3:a:golang:networking:v0.17.0:*:*:*:*:go:*:*",
-          "source": "nvd-cpe-dictionary"
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:html:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:http:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:http2:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:proxy:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:websocket:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
         }
       ],
       "purl": "pkg:golang/golang.org/x/net@v0.17.0",
@@ -6997,8 +7033,16 @@
       "language": "go",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:golang:x\\/oauth2:v0.11.0:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:golang:oauth2:v0.11.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:jws:v0.11.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:jwt:v0.11.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
         }
       ],
       "purl": "pkg:golang/golang.org/x/oauth2@v0.11.0",

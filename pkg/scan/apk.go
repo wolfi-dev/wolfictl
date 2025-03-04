@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/adrg/xdg"
@@ -21,10 +23,14 @@ import (
 	"github.com/anchore/grype/grype/db/v5/matcher/ruby"
 	"github.com/anchore/grype/grype/db/v5/matcher/rust"
 	"github.com/anchore/grype/grype/db/v5/matcher/stock"
+	"github.com/anchore/grype/grype/db/v5/search"
+	"github.com/anchore/grype/grype/match"
 	grypePkg "github.com/anchore/grype/grype/pkg"
+	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
+	"github.com/charmbracelet/log"
 	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
@@ -231,6 +237,23 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	for i := range matches {
 		m := matches[i]
 
+		if allow, reason := shouldAllowMatch(m); !allow {
+			log.Info(
+				"match deemed invalid, dropping from results",
+				"vulnerabilityID",
+				m.Vulnerability.ID,
+				"componentName",
+				m.Package.Name,
+				"componentVersion",
+				m.Package.Version,
+				"componentType",
+				m.Package.Type,
+				"reason",
+				reason,
+			)
+			continue
+		}
+
 		finding, err := mapMatchToFinding(m, s.datastore)
 		if err != nil {
 			return nil, fmt.Errorf("failed to map match to finding: %w", err)
@@ -249,6 +272,64 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 
 	return result, nil
 }
+
+// shouldAllowMatch is a point where we can optionally filter out matches from
+// the scan based on criteria we define. This function will return true unless
+// it determines that the match should be dropped from the final result set. In
+// this latter case, it also returns a string explanation of the reason for
+// dropping the match.
+func shouldAllowMatch(m match.Match) (allow bool, reason string) {
+	// For now, since our new changes are centered on Go, allow all non-Go matches
+	// to minimize unexpected disruption in scanning. We can widen the scope of this
+	// filtering to other ecosystems when we're comfortable with it.
+	if m.Package.Type != pkg.GoModulePkg {
+		return true, ""
+	}
+
+	// Also exempt the Go stdlib.
+	if m.Package.Name == "stdlib" {
+		return true, ""
+	}
+
+	for _, d := range m.Details {
+		if d.Type != match.CPEMatch {
+			continue
+		}
+
+		// Be especially critical of CPE-based results...
+
+		r, ok := d.Found.(search.CPEResult)
+		if !ok {
+			continue
+		}
+
+		// Drop matches where the version constraint is totally nonexistent, to reduce
+		// false positives.
+		if strings.HasPrefix(r.VersionConstraint, "none") {
+			return false, "CPE has no version constraint"
+		}
+
+		// Drop matches where there's no fix.
+		if m.Vulnerability.Fix.State != vulnerability.FixStateFixed {
+			return false, "CPE-based match with no fix available"
+		}
+
+		// Older golang.org/x repositories have versions like "2019-03-20". This will
+		// create false positives when versions are sorted, so let's drop these.
+		if len(m.Vulnerability.Fix.Versions) != 1 {
+			continue
+		}
+
+		f := m.Vulnerability.Fix.Versions[0]
+		if regexGolangDateVersion.MatchString(f) {
+			return false, "CPE-based match unexpected version format ('XXXX-YY-ZZ')"
+		}
+	}
+
+	return true, ""
+}
+
+var regexGolangDateVersion = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 
 // Close closes the scanner's database connection.
 func (s *Scanner) Close() {
@@ -273,7 +354,7 @@ func createMatchers(useCPEs bool) []matcher.Matcher {
 		matcher.Config{
 			Dotnet: dotnet.MatcherConfig{UseCPEs: useCPEs},
 			Golang: golang.MatcherConfig{
-				UseCPEs:                                useCPEs,
+				UseCPEs:                                true, // note: disregarding --use-cpes flag value
 				AlwaysUseCPEForStdlib:                  true,
 				AllowMainModulePseudoVersionComparison: false,
 			},
