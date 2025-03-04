@@ -16,6 +16,11 @@ import (
 	"testing"
 
 	"chainguard.dev/melange/pkg/cli"
+	"github.com/anchore/grype/grype/db/v5/search"
+	"github.com/anchore/grype/grype/match"
+	grypePkg "github.com/anchore/grype/grype/pkg"
+	"github.com/anchore/grype/grype/vulnerability"
+	"github.com/anchore/syft/syft/pkg"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
 
@@ -162,5 +167,171 @@ func TestScanner_ScanAPK(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+func Test_shouldAllowMatch(t *testing.T) {
+	cases := []struct {
+		name     string
+		m        match.Match
+		expected bool
+	}{
+		{
+			name: "non-Go package",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{},
+				Package: grypePkg.Package{
+					Name: "foo",
+					Type: pkg.GemPkg,
+				},
+				Details: []match.Detail{
+					{
+						Type:       "",
+						SearchedBy: nil,
+						Found:      nil,
+						Matcher:    "",
+						Confidence: 0,
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "Go stdlib",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{},
+				Package: grypePkg.Package{
+					Name: "stdlib",
+					Type: pkg.GoModulePkg,
+				},
+				Details: []match.Detail{
+					{
+						Type: match.CPEMatch,
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "not a CPE-based match",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{},
+				Package: grypePkg.Package{
+					Name: "foo",
+					Type: pkg.GoModulePkg,
+				},
+				Details: []match.Detail{
+					{
+						Type: "not CPE!",
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "legit CPE match",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{
+					Fix: vulnerability.Fix{
+						Versions: []string{"0.35.0"},
+						State:    vulnerability.FixStateFixed,
+					},
+				},
+				Package: grypePkg.Package{
+					Name: "foo",
+					Type: pkg.GoModulePkg,
+				},
+				Details: []match.Detail{
+					{
+						Type: match.CPEMatch,
+						Found: search.CPEResult{
+							VersionConstraint: "< 0.35.0",
+						},
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "no version constraint for CPE",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{
+					Fix: vulnerability.Fix{
+						Versions: []string{"0.35.0"},
+						State:    vulnerability.FixStateFixed,
+					},
+				},
+				Package: grypePkg.Package{
+					Name: "foo",
+					Type: pkg.GoModulePkg,
+				},
+				Details: []match.Detail{
+					{
+						Type: match.CPEMatch,
+						Found: search.CPEResult{
+							VersionConstraint: "none (unknown)",
+						},
+					},
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "no fixed version for CPE-based match",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{
+					Fix: vulnerability.Fix{
+						State: vulnerability.FixStateNotFixed,
+					},
+				},
+				Package: grypePkg.Package{
+					Name: "foo",
+					Type: pkg.GoModulePkg,
+				},
+				Details: []match.Detail{
+					{
+						Type: match.CPEMatch,
+						Found: search.CPEResult{
+							VersionConstraint: "< 0.35.0",
+						},
+					},
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "bad fixed version for CPE-based match",
+			m: match.Match{
+				Vulnerability: vulnerability.Vulnerability{
+					Fix: vulnerability.Fix{
+						Versions: []string{"2025-03-03"},
+						State:    vulnerability.FixStateFixed,
+					},
+				},
+				Package: grypePkg.Package{
+					Name: "foo",
+					Type: pkg.GoModulePkg,
+				},
+				Details: []match.Detail{
+					{
+						Type: match.CPEMatch,
+						Found: search.CPEResult{
+							VersionConstraint: "< 2025-03-03",
+						},
+					},
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			allow, _ := shouldAllowMatch(tt.m)
+
+			if allow != tt.expected {
+				t.Errorf("got %t, want %t", allow, tt.expected)
+			}
+		})
 	}
 }
