@@ -88,9 +88,23 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 }
 
 func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Document], req Request) error {
-	newAdvisoryID, err := GenerateCGAID()
-	if err != nil {
-		return fmt.Errorf("generating CGA ID: %w", err)
+	var newAdvisoryID string
+
+	// Continuously generate new CGA IDs until we get a unique one.
+	for {
+		id, err := GenerateCGAID()
+		if err != nil {
+			return fmt.Errorf("generating CGA ID: %w", err)
+		}
+
+		exists, err := CGAIDExists(ctx, id)
+		if err != nil {
+			return fmt.Errorf("checking existence of %s: %w", id, err)
+		}
+		if !exists {
+			newAdvisoryID = id
+			break
+		}
 	}
 
 	newAdvisory := v2.Advisory{
@@ -99,7 +113,7 @@ func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Docum
 		Events:  []v2.Event{req.Event},
 	}
 
-	err = documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
+	err := documents.Create(ctx, fmt.Sprintf("%s.advisories.yaml", req.Package), v2.Document{
 		SchemaVersion: v2.SchemaVersion,
 		Package: v2.Package{
 			Name: req.Package,
