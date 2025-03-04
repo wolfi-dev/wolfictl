@@ -153,3 +153,61 @@ var pkgNameToWfnAttributes = map[string]wfn.Attributes{
 		Product: "vault",
 	},
 }
+
+// cpesFromGolangOrgXModule provides one or more CPE strings given the Go module
+// name, when the Go module belongs to the 'golang.org/x/...' collection of
+// repositories. CPEs for these repositories tend to map to packages (in the Go
+// sense of the word) rather than modules, and therefore we don't know from the
+// module name alone which packages are present in the scanned content, so we
+// err on the side of assuming more packages are present by providing more CPEs
+// that can be used for looking up potentially relevant vulnerabilities.
+func cpesFromGolangOrgXModule(moduleName string) []string {
+	const prefix = "golang.org/x/"
+
+	if !strings.HasPrefix(moduleName, prefix) {
+		return nil
+	}
+	moduleBase := strings.TrimPrefix(moduleName, prefix)
+
+	// TODO(luhring): This is a first pass picking out just a few packages, but we
+	//  could consider auto-generating this by inspecting these git repositories.
+	var products []string
+	switch moduleBase {
+	case "crypto":
+		products = []string{
+			"crypto",
+			"bcrypt",
+			"openpgp",
+			"scrypt",
+			"ssh",
+		}
+	case "net":
+		products = []string{
+			"networking", // weird, but real! Check the NVD CPE dictionary if you don't believe it.
+			"html",
+			"http",
+			"http2",
+			"proxy",
+			"websocket",
+		}
+	case "oauth2":
+		products = []string{
+			"oauth2",
+			"jws",
+			"jwt",
+		}
+	}
+
+	var cpes []string
+	for _, product := range products {
+		cpe := wfn.Attributes{
+			Part:     "a",
+			Vendor:   "golang",
+			Product:  product,
+			TargetSW: "go",
+		}
+		cpes = append(cpes, cpe.BindToFmtString())
+	}
+
+	return cpes
+}
