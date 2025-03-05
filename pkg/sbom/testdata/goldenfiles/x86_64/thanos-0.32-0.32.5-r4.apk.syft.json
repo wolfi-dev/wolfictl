@@ -6986,6 +6986,14 @@
           "source": "wolfictl"
         },
         {
+          "cpe": "cpe:2.3:a:golang:bpf:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:dns:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
           "cpe": "cpe:2.3:a:golang:html:v0.17.0:*:*:*:*:go:*:*",
           "source": "wolfictl"
         },
@@ -6994,11 +7002,31 @@
           "source": "wolfictl"
         },
         {
+          "cpe": "cpe:2.3:a:golang:httpproxy:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
           "cpe": "cpe:2.3:a:golang:http2:v0.17.0:*:*:*:*:go:*:*",
           "source": "wolfictl"
         },
         {
+          "cpe": "cpe:2.3:a:golang:hpack:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
           "cpe": "cpe:2.3:a:golang:proxy:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:route:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:trace:v0.17.0:*:*:*:*:go:*:*",
+          "source": "wolfictl"
+        },
+        {
+          "cpe": "cpe:2.3:a:golang:webdev:v0.17.0:*:*:*:*:go:*:*",
           "source": "wolfictl"
         },
         {

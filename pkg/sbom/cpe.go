@@ -184,10 +184,17 @@ func cpesFromGolangOrgXModule(moduleName string) []string {
 	case "net":
 		products = []string{
 			"networking", // weird, but real! Check the NVD CPE dictionary if you don't believe it.
+			"bpf",
+			"dns",
 			"html",
 			"http",
+			"httpproxy",
 			"http2",
+			"hpack",
 			"proxy",
+			"route",
+			"trace",
+			"webdev",
 			"websocket",
 		}
 	case "oauth2":
