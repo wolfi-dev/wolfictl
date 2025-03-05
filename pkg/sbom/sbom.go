@@ -36,8 +36,8 @@ import (
 )
 
 const (
-	cpeSourceWolfictl             cpe.Source = "wolfictl"
-	cpeSourceMelangeConfiguration cpe.Source = "melange-configuration"
+	CPESourceWolfictl             cpe.Source = "wolfictl"
+	CPESourceMelangeConfiguration cpe.Source = "melange-configuration"
 )
 
 // Generate creates an SBOM for the given APK file.
@@ -209,7 +209,7 @@ func refineGoModuleCPEs(collection *pkg.Collection) error {
 
 		var cpes []cpe.CPE
 		for _, refinedCPE := range refinedCPEs {
-			c, err := cpe.New(refinedCPE, cpeSourceWolfictl)
+			c, err := cpe.New(refinedCPE, CPESourceWolfictl)
 			if err != nil {
 				return fmt.Errorf("creating CPE for %q: %w", refinedCPE, err)
 			}
@@ -292,7 +292,7 @@ func newAPKPackage(
 		// Don't forget to use the package's version!
 		attr.Version = pkginfo.PkgVer
 
-		p.CPEs = []cpe.CPE{{Attributes: cpe.Attributes(*attr), Source: cpeSourceMelangeConfiguration}}
+		p.CPEs = []cpe.CPE{{Attributes: cpe.Attributes(*attr), Source: CPESourceMelangeConfiguration}}
 		log.Debug("using CPE from melange configuration", "cpe", attr.BindToFmtString())
 	} else {
 		p.CPEs = generateSyftCPEs(*pkginfo, p)
@@ -377,7 +377,7 @@ func generatePURL(info pkgInfo, distroID string) string {
 
 func generateSyftCPEs(apk pkgInfo, syftPkg pkg.Package) []cpe.CPE {
 	if attr := generateWfnAttributesForAPK(apk); attr != nil {
-		return []cpe.CPE{{Attributes: cpe.Attributes(*attr), Source: cpeSourceWolfictl}}
+		return []cpe.CPE{{Attributes: cpe.Attributes(*attr), Source: CPESourceWolfictl}}
 	}
 
 	if dictionaryCPE, ok := cpegen.DictionaryFind(syftPkg); ok {

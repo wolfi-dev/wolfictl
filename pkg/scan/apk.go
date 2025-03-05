@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/anchore/grype/grype/match"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/vulnerability"
+	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/pkg"
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
@@ -303,6 +305,11 @@ func shouldAllowMatch(m match.Match) (allow bool, reason string) {
 			continue
 		}
 
+		p, ok := d.SearchedBy.(search.CPEParameters)
+		if !ok {
+			continue
+		}
+
 		// Drop matches where the version constraint is totally nonexistent, to reduce
 		// false positives.
 		if strings.HasPrefix(r.VersionConstraint, "none") {
@@ -320,6 +327,11 @@ func shouldAllowMatch(m match.Match) (allow bool, reason string) {
 			continue
 		}
 
+		// Only use CPEs from a trusted source.
+		if !isMatchFromTrustedCPESource(p.CPEs, m.Package.CPEs) {
+			return false, "CPE-based match from untrusted CPE source"
+		}
+
 		f := m.Vulnerability.Fix.Versions[0]
 		if regexGolangDateVersion.MatchString(f) {
 			return false, "CPE-based match unexpected version format ('XXXX-YY-ZZ')"
@@ -327,6 +339,40 @@ func shouldAllowMatch(m match.Match) (allow bool, reason string) {
 	}
 
 	return true, ""
+}
+
+func isMatchFromTrustedCPESource(searchCPEs []string, packageCPEs []cpe.CPE) bool {
+	// Basically allow everything except "syft-generated".
+
+	// First we'll build a lookup table of CPEs to sources, and then use that to
+	// determine if the CPE(s) we matched on came from at least one trusted source.
+	sourcesByCPE := make(map[string][]cpe.Source)
+	for i := range packageCPEs {
+		c := packageCPEs[i]
+		cpeStr := c.Attributes.BindToFmtString()
+		sourcesByCPE[cpeStr] = append(sourcesByCPE[cpeStr], c.Source)
+	}
+
+	for i := range searchCPEs {
+		c := searchCPEs[i]
+		srcs := sourcesByCPE[c]
+		if len(srcs) == 0 {
+			continue
+		}
+		for _, src := range srcs {
+			if slices.Contains(trustedCPESources, src) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+var trustedCPESources = []cpe.Source{
+	sbom.CPESourceWolfictl,
+	sbom.CPESourceMelangeConfiguration,
+	cpe.NVDDictionaryLookupSource,
 }
 
 var regexGolangDateVersion = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
