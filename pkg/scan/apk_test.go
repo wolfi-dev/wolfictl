@@ -20,6 +20,7 @@ import (
 	"github.com/anchore/grype/grype/match"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/vulnerability"
+	"github.com/anchore/syft/syft/cpe"
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
@@ -186,11 +187,13 @@ func Test_shouldAllowMatch(t *testing.T) {
 				},
 				Details: []match.Detail{
 					{
-						Type:       "",
-						SearchedBy: nil,
-						Found:      nil,
-						Matcher:    "",
-						Confidence: 0,
+						Type: match.CPEMatch,
+						SearchedBy: search.CPEParameters{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
+						Found: search.CPEResult{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
 					},
 				},
 			},
@@ -207,6 +210,12 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
+						SearchedBy: search.CPEParameters{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
+						Found: search.CPEResult{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
 					},
 				},
 			},
@@ -240,12 +249,22 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Package: grypePkg.Package{
 					Name: "foo",
 					Type: pkg.GoModulePkg,
+					CPEs: []cpe.CPE{
+						{
+							Attributes: cpe.Attributes{Part: "a", Vendor: "bar", Product: "foo", Version: "1.0.0"},
+							Source:     cpe.NVDDictionaryLookupSource,
+						},
+					},
 				},
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
+						SearchedBy: search.CPEParameters{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
 						Found: search.CPEResult{
 							VersionConstraint: "< 0.35.0",
+							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
 					},
 				},
@@ -268,8 +287,12 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
+						SearchedBy: search.CPEParameters{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
 						Found: search.CPEResult{
 							VersionConstraint: "none (unknown)",
+							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
 					},
 				},
@@ -291,8 +314,12 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
+						SearchedBy: search.CPEParameters{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
 						Found: search.CPEResult{
 							VersionConstraint: "< 0.35.0",
+							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
 					},
 				},
@@ -315,8 +342,12 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
+						SearchedBy: search.CPEParameters{
+							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
+						},
 						Found: search.CPEResult{
 							VersionConstraint: "< 2025-03-03",
+							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
 					},
 				},
@@ -331,6 +362,103 @@ func Test_shouldAllowMatch(t *testing.T) {
 
 			if allow != tt.expected {
 				t.Errorf("got %t, want %t", allow, tt.expected)
+			}
+		})
+	}
+}
+
+func Test_isMatchFromTrustedCPESource(t *testing.T) {
+	cases := []struct {
+		name         string
+		searchedCPEs []string
+		packageCPEs  []cpe.CPE
+		expected     bool
+	}{
+		{
+			name: "single untrusted source",
+			searchedCPEs: []string{
+				cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"}.BindToFmtString(),
+			},
+			packageCPEs: []cpe.CPE{
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"},
+					Source:     "bad bad untrusted",
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "single trusted source",
+			searchedCPEs: []string{
+				cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"}.BindToFmtString(),
+			},
+			packageCPEs: []cpe.CPE{
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"},
+					Source:     sbom.CPESourceWolfictl,
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "multiple sources, but the trusted one was used",
+			searchedCPEs: []string{
+				cpe.Attributes{Part: "a", Vendor: "good", Product: "bar", Version: "1.0.0"}.BindToFmtString(),
+			},
+			packageCPEs: []cpe.CPE{
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "bad", Product: "bar", Version: "1.0.0"},
+					Source:     "bad bad untrusted",
+				},
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "good", Product: "bar", Version: "1.0.0"},
+					Source:     sbom.CPESourceMelangeConfiguration,
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "multiple sources, but the untrusted one was used",
+			searchedCPEs: []string{
+				cpe.Attributes{Part: "a", Vendor: "bad", Product: "bar", Version: "1.0.0"}.BindToFmtString(),
+			},
+			packageCPEs: []cpe.CPE{
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "bad", Product: "bar", Version: "1.0.0"},
+					Source:     "bad bad untrusted",
+				},
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "good", Product: "bar", Version: "1.0.0"},
+					Source:     sbom.CPESourceMelangeConfiguration,
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "both untrusted and trusted sources for the same CPE (trusted should take precedence)",
+			searchedCPEs: []string{
+				cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"}.BindToFmtString(),
+			},
+			packageCPEs: []cpe.CPE{
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"},
+					Source:     "bad bad untrusted",
+				},
+				{
+					Attributes: cpe.Attributes{Part: "a", Vendor: "foo", Product: "bar", Version: "1.0.0"},
+					Source:     cpe.NVDDictionaryLookupSource,
+				},
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			fromTrusted := isMatchFromTrustedCPESource(tt.searchedCPEs, tt.packageCPEs)
+
+			if fromTrusted != tt.expected {
+				t.Errorf("got %t, want %t", fromTrusted, tt.expected)
 			}
 		})
 	}
