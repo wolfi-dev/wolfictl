@@ -17,7 +17,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-11233",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.26-r0"
       }
     },
@@ -33,7 +33,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-11234",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.26-r0"
       }
     },
@@ -49,7 +49,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-11236",
         "Severity": "Critical",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.26-r0"
       }
     },
@@ -65,7 +65,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-2408",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.20-r0"
       }
     },
@@ -81,7 +81,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-4577",
         "Severity": "Critical",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.20-r0"
       }
     },
@@ -97,7 +97,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-5458",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.20-r0"
       }
     },
@@ -113,7 +113,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-5585",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.20-r0"
       }
     },
@@ -129,7 +129,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-8932",
         "Severity": "Critical",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.26-r0"
       }
     },
@@ -145,7 +145,7 @@
       "Vulnerability": {
         "ID": "GHSA-vxpp-6299-mxw3",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "8.2.20-r0"
       }
     }

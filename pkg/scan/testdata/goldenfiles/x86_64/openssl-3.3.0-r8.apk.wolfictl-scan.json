@@ -17,7 +17,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-12797",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.4.1-r0"
       }
     },
@@ -33,7 +33,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-13176",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.4.0-r6"
       }
     },
@@ -49,9 +49,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-4741",
         "Severity": "High",
-        "Aliases": [
-          "CVE-2024-4741"
-        ],
+        "Aliases": null,
         "FixedVersion": ""
       }
     },
@@ -67,7 +65,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-5535",
         "Severity": "Critical",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.1-r3"
       }
     },
@@ -83,7 +81,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-6119",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.2-r0"
       }
     },
@@ -99,7 +97,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-9143",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.2-r2"
       }
     },
@@ -115,7 +113,7 @@
       "Vulnerability": {
         "ID": "GHSA-4fc7-mvrr-wv2c",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.1-r3"
       }
     },
@@ -131,7 +129,7 @@
       "Vulnerability": {
         "ID": "GHSA-7m4m-pwhv-49c5",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.2-r0"
       }
     },
@@ -147,7 +145,7 @@
       "Vulnerability": {
         "ID": "GHSA-q764-r57m-9wp9",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.2-r2"
       }
     },
@@ -163,7 +161,7 @@
       "Vulnerability": {
         "ID": "GHSA-r9fv-h47r-823f",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.4.0-r6"
       }
     }

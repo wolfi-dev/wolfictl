@@ -99,9 +99,19 @@ func mapMatchToFinding(m match.Match, vulnProvider vulnerability.Provider) (*Fin
 		relatedMetadatas = append(relatedMetadatas, relatedMetadata)
 	}
 
-	aliases := lo.Map(relatedMetadatas, func(m *vulnerability.Metadata, _ int) string {
-		return m.ID
-	})
+	var aliases []string
+	for _, rel := range relatedMetadatas {
+		if rel == nil {
+			continue
+		}
+		if rel.ID == m.Vulnerability.ID {
+			// Don't count the matched vulnerability ID as its own alias. In v0.88.0, Grype
+			// began listing vulnerabilities as their own related vulnerabilities, and we
+			// filed a bug here: https://github.com/anchore/grype/issues/2514
+			continue
+		}
+		aliases = append(aliases, rel.ID)
+	}
 
 	locations := lo.Map(m.Package.Locations.ToSlice(), func(l file.Location, _ int) string {
 		return "/" + l.RealPath

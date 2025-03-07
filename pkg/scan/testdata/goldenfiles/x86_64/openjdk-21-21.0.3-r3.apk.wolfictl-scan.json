@@ -17,7 +17,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21131",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -33,7 +33,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21138",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -49,7 +49,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21140",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -65,7 +65,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21145",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -81,7 +81,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21147",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -97,9 +97,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21208",
         "Severity": "Low",
-        "Aliases": [
-          "CVE-2024-21208"
-        ],
+        "Aliases": null,
         "FixedVersion": ""
       }
     },
@@ -115,9 +113,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21210",
         "Severity": "Low",
-        "Aliases": [
-          "CVE-2024-21210"
-        ],
+        "Aliases": null,
         "FixedVersion": ""
       }
     },
@@ -133,9 +129,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21217",
         "Severity": "Low",
-        "Aliases": [
-          "CVE-2024-21217"
-        ],
+        "Aliases": null,
         "FixedVersion": ""
       }
     },
@@ -151,9 +145,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-21235",
         "Severity": "Medium",
-        "Aliases": [
-          "CVE-2024-21235"
-        ],
+        "Aliases": null,
         "FixedVersion": ""
       }
     },
@@ -169,7 +161,7 @@
       "Vulnerability": {
         "ID": "CVE-2025-21502",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.6-r0"
       }
     },
@@ -185,7 +177,7 @@
       "Vulnerability": {
         "ID": "GHSA-46mv-5cpj-wjxv",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.6-r0"
       }
     },
@@ -201,7 +193,7 @@
       "Vulnerability": {
         "ID": "GHSA-4mqw-v4pq-hg97",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -217,7 +209,7 @@
       "Vulnerability": {
         "ID": "GHSA-4rqr-f9qq-h7w3",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -233,7 +225,7 @@
       "Vulnerability": {
         "ID": "GHSA-7prq-r42m-wfcx",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -249,7 +241,7 @@
       "Vulnerability": {
         "ID": "GHSA-hw83-24q6-v392",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     },
@@ -265,7 +257,7 @@
       "Vulnerability": {
         "ID": "GHSA-v5pp-g8vf-3fxg",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "21.0.4-r0"
       }
     }
