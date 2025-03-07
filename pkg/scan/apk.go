@@ -13,19 +13,19 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/anchore/grype/grype"
-	db "github.com/anchore/grype/grype/db/legacy/distribution"
-	v5 "github.com/anchore/grype/grype/db/v5"
-	"github.com/anchore/grype/grype/db/v5/matcher"
-	"github.com/anchore/grype/grype/db/v5/matcher/dotnet"
-	"github.com/anchore/grype/grype/db/v5/matcher/golang"
-	"github.com/anchore/grype/grype/db/v5/matcher/java"
-	"github.com/anchore/grype/grype/db/v5/matcher/javascript"
-	"github.com/anchore/grype/grype/db/v5/matcher/python"
-	"github.com/anchore/grype/grype/db/v5/matcher/ruby"
-	"github.com/anchore/grype/grype/db/v5/matcher/rust"
-	"github.com/anchore/grype/grype/db/v5/matcher/stock"
-	"github.com/anchore/grype/grype/db/v5/search"
+	v6 "github.com/anchore/grype/grype/db/v6"
+	"github.com/anchore/grype/grype/db/v6/distribution"
+	"github.com/anchore/grype/grype/db/v6/installation"
 	"github.com/anchore/grype/grype/match"
+	"github.com/anchore/grype/grype/matcher"
+	"github.com/anchore/grype/grype/matcher/dotnet"
+	"github.com/anchore/grype/grype/matcher/golang"
+	"github.com/anchore/grype/grype/matcher/java"
+	"github.com/anchore/grype/grype/matcher/javascript"
+	"github.com/anchore/grype/grype/matcher/python"
+	"github.com/anchore/grype/grype/matcher/ruby"
+	"github.com/anchore/grype/grype/matcher/rust"
+	"github.com/anchore/grype/grype/matcher/stock"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/cpe"
@@ -38,7 +38,6 @@ import (
 )
 
 const (
-	grypeDBListingURL  = "https://toolbox-data.anchore.io/grype/databases/listing.json"
 	mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
 )
 
@@ -47,7 +46,7 @@ var DefaultGrypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 type Result struct {
 	TargetAPK     TargetAPK
 	Findings      []Finding
-	GrypeDBStatus *db.Status
+	GrypeDBStatus *v6.Status
 }
 
 type TargetAPK struct {
@@ -90,8 +89,8 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 }
 
 type Scanner struct {
-	datastore            *v5.ProviderStore
-	dbStatus             *db.Status
+	vulnProvider         vulnerability.Provider
+	dbStatus             *v6.Status
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
 	disableSBOMCache     bool
 }
@@ -140,38 +139,45 @@ func NewScanner(opts Options) (*Scanner, error) {
 		dbDestDir = DefaultGrypeDBDir
 	}
 
-	grypeDBConfig := db.Config{
-		DBRootDir:           dbDestDir,
-		ListingURL:          grypeDBListingURL,
-		ValidateByHashOnGet: true,
-		ValidateAge:         !opts.DisableDatabaseAgeValidation,
-		MaxAllowedBuiltAge:  24 * time.Hour,
+	installCfg := installation.Config{
+		DBRootDir:               dbDestDir,
+		ValidateChecksum:        true,
+		ValidateAge:             !opts.DisableDatabaseAgeValidation,
+		MaxAllowedBuiltAge:      24 * time.Hour,
+		UpdateCheckMaxFrequency: 1 * time.Hour,
+	}
+
+	distCfg := distribution.DefaultConfig()
+
+	distClient, err := distribution.NewClient(distCfg)
+	if err != nil {
+		return nil, fmt.Errorf("creating distribution client: %w", err)
 	}
 
 	updateDB := true
 	if dbArchivePath := opts.PathOfDatabaseArchiveToImport; dbArchivePath != "" {
 		fmt.Fprintf(os.Stderr, "using local grype DB archive %q...\n", dbArchivePath)
-		dbCurator, err := db.NewCurator(grypeDBConfig)
+		dbCurator, err := installation.NewCurator(installCfg, distClient)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create the grype db import config: %w", err)
 		}
 
-		if err := dbCurator.ImportFrom(dbArchivePath); err != nil {
+		if err := dbCurator.Import(dbArchivePath); err != nil {
 			return nil, fmt.Errorf("unable to import vulnerability database: %w", err)
 		}
 
 		updateDB = false
 	}
 
-	datastore, dbStatus, err := grype.LoadVulnerabilityDB(grypeDBConfig, updateDB)
+	vulnProvider, dbStatus, err := grype.LoadVulnerabilityDB(distCfg, installCfg, updateDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
 	}
 
-	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(*datastore, opts.UseCPEs)
+	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(vulnProvider, opts.UseCPEs)
 
 	return &Scanner{
-		datastore:            datastore,
+		vulnProvider:         vulnProvider,
 		dbStatus:             dbStatus,
 		vulnerabilityMatcher: vulnerabilityMatcher,
 		disableSBOMCache:     opts.DisableSBOMCache,
@@ -256,7 +262,7 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 			continue
 		}
 
-		finding, err := mapMatchToFinding(m, s.datastore)
+		finding, err := mapMatchToFinding(m, s.vulnProvider)
 		if err != nil {
 			return nil, fmt.Errorf("failed to map match to finding: %w", err)
 		}
@@ -300,12 +306,12 @@ func shouldAllowMatch(m match.Match) (allow bool, reason string) {
 
 		// Be especially critical of CPE-based results...
 
-		r, ok := d.Found.(search.CPEResult)
+		r, ok := d.Found.(match.CPEResult)
 		if !ok {
 			continue
 		}
 
-		p, ok := d.SearchedBy.(search.CPEParameters)
+		p, ok := d.SearchedBy.(match.CPEParameters)
 		if !ok {
 			continue
 		}
@@ -379,23 +385,23 @@ var regexGolangDateVersion = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 
 // Close closes the scanner's database connection.
 func (s *Scanner) Close() {
-	if s.datastore == nil {
+	if s.vulnProvider == nil {
 		return
 	}
 
-	if err := s.datastore.Close(); err != nil {
+	if err := s.vulnProvider.Close(); err != nil {
 		clog.FromContext(context.Background()).Warnf("failed to close grype database: %v", err)
 	}
 }
 
-func NewGrypeVulnerabilityMatcher(datastore v5.ProviderStore, useCPEs bool) *grype.VulnerabilityMatcher {
+func NewGrypeVulnerabilityMatcher(vulnProvider vulnerability.Provider, useCPEs bool) *grype.VulnerabilityMatcher {
 	return &grype.VulnerabilityMatcher{
-		Store:    datastore,
-		Matchers: createMatchers(useCPEs),
+		VulnerabilityProvider: vulnProvider,
+		Matchers:              createMatchers(useCPEs),
 	}
 }
 
-func createMatchers(useCPEs bool) []matcher.Matcher {
+func createMatchers(useCPEs bool) []match.Matcher {
 	return matcher.NewDefaultMatchers(
 		matcher.Config{
 			Dotnet: dotnet.MatcherConfig{UseCPEs: useCPEs},

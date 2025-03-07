@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	v5 "github.com/anchore/grype/grype/db/v5"
 	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/file"
@@ -82,17 +81,17 @@ type TriageAssessment struct {
 	Reason string
 }
 
-func mapMatchToFinding(m match.Match, datastore *v5.ProviderStore) (*Finding, error) {
-	metadata, err := datastore.VulnerabilityMetadataProvider.GetMetadata(m.Vulnerability.ID, m.Vulnerability.Namespace)
+func mapMatchToFinding(m match.Match, vulnProvider vulnerability.Provider) (*Finding, error) {
+	metadata, err := vulnProvider.VulnerabilityMetadata(m.Vulnerability.Reference)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get metadata for vulnerability %s: %w", m.Vulnerability.ID, err)
+		return nil, fmt.Errorf("retrieving metadata for vulnerability %s (%s): %w", m.Vulnerability.ID, m.Vulnerability.Namespace, err)
 	}
 
 	var relatedMetadatas []*vulnerability.Metadata
 	for _, relatedRef := range m.Vulnerability.RelatedVulnerabilities {
-		relatedMetadata, err := datastore.VulnerabilityMetadataProvider.GetMetadata(relatedRef.ID, relatedRef.Namespace)
+		relatedMetadata, err := vulnProvider.VulnerabilityMetadata(relatedRef)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get metadata for related vulnerability %s: %w", relatedRef.ID, err)
+			return nil, fmt.Errorf("retrieving metadata for related vulnerability %s (%s): %w", relatedRef.ID, relatedRef.Namespace, err)
 		}
 		if relatedMetadata == nil {
 			continue
@@ -100,9 +99,19 @@ func mapMatchToFinding(m match.Match, datastore *v5.ProviderStore) (*Finding, er
 		relatedMetadatas = append(relatedMetadatas, relatedMetadata)
 	}
 
-	aliases := lo.Map(relatedMetadatas, func(m *vulnerability.Metadata, _ int) string {
-		return m.ID
-	})
+	var aliases []string
+	for _, rel := range relatedMetadatas {
+		if rel == nil {
+			continue
+		}
+		if rel.ID == m.Vulnerability.ID {
+			// Don't count the matched vulnerability ID as its own alias. In v0.88.0, Grype
+			// began listing vulnerabilities as their own related vulnerabilities, and we
+			// filed a bug here: https://github.com/anchore/grype/issues/2514
+			continue
+		}
+		aliases = append(aliases, rel.ID)
+	}
 
 	locations := lo.Map(m.Package.Locations.ToSlice(), func(l file.Location, _ int) string {
 		return "/" + l.RealPath

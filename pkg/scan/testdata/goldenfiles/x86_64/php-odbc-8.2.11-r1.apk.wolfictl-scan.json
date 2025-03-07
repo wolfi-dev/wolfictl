@@ -4,12 +4,157 @@
     "Version": "8.2.11-r1",
     "OriginPackageName": "php-8.2"
   },
-  "Findings": null,
+  "Findings": [
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-11233",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "8.2.26-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-11234",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "8.2.26-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-11236",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "8.2.26-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-2408",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "8.2.20-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-4577",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "8.2.20-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-5458",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "8.2.20-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-5585",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "8.2.20-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-8932",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "8.2.26-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "33d819e63a3abdac",
+        "Name": "php-odbc",
+        "Version": "8.2.11-r1",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/php-odbc@8.2.11-r1?arch=x86_64\u0026origin=php-8.2"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-vxpp-6299-mxw3",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "8.2.20-r0"
+      }
+    }
+  ],
   "GrypeDBStatus": {
-    "built": "2024-06-11T01:29:53Z",
-    "schemaVersion": 5,
-    "location": "testdata/grypedb/5",
-    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
-    "error": null
+    "schemaVersion": "v6.0.2",
+    "built": "2025-03-06T04:06:38Z",
+    "path": "testdata/grypedb/6/vulnerability.db",
+    "checksum": "[REDACTED]",
+    "error": ""
   }
 }

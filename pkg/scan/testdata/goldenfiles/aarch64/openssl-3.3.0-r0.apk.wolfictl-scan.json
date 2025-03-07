@@ -16,11 +16,41 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-6237",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2023-6237"
-        ],
+        "Severity": "Medium",
+        "Aliases": null,
         "FixedVersion": "3.3.0-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-12797",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "3.4.1-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-13176",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "3.4.0-r6"
       }
     },
     {
@@ -35,9 +65,7 @@
       "Vulnerability": {
         "ID": "CVE-2024-2511",
         "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2024-2511"
-        ],
+        "Aliases": null,
         "FixedVersion": "3.3.0-r5"
       }
     },
@@ -52,11 +80,73 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-4603",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2024-4603"
-        ],
+        "Severity": "Medium",
+        "Aliases": null,
         "FixedVersion": "3.3.0-r8"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-4741",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-5535",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "3.3.1-r3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-6119",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "3.3.2-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-9143",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "3.3.2-r2"
       }
     },
     {
@@ -71,8 +161,40 @@
       "Vulnerability": {
         "ID": "GHSA-299c-jvhc-gxj8",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.0-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4fc7-mvrr-wv2c",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.3.1-r3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-7m4m-pwhv-49c5",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.3.2-r0"
       }
     },
     {
@@ -87,7 +209,7 @@
       "Vulnerability": {
         "ID": "GHSA-85xr-ghj6-6m46",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.0-r8"
       }
     },
@@ -103,16 +225,48 @@
       "Vulnerability": {
         "ID": "GHSA-hvc4-mjv4-5mw6",
         "Severity": "Unknown",
-        "Aliases": [],
+        "Aliases": null,
         "FixedVersion": "3.3.0-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-q764-r57m-9wp9",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.3.2-r2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9f0945d450c15a54",
+        "Name": "openssl",
+        "Version": "3.3.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openssl@3.3.0-r0?arch=aarch64\u0026origin=openssl"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-r9fv-h47r-823f",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.4.0-r6"
       }
     }
   ],
   "GrypeDBStatus": {
-    "built": "2024-06-11T01:29:53Z",
-    "schemaVersion": 5,
-    "location": "testdata/grypedb/5",
-    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
-    "error": null
+    "schemaVersion": "v6.0.2",
+    "built": "2025-03-06T04:06:38Z",
+    "path": "testdata/grypedb/6/vulnerability.db",
+    "checksum": "[REDACTED]",
+    "error": ""
   }
 }

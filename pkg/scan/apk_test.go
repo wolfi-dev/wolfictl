@@ -16,7 +16,6 @@ import (
 	"testing"
 
 	"chainguard.dev/melange/pkg/cli"
-	"github.com/anchore/grype/grype/db/v5/search"
 	"github.com/anchore/grype/grype/match"
 	grypePkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/vulnerability"
@@ -29,7 +28,7 @@ var (
 	updateGoldenFiles = flag.Bool("update-golden-files", false, "update golden files")
 )
 
-var testDBArchivePath = filepath.Join("testdata", "grypedb", "grypedb.tar.gz")
+var testDBArchivePath = filepath.Join("testdata", "grypedb", "grypedb.tar.zst")
 
 func getGrypeDB() (string, error) {
 	fi, err := os.Stat(testDBArchivePath)
@@ -43,7 +42,7 @@ func getGrypeDB() (string, error) {
 	// pinned version. It's not strictly necessary, but it may help us catch more
 	// kinds of issues with vulnerability matching. When we update the pinned
 	// version we'll need to regenerate the golden files.
-	const dbURL = "https://toolbox-data.anchore.io/grype/databases/vulnerability-db_v5_2024-06-11T01:29:53Z_1718079715.tar.gz"
+	const dbURL = "https://grype.anchore.io/databases/v6/vulnerability-db_v6.0.2_2025-03-06T01:32:58Z_1741233998.tar.zst"
 
 	resp, err := http.Get(dbURL)
 	if err != nil {
@@ -122,6 +121,13 @@ func TestScanner_ScanAPK(t *testing.T) {
 					t.Fatalf("scanning APK: %v", err)
 				}
 
+				// TODO(luhring): Starting in v6, this value became semi-unstable. It's stable
+				//  only after you've downloaded the database, decompressed it, and ran a first
+				//  scan (which triggers indexing on various tables). Stabilizing this value
+				//  better is on the grype team's radar, and we'll come back and un-redact this
+				//  when that's done.
+				result.GrypeDBStatus.Checksum = "[REDACTED]"
+
 				actual := &bytes.Buffer{}
 				enc := json.NewEncoder(actual)
 				enc.SetIndent("", "  ")
@@ -188,10 +194,10 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
-						SearchedBy: search.CPEParameters{
+						SearchedBy: match.CPEParameters{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
-						Found: search.CPEResult{
+						Found: match.CPEResult{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
 					},
@@ -210,10 +216,10 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
-						SearchedBy: search.CPEParameters{
+						SearchedBy: match.CPEParameters{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
-						Found: search.CPEResult{
+						Found: match.CPEResult{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
 					},
@@ -259,10 +265,10 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
-						SearchedBy: search.CPEParameters{
+						SearchedBy: match.CPEParameters{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
-						Found: search.CPEResult{
+						Found: match.CPEResult{
 							VersionConstraint: "< 0.35.0",
 							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
@@ -287,10 +293,10 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
-						SearchedBy: search.CPEParameters{
+						SearchedBy: match.CPEParameters{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
-						Found: search.CPEResult{
+						Found: match.CPEResult{
 							VersionConstraint: "none (unknown)",
 							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
@@ -314,10 +320,10 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
-						SearchedBy: search.CPEParameters{
+						SearchedBy: match.CPEParameters{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
-						Found: search.CPEResult{
+						Found: match.CPEResult{
 							VersionConstraint: "< 0.35.0",
 							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
@@ -342,10 +348,10 @@ func Test_shouldAllowMatch(t *testing.T) {
 				Details: []match.Detail{
 					{
 						Type: match.CPEMatch,
-						SearchedBy: search.CPEParameters{
+						SearchedBy: match.CPEParameters{
 							CPEs: []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
-						Found: search.CPEResult{
+						Found: match.CPEResult{
 							VersionConstraint: "< 2025-03-03",
 							CPEs:              []string{"cpe:2.3:a:bar:foo:1.0.0:*:*:*:*:*:*:*"},
 						},
