@@ -7,6 +7,24 @@
   "Findings": [
     {
       "Package": {
+        "ID": "6743558955678bb1",
+        "Name": "golang.org/x/net",
+        "Version": "v0.17.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/net@v0.17.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "0.23.0"
+      }
+    },
+    {
+      "Package": {
         "ID": "c49cb538e6a39bae",
         "Name": "stdlib",
         "Version": "go1.21.5",
@@ -16,9 +34,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "1.21.9, 1.22.2"
       }
     },
     {
@@ -32,9 +52,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-45289"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1, 1.21.8, 1.22.1"
       }
     },
     {
@@ -48,9 +70,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-45290"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1"
       }
     },
     {
@@ -64,9 +88,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24783"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1"
       }
     },
     {
@@ -80,9 +106,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-24784"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1"
       }
     },
     {
@@ -97,8 +125,10 @@
       "Vulnerability": {
         "ID": "CVE-2024-24785",
         "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2024-24785"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1"
       }
     },
     {
@@ -112,9 +142,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24787"
+        ],
+        "FixedVersion": "1.21.10, 1.22.3"
       }
     },
     {
@@ -128,9 +160,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24789"
+        ],
+        "FixedVersion": "1.21.11, 1.22.4"
       }
     },
     {
@@ -144,9 +178,209 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-24790"
+        ],
+        "FixedVersion": "1.21.11, 1.22.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-24791"
+        ],
+        "FixedVersion": "1.21.12, 1.22.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-34155"
+        ],
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-34156"
+        ],
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-34158"
+        ],
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45336",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-45336"
+        ],
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a81fdd341b4ee1cc",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.17.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.17.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45337",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-45337"
+        ],
+        "FixedVersion": "0.31.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "6743558955678bb1",
+        "Name": "golang.org/x/net",
+        "Version": "v0.17.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/net@v0.17.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45338",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-45338"
+        ],
+        "FixedVersion": "0.33.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45341",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-45341"
+        ],
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c49cb538e6a39bae",
+        "Name": "stdlib",
+        "Version": "go1.21.5",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/stdlib@1.21.5"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2025-22866"
+        ],
+        "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b3c03fb8b6606b5a",
+        "Name": "golang.org/x/oauth2",
+        "Version": "v0.11.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/oauth2@v0.11.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22868",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2025-22868"
+        ],
+        "FixedVersion": "0.27.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a81fdd341b4ee1cc",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.17.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.17.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22869",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2025-22869"
+        ],
+        "FixedVersion": "0.35.0"
       }
     },
     {
@@ -184,13 +418,67 @@
         ],
         "FixedVersion": "1.33.0"
       }
+    },
+    {
+      "Package": {
+        "ID": "2d2b04355924ae57",
+        "Name": "github.com/Azure/azure-sdk-for-go/sdk/azidentity",
+        "Version": "v1.3.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/github.com/Azure/azure-sdk-for-go@v1.3.1#sdk/azidentity"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-m5vv-6r4h-3vj9",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-35255"
+        ],
+        "FixedVersion": "1.6.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a81fdd341b4ee1cc",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.17.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.17.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v778-237x-gjrc",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-45337"
+        ],
+        "FixedVersion": "0.31.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "6743558955678bb1",
+        "Name": "golang.org/x/net",
+        "Version": "v0.17.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/net@v0.17.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-w32m-9786-jp63",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-45338"
+        ],
+        "FixedVersion": "0.33.0"
+      }
     }
   ],
   "GrypeDBStatus": {
-    "built": "2024-06-11T01:29:53Z",
-    "schemaVersion": 5,
-    "location": "testdata/grypedb/5",
-    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
-    "error": null
+    "schemaVersion": "v6.0.2",
+    "built": "2025-03-06T04:06:38Z",
+    "path": "testdata/grypedb/6/vulnerability.db",
+    "checksum": "xxh64:c1df5bf8e5a808f2",
+    "error": ""
   }
 }

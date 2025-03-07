@@ -4,12 +4,277 @@
     "Version": "21.0.3-r3",
     "OriginPackageName": "openjdk-21"
   },
-  "Findings": null,
+  "Findings": [
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21131",
+        "Severity": "Low",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21138",
+        "Severity": "Low",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21140",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21145",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21147",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21208",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21208"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21210",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21210"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21217",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21217"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21235",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-21235"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-21502",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "21.0.6-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-46mv-5cpj-wjxv",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "21.0.6-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4mqw-v4pq-hg97",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4rqr-f9qq-h7w3",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-7prq-r42m-wfcx",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-hw83-24q6-v392",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c0044d4ea9b8e0a5",
+        "Name": "openjdk-21",
+        "Version": "21.0.3-r3",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v5pp-g8vf-3fxg",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "21.0.4-r0"
+      }
+    }
+  ],
   "GrypeDBStatus": {
-    "built": "2024-06-11T01:29:53Z",
-    "schemaVersion": 5,
-    "location": "testdata/grypedb/5",
-    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
-    "error": null
+    "schemaVersion": "v6.0.2",
+    "built": "2025-03-06T04:06:38Z",
+    "path": "testdata/grypedb/6/vulnerability.db",
+    "checksum": "xxh64:c1df5bf8e5a808f2",
+    "error": ""
   }
 }

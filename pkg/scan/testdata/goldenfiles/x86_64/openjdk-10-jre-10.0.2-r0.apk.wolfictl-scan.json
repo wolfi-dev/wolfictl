@@ -15,9 +15,65 @@
         "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
       },
       "Vulnerability": {
+        "ID": "CVE-2019-7317",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2019-7317"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-21830",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-21830"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-21835",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-21835"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-21930",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21930"
+        ],
         "FixedVersion": ""
       }
     },
@@ -33,7 +89,9 @@
       "Vulnerability": {
         "ID": "CVE-2023-21937",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21937"
+        ],
         "FixedVersion": ""
       }
     },
@@ -49,7 +107,9 @@
       "Vulnerability": {
         "ID": "CVE-2023-21938",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21938"
+        ],
         "FixedVersion": ""
       }
     },
@@ -65,7 +125,9 @@
       "Vulnerability": {
         "ID": "CVE-2023-21939",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21939"
+        ],
         "FixedVersion": ""
       }
     },
@@ -81,7 +143,9 @@
       "Vulnerability": {
         "ID": "CVE-2023-21954",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21954"
+        ],
         "FixedVersion": ""
       }
     },
@@ -97,7 +161,9 @@
       "Vulnerability": {
         "ID": "CVE-2023-21967",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21967"
+        ],
         "FixedVersion": ""
       }
     },
@@ -113,7 +179,45 @@
       "Vulnerability": {
         "ID": "CVE-2023-21968",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-21968"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-22006",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2023-22006"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-22036",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2023-22036"
+        ],
         "FixedVersion": ""
       }
     },
@@ -129,7 +233,63 @@
       "Vulnerability": {
         "ID": "CVE-2023-22041",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-22041"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-22045",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2023-22045"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-22049",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2023-22049"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-22081",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-22081"
+        ],
         "FixedVersion": ""
       }
     },
@@ -145,7 +305,9 @@
       "Vulnerability": {
         "ID": "CVE-2023-25193",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2023-25193"
+        ],
         "FixedVersion": ""
       }
     },
@@ -161,7 +323,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-20918",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-20918"
+        ],
         "FixedVersion": ""
       }
     },
@@ -177,7 +341,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-20919",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-20919"
+        ],
         "FixedVersion": ""
       }
     },
@@ -193,7 +359,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-20921",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-20921"
+        ],
         "FixedVersion": ""
       }
     },
@@ -209,7 +377,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-20926",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-20926"
+        ],
         "FixedVersion": ""
       }
     },
@@ -225,7 +395,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-20945",
         "Severity": "Medium",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-20945"
+        ],
         "FixedVersion": ""
       }
     },
@@ -241,7 +413,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-20952",
         "Severity": "High",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-20952"
+        ],
         "FixedVersion": ""
       }
     },
@@ -257,7 +431,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-21011",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-21011"
+        ],
         "FixedVersion": ""
       }
     },
@@ -273,7 +449,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-21012",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-21012"
+        ],
         "FixedVersion": ""
       }
     },
@@ -289,7 +467,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-21068",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-21068"
+        ],
         "FixedVersion": ""
       }
     },
@@ -305,7 +485,9 @@
       "Vulnerability": {
         "ID": "CVE-2024-21085",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-21085"
+        ],
         "FixedVersion": ""
       }
     },
@@ -321,16 +503,216 @@
       "Vulnerability": {
         "ID": "CVE-2024-21094",
         "Severity": "Low",
-        "Aliases": [],
+        "Aliases": [
+          "CVE-2024-21094"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21131",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21131"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21138",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21138"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21140",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-21140"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21144",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21144"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21145",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-21145"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21147",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-21147"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21208",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21208"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21210",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21210"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21217",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-21217"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-21235",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-21235"
+        ],
+        "FixedVersion": ""
+      }
+    },
+    {
+      "Package": {
+        "ID": "285ea06abc1745e4",
+        "Name": "openjdk-10-jre",
+        "Version": "10.0.2-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/openjdk-10-jre@10.0.2-r0?arch=x86_64\u0026origin=openjdk-10"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-21502",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2025-21502"
+        ],
         "FixedVersion": ""
       }
     }
   ],
   "GrypeDBStatus": {
-    "built": "2024-06-11T01:29:53Z",
-    "schemaVersion": 5,
-    "location": "testdata/grypedb/5",
-    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
-    "error": null
+    "schemaVersion": "v6.0.2",
+    "built": "2025-03-06T04:06:38Z",
+    "path": "testdata/grypedb/6/vulnerability.db",
+    "checksum": "xxh64:c1df5bf8e5a808f2",
+    "error": ""
   }
 }

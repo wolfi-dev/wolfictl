@@ -7,6 +7,42 @@
   "Findings": [
     {
       "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2022-41723",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2022-41723"
+        ],
+        "FixedVersion": "0.7.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24531",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2023-24531"
+        ],
+        "FixedVersion": "1.21.0-0"
+      }
+    },
+    {
+      "Package": {
         "ID": "d82126e9ac32621c",
         "Name": "stdlib",
         "Version": "go1.20.1",
@@ -17,8 +53,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24532",
         "Severity": "Medium",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24532"
+        ],
+        "FixedVersion": "1.19.7, 1.20.2"
       }
     },
     {
@@ -33,8 +71,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24534",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24534"
+        ],
+        "FixedVersion": "1.19.8, 1.20.3"
       }
     },
     {
@@ -49,8 +89,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24536",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24536"
+        ],
+        "FixedVersion": "1.19.8, 1.20.3"
       }
     },
     {
@@ -65,8 +107,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24537",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24537"
+        ],
+        "FixedVersion": "1.19.8, 1.20.3"
       }
     },
     {
@@ -81,8 +125,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24538",
         "Severity": "Critical",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24538"
+        ],
+        "FixedVersion": "1.19.8, 1.20.3"
       }
     },
     {
@@ -97,8 +143,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24539",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24539"
+        ],
+        "FixedVersion": "1.19.9, 1.20.4"
       }
     },
     {
@@ -113,8 +161,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-24540",
         "Severity": "Critical",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-24540"
+        ],
+        "FixedVersion": "1.19.9, 1.20.4"
       }
     },
     {
@@ -129,8 +179,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29400",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29400"
+        ],
+        "FixedVersion": "1.19.9, 1.20.4"
       }
     },
     {
@@ -145,8 +197,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29402",
         "Severity": "Critical",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29402"
+        ],
+        "FixedVersion": "1.19.10, 1.20.5"
       }
     },
     {
@@ -161,8 +215,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29403",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29403"
+        ],
+        "FixedVersion": "1.19.10, 1.20.5"
       }
     },
     {
@@ -177,8 +233,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29404",
         "Severity": "Critical",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29404"
+        ],
+        "FixedVersion": "1.19.10, 1.20.5"
       }
     },
     {
@@ -193,8 +251,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29405",
         "Severity": "Critical",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29405"
+        ],
+        "FixedVersion": "1.19.10, 1.20.5"
       }
     },
     {
@@ -209,8 +269,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29406",
         "Severity": "Medium",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29406"
+        ],
+        "FixedVersion": "1.19.11, 1.20.6"
       }
     },
     {
@@ -225,8 +287,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-29409",
         "Severity": "Medium",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-29409"
+        ],
+        "FixedVersion": "1.19.12, 1.20.7"
       }
     },
     {
@@ -241,8 +305,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-39318",
         "Severity": "Medium",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-39318"
+        ],
+        "FixedVersion": "1.20.8, 1.21.1"
       }
     },
     {
@@ -257,8 +323,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-39319",
         "Severity": "Medium",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-39319"
+        ],
+        "FixedVersion": "1.20.8, 1.21.1"
       }
     },
     {
@@ -273,8 +341,28 @@
       "Vulnerability": {
         "ID": "CVE-2023-39323",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-39323"
+        ],
+        "FixedVersion": "1.20.9, 1.21.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39325",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-39325"
+        ],
+        "FixedVersion": "0.17.0"
       }
     },
     {
@@ -289,8 +377,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-39325",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-39325"
+        ],
+        "FixedVersion": "1.20.10, 1.21.3"
       }
     },
     {
@@ -305,9 +395,7 @@
       "Vulnerability": {
         "ID": "CVE-2023-39325",
         "Severity": "High",
-        "Aliases": [
-          "CVE-2023-39325"
-        ],
+        "Aliases": [],
         "FixedVersion": "1.5.5-r6"
       }
     },
@@ -323,8 +411,28 @@
       "Vulnerability": {
         "ID": "CVE-2023-39326",
         "Severity": "Medium",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-39326"
+        ],
+        "FixedVersion": "1.20.12, 1.21.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-3978",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-3978"
+        ],
+        "FixedVersion": "0.13.0"
       }
     },
     {
@@ -339,10 +447,26 @@
       "Vulnerability": {
         "ID": "CVE-2023-3978",
         "Severity": "Medium",
-        "Aliases": [
-          "CVE-2023-3978"
-        ],
+        "Aliases": [],
         "FixedVersion": "1.5.5-r6"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-44487",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-44487"
+        ],
+        "FixedVersion": "0.17.0"
       }
     },
     {
@@ -357,8 +481,10 @@
       "Vulnerability": {
         "ID": "CVE-2023-44487",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-44487"
+        ],
+        "FixedVersion": "1.20.10, 1.21.3"
       }
     },
     {
@@ -373,9 +499,7 @@
       "Vulnerability": {
         "ID": "CVE-2023-44487",
         "Severity": "High",
-        "Aliases": [
-          "CVE-2023-44487"
-        ],
+        "Aliases": [],
         "FixedVersion": "1.5.7-r0"
       }
     },
@@ -391,8 +515,28 @@
       "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Aliases": [
+          "CVE-2023-45285"
+        ],
+        "FixedVersion": "1.20.12, 1.21.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "0.23.0"
       }
     },
     {
@@ -406,9 +550,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-45288"
+        ],
+        "FixedVersion": "1.21.9, 1.22.2"
       }
     },
     {
@@ -422,10 +568,8 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45288",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2023-45288"
-        ],
+        "Severity": "High",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r6"
       }
     },
@@ -440,9 +584,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-45289"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1, 1.21.8, 1.22.1"
       }
     },
     {
@@ -456,10 +602,8 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45289",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2023-45289"
-        ],
+        "Severity": "Medium",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r4"
       }
     },
@@ -474,9 +618,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-45290"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1"
       }
     },
     {
@@ -490,10 +636,8 @@
       },
       "Vulnerability": {
         "ID": "CVE-2023-45290",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2023-45290"
-        ],
+        "Severity": "Medium",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r4"
       }
     },
@@ -509,9 +653,7 @@
       "Vulnerability": {
         "ID": "CVE-2023-48795",
         "Severity": "Medium",
-        "Aliases": [
-          "CVE-2023-48795"
-        ],
+        "Aliases": [],
         "FixedVersion": "1.5.7-r3"
       }
     },
@@ -526,9 +668,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24783"
+        ],
+        "FixedVersion": "1.21.8, 1.22.1"
       }
     },
     {
@@ -542,10 +686,8 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24783",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2024-24783"
-        ],
+        "Severity": "Medium",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r4"
       }
     },
@@ -560,26 +702,26 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24784",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "90ebbe6bb159cb01",
-        "Name": "terraform",
-        "Version": "1.3.9-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24784",
-        "Severity": "Unknown",
+        "Severity": "High",
         "Aliases": [
           "CVE-2024-24784"
         ],
+        "FixedVersion": "1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24784",
+        "Severity": "High",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r4"
       }
     },
@@ -591,22 +733,6 @@
         "Type": "go-module",
         "Location": "/usr/bin/terraform",
         "PURL": "pkg:golang/stdlib@1.20.1"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24785",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "90ebbe6bb159cb01",
-        "Name": "terraform",
-        "Version": "1.3.9-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
       },
       "Vulnerability": {
         "ID": "CVE-2024-24785",
@@ -614,6 +740,22 @@
         "Aliases": [
           "CVE-2024-24785"
         ],
+        "FixedVersion": "1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24785",
+        "Severity": "Unknown",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r4"
       }
     },
@@ -628,10 +770,8 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24786",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2024-24786"
-        ],
+        "Severity": "High",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r5"
       }
     },
@@ -646,9 +786,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24787",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24787"
+        ],
+        "FixedVersion": "1.21.10, 1.22.3"
       }
     },
     {
@@ -662,26 +804,26 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24789",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "90ebbe6bb159cb01",
-        "Name": "terraform",
-        "Version": "1.3.9-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24789",
-        "Severity": "Unknown",
+        "Severity": "Medium",
         "Aliases": [
           "CVE-2024-24789"
         ],
+        "FixedVersion": "1.21.11, 1.22.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Medium",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r12"
       }
     },
@@ -696,9 +838,11 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
-        "Severity": "Unknown",
-        "Aliases": [],
-        "FixedVersion": ""
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-24790"
+        ],
+        "FixedVersion": "1.21.11, 1.22.4"
       }
     },
     {
@@ -712,11 +856,145 @@
       },
       "Vulnerability": {
         "ID": "CVE-2024-24790",
-        "Severity": "Unknown",
-        "Aliases": [
-          "CVE-2024-24790"
-        ],
+        "Severity": "Critical",
+        "Aliases": [],
         "FixedVersion": "1.5.7-r12"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-24791"
+        ],
+        "FixedVersion": "1.21.12, 1.22.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r15"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-34155"
+        ],
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r16"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-34156"
+        ],
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r16"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-34158"
+        ],
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r16"
       }
     },
     {
@@ -731,10 +1009,264 @@
       "Vulnerability": {
         "ID": "CVE-2024-3817",
         "Severity": "Critical",
-        "Aliases": [
-          "CVE-2024-3817"
-        ],
+        "Aliases": [],
         "FixedVersion": "1.5.7-r8"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45336",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-45336"
+        ],
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "21c9e7c519ef80f6",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45337",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-45337"
+        ],
+        "FixedVersion": "0.31.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45337",
+        "Severity": "Critical",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r18"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45338",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-45338"
+        ],
+        "FixedVersion": "0.33.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45338",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r19"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45341",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-45341"
+        ],
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-51744",
+        "Severity": "Low",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r17"
+      }
+    },
+    {
+      "Package": {
+        "ID": "2d3292a6549e8a25",
+        "Name": "github.com/hashicorp/go-retryablehttp",
+        "Version": "v0.7.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-retryablehttp@v0.7.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-6104",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-6104"
+        ],
+        "FixedVersion": "0.7.7"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-6104",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r13"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-6257",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r14"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-0377",
+        "Severity": "High",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r21"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d82126e9ac32621c",
+        "Name": "stdlib",
+        "Version": "go1.20.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.20.1"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2025-22866"
+        ],
+        "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r22"
+      }
+    },
+    {
+      "Package": {
+        "ID": "04e50b17c22c9d6e",
+        "Name": "golang.org/x/oauth2",
+        "Version": "v0.0.0-20210819190943-2bc19b11175f",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/oauth2@v0.0.0-20210819190943-2bc19b11175f"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22868",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2025-22868"
+        ],
+        "FixedVersion": "0.27.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "21c9e7c519ef80f6",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22869",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2025-22869"
+        ],
+        "FixedVersion": "0.35.0"
       }
     },
     {
@@ -751,6 +1283,40 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "1.5.7-r12"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9b855c673286e43d",
+        "Name": "github.com/golang-jwt/jwt/v4",
+        "Version": "v4.2.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/golang-jwt/jwt@v4.2.0#v4"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-29wx-vh33-7x7r",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-51744"
+        ],
+        "FixedVersion": "4.5.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-29wx-vh33-7x7r",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r17"
       }
     },
     {
@@ -817,6 +1383,22 @@
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "1.5.7-r4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-3whm-j4xm-rv8x",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r22"
       }
     },
     {
@@ -981,6 +1563,38 @@
         "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
       },
       "Vulnerability": {
+        "ID": "GHSA-8xfx-rj4p-23jm",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r16"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-crqm-pwhx-j97f",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r16"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
         "ID": "GHSA-fgq5-q76c-gx78",
         "Severity": "Unknown",
         "Aliases": [],
@@ -997,10 +1611,42 @@
         "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
       },
       "Vulnerability": {
+        "ID": "GHSA-hw49-2p59-3mhj",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r15"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
         "ID": "GHSA-j6m3-gc37-6r6q",
         "Severity": "Unknown",
         "Aliases": [],
         "FixedVersion": "1.5.7-r4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-j7vj-rw65-4v26",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r16"
       }
     },
     {
@@ -1157,6 +1803,74 @@
     },
     {
       "Package": {
+        "ID": "2d3292a6549e8a25",
+        "Name": "github.com/hashicorp/go-retryablehttp",
+        "Version": "v0.7.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-retryablehttp@v0.7.1"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v6v8-xj6m-xwqh",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-6104"
+        ],
+        "FixedVersion": "0.7.7"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v6v8-xj6m-xwqh",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r13"
+      }
+    },
+    {
+      "Package": {
+        "ID": "21c9e7c519ef80f6",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v778-237x-gjrc",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-45337"
+        ],
+        "FixedVersion": "0.31.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v778-237x-gjrc",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r18"
+      }
+    },
+    {
+      "Package": {
         "ID": "7358cc66ee4eb94f",
         "Name": "golang.org/x/net",
         "Version": "v0.5.0",
@@ -1172,13 +1886,115 @@
         ],
         "FixedVersion": "0.7.0"
       }
+    },
+    {
+      "Package": {
+        "ID": "7358cc66ee4eb94f",
+        "Name": "golang.org/x/net",
+        "Version": "v0.5.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/net@v0.5.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-w32m-9786-jp63",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-45338"
+        ],
+        "FixedVersion": "0.33.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-w32m-9786-jp63",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r19"
+      }
+    },
+    {
+      "Package": {
+        "ID": "692c8f36563df880",
+        "Name": "github.com/hashicorp/go-slug",
+        "Version": "v0.10.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-slug@v0.10.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-wpfp-cm49-9m9q",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2025-0377"
+        ],
+        "FixedVersion": "0.16.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-wpfp-cm49-9m9q",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r21"
+      }
+    },
+    {
+      "Package": {
+        "ID": "ed3a65a940c73184",
+        "Name": "github.com/hashicorp/go-getter",
+        "Version": "v1.6.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-getter@v1.6.2"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xfhp-jf8p-mh5w",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-6257"
+        ],
+        "FixedVersion": "1.7.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "90ebbe6bb159cb01",
+        "Name": "terraform",
+        "Version": "1.3.9-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/terraform@1.3.9-r0?arch=x86_64\u0026origin=terraform"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xfhp-jf8p-mh5w",
+        "Severity": "Unknown",
+        "Aliases": [],
+        "FixedVersion": "1.5.7-r14"
+      }
     }
   ],
   "GrypeDBStatus": {
-    "built": "2024-06-11T01:29:53Z",
-    "schemaVersion": 5,
-    "location": "testdata/grypedb/5",
-    "checksum": "sha256:d53b8f394bd155c9562f80d8b4128ff57b6e6fbfc122742454ad951363b9e05d",
-    "error": null
+    "schemaVersion": "v6.0.2",
+    "built": "2025-03-06T04:06:38Z",
+    "path": "testdata/grypedb/6/vulnerability.db",
+    "checksum": "xxh64:c1df5bf8e5a808f2",
+    "error": ""
   }
 }
