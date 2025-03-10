@@ -14,7 +14,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 
 require (
-	chainguard.dev/apko v0.25.2-0.20250225192758-581904a29f4a
+	chainguard.dev/apko v0.25.2
 	chainguard.dev/melange v0.22.1
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
