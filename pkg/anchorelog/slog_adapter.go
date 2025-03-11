@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"strings"
 
 	"github.com/anchore/go-logger"
 )
@@ -26,6 +27,13 @@ func (s *SlogAdapter) log(level func(msg string, args ...any), args ...interface
 		return
 	}
 	msg := fmt.Sprint(args...)
+
+	// Specialized adjustment for messages heading into our logging system.
+	if strings.HasPrefix(msg, "task completed") {
+		// This one gets pretty noisy.
+		level = s.logger.Debug
+	}
+
 	level(msg)
 }
 
