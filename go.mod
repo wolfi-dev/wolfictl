@@ -15,7 +15,7 @@ replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 
 require (
 	chainguard.dev/apko v0.25.2-0.20250225192758-581904a29f4a
-	chainguard.dev/melange v0.22.1
+	chainguard.dev/melange v0.22.2
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.89.0
@@ -81,10 +81,10 @@ require (
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cloud.google.com/go/iam v1.3.1 // indirect
 	cloud.google.com/go/monitoring v1.24.0 // indirect
-	dagger.io/dagger v0.15.3 // indirect
+	dagger.io/dagger v0.16.2 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/99designs/gqlgen v0.17.64 // indirect
+	github.com/99designs/gqlgen v0.17.66 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20231105174938-2b5cbb29f3e2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
@@ -271,7 +271,7 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0 // indirect
+	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/opencontainers/runtime-spec v1.2.0 // indirect
 	github.com/opencontainers/selinux v1.11.1 // indirect
 	github.com/pandatix/go-cvss v0.6.2 // indirect
