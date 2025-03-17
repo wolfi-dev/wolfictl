@@ -111,15 +111,21 @@ func (l *Linter) Lint(ctx context.Context, minSeverity Severity) (Result, error)
 // Print prints the result to stdout.
 func (l *Linter) Print(ctx context.Context, result Result) {
 	log := clog.FromContext(ctx)
-	foundAny := false
-	for _, res := range result {
-		if res.Errors.WrapErrors() != nil {
-			foundAny = true
-			log.Infof("Package: %s: %s", res.File, res.Errors.WrapErrors())
-		}
-	}
-	if !foundAny {
+	if !result.HasErrors() {
 		log.Infof("No linting issues found!")
+		return
+	}
+	for _, res := range result {
+		for _, v := range res.Errors {
+			switch v.Rule.Severity.Value {
+			case SeverityErrorLevel:
+				log.Errorf("Package: %s: %s", res.File, v.Error)
+			case SeverityWarningLevel:
+				log.Warnf("Package: %s: %s", res.File, v.Error)
+			case SeverityInfoLevel:
+				log.Infof("Package: %s: %s", res.File, v.Error)
+			}
+		}
 	}
 }
 
