@@ -90,6 +90,11 @@ func newFromOpts(opts opts) (*FS, error) {
 			return err
 		}
 
+		if filepath.Base(path) == ".gitkeep" {
+			// ignore
+			return nil
+		}
+
 		if path != "." && len(opts.mask) > 0 {
 			// If a mask is provided, skip any paths that don't match the mask. Also infer
 			// expected files that should be included implicitly by the mask elements.
