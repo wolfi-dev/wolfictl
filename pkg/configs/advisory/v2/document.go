@@ -63,7 +63,7 @@ func (doc Document) ValidateSchemaVersion() error {
 	return nil
 }
 
-func decodeDocument(r io.Reader) (*Document, error) {
+func DecodeDocument(r io.Reader) (*Document, error) {
 	doc := &Document{}
 	decoder := yaml.NewDecoder(r)
 	decoder.KnownFields(true)
