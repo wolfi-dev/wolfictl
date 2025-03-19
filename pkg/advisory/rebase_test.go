@@ -130,4 +130,50 @@ func TestRebase(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("no src document", func(t *testing.T) {
+		// "Arrange"
+
+		ctx := context.Background()
+		testCaseDir := filepath.Join("testdata", "rebase", "src-no-document")
+
+		srcDir := filepath.Join(testCaseDir, "src")
+		srcFsys := memfs.New(os.DirFS(srcDir))
+		srcIndex, err := v2.NewIndex(ctx, srcFsys)
+		if err != nil {
+			t.Fatalf("creating advisory index for source directory %q: %v", srcDir, err)
+		}
+
+		dstDir := filepath.Join(testCaseDir, "dst")
+		dstFsys, err := testerfs.NewWithLogger(os.DirFS(dstDir), logger)
+		if err != nil {
+			t.Fatalf("creating test fixture filesystem for destination directory %q: %v", dstDir, err)
+		}
+		dstIndex, err := v2.NewIndex(ctx, dstFsys)
+		if err != nil {
+			t.Fatalf("creating advisory index for destination directory %q: %v", dstDir, err)
+		}
+
+		// Fixed time for deterministic test, but this value shouldn't end up mattering.
+		baselineTime := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+		const packageName = "grype" // i.e. package with no source data in our test fixture
+
+		opts := RebaseOptions{
+			SourceIndex:      srcIndex,
+			DestinationIndex: dstIndex,
+			PackageName:      packageName,
+			VulnerabilityID:  "",
+			CurrentTime:      v2.Timestamp(baselineTime.AddDate(1, 0, 0)),
+		}
+
+		// "Act"
+
+		err = Rebase(ctx, opts)
+
+		// "Assert"
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

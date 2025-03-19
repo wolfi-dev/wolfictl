@@ -46,6 +46,10 @@ func Rebase(ctx context.Context, opts RebaseOptions) error {
 
 	srcEntry, err := opts.SourceIndex.Select().WhereName(opts.PackageName).First()
 	if err != nil {
+		if errors.Is(err, configs.ErrNoEntries) {
+			log.Warn("no source advisories found for package, skipping")
+			return nil
+		}
 		return fmt.Errorf("finding source document for %q: %w", opts.PackageName, err)
 	}
 	srcDoc := srcEntry.Configuration()
