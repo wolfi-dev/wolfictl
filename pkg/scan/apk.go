@@ -13,7 +13,6 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/anchore/grype/grype"
-	v6 "github.com/anchore/grype/grype/db/v6"
 	"github.com/anchore/grype/grype/db/v6/distribution"
 	"github.com/anchore/grype/grype/db/v6/installation"
 	"github.com/anchore/grype/grype/match"
@@ -44,9 +43,15 @@ const (
 var DefaultGrypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 
 type Result struct {
-	TargetAPK     TargetAPK
-	Findings      []Finding
-	GrypeDBStatus *v6.Status
+	TargetAPK TargetAPK
+	Findings  []Finding
+
+	// TODO(luhring): In the future, we may want to capture provider-specific
+	// metadata from this anonymous struct:
+	// https://github.com/anchore/grype/blob/2eb0c33e01081ae876ddd874ae22a59c1795d914/cmd/grype/cli/commands/root.go#L234-L240.
+	// I held off for now because it's an anonymous struct and a larger diff from
+	// what we were capturing previously.
+	GrypeDBStatus *vulnerability.ProviderStatus
 }
 
 type TargetAPK struct {
@@ -90,7 +95,7 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 
 type Scanner struct {
 	vulnProvider         vulnerability.Provider
-	dbStatus             *v6.Status
+	dbStatus             *vulnerability.ProviderStatus
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
 	disableSBOMCache     bool
 }
