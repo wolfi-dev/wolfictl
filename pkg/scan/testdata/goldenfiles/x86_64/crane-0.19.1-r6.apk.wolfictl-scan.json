@@ -376,9 +376,9 @@
   ],
   "GrypeDBStatus": {
     "schemaVersion": "v6.0.2",
+    "from": "manual import",
     "built": "2025-03-06T04:06:38Z",
     "path": "testdata/grypedb/6/vulnerability.db",
-    "checksum": "[REDACTED]",
-    "error": ""
+    "valid": true
   }
 }
