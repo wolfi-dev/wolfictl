@@ -412,7 +412,7 @@ func createMatchers(useCPEs bool) []match.Matcher {
 			},
 			Java: java.MatcherConfig{
 				ExternalSearchConfig: java.ExternalSearchConfig{
-					SearchMavenUpstream: true,
+					SearchMavenUpstream: false, // temporary disable of maven searches until we figure out the 403 rate limit issues
 					MavenBaseURL:        mavenSearchBaseURL,
 					MavenRateLimit:      400 * time.Millisecond, // increased from the default of 300ms to avoid rate limiting with extremely large set of java packages such as druid
 				},
