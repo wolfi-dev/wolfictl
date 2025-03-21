@@ -1,7 +1,6 @@
 module github.com/wolfi-dev/wolfictl
 
 go 1.24.0
-
 // https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
@@ -19,7 +18,7 @@ require (
 	cloud.google.com/go/storage v1.50.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.89.0
-	github.com/anchore/stereoscope v0.0.13
+	github.com/anchore/stereoscope v0.1.0
 	github.com/anchore/syft v1.20.0
 	github.com/chainguard-dev/clog v1.7.0
 	github.com/chainguard-dev/yam v0.2.10
@@ -319,7 +318,7 @@ require (
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/sylabs/sif/v2 v2.20.2 // indirect
-	github.com/sylabs/squashfs v1.0.4 // indirect
+	github.com/sylabs/squashfs v1.0.5 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/theupdateframework/go-tuf v0.7.0 // indirect
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399 // indirect
