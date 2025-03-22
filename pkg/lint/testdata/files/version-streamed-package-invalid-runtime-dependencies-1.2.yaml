@@ -1,0 +1,32 @@
+package:
+  name: version-streamed-package-invalid-runtime-dependencies-1.2
+  version: 1.2.3
+  epoch: 0
+  description: "a version-package with non-streamed runtime dependencies"
+  dependencies:
+    runtime:
+      - version-streamed-package-invalid-runtime-dependencies-foo # NOK
+      - ${{package.name}}-bar # OK
+
+pipeline:
+  - runs: echo "test"
+
+subpackages:
+  - name: ${{package.name}}-foo
+    description: "a subpackage with provides that doesn't contain the version stream"
+    pipeline:
+      - runs: echo "test"
+    dependencies:
+      provides:
+        - version-streamed-package-invalid-runtime-dependencies-foo=${{package.full-version}}
+
+  - name: ${{package.name}}-bar
+    description: "a subpackage with provides that does contain the version stream"
+    pipeline:
+      - runs: echo "test"
+    dependencies:
+      provides:
+        - ${{package.name}}-bar=${{package.full-version}}
+
+update:
+  enabled: true

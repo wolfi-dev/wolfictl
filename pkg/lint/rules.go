@@ -27,6 +27,13 @@ var (
 	// Be stricter than Go to promote consistency and avoid homograph attacks
 	reValidHostname = regexp.MustCompile(`^[a-z0-9][a-z0-9\.\-]+\.[a-z]{2,6}$`)
 
+	// This regex captures a string that ends with a semantic version (semver) suffix.
+	// It returns two groups:
+	// - Group 1: The prefix part of the string before the semver.
+	// - Group 2: The semver (major.minor or major.minor.patch).
+	// If there is no semver suffix, the string will not match.
+	reVersionStream = regexp.MustCompile(`^(.*?)-(\d+\.\d+(?:\.\d+)?)$`)
+
 	forbiddenRepositories = []string{
 		"https://packages.wolfi.dev/os",
 	}
@@ -466,6 +473,37 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				}
 				_, err := config.Update.Schedule.GetScheduleMessage()
 				return err
+			},
+		},
+		{
+			Name:        "version-streamed-runtime-dependencies",
+			Description: "version-streamed packages must provide versioned runtime dependencies of its subpackage names instead of 'provides'",
+			Severity:    SeverityError,
+			LintFunc: func(c config.Configuration) error {
+				if !reVersionStream.MatchString(c.Package.Name) {
+					return nil
+				}
+				providesSet := make(map[string]struct{})
+				for _, subpkg := range c.Subpackages {
+					for _, prov := range subpkg.Dependencies.Provides {
+						namePart := strings.SplitN(prov, "=", 2)[0]
+						providesSet[namePart] = struct{}{}
+					}
+				}
+				var invalid []string
+				for _, dep := range c.Package.Dependencies.Runtime {
+					// Skip cases where the provides: might be like: ${{package.name}}-foo=${{package.full-version}}
+					if strings.Contains(dep, c.Package.Name) {
+						continue
+					}
+					if _, ok := providesSet[dep]; ok {
+						invalid = append(invalid, dep)
+					}
+				}
+				if len(invalid) > 0 {
+					return fmt.Errorf("version-streamed package must use versioned runtime dependencies for its subpackages: %s", strings.Join(invalid, ", "))
+				}
+				return nil
 			},
 		},
 	}
