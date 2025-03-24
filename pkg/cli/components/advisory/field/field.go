@@ -16,7 +16,7 @@ type Field interface {
 	SetBlur() Field
 	SetFocus() (Field, tea.Cmd)
 	Update(tea.Msg) (Field, tea.Cmd)
-	UpdateRequest(request advisory.Request) advisory.Request
+	UpdateRequestParams(p advisory.RequestParams) advisory.RequestParams
 	SubmitValue() (Field, error)
 }
 

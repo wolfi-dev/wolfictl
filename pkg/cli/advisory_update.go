@@ -9,8 +9,8 @@ import (
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/apk/client"
+	"github.com/chainguard-dev/clog"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/prompt"
@@ -40,11 +40,17 @@ You can specify required values on the command line using the flags relevant to
 the advisory event you are adding. If not all required values are provided on
 the command line, the command will prompt for the missing values.
 
+It's possible to update advisories for multiple packages and/or vulnerabilities 
+at once by using a comma-separated list of package names and vulnerabilities. 
+This is available for both the CLI flags and the interactive prompt fields.
+
 If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.`,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ctx := cmd.Context()
+
 			// Get initial values for distro-related parameters.
 			archs := p.archs
 			packageRepositoryURL := p.packageRepositoryURL
@@ -109,16 +115,15 @@ required fields are missing.`,
 				return err
 			}
 
+			advGetter := advisory.NewFSGetter(os.DirFS(advisoriesRepoDir))
+
 			fsys := rwos.DirFS(distroRepoDir)
 			buildCfgs, err := buildconfigs.NewIndex(cmd.Context(), fsys)
 			if err != nil {
 				return fmt.Errorf("unable to select packages: %w", err)
 			}
 
-			req, err := p.requestParams.advisoryRequest()
-			if err != nil {
-				return err
-			}
+			reqParams := p.requestParams
 
 			c := client.New(http.DefaultClient)
 			var apkindexes []*apk.APKIndex
@@ -130,35 +135,41 @@ required fields are missing.`,
 				apkindexes = append(apkindexes, idx)
 			}
 
-			if err := req.Validate(); err != nil {
+			if missing := reqParams.MissingValues(); len(missing) > 0 {
+				clog.FromContext(ctx).Debug("some request parameters are missing", "missing", missing)
 				if p.doNotPrompt {
-					return fmt.Errorf("not enough information to create advisory: %w", err)
+					return fmt.Errorf("missing required fields, and user disabled prompting for missing fields: %v", missing)
 				}
 
 				// prompt for missing fields
 
-				allowedPackages := func() []string {
-					return lo.Map(advisoryCfgs.Select().Configurations(), func(cfg v2.Document, _ int) string {
-						return cfg.Package.Name
-					})
+				allowedPackages := func() ([]string, error) {
+					return advGetter.PackageNames(ctx)
 				}
 
-				allowedVulnerabilities := func(packageName string) []string {
+				allowedVulnerabilities := func(packageName string) ([]string, error) {
 					var vulnerabilities []string
-					for _, cfg := range advisoryCfgs.Select().WhereName(packageName).Configurations() {
-						vulns := lo.FlatMap(cfg.Advisories, func(adv v2.Advisory, _ int) []string {
-							return adv.VulnerabilityIDs()
-						})
+
+					advs, err := advGetter.Advisories(ctx, packageName)
+					if err != nil {
+						return nil, fmt.Errorf("getting advisories for %q: %w", packageName, err)
+					}
+
+					for _, adv := range advs {
+						vulns := adv.VulnerabilityIDs()
 						sort.Strings(vulns)
 						vulnerabilities = append(vulnerabilities, vulns...)
 					}
-					return vulnerabilities
+
+					return vulnerabilities, nil
 				}
 
-				allowedFixedVersions := newAllowedFixedVersionsFunc(apkindexes, buildCfgs)
+				allowedFixedVersions := func(packageName string) ([]string, error) {
+					return newAllowedFixedVersionsFunc(apkindexes, buildCfgs)(packageName), nil
+				}
 
 				m := prompt.New(prompt.Configuration{
-					Request:                    req,
+					RequestParams:              reqParams,
 					AllowedPackagesFunc:        allowedPackages,
 					AllowedVulnerabilitiesFunc: allowedVulnerabilities,
 					AllowedFixedVersionsFunc:   allowedFixedVersions,
@@ -172,22 +183,44 @@ required fields are missing.`,
 
 				if m, ok := returnedModel.(prompt.Model); ok {
 					if m.EarlyExit {
+						if m.Err != nil {
+							return m.Err
+						}
+
 						return nil
 					}
 
-					req = m.Request
+					reqParams = m.RequestParams
 				} else {
 					return fmt.Errorf("unexpected model type: %T", returnedModel)
 				}
 			}
 
-			opts := advisory.UpdateOptions{
-				AdvisoryDocs: advisoryCfgs,
+			requests, err := reqParams.GenerateRequests()
+			if err != nil {
+				return fmt.Errorf("generating advisory data requests: %w", err)
 			}
 
-			err = advisory.Update(cmd.Context(), req, opts)
-			if err != nil {
-				return err
+			// Do just a single pass at finding aliases, instead of per-request.
+			af := advisory.NewHTTPAliasFinder(http.DefaultClient)
+
+			for _, r := range requests {
+				// Complete the alias set for the request. Use the singular AliasFinder to
+				// benefit from its cache across multiple requests' resolutions.
+				aliases, err := advisory.CompleteAliasSet(ctx, af, r.Aliases)
+				if err != nil {
+					return fmt.Errorf("completing alias set for advisory request (package %q): %w", r.Package, err)
+				}
+				r.Aliases = aliases
+
+				// TODO(luhring): Replace this call with modifying advisory data via an
+				//  abstraction.
+				opts := advisory.UpdateOptions{
+					AdvisoryDocs: advisoryCfgs,
+				}
+				if err := advisory.Update(ctx, r, opts); err != nil {
+					return fmt.Errorf("updating advisory: %w", err)
+				}
 			}
 
 			return nil
@@ -202,7 +235,7 @@ type updateParams struct {
 	doNotDetectDistro bool
 	doNotPrompt       bool
 
-	requestParams                    advisoryRequestParams
+	requestParams                    advisory.RequestParams
 	distroRepoDir, advisoriesRepoDir string
 	archs                            []string
 	packageRepositoryURL             string
@@ -212,7 +245,7 @@ func (p *updateParams) addFlagsTo(cmd *cobra.Command) {
 	addNoDistroDetectionFlag(&p.doNotDetectDistro, cmd)
 	addNoPromptFlag(&p.doNotPrompt, cmd)
 
-	p.requestParams.addFlags(cmd)
+	addFlagsForAdvisoryRequestParams(&p.requestParams, cmd)
 	addDistroDirFlag(&p.distroRepoDir, cmd)
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	cmd.Flags().StringSliceVar(&p.archs, "arch", []string{"x86_64", "aarch64"}, "package architectures to find published versions for")

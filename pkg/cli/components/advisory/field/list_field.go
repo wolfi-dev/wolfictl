@@ -11,20 +11,20 @@ import (
 )
 
 type ListField struct {
-	id             string
-	prompt         string
-	input          list.Model
-	done           bool
-	requestUpdater func(value string, req advisory.Request) advisory.Request
+	id                   string
+	prompt               string
+	input                list.Model
+	done                 bool
+	requestParamsUpdater func(value string, p advisory.RequestParams) advisory.RequestParams
 }
 
 type ListFieldConfiguration struct {
 	// ID is a unique identifier for the field.
 	ID string
 
-	Prompt         string
-	Options        []string
-	RequestUpdater func(value string, req advisory.Request) advisory.Request
+	Prompt               string
+	Options              []string
+	RequestParamsUpdater func(value string, p advisory.RequestParams) advisory.RequestParams
 }
 
 func NewListField(cfg ListFieldConfiguration) ListField {
@@ -33,10 +33,10 @@ func NewListField(cfg ListFieldConfiguration) ListField {
 	l.UnselectedStyle = styles.Secondary()
 
 	return ListField{
-		id:             cfg.ID,
-		prompt:         cfg.Prompt,
-		input:          l,
-		requestUpdater: cfg.RequestUpdater,
+		id:                   cfg.ID,
+		prompt:               cfg.Prompt,
+		input:                l,
+		requestParamsUpdater: cfg.RequestParamsUpdater,
 	}
 }
 
@@ -44,9 +44,9 @@ func (f ListField) ID() string {
 	return f.id
 }
 
-func (f ListField) UpdateRequest(req advisory.Request) advisory.Request {
+func (f ListField) UpdateRequestParams(p advisory.RequestParams) advisory.RequestParams {
 	value := f.Value()
-	return f.requestUpdater(value, req)
+	return f.requestParamsUpdater(value, p)
 }
 
 func (f ListField) SubmitValue() (Field, error) {

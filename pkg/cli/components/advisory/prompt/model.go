@@ -2,6 +2,8 @@ package prompt
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -15,17 +17,20 @@ type Model struct {
 	// internal data
 	focusIndex                 int
 	fields                     []field.Field
-	allowedPackagesFunc        func() []string
-	allowedVulnerabilitiesFunc func(packageName string) []string
-	allowedFixedVersionsFunc   func(packageName string) []string
+	allowedPackagesFunc        func() ([]string, error)
+	allowedVulnerabilitiesFunc func(packageName string) ([]string, error)
+	allowedFixedVersionsFunc   func(packageName string) ([]string, error)
 
 	// input/output data
-	Request advisory.Request
+	RequestParams advisory.RequestParams
 
 	// output data
 
 	// EarlyExit is set to true if the user asks to exit the prompt early.
 	EarlyExit bool
+
+	// Err is set if an error occurs during the prompt.
+	Err error
 }
 
 const (
@@ -41,38 +46,54 @@ const (
 	fieldIDPendingUpstreamFixNote = "pending-upstream-fix-note"
 )
 
-func (m Model) newPackageFieldConfig() field.TextFieldConfiguration {
-	allowedValues := m.allowedPackagesFunc()
+func (m Model) newPackageFieldConfig() (field.TextFieldConfiguration, error) {
+	allowedValues, err := m.allowedPackagesFunc()
+	if err != nil {
+		return field.TextFieldConfiguration{}, fmt.Errorf("getting list of allowed packages: %w", err)
+	}
 
 	return field.TextFieldConfiguration{
 		ID:     fieldIDPackage,
 		Prompt: "Package: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Package = value
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			names := strings.Split(value, ",")
+			for _, name := range names {
+				p.PackageNames = append(p.PackageNames, strings.TrimSpace(name))
+			}
+			return p
 		},
-		AllowedValues:     allowedValues,
 		EmptyValueHelpMsg: "Type to find a package.",
 		NoMatchHelpMsg:    "No matching package found.",
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
 		},
-	}
+		AllowedValues: allowedValues,
+	}, nil
 }
 
-func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
-	allowedValues := m.allowedVulnerabilitiesFunc(m.Request.Package)
+func (m Model) newVulnerabilityFieldConfig() (field.TextFieldConfiguration, error) {
+	var allowedValues []string
+
+	// If there are multiple packages selected, disable the constraint on the
+	// vulnerability field; otherwise, obtain the allowed values using the one
+	// package name.
+	if len(m.RequestParams.PackageNames) == 1 {
+		allowed, err := m.allowedVulnerabilitiesFunc(m.RequestParams.PackageNames[0])
+		if err != nil {
+			return field.TextFieldConfiguration{}, fmt.Errorf("getting list of allowed vulnerabilities: %w", err)
+		}
+		allowedValues = allowed
+	}
 
 	return field.TextFieldConfiguration{
 		ID:     fieldIDVulnerability,
 		Prompt: "Vulnerability: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if vuln.RegexCGA.MatchString(value) {
-				req.AdvisoryID = value
-				return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			vulns := strings.Split(value, ",")
+			for _, v := range vulns {
+				p.Vulns = append(p.Vulns, strings.TrimSpace(v))
 			}
-			req.Aliases = append(req.Aliases, value)
-			return req
+			return p
 		},
 		EmptyValueHelpMsg: "Provide a valid vulnerability ID.",
 		ValidationRules: []field.TextValidationRule{
@@ -80,17 +101,22 @@ func (m Model) newVulnerabilityFieldConfig() field.TextFieldConfiguration {
 			vuln.ValidateID,
 		},
 		AllowedValues: allowedValues,
-	}
+	}, nil
 }
 
 func (m Model) newTypeFieldConfig() field.ListFieldConfiguration {
 	return field.ListFieldConfiguration{
-		ID:      fieldIDEventType,
-		Prompt:  "Type: ",
-		Options: v2.EventTypes,
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			req.Event.Type = value
-			return req
+		ID:     fieldIDEventType,
+		Prompt: "Type: ",
+		Options: []string{
+			v2.EventTypeFixed,
+			v2.EventTypeFalsePositiveDetermination,
+			v2.EventTypeFixNotPlanned,
+			v2.EventTypePendingUpstreamFix,
+		},
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.EventType = value
+			return p
 		},
 	}
 }
@@ -99,19 +125,9 @@ func (m Model) newTruePositiveNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
 		ID:     fieldIDTruePositiveNote,
 		Prompt: "Note: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if value == "" {
-				req.Event.Data = nil
-				return req
-			}
-
-			if req.Event.Data == nil {
-				req.Event.Data = v2.TruePositiveDetermination{
-					Note: value,
-				}
-			}
-
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.TruePositiveNote = value
+			return p
 		},
 	}
 }
@@ -120,16 +136,9 @@ func (m Model) newFixNotPlannedNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
 		ID:     fieldIDFixNotPlannedNote,
 		Prompt: "Note: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if req.Event.Data == nil {
-				req.Event.Data = v2.FixNotPlanned{
-					Note: value,
-				}
-			} else if data, ok := req.Event.Data.(v2.FixNotPlanned); ok {
-				data.Note = value
-				req.Event.Data = data
-			}
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.Note = value
+			return p
 		},
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
@@ -141,16 +150,9 @@ func (m Model) newAnalysisNotPlannedNoteFieldConfig() field.TextFieldConfigurati
 	return field.TextFieldConfiguration{
 		ID:     fieldIDAnalysisNotPlannedNote,
 		Prompt: "Note: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if req.Event.Data == nil {
-				req.Event.Data = v2.AnalysisNotPlanned{
-					Note: value,
-				}
-			} else if data, ok := req.Event.Data.(v2.AnalysisNotPlanned); ok {
-				data.Note = value
-				req.Event.Data = data
-			}
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.Note = value
+			return p
 		},
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
@@ -162,16 +164,9 @@ func (m Model) newPendingUpstreamReleaseNoteFieldConfig() field.TextFieldConfigu
 	return field.TextFieldConfiguration{
 		ID:     fieldIDPendingUpstreamFixNote,
 		Prompt: "Note: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if req.Event.Data == nil {
-				req.Event.Data = v2.PendingUpstreamFix{
-					Note: value,
-				}
-			} else if data, ok := req.Event.Data.(v2.PendingUpstreamFix); ok {
-				data.Note = value
-				req.Event.Data = data
-			}
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.Note = value
+			return p
 		},
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
@@ -183,16 +178,9 @@ func (m Model) newFalsePositiveNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
 		ID:     fieldIDFalsePositiveNote,
 		Prompt: "Note: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if req.Event.Data == nil {
-				req.Event.Data = v2.FalsePositiveDetermination{
-					Note: value,
-				}
-			} else if data, ok := req.Event.Data.(v2.FalsePositiveDetermination); ok {
-				data.Note = value
-				req.Event.Data = data
-			}
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.FalsePositiveNote = value
+			return p
 		},
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
@@ -205,33 +193,25 @@ func (m Model) newFalsePositiveTypeFieldConfig() field.ListFieldConfiguration {
 		ID:      fieldIDFalsePositiveType,
 		Prompt:  "False Positive Type: ",
 		Options: v2.FPTypes,
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if req.Event.Data == nil {
-				req.Event.Data = v2.FalsePositiveDetermination{
-					Type: value,
-				}
-			} else if data, ok := req.Event.Data.(v2.FalsePositiveDetermination); ok {
-				data.Type = value
-				req.Event.Data = data
-			}
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.FalsePositiveType = value
+			return p
 		},
 	}
 }
 
-func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldConfiguration {
-	allowedVersions := m.allowedFixedVersionsFunc(packageName)
+func (m Model) newFixedVersionFieldConfig(packageName string) (field.TextFieldConfiguration, error) {
+	allowedVersions, err := m.allowedFixedVersionsFunc(packageName)
+	if err != nil {
+		return field.TextFieldConfiguration{}, fmt.Errorf("getting list of allowed fixed versions: %w", err)
+	}
 
 	cfg := field.TextFieldConfiguration{
 		ID:     fieldIDFixedVersion,
 		Prompt: "Fixed Version: ",
-		RequestUpdater: func(value string, req advisory.Request) advisory.Request {
-			if req.Event.Data == nil {
-				req.Event.Data = v2.Fixed{
-					FixedVersion: value,
-				}
-			}
-			return req
+		RequestParamsUpdater: func(value string, p advisory.RequestParams) advisory.RequestParams {
+			p.FixedVersion = value
+			return p
 		},
 		AllowedValues:  allowedVersions,
 		NoMatchHelpMsg: "No matching version found.",
@@ -241,7 +221,7 @@ func (m Model) newFixedVersionFieldConfig(packageName string) field.TextFieldCon
 		cfg.DefaultSuggestion = allowedVersions[0]
 	}
 
-	return cfg
+	return cfg, nil
 }
 
 func (m Model) hasFieldWithID(id string) bool {
@@ -255,15 +235,15 @@ func (m Model) hasFieldWithID(id string) bool {
 }
 
 type Configuration struct {
-	Request                    advisory.Request
-	AllowedPackagesFunc        func() []string
-	AllowedVulnerabilitiesFunc func(packageName string) []string
-	AllowedFixedVersionsFunc   func(packageName string) []string
+	RequestParams              advisory.RequestParams
+	AllowedPackagesFunc        func() ([]string, error)
+	AllowedVulnerabilitiesFunc func(packageName string) ([]string, error)
+	AllowedFixedVersionsFunc   func(packageName string) ([]string, error)
 }
 
 func New(config Configuration) Model {
 	m := Model{
-		Request: config.Request,
+		RequestParams: config.RequestParams,
 
 		allowedPackagesFunc:        config.AllowedPackagesFunc,
 		allowedVulnerabilitiesFunc: config.AllowedVulnerabilitiesFunc,
@@ -280,28 +260,55 @@ func New(config Configuration) Model {
 // addMissingFields returns an updated model, and a bool indicating whether any
 // fields needed to be added.
 func (m Model) addMissingFields() (Model, bool) {
-	if m.Request.Package == "" {
-		f := field.NewTextField(m.newPackageFieldConfig())
+	if len(m.RequestParams.PackageNames) == 0 {
+		fieldConfig, err := m.newPackageFieldConfig()
+		if err != nil {
+			m.Err = fmt.Errorf("failed to create package field: %w", err)
+			m.EarlyExit = true
+			return m, false
+		}
+
+		f := field.NewTextField(fieldConfig)
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
-	if len(m.Request.VulnerabilityIDs()) == 0 {
-		f := field.NewTextField(m.newVulnerabilityFieldConfig())
+	if len(m.RequestParams.Vulns) == 0 {
+		fieldConfig, err := m.newVulnerabilityFieldConfig()
+		if err != nil {
+			m.Err = fmt.Errorf("failed to create vulnerability field: %w", err)
+			m.EarlyExit = true
+			return m, false
+		}
+
+		f := field.NewTextField(fieldConfig)
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
-	if m.Request.Event.Type == "" {
+	if m.RequestParams.EventType == "" {
 		f := field.NewListField(m.newTypeFieldConfig())
 		m.fields = append(m.fields, f)
 		return m, true
 	}
 
-	switch e := m.Request.Event; e.Type {
+	switch p := m.RequestParams; p.EventType {
 	case v2.EventTypeFixed:
-		if data, ok := e.Data.(v2.Fixed); !ok || data.FixedVersion == "" {
-			f := field.NewTextField(m.newFixedVersionFieldConfig(m.Request.Package))
+		if p.FixedVersion == "" {
+			if len(p.PackageNames) > 1 {
+				m.Err = errors.New("prompting doesn't support fixed events when specifying multiple packages")
+				m.EarlyExit = true
+				return m, false
+			}
+
+			fieldConfig, err := m.newFixedVersionFieldConfig(p.PackageNames[0])
+			if err != nil {
+				m.Err = fmt.Errorf("failed to create fixed version field: %w", err)
+				m.EarlyExit = true
+				return m, false
+			}
+
+			f := field.NewTextField(fieldConfig)
 			m.fields = append(m.fields, f)
 			return m, true
 		}
@@ -312,41 +319,41 @@ func (m Model) addMissingFields() (Model, bool) {
 			return m, false
 		}
 
-		if _, ok := e.Data.(v2.TruePositiveDetermination); !ok {
+		if p.TruePositiveNote == "" && p.Note == "" {
 			f := field.NewTextField(m.newTruePositiveNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
 	case v2.EventTypeFalsePositiveDetermination:
-		if data, ok := e.Data.(v2.FalsePositiveDetermination); !ok || data.Type == "" {
+		if p.FalsePositiveType == "" {
 			f := field.NewListField(m.newFalsePositiveTypeFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
-		if data, ok := e.Data.(v2.FalsePositiveDetermination); !ok || data.Note == "" {
+		if p.FalsePositiveNote == "" && p.Note == "" {
 			f := field.NewTextField(m.newFalsePositiveNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
 	case v2.EventTypeFixNotPlanned:
-		if data, ok := e.Data.(v2.FixNotPlanned); !ok || data.Note == "" {
+		if p.Note == "" {
 			f := field.NewTextField(m.newFixNotPlannedNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
 	case v2.EventTypeAnalysisNotPlanned:
-		if data, ok := e.Data.(v2.AnalysisNotPlanned); !ok || data.Note == "" {
+		if p.Note == "" {
 			f := field.NewTextField(m.newAnalysisNotPlannedNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
 
 	case v2.EventTypePendingUpstreamFix:
-		if data, ok := e.Data.(v2.PendingUpstreamFix); !ok || data.Note == "" {
+		if p.Note == "" {
 			f := field.NewTextField(m.newPendingUpstreamReleaseNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
@@ -383,12 +390,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// TODO: Handle other errors
 			}
 
-			m.Request = sel.UpdateRequest(m.Request)
-
-			// We should move this business logic snippet somewhere else eventually.
-			if m.Request.Event.Type == v2.EventTypeDetection {
-				m.Request.Event.Data = v2.Detection{Type: v2.DetectionTypeManual}
-			}
+			m.RequestParams = sel.UpdateRequestParams(m.RequestParams)
 
 			m.fields[m.focusIndex] = sel
 

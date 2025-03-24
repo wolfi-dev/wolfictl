@@ -22,9 +22,9 @@ const maxSuggestionsDisplayed = 4
 var ErrValueNotInAllowedSet = errors.New("value not in allowed set")
 
 type TextField struct {
-	id             string
-	allowedValues  []string
-	requestUpdater func(value string, req advisory.Request) advisory.Request
+	id                   string
+	allowedValues        []string
+	requestParamsUpdater func(value string, p advisory.RequestParams) advisory.RequestParams
 
 	input                 textinput.Model
 	done                  bool
@@ -46,9 +46,9 @@ type TextFieldConfiguration struct {
 	// Prompt is the text shown before the input field. (E.g. "Name: ")
 	Prompt string
 
-	// RequestUpdater is a function that updates the advisory request with the
+	// RequestParamsUpdater is a function that updates the advisory request with the
 	// current field value.
-	RequestUpdater func(value string, req advisory.Request) advisory.Request
+	RequestParamsUpdater func(value string, p advisory.RequestParams) advisory.RequestParams
 
 	// AllowedValues is a list of values that are allowed to be entered and are used
 	// as suggestions when the user starts typing.
@@ -80,14 +80,14 @@ func NewTextField(cfg TextFieldConfiguration) TextField {
 	t.Prompt = cfg.Prompt
 
 	return TextField{
-		id:                cfg.ID,
-		input:             t,
-		requestUpdater:    cfg.RequestUpdater,
-		allowedValues:     cfg.AllowedValues,
-		emptyValueHelpMsg: cfg.EmptyValueHelpMsg,
-		noMatchHelpMsg:    cfg.NoMatchHelpMsg,
-		validationRules:   cfg.ValidationRules,
-		defaultSuggestion: cfg.DefaultSuggestion,
+		id:                   cfg.ID,
+		input:                t,
+		requestParamsUpdater: cfg.RequestParamsUpdater,
+		allowedValues:        cfg.AllowedValues,
+		emptyValueHelpMsg:    cfg.EmptyValueHelpMsg,
+		noMatchHelpMsg:       cfg.NoMatchHelpMsg,
+		validationRules:      cfg.ValidationRules,
+		defaultSuggestion:    cfg.DefaultSuggestion,
 	}
 }
 
@@ -104,6 +104,11 @@ func (f TextField) ID() string {
 }
 
 func (f TextField) runAllValidationRules(value string) error {
+	// Ignore validation when user is entering multiple (comma-separated) values.
+	if strings.Contains(value, ",") {
+		return nil
+	}
+
 	for _, rule := range f.validationRules {
 		err := rule(value)
 		if err != nil {
@@ -114,9 +119,9 @@ func (f TextField) runAllValidationRules(value string) error {
 	return nil
 }
 
-func (f TextField) UpdateRequest(req advisory.Request) advisory.Request {
+func (f TextField) UpdateRequestParams(p advisory.RequestParams) advisory.RequestParams {
 	value := f.Value()
-	return f.requestUpdater(value, req)
+	return f.requestParamsUpdater(value, p)
 }
 
 func (f TextField) SubmitValue() (Field, error) {
@@ -173,6 +178,11 @@ func (f TextField) Update(msg tea.Msg) (Field, tea.Cmd) {
 }
 
 func (f TextField) usingSuggestions() bool {
+	if v := f.input.Value(); strings.Contains(v, ",") {
+		// Turn off suggestions if specifying multiple multiple values.
+		return false
+	}
+
 	return f.allowedValues != nil
 }
 

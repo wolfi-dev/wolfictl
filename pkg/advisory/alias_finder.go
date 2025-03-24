@@ -8,14 +8,79 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/samber/lo"
+	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 type AliasFinder interface {
 	CVEForGHSA(ctx context.Context, ghsaID string) (string, error)
 	GHSAsForCVE(ctx context.Context, cveID string) ([]string, error)
+}
+
+// CompleteAliasSet takes a set of vulnerability IDs and uses the given
+// AliasFinder to resolve any remaining aliases in the set of IDs.
+func CompleteAliasSet(ctx context.Context, finder AliasFinder, vulnIDs []string) ([]string, error) {
+	// Known IDs so we don't process or return duplicates.
+	known := make(map[string]struct{})
+
+	// Initialize a queue with the starting set of vulnIDs.
+	queue := make([]string, 0, len(vulnIDs))
+
+	// Fill the queue and the known set with our initial IDs.
+	for _, v := range vulnIDs {
+		if _, ok := known[v]; !ok {
+			known[v] = struct{}{}
+			queue = append(queue, v)
+		}
+	}
+
+	// Process until no new IDs are discovered.
+	for len(queue) > 0 {
+		v := queue[0]
+		queue = queue[1:] // Pop from the front of the queue
+
+		switch {
+		case vuln.RegexGHSA.MatchString(v):
+			cveID, err := finder.CVEForGHSA(ctx, v)
+			if err != nil {
+				return nil, fmt.Errorf("resolving CVE for %q: %w", v, err)
+			}
+			if cveID != "" {
+				// If it's new, push it on the queue
+				if _, ok := known[cveID]; !ok {
+					known[cveID] = struct{}{}
+					queue = append(queue, cveID)
+				}
+			}
+
+		case vuln.RegexCVE.MatchString(v):
+			ghsaIDs, err := finder.GHSAsForCVE(ctx, v)
+			if err != nil {
+				return nil, fmt.Errorf("resolving GHSA(s) for %q: %w", v, err)
+			}
+			for _, ghsaID := range ghsaIDs {
+				if _, ok := known[ghsaID]; !ok {
+					known[ghsaID] = struct{}{}
+					queue = append(queue, ghsaID)
+				}
+			}
+
+		default:
+			return nil, fmt.Errorf("unknown type of vulnerability ID: %s", v)
+		}
+	}
+
+	// Convert the map keys to a slice and sort
+	var result []string
+	for k := range known {
+		result = append(result, k)
+	}
+	sort.Strings(result)
+
+	return result, nil
 }
 
 type HTTPAliasFinder struct {

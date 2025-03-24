@@ -24,3 +24,7 @@ type Getter interface {
 	// valid, non-empty data.
 	Advisories(ctx context.Context, packageName string) ([]v2.PackageAdvisory, error)
 }
+
+type Putter interface {
+	Upsert(ctx context.Context, request Request) (string, error)
+}

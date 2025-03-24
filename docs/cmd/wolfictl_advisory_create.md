@@ -28,6 +28,10 @@ command line, the command will prompt for the missing values.
 If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.
 
+It's possible to create advisories for multiple packages and/or vulnerabilities 
+at once by using a comma-separated list of package names and vulnerabilities. 
+This is available for both the CLI flags and the interactive prompt fields.
+
 This command also performs a follow-up operation to discover aliases for the
 newly created advisory and any other advisories for the same package.
 
@@ -43,11 +47,11 @@ newly created advisory and any other advisories for the same package.
       --no-distro-detection          do not attempt to auto-detect the distro
       --no-prompt                    do not prompt the user for input
       --note string                  prose explanation to attach to the event data (can be used with any event type)
-  -p, --package string               package name
+  -p, --package strings              package names
   -r, --package-repo-url string      URL of the APK package repository
       --timestamp string             timestamp of the event (RFC3339 format) (default "now")
   -t, --type string                  type of event [detection, true-positive-determination, fixed, false-positive-determination, analysis-not-planned, fix-not-planned, pending-upstream-fix]
-  -V, --vuln string                  vulnerability ID for advisory
+  -V, --vuln strings                 vulnerability IDs for advisory
 ```
 
 ### Options inherited from parent commands
