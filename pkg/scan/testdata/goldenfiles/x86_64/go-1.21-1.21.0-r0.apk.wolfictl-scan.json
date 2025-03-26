@@ -9254,11 +9254,9 @@
       }
     }
   ],
-  "GrypeDBStatus": {
-    "schemaVersion": "v6.0.2",
-    "from": "manual import",
-    "built": "2025-03-06T04:06:38Z",
-    "path": "testdata/grypedb/6/vulnerability.db",
-    "valid": true
+  "DataSource": {
+    "Schema": "v6.0.2",
+    "Integrity": "imported_db_archive_checksum=sha256:cb212d2776d099cb8635d5d238fcb3894ea81c0285b27911585c7556fbcb412f",
+    "Date": "2025-03-06T04:06:38Z"
   }
 }
