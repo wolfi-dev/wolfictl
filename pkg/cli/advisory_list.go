@@ -10,10 +10,10 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
 //nolint:gocyclo // This CLI command is handling business logic while we experiment with the design; we can factor out common patterns later.
@@ -83,6 +83,8 @@ flag. This will report just the count, not the full list of advisories.
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ctx := cmd.Context()
+
 			if p.history && p.typ != "" {
 				return fmt.Errorf("cannot use --history and --type together")
 			}
@@ -111,11 +113,6 @@ flag. This will report just the count, not the full list of advisories.
 
 			if p.advisoriesRepoDir == "" {
 				p.advisoriesRepoDir = "." // default to current working directory
-			}
-
-			index, err := v2.NewIndex(cmd.Context(), rwos.DirFS(p.advisoriesRepoDir))
-			if err != nil {
-				return err
 			}
 
 			var (
@@ -160,15 +157,26 @@ flag. This will report just the count, not the full list of advisories.
 				updatedBefore = &ts
 			}
 
-			if index.Select().Len() == 0 {
-				return fmt.Errorf("no advisory data found in %q; cd to an advisories directory, or use -a flag", p.advisoriesRepoDir)
+			var getter advisory.Getter = advisory.NewFSGetter(os.DirFS(p.advisoriesRepoDir))
+
+			var packageNames []string
+			if p.packageName != "" {
+				packageNames = []string{p.packageName}
+			} else {
+				var err error
+				packageNames, err = getter.PackageNames(ctx)
+				if err != nil {
+					return fmt.Errorf("listing packages: %w", err)
+				}
 			}
 
-			var docs []v2.Document
-			if pkg := p.packageName; pkg != "" {
-				docs = index.Select().WhereName(pkg).Configurations()
-			} else {
-				docs = index.Select().Configurations()
+			var advs []v2.PackageAdvisory
+			for _, name := range packageNames {
+				advisories, err := getter.Advisories(ctx, name)
+				if err != nil {
+					return fmt.Errorf("getting advisories for %q: %w", name, err)
+				}
+				advs = append(advs, advisories...)
 			}
 
 			var table *advisoryListTableRenderer
@@ -179,102 +187,93 @@ flag. This will report just the count, not the full list of advisories.
 				}
 			}
 
-			var resultDocs []v2.Document
-			for _, doc := range docs {
-				var resultAdvs []v2.Advisory
-				for _, adv := range doc.Advisories {
-					sortedEvents := adv.SortedEvents()
+			var resultAdvs []v2.PackageAdvisory
+			for _, adv := range advs {
+				sortedEvents := adv.SortedEvents()
 
-					if len(sortedEvents) == 0 {
-						// nothing to add
-						continue
-					}
+				if len(sortedEvents) == 0 {
+					// nothing to add
+					continue
+				}
 
-					if p.vuln != "" && !adv.DescribesVulnerability(p.vuln) {
-						// user specified a particular different vulnerability
-						continue
-					}
+				if p.vuln != "" && !adv.DescribesVulnerability(p.vuln) {
+					// user specified a particular different vulnerability
+					continue
+				}
 
-					if p.unresolved && adv.Resolved() {
-						// user wants only unresolved advisories
-						continue
-					}
+				if p.unresolved && adv.Resolved() {
+					// user wants only unresolved advisories
+					continue
+				}
 
-					if p.componentType != "" && !advHasDetectedComponentType(adv, p.componentType) {
-						// user specified a particular different component type
-						continue
-					}
+				if p.componentType != "" && !advHasDetectedComponentType(adv, p.componentType) {
+					// user specified a particular different component type
+					continue
+				}
 
-					created := sortedEvents[0].Timestamp
-					updated := sortedEvents[len(sortedEvents)-1].Timestamp
+				created := sortedEvents[0].Timestamp
+				updated := sortedEvents[len(sortedEvents)-1].Timestamp
 
-					if createdSince != nil && !created.After(*createdSince) {
-						// user wants only advisories created since a certain date
-						continue
-					}
+				if createdSince != nil && !created.After(*createdSince) {
+					// user wants only advisories created since a certain date
+					continue
+				}
 
-					if createdBefore != nil && !created.Before(*createdBefore) {
-						// user wants only advisories created before a certain date
-						continue
-					}
+				if createdBefore != nil && !created.Before(*createdBefore) {
+					// user wants only advisories created before a certain date
+					continue
+				}
 
-					if updatedSince != nil && !updated.After(*updatedSince) {
-						// user wants only advisories updated since a certain date
-						continue
-					}
+				if updatedSince != nil && !updated.After(*updatedSince) {
+					// user wants only advisories updated since a certain date
+					continue
+				}
 
-					if updatedBefore != nil && !updated.Before(*updatedBefore) {
-						// user wants only advisories updated before a certain date
-						continue
-					}
+				if updatedBefore != nil && !updated.Before(*updatedBefore) {
+					// user wants only advisories updated before a certain date
+					continue
+				}
 
-					if p.history {
-						// user wants the full history
-
-						switch p.outputFormat {
-						case outputFormatTable:
-							for i, event := range sortedEvents {
-								isLatest := i == len(sortedEvents)-1 // last event is the latest
-								table.add(doc.Package.Name, adv.ID, adv.Aliases, event, isLatest)
-							}
-
-						case outputFormatJSON:
-							resultAdvs = append(resultAdvs, adv)
-						}
-
-						continue
-					}
-
-					latest := adv.Latest()
-
-					if p.typ != "" && latest.Type != p.typ {
-						// user wants to filter by event type
-						continue
-					}
+				if p.history {
+					// user wants the full history
 
 					switch p.outputFormat {
 					case outputFormatTable:
-						table.add(doc.Package.Name, adv.ID, adv.Aliases, latest, true)
+						for i, event := range sortedEvents {
+							isLatest := i == len(sortedEvents)-1 // last event is the latest
+							table.add(adv.PackageName, adv.ID, adv.Aliases, event, isLatest)
+						}
 
 					case outputFormatJSON:
-						// Since full history wasn't requested, filter the advisory's event list to just
-						// the latest.
-						prunedAdv := v2.Advisory{
+						resultAdvs = append(resultAdvs, adv)
+					}
+
+					continue
+				}
+
+				latest := adv.Latest()
+
+				if p.typ != "" && latest.Type != p.typ {
+					// user wants to filter by event type
+					continue
+				}
+
+				switch p.outputFormat {
+				case outputFormatTable:
+					table.add(adv.PackageName, adv.ID, adv.Aliases, latest, true)
+
+				case outputFormatJSON:
+					// Since full history wasn't requested, filter the advisory's event list to just
+					// the latest.
+					prunedAdv := v2.PackageAdvisory{
+						PackageName: adv.PackageName,
+						Advisory: v2.Advisory{
 							ID:      adv.ID,
 							Aliases: adv.Aliases,
 							Events:  []v2.Event{latest},
-						}
-						resultAdvs = append(resultAdvs, prunedAdv)
+						},
 					}
-				}
-
-				if len(resultAdvs) >= 1 {
-					resultDoc := v2.Document{
-						SchemaVersion: doc.SchemaVersion,
-						Package:       doc.Package,
-						Advisories:    resultAdvs,
-					}
-					resultDocs = append(resultDocs, resultDoc)
+					resultAdvs = append(resultAdvs, prunedAdv)
 				}
 			}
 
@@ -289,11 +288,7 @@ flag. This will report just the count, not the full list of advisories.
 				fmt.Printf("%s\n", table)
 
 			case outputFormatJSON:
-				if resultDocs == nil {
-					resultDocs = []v2.Document{}
-				}
-
-				if err := json.NewEncoder(os.Stdout).Encode(resultDocs); err != nil {
+				if err := json.NewEncoder(os.Stdout).Encode(resultAdvs); err != nil {
 					return fmt.Errorf("encoding JSON: %w", err)
 				}
 			}
@@ -346,7 +341,7 @@ func (p *listParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.outputFormat, "output", "o", "", fmt.Sprintf("output format (%s), defaults to %s", strings.Join(validAdvListOutputFormats, "|"), outputFormatTable))
 }
 
-func advHasDetectedComponentType(adv v2.Advisory, componentType string) bool {
+func advHasDetectedComponentType(adv v2.PackageAdvisory, componentType string) bool {
 	for _, event := range adv.Events {
 		if event.Type == v2.EventTypeDetection {
 			if data, ok := event.Data.(v2.Detection); ok {

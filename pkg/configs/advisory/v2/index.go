@@ -23,6 +23,6 @@ func newConfigurationDecodeFunc(fsys fs.FS) func(context.Context, string) (*Docu
 			return nil, err
 		}
 
-		return decodeDocument(file)
+		return DecodeDocument(file)
 	}
 }
