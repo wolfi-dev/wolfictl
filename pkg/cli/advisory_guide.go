@@ -439,7 +439,7 @@ func renderResultWithAPKs(r resultWithAPKs) string {
 func collateVulnerabilities(results []scan.Result) []resultWithAPKs {
 	vulnAPKsMap := make(map[string]resultWithAPKs)
 
-	for _, result := range results {
+	for _, result := range results { //nolint:gocritic
 		for _, finding := range result.Findings { //nolint:gocritic
 			match, exists := vulnAPKsMap[finding.Vulnerability.ID]
 			if !exists {
@@ -457,7 +457,7 @@ func collateVulnerabilities(results []scan.Result) []resultWithAPKs {
 	}
 
 	var vulnAPKs []resultWithAPKs
-	for _, v := range vulnAPKsMap {
+	for _, v := range vulnAPKsMap { //nolint:gocritic
 		vulnAPKs = append(vulnAPKs, v)
 	}
 
@@ -467,7 +467,7 @@ func collateVulnerabilities(results []scan.Result) []resultWithAPKs {
 func filterCollatedVulnerabilities(ctx context.Context, apkResults []resultWithAPKs, sess *advisory.DataSession) ([]resultWithAPKs, error) {
 	var filtered []resultWithAPKs
 
-	for _, ar := range apkResults {
+	for _, ar := range apkResults { //nolint:gocritic
 		filteredFindings, err := scan.FilterWithAdvisories(
 			ctx,
 			ar.Result,
