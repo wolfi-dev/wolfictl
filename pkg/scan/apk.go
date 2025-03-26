@@ -58,6 +58,11 @@ type Result struct {
 // implementation, to avoid scanner-specific types and dependencies leaking into
 // our scan results processing pipeline.
 type DataSource struct {
+	// Kind states the type of data source used during the scan (e.g. "grype-db").
+	// This field can be used to better interpret the specific values populating the
+	// other fields of this struct.
+	Kind string
+
 	// Schema describes the schema version of the underlying vulnerability data
 	// source.
 	Schema string
@@ -322,6 +327,7 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 		TargetAPK: apk,
 		Findings:  findings,
 		DataSource: DataSource{
+			Kind:      "grype-db",
 			Schema:    s.dbStatus.SchemaVersion,
 			Integrity: s.dbChecksum,
 			Date:      s.dbStatus.Built,
