@@ -58,7 +58,7 @@ func TestFSGetter(t *testing.T) {
 
 		t.Run("not found", func(t *testing.T) {
 			_, err := g.Advisories(ctx, "not-found")
-			assert.ErrorIs(t, err, ErrNoAdvisories)
+			assert.NoError(t, err)
 		})
 	})
 }

@@ -7,6 +7,7 @@ type PackageAdvisory struct {
 	Advisory
 }
 
+// IsZero returns true if the package advisory has no data.
 func (pa PackageAdvisory) IsZero() bool {
 	return pa.PackageName == "" && pa.Advisory.IsZero()
 }

@@ -54,7 +54,8 @@ func (g FSGetter) Advisories(_ context.Context, packageName string) ([]v2.Packag
 	f, err := g.fsys.Open(advFileName)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return nil, fmt.Errorf("%w: opening advisory file %q: %w", ErrNoAdvisories, advFileName, err)
+			// This is normal, just no advisories for this package.
+			return nil, nil
 		}
 
 		return nil, fmt.Errorf("opening advisory file %q: %w", advFileName, err)
