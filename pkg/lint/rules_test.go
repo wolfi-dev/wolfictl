@@ -476,10 +476,7 @@ func TestLinter_Rules(t *testing.T) {
 			ctx := context.Background()
 			l := newTestLinterWithFile(tt.file)
 			got, err := l.Lint(ctx, tt.minSeverity)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Lint() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			assert.Nil(t, err, "Error in the linting process")
 
 			// Always should be a single element array.
 			require.Len(t, got, tt.matches)
