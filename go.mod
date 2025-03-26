@@ -1,6 +1,7 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.24.0
+go 1.24.1
+
 // https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
