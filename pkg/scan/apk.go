@@ -2,10 +2,13 @@ package scan
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -33,6 +36,7 @@ import (
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/charmbracelet/log"
+	"github.com/spf13/afero"
 	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 )
@@ -44,9 +48,32 @@ const (
 var DefaultGrypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
 
 type Result struct {
-	TargetAPK     TargetAPK
-	Findings      []Finding
-	GrypeDBStatus *v6.Status
+	TargetAPK  TargetAPK
+	Findings   []Finding
+	DataSource DataSource
+}
+
+// DataSource describes the underlying data used during the vulnerability scan,
+// in such a way that is intentionally abstracted from any specific scanner
+// implementation, to avoid scanner-specific types and dependencies leaking into
+// our scan results processing pipeline.
+type DataSource struct {
+	// Kind states the type of data source used during the scan (e.g. "grype-db").
+	// This field can be used to better interpret the specific values populating the
+	// other fields of this struct.
+	Kind string
+
+	// Schema describes the schema version of the underlying vulnerability data
+	// source.
+	Schema string
+
+	// Integrity should provide some kind of machine-readable way for consumers of
+	// scan data to validate the data integrity of the underlying data source. This
+	// could be a checksum, signature, etc.
+	Integrity string
+
+	// Date indicates how fresh the dats source's data is.
+	Date time.Time
 }
 
 type TargetAPK struct {
@@ -90,7 +117,8 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 
 type Scanner struct {
 	vulnProvider         vulnerability.Provider
-	dbStatus             *v6.Status
+	dbStatus             *vulnerability.ProviderStatus
+	dbChecksum           string
 	vulnerabilityMatcher *grype.VulnerabilityMatcher
 	disableSBOMCache     bool
 }
@@ -155,12 +183,25 @@ func NewScanner(opts Options) (*Scanner, error) {
 	}
 
 	updateDB := true
+	var checksum string
 	if dbArchivePath := opts.PathOfDatabaseArchiveToImport; dbArchivePath != "" {
 		fmt.Fprintf(os.Stderr, "using local grype DB archive %q...\n", dbArchivePath)
 		dbCurator, err := installation.NewCurator(installCfg, distClient)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create the grype db import config: %w", err)
 		}
+
+		// Take the hash of the file at dbArchivePath
+		h := sha256.New()
+		f, err := os.Open(dbArchivePath)
+		if err != nil {
+			return nil, fmt.Errorf("opening vulnerability database archive for hashing: %w", err)
+		}
+		defer f.Close()
+		if _, err := io.Copy(h, f); err != nil {
+			return nil, fmt.Errorf("hashing vulnerability database archive: %w", err)
+		}
+		checksum = fmt.Sprintf("imported_db_archive_checksum=sha256:%x", h.Sum(nil))
 
 		if err := dbCurator.Import(dbArchivePath); err != nil {
 			return nil, fmt.Errorf("unable to import vulnerability database: %w", err)
@@ -174,11 +215,21 @@ func NewScanner(opts Options) (*Scanner, error) {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
 	}
 
+	if checksum == "" {
+		metadata, err := v6.ReadImportMetadata(afero.NewOsFs(), filepath.Dir(dbStatus.Path))
+		if err != nil {
+			return nil, fmt.Errorf("reading Grype DB import metadata: %w", err)
+		}
+
+		checksum = fmt.Sprintf("import_metadata_digest=%s", metadata.Digest)
+	}
+
 	vulnerabilityMatcher := NewGrypeVulnerabilityMatcher(vulnProvider, opts.UseCPEs)
 
 	return &Scanner{
 		vulnProvider:         vulnProvider,
 		dbStatus:             dbStatus,
+		dbChecksum:           checksum,
 		vulnerabilityMatcher: vulnerabilityMatcher,
 		disableSBOMCache:     opts.DisableSBOMCache,
 	}, nil
@@ -273,9 +324,14 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	}
 
 	result := &Result{
-		TargetAPK:     apk,
-		Findings:      findings,
-		GrypeDBStatus: s.dbStatus,
+		TargetAPK: apk,
+		Findings:  findings,
+		DataSource: DataSource{
+			Kind:      "grype-db",
+			Schema:    s.dbStatus.SchemaVersion,
+			Integrity: s.dbChecksum,
+			Date:      s.dbStatus.Built,
+		},
 	}
 
 	return result, nil

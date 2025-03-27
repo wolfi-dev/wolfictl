@@ -121,13 +121,6 @@ func TestScanner_ScanAPK(t *testing.T) {
 					t.Fatalf("scanning APK: %v", err)
 				}
 
-				// TODO(luhring): Starting in v6, this value became semi-unstable. It's stable
-				//  only after you've downloaded the database, decompressed it, and ran a first
-				//  scan (which triggers indexing on various tables). Stabilizing this value
-				//  better is on the grype team's radar, and we'll come back and un-redact this
-				//  when that's done.
-				result.GrypeDBStatus.Checksum = "[REDACTED]"
-
 				actual := &bytes.Buffer{}
 				enc := json.NewEncoder(actual)
 				enc.SetIndent("", "  ")
