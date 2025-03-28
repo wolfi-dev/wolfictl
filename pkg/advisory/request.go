@@ -142,8 +142,20 @@ func (req Request) ResolveAliases(ctx context.Context, af AliasFinder) (*Request
 type RequestParams struct {
 	PackageNames, Vulns []string
 
-	EventType, TruePositiveNote, FalsePositiveNote, FalsePositiveType, Timestamp, FixedVersion, Note string
+	Timestamp, EventType, FixedVersion, FalsePositiveType, FalsePositiveNote, TruePositiveNote, Note string
 }
+
+const (
+	RequestParamPackageNames      = "PackageNames"
+	RequestParamVulns             = "Vulns"
+	RequestParamTimestamp         = "Timestamp"
+	RequestParamEventType         = "EventType"
+	RequestParamFixedVersion      = "FixedVersion"
+	RequestParamFalsePositiveType = "FalsePositiveType"
+	RequestParamFalsePositiveNote = "FalsePositiveNote"
+	RequestParamTruePositiveNote  = "TruePositiveNote"
+	RequestParamNote              = "Note"
+)
 
 // MissingValues returns a slice of names of fields that are missing, such that
 // generating any Request data is not possible. If enough fields are present to
@@ -153,14 +165,50 @@ func (p RequestParams) MissingValues() []string {
 	var missing []string
 
 	if len(p.PackageNames) == 0 {
-		missing = append(missing, "PackageNames")
+		missing = append(missing, RequestParamPackageNames)
 	}
 
 	if len(p.Vulns) == 0 {
-		missing = append(missing, "Vulns")
+		missing = append(missing, RequestParamVulns)
 	}
 
-	// TODO: handle the rest of the values
+	if p.EventType == "" {
+		missing = append(missing, RequestParamEventType)
+	}
+
+	if p.Timestamp == "" {
+		missing = append(missing, RequestParamTimestamp)
+	}
+
+	if p.EventType == v2.EventTypeFixed && p.FixedVersion == "" {
+		missing = append(missing, RequestParamFixedVersion)
+	}
+
+	if p.EventType == v2.EventTypeFalsePositiveDetermination {
+		if p.FalsePositiveType == "" {
+			missing = append(missing, RequestParamFalsePositiveType)
+		}
+
+		if p.FalsePositiveNote == "" && p.Note == "" {
+			missing = append(missing, RequestParamFalsePositiveNote)
+		}
+	}
+
+	if p.EventType == v2.EventTypeTruePositiveDetermination && p.TruePositiveNote == "" && p.Note == "" {
+		missing = append(missing, RequestParamTruePositiveNote)
+	}
+
+	if p.EventType == v2.EventTypeAnalysisNotPlanned && p.Note == "" {
+		missing = append(missing, RequestParamNote)
+	}
+
+	if p.EventType == v2.EventTypeFixNotPlanned && p.Note == "" {
+		missing = append(missing, RequestParamNote)
+	}
+
+	if p.EventType == v2.EventTypePendingUpstreamFix && p.Note == "" {
+		missing = append(missing, RequestParamNote)
+	}
 
 	return missing
 }
