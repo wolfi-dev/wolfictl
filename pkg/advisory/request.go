@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
@@ -134,4 +135,172 @@ func (req Request) ResolveAliases(ctx context.Context, af AliasFinder) (*Request
 	req.Aliases = slices.Compact(req.Aliases)
 
 	return &req, nil
+}
+
+// RequestParams is a flattened, utility data structure that can be used to
+// generate one or more Requests.
+type RequestParams struct {
+	PackageNames, Vulns []string
+
+	Timestamp, EventType, FixedVersion, FalsePositiveType, FalsePositiveNote, TruePositiveNote, Note string
+}
+
+const (
+	RequestParamPackageNames      = "PackageNames"
+	RequestParamVulns             = "Vulns"
+	RequestParamTimestamp         = "Timestamp"
+	RequestParamEventType         = "EventType"
+	RequestParamFixedVersion      = "FixedVersion"
+	RequestParamFalsePositiveType = "FalsePositiveType"
+	RequestParamFalsePositiveNote = "FalsePositiveNote"
+	RequestParamTruePositiveNote  = "TruePositiveNote"
+	RequestParamNote              = "Note"
+)
+
+// MissingValues returns a slice of names of fields that are missing, such that
+// generating any Request data is not possible. If enough fields are present to
+// potentially generate a Request, an empty slice is returned. This method does
+// not validate the values themselves.
+func (p RequestParams) MissingValues() []string {
+	var missing []string
+
+	if len(p.PackageNames) == 0 {
+		missing = append(missing, RequestParamPackageNames)
+	}
+
+	if len(p.Vulns) == 0 {
+		missing = append(missing, RequestParamVulns)
+	}
+
+	if p.EventType == "" {
+		missing = append(missing, RequestParamEventType)
+	}
+
+	if p.Timestamp == "" {
+		missing = append(missing, RequestParamTimestamp)
+	}
+
+	if p.EventType == v2.EventTypeFixed && p.FixedVersion == "" {
+		missing = append(missing, RequestParamFixedVersion)
+	}
+
+	if p.EventType == v2.EventTypeFalsePositiveDetermination {
+		if p.FalsePositiveType == "" {
+			missing = append(missing, RequestParamFalsePositiveType)
+		}
+
+		if p.FalsePositiveNote == "" && p.Note == "" {
+			missing = append(missing, RequestParamFalsePositiveNote)
+		}
+	}
+
+	if p.EventType == v2.EventTypeTruePositiveDetermination && p.TruePositiveNote == "" && p.Note == "" {
+		missing = append(missing, RequestParamTruePositiveNote)
+	}
+
+	if p.EventType == v2.EventTypeAnalysisNotPlanned && p.Note == "" {
+		missing = append(missing, RequestParamNote)
+	}
+
+	if p.EventType == v2.EventTypeFixNotPlanned && p.Note == "" {
+		missing = append(missing, RequestParamNote)
+	}
+
+	if p.EventType == v2.EventTypePendingUpstreamFix && p.Note == "" {
+		missing = append(missing, RequestParamNote)
+	}
+
+	return missing
+}
+
+// GenerateRequests returns a slice of new Requests generated using the data
+// provided in the RequestParams.
+func (p *RequestParams) GenerateRequests() ([]Request, error) {
+	if m := p.MissingValues(); len(m) > 0 {
+		return nil, fmt.Errorf("missing values: %v", m)
+	}
+
+	timestamp, err := resolveTimestamp(p.Timestamp)
+	if err != nil {
+		return nil, fmt.Errorf("resolving timestamp: %w", err)
+	}
+
+	reqs := make([]Request, 0, len(p.PackageNames)*len(p.Vulns))
+
+	// For now, introduce p.note as a fallback value for event-specific notes. Then
+	// in the future, we could deprecate and remove the event-specific note flags.
+
+	event := v2.Event{
+		Timestamp: timestamp,
+		Type:      p.EventType,
+		Data:      nil,
+	}
+
+	switch event.Type {
+	case v2.EventTypeFixed:
+		event.Data = v2.Fixed{
+			FixedVersion: p.FixedVersion,
+		}
+
+	case v2.EventTypeFalsePositiveDetermination:
+		note := p.FalsePositiveNote
+		if note == "" {
+			note = p.Note
+		}
+		event.Data = v2.FalsePositiveDetermination{
+			Type: p.FalsePositiveType,
+			Note: note,
+		}
+
+	case v2.EventTypeTruePositiveDetermination:
+		note := p.TruePositiveNote
+		if note == "" {
+			note = p.Note
+		}
+		event.Data = v2.TruePositiveDetermination{
+			Note: note,
+		}
+
+	case v2.EventTypeAnalysisNotPlanned:
+		event.Data = v2.AnalysisNotPlanned{
+			Note: p.Note,
+		}
+
+	case v2.EventTypeFixNotPlanned:
+		event.Data = v2.FixNotPlanned{
+			Note: p.Note,
+		}
+
+	case v2.EventTypePendingUpstreamFix:
+		event.Data = v2.PendingUpstreamFix{
+			Note: p.Note,
+		}
+	}
+
+	for _, packageName := range p.PackageNames {
+		for _, vulnID := range p.Vulns {
+			r := Request{
+				Package: packageName,
+				Aliases: []string{vulnID},
+				Event:   event,
+			}
+
+			reqs = append(reqs, r)
+		}
+	}
+
+	return reqs, nil
+}
+
+func resolveTimestamp(ts string) (v2.Timestamp, error) {
+	if ts == "now" {
+		return v2.Now(), nil
+	}
+
+	t, err := time.Parse(time.RFC3339, ts)
+	if err != nil {
+		return v2.Timestamp{}, fmt.Errorf("unable to parse timestamp: %w", err)
+	}
+
+	return v2.Timestamp(t), nil
 }

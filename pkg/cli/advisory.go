@@ -5,7 +5,6 @@ import (
 	"os"
 	"sort"
 	"strings"
-	"time"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
@@ -17,7 +16,6 @@ import (
 	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 const (
@@ -78,106 +76,19 @@ func renderDetectedDistro(d distro.Distro) string {
 	return styles.Secondary().Render("Auto-detected distro: ") + d.Absolute.Name + "\n\n"
 }
 
-func resolveTimestamp(ts string) (v2.Timestamp, error) {
-	if ts == "now" {
-		return v2.Now(), nil
-	}
+func addFlagsForAdvisoryRequestParams(p *advisory.RequestParams, cmd *cobra.Command) {
+	addMultiPackageFlag(&p.PackageNames, cmd)
+	addMultiVulnFlag(&p.Vulns, cmd)
 
-	t, err := time.Parse(time.RFC3339, ts)
-	if err != nil {
-		return v2.Timestamp{}, fmt.Errorf("unable to parse timestamp: %w", err)
-	}
-
-	return v2.Timestamp(t), nil
-}
-
-type advisoryRequestParams struct {
-	packageName, vuln, eventType, truePositiveNote, falsePositiveNote, falsePositiveType, timestamp, fixedVersion, note string
-}
-
-func (p *advisoryRequestParams) addFlags(cmd *cobra.Command) {
-	addPackageFlag(&p.packageName, cmd)
-	addVulnFlag(&p.vuln, cmd)
-
-	cmd.Flags().StringVarP(&p.eventType, "type", "t", "", fmt.Sprintf("type of event [%s]", strings.Join(v2.EventTypes, ", ")))
-	cmd.Flags().StringVar(&p.note, "note", "", "prose explanation to attach to the event data (can be used with any event type)")
-	cmd.Flags().StringVar(&p.truePositiveNote, "tp-note", "", "prose explanation of the true positive (used only for true positives)")
+	cmd.Flags().StringVarP(&p.EventType, "type", "t", "", fmt.Sprintf("type of event [%s]", strings.Join(v2.EventTypes, ", ")))
+	cmd.Flags().StringVar(&p.Note, "note", "", "prose explanation to attach to the event data (can be used with any event type)")
+	cmd.Flags().StringVar(&p.TruePositiveNote, "tp-note", "", "prose explanation of the true positive (used only for true positives)")
 	_ = cmd.Flags().MarkDeprecated("tp-note", "use --note instead") //nolint:errcheck
-	cmd.Flags().StringVar(&p.falsePositiveNote, "fp-note", "", "prose explanation of the false positive (used only for false positives)")
+	cmd.Flags().StringVar(&p.FalsePositiveNote, "fp-note", "", "prose explanation of the false positive (used only for false positives)")
 	_ = cmd.Flags().MarkDeprecated("fp-note", "use --note instead") //nolint:errcheck
-	cmd.Flags().StringVar(&p.falsePositiveType, "fp-type", "", fmt.Sprintf("type of false positive [%s]", strings.Join(v2.FPTypes, ", ")))
-	cmd.Flags().StringVar(&p.timestamp, "timestamp", "now", "timestamp of the event (RFC3339 format)")
-	cmd.Flags().StringVar(&p.fixedVersion, "fixed-version", "", "package version where fix was applied (used only for 'fixed' event type)")
-}
-
-func (p *advisoryRequestParams) advisoryRequest() (advisory.Request, error) {
-	timestamp, err := resolveTimestamp(p.timestamp)
-	if err != nil {
-		return advisory.Request{}, fmt.Errorf("unable to process timestamp: %w", err)
-	}
-
-	req := advisory.Request{
-		Package: p.packageName,
-		Event: v2.Event{
-			Timestamp: timestamp,
-			Type:      p.eventType,
-			Data:      nil,
-		},
-	}
-
-	if p.vuln != "" {
-		if vuln.RegexCGA.MatchString(p.vuln) {
-			req.AdvisoryID = p.vuln
-		} else {
-			req.Aliases = []string{p.vuln}
-		}
-	}
-
-	// For now, introduce p.note as a fallback value for event-specific notes. Then
-	// in the future, we could deprecate and remove the event-specific note flags.
-
-	switch req.Event.Type {
-	case v2.EventTypeFixed:
-		req.Event.Data = v2.Fixed{
-			FixedVersion: p.fixedVersion,
-		}
-
-	case v2.EventTypeFalsePositiveDetermination:
-		note := p.falsePositiveNote
-		if note == "" {
-			note = p.note
-		}
-		req.Event.Data = v2.FalsePositiveDetermination{
-			Type: p.falsePositiveType,
-			Note: note,
-		}
-
-	case v2.EventTypeTruePositiveDetermination:
-		note := p.truePositiveNote
-		if note == "" {
-			note = p.note
-		}
-		req.Event.Data = v2.TruePositiveDetermination{
-			Note: note,
-		}
-
-	case v2.EventTypeAnalysisNotPlanned:
-		req.Event.Data = v2.AnalysisNotPlanned{
-			Note: p.note,
-		}
-
-	case v2.EventTypeFixNotPlanned:
-		req.Event.Data = v2.FixNotPlanned{
-			Note: p.note,
-		}
-
-	case v2.EventTypePendingUpstreamFix:
-		req.Event.Data = v2.PendingUpstreamFix{
-			Note: p.note,
-		}
-	}
-
-	return req, nil
+	cmd.Flags().StringVar(&p.FalsePositiveType, "fp-type", "", fmt.Sprintf("type of false positive [%s]", strings.Join(v2.FPTypes, ", ")))
+	cmd.Flags().StringVar(&p.Timestamp, "timestamp", "now", "timestamp of the event (RFC3339 format)")
+	cmd.Flags().StringVar(&p.FixedVersion, "fixed-version", "", "package version where fix was applied (used only for 'fixed' event type)")
 }
 
 const (
@@ -194,8 +105,16 @@ func addPackageFlag(val *string, cmd *cobra.Command) {
 	cmd.Flags().StringVarP(val, flagNamePackage, "p", "", "package name")
 }
 
+func addMultiPackageFlag(val *[]string, cmd *cobra.Command) {
+	cmd.Flags().StringSliceVarP(val, flagNamePackage, "p", nil, "package names")
+}
+
 func addVulnFlag(val *string, cmd *cobra.Command) {
 	cmd.Flags().StringVarP(val, flagNameVuln, "V", "", "vulnerability ID for advisory")
+}
+
+func addMultiVulnFlag(val *[]string, cmd *cobra.Command) {
+	cmd.Flags().StringSliceVarP(val, flagNameVuln, "V", nil, "vulnerability IDs for advisory")
 }
 
 func addDistroDirFlag(val *string, cmd *cobra.Command) {

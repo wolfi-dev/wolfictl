@@ -25,6 +25,10 @@ You can specify required values on the command line using the flags relevant to
 the advisory event you are adding. If not all required values are provided on
 the command line, the command will prompt for the missing values.
 
+It's possible to update advisories for multiple packages and/or vulnerabilities 
+at once by using a comma-separated list of package names and vulnerabilities. 
+This is available for both the CLI flags and the interactive prompt fields.
+
 If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.
 
@@ -40,11 +44,11 @@ required fields are missing.
       --no-distro-detection          do not attempt to auto-detect the distro
       --no-prompt                    do not prompt the user for input
       --note string                  prose explanation to attach to the event data (can be used with any event type)
-  -p, --package string               package name
+  -p, --package strings              package names
   -r, --package-repo-url string      URL of the APK package repository
       --timestamp string             timestamp of the event (RFC3339 format) (default "now")
   -t, --type string                  type of event [detection, true-positive-determination, fixed, false-positive-determination, analysis-not-planned, fix-not-planned, pending-upstream-fix]
-  -V, --vuln string                  vulnerability ID for advisory
+  -V, --vuln strings                 vulnerability IDs for advisory
 ```
 
 ### Options inherited from parent commands

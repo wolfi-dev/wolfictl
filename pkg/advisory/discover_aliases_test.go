@@ -180,10 +180,10 @@ type mockAliasFinder struct {
 	ghsasByCVE map[string][]string
 }
 
-func (f *mockAliasFinder) CVEForGHSA(_ context.Context, ghsaID string) (string, error) {
+func (f mockAliasFinder) CVEForGHSA(_ context.Context, ghsaID string) (string, error) {
 	return f.cveByGHSA[ghsaID], nil
 }
 
-func (f *mockAliasFinder) GHSAsForCVE(_ context.Context, cveID string) ([]string, error) {
+func (f mockAliasFinder) GHSAsForCVE(_ context.Context, cveID string) ([]string, error) {
 	return f.ghsasByCVE[cveID], nil
 }
