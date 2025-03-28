@@ -160,7 +160,7 @@ func (m Model) newAnalysisNotPlannedNoteFieldConfig() field.TextFieldConfigurati
 	}
 }
 
-func (m Model) newPendingUpstreamReleaseNoteFieldConfig() field.TextFieldConfiguration {
+func (m Model) newPendingUpstreamFixNoteFieldConfig() field.TextFieldConfiguration {
 	return field.TextFieldConfiguration{
 		ID:     fieldIDPendingUpstreamFixNote,
 		Prompt: "Note: ",
@@ -354,7 +354,7 @@ func (m Model) addMissingFields() (Model, bool) {
 
 	case v2.EventTypePendingUpstreamFix:
 		if p.Note == "" {
-			f := field.NewTextField(m.newPendingUpstreamReleaseNoteFieldConfig())
+			f := field.NewTextField(m.newPendingUpstreamFixNoteFieldConfig())
 			m.fields = append(m.fields, f)
 			return m, true
 		}
