@@ -167,11 +167,23 @@ func NewScanner(opts Options) (*Scanner, error) {
 		dbDestDir = DefaultGrypeDBDir
 	}
 
+	// Default to 24 hours if GRYPE_DB_MAX_ALLOWED_BUILT_AGE is unset
+	maxAllowedBuiltAge := 24 * time.Hour
+
+	grypeMaxAllowedBuiltAge := os.Getenv("GRYPE_DB_MAX_ALLOWED_BUILT_AGE")
+	if grypeMaxAllowedBuiltAge != "" {
+		parseMaxAllowedBuiltAge, err := time.ParseDuration(grypeMaxAllowedBuiltAge)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse GRYPE_DB_MAX_ALLOWED_BUILT_AGE: %w", err)
+		}
+		maxAllowedBuiltAge = parseMaxAllowedBuiltAge
+	}
+
 	installCfg := installation.Config{
 		DBRootDir:               dbDestDir,
 		ValidateChecksum:        true,
 		ValidateAge:             !opts.DisableDatabaseAgeValidation,
-		MaxAllowedBuiltAge:      24 * time.Hour,
+		MaxAllowedBuiltAge:      maxAllowedBuiltAge,
 		UpdateCheckMaxFrequency: 1 * time.Hour,
 	}
 
