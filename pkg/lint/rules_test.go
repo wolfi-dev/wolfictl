@@ -451,6 +451,24 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 			matches: 1,
 		},
+		{
+			file:        "invalid-spdx-license.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "invalid-spdx-license",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-spdx-license",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[valid-spdx-license]: license \"Apache License 2.0\" is not valid SPDX license (ERROR)"),
+					},
+				},
+			},
+			wantErr: true,
+			matches: 1,
+		},
 	}
 
 	for _, tt := range tests {
@@ -458,10 +476,7 @@ func TestLinter_Rules(t *testing.T) {
 			ctx := context.Background()
 			l := newTestLinterWithFile(tt.file)
 			got, err := l.Lint(ctx, tt.minSeverity)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Lint() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			assert.Nil(t, err, "Error in the linting process")
 
 			// Always should be a single element array.
 			require.Len(t, got, tt.matches)

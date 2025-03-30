@@ -108,14 +108,13 @@ func (l *Linter) Lint(ctx context.Context, minSeverity Severity) (Result, error)
 	return results, nil
 }
 
-// Print prints the result to stdout.
 func (l *Linter) Print(ctx context.Context, result Result) {
 	log := clog.FromContext(ctx)
 	foundAny := false
 	for _, res := range result {
 		if res.Errors.WrapErrors() != nil {
 			foundAny = true
-			log.Infof("Package: %s: %s", res.File, res.Errors.WrapErrors())
+			log.Errorf("Package: %s: %s", res.File, res.Errors.WrapErrors())
 		}
 	}
 	if !foundAny {
