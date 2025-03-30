@@ -451,6 +451,24 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: false,
 			matches: 1,
 		},
+		{
+			file:        "version-streamed-package-invalid-runtime-dependencies-1.2.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "version-streamed-package-invalid-runtime-dependencies-1.2",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "version-streamed-runtime-dependencies",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[version-streamed-runtime-dependencies]: version-streamed package must use versioned runtime dependencies for its subpackages: version-streamed-package-invalid-runtime-dependencies-foo (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
 	}
 
 	for _, tt := range tests {
