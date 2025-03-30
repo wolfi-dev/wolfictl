@@ -1,0 +1,18 @@
+package:
+  name: version-stream-mismatch-version-1.2
+  version: 1.7 # Supposed to be 1.2.*
+  epoch: 0
+  description: "a version-streamed package with no dependencies.provides"
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://test.com/version-stream-mismatch-version/${{package.version}}.tar.gz
+      expected-sha256: ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269
+
+test:
+  pipeline:
+    - runs: "echo 'test'"
+
+update:
+  enabled: true
