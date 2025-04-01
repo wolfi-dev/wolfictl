@@ -301,6 +301,11 @@ func (fsys *FS) Open(name string) (fs.File, error) {
 			// be allowed to return EOF again.
 			f.writtenBackReader = bytes.NewReader(f.writtenBack.Bytes())
 		} else {
+			if f.missingOriginal {
+				// There is no original file. So if it hasn't been updated, we'd want to
+				// represent it as still not existing.
+				return nil, fs.ErrNotExist
+			}
 			f.originalReader = bytes.NewReader(f.originalBytes)
 		}
 		return f, nil
@@ -453,6 +458,7 @@ func (fsys *FS) addOnlyExpectedFileAtPath(expectedFilePath string) error {
 		return fmt.Errorf("loading expected file from existing fsys: %w", err)
 	}
 
+	tf.missingOriginal = true
 	tf.writtenBack = new(bytes.Buffer)
 	fsys.registerTestFile(tf.path, tf)
 	return nil
