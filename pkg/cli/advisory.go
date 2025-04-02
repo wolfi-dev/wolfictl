@@ -3,11 +3,14 @@ package cli
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/melange/pkg/config"
+	yamutil "github.com/chainguard-dev/yam/pkg/util"
+	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
@@ -162,4 +165,25 @@ func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.
 
 		return allowedVersions
 	}
+}
+
+// getYamEncodeOptions does a "best effort" retrieval of the yam encode options.
+// If no yam config is present in the given directory, no error is returned, and
+// a set of default options are returned. An error is only returned if there is
+// a problem reading the (present) yam config file.
+func getYamEncodeOptions(dir string) (formatted.EncodeOptions, error) {
+	defaultOpts := formatted.EncodeOptions{}
+
+	yamCfgPath := filepath.Join(dir, yamutil.ConfigFileName)
+	yamCfgFile, err := os.Open(yamCfgPath)
+	if err != nil {
+		return defaultOpts, nil
+	}
+
+	readOpts, err := formatted.ReadConfigFrom(yamCfgFile)
+	if err != nil {
+		return defaultOpts, fmt.Errorf("reading yam config from %q: %w", yamCfgPath, err)
+	}
+
+	return *readOpts, nil
 }

@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/prompt"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
@@ -109,13 +108,14 @@ required fields are missing.`,
 				_, _ = fmt.Fprint(os.Stderr, renderDetectedDistro(d))
 			}
 
-			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoryFsys)
-			if err != nil {
-				return err
-			}
-
 			advGetter := advisory.NewFSGetter(os.DirFS(advisoriesRepoDir))
+
+			encodeOpts, err := getYamEncodeOptions(advisoriesRepoDir)
+			if err != nil {
+				return fmt.Errorf("getting yam encode options: %w", err)
+			}
+			encoder := advisory.NewYamDocumentEncoder(encodeOpts)
+			advPutter := advisory.NewFSPutter(rwos.DirFS(advisoriesRepoDir), encoder)
 
 			fsys := rwos.DirFS(distroRepoDir)
 			buildCfgs, err := buildconfigs.NewIndex(cmd.Context(), fsys)
@@ -213,13 +213,9 @@ required fields are missing.`,
 				}
 				r.Aliases = aliases
 
-				// TODO(luhring): Replace this call with modifying advisory data via an
-				//  abstraction.
-				opts := advisory.UpdateOptions{
-					AdvisoryDocs: advisoryCfgs,
-				}
-				if err := advisory.Update(ctx, r, opts); err != nil {
-					return fmt.Errorf("updating advisory: %w", err)
+				_, err = advPutter.Upsert(ctx, r)
+				if err != nil {
+					return fmt.Errorf("updating advisory %q for package %q: %w", r.AdvisoryID, r.Package, err)
 				}
 			}
 

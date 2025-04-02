@@ -2,6 +2,7 @@ package advisory
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -179,6 +180,144 @@ func TestRequestParams_MissingValues(t *testing.T) {
 
 			if diff := cmp.Diff(tt.expected, actual); diff != "" {
 				t.Errorf("RequestParams.MissingValues() mismatch (-expected +actual):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestRequestParams_GenerateRequests(t *testing.T) {
+	testTime := v2.Timestamp(time.Date(2022, 9, 15, 2, 40, 18, 0, time.UTC))
+
+	cases := []struct {
+		name      string
+		reqParams RequestParams
+		expected  []Request
+		assertErr assert.ErrorAssertionFunc
+	}{
+		{
+			name:      "empty",
+			reqParams: RequestParams{},
+			expected:  nil,
+			assertErr: assert.Error, // because of missing values
+		},
+		{
+			name: "single request, no ID, pending upstream fix",
+			reqParams: RequestParams{
+				PackageNames: []string{"foo"},
+				Vulns:        []string{"CVE-2222-2222"},
+				EventType:    v2.EventTypePendingUpstreamFix,
+				Timestamp:    testTime.String(),
+				Note:         "because because because because because",
+			},
+			expected: []Request{
+				{
+					Package: "foo",
+					Aliases: []string{"CVE-2222-2222"},
+					Event: v2.Event{
+						Timestamp: testTime,
+						Type:      v2.EventTypePendingUpstreamFix,
+						Data: v2.PendingUpstreamFix{
+							Note: "because because because because because",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "single request, with ID, pending upstream fix",
+			reqParams: RequestParams{
+				PackageNames: []string{"foo"},
+				Vulns:        []string{"CGA-2222-2222-2222"},
+				EventType:    v2.EventTypePendingUpstreamFix,
+				Timestamp:    testTime.String(),
+				Note:         "because because because because because",
+			},
+			expected: []Request{
+				{
+					Package:    "foo",
+					AdvisoryID: "CGA-2222-2222-2222",
+					Event: v2.Event{
+						Timestamp: testTime,
+						Type:      v2.EventTypePendingUpstreamFix,
+						Data: v2.PendingUpstreamFix{
+							Note: "because because because because because",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "multiple packages, multiple vulns, false positive",
+			reqParams: RequestParams{
+				PackageNames:      []string{"foo", "bar"},
+				Vulns:             []string{"CVE-2222-2222", "CVE-3333-3333"},
+				EventType:         v2.EventTypeFalsePositiveDetermination,
+				Timestamp:         testTime.String(),
+				FalsePositiveType: v2.FPTypeComponentVulnerabilityMismatch,
+				Note:              "because because because because because",
+			},
+			expected: []Request{
+				{
+					Package: "foo",
+					Aliases: []string{"CVE-2222-2222"},
+					Event: v2.Event{
+						Timestamp: testTime,
+						Type:      v2.EventTypeFalsePositiveDetermination,
+						Data: v2.FalsePositiveDetermination{
+							Type: v2.FPTypeComponentVulnerabilityMismatch,
+							Note: "because because because because because",
+						},
+					},
+				},
+				{
+					Package: "foo",
+					Aliases: []string{"CVE-3333-3333"},
+					Event: v2.Event{
+						Timestamp: testTime,
+						Type:      v2.EventTypeFalsePositiveDetermination,
+						Data: v2.FalsePositiveDetermination{
+							Type: v2.FPTypeComponentVulnerabilityMismatch,
+							Note: "because because because because because",
+						},
+					},
+				},
+				{
+					Package: "bar",
+					Aliases: []string{"CVE-2222-2222"},
+					Event: v2.Event{
+						Timestamp: testTime,
+						Type:      v2.EventTypeFalsePositiveDetermination,
+						Data: v2.FalsePositiveDetermination{
+							Type: v2.FPTypeComponentVulnerabilityMismatch,
+							Note: "because because because because because",
+						},
+					},
+				},
+				{
+					Package: "bar",
+					Aliases: []string{"CVE-3333-3333"},
+					Event: v2.Event{
+						Timestamp: testTime,
+						Type:      v2.EventTypeFalsePositiveDetermination,
+						Data: v2.FalsePositiveDetermination{
+							Type: v2.FPTypeComponentVulnerabilityMismatch,
+							Note: "because because because because because",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			requests, err := tt.reqParams.GenerateRequests()
+			if tt.assertErr != nil {
+				tt.assertErr(t, err)
+			}
+
+			if diff := cmp.Diff(tt.expected, requests); diff != "" {
+				t.Errorf("RequestParams.GenerateRequests() mismatch (-expected +actual):\n%s", diff)
 			}
 		})
 	}

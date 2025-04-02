@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/prompt"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
@@ -113,11 +112,12 @@ newly created advisory and any other advisories for the same package.`,
 
 			advGetter := advisory.NewFSGetter(os.DirFS(advisoriesRepoDir))
 
-			advisoryFsys := rwos.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(ctx, advisoryFsys)
+			encodeOpts, err := getYamEncodeOptions(advisoriesRepoDir)
 			if err != nil {
-				return err
+				return fmt.Errorf("getting yam encode options: %w", err)
 			}
+			encoder := advisory.NewYamDocumentEncoder(encodeOpts)
+			advPutter := advisory.NewFSPutter(rwos.DirFS(advisoriesRepoDir), encoder)
 
 			fsys := rwos.DirFS(distroRepoDir)
 			buildCfgs, err := buildconfigs.NewIndex(ctx, fsys)
@@ -202,13 +202,9 @@ newly created advisory and any other advisories for the same package.`,
 				}
 				r.Aliases = aliases
 
-				// TODO(luhring): Replace this call with modifying advisory data via an
-				//  abstraction.
-				opts := advisory.CreateOptions{
-					AdvisoryDocs: advisoryCfgs,
-				}
-				if err := advisory.Create(ctx, r, opts); err != nil {
-					return fmt.Errorf("creating advisory: %w", err)
+				_, err = advPutter.Upsert(ctx, r)
+				if err != nil {
+					return fmt.Errorf("creating advisory data for %q (%v): %w", r.Package, r.Aliases, err)
 				}
 			}
 

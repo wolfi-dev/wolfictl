@@ -278,11 +278,26 @@ func (p *RequestParams) GenerateRequests() ([]Request, error) {
 	}
 
 	for _, packageName := range p.PackageNames {
-		for _, vulnID := range p.Vulns {
+		for _, id := range p.Vulns {
+			cgaID := ""
+			var aliases []string
+
+			// If the vuln is a CGA ID, use it as the AdvisoryID and set the aliases to the
+			// empty slice. Otherwise, use the ID as an alias. The RequestParams type cannot
+			// be used to generate a Request that has both an AdvisoryID and an alias at the
+			// same time.
+
+			if vuln.RegexCGA.MatchString(id) {
+				cgaID = id
+			} else {
+				aliases = []string{id}
+			}
+
 			r := Request{
-				Package: packageName,
-				Aliases: []string{vulnID},
-				Event:   event,
+				Package:    packageName,
+				AdvisoryID: cgaID,
+				Aliases:    aliases,
+				Event:      event,
 			}
 
 			reqs = append(reqs, r)
