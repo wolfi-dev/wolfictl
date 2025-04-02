@@ -322,3 +322,128 @@ func TestRequestParams_GenerateRequests(t *testing.T) {
 		})
 	}
 }
+
+func TestMatchPackageAdvisoryToRequest(t *testing.T) {
+	var (
+		pkgAdvA = v2.PackageAdvisory{
+			PackageName: "foo",
+			Advisory: v2.Advisory{
+				ID: "CGA-2222-2222-2222",
+				Events: []v2.Event{
+					{
+						Type: v2.EventTypeFalsePositiveDetermination,
+						Data: v2.FalsePositiveDetermination{
+							Type: v2.FPTypeVulnerabilityRecordAnalysisContested,
+							Note: "Insert reason here",
+						},
+					},
+				},
+			},
+		}
+		pkgAdvB = v2.PackageAdvisory{
+			PackageName: "foo",
+			Advisory: v2.Advisory{
+				ID:      "CGA-4444-4444-4444",
+				Aliases: []string{"CVE-2025-1111"},
+				Events: []v2.Event{
+					{
+						Type: v2.EventTypeDetection,
+						Data: v2.Detection{
+							Type: v2.DetectionTypeManual,
+						},
+					},
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name     string
+		advs     []v2.PackageAdvisory
+		req      Request
+		expected *v2.PackageAdvisory
+	}{
+		{
+			name: "match by package name and advisory ID",
+			advs: []v2.PackageAdvisory{
+				pkgAdvA,
+				pkgAdvB,
+			},
+			req: Request{
+				Package:    "foo",
+				AdvisoryID: "CGA-2222-2222-2222",
+			},
+			expected: &pkgAdvA,
+		},
+		{
+			name: "match by package name and advisory ID (inverted input order)",
+			advs: []v2.PackageAdvisory{
+				pkgAdvB,
+				pkgAdvA,
+			},
+			req: Request{
+				Package:    "foo",
+				AdvisoryID: "CGA-2222-2222-2222",
+			},
+			expected: &pkgAdvA,
+		},
+		{
+			name: "match by package name and alias",
+			advs: []v2.PackageAdvisory{
+				pkgAdvA,
+				pkgAdvB,
+			},
+			req: Request{
+				Package: "foo",
+				Aliases: []string{"CVE-2025-1111"}, // matching alias from pkgAdvB
+			},
+			expected: &pkgAdvB,
+		},
+		{
+			name: "no match by package name",
+			advs: []v2.PackageAdvisory{
+				pkgAdvA,
+				pkgAdvB,
+			},
+			req: Request{
+				Package: "bar",                     // different package name
+				Aliases: []string{"CVE-2025-1111"}, // alias match shouldn't matter since package name doesn't match
+			},
+			expected: nil, // no match found
+		},
+		{
+			name: "no match by advisory ID",
+			advs: []v2.PackageAdvisory{
+				pkgAdvA,
+				pkgAdvB,
+			},
+			req: Request{
+				Package:    "foo",
+				AdvisoryID: "CGA-9999-9999-9999", // non-existent advisory ID
+			},
+			expected: nil, // no match found
+		},
+		{
+			name: "no match by alias when no advisory ID is set",
+			advs: []v2.PackageAdvisory{
+				pkgAdvA,
+				pkgAdvB,
+			},
+			req: Request{
+				Package: "foo",
+				Aliases: []string{"CVE-9999-9999"}, // non-existent alias
+			},
+			expected: nil, // no match found
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := MatchPackageAdvisoryToRequest(tt.advs, tt.req)
+
+			if diff := cmp.Diff(tt.expected, actual); diff != "" {
+				t.Errorf("MatchPackageAdvisoryToRequest() mismatch (-expected +actual):\n%s", diff)
+			}
+		})
+	}
+}

@@ -18,7 +18,7 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
 
-func cmdAdvisoryCreate() *cobra.Command {
+func cmdAdvisoryCreate() *cobra.Command { //nolint:gocyclo
 	p := &createParams{}
 	cmd := &cobra.Command{
 		Use:   "create",
@@ -44,6 +44,11 @@ required fields are missing.
 It's possible to create advisories for multiple packages and/or vulnerabilities 
 at once by using a comma-separated list of package names and vulnerabilities. 
 This is available for both the CLI flags and the interactive prompt fields.
+
+When performing a bulk operation (i.e. on multiple advisories at once), if an
+advisory already has an event of the same type as the one being added, that
+advisory will be skipped, and a warning will be logged. This is to prevent
+adding redundant events to advisories that already have the same type of event.
 
 This command also performs a follow-up operation to discover aliases for the
 newly created advisory and any other advisories for the same package.`,
@@ -190,10 +195,44 @@ newly created advisory and any other advisories for the same package.`,
 				return fmt.Errorf("generating advisory data requests: %w", err)
 			}
 
+			// If there are multiple requests to process, this is a "bulk" operation, and we
+			// want to skip (but log a warning) cases where we'd be adding an event to an
+			// existing advisory with the same type as that advisory's latest pre-existing
+			// event. To make this determination, we'll need a Getter.
+
+			// Default behavior.
+			skipRedundantEventType := func(_ advisory.Request) (bool, error) {
+				return false, nil
+			}
+
+			if len(requests) >= 2 {
+				g := advisory.NewFSGetter(os.DirFS(advisoriesRepoDir))
+
+				// Behavior for bulk operation.
+				skipRedundantEventType = func(req advisory.Request) (bool, error) {
+					return doesRequestRepeatEventType(ctx, g, req)
+				}
+			}
+
 			// Do just a single pass at finding aliases, instead of per-request.
 			af := advisory.NewHTTPAliasFinder(http.DefaultClient)
 
 			for _, r := range requests {
+				skip, err := skipRedundantEventType(r)
+				if err != nil {
+					return fmt.Errorf("checking for redundant event type for package %q: %w", r.Package, err)
+				}
+				if skip {
+					clog.FromContext(ctx).Warn(
+						"skipping processing of advisory request with same event type as existing advisory's latest event",
+						"package", r.Package,
+						"advisoryID", r.AdvisoryID,
+						"aliases", r.Aliases,
+						"eventType", r.Event.Type,
+					)
+					continue
+				}
+
 				// Complete the alias set for the request. Use the singular AliasFinder to
 				// benefit from its cache across multiple requests' resolutions.
 				aliases, err := advisory.CompleteAliasSet(ctx, af, r.Aliases)
