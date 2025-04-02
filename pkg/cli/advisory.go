@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -186,4 +187,25 @@ func getYamEncodeOptions(dir string) (formatted.EncodeOptions, error) {
 	}
 
 	return *readOpts, nil
+}
+
+func doesRequestRepeatEventType(ctx context.Context, g advisory.Getter, req advisory.Request) (bool, error) {
+	pkgAdvs, err := g.Advisories(ctx, req.Package)
+	if err != nil {
+		return false, fmt.Errorf("getting advisories for package %q: %w", req.Package, err)
+	}
+	if len(pkgAdvs) == 0 {
+		return false, nil
+	}
+
+	pkgAdv := advisory.MatchToRequest(pkgAdvs, req)
+	if pkgAdv != nil {
+		// We found an existing advisory for this package.
+		// Check if the latest event type is the same as the one we're adding.
+		if pkgAdv.Latest().Type == req.Event.Type {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

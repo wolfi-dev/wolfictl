@@ -54,6 +54,17 @@ func TestFSPutter_Upsert(t *testing.T) {
 			assertErr:  assert.NoError,
 		},
 		{
+			name: "just update aliases",
+			req: Request{
+				Package:    "foo",
+				AdvisoryID: "CGA-2222-2222-2222",
+				Aliases:    []string{"GHSA-xxxx-xxxx-xxxx"},
+				Event:      v2.Event{},
+			},
+			expectedID: "CGA-2222-2222-2222",
+			assertErr:  assert.NoError,
+		},
+		{
 			name: "create when no document exists",
 			req: Request{
 				Package: "foo",

@@ -32,6 +32,11 @@ It's possible to create advisories for multiple packages and/or vulnerabilities
 at once by using a comma-separated list of package names and vulnerabilities. 
 This is available for both the CLI flags and the interactive prompt fields.
 
+When performing a bulk operation (i.e. on multiple advisories at once), if an
+advisory already has an event of the same type as the one being added, that
+advisory will be skipped, and a warning will be logged. This is to prevent
+adding redundant events to advisories that already have the same type of event.
+
 This command also performs a follow-up operation to discover aliases for the
 newly created advisory and any other advisories for the same package.
 
