@@ -320,15 +320,15 @@ func resolveTimestamp(ts string) (v2.Timestamp, error) {
 	return v2.Timestamp(t), nil
 }
 
-// MatchPackageAdvisoryToRequest takes an input slice of PackageAdvisory and a
-// Request and returns the first PackageAdvisory that matches the Request. If no
-// match is found, it returns nil.
+// MatchToRequest takes an input slice of PackageAdvisory and a Request and
+// returns the first PackageAdvisory that matches the Request. If no match is
+// found, it returns nil.
 //
 // A "match" is defined as meeting all the following criteria: having the same
 // Package name; if the Request's AdvisoryID is set, it must match the
 // PackageAdvisory's ID; and if the Request has Aliases and no AdvisoryID, at
 // least one of the Aliases must match the PackageAdvisory's Aliases.
-func MatchPackageAdvisoryToRequest(advs []v2.PackageAdvisory, req Request) *v2.PackageAdvisory {
+func MatchToRequest(advs []v2.PackageAdvisory, req Request) *v2.PackageAdvisory {
 	for _, adv := range advs {
 		if adv.PackageName != req.Package {
 			continue

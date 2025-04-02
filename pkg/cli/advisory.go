@@ -198,7 +198,7 @@ func doesRequestRepeatEventType(ctx context.Context, g advisory.Getter, req advi
 		return false, nil
 	}
 
-	pkgAdv := advisory.MatchPackageAdvisoryToRequest(pkgAdvs, req)
+	pkgAdv := advisory.MatchToRequest(pkgAdvs, req)
 	if pkgAdv != nil {
 		// We found an existing advisory for this package.
 		// Check if the latest event type is the same as the one we're adding.

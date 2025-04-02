@@ -323,7 +323,7 @@ func TestRequestParams_GenerateRequests(t *testing.T) {
 	}
 }
 
-func TestMatchPackageAdvisoryToRequest(t *testing.T) {
+func TestMatchToRequest(t *testing.T) {
 	var (
 		pkgAdvA = v2.PackageAdvisory{
 			PackageName: "foo",
@@ -439,10 +439,10 @@ func TestMatchPackageAdvisoryToRequest(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := MatchPackageAdvisoryToRequest(tt.advs, tt.req)
+			actual := MatchToRequest(tt.advs, tt.req)
 
 			if diff := cmp.Diff(tt.expected, actual); diff != "" {
-				t.Errorf("MatchPackageAdvisoryToRequest() mismatch (-expected +actual):\n%s", diff)
+				t.Errorf("MatchToRequest() mismatch (-expected +actual):\n%s", diff)
 			}
 		})
 	}
