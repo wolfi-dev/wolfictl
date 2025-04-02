@@ -60,6 +60,7 @@ func (g FSGetter) Advisories(_ context.Context, packageName string) ([]v2.Packag
 
 		return nil, fmt.Errorf("opening advisory file %q: %w", advFileName, err)
 	}
+	defer f.Close()
 
 	doc, err := v2.DecodeDocument(f)
 	if err != nil {
