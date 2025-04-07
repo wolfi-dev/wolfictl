@@ -15,7 +15,7 @@ replace golang.org/x/vuln => github.com/chainguard-dev/golang-vuln v1.1.3
 
 require (
 	chainguard.dev/apko v0.25.6
-	chainguard.dev/melange v0.23.4
+	chainguard.dev/melange v0.23.5
 	cloud.google.com/go/storage v1.51.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.91.0
