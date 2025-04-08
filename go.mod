@@ -59,7 +59,7 @@ require (
 	github.com/tmc/dot v0.2.0
 	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
-	golang.org/x/oauth2 v0.28.0
+	golang.org/x/oauth2 v0.29.0
 	golang.org/x/sync v0.13.0
 	golang.org/x/term v0.31.0
 	golang.org/x/text v0.24.0
