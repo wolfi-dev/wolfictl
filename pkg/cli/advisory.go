@@ -157,9 +157,12 @@ func newAllowedFixedVersionsFunc(apkindexes []*apk.APKIndex, buildCfgs *configs.
 
 		// Also ensure the currently defined version is included in the set, even if it's not been published yet.
 
-		pkg := buildCfgs.Select().WhereName(packageName).Configurations()[0].Package
-		currentVersion := fmt.Sprintf("%s-r%d", pkg.Version, pkg.Epoch)
-		allowedVersionSet[currentVersion] = struct{}{}
+		entry, err := buildCfgs.Select().WhereName(packageName).First()
+		if err == nil { // Otherwise there's no melange config from which to extract version data.
+			pkg := entry.Configuration().Package
+			currentVersion := fmt.Sprintf("%s-r%d", pkg.Version, pkg.Epoch)
+			allowedVersionSet[currentVersion] = struct{}{}
+		}
 
 		allowedVersions := lo.Keys(allowedVersionSet)
 		sort.Sort(versions.ByLatestStrings(allowedVersions))
