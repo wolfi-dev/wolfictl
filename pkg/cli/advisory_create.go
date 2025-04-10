@@ -16,6 +16,7 @@ import (
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	"github.com/wolfi-dev/wolfictl/pkg/yam"
 )
 
 func cmdAdvisoryCreate() *cobra.Command { //nolint:gocyclo
@@ -117,7 +118,7 @@ newly created advisory and any other advisories for the same package.`,
 
 			advGetter := advisory.NewFSGetter(os.DirFS(advisoriesRepoDir))
 
-			encodeOpts, err := getYamEncodeOptions(advisoriesRepoDir)
+			encodeOpts, err := yam.TryReadingEncodeOptions(advisoriesRepoDir)
 			if err != nil {
 				return fmt.Errorf("getting yam encode options: %w", err)
 			}

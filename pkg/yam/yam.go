@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	osAdapter "github.com/chainguard-dev/yam/pkg/rwfs/os"
+	"github.com/chainguard-dev/yam/pkg/util"
 	"github.com/chainguard-dev/yam/pkg/yam"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 )
@@ -29,4 +30,29 @@ func FormatConfigurationFile(dir, filename string) error {
 		return fmt.Errorf("error formatting the file %s: %v", filename, err)
 	}
 	return nil
+}
+
+// TryReadingEncodeOptions does a "best effort" retrieval of the yam encode
+// options. If no yam config is present in the given directory, no error is
+// returned, and a set of default options are returned. An error is only
+// returned if there is a problem reading the (present) yam config file.
+func TryReadingEncodeOptions(dir string) (formatted.EncodeOptions, error) {
+	defaultOpts := formatted.EncodeOptions{}
+
+	yamCfgPath := filepath.Join(dir, util.ConfigFileName)
+	yamCfgFile, err := os.Open(yamCfgPath)
+	if err != nil {
+		return defaultOpts, nil
+	}
+
+	readOpts, err := formatted.ReadConfigFrom(yamCfgFile)
+	if err != nil {
+		return defaultOpts, fmt.Errorf("reading yam config from %q: %w", yamCfgPath, err)
+	}
+
+	if err := yamCfgFile.Close(); err != nil {
+		return defaultOpts, fmt.Errorf("closing yam config file: %w", err)
+	}
+
+	return *readOpts, nil
 }

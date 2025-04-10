@@ -17,6 +17,7 @@ import (
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+	"github.com/wolfi-dev/wolfictl/pkg/yam"
 )
 
 func cmdAdvisoryUpdate() *cobra.Command { //nolint:gocyclo
@@ -115,7 +116,7 @@ required fields are missing.`,
 
 			advGetter := advisory.NewFSGetter(os.DirFS(advisoriesRepoDir))
 
-			encodeOpts, err := getYamEncodeOptions(advisoriesRepoDir)
+			encodeOpts, err := yam.TryReadingEncodeOptions(advisoriesRepoDir)
 			if err != nil {
 				return fmt.Errorf("getting yam encode options: %w", err)
 			}
