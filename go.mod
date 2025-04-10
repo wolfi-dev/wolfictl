@@ -23,7 +23,7 @@ require (
 	github.com/anchore/syft v1.22.0
 	github.com/chainguard-dev/clog v1.7.0
 	github.com/chainguard-dev/yam v0.2.12
-	github.com/charmbracelet/bubbles v0.20.0
+	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/log v0.4.1
