@@ -150,10 +150,6 @@ wolfictl scan package1 package2 --remote
 				return errors.New("cannot specify more than one of [--build-log, --sbom, --remote]")
 			}
 
-			if p.triageWithGoVulnCheck && p.sbomInput {
-				return errors.New("cannot specify both -s/--sbom and --govulncheck (govulncheck needs access to actual Go binaries)")
-			}
-
 			if p.advisoryFilterSet != "" {
 				if !slices.Contains(scan.ValidAdvisoriesSets, p.advisoryFilterSet) {
 					return fmt.Errorf(
@@ -340,18 +336,17 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 }
 
 type scanParams struct {
-	requireZeroFindings   bool
-	localDBFilePath       string
-	outputFormat          string
-	sbomInput             bool
-	packageBuildLogInput  bool
-	distro                string
-	advisoryFilterSet     string
-	advisoriesRepoDir     string
-	disableSBOMCache      bool
-	triageWithGoVulnCheck bool
-	remoteScanning        bool
-	useCPEMatching        bool
+	requireZeroFindings  bool
+	localDBFilePath      string
+	outputFormat         string
+	sbomInput            bool
+	packageBuildLogInput bool
+	distro               string
+	advisoryFilterSet    string
+	advisoriesRepoDir    string
+	disableSBOMCache     bool
+	remoteScanning       bool
+	useCPEMatching       bool
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -364,8 +359,6 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.advisoryFilterSet, "advisory-filter", "f", "", fmt.Sprintf("exclude vulnerability matches that are referenced from the specified set of advisories (%s)", strings.Join(scan.ValidAdvisoriesSets, "|")))
 	addAdvisoriesDirFlag(&p.advisoriesRepoDir, cmd)
 	cmd.Flags().BoolVarP(&p.disableSBOMCache, "disable-sbom-cache", "D", false, "don't use the SBOM cache")
-	cmd.Flags().BoolVar(&p.triageWithGoVulnCheck, "govulncheck", false, "EXPERIMENTAL: triage vulnerabilities in Go binaries using govulncheck")
-	_ = cmd.Flags().MarkHidden("govulncheck") //nolint:errcheck
 	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
 	cmd.Flags().BoolVar(&p.useCPEMatching, "use-cpes", false, "turn on all CPE matching in Grype")
 }
@@ -414,16 +407,6 @@ func (p *scanParams) doScanCommandForSingleInput(
 	result, err := scanner.APKSBOM(ctx, apkSBOM)
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan APK: %w", err)
-	}
-
-	// If requested, triage vulnerabilities in Go binaries using govulncheck
-
-	if p.triageWithGoVulnCheck {
-		triagedFindings, err := scan.Triage(ctx, *result, inputFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to triage vulnerability matches: %w", err)
-		}
-		result.Findings = triagedFindings
 	}
 
 	inputFile.Close()
