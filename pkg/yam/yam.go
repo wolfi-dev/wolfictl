@@ -50,5 +50,9 @@ func TryReadingEncodeOptions(dir string) (formatted.EncodeOptions, error) {
 		return defaultOpts, fmt.Errorf("reading yam config from %q: %w", yamCfgPath, err)
 	}
 
+	if err := yamCfgFile.Close(); err != nil {
+		return defaultOpts, fmt.Errorf("closing yam config file: %w", err)
+	}
+
 	return *readOpts, nil
 }
