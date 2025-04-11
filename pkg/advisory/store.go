@@ -66,6 +66,7 @@ func MapByVulnID(advisories []v2.PackageAdvisory) map[string]*v2.PackageAdvisory
 		advCopy := adv // Create a copy of the loop variable
 		for _, alias := range adv.Aliases {
 			advsByAlias[alias] = &advCopy
+		}
 	}
 
 	return advsByAlias
