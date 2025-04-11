@@ -171,7 +171,7 @@ func NewScanner(opts Options) (*Scanner, error) {
 		DBRootDir:               dbDestDir,
 		ValidateChecksum:        true,
 		ValidateAge:             !opts.DisableDatabaseAgeValidation,
-		MaxAllowedBuiltAge:      24 * time.Hour,
+		MaxAllowedBuiltAge:      48 * time.Hour,
 		UpdateCheckMaxFrequency: 1 * time.Hour,
 	}
 
