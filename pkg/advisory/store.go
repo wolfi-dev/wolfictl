@@ -63,9 +63,9 @@ func MapByVulnID(advisories []v2.PackageAdvisory) map[string]*v2.PackageAdvisory
 	advsByAlias := make(map[string]*v2.PackageAdvisory, len(advisories)) // even though we'll exceed this capacity if there are multiple aliases.
 
 	for _, adv := range advisories {
+		advCopy := adv // Create a copy of the loop variable
 		for _, alias := range adv.Aliases {
-			advsByAlias[alias] = &adv
-		}
+			advsByAlias[alias] = &advCopy
 	}
 
 	return advsByAlias
