@@ -22,11 +22,9 @@ import (
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/buildlog"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/scanfindings"
-	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
@@ -166,16 +164,9 @@ wolfictl scan package1 package2 --remote
 				logger.Info("scan results will be filtered using advisory data", "filterSet", p.advisoryFilterSet, "advisoriesRepoDir", p.advisoriesRepoDir)
 			}
 
-			var advisoryDocumentIndex *configs.Index[v2.Document]
-
+			var advGetter advisory.Getter
 			if p.advisoriesRepoDir != "" {
-				dir := p.advisoriesRepoDir
-				advisoryFsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
-				if err != nil {
-					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
-				}
-				advisoryDocumentIndex = index
+				advGetter = advisory.NewFSGetter(os.DirFS(p.advisoriesRepoDir))
 			}
 
 			// TODO: This is a bit of a hack because MultiAuthenticator uses Basic auth to
@@ -197,7 +188,7 @@ wolfictl scan package1 package2 --remote
 				}()
 			}
 
-			scans, inputPathsFailingRequireZero, err := scanEverything(ctx, p, inputs, advisoryDocumentIndex)
+			scans, inputPathsFailingRequireZero, err := scanEverything(ctx, p, inputs, advGetter)
 			if err != nil {
 				return err
 			}
@@ -222,7 +213,7 @@ wolfictl scan package1 package2 --remote
 	return cmd
 }
 
-func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisoryDocumentIndex *configs.Index[v2.Document]) ([]scan.Result, []string, error) {
+func scanEverything(ctx context.Context, p *scanParams, inputs []string, advGetter advisory.Getter) ([]scan.Result, []string, error) {
 	// We're going to generate the SBOMs concurrently, then scan them sequentially.
 	var g errgroup.Group
 	g.SetLimit(runtime.GOMAXPROCS(0) + 1)
@@ -279,7 +270,7 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advisor
 				fmt.Printf("🔎 Scanning %q\n", input)
 			}
 
-			result, err := p.doScanCommandForSingleInput(ctx, scanner, file, apkSBOM, advisoryDocumentIndex)
+			result, err := p.doScanCommandForSingleInput(ctx, scanner, file, apkSBOM, advGetter)
 			if err != nil {
 				return fmt.Errorf("failed to scan %q: %w", input, err)
 			}
@@ -400,7 +391,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	scanner *scan.Scanner,
 	inputFile *os.File,
 	apkSBOM *sbomSyft.SBOM,
-	advisoryDocumentIndex *configs.Index[v2.Document],
+	advGetter advisory.Getter,
 ) (*scan.Result, error) {
 	log := clog.FromContext(ctx)
 
@@ -414,7 +405,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 	// If requested, filter scan results using advisories
 
 	if set := p.advisoryFilterSet; set != "" {
-		findings, err := scan.FilterWithAdvisories(ctx, *result, advisoryDocumentIndex, set)
+		findings, err := scan.FilterWithAdvisories(ctx, *result, advGetter, set)
 		if err != nil {
 			return nil, fmt.Errorf("failed to filter scan results with advisories: %w", err)
 		}
@@ -422,21 +413,26 @@ func (p *scanParams) doScanCommandForSingleInput(
 		result.Findings = findings
 	}
 
-	if advisoryDocumentIndex != nil {
+	if advGetter != nil {
 		log.Debug("advisory data available for adding context to findings")
 
-		entry, err := advisoryDocumentIndex.Select().WhereName(result.TargetAPK.Origin()).First()
+		advs, err := advGetter.Advisories(ctx, result.TargetAPK.Origin())
 		if err != nil {
-			log.Warnf("failed to get advisory document for package %q: %v", result.TargetAPK.Origin(), err)
+			log.Warnf("getting advisory data for package %q: %v", result.TargetAPK.Origin(), err)
 		} else {
-			doc := entry.Configuration()
-
 			// If requested, add advisory data to the scan results
+
+			advsByVulnID := advisory.MapByVulnID(advs)
+
 			for i := range result.Findings {
 				f := &result.Findings[i]
-				if adv, ok := doc.Advisories.GetByAnyVulnerability(f.Vulnerability.Aliases...); ok {
-					f.Advisory = &adv
-					result.Findings[i] = *f
+
+				for _, alias := range f.Vulnerability.Aliases {
+					if adv, ok := advsByVulnID[alias]; ok {
+						f.Advisory = &adv.Advisory
+						result.Findings[i] = *f
+						break
+					}
 				}
 			}
 		}
