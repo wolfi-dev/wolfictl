@@ -471,7 +471,7 @@ func filterCollatedVulnerabilities(ctx context.Context, apkResults []resultWithA
 		filteredFindings, err := scan.FilterWithAdvisories(
 			ctx,
 			ar.Result,
-			sess.Index(),
+			advisory.AdaptIndex(sess.Index()),
 			scan.AdvisoriesSetConcluded,
 		)
 		if err != nil {
