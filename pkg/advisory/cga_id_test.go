@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	vuln "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 )
 
@@ -14,7 +13,7 @@ func TestGenerateCGAID(t *testing.T) {
 	numUUIDs := 10000
 
 	// Compile the regular expression once
-	regex := vuln.RegexCGA
+	regex := vulnadvs.RegexCGA
 
 	for i := 0; i < numUUIDs; i++ {
 		uid, err := GenerateCGAID()
