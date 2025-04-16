@@ -6,8 +6,9 @@ import (
 	"sort"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // CreateOptions configures the Create operation.
@@ -39,7 +40,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 
 	case 1:
 		// i.e. exactly one advisories file for this package
-		u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+		u := adv2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 			for _, alias := range req.Aliases {
 				if _, exists := doc.Advisories.GetByVulnerability(alias); exists {
 					return v2.Advisories{}, fmt.Errorf("advisory %q already exists for %q", alias, req.Package)
@@ -76,7 +77,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 		}
 
 		// Update the schema version to the latest version.
-		err = documents.Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+		err = documents.Update(ctx, adv2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 		if err != nil {
 			return fmt.Errorf("unable to update schema version for %q: %w", req.Package, err)
 		}

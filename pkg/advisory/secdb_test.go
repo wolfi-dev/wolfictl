@@ -5,11 +5,12 @@ import (
 	"os"
 	"testing"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -64,7 +65,7 @@ func TestBuildSecurityDatabase(t *testing.T) {
 			indices := make([]*configs.Index[v2.Document], 0, len(tt.advisoryDirs))
 			for _, dir := range tt.advisoryDirs {
 				advisoryFsys := rwos.DirFS(dir)
-				advisoryCfgs, err := v2.NewIndex(context.Background(), advisoryFsys)
+				advisoryCfgs, err := adv2.NewIndex(context.Background(), advisoryFsys)
 				require.NoError(t, err)
 				indices = append(indices, advisoryCfgs)
 			}

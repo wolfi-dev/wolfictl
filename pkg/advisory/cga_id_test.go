@@ -5,7 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	vuln "github.com/chainguard-dev/advisory-schema/pkg/vuln"
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 )
 
 func TestGenerateCGAID(t *testing.T) {
@@ -31,7 +32,7 @@ func TestGenerateCGAID(t *testing.T) {
 
 func TestGenerateCGAIDWithSeed(t *testing.T) {
 	// Compile the regular expression once
-	regex := vuln.RegexCGA
+	regex := vulnadvs.RegexCGA
 
 	// Test deterministic output with a specific seed
 	seed := int64(12345)
@@ -48,7 +49,7 @@ func TestGenerateCGAIDWithSeed(t *testing.T) {
 
 func TestGenerateCGAIDFormat(t *testing.T) {
 	// Compile the regular expression once
-	regex := vuln.RegexCGA
+	regex := vulnadvs.RegexCGA
 
 	// Test multiple seeds for format compliance
 	seeds := []int64{12345, 54321, 67890, 98765}

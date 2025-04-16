@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	"github.com/chainguard-dev/clog"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -28,7 +30,6 @@ import (
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/builds"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/internal/wrapped"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/internal"
 	question2 "github.com/wolfi-dev/wolfictl/pkg/question"
@@ -276,7 +277,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 				req := advisory.Request{
 					Package: vaPicked.APKs[0],
 				}
-				if vuln.RegexCGA.MatchString(findingVulnID) {
+				if vulnadvs.RegexCGA.MatchString(findingVulnID) {
 					req.AdvisoryID = findingVulnID
 				} else {
 					req.Aliases = []string{findingVulnID}

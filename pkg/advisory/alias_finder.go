@@ -11,8 +11,8 @@ import (
 	"sort"
 	"time"
 
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	"github.com/samber/lo"
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 type AliasFinder interface {
@@ -43,7 +43,7 @@ func CompleteAliasSet(ctx context.Context, finder AliasFinder, vulnIDs []string)
 		queue = queue[1:] // Pop from the front of the queue
 
 		switch {
-		case vuln.RegexGHSA.MatchString(v):
+		case vulnadvs.RegexGHSA.MatchString(v):
 			cveID, err := finder.CVEForGHSA(ctx, v)
 			if err != nil {
 				return nil, fmt.Errorf("resolving CVE for %q: %w", v, err)
@@ -56,7 +56,7 @@ func CompleteAliasSet(ctx context.Context, finder AliasFinder, vulnIDs []string)
 				}
 			}
 
-		case vuln.RegexCVE.MatchString(v):
+		case vulnadvs.RegexCVE.MatchString(v):
 			ghsaIDs, err := finder.GHSAsForCVE(ctx, v)
 			if err != nil {
 				return nil, fmt.Errorf("resolving GHSA(s) for %q: %w", v, err)

@@ -9,8 +9,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -52,7 +53,7 @@ func ImporAdvisoriesYAML(inputData []byte) (tempDir string, documents *configs.I
 	}
 
 	advisoryFsys := rwos.DirFS(tempDir)
-	advisoryDocIndices, err := v2.NewIndex(context.Background(), advisoryFsys)
+	advisoryDocIndices, err := adv2.NewIndex(context.Background(), advisoryFsys)
 	if err != nil {
 		return "", nil, fmt.Errorf("unable to index advisory configs for directory %q: %v", tempDir, err)
 	}

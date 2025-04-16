@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"slices"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // ErrNoSourceAdvisoriesSelected is returned when provided package name and
@@ -151,7 +152,7 @@ func (opts RebaseOptions) updateDestinationIndexWithNewAdvisoryData(ctx context.
 
 	log.Debug("updating destination with new advisory data")
 
-	return opts.DestinationIndex.Select().WhereName(opts.PackageName).Update(ctx, v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+	return opts.DestinationIndex.Select().WhereName(opts.PackageName).Update(ctx, adv2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories
 		advisories = advisories.Upsert(dstAdv.ID, dstAdv)
 		return advisories, nil

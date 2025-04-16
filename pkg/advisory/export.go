@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"io"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader" // to be able to download the schema from the URL
 
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v3"
 
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 type ExportOptions struct {

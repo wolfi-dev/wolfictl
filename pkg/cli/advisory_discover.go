@@ -11,9 +11,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/matchwatcher"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwfsOS "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
@@ -57,7 +57,7 @@ func cmdAdvisoryDiscover() *cobra.Command {
 			}
 
 			advisoriesFsys := rwfsOS.DirFS(advisoriesRepoDir)
-			advisoryCfgs, err := v2.NewIndex(cmd.Context(), advisoriesFsys)
+			advisoryCfgs, err := adv2.NewIndex(cmd.Context(), advisoriesFsys)
 			if err != nil {
 				return err
 			}

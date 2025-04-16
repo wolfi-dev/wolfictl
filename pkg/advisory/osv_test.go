@@ -8,10 +8,11 @@ import (
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
@@ -26,7 +27,7 @@ func Test_BuildOSVDataset(t *testing.T) {
 	var advisoryIndices []*configs.Index[v2.Document]
 	for _, r := range advisoryRepos {
 		fsys := rwos.DirFS(filepath.Join(testdataOSVDir, r))
-		index, err := v2.NewIndex(context.Background(), fsys)
+		index, err := adv2.NewIndex(context.Background(), fsys)
 		require.NoError(t, err)
 		advisoryIndices = append(advisoryIndices, index)
 	}

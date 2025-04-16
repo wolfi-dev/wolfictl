@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/testerfs"
 )
 

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/advisory/field"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 type Model struct {
@@ -98,7 +98,7 @@ func (m Model) newVulnerabilityFieldConfig() (field.TextFieldConfiguration, erro
 		EmptyValueHelpMsg: "Provide a valid vulnerability ID.",
 		ValidationRules: []field.TextValidationRule{
 			field.NotEmpty,
-			vuln.ValidateID,
+			vulnadvs.ValidateID,
 		},
 		AllowedValues: allowedValues,
 	}, nil

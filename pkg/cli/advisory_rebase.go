@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"path/filepath"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -46,14 +47,14 @@ wolfictl adv rebase ./argo-cd-2.8.yaml ../enterprise-advisories -V CVE-2021-2574
 
 			log = log.With("srcDir", srcDir, "dstDir", dstDir)
 			log.Debug("creating index for source directory")
-			srcIndex, err := v2.NewIndex(ctx, srcFsys)
+			srcIndex, err := adv2.NewIndex(ctx, srcFsys)
 			if err != nil {
 				return fmt.Errorf("creating advisory index for source directory %q: %w", srcDir, err)
 			}
 
 			dstFsys := rwos.DirFS(dstDir)
 			log.Debug("creating index for destination directory")
-			dstIndex, err := v2.NewIndex(ctx, dstFsys)
+			dstIndex, err := adv2.NewIndex(ctx, dstFsys)
 			if err != nil {
 				return fmt.Errorf("creating advisory index for destination directory %q: %w", dstDir, err)
 			}

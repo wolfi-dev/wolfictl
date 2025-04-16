@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -255,9 +256,9 @@ func TestIndexDiff(t *testing.T) {
 			bDir := filepath.Join("testdata", "diff", tt.name, "b")
 			aFsys := rwos.DirFS(aDir)
 			bFsys := rwos.DirFS(bDir)
-			aIndex, err := v2.NewIndex(context.Background(), aFsys)
+			aIndex, err := adv2.NewIndex(context.Background(), aFsys)
 			require.NoError(t, err)
-			bIndex, err := v2.NewIndex(context.Background(), bFsys)
+			bIndex, err := adv2.NewIndex(context.Background(), bFsys)
 			require.NoError(t, err)
 
 			diff := IndexDiff(aIndex, bIndex)

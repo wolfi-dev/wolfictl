@@ -5,9 +5,10 @@ import (
 	"sort"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -34,7 +35,7 @@ of the event to now. The command will not copy events of type "detection", "fixe
 			have = strings.TrimSuffix(have, ".advisories.yaml")
 
 			advisoryFsys := rwos.DirFS(dir)
-			advisoryCfgs, err := v2.NewIndex(ctx, advisoryFsys)
+			advisoryCfgs, err := adv2.NewIndex(ctx, advisoryFsys)
 			if err != nil {
 				return err
 			}

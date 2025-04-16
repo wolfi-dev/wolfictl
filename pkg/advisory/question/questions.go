@@ -3,8 +3,8 @@ package question
 import (
 	"fmt"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/question"
 )
 

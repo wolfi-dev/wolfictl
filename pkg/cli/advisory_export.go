@@ -6,11 +6,12 @@ import (
 	"os"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/spf13/cobra"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -41,7 +42,7 @@ func cmdAdvisoryExport() *cobra.Command {
 			indices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
 			for _, dir := range p.advisoriesRepoDirs {
 				advisoryFsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
+				index, err := adv2.NewIndex(cmd.Context(), advisoryFsys)
 				if err != nil {
 					return fmt.Errorf("unable to index advisory configs for directory %q: %w", dir, err)
 				}

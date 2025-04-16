@@ -13,7 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 )
@@ -52,7 +52,7 @@ func cmdAdvisoryMigrateIDs() *cobra.Command {
 			}
 
 			advisoryFsys := rwos.DirFS(p.advisoriesRepoDir)
-			index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
+			index, err := adv2.NewIndex(cmd.Context(), advisoryFsys)
 			if err != nil {
 				return fmt.Errorf("unable to index advisory configs for directory %q: %w", p.advisoriesRepoDir, err)
 			}

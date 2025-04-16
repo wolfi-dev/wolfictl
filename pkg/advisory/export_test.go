@@ -7,11 +7,12 @@ import (
 	"strings"
 	"testing"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -38,7 +39,7 @@ func Test_ExportFuncs(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			advisoryFsys := rwos.DirFS(testdataDir)
-			advisoryDocs, err := v2.NewIndex(context.Background(), advisoryFsys)
+			advisoryDocs, err := adv2.NewIndex(context.Background(), advisoryFsys)
 			require.NoError(t, err)
 			indices := []*configs.Index[v2.Document]{advisoryDocs}
 

@@ -9,8 +9,9 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/stretchr/testify/assert"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/memfs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/testerfs"
 )
@@ -80,7 +81,7 @@ func TestRebase(t *testing.T) {
 
 			srcDir := filepath.Join(testCaseDir, "src")
 			srcFsys := memfs.New(os.DirFS(srcDir))
-			srcIndex, err := v2.NewIndex(ctx, srcFsys)
+			srcIndex, err := adv2.NewIndex(ctx, srcFsys)
 			if err != nil {
 				t.Fatalf("creating advisory index for source directory %q: %v", srcDir, err)
 			}
@@ -90,7 +91,7 @@ func TestRebase(t *testing.T) {
 			if err != nil {
 				t.Fatalf("creating test fixture filesystem for destination directory %q: %v", dstDir, err)
 			}
-			dstIndex, err := v2.NewIndex(ctx, dstFsys)
+			dstIndex, err := adv2.NewIndex(ctx, dstFsys)
 			if err != nil {
 				t.Fatalf("creating advisory index for destination directory %q: %v", dstDir, err)
 			}
@@ -139,7 +140,7 @@ func TestRebase(t *testing.T) {
 
 		srcDir := filepath.Join(testCaseDir, "src")
 		srcFsys := memfs.New(os.DirFS(srcDir))
-		srcIndex, err := v2.NewIndex(ctx, srcFsys)
+		srcIndex, err := adv2.NewIndex(ctx, srcFsys)
 		if err != nil {
 			t.Fatalf("creating advisory index for source directory %q: %v", srcDir, err)
 		}
@@ -149,7 +150,7 @@ func TestRebase(t *testing.T) {
 		if err != nil {
 			t.Fatalf("creating test fixture filesystem for destination directory %q: %v", dstDir, err)
 		}
-		dstIndex, err := v2.NewIndex(ctx, dstFsys)
+		dstIndex, err := adv2.NewIndex(ctx, dstFsys)
 		if err != nil {
 			t.Fatalf("creating advisory index for destination directory %q: %v", dstDir, err)
 		}

@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"chainguard.dev/melange/pkg/config"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
@@ -56,7 +57,7 @@ directory must already exist before running the command.
 			advisoryIndices := make([]*configs.Index[v2.Document], 0, len(p.advisoriesRepoDirs))
 			for _, dir := range p.advisoriesRepoDirs {
 				fsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(cmd.Context(), fsys)
+				index, err := adv2.NewIndex(cmd.Context(), fsys)
 				if err != nil {
 					return fmt.Errorf("indexing advisory documents for directory %q: %w", dir, err)
 				}
