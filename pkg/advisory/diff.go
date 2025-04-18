@@ -3,8 +3,8 @@ package advisory
 import (
 	"reflect"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // IndexDiffResult is the result of diffing two advisory document indexes.

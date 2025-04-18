@@ -9,7 +9,7 @@ import (
 	"chainguard.dev/melange/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
@@ -66,9 +66,9 @@ func TestValidate(t *testing.T) {
 				bDir := filepath.Join("testdata", "diff", tt.name, "b")
 				aFsys := rwos.DirFS(aDir)
 				bFsys := rwos.DirFS(bDir)
-				aIndex, err := v2.NewIndex(context.Background(), aFsys)
+				aIndex, err := adv2.NewIndex(context.Background(), aFsys)
 				require.NoError(t, err)
-				bIndex, err := v2.NewIndex(context.Background(), bFsys)
+				bIndex, err := adv2.NewIndex(context.Background(), bFsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{
@@ -207,9 +207,9 @@ func TestValidate(t *testing.T) {
 					bDir := filepath.Join("testdata", "diff", tt.name, "b")
 					aFsys := rwos.DirFS(aDir)
 					bFsys := rwos.DirFS(bDir)
-					aIndex, err := v2.NewIndex(context.Background(), aFsys)
+					aIndex, err := adv2.NewIndex(context.Background(), aFsys)
 					require.NoError(t, err)
-					bIndex, err := v2.NewIndex(context.Background(), bFsys)
+					bIndex, err := adv2.NewIndex(context.Background(), bFsys)
 					require.NoError(t, err)
 
 					err = Validate(context.Background(), ValidateOptions{
@@ -262,7 +262,7 @@ func TestValidate(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				dir := filepath.Join("testdata", "validate", tt.name)
 				fsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(context.Background(), fsys)
+				index, err := adv2.NewIndex(context.Background(), fsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{
@@ -302,7 +302,7 @@ func TestValidate(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				dir := filepath.Join("testdata", "validate", tt.name)
 				fsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(context.Background(), fsys)
+				index, err := adv2.NewIndex(context.Background(), fsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{
@@ -333,7 +333,7 @@ func TestValidate(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				dir := filepath.Join("testdata", "validate", tt.name)
 				fsys := rwos.DirFS(dir)
-				index, err := v2.NewIndex(context.Background(), fsys)
+				index, err := adv2.NewIndex(context.Background(), fsys)
 				require.NoError(t, err)
 
 				err = Validate(context.Background(), ValidateOptions{

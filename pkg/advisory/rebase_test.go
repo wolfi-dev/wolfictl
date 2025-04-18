@@ -9,8 +9,10 @@ import (
 	"testing"
 	"time"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/stretchr/testify/assert"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/memfs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/testerfs"
 )
@@ -68,8 +70,8 @@ func TestRebase(t *testing.T) {
 	}
 
 	expectedNewAdvID := "CGA-zzzz-zzzz-zzzz"
-	DefaultIDGenerator = StaticIDGenerator{ID: expectedNewAdvID}
-	defer func() { DefaultIDGenerator = &RandomIDGenerator{} }()
+	cgaid.DefaultIDGenerator = cgaid.StaticIDGenerator{ID: expectedNewAdvID}
+	defer func() { cgaid.DefaultIDGenerator = &cgaid.RandomIDGenerator{} }()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -80,7 +82,7 @@ func TestRebase(t *testing.T) {
 
 			srcDir := filepath.Join(testCaseDir, "src")
 			srcFsys := memfs.New(os.DirFS(srcDir))
-			srcIndex, err := v2.NewIndex(ctx, srcFsys)
+			srcIndex, err := adv2.NewIndex(ctx, srcFsys)
 			if err != nil {
 				t.Fatalf("creating advisory index for source directory %q: %v", srcDir, err)
 			}
@@ -90,7 +92,7 @@ func TestRebase(t *testing.T) {
 			if err != nil {
 				t.Fatalf("creating test fixture filesystem for destination directory %q: %v", dstDir, err)
 			}
-			dstIndex, err := v2.NewIndex(ctx, dstFsys)
+			dstIndex, err := adv2.NewIndex(ctx, dstFsys)
 			if err != nil {
 				t.Fatalf("creating advisory index for destination directory %q: %v", dstDir, err)
 			}
@@ -139,7 +141,7 @@ func TestRebase(t *testing.T) {
 
 		srcDir := filepath.Join(testCaseDir, "src")
 		srcFsys := memfs.New(os.DirFS(srcDir))
-		srcIndex, err := v2.NewIndex(ctx, srcFsys)
+		srcIndex, err := adv2.NewIndex(ctx, srcFsys)
 		if err != nil {
 			t.Fatalf("creating advisory index for source directory %q: %v", srcDir, err)
 		}
@@ -149,7 +151,7 @@ func TestRebase(t *testing.T) {
 		if err != nil {
 			t.Fatalf("creating test fixture filesystem for destination directory %q: %v", dstDir, err)
 		}
-		dstIndex, err := v2.NewIndex(ctx, dstFsys)
+		dstIndex, err := adv2.NewIndex(ctx, dstFsys)
 		if err != nil {
 			t.Fatalf("creating advisory index for destination directory %q: %v", dstDir, err)
 		}

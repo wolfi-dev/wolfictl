@@ -12,10 +12,11 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
+
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 )
 
 func cmdAdvisoryMigrateIDs() *cobra.Command {
@@ -52,7 +53,7 @@ func cmdAdvisoryMigrateIDs() *cobra.Command {
 			}
 
 			advisoryFsys := rwos.DirFS(p.advisoriesRepoDir)
-			index, err := v2.NewIndex(cmd.Context(), advisoryFsys)
+			index, err := adv2.NewIndex(cmd.Context(), advisoryFsys)
 			if err != nil {
 				return fmt.Errorf("unable to index advisory configs for directory %q: %w", p.advisoriesRepoDir, err)
 			}
@@ -65,7 +66,7 @@ func cmdAdvisoryMigrateIDs() *cobra.Command {
 					sort.Strings(adv.Aliases)
 
 					var err error
-					adv.ID, err = advisory.GenerateCGAID()
+					adv.ID, err = cgaid.GenerateCGAID()
 					if err != nil {
 						return err
 					}

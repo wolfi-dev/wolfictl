@@ -3,7 +3,7 @@ package advisory
 import (
 	"context"
 
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 )
 
 // Store abstracts the storage and retrieval of advisory data.

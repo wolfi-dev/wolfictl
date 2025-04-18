@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
 )
 
 func cmdAdvisoryAliasFind() *cobra.Command {
@@ -71,10 +71,10 @@ hyperlinked to the relevant webpage from the upstream data source.
 
 func findAliases(ctx context.Context, af advisory.AliasFinder, vulnerabilityID string) ([]string, error) {
 	switch {
-	case vuln.RegexCVE.MatchString(vulnerabilityID):
+	case vulnadvs.RegexCVE.MatchString(vulnerabilityID):
 		return af.GHSAsForCVE(ctx, vulnerabilityID)
 
-	case vuln.RegexGHSA.MatchString(vulnerabilityID):
+	case vulnadvs.RegexGHSA.MatchString(vulnerabilityID):
 		cve, err := af.CVEForGHSA(ctx, vulnerabilityID)
 		if err != nil {
 			return nil, err

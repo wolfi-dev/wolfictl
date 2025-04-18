@@ -6,10 +6,10 @@ import (
 	"errors"
 	"sort"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory/secdb"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 const apkURL = "{{urlprefix}}/{{reponame}}/{{arch}}/{{pkg.name}}-{{pkg.ver}}.apk"

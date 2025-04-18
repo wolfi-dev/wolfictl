@@ -8,8 +8,9 @@ import (
 	"io/fs"
 	"sort"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 )
 
@@ -43,7 +44,7 @@ func NewYamDocumentEncoder(opts formatted.EncodeOptions) DocumentEncoder {
 type FSPutter struct {
 	fsys        rwfs.FS
 	enc         DocumentEncoder
-	idGenerator IDGenerator
+	idGenerator cgaid.IDGenerator
 }
 
 // NewFSPutter creates and returns a new FSPutter that updates advisory data in
@@ -53,7 +54,7 @@ func NewFSPutter(fsys rwfs.FS, enc DocumentEncoder) *FSPutter {
 	return &FSPutter{
 		fsys:        fsys,
 		enc:         enc,
-		idGenerator: DefaultIDGenerator,
+		idGenerator: cgaid.DefaultIDGenerator,
 	}
 }
 

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -27,7 +27,7 @@ func Test_ImportAdvisoriesYAML(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			advisoryFsys := rwos.DirFS(testdataDir)
-			advisoryDocs, err := v2.NewIndex(context.Background(), advisoryFsys)
+			advisoryDocs, err := adv2.NewIndex(context.Background(), advisoryFsys)
 			require.NoError(t, err)
 
 			b, err := os.ReadFile(tt.pathToInputData)

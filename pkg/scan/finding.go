@@ -7,8 +7,8 @@ import (
 	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/file"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/samber/lo"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // Finding represents a vulnerability finding for a single package.

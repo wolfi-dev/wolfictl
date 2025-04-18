@@ -10,8 +10,9 @@ import (
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 )
 
 // Request specifies the parameters for creating a new advisory or updating an existing advisory.
@@ -72,11 +73,11 @@ func (req Request) Validate() error {
 	}
 
 	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
-		if vuln.RegexCGA.MatchString(alias) {
+		if cgaid.RegexCGA.MatchString(alias) {
 			return ErrCGAIDAsAlias
 		}
 
-		if err := vuln.ValidateID(alias); err != nil {
+		if err := vulnadvs.ValidateID(alias); err != nil {
 			return fmt.Errorf("%q: %w", alias, ErrInvalidVulnerabilityID)
 		}
 		return nil
@@ -84,7 +85,7 @@ func (req Request) Validate() error {
 		errs = append(errs, err)
 	}
 
-	if req.AdvisoryID != "" && !vuln.RegexCGA.MatchString(req.AdvisoryID) {
+	if req.AdvisoryID != "" && !cgaid.RegexCGA.MatchString(req.AdvisoryID) {
 		errs = append(errs, ErrInvalidAdvisoryID)
 	}
 
@@ -107,7 +108,7 @@ func (req Request) ResolveAliases(ctx context.Context, af AliasFinder) (*Request
 
 	for _, alias := range req.Aliases {
 		switch {
-		case vuln.RegexGHSA.MatchString(alias):
+		case vulnadvs.RegexGHSA.MatchString(alias):
 			cve, err := af.CVEForGHSA(ctx, alias)
 			if err != nil {
 				return nil, fmt.Errorf("resolving GHSA %q: %w", alias, err)
@@ -116,7 +117,7 @@ func (req Request) ResolveAliases(ctx context.Context, af AliasFinder) (*Request
 			newAliases = append(newAliases, cve)
 			continue
 
-		case vuln.RegexCVE.MatchString(alias):
+		case vulnadvs.RegexCVE.MatchString(alias):
 			ghsas, err := af.GHSAsForCVE(ctx, alias)
 			if err != nil {
 				return nil, fmt.Errorf("resolving CVE %q: %w", alias, err)
@@ -287,7 +288,7 @@ func (p *RequestParams) GenerateRequests() ([]Request, error) {
 			// be used to generate a Request that has both an AdvisoryID and an alias at the
 			// same time.
 
-			if vuln.RegexCGA.MatchString(id) {
+			if cgaid.RegexCGA.MatchString(id) {
 				cgaID = id
 			} else {
 				aliases = []string{id}

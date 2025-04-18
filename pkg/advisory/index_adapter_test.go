@@ -5,9 +5,10 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
 
@@ -15,7 +16,7 @@ func Test_indexAdapter(t *testing.T) {
 	ctx := t.Context()
 
 	fsys := rwos.DirFS(filepath.Join("testdata", "index_adapter", "advisories"))
-	index, err := v2.NewIndex(ctx, fsys)
+	index, err := adv2.NewIndex(ctx, fsys)
 	require.NoError(t, err)
 
 	adapter := AdaptIndex(index)

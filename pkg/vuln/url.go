@@ -1,14 +1,18 @@
 package vuln
 
-import "fmt"
+import (
+	"fmt"
+
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
+)
 
 // URL returns the canonical web URL for the given vulnerability ID.
 func URL(id string) string {
 	switch {
-	case RegexCVE.MatchString(id):
+	case vulnadvs.RegexCVE.MatchString(id):
 		return fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", id)
 
-	case RegexGHSA.MatchString(id):
+	case vulnadvs.RegexGHSA.MatchString(id):
 		return fmt.Sprintf("https://github.com/advisories/%s", id)
 	}
 

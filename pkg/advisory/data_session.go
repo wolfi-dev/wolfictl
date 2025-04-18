@@ -7,12 +7,13 @@ import (
 	"slices"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/go-github/v58/github"
 	"github.com/google/uuid"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
@@ -85,7 +86,7 @@ func NewDataSession(ctx context.Context, opts DataSessionOptions) (*DataSession,
 	}
 
 	// index advisory documents
-	index, err := v2.NewIndex(ctx, rwos.DirFS(tempDir))
+	index, err := adv2.NewIndex(ctx, rwos.DirFS(tempDir))
 	if err != nil {
 		return nil, fmt.Errorf("indexing advisory documents: %w", err)
 	}

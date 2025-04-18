@@ -9,12 +9,13 @@ import (
 
 	"chainguard.dev/apko/pkg/apk/client"
 	"chainguard.dev/melange/pkg/config"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
@@ -154,13 +155,13 @@ print an error message that specifies where and how the data is invalid.`,
 
 				logger.Debug("cloned upstream advisories repo for comparison", "dir", cloneDir)
 
-				baseAdvisoriesIndex, err = v2.NewIndex(cmd.Context(), rwos.DirFS(cloneDir))
+				baseAdvisoriesIndex, err = adv2.NewIndex(cmd.Context(), rwos.DirFS(cloneDir))
 				if err != nil {
 					return fmt.Errorf("unable to create index of upstream advisories for comparison: %w", err)
 				}
 			}
 
-			advisoriesIndex, err := v2.NewIndex(cmd.Context(), rwos.DirFS(advisoriesRepoDir))
+			advisoriesIndex, err := adv2.NewIndex(cmd.Context(), rwos.DirFS(advisoriesRepoDir))
 			if err != nil {
 				return fmt.Errorf("unable to create index of advisories repo: %w", err)
 			}

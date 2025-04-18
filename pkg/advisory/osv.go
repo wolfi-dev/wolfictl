@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"chainguard.dev/melange/pkg/config"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
 	"github.com/google/osv-scanner/pkg/models"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // OSVOptions contains the options for building an OSV dataset.

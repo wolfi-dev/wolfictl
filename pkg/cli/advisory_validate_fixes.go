@@ -9,11 +9,12 @@ import (
 	"path/filepath"
 
 	"chainguard.dev/apko/pkg/apk/apk"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/scan"
 	"github.com/wolfi-dev/wolfictl/pkg/versions"
@@ -38,7 +39,7 @@ func cmdAdvisoryValidateFixes() *cobra.Command {
 				return fmt.Errorf("need --%s", flagNameBuiltPackagesDir)
 			}
 
-			advIndex, err := v2.NewIndex(ctx, rwos.DirFS(p.advisoriesRepoDir))
+			advIndex, err := adv2.NewIndex(ctx, rwos.DirFS(p.advisoriesRepoDir))
 			if err != nil {
 				return fmt.Errorf("creating index of advisories repo: %w", err)
 			}

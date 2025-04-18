@@ -6,8 +6,9 @@ import (
 	"sort"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // UpdateOptions configures the Update operation.
@@ -31,7 +32,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 		return fmt.Errorf("cannot update advisory: found %d advisory documents for package %q", count, req.Package)
 	}
 
-	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+	u := adv2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories
 
 		// If the request specifies the advisory ID, that takes priority. Otherwise, use
@@ -71,7 +72,7 @@ func Update(ctx context.Context, req Request, opts UpdateOptions) error {
 	}
 
 	// Update the schema version to the latest version.
-	err = documents.Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	err = documents.Update(ctx, adv2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 	if err != nil {
 		return fmt.Errorf("unable to update schema version for %q: %w", req.Package, err)
 	}

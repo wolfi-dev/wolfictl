@@ -1,6 +1,6 @@
 package advisory
 
-import v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+import v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 
 // MapByVulnID maps the given advisories by their vulnerability ID, creating a
 // pre-indexed collection of advisories for performant lookup. The map keys are

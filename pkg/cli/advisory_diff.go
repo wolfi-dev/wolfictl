@@ -6,12 +6,13 @@ import (
 	"os"
 	"strings"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	wgit "github.com/wolfi-dev/wolfictl/pkg/git"
@@ -46,12 +47,12 @@ func cmdAdvisoryDiff() *cobra.Command {
 			}
 
 			baseAdvisoriesFsys := rwos.DirFS(cloneDir)
-			baseAdvisoriesIndex, err := v2.NewIndex(cmd.Context(), baseAdvisoriesFsys)
+			baseAdvisoriesIndex, err := adv2.NewIndex(cmd.Context(), baseAdvisoriesFsys)
 			if err != nil {
 				return err
 			}
 
-			currentAdvisoriesIndex, err := v2.NewIndex(cmd.Context(), rwos.DirFS(d.Local.AdvisoriesRepo.Dir))
+			currentAdvisoriesIndex, err := adv2.NewIndex(cmd.Context(), rwos.DirFS(d.Local.AdvisoriesRepo.Dir))
 			if err != nil {
 				return err
 			}

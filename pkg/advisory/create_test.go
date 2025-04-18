@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/memfs"
 )
 
@@ -195,7 +196,7 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want a fresh memfs for each test case.
 			fsys := memfs.New(dirFS)
-			advisoryDocs, err := v2.NewIndex(context.Background(), fsys)
+			advisoryDocs, err := adv2.NewIndex(context.Background(), fsys)
 			require.NoError(t, err)
 
 			err = Create(context.Background(), tt.req, CreateOptions{

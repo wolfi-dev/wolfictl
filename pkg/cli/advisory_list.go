@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/components/vulnid"
 	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 //nolint:gocyclo // This CLI command is handling business logic while we experiment with the design; we can factor out common patterns later.

@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/testerfs"
 )
 
@@ -140,7 +141,7 @@ func TestFSPutter_Upsert(t *testing.T) {
 			p := &FSPutter{
 				fsys:        fsys,
 				enc:         enc,
-				idGenerator: StaticIDGenerator{ID: "CGA-2222-2222-2222"},
+				idGenerator: cgaid.StaticIDGenerator{ID: "CGA-2222-2222-2222"},
 			}
 
 			id, err := p.Upsert(ctx, tt.req)

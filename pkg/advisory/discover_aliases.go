@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"sort"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
-	"github.com/wolfi-dev/wolfictl/pkg/vuln"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // DiscoverAliasesOptions is the set of options for the DiscoverAliases
@@ -45,7 +46,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 
 	updatedAliases := lo.Uniq(append(adv.Aliases, ghsas...))
 	adv.Aliases = updatedAliases
-	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+	u := adv2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		advisories := doc.Advisories.Update(adv.ID, adv)
 
 		// Ensure the package's advisory list is sorted before returning it.
@@ -59,7 +60,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithCVEIDs(ctx c
 	}
 
 	// Update the schema version to the latest version.
-	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, adv2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 	if err != nil {
 		return fmt.Errorf("unable to update schema version for %q: %w", doc.Name(), err)
 	}
@@ -115,7 +116,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	updatedAliases := lo.Uniq(append(adv.Aliases, ghsas...))
 	sort.Strings(updatedAliases)
 	adv.Aliases = updatedAliases
-	u := v2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
+	u := adv2.NewAdvisoriesSectionUpdater(func(doc v2.Document) (v2.Advisories, error) {
 		// First, check if there would be a collision with the new CVE ID. If so, error
 		// out.
 
@@ -134,7 +135,7 @@ func (opts *DiscoverAliasesOptions) discoverAliasesForAdvisoriesWithGHSAIDs(ctx 
 	}
 
 	// Update the schema version to the latest version.
-	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, v2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
+	err = opts.AdvisoryDocs.Select().WhereName(doc.Name()).Update(ctx, adv2.NewSchemaVersionSectionUpdater(v2.SchemaVersion))
 	if err != nil {
 		return fmt.Errorf("unable to update schema version for %q: %w", doc.Name(), err)
 	}
@@ -163,7 +164,7 @@ func DiscoverAliases(ctx context.Context, opts DiscoverAliasesOptions) error {
 				switch {
 				// If the advisory ID is already a CVE ID, do a lookup and ensure the discovered
 				// aliases are present in the advisory's list of aliases.
-				case vuln.RegexCVE.MatchString(alias):
+				case vulnadvs.RegexCVE.MatchString(alias):
 					err := opts.discoverAliasesForAdvisoriesWithCVEIDs(ctx, doc, alias)
 					if err != nil {
 						return err
@@ -173,7 +174,7 @@ func DiscoverAliases(ctx context.Context, opts DiscoverAliasesOptions) error {
 				// there exists a CVE ID among those aliases. If so, adjust the advisory so that
 				// the advisory ID is this CVE ID, and ensure all other IDs are present in the
 				// advisory's list of aliases (including the advisory's original ID).
-				case vuln.RegexGHSA.MatchString(alias):
+				case vulnadvs.RegexGHSA.MatchString(alias):
 					err := opts.discoverAliasesForAdvisoriesWithGHSAIDs(ctx, doc, alias)
 					if err != nil {
 						return err

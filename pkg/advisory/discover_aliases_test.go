@@ -5,8 +5,9 @@ import (
 	"os"
 	"testing"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/memfs"
 )
 
@@ -146,7 +147,7 @@ func TestDiscoverAliases(t *testing.T) {
 			// back to disk.
 			fsys := memfs.New(os.DirFS("testdata/discover_aliases/advisories"))
 
-			advisoryDocs, err := v2.NewIndex(context.Background(), fsys)
+			advisoryDocs, err := adv2.NewIndex(context.Background(), fsys)
 			if err != nil {
 				t.Fatalf("unable to create advisory docs index: %v", err)
 			}

@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
-	v2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 func TestRequest_Validate(t *testing.T) {
