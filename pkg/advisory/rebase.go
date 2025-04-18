@@ -9,8 +9,8 @@ import (
 	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
-	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // ErrNoSourceAdvisoriesSelected is returned when provided package name and

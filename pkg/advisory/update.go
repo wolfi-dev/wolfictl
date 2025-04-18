@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
-	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 )
 
 // UpdateOptions configures the Update operation.

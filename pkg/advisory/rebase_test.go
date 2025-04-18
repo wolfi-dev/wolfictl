@@ -12,7 +12,7 @@ import (
 	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/stretchr/testify/assert"
-	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/memfs"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os/testerfs"
 )

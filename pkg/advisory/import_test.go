@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
+	adv2 "github.com/wolfi-dev/wolfictl/pkg/configs/advisory/v2"
 
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 )
