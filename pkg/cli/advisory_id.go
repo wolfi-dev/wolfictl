@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/wolfi-dev/wolfictl/pkg/advisory"
+
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 )
 
 func cmdAdvisoryID() *cobra.Command {
@@ -14,7 +15,7 @@ func cmdAdvisoryID() *cobra.Command {
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
-			id, err := advisory.GenerateCGAID()
+			id, err := cgaid.GenerateCGAID()
 			if err != nil {
 				return fmt.Errorf("generating advisory ID: %w", err)
 			}

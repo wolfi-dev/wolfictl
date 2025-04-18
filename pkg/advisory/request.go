@@ -10,6 +10,7 @@ import (
 	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 )
@@ -72,7 +73,7 @@ func (req Request) Validate() error {
 	}
 
 	if err := errors.Join(lo.Map(req.Aliases, func(alias string, _ int) error {
-		if vulnadvs.RegexCGA.MatchString(alias) {
+		if cgaid.RegexCGA.MatchString(alias) {
 			return ErrCGAIDAsAlias
 		}
 
@@ -84,7 +85,7 @@ func (req Request) Validate() error {
 		errs = append(errs, err)
 	}
 
-	if req.AdvisoryID != "" && !vulnadvs.RegexCGA.MatchString(req.AdvisoryID) {
+	if req.AdvisoryID != "" && !cgaid.RegexCGA.MatchString(req.AdvisoryID) {
 		errs = append(errs, ErrInvalidAdvisoryID)
 	}
 
@@ -287,7 +288,7 @@ func (p *RequestParams) GenerateRequests() ([]Request, error) {
 			// be used to generate a Request that has both an AdvisoryID and an alias at the
 			// same time.
 
-			if vulnadvs.RegexCGA.MatchString(id) {
+			if cgaid.RegexCGA.MatchString(id) {
 				cgaID = id
 			} else {
 				aliases = []string{id}

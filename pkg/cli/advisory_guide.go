@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
-	vulnadvs "github.com/chainguard-dev/advisory-schema/pkg/vuln"
 	"github.com/chainguard-dev/clog"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -277,7 +277,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 				req := advisory.Request{
 					Package: vaPicked.APKs[0],
 				}
-				if vulnadvs.RegexCGA.MatchString(findingVulnID) {
+				if cgaid.RegexCGA.MatchString(findingVulnID) {
 					req.AdvisoryID = findingVulnID
 				} else {
 					req.Aliases = []string{findingVulnID}

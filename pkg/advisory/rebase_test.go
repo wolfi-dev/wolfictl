@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/stretchr/testify/assert"
 	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
@@ -69,8 +70,8 @@ func TestRebase(t *testing.T) {
 	}
 
 	expectedNewAdvID := "CGA-zzzz-zzzz-zzzz"
-	DefaultIDGenerator = StaticIDGenerator{ID: expectedNewAdvID}
-	defer func() { DefaultIDGenerator = &RandomIDGenerator{} }()
+	cgaid.DefaultIDGenerator = cgaid.StaticIDGenerator{ID: expectedNewAdvID}
+	defer func() { cgaid.DefaultIDGenerator = &cgaid.RandomIDGenerator{} }()
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {

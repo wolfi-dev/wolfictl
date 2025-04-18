@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	"github.com/chainguard-dev/clog"
 	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
@@ -134,7 +135,7 @@ func (opts RebaseOptions) updateDestinationIndexWithNewAdvisoryData(ctx context.
 	} else {
 		log.Debug("no existing destination advisory found, creating new one")
 
-		dstAdvID, err := GenerateCGAID()
+		dstAdvID, err := cgaid.GenerateCGAID()
 		if err != nil {
 			return fmt.Errorf("generating new CGA ID: %w", err)
 		}

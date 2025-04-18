@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
 	adv2 "github.com/wolfi-dev/wolfictl/pkg/advisory/v2"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
@@ -47,7 +48,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 				}
 			}
 
-			newAdvisoryID, err := GenerateCGAID()
+			newAdvisoryID, err := cgaid.GenerateCGAID()
 			if err != nil {
 				return v2.Advisories{}, fmt.Errorf("generating CGA ID: %w", err)
 			}
@@ -89,7 +90,7 @@ func Create(ctx context.Context, req Request, opts CreateOptions) error {
 }
 
 func createAdvisoryConfig(ctx context.Context, documents *configs.Index[v2.Document], req Request) error {
-	newAdvisoryID, err := GenerateCGAID()
+	newAdvisoryID, err := cgaid.GenerateCGAID()
 	if err != nil {
 		return fmt.Errorf("generating CGA ID: %w", err)
 	}
