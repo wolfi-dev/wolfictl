@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "crane",
     "Version": "0.14.0-r0",
-    "OriginPackageName": "crane"
+    "OriginPackageName": "crane",
+    "Arch": "x86_64"
   },
   "Findings": [
     {

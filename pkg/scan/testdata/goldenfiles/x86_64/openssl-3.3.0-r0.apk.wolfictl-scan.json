@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "openssl",
     "Version": "3.3.0-r0",
-    "OriginPackageName": "openssl"
+    "OriginPackageName": "openssl",
+    "Arch": "x86_64"
   },
   "Findings": [
     {

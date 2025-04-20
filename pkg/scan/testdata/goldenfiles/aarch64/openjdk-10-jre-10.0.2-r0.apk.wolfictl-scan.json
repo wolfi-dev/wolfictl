@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "openjdk-10-jre",
     "Version": "10.0.2-r0",
-    "OriginPackageName": "openjdk-10"
+    "OriginPackageName": "openjdk-10",
+    "Arch": "aarch64"
   },
   "Findings": [
     {

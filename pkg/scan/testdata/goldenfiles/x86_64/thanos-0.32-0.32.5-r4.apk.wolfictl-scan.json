@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "thanos-0.32",
     "Version": "0.32.5-r4",
-    "OriginPackageName": "thanos-0.32"
+    "OriginPackageName": "thanos-0.32",
+    "Arch": "x86_64"
   },
   "Findings": [
     {

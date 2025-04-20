@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "powershell",
     "Version": "7.4.1-r0",
-    "OriginPackageName": "powershell"
+    "OriginPackageName": "powershell",
+    "Arch": "aarch64"
   },
   "Findings": [
     {

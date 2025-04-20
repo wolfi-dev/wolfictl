@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "openjdk-21",
     "Version": "21.0.3-r3",
-    "OriginPackageName": "openjdk-21"
+    "OriginPackageName": "openjdk-21",
+    "Arch": "x86_64"
   },
   "Findings": [
     {
