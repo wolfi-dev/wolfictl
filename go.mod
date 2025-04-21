@@ -11,15 +11,15 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v0.26.0
-	chainguard.dev/melange v0.23.7
+	chainguard.dev/apko v0.26.1
+	chainguard.dev/melange v0.23.8
 	cloud.google.com/go/storage v1.51.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.91.0
 	github.com/anchore/stereoscope v0.1.3
 	github.com/anchore/syft v1.22.0
 	github.com/chainguard-dev/clog v1.7.0
-	github.com/chainguard-dev/yam v0.2.12
+	github.com/chainguard-dev/yam v0.2.13
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250319133953-166f707985bc
@@ -43,7 +43,7 @@ require (
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/muesli/reflow v0.3.0
-	github.com/openvex/go-vex v0.2.5
+	github.com/openvex/go-vex v0.2.5 // indirect
 	github.com/package-url/packageurl-go v0.1.3
 	github.com/samber/lo v1.49.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
@@ -67,6 +67,7 @@ require (
 
 require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
+	github.com/chainguard-dev/advisory-schema v0.37.1
 	github.com/spf13/afero v1.14.0
 )
 
@@ -136,7 +137,6 @@ require (
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/chainguard-dev/advisory-schema v0.37.1 // indirect
 	github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 // indirect
 	github.com/charmbracelet/colorprofile v0.3.0 // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
@@ -269,6 +269,7 @@ require (
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/locker v1.0.1 // indirect
 	github.com/moby/moby v28.1.0+incompatible // indirect
+	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/moby/sys/mountinfo v0.7.2 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
 	github.com/moby/sys/signal v0.7.1 // indirect
