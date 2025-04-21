@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "py3-poetry-core",
     "Version": "1.9.0-r1",
-    "OriginPackageName": "py3-poetry-core"
+    "OriginPackageName": "py3-poetry-core",
+    "Arch": "x86_64"
   },
   "Findings": null,
   "DataSource": {

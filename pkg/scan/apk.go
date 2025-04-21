@@ -77,9 +77,22 @@ type DataSource struct {
 }
 
 type TargetAPK struct {
-	Name              string
-	Version           string
+	// Name of the package in the APK (i.e., the value of pkgname in PKGINFO).
+	// Example: "libcrypto3".
+	Name string
+
+	// Version of the package in the APK (i.e., the value of pkgver in PKGINFO).
+	// Example: "3.0.11-r0".
+	Version string
+
+	// OriginPackageName is the name of the origin package for the package (i.e.,
+	// the value of origin in PKGINFO), which, for non-subpackages, would be the
+	// same as Name. Example: "openssl".
 	OriginPackageName string
+
+	// Arch is the architecture of the package (i.e., the value of arch in PKGINFO).
+	// Should be "aarch64" or "x86_64".
+	Arch string
 }
 
 // Origin returns the name of the origin package, if the package's metadata
@@ -112,6 +125,7 @@ func newTargetAPK(s *sbomSyft.SBOM) (TargetAPK, error) {
 		Name:              p.Name,
 		Version:           p.Version,
 		OriginPackageName: metadata.OriginPackage,
+		Arch:              metadata.Architecture,
 	}, nil
 }
 

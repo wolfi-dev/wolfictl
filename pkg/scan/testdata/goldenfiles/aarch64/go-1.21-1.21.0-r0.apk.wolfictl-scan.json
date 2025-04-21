@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "go-1.21",
     "Version": "1.21.0-r0",
-    "OriginPackageName": "go-1.21"
+    "OriginPackageName": "go-1.21",
+    "Arch": "aarch64"
   },
   "Findings": [
     {

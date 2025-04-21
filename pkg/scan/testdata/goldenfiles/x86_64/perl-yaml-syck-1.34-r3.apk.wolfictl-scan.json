@@ -2,7 +2,8 @@
   "TargetAPK": {
     "Name": "perl-yaml-syck",
     "Version": "1.34-r3",
-    "OriginPackageName": "perl-yaml-syck"
+    "OriginPackageName": "perl-yaml-syck",
+    "Arch": "x86_64"
   },
   "Findings": null,
   "DataSource": {
