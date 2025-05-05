@@ -26,20 +26,11 @@ func FilterWithAdvisories(ctx context.Context, result Result, advGetter advisory
 		return nil, fmt.Errorf("advGetter cannot be nil")
 	}
 
-	packageNames, err := advGetter.PackageNames(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("getting package names for advisories: %w", err)
-	}
-
-	if len(packageNames) == 0 {
-		// No advisory configs for this package, so we know we wouldn't be able to filter anything.
-		return result.Findings, nil
-	}
-
 	// Use a copy of the findings, so we don't mutate the original result.
 	filteredFindings := slices.Clone(result.Findings)
 
-	for _, name := range packageNames {
+	// Check for advisories in both the result target's name and origin package (to handle subpackages)
+	for _, name := range []string{result.TargetAPK.Name, result.TargetAPK.OriginPackageName} {
 		packageAdvisories, err := advGetter.Advisories(ctx, name)
 		if err != nil {
 			return nil, fmt.Errorf("getting advisories for package %q: %w", name, err)
