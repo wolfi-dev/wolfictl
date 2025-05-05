@@ -26,38 +26,27 @@ func FilterWithAdvisories(ctx context.Context, result Result, advGetter advisory
 		return nil, fmt.Errorf("advGetter cannot be nil")
 	}
 
-	packageNames, err := advGetter.PackageNames(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("getting package names for advisories: %w", err)
-	}
-
-	if len(packageNames) == 0 {
-		// No advisory configs for this package, so we know we wouldn't be able to filter anything.
-		return result.Findings, nil
-	}
-
 	// Use a copy of the findings, so we don't mutate the original result.
 	filteredFindings := slices.Clone(result.Findings)
 
-	for _, name := range packageNames {
-		packageAdvisories, err := advGetter.Advisories(ctx, name)
-		if err != nil {
-			return nil, fmt.Errorf("getting advisories for package %q: %w", name, err)
-		}
+	// Check for advisories in the result target's origin
+	packageAdvisories, err := advGetter.Advisories(ctx, result.TargetAPK.Origin())
+	if err != nil {
+		return nil, fmt.Errorf("getting advisories for package %q: %w", result.TargetAPK.Origin(), err)
+	}
 
-		switch advisoryFilterSet {
-		case AdvisoriesSetAll:
-			filteredFindings = filterFindingsWithAllAdvisories(filteredFindings, packageAdvisories)
+	switch advisoryFilterSet {
+	case AdvisoriesSetAll:
+		filteredFindings = filterFindingsWithAllAdvisories(filteredFindings, packageAdvisories)
 
-		case AdvisoriesSetResolved:
-			filteredFindings = filterFindingsWithResolvedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+	case AdvisoriesSetResolved:
+		filteredFindings = filterFindingsWithResolvedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
-		case AdvisoriesSetConcluded:
-			filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+	case AdvisoriesSetConcluded:
+		filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
-		default:
-			return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
-		}
+	default:
+		return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
 	}
 
 	return filteredFindings, nil
