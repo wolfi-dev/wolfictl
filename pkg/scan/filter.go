@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	"github.com/chainguard-dev/clog"
 	"github.com/samber/lo"
 	"github.com/wolfi-dev/wolfictl/pkg/advisory"
 )
@@ -20,11 +21,16 @@ var ValidAdvisoriesSets = []string{AdvisoriesSetResolved, AdvisoriesSetAll, Advi
 
 // FilterWithAdvisories filters the findings in the result based on the advisories for the target APK.
 func FilterWithAdvisories(ctx context.Context, result Result, advGetter advisory.Getter, advisoryFilterSet string) ([]Finding, error) {
-	// TODO: consider using the context for more detailed logging of the filtering logic.
+	log := clog.FromContext(ctx).With(
+		"advisoryFilterSet", advisoryFilterSet,
+		"targetAPKOrigin", result.TargetAPK.Origin(),
+	)
 
 	if advGetter == nil {
 		return nil, fmt.Errorf("advGetter cannot be nil")
 	}
+
+	log.Debugf("filtering findings with advisories, count of input findings: %d", len(result.Findings))
 
 	// Use a copy of the findings, so we don't mutate the original result.
 	filteredFindings := slices.Clone(result.Findings)
@@ -48,6 +54,8 @@ func FilterWithAdvisories(ctx context.Context, result Result, advGetter advisory
 	default:
 		return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
 	}
+
+	log.Debugf("filtered findings with advisories, count of output findings: %d", len(filteredFindings))
 
 	return filteredFindings, nil
 }
