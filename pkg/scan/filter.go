@@ -29,26 +29,24 @@ func FilterWithAdvisories(ctx context.Context, result Result, advGetter advisory
 	// Use a copy of the findings, so we don't mutate the original result.
 	filteredFindings := slices.Clone(result.Findings)
 
-	// Check for advisories in both the result target's name and origin package (to handle subpackages)
-	for _, name := range []string{result.TargetAPK.Name, result.TargetAPK.OriginPackageName} {
-		packageAdvisories, err := advGetter.Advisories(ctx, name)
-		if err != nil {
-			return nil, fmt.Errorf("getting advisories for package %q: %w", name, err)
-		}
+	// Check for advisories in the result target's origin
+	packageAdvisories, err := advGetter.Advisories(ctx, result.TargetAPK.Origin())
+	if err != nil {
+		return nil, fmt.Errorf("getting advisories for package %q: %w", result.TargetAPK.Origin(), err)
+	}
 
-		switch advisoryFilterSet {
-		case AdvisoriesSetAll:
-			filteredFindings = filterFindingsWithAllAdvisories(filteredFindings, packageAdvisories)
+	switch advisoryFilterSet {
+	case AdvisoriesSetAll:
+		filteredFindings = filterFindingsWithAllAdvisories(filteredFindings, packageAdvisories)
 
-		case AdvisoriesSetResolved:
-			filteredFindings = filterFindingsWithResolvedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+	case AdvisoriesSetResolved:
+		filteredFindings = filterFindingsWithResolvedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
-		case AdvisoriesSetConcluded:
-			filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
+	case AdvisoriesSetConcluded:
+		filteredFindings = filterFindingsWithConcludedAdvisories(filteredFindings, packageAdvisories, result.TargetAPK.Version)
 
-		default:
-			return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
-		}
+	default:
+		return nil, fmt.Errorf("unknown advisory filter set: %s", advisoryFilterSet)
 	}
 
 	return filteredFindings, nil
