@@ -372,6 +372,50 @@ func TestFilterWithAdvisories(t *testing.T) {
 			},
 			errAssertion: assert.NoError,
 		},
+		{
+			name: "no advisory document available for package, return the same findings",
+			result: &Result{
+				TargetAPK: TargetAPK{
+					Name:    "withoutadvisory",
+					Version: "0.13.0-r30",
+				},
+				Findings: []Finding{
+					{
+						Vulnerability: Vulnerability{
+							ID: "GHSA-2h5h-59f5-c5x9",
+						},
+						Package: Package{
+							Type: "go-module",
+							PURL: "purl-value",
+						},
+					},
+					{
+						Vulnerability: Vulnerability{
+							ID: "CVE-1999-11111",
+						},
+					},
+				},
+			},
+			advisoryGetterFunc: getSingleAdvisoriesGetter,
+			advisoryFilterSet:  "resolved",
+			expectedFindings: []Finding{
+				{
+					Vulnerability: Vulnerability{
+						ID: "GHSA-2h5h-59f5-c5x9",
+					},
+					Package: Package{
+						Type: "go-module",
+						PURL: "purl-value",
+					},
+				},
+				{
+					Vulnerability: Vulnerability{
+						ID: "CVE-1999-11111",
+					},
+				},
+			},
+			errAssertion: assert.NoError,
+		},
 	}
 
 	for _, tt := range cases {

@@ -2,10 +2,11 @@ package advisory
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"sort"
 
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	"github.com/chainguard-dev/clog"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 )
 
@@ -35,10 +36,14 @@ func (c indexAdapter) PackageNames(_ context.Context) ([]string, error) {
 	return packageNames, nil
 }
 
-func (c indexAdapter) Advisories(_ context.Context, packageName string) ([]v2.PackageAdvisory, error) {
+func (c indexAdapter) Advisories(ctx context.Context, packageName string) ([]v2.PackageAdvisory, error) {
 	entry, err := c.index.Select().WhereName(packageName).First()
 	if err != nil {
-		return nil, fmt.Errorf("getting advisory document for %q: %w", packageName, err)
+		if errors.Is(err, configs.ErrNoEntries) {
+			clog.FromContext(ctx).Warnf("no source advisories found for package %q, skipping", packageName)
+			return []v2.PackageAdvisory{}, nil
+		}
+		return nil, err
 	}
 
 	doc := entry.Configuration()

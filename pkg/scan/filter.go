@@ -41,6 +41,10 @@ func FilterWithAdvisories(ctx context.Context, result Result, advGetter advisory
 		return nil, fmt.Errorf("getting advisories for package %q: %w", result.TargetAPK.Origin(), err)
 	}
 
+	if len(packageAdvisories) == 0 {
+		return filteredFindings, nil
+	}
+
 	switch advisoryFilterSet {
 	case AdvisoriesSetAll:
 		filteredFindings = filterFindingsWithAllAdvisories(filteredFindings, packageAdvisories)
