@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v0.27.2
-	chainguard.dev/melange v0.23.13
+	chainguard.dev/melange v0.23.15
 	cloud.google.com/go/storage v1.53.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.91.0
@@ -67,7 +67,7 @@ require (
 
 require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
-	github.com/chainguard-dev/advisory-schema v0.37.3
+	github.com/chainguard-dev/advisory-schema v0.37.4
 	github.com/spf13/afero v1.14.0
 )
 
@@ -256,7 +256,6 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nwaples/rardecode v1.1.3 // indirect
 	github.com/nwaples/rardecode/v2 v2.0.0-beta.4.0.20241112120701-034e449c6e78 // indirect
-	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
