@@ -56,7 +56,7 @@ require (
 	github.com/tmc/dot v0.2.0
 	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
-	golang.org/x/oauth2 v0.29.0
+	golang.org/x/oauth2 v0.30.0
 	golang.org/x/sync v0.14.0
 	golang.org/x/term v0.32.0
 	golang.org/x/text v0.24.0
