@@ -1083,6 +1083,43 @@
       }
     },
     {
+      "id": "28c5bcae12152313",
+      "name": "Microsoft.Management.Infrastructure",
+      "version": "3.0.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-deps-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pwsh.deps.json",
+          "accessPath": "usr/lib/powershell/pwsh.deps.json",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:microsoft_management_infrastructure:microsoft_management_infrastructure_.net:3.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:microsoft_management_infrastructure:microsoft_management_infrastructure:3.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Management.Infrastructure@3.0.0",
+      "metadataType": "dotnet-deps-entry",
+      "metadata": {
+        "name": "Microsoft.Management.Infrastructure",
+        "version": "3.0.0",
+        "path": "microsoft.management.infrastructure/3.0.0",
+        "sha512": "sha512-cGZi0q5IujCTVYKo9h22Pw+UwfZDV82HXO8HTxMG2HqntPlT3Ls8jY6punLp4YzCypJNpfCAu2kae3TIyuAiJw==",
+        "hashPath": "microsoft.management.infrastructure.3.0.0.nupkg.sha512"
+      }
+    },
+    {
       "id": "a8730d3bdb10dd5e",
       "name": "Microsoft.Management.Infrastructure.Runtime.Unix",
       "version": "3.0.0",
@@ -1477,6 +1514,43 @@
       }
     },
     {
+      "id": "22212a0d95fa0bf8",
+      "name": "Microsoft.PowerShell.Native",
+      "version": "7.4.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-deps-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pwsh.deps.json",
+          "accessPath": "usr/lib/powershell/pwsh.deps.json",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:microsoft_powershell_native:microsoft_powershell_native_.net:7.4.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:microsoft_powershell_native:microsoft_powershell_native:7.4.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.PowerShell.Native@7.4.0",
+      "metadataType": "dotnet-deps-entry",
+      "metadata": {
+        "name": "Microsoft.PowerShell.Native",
+        "version": "7.4.0",
+        "path": "microsoft.powershell.native/7.4.0",
+        "sha512": "sha512-FlaJ3JBWhqFToYT0ycMb/Xxzoof7oTQbNyI4UikgubC7AMWt5ptBNKjIAMPvOcvEHr+ohaO9GvRWp3tiyS3sKw==",
+        "hashPath": "microsoft.powershell.native.7.4.0.nupkg.sha512"
+      }
+    },
+    {
       "id": "1c6b3c9ce0a9636f",
       "name": "Microsoft.PowerShell.SDK",
       "version": "7.4.1",
@@ -1758,6 +1832,43 @@
             "productVersion": "8.0.0+5535e31a712343a63f5d7d796cd874e563e5ac14"
           }
         }
+      }
+    },
+    {
+      "id": "64bed5e79a0c1af1",
+      "name": "Microsoft.Windows.Compatibility",
+      "version": "8.0.1",
+      "type": "dotnet",
+      "foundBy": "dotnet-deps-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pwsh.deps.json",
+          "accessPath": "usr/lib/powershell/pwsh.deps.json",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:microsoft_windows_compatibility:microsoft_windows_compatibility_.net:8.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:microsoft_windows_compatibility:microsoft_windows_compatibility:8.0.1:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.Windows.Compatibility@8.0.1",
+      "metadataType": "dotnet-deps-entry",
+      "metadata": {
+        "name": "Microsoft.Windows.Compatibility",
+        "version": "8.0.1",
+        "path": "microsoft.windows.compatibility/8.0.1",
+        "sha512": "sha512-Gr6QvHy9Y5PK5/ijl+cnCnfLr9HdCVByHtbPR5CxOAPeshURdJ/SNMi1t7qbUMBFCU9zsBlXSE1q/TsOUS0u8A==",
+        "hashPath": "microsoft.windows.compatibility.8.0.1.nupkg.sha512"
       }
     },
     {
@@ -5356,6 +5467,80 @@
             "productVersion": "7.4.1 SHA: 5668713d3c906d63cd68e37d415206a95ac061d0+5668713d3c906d63cd68e37d415206a95ac061d0"
           }
         }
+      }
+    },
+    {
+      "id": "4f3c4993a7034a80",
+      "name": "runtime.linux-x64.runtime.native.System.IO.Ports",
+      "version": "8.0.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-deps-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pwsh.deps.json",
+          "accessPath": "usr/lib/powershell/pwsh.deps.json",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:runtime_linux_x64_runtime_native_system_io_ports:runtime_linux_x64_runtime_native_system_io_ports_.net:8.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:runtime_linux_x64_runtime_native_system_io_ports:runtime_linux_x64_runtime_native_system_io_ports:8.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/runtime.linux-x64.runtime.native.System.IO.Ports@8.0.0",
+      "metadataType": "dotnet-deps-entry",
+      "metadata": {
+        "name": "runtime.linux-x64.runtime.native.System.IO.Ports",
+        "version": "8.0.0",
+        "path": "runtime.linux-x64.runtime.native.system.io.ports/8.0.0",
+        "sha512": "sha512-Wnw5vhA4mgGbIFoo6l9Fk3iEcwRSq49a1aKwJgXUCUtEQLCSUDjTGSxqy/oMUuOyyn7uLHsH8KgZzQ1y3lReiQ==",
+        "hashPath": "runtime.linux-x64.runtime.native.system.io.ports.8.0.0.nupkg.sha512"
+      }
+    },
+    {
+      "id": "911665b9d76735aa",
+      "name": "runtime.native.System.IO.Ports",
+      "version": "8.0.0",
+      "type": "dotnet",
+      "foundBy": "dotnet-deps-binary-cataloger",
+      "locations": [
+        {
+          "path": "usr/lib/powershell/pwsh.deps.json",
+          "accessPath": "usr/lib/powershell/pwsh.deps.json",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [],
+      "language": "dotnet",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:runtime_native_system_io_ports:runtime_native_system_io_ports_.net:8.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:runtime_native_system_io_ports:runtime_native_system_io_ports:8.0.0:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:nuget/runtime.native.System.IO.Ports@8.0.0",
+      "metadataType": "dotnet-deps-entry",
+      "metadata": {
+        "name": "runtime.native.System.IO.Ports",
+        "version": "8.0.0",
+        "path": "runtime.native.system.io.ports/8.0.0",
+        "sha512": "sha512-Ee7Sz5llLpTgyKIWzKI/GeuRSbFkOABgJRY00SqTY0OkTYtkB+9l5rFZfE7fxPA3c22RfytCBYkUdAkcmwMjQg==",
+        "hashPath": "runtime.native.system.io.ports.8.0.0.nupkg.sha512"
       }
     }
   ],
