@@ -11,7 +11,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v0.27.2
+	chainguard.dev/apko v0.27.3
 	chainguard.dev/melange v0.23.15
 	cloud.google.com/go/storage v1.53.0
 	github.com/adrg/xdg v0.5.3
@@ -56,7 +56,7 @@ require (
 	github.com/tmc/dot v0.2.0
 	go.lsp.dev/uri v0.3.0
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
-	golang.org/x/oauth2 v0.29.0
+	golang.org/x/oauth2 v0.30.0
 	golang.org/x/sync v0.14.0
 	golang.org/x/term v0.32.0
 	golang.org/x/text v0.24.0
@@ -76,7 +76,7 @@ require (
 	chainguard.dev/go-grpc-kit v0.17.10 // indirect
 	chainguard.dev/sdk v0.1.32 // indirect
 	cloud.google.com/go v0.120.1 // indirect
-	cloud.google.com/go/auth v0.16.0 // indirect
+	cloud.google.com/go/auth v0.16.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cloud.google.com/go/iam v1.5.2 // indirect
@@ -337,7 +337,7 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
-	google.golang.org/api v0.230.0 // indirect
+	google.golang.org/api v0.231.0 // indirect
 	google.golang.org/genproto v0.0.0-20250414145226-207652e42e2e // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250425173222-7b384671a197 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250425173222-7b384671a197 // indirect
