@@ -30,7 +30,7 @@ jobs:
           go-version-file: 'go.mod'
           check-latest: true
 
-      - uses: chainguard-dev/actions/goimports@dd4524afd480a43ead9543a08be1c5004ee8b0a7 # v1.0.7
+      - uses: chainguard-dev/actions/goimports@ec48ea414c0cb207549029d8fe35f8f01e563219 # v1.0.8
       - run: make wolfictl
       - run: make test
 
