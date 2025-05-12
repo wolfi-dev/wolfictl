@@ -23,7 +23,7 @@ require (
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.5
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250319133953-166f707985bc
-	github.com/charmbracelet/log v0.4.1
+	github.com/charmbracelet/log v0.4.2
 	github.com/cli/browser v1.3.0
 	github.com/cli/go-gh/v2 v2.12.0
 	github.com/cpuguy83/go-md2man v1.0.10
