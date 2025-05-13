@@ -429,7 +429,7 @@ func (p *scanParams) doScanCommandForSingleInput(
 
 				for _, alias := range f.Vulnerability.Aliases {
 					if adv, ok := advsByVulnID[alias]; ok {
-						f.Advisory = &adv.Advisory
+						f.Advisory = &adv.Advisory //nolint:staticcheck // TODO: use advisory.Getter to lookup the advisory instead.
 						result.Findings[i] = *f
 						break
 					}

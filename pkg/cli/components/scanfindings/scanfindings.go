@@ -121,8 +121,8 @@ func Render(findings []scan.Finding) (string, error) {
 			),
 		}
 
-		if f.Advisory != nil {
-			pathParts = append(pathParts, renderAdvisoryPathParts(f.Advisory)...)
+		if f.Advisory != nil { //nolint:staticcheck // TODO: use advisory.Getter to lookup the advisory instead.
+			pathParts = append(pathParts, renderAdvisoryPathParts(f.Advisory)...) //nolint:staticcheck // TODO: use advisory.Getter to lookup the advisory instead.
 		}
 
 		return pathParts
