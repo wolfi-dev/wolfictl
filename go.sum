@@ -1,11 +1,11 @@
 cel.dev/expr v0.23.1 h1:K4KOtPCJQjVggkARsjG9RWXP6O4R73aHeJMa/dmCQQg=
 cel.dev/expr v0.23.1/go.mod h1:hLPLo1W4QUmuYdA72RBX06QTs6MXw941piREPl3Yfiw=
-chainguard.dev/apko v0.27.4 h1:7jZlT9SwZKdsW5VL2ywU+0Ez0DGuUhjb63KoT8mCofI=
-chainguard.dev/apko v0.27.4/go.mod h1:U88C5Vh2eQi0B21LrIGTGu7lpoO59iQTAZ2PiFYGmho=
+chainguard.dev/apko v0.27.6 h1:GP9Wn3s1LV/mdBav7EUtlvVROYRm1M8nMhXTZgb3OGU=
+chainguard.dev/apko v0.27.6/go.mod h1:50MFlnBotxCgObuO+jWUaJAdUWdm4uheMQl5HR5U3rQ=
 chainguard.dev/go-grpc-kit v0.17.10 h1:uymMNUIBgbypeIurW25XaXvx3kbS0JpfKsJEMrS0abY=
 chainguard.dev/go-grpc-kit v0.17.10/go.mod h1:RPyCEjTxWAxrODH5V4vJOLy/gHRjEjVF9dzWN+LmIvo=
-chainguard.dev/melange v0.23.16 h1:FSh6DePyWO1X03OV980twCobJQ3PlWhpX3NuvRPximY=
-chainguard.dev/melange v0.23.16/go.mod h1:DnXDBWXg6ddTJoXl8GYVrgMTTmLdJYhzyzeuuzUUIcQ=
+chainguard.dev/melange v0.23.17 h1:B7Sz1cPwtmXSJpM4rLoFTRmc8Wu4tYvnJyOvx36sH3M=
+chainguard.dev/melange v0.23.17/go.mod h1:DnXDBWXg6ddTJoXl8GYVrgMTTmLdJYhzyzeuuzUUIcQ=
 chainguard.dev/sdk v0.1.32 h1:pZWN2irtvKMaAkgOpM3LRhuOrlpR3UGhg4F9LVWSyA8=
 chainguard.dev/sdk v0.1.32/go.mod h1:ma1I0De/7PYJz8pEhEvTPv3hbnEehZPUKSiytzv2rJU=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -793,8 +793,8 @@ github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/chainguard-dev/advisory-schema v0.37.4 h1:0ImWV8cnvvHCMha3q7SJtBaoiN52cr4z4Lv1Dij+3wA=
-github.com/chainguard-dev/advisory-schema v0.37.4/go.mod h1:cQSeFeRv/RgrRL9tTqHlmN7Nvs1jZMbqOfm0yQvSVKk=
+github.com/chainguard-dev/advisory-schema v0.37.5 h1:PoG4mseF4BII/dk22Xbj5+VL9iXRr+XeL+OkQNM5GzI=
+github.com/chainguard-dev/advisory-schema v0.37.5/go.mod h1:fbnsNOVujL99hriVDQT5qzoU9cIn8ntb5eLX/xPgYJU=
 github.com/chainguard-dev/clog v1.7.0 h1:guPznsK8vLHvzz1QJe2yU6MFeYaiSOFOQBYw4OXu+g8=
 github.com/chainguard-dev/clog v1.7.0/go.mod h1:4+WFhRMsGH79etYXY3plYdp+tCz/KCkU8fAr0HoaPvs=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 h1:XR2vgQC024I9/boh9r1ihVv8Z14+pbvWqXeYMCnZJpc=
