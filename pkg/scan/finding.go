@@ -15,7 +15,11 @@ import (
 type Finding struct {
 	Package       Package
 	Vulnerability Vulnerability
-	Advisory      *v2.Advisory `json:",omitempty"`
+	CGAID         string `json:",omitempty"`
+
+	// Deprecated: This field will be removed soon. Plan to use CGAID to lookup the
+	// associated advisory out-of-band, instead of using this pointer.
+	Advisory *v2.Advisory `json:",omitempty"`
 
 	// Deprecated: This field will be removed soon.
 	TriageAssessments []TriageAssessment `json:",omitempty"`
