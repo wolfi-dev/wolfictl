@@ -19,6 +19,7 @@ import (
 	v6 "github.com/anchore/grype/grype/db/v6"
 	"github.com/anchore/grype/grype/db/v6/distribution"
 	"github.com/anchore/grype/grype/db/v6/installation"
+	"github.com/anchore/grype/grype/distro"
 	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/matcher"
 	"github.com/anchore/grype/grype/matcher/dotnet"
@@ -296,7 +297,7 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	// Find vulnerability matches
 	matchesCollection, _, err := s.vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{
 		Source: &ssbom.Source,
-		Distro: ssbom.Artifacts.LinuxDistribution,
+		Distro: distro.FromRelease(ssbom.Artifacts.LinuxDistribution),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to find vulnerability matches: %w", err)
