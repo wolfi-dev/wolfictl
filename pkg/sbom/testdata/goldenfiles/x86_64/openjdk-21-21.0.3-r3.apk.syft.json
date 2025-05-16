@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "c0044d4ea9b8e0a5",
+      "id": "eeb7c4c0ca34b36c",
       "name": "openjdk-21",
       "version": "21.0.3-r3",
       "type": "apk",

@@ -15,9 +15,9 @@ require (
 	chainguard.dev/melange v0.24.0
 	cloud.google.com/go/storage v1.54.0
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/grype v0.91.2
+	github.com/anchore/grype v0.92.0
 	github.com/anchore/stereoscope v0.1.4
-	github.com/anchore/syft v1.23.1
+	github.com/anchore/syft v1.24.0
 	github.com/chainguard-dev/clog v1.7.0
 	github.com/chainguard-dev/yam v0.2.15
 	github.com/charmbracelet/bubbles v0.21.0
@@ -93,7 +93,6 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
@@ -104,8 +103,8 @@ require (
 	github.com/acobaugh/osrelease v0.1.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/anchore/archiver/v3 v3.5.3-0.20241210171143-5b1d8d1c7c51 // indirect
-	github.com/anchore/clio v0.0.0-20250401141128-4c1d6bd1e872 // indirect
-	github.com/anchore/fangs v0.0.0-20250326231402-da263204d38e // indirect
+	github.com/anchore/clio v0.0.0-20250408180537-ec8fa27f0d9f // indirect
+	github.com/anchore/fangs v0.0.0-20250402135612-96e29e45f3fe // indirect
 	github.com/anchore/go-collections v0.0.0-20240216214351-5baf374cca6f // indirect
 	github.com/anchore/go-homedir v0.0.0-20250319154043-c29668562e4d // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
@@ -255,6 +254,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
+	github.com/nix-community/go-nix v0.0.0-20250101154619-4bdde671e0a1 // indirect
 	github.com/nwaples/rardecode v1.1.3 // indirect
 	github.com/nwaples/rardecode/v2 v2.1.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
@@ -331,11 +331,11 @@ require (
 	go.step.sm/crypto v0.61.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/tools v0.32.0 // indirect
+	golang.org/x/tools v0.33.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/api v0.232.0 // indirect
 	google.golang.org/genproto v0.0.0-20250414145226-207652e42e2e // indirect
@@ -345,7 +345,7 @@ require (
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gorm.io/gorm v1.25.12 // indirect
+	gorm.io/gorm v1.26.1 // indirect
 	k8s.io/apimachinery v0.32.3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	modernc.org/libc v1.62.1 // indirect

@@ -5838,7 +5838,7 @@
       }
     },
     {
-      "id": "a1fa4cba82f98855",
+      "id": "a5963ac4aad96084",
       "name": "stdlib",
       "version": "go1.22.4",
       "type": "go-module",
@@ -5876,7 +5876,7 @@
       }
     },
     {
-      "id": "42e5a80137c290cd",
+      "id": "8965a15e14ddfc73",
       "name": "terraform",
       "version": "1.5.7-r12",
       "type": "apk",
