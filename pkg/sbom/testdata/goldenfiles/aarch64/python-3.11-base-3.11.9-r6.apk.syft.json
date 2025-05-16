@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "703cd0ac27ed3f1c",
+      "id": "85d42e0e57aab361",
       "name": "pip",
       "version": "24.0",
       "type": "python",
@@ -87,7 +87,7 @@
       "purl": "pkg:pypi/pip@24.0"
     },
     {
-      "id": "c384b1b098432e24",
+      "id": "9bc9cc1c80f202a3",
       "name": "python-3.11-base",
       "version": "3.11.9-r6",
       "type": "apk",

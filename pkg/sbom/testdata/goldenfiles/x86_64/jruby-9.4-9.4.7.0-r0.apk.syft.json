@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "57065b70a0ccd08e",
+      "id": "56fa2671e3823910",
       "name": "abbrev",
       "version": "0.1.0",
       "type": "gem",
@@ -98,7 +98,7 @@
       }
     },
     {
-      "id": "b6a37df27eb290f3",
+      "id": "d07b3528ac7db1cf",
       "name": "backport9",
       "version": "1.13",
       "type": "java-archive",
@@ -184,7 +184,7 @@
       }
     },
     {
-      "id": "2e0145ba9b5087bb",
+      "id": "b11d893b62726552",
       "name": "base64",
       "version": "0.1.1",
       "type": "gem",
@@ -77838,7 +77838,7 @@
       }
     },
     {
-      "id": "3dcef6aedfd0d375",
+      "id": "040d7447aa36c369",
       "name": "benchmark",
       "version": "0.2.0",
       "type": "gem",
@@ -77936,7 +77936,7 @@
       }
     },
     {
-      "id": "faf230d34e82fd54",
+      "id": "b7b8bbf28eac7011",
       "name": "bigdecimal",
       "version": "3.1.4",
       "type": "gem",
@@ -78051,7 +78051,7 @@
       }
     },
     {
-      "id": "018441e7e16d55b3",
+      "id": "0e575cd494826bfe",
       "name": "bundler",
       "version": "2.3.26",
       "type": "gem",
@@ -78547,7 +78547,7 @@
       }
     },
     {
-      "id": "80bbc1c833db7f03",
+      "id": "c62f38838a697b2f",
       "name": "cgi",
       "version": "0.3.6",
       "type": "gem",
@@ -78692,7 +78692,7 @@
       }
     },
     {
-      "id": "b918866ed2495239",
+      "id": "ec40ea4ba8a077f8",
       "name": "csv",
       "version": "3.2.5",
       "type": "gem",
@@ -78827,7 +78827,7 @@
       }
     },
     {
-      "id": "95fc66d95c068c7e",
+      "id": "667fef55a794882d",
       "name": "date",
       "version": "3.3.3",
       "type": "gem",
@@ -78892,7 +78892,7 @@
       }
     },
     {
-      "id": "6e5f124b914874c0",
+      "id": "62740bb7b96eaba4",
       "name": "debug",
       "version": "0.2.1",
       "type": "gem",
@@ -78988,7 +78988,7 @@
       }
     },
     {
-      "id": "b441548274273fad",
+      "id": "9c9ba262cad43b54",
       "name": "delegate",
       "version": "0.2.0",
       "type": "gem",
@@ -79085,7 +79085,7 @@
       }
     },
     {
-      "id": "7bab69d3cf690f3b",
+      "id": "a6dae24364a3bdf5",
       "name": "did_you_mean",
       "version": "1.6.1",
       "type": "gem",
@@ -79275,7 +79275,7 @@
       }
     },
     {
-      "id": "b4054c389ed2bb42",
+      "id": "93db99d8c2783866",
       "name": "digest",
       "version": "3.1.0",
       "type": "gem",
@@ -79428,7 +79428,7 @@
       }
     },
     {
-      "id": "eb368f6b6c68e61d",
+      "id": "81f84a4fe059dc07",
       "name": "dirgra",
       "version": "0.3",
       "type": "java-archive",
@@ -79516,7 +79516,7 @@
       }
     },
     {
-      "id": "f5c4608e16c0291a",
+      "id": "7acbb34d77e319fb",
       "name": "drb",
       "version": "2.1.0",
       "type": "gem",
@@ -79619,7 +79619,7 @@
       }
     },
     {
-      "id": "3df269625e88f3f7",
+      "id": "24748926d66ad843",
       "name": "english",
       "version": "0.7.1",
       "type": "gem",
@@ -79716,7 +79716,7 @@
       }
     },
     {
-      "id": "6cd9c01e51b384fe",
+      "id": "9f9cbaf23607213b",
       "name": "erb",
       "version": "2.2.3",
       "type": "gem",
@@ -79816,7 +79816,7 @@
       }
     },
     {
-      "id": "d136645da50b7386",
+      "id": "7139b90ade7c130f",
       "name": "error_highlight",
       "version": "0.3.0",
       "type": "gem",
@@ -79987,7 +79987,7 @@
       }
     },
     {
-      "id": "e10d4ff3d33f2a51",
+      "id": "9f9630ad9bce6291",
       "name": "ffi",
       "version": "1.16.3",
       "type": "gem",
@@ -80167,7 +80167,7 @@
       }
     },
     {
-      "id": "c472ae455b7f31ab",
+      "id": "b63c19b997e71fe2",
       "name": "ffi-binary-libfixposix",
       "version": "0.5.1.1",
       "type": "gem",
@@ -80470,7 +80470,7 @@
       }
     },
     {
-      "id": "a68e7a96ce92c439",
+      "id": "c26f0fee9ca32960",
       "name": "fileutils",
       "version": "1.6.0",
       "type": "gem",
@@ -80546,7 +80546,7 @@
       }
     },
     {
-      "id": "ea0946c91443c4e4",
+      "id": "2b18a142ba0d0074",
       "name": "find",
       "version": "0.1.1",
       "type": "gem",
@@ -80643,7 +80643,7 @@
       }
     },
     {
-      "id": "84f321d8c965a937",
+      "id": "077f86e8ace3292a",
       "name": "forwardable",
       "version": "1.3.2",
       "type": "gem",
@@ -80780,7 +80780,7 @@
       }
     },
     {
-      "id": "476fee8a7c9ff87a",
+      "id": "ad61b0a4e5490efb",
       "name": "getoptlong",
       "version": "0.1.1",
       "type": "gem",
@@ -80876,7 +80876,7 @@
       }
     },
     {
-      "id": "e5b7b564b185aeea",
+      "id": "6e04b22756b0b917",
       "name": "invokebinder",
       "version": "1.13",
       "type": "java-archive",
@@ -80963,7 +80963,7 @@
       }
     },
     {
-      "id": "16f340ad4834b092",
+      "id": "0a67ea1f550fc98b",
       "name": "io-console",
       "version": "0.7.2",
       "type": "gem",
@@ -81102,7 +81102,7 @@
       }
     },
     {
-      "id": "0e2b9954b623e662",
+      "id": "3acd44807fa1df90",
       "name": "io-wait",
       "version": "0.3.0",
       "type": "gem",
@@ -81251,7 +81251,7 @@
       }
     },
     {
-      "id": "8397b62fd9bb64e4",
+      "id": "54c08c1277e629f7",
       "name": "ipaddr",
       "version": "1.2.4",
       "type": "gem",
@@ -81351,7 +81351,7 @@
       }
     },
     {
-      "id": "419392a75b56c773",
+      "id": "044d445815e00b78",
       "name": "irb",
       "version": "1.4.2",
       "type": "gem",
@@ -81503,7 +81503,7 @@
       }
     },
     {
-      "id": "7a77953be16f0f9b",
+      "id": "7912ab5d691f33b9",
       "name": "jar-dependencies",
       "version": "0.4.1",
       "type": "gem",
@@ -81650,7 +81650,7 @@
       }
     },
     {
-      "id": "4b7ea580e072ae0b",
+      "id": "0a70377d540e8314",
       "name": "jcodings",
       "version": "1.0.58",
       "type": "java-archive",
@@ -81737,7 +81737,7 @@
       }
     },
     {
-      "id": "fabdba97efa13606",
+      "id": "98f881d1a04866f4",
       "name": "jffi",
       "version": "1.3.13",
       "type": "java-archive",
@@ -81846,7 +81846,7 @@
       }
     },
     {
-      "id": "5345f81939a2ec74",
+      "id": "7b1109fb645350d7",
       "name": "jitescript",
       "version": "0.4.1",
       "type": "java-archive",
@@ -81926,7 +81926,7 @@
       }
     },
     {
-      "id": "af4bb88964ba34ee",
+      "id": "3467473051163fd3",
       "name": "jline",
       "version": "2.14.6",
       "type": "java-archive",
@@ -82048,7 +82048,7 @@
       }
     },
     {
-      "id": "c756b14c9e2d2802",
+      "id": "c5eaa70779e4798a",
       "name": "jnr-a64asm",
       "version": "1.0.0",
       "type": "java-archive",
@@ -82207,7 +82207,7 @@
       }
     },
     {
-      "id": "11a82a3c0aeb0a8b",
+      "id": "98ddefedff795b03",
       "name": "jnr-constants",
       "version": "0.10.4",
       "type": "java-archive",
@@ -82367,7 +82367,7 @@
       }
     },
     {
-      "id": "0b39b19e089e7328",
+      "id": "457ef76f2d585f1c",
       "name": "jnr-enxio",
       "version": "0.32.17",
       "type": "java-archive",
@@ -82527,7 +82527,7 @@
       }
     },
     {
-      "id": "b894a99c9ada7166",
+      "id": "d70257516ceb910b",
       "name": "jnr-ffi",
       "version": "2.2.16",
       "type": "java-archive",
@@ -82687,7 +82687,7 @@
       }
     },
     {
-      "id": "d7aef782ef1a9657",
+      "id": "3778a8199bee31ff",
       "name": "jnr-netdb",
       "version": "1.2.0",
       "type": "java-archive",
@@ -82847,7 +82847,7 @@
       }
     },
     {
-      "id": "dcc72be04cf0e16e",
+      "id": "7aab83aedd85a77e",
       "name": "jnr-posix",
       "version": "3.1.19",
       "type": "java-archive",
@@ -83040,7 +83040,7 @@
       }
     },
     {
-      "id": "24dfbbcb3738170b",
+      "id": "193c25ca5b4a61fd",
       "name": "jnr-unixsocket",
       "version": "0.38.22",
       "type": "java-archive",
@@ -83200,7 +83200,7 @@
       }
     },
     {
-      "id": "076a8924d48758ae",
+      "id": "81e2194cce8fefb2",
       "name": "jnr-x86asm",
       "version": "1.0.2",
       "type": "java-archive",
@@ -83360,7 +83360,7 @@
       }
     },
     {
-      "id": "af76ce04f9ca2211",
+      "id": "cd53500293b0a779",
       "name": "joda-time",
       "version": "2.12.7",
       "type": "java-archive",
@@ -83443,7 +83443,7 @@
       }
     },
     {
-      "id": "f4b6e2c37880c555",
+      "id": "f9546ad400a0314b",
       "name": "joni",
       "version": "2.2.1",
       "type": "java-archive",
@@ -83589,7 +83589,7 @@
       }
     },
     {
-      "id": "ca8eace2fcf6828b",
+      "id": "22c378f9855ea08e",
       "name": "jruby-9.4",
       "version": "9.4.7.0-r0",
       "type": "apk",
@@ -90359,7 +90359,7 @@
       }
     },
     {
-      "id": "1ac1bd89c6841000",
+      "id": "2f955381b287dd0d",
       "name": "jruby-base",
       "version": "9.4.7.0",
       "type": "java-archive",
@@ -90387,7 +90387,8 @@
                 "evidence": "primary"
               }
             }
-          ]
+          ],
+          "contents": "\r\n                                 Apache License\r\n                           Version 2.0, January 2004\r\n                        http://www.apache.org/licenses/\r\n\r\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\r\n\r\n   1. Definitions.\r\n\r\n      \"License\" shall mean the terms and conditions for use, reproduction,\r\n      and distribution as defined by Sections 1 through 9 of this document.\r\n\r\n      \"Licensor\" shall mean the copyright owner or entity authorized by\r\n      the copyright owner that is granting the License.\r\n\r\n      \"Legal Entity\" shall mean the union of the acting entity and all\r\n      other entities that control, are controlled by, or are under common\r\n      control with that entity. For the purposes of this definition,\r\n      \"control\" means (i) the power, direct or indirect, to cause the\r\n      direction or management of such entity, whether by contract or\r\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\r\n      outstanding shares, or (iii) beneficial ownership of such entity.\r\n\r\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\r\n      exercising permissions granted by this License.\r\n\r\n      \"Source\" form shall mean the preferred form for making modifications,\r\n      including but not limited to software source code, documentation\r\n      source, and configuration files.\r\n\r\n      \"Object\" form shall mean any form resulting from mechanical\r\n      transformation or translation of a Source form, including but\r\n      not limited to compiled object code, generated documentation,\r\n      and conversions to other media types.\r\n\r\n      \"Work\" shall mean the work of authorship, whether in Source or\r\n      Object form, made available under the License, as indicated by a\r\n      copyright notice that is included in or attached to the work\r\n      (an example is provided in the Appendix below).\r\n\r\n      \"Derivative Works\" shall mean any work, whether in Source or Object\r\n      form, that is based on (or derived from) the Work and for which the\r\n      editorial revisions, annotations, elaborations, or other modifications\r\n      represent, as a whole, an original work of authorship. For the purposes\r\n      of this License, Derivative Works shall not include works that remain\r\n      separable from, or merely link (or bind by name) to the interfaces of,\r\n      the Work and Derivative Works thereof.\r\n\r\n      \"Contribution\" shall mean any work of authorship, including\r\n      the original version of the Work and any modifications or additions\r\n      to that Work or Derivative Works thereof, that is intentionally\r\n      submitted to Licensor for inclusion in the Work by the copyright owner\r\n      or by an individual or Legal Entity authorized to submit on behalf of\r\n      the copyright owner. For the purposes of this definition, \"submitted\"\r\n      means any form of electronic, verbal, or written communication sent\r\n      to the Licensor or its representatives, including but not limited to\r\n      communication on electronic mailing lists, source code control systems,\r\n      and issue tracking systems that are managed by, or on behalf of, the\r\n      Licensor for the purpose of discussing and improving the Work, but\r\n      excluding communication that is conspicuously marked or otherwise\r\n      designated in writing by the copyright owner as \"Not a Contribution.\"\r\n\r\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\r\n      on behalf of whom a Contribution has been received by Licensor and\r\n      subsequently incorporated within the Work.\r\n\r\n   2. Grant of Copyright License. Subject to the terms and conditions of\r\n      this License, each Contributor hereby grants to You a perpetual,\r\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\r\n      copyright license to reproduce, prepare Derivative Works of,\r\n      publicly display, publicly perform, sublicense, and distribute the\r\n      Work and such Derivative Works in Source or Object form.\r\n\r\n   3. Grant of Patent License. Subject to the terms and conditions of\r\n      this License, each Contributor hereby grants to You a perpetual,\r\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\r\n      (except as stated in this section) patent license to make, have made,\r\n      use, offer to sell, sell, import, and otherwise transfer the Work,\r\n      where such license applies only to those patent claims licensable\r\n      by such Contributor that are necessarily infringed by their\r\n      Contribution(s) alone or by combination of their Contribution(s)\r\n      with the Work to which such Contribution(s) was submitted. If You\r\n      institute patent litigation against any entity (including a\r\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\r\n      or a Contribution incorporated within the Work constitutes direct\r\n      or contributory patent infringement, then any patent licenses\r\n      granted to You under this License for that Work shall terminate\r\n      as of the date such litigation is filed.\r\n\r\n   4. Redistribution. You may reproduce and distribute copies of the\r\n      Work or Derivative Works thereof in any medium, with or without\r\n      modifications, and in Source or Object form, provided that You\r\n      meet the following conditions:\r\n\r\n      (a) You must give any other recipients of the Work or\r\n          Derivative Works a copy of this License; and\r\n\r\n      (b) You must cause any modified files to carry prominent notices\r\n          stating that You changed the files; and\r\n\r\n      (c) You must retain, in the Source form of any Derivative Works\r\n          that You distribute, all copyright, patent, trademark, and\r\n          attribution notices from the Source form of the Work,\r\n          excluding those notices that do not pertain to any part of\r\n          the Derivative Works; and\r\n\r\n      (d) If the Work includes a \"NOTICE\" text file as part of its\r\n          distribution, then any Derivative Works that You distribute must\r\n          include a readable copy of the attribution notices contained\r\n          within such NOTICE file, excluding those notices that do not\r\n          pertain to any part of the Derivative Works, in at least one\r\n          of the following places: within a NOTICE text file distributed\r\n          as part of the Derivative Works; within the Source form or\r\n          documentation, if provided along with the Derivative Works; or,\r\n          within a display generated by the Derivative Works, if and\r\n          wherever such third-party notices normally appear. The contents\r\n          of the NOTICE file are for informational purposes only and\r\n          do not modify the License. You may add Your own attribution\r\n          notices within Derivative Works that You distribute, alongside\r\n          or as an addendum to the NOTICE text from the Work, provided\r\n          that such additional attribution notices cannot be construed\r\n          as modifying the License.\r\n\r\n      You may add Your own copyright statement to Your modifications and\r\n      may provide additional or different license terms and conditions\r\n      for use, reproduction, or distribution of Your modifications, or\r\n      for any such Derivative Works as a whole, provided Your use,\r\n      reproduction, and distribution of the Work otherwise complies with\r\n      the conditions stated in this License.\r\n\r\n   5. Submission of Contributions. Unless You explicitly state otherwise,\r\n      any Contribution intentionally submitted for inclusion in the Work\r\n      by You to the Licensor shall be under the terms and conditions of\r\n      this License, without any additional terms or conditions.\r\n      Notwithstanding the above, nothing herein shall supersede or modify\r\n      the terms of any separate license agreement you may have executed\r\n      with Licensor regarding such Contributions.\r\n\r\n   6. Trademarks. This License does not grant permission to use the trade\r\n      names, trademarks, service marks, or product names of the Licensor,\r\n      except as required for reasonable and customary use in describing the\r\n      origin of the Work and reproducing the content of the NOTICE file.\r\n\r\n   7. Disclaimer of Warranty. Unless required by applicable law or\r\n      agreed to in writing, Licensor provides the Work (and each\r\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\r\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\r\n      implied, including, without limitation, any warranties or conditions\r\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\r\n      PARTICULAR PURPOSE. You are solely responsible for determining the\r\n      appropriateness of using or redistributing the Work and assume any\r\n      risks associated with Your exercise of permissions under this License.\r\n\r\n   8. Limitation of Liability. In no event and under no legal theory,\r\n      whether in tort (including negligence), contract, or otherwise,\r\n      unless required by applicable law (such as deliberate and grossly\r\n      negligent acts) or agreed to in writing, shall any Contributor be\r\n      liable to You for damages, including any direct, indirect, special,\r\n      incidental, or consequential damages of any character arising as a\r\n      result of this License or out of the use or inability to use the\r\n      Work (including but not limited to damages for loss of goodwill,\r\n      work stoppage, computer failure or malfunction, or any and all\r\n      other commercial damages or losses), even if such Contributor\r\n      has been advised of the possibility of such damages.\r\n\r\n   9. Accepting Warranty or Additional Liability. While redistributing\r\n      the Work or Derivative Works thereof, You may choose to offer,\r\n      and charge a fee for, acceptance of support, warranty, indemnity,\r\n      or other liability obligations and/or rights consistent with this\r\n      License. However, in accepting such obligations, You may act only\r\n      on Your own behalf and on Your sole responsibility, not on behalf\r\n      of any other Contributor, and only if You agree to indemnify,\r\n      defend, and hold each Contributor harmless for any liability\r\n      incurred by, or claims asserted against, such Contributor by reason\r\n      of your accepting any such warranty or additional liability.\r\n\r\n   END OF TERMS AND CONDITIONS\r\n\r\n   APPENDIX: How to apply the Apache License to your work.\r\n\r\n      To apply the Apache License to your work, attach the following\r\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\r\n      replaced with your own identifying information. (Don't include\r\n      the brackets!)  The text should be enclosed in the appropriate\r\n      comment syntax for the file format. We also recommend that a\r\n      file or class name and description of purpose be included on the\r\n      same \"printed page\" as the copyright notice for easier\r\n      identification within third-party archives.\r\n\r\n   Copyright [yyyy] [name of copyright owner]\r\n\r\n   Licensed under the Apache License, Version 2.0 (the \"License\");\r\n   you may not use this file except in compliance with the License.\r\n   You may obtain a copy of the License at\r\n\r\n       http://www.apache.org/licenses/LICENSE-2.0\r\n\r\n   Unless required by applicable law or agreed to in writing, software\r\n   distributed under the License is distributed on an \"AS IS\" BASIS,\r\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n   See the License for the specific language governing permissions and\r\n   limitations under the License.\r\n"
         }
       ],
       "language": "java",
@@ -90577,7 +90578,7 @@
       }
     },
     {
-      "id": "7a7820a5162f4a83",
+      "id": "2dcc79216489ad12",
       "name": "jruby-openssl",
       "version": "0.14.5",
       "type": "gem",
@@ -90781,7 +90782,7 @@
       }
     },
     {
-      "id": "807b16da33814c98",
+      "id": "c556c086c58824e7",
       "name": "jruby-openssl",
       "version": "0.14.5",
       "type": "java-archive",
@@ -90898,7 +90899,7 @@
       }
     },
     {
-      "id": "e39ed7760248afd0",
+      "id": "d0c0eb2fff591a9c",
       "name": "jruby-readline",
       "version": "1.3.7",
       "type": "gem",
@@ -91049,7 +91050,7 @@
       }
     },
     {
-      "id": "87705faad77e2c57",
+      "id": "f301610243639750",
       "name": "jruby-readline",
       "version": "1.3.7",
       "type": "java-archive",
@@ -91166,7 +91167,7 @@
       }
     },
     {
-      "id": "b5c14f75c73f2910",
+      "id": "5533782db2ad1f26",
       "name": "json",
       "version": "2.7.1",
       "type": "gem",
@@ -91243,7 +91244,7 @@
       }
     },
     {
-      "id": "b123615f7cffba8a",
+      "id": "eca144c9b6414b46",
       "name": "jzlib",
       "version": "1.1.5",
       "type": "java-archive",
@@ -91331,7 +91332,7 @@
       }
     },
     {
-      "id": "04923d1b7d4c02ae",
+      "id": "956850cfb2f7a12a",
       "name": "logger",
       "version": "1.5.1",
       "type": "gem",
@@ -91435,7 +91436,7 @@
       }
     },
     {
-      "id": "e92e3884662a9a38",
+      "id": "f17cd4449783f7c3",
       "name": "matrix",
       "version": "0.4.2",
       "type": "gem",
@@ -91520,7 +91521,7 @@
       }
     },
     {
-      "id": "4baba6d0f9ebf4a4",
+      "id": "7c22103cf00ccff6",
       "name": "minitest",
       "version": "5.15.0",
       "type": "gem",
@@ -91599,7 +91600,7 @@
       }
     },
     {
-      "id": "8537fb64c9dddf79",
+      "id": "53c6a7e75f54dfec",
       "name": "mutex_m",
       "version": "0.1.1",
       "type": "gem",
@@ -91732,7 +91733,7 @@
       }
     },
     {
-      "id": "7ac0b41a86259343",
+      "id": "d6292411f2709cb1",
       "name": "net-ftp",
       "version": "0.1.3",
       "type": "gem",
@@ -91857,7 +91858,7 @@
       }
     },
     {
-      "id": "97ecb6abc36d7e79",
+      "id": "c6d5f07f66d66d37",
       "name": "net-http",
       "version": "0.3.0",
       "type": "gem",
@@ -92007,7 +92008,7 @@
       }
     },
     {
-      "id": "e1f89d9501da60ea",
+      "id": "ee043d2b08b8b1fc",
       "name": "net-imap",
       "version": "0.2.3",
       "type": "gem",
@@ -92056,68 +92057,8 @@
       "language": "ruby",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:shugo-maeda:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:shugo-maeda:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:shugo_maeda:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:shugo_maeda:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:ruby-lang:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:ruby-lang:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:ruby_lang:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:ruby_lang:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:net-imap:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:net-imap:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:net_imap:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:net_imap:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:ruby:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:ruby:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:net:net-imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:net:net_imap:0.2.3:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:ruby-lang:net\\:\\:imap:0.2.3:*:*:*:*:ruby:*:*",
+          "source": "nvd-cpe-dictionary"
         }
       ],
       "purl": "pkg:gem/net-imap@0.2.3",
@@ -92132,7 +92073,7 @@
       }
     },
     {
-      "id": "425d627d1bb46094",
+      "id": "2771219d7d2409b9",
       "name": "net-pop",
       "version": "0.1.1",
       "type": "gem",
@@ -92257,7 +92198,7 @@
       }
     },
     {
-      "id": "2bdd4ce10beb3005",
+      "id": "3c5e85a82e53fdfd",
       "name": "net-protocol",
       "version": "0.1.2",
       "type": "gem",
@@ -92395,7 +92336,7 @@
       }
     },
     {
-      "id": "ade675a6ffca79c6",
+      "id": "dff65eddcf463d46",
       "name": "net-smtp",
       "version": "0.3.1",
       "type": "gem",
@@ -92520,7 +92461,7 @@
       }
     },
     {
-      "id": "9cdc6c85fac71dd9",
+      "id": "9acba0f851738dcb",
       "name": "nkf",
       "version": "0.2.0",
       "type": "gem",
@@ -92720,7 +92661,7 @@
       }
     },
     {
-      "id": "fc4037b57f44c883",
+      "id": "54bfcf6d58a251d9",
       "name": "observer",
       "version": "0.1.1",
       "type": "gem",
@@ -92817,7 +92758,7 @@
       }
     },
     {
-      "id": "652ba40977b0277b",
+      "id": "29a96061cdd4e1ff",
       "name": "open-uri",
       "version": "0.3.0",
       "type": "gem",
@@ -92947,7 +92888,7 @@
       }
     },
     {
-      "id": "365581156cb5a86a",
+      "id": "b9aa8419b45b2b69",
       "name": "open3",
       "version": "0.1.2",
       "type": "gem",
@@ -93048,7 +92989,7 @@
       }
     },
     {
-      "id": "062980bcca5611e3",
+      "id": "372502c6772e5448",
       "name": "options",
       "version": "1.6",
       "type": "java-archive",
@@ -93135,7 +93076,7 @@
       }
     },
     {
-      "id": "91ac5e956ae1443b",
+      "id": "7e936a2405bd93fa",
       "name": "optparse",
       "version": "0.2.0",
       "type": "gem",
@@ -93295,7 +93236,7 @@
       }
     },
     {
-      "id": "7b01e2c593940b7e",
+      "id": "0d4280525b81b1bf",
       "name": "ostruct",
       "version": "0.5.5",
       "type": "gem",
@@ -93438,7 +93379,7 @@
       }
     },
     {
-      "id": "2733844680a8b224",
+      "id": "d52ae968a676b5bd",
       "name": "power_assert",
       "version": "2.0.1",
       "type": "gem",
@@ -93566,7 +93507,7 @@
       }
     },
     {
-      "id": "12479478e17978d3",
+      "id": "0ddf9996251347f3",
       "name": "pp",
       "version": "0.3.0",
       "type": "gem",
@@ -93656,7 +93597,7 @@
       }
     },
     {
-      "id": "115156235b18001e",
+      "id": "a54f76c5ca45650f",
       "name": "prettyprint",
       "version": "0.1.1",
       "type": "gem",
@@ -93753,7 +93694,7 @@
       }
     },
     {
-      "id": "185a99db47432290",
+      "id": "a307c7d029905f30",
       "name": "prime",
       "version": "0.1.2",
       "type": "gem",
@@ -93838,7 +93779,7 @@
       }
     },
     {
-      "id": "f7796bfff90c74f4",
+      "id": "d1ea8fd6a583384c",
       "name": "pstore",
       "version": "0.1.1",
       "type": "gem",
@@ -93935,7 +93876,7 @@
       }
     },
     {
-      "id": "1baa05755baebc54",
+      "id": "7f241cef373bff69",
       "name": "psych",
       "version": "5.1.1.1",
       "type": "gem",
@@ -94130,7 +94071,7 @@
       }
     },
     {
-      "id": "3a5d0c01d7bbe732",
+      "id": "245b0518b29a8cf6",
       "name": "racc",
       "version": "1.6.0",
       "type": "gem",
@@ -94262,7 +94203,7 @@
       }
     },
     {
-      "id": "712ce854f4dae9ca",
+      "id": "7cdb69bd9fb78310",
       "name": "rake",
       "version": "13.0.6",
       "type": "gem",
@@ -94317,7 +94258,7 @@
       }
     },
     {
-      "id": "6925e54e0c0660ec",
+      "id": "19f8383aff9f9e6c",
       "name": "rake-ant",
       "version": "1.0.6",
       "type": "gem",
@@ -94465,7 +94406,7 @@
       }
     },
     {
-      "id": "91c5f5e5ee416de9",
+      "id": "c9b982df1c7126aa",
       "name": "rdoc",
       "version": "6.4.1.1",
       "type": "gem",
@@ -94776,7 +94717,7 @@
       }
     },
     {
-      "id": "842469d742a04109",
+      "id": "bae8121b2e6c063c",
       "name": "reline",
       "version": "0.4.2",
       "type": "gem",
@@ -94867,7 +94808,7 @@
       }
     },
     {
-      "id": "3bd3282fb1fe5daf",
+      "id": "2047e6b92a3de00b",
       "name": "resolv",
       "version": "0.4.0",
       "type": "gem",
@@ -94952,7 +94893,7 @@
       }
     },
     {
-      "id": "ebd3e8fbceb49840",
+      "id": "a8c5f61d9c6a04fb",
       "name": "resolv-replace",
       "version": "0.1.0",
       "type": "gem",
@@ -95088,7 +95029,7 @@
       }
     },
     {
-      "id": "d5985b7f03994d4d",
+      "id": "50ec1b58fe12f737",
       "name": "rexml",
       "version": "3.2.5",
       "type": "gem",
@@ -95155,7 +95096,7 @@
       }
     },
     {
-      "id": "4b3f93c8ffec9d77",
+      "id": "344ce7525f87dca0",
       "name": "rinda",
       "version": "0.1.1",
       "type": "gem",
@@ -95254,7 +95195,7 @@
       }
     },
     {
-      "id": "28df8075370b93b5",
+      "id": "d27cff8ef932cf78",
       "name": "rss",
       "version": "0.2.9",
       "type": "gem",
@@ -95324,7 +95265,7 @@
       }
     },
     {
-      "id": "d60061aa57056a90",
+      "id": "cb577c58a5bb8585",
       "name": "ruby2_keywords",
       "version": "0.0.5",
       "type": "gem",
@@ -95460,7 +95401,7 @@
       }
     },
     {
-      "id": "02af31671ed979c1",
+      "id": "b8205e625bb0ea65",
       "name": "rubygems-update",
       "version": "3.3.26",
       "type": "gem",
@@ -96289,7 +96230,7 @@
       }
     },
     {
-      "id": "bbc817ec42b5d2f8",
+      "id": "6c5694198564e4bc",
       "name": "securerandom",
       "version": "0.2.0",
       "type": "gem",
@@ -96388,7 +96329,7 @@
       }
     },
     {
-      "id": "0679e01f650193d3",
+      "id": "69a3add1df46961b",
       "name": "shellwords",
       "version": "0.1.0",
       "type": "gem",
@@ -96485,7 +96426,7 @@
       }
     },
     {
-      "id": "0253aaab922f762c",
+      "id": "fa6326c15e040f55",
       "name": "singleton",
       "version": "0.1.1",
       "type": "gem",
@@ -96582,7 +96523,7 @@
       }
     },
     {
-      "id": "1d48bff9b0507412",
+      "id": "0661654678647081",
       "name": "snakeyaml-engine",
       "version": "2.7",
       "type": "java-archive",
@@ -96772,7 +96713,7 @@
       }
     },
     {
-      "id": "958fb66d0b577041",
+      "id": "3f0e120670ca99bc",
       "name": "stringio",
       "version": "3.0.8",
       "type": "gem",
@@ -96918,7 +96859,7 @@
       }
     },
     {
-      "id": "97a19c2e2184de7c",
+      "id": "b87dd8fe3ab2ac83",
       "name": "strscan",
       "version": "3.1.0",
       "type": "gem",
@@ -97074,7 +97015,7 @@
       }
     },
     {
-      "id": "b280b54a904bd39a",
+      "id": "4ac8d8bc5aff5f40",
       "name": "subspawn",
       "version": "0.1.1",
       "type": "gem",
@@ -97193,7 +97134,7 @@
       }
     },
     {
-      "id": "53628b7ca08249be",
+      "id": "18b74a527dcff8a9",
       "name": "subspawn-posix",
       "version": "0.1.1",
       "type": "gem",
@@ -97354,7 +97295,7 @@
       }
     },
     {
-      "id": "d0800bdc5867dc77",
+      "id": "4a4d507cc6da17ea",
       "name": "test-unit",
       "version": "3.5.3",
       "type": "gem",
@@ -97511,7 +97452,7 @@
       }
     },
     {
-      "id": "25b2c9a1de5e909e",
+      "id": "dec51383f124c8ad",
       "name": "time",
       "version": "0.2.2",
       "type": "gem",
@@ -97589,7 +97530,7 @@
       }
     },
     {
-      "id": "61ec24590da6373f",
+      "id": "00dd59269a89fc5b",
       "name": "timeout",
       "version": "0.3.2",
       "type": "gem",
@@ -97681,7 +97622,7 @@
       }
     },
     {
-      "id": "03fbb65b20c79476",
+      "id": "8297995d9a2918f9",
       "name": "tsort",
       "version": "0.1.0",
       "type": "gem",
@@ -97778,7 +97719,7 @@
       }
     },
     {
-      "id": "b3a65ee6d6a43368",
+      "id": "ccc43a031bf98c3c",
       "name": "un",
       "version": "0.2.0",
       "type": "gem",
@@ -97874,7 +97815,7 @@
       }
     },
     {
-      "id": "6a2fc9c3b414c936",
+      "id": "6108c8fad04008c2",
       "name": "uri",
       "version": "0.12.2",
       "type": "gem",
@@ -98013,7 +97954,7 @@
       }
     },
     {
-      "id": "47ab67f46d0f1aed",
+      "id": "7509de29d6064474",
       "name": "weakref",
       "version": "0.1.1",
       "type": "gem",
@@ -98110,7 +98051,7 @@
       }
     },
     {
-      "id": "f6ea800b4f78c120",
+      "id": "39275e0eaeecc4d4",
       "name": "yaml",
       "version": "0.2.0",
       "type": "gem",
