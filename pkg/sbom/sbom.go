@@ -14,6 +14,7 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/anchore/syft/syft"
+	"github.com/anchore/syft/syft/cataloging"
 	"github.com/anchore/syft/syft/cataloging/filecataloging"
 	"github.com/anchore/syft/syft/cataloging/pkgcataloging"
 	"github.com/anchore/syft/syft/cpe"
@@ -140,7 +141,17 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		catalogers.AngularJSReference,
 		catalogers.PipVendorReference,
 		catalogers.WheelReference,
-	)
+	).WithLicenseConfig(cataloging.LicenseConfig{
+		// Syft 1.24.0 starts adding full license texts into the SBOM, and this option
+		// should prevent that (we don't need these huge license texts right now). But,
+		// emphasis on "should"... the config wasn't wired correctly in Syft until
+		// https://github.com/anchore/syft/pull/3900. So, our integration test golden
+		// files were regenerated to absorb this change (to include licenses), and then
+		// when that fix PR rolls out, the tests will fail again, and we'll need to
+		// regenerate the golden files to account for subtracting the license texts back
+		// out.
+		IncludeContent: cataloging.LicenseContentExcludeAll,
+	})
 
 	createdSBOM, err := syft.CreateSBOM(ctx, src, cfg)
 	if err != nil {
