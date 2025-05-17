@@ -10,6 +10,7 @@ import (
 
 	cgaid "github.com/chainguard-dev/advisory-schema/pkg/advisory"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
+	"github.com/chainguard-dev/yam/pkg/util"
 	"github.com/chainguard-dev/yam/pkg/yam/formatted"
 	"github.com/wolfi-dev/wolfictl/pkg/configs/rwfs"
 )
@@ -56,6 +57,33 @@ func NewFSPutter(fsys rwfs.FS, enc DocumentEncoder) *FSPutter {
 		enc:         enc,
 		idGenerator: cgaid.DefaultIDGenerator,
 	}
+}
+
+// NewFSPutterWithAutomaticEncoder creates and returns a new FSPutter. It
+// determines the encoder configuration by attempting to use the `.yam.yaml`
+// file at the root of the given `fsys`. If none is available, a default
+// configuration is used for the encoder.
+func NewFSPutterWithAutomaticEncoder(fsys rwfs.FS) *FSPutter {
+	// We'll set defaults to be used if we can't open and use the config file.
+	encodeOptions := formatted.EncodeOptions{
+		Indent:         2,
+		GapExpressions: []string{".", ".advisories"},
+	}
+
+	// Best-effort attempt to read the config file. If any we hit any errors, we're
+	// totally fine using the above defaults.
+
+	cfgFile, err := fsys.Open(util.ConfigFileName)
+	if err == nil {
+		defer cfgFile.Close()
+
+		encodeOptionsFromFsys, err := formatted.ReadConfigFrom(cfgFile)
+		if err == nil {
+			encodeOptions = *encodeOptionsFromFsys
+		}
+	}
+
+	return NewFSPutter(fsys, NewYamDocumentEncoder(encodeOptions))
 }
 
 func (p FSPutter) Upsert(_ context.Context, request Request) (string, error) {

@@ -159,3 +159,47 @@ func TestFSPutter_Upsert(t *testing.T) {
 		})
 	}
 }
+
+func TestNewFSPutterWithAutomaticEncoder(t *testing.T) {
+	cases := []string{
+		"with-config-file",
+		"without-config-file",
+	}
+
+	testTime := v2.Timestamp(time.Date(2025, 3, 11, 2, 40, 18, 0, time.UTC))
+
+	for _, tt := range cases {
+		t.Run(tt, func(t *testing.T) {
+			ctx := t.Context()
+			testDir := filepath.Join("testdata", "fs_putter", "automatic-encoder", tt)
+
+			fsys, err := testerfs.New(os.DirFS(testDir))
+			require.NoError(t, err, "creating test filesystem")
+
+			p := NewFSPutterWithAutomaticEncoder(fsys) // (we want to test this constructor specifically)
+			require.NotNil(t, p, "creating FSPutter")
+
+			req := Request{
+				Package:    "foo",
+				AdvisoryID: "CGA-xvg9-g29c-rr68",
+				Event: v2.Event{
+					Timestamp: testTime,
+					Type:      v2.EventTypeFixed,
+					Data: v2.Fixed{
+						FixedVersion: "1.2.3-r4",
+					},
+				},
+			}
+
+			// We're upserting just so that we can see if `NewFSPutterWithAutomaticEncoder`
+			// set up the encoder correctly (when YAML data is written to the filesystem).
+
+			_, err = p.Upsert(ctx, req)
+			require.NoError(t, err, "upserting advisory data")
+
+			if diff := fsys.DiffAll(); diff != "" {
+				t.Errorf("filesystem in an unexpected state (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
