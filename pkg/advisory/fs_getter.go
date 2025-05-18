@@ -51,6 +51,15 @@ func (g FSGetter) PackageNames(_ context.Context) ([]string, error) {
 
 func (g FSGetter) Advisories(_ context.Context, packageName string) ([]v2.PackageAdvisory, error) {
 	advFileName := fmt.Sprintf("%s.advisories.yaml", packageName)
+	return g.AdvisoriesFromFile(advFileName, packageName)
+}
+
+// AdvisoriesFromFile is a function not part of the Getter interface. It allows
+// one to explicitly decode advisories from  a file with the given name. This
+// obviously does not make sense to belong to a generic interface that does
+// not have files.
+
+func (g FSGetter) AdvisoriesFromFile(advFileName, packageName string) ([]v2.PackageAdvisory, error) {
 	f, err := g.fsys.Open(advFileName)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
