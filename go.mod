@@ -15,7 +15,7 @@ require (
 	chainguard.dev/melange v0.25.1
 	cloud.google.com/go/storage v1.54.0
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/grype v0.92.0
+	github.com/anchore/grype v0.92.1
 	github.com/anchore/stereoscope v0.1.4
 	github.com/anchore/syft v1.25.1
 	github.com/chainguard-dev/clog v1.7.0
