@@ -133,13 +133,13 @@ func (t Tree[T]) Render() string {
 		indentation := "    " // Adjust indentation as needed
 
 		// Write the node's value with appropriate indentation and prefix
-		switch {
-		case level == 0:
+		switch level {
+		case 0:
 			if n.value != "" {
 				sb.WriteString(n.value)
 				sb.WriteString("\n")
 			}
-		case level == 1:
+		case 1:
 			sb.WriteString(prefix)
 			if isLast {
 				sb.WriteString("└── ")

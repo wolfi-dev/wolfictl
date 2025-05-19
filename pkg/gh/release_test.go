@@ -94,7 +94,7 @@ func TestPrereleaseBump(t *testing.T) {
 			e, err := version.NewVersion(test.expected)
 			assert.NoError(t, err)
 
-			got, err := test.ReleaseOptions.bumpReleaseVersion(c)
+			got, err := test.bumpReleaseVersion(c)
 			assert.NoError(t, err)
 
 			assert.Equal(t, e.Original(), got.Original())
