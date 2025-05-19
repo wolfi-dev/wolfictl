@@ -87,6 +87,14 @@ func NewFSPutterWithAutomaticEncoder(fsys rwfs.FS) *FSPutter {
 }
 
 func (p FSPutter) Upsert(_ context.Context, request Request) (string, error) {
+	advFileName := fmt.Sprintf("%s.advisories.yaml", request.Package)
+	return p.UpsertToFile(advFileName, request)
+}
+
+// UpsertToFile is a function not part of the Putter interface. It allows one to
+// explicitly update a file with the given name. This obviously does not make
+// sense to belong to a generic interface that does not have files.
+func (p FSPutter) UpsertToFile(advFileName string, request Request) (string, error) {
 	if request.Package == "" {
 		return "", ErrEmptyPackage
 	}
@@ -96,7 +104,6 @@ func (p FSPutter) Upsert(_ context.Context, request Request) (string, error) {
 
 	advisoryFileHadExisted := false
 
-	advFileName := fmt.Sprintf("%s.advisories.yaml", request.Package)
 	f, err := p.fsys.Open(advFileName)
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return "", fmt.Errorf("opening advisory file %q: %w", advFileName, err)
