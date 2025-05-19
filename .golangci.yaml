@@ -1,30 +1,11 @@
----
+version: "2"
 run:
   concurrency: 6
-  timeout: 10m
-issues:
-  exclude-rules:
-    # counterfeiter fakes are usually named 'fake_<something>.go'
-    - path: fake_.*\.go
-      linters:
-        - gocritic
-        - golint
-        - dupl
-    - path: .*_test.go
-      linters:
-        - dupl
-
-  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
-  max-issues-per-linter: 0
-
-  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
-  max-same-issues: 0
 linters:
-  disable-all: true
+  default: none
   enable:
     - asciicheck
     - bodyclose
-    # - depguard is disabled because I didn't see us using it (e.g. defining our allowed deps), but it's causing lint errors locally. If we want to use it, we should define our allowed deps.
     - dogsled
     - dupl
     - durationcheck
@@ -32,133 +13,108 @@ linters:
     - gocritic
     - gocyclo
     - godox
-    - gofmt
     - goheader
-    - goimports
-    # - gomoddirectives is disabled because it wasn't allowing the 'replace' directive, and it didn't look possible to exempt a single line of a go.mod. I'm not a fan of replaces, but they're useful as temporary measures.
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - importas
     - ineffassign
     - makezero
-    # - misspell
     - nakedret
     - nolintlint
-    # - prealloc is disabled because it is terrible. Following this rule doesn't necessarily improve the readability or performance of the code, and it can encourage wasteful allocations depending on the circumstance.
     - predeclared
     - promlinter
     - revive
-    # - rowserrcheck is disabled because of generics. You can track the evolution of the generics support by following the https://github.com/golangci/golangci-lint/issues/2649
-    # - sqlclosecheck is disabled because of generics. You can track the evolution of the generics support by following the https://github.com/golangci/golangci-lint/issues/2649
     - staticcheck
-    - stylecheck
-    - typecheck
     - unconvert
     - unparam
     - unused
     - whitespace
-    # - cyclop
-    # - errorlint
-    # - exhaustive
-    # - exhaustivestruct
-    # - exportloopref
-    # - forbidigo
-    # - forcetypeassert
-    # - funlen
-    # - gci
-    # - gochecknoglobals
-    # - gochecknoinits
-    # - gocognit
-    # - godot
-    # - goerr113
-    # - gomnd
-    # - ifshort
-    # - lll
-    # - nestif
-    # - nilerr
-    # - nlreturn
-    # - noctx
-    # - paralleltest
-    # - scopelint
-    # - tagliatelle
-    # - testpackage
-    # - thelper
-    # - tparallel
-    # - wastedassign
-    # - wrapcheck
-    # - wsl
-linters-settings:
-  godox:
-    keywords:
-      - BUG
-      - FIXME
-      - HACK
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
-  gosec:
-    # To specify the configuration of rules.
-    config:
-      # Maximum allowed permissions mode for os.WriteFile
-      # Default: "0600"
-      G306: "0644"
-  gocritic:
-    enabled-checks:
-      # Diagnostic
-      - commentedOutCode
-      - nilValReturn
-      - sloppyReassign
-      - weakCond
-      - octalLiteral
-
-      # Performance
-      - appendCombine
-      - equalFold
-      # - hugeParam is disabled because it's not always worthwhile to favor a pointer over a value for "large" data types. Pointers can create footguns and create the need for additional nil checks to keep the code safe..
-      - indexAlloc
-      - rangeExprCopy
-      - rangeValCopy
-
-      # Style
-      - boolExprSimplify
-      - commentedOutImport
-      - docStub
-      - emptyFallthrough
-      - emptyStringTest
-      - hexLiteral
-      - methodExprCall
-      - stringXbytes
-      - typeAssertChain
-      - unlabelStmt
-      - yodaStyleExpr
-      # - ifElseChain
-
-      # Opinionated
-      - builtinShadow
-      - importShadow
-      - initClause
-      - nestingReduce
-      - paramTypeCombine
-      - ptrToRefParam
-      - typeUnparen
-      - unnamedResult
-      - unnecessaryBlock
-  nolintlint:
-    # Enable to ensure that nolint directives are all used. Default is true.
-    allow-unused: false
-    # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
-    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
-    # TODO(lint): Enforce explanations for `nolint` directives
-    require-explanation: false
-    # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
-  gomoddirectives:
-    replace-allow-list:
-      - gitlab.alpinelinux.org/alpine/go
-      - github.com/goccy/go-graphviz
-      - k8s.io/client-go
-      - github.com/anchore/syft
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    gocritic:
+      enabled-checks:
+        - commentedOutCode
+        - nilValReturn
+        - sloppyReassign
+        - weakCond
+        - octalLiteral
+        - appendCombine
+        - equalFold
+        - indexAlloc
+        - rangeExprCopy
+        - rangeValCopy
+        - boolExprSimplify
+        - commentedOutImport
+        - docStub
+        - emptyFallthrough
+        - emptyStringTest
+        - hexLiteral
+        - methodExprCall
+        - stringXbytes
+        - typeAssertChain
+        - unlabelStmt
+        - yodaStyleExpr
+        - builtinShadow
+        - importShadow
+        - initClause
+        - nestingReduce
+        - paramTypeCombine
+        - ptrToRefParam
+        - typeUnparen
+        - unnamedResult
+        - unnecessaryBlock
+    godox:
+      keywords:
+        - BUG
+        - FIXME
+        - HACK
+    gomoddirectives:
+      replace-allow-list:
+        - gitlab.alpinelinux.org/alpine/go
+        - github.com/goccy/go-graphviz
+        - k8s.io/client-go
+        - github.com/anchore/syft
+    gosec:
+      config:
+        G306: "0644"
+    nolintlint:
+      require-explanation: false
+      require-specific: true
+      allow-unused: false
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - dupl
+          - gocritic
+          - golint
+        path: fake_.*\.go
+      - linters:
+          - dupl
+        path: .*_test.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
