@@ -1,16 +1,12 @@
 # Copyright 2025 Chainguard, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-name: cg-goreleaser-build
+name: goreleaser-build
 
 on:
   pull_request:
     branches:
       - 'main'
-      - 'release-*'
-    paths:
-      - cg/**
-      - .github/workflows/cg-goreleaser-build.yaml
 
 permissions: {}
 
