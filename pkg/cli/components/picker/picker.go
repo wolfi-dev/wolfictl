@@ -150,12 +150,12 @@ func (m Model[T]) View() string {
 
 	for i, item := range m.items {
 		if i == m.selected {
-			sb.WriteString(fmt.Sprintf("%s %s\n", breatherView, m.itemRendererFunc(item)))
+			fmt.Fprintf(sb, "%s %s\n", breatherView, m.itemRendererFunc(item))
 			continue
 		}
 
 		if !m.aboutToExit {
-			sb.WriteString(fmt.Sprintf("  %s\n", m.itemRendererFunc(item)))
+			fmt.Fprintf(sb, "  %s\n", m.itemRendererFunc(item))
 		}
 	}
 
@@ -171,11 +171,11 @@ func (m Model[T]) View() string {
 		}
 
 		for _, action := range m.customActions {
-			sb.WriteString(fmt.Sprintf(
+			fmt.Fprintf(sb,
 				"%s %s\n",
 				styleHelpKey.Render(action.Key),
 				styleHelpExplanation.Render(action.Description+"."),
-			))
+			)
 		}
 	}
 

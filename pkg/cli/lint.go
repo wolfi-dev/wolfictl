@@ -50,10 +50,10 @@ func (o lintOptions) LintCmd(ctx context.Context) error {
 
 	// Run the linter.
 	minSeverity := lint.SeverityWarning
-	switch {
-	case o.severity == "error", o.severity == "ERROR":
+	switch o.severity {
+	case "error", "ERROR":
 		minSeverity = lint.SeverityError
-	case o.severity == "info", o.severity == "INFO":
+	case "info", "INFO":
 		minSeverity = lint.SeverityInfo
 	}
 	result, err := linter.Lint(ctx, minSeverity)

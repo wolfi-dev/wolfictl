@@ -65,12 +65,12 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	buf.WriteString(short + "\n\n")
 
 	if len(cmd.Aliases) > 0 {
-		buf.WriteString(fmt.Sprintf("***Aliases**: %s*\n\n", strings.Join(cmd.Aliases, ",")))
+		fmt.Fprintf(buf, "***Aliases**: %s*\n\n", strings.Join(cmd.Aliases, ","))
 	}
 
 	if cmd.Runnable() {
 		buf.WriteString("### Usage\n\n")
-		buf.WriteString(fmt.Sprintf("```\n%s\n```\n\n", cmd.UseLine()))
+		fmt.Fprintf(buf, "```\n%s\n```\n\n", cmd.UseLine())
 	}
 
 	buf.WriteString("### Synopsis\n\n")
@@ -79,7 +79,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 
 	if cmd.Example != "" {
 		buf.WriteString("### Examples\n\n")
-		buf.WriteString(fmt.Sprintf("%s\n\n", cmd.Example))
+		fmt.Fprintf(buf, "%s\n\n", cmd.Example)
 	}
 
 	if err := printOptions(buf, cmd); err != nil {
@@ -92,7 +92,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			pname := parent.CommandPath()
 			link := pname + markdownExtension
 			link = strings.ReplaceAll(link, " ", "_")
-			buf.WriteString(fmt.Sprintf("* [%s](%s)\t - %s\n", pname, linkHandler(link), parent.Short))
+			fmt.Fprintf(buf, "* [%s](%s)\t - %s\n", pname, linkHandler(link), parent.Short)
 			cmd.VisitParents(func(c *cobra.Command) {
 				if c.DisableAutoGenTag {
 					cmd.DisableAutoGenTag = c.DisableAutoGenTag
@@ -110,7 +110,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			cname := name + " " + child.Name()
 			link := cname + markdownExtension
 			link = strings.ReplaceAll(link, " ", "_")
-			buf.WriteString(fmt.Sprintf("* [%s](%s)\t - %s\n", cname, linkHandler(link), child.Short))
+			fmt.Fprintf(buf, "* [%s](%s)\t - %s\n", cname, linkHandler(link), child.Short)
 		}
 		buf.WriteString("\n")
 	}

@@ -71,6 +71,6 @@ func TestDetector_VulnerabilitiesForPackages(t *testing.T) {
 	}
 }
 
-func vulnMatchToCVE(vuln vuln.Match, _ int) string {
-	return vuln.Vulnerability.ID
+func vulnMatchToCVE(vulnMatch vuln.Match, _ int) string {
+	return vulnMatch.Vulnerability.ID
 }

@@ -129,14 +129,14 @@ func manPreamble(buf *bytes.Buffer, header *GenManHeader, cmd *cobra.Command, da
 		description = cmd.Short
 	}
 
-	buf.WriteString(fmt.Sprintf(`%% %s(%s)
+	fmt.Fprintf(buf, `%% %s(%s)
 %% %s
 %% %s
 # NAME
-`, header.Title, header.Section, header.Source, header.Manual))
-	buf.WriteString(fmt.Sprintf("%s \\- %s\n\n", dashedName, cmd.Short))
+`, header.Title, header.Section, header.Source, header.Manual)
+	fmt.Fprintf(buf, "%s \\- %s\n\n", dashedName, cmd.Short)
 	buf.WriteString("# SYNOPSIS\n")
-	buf.WriteString(fmt.Sprintf("**%s**\n\n", cmd.UseLine()))
+	fmt.Fprintf(buf, "**%s**\n\n", cmd.UseLine())
 	buf.WriteString("# DESCRIPTION\n")
 	buf.WriteString(description + "\n\n")
 }
@@ -165,7 +165,7 @@ func manPrintFlags(buf *bytes.Buffer, flags *pflag.FlagSet) {
 			format += "]"
 		}
 		format += "\n\t%s\n\n"
-		buf.WriteString(fmt.Sprintf(format, flag.DefValue, flag.Usage))
+		fmt.Fprintf(buf, format, flag.DefValue, flag.Usage)
 	})
 }
 
@@ -197,7 +197,7 @@ func genMan(cmd *cobra.Command, header *GenManHeader) []byte {
 	manPrintOptions(buf, cmd)
 	if cmd.Example != "" {
 		buf.WriteString("# EXAMPLE\n")
-		buf.WriteString(fmt.Sprintf("\n%s\n\n", cmd.Example))
+		fmt.Fprintf(buf, "\n%s\n\n", cmd.Example)
 	}
 	if hasSeeAlso(cmd) {
 		buf.WriteString("# SEE ALSO\n")

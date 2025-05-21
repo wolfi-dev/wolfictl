@@ -18,8 +18,8 @@ type SlogAdapter struct {
 	logger *slog.Logger
 }
 
-func NewSlogAdapter(logger *slog.Logger) *SlogAdapter {
-	return &SlogAdapter{logger: logger}
+func NewSlogAdapter(slogger *slog.Logger) *SlogAdapter {
+	return &SlogAdapter{logger: slogger}
 }
 
 func (s *SlogAdapter) log(level func(msg string, args ...any), args ...interface{}) {
