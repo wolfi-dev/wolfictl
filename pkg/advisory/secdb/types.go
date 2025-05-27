@@ -19,4 +19,4 @@ type Package struct {
 
 type Secfixes map[string][]string
 
-const NAK = "0"
+const NAK = "0-r0"
