@@ -1,0 +1,67 @@
+# Copyright 2025 Chainguard, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+version: 2
+project_name: wolfictl
+
+archives:
+  - formats:
+      - 'binary'
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+
+builds:
+  - id: wolfictl
+    dir: .
+    main: .
+    binary: wolfictl_{{ .Os }}_{{ .Arch }}
+    no_unique_dist_dir: true
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - '-s -w'
+      - -X sigs.k8s.io/release-utils/version.gitVersion={{.Version}}
+      - -X sigs.k8s.io/release-utils/version.gitCommit={{.Commit}}
+      - -X sigs.k8s.io/release-utils/version.buildDate={{.Date}}
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+signs:
+  - id: binary
+    artifacts: binary
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.cert.pem"
+    cmd: cosign
+    args:
+      - sign-blob
+      - "--yes"
+      - "--output-signature=${artifact}.sig"
+      - "--output-certificate=${artifact}.cert.pem"
+      - "${artifact}"
+  - id: checksum
+    artifacts: checksum
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.cert.pem"
+    cmd: cosign
+    args:
+      - sign-blob
+      - "--yes"
+      - "--output-signature=${artifact}.sig"
+      - "--output-certificate=${artifact}.cert.pem"
+      - "${artifact}"
+
+snapshot:
+  version_template: "{{ .Version }}-SNAPSHOT"
+
+release:
+  draft: false
+
+changelog:
+  use: github-native
