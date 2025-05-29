@@ -11,15 +11,15 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v0.27.6
-	chainguard.dev/melange v0.25.1
+	chainguard.dev/apko v0.27.7
+	chainguard.dev/melange v0.26.1
 	cloud.google.com/go/storage v1.54.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.92.1
 	github.com/anchore/stereoscope v0.1.4
 	github.com/anchore/syft v1.25.1
 	github.com/chainguard-dev/clog v1.7.0
-	github.com/chainguard-dev/yam v0.2.16
+	github.com/chainguard-dev/yam v0.2.17
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.5
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250319133953-166f707985bc
@@ -67,7 +67,7 @@ require (
 
 require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
-	github.com/chainguard-dev/advisory-schema v0.37.5
+	github.com/chainguard-dev/advisory-schema v0.37.7
 	github.com/spf13/afero v1.14.0
 )
 
