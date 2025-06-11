@@ -45,7 +45,7 @@ require (
 	github.com/muesli/reflow v0.3.0
 	github.com/openvex/go-vex v0.2.5 // indirect
 	github.com/package-url/packageurl-go v0.1.3
-	github.com/samber/lo v1.50.0
+	github.com/samber/lo v1.51.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/savioxavier/termlink v1.4.2
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
