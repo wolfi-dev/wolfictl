@@ -17,7 +17,7 @@ require (
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.92.2
 	github.com/anchore/stereoscope v0.1.5
-	github.com/anchore/syft v1.26.1
+	github.com/anchore/syft v1.27.0
 	github.com/chainguard-dev/clog v1.7.0
 	github.com/chainguard-dev/yam v0.2.19
 	github.com/charmbracelet/bubbles v0.21.0
@@ -285,7 +285,7 @@ require (
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/sassoftware/go-rpmutils v0.4.0 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
-	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
+	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
@@ -330,9 +330,9 @@ require (
 	go.step.sm/crypto v0.61.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/tools v0.33.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
@@ -347,9 +347,9 @@ require (
 	gorm.io/gorm v1.26.1 // indirect
 	k8s.io/apimachinery v0.32.3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
-	modernc.org/libc v1.62.1 // indirect
+	modernc.org/libc v1.65.10 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.9.1 // indirect
-	modernc.org/sqlite v1.37.0 // indirect
+	modernc.org/memory v1.11.0 // indirect
+	modernc.org/sqlite v1.38.0 // indirect
 	mvdan.cc/sh/v3 v3.11.0 // indirect
 )
