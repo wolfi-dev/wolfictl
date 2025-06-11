@@ -15,7 +15,7 @@ require (
 	chainguard.dev/melange v0.26.9
 	cloud.google.com/go/storage v1.55.0
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/grype v0.92.2
+	github.com/anchore/grype v0.93.0
 	github.com/anchore/stereoscope v0.1.5
 	github.com/anchore/syft v1.27.0
 	github.com/chainguard-dev/clog v1.7.0
@@ -159,7 +159,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v28.2.2+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v28.1.1+incompatible // indirect
+	github.com/docker/docker v28.2.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
@@ -334,7 +334,7 @@ require (
 	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/tools v0.33.0 // indirect
+	golang.org/x/tools v0.34.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/api v0.235.0 // indirect
 	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
@@ -344,7 +344,7 @@ require (
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gorm.io/gorm v1.26.1 // indirect
+	gorm.io/gorm v1.30.0 // indirect
 	k8s.io/apimachinery v0.32.3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	modernc.org/libc v1.65.10 // indirect
