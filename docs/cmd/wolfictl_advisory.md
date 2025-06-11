@@ -28,9 +28,11 @@ Commands for consuming and maintaining security advisory data
 * [wolfictl advisory create](wolfictl_advisory_create.md)	 - Create a new advisory
 * [wolfictl advisory diff](wolfictl_advisory_diff.md)	 - See the advisory data differences introduced by your local changes
 * [wolfictl advisory discover](wolfictl_advisory_discover.md)	 - Automatically create advisories by matching distro packages to vulnerabilities in NVD
+* [wolfictl advisory export](wolfictl_advisory_export.md)	 - Export advisory data (experimental)
 * [wolfictl advisory guide](wolfictl_advisory_guide.md)	 - Launch an interactive guide to help you enter advisory data for a package
 * [wolfictl advisory id](wolfictl_advisory_id.md)	 - Generate a new advisory ID
 * [wolfictl advisory list](wolfictl_advisory_list.md)	 - List advisories for specific packages, vulnerabilities, or the entire data set
+* [wolfictl advisory migrate-ids](wolfictl_advisory_migrate-ids.md)	 - Migrate advisory files to CGA IDs
 * [wolfictl advisory osv](wolfictl_advisory_osv.md)	 - Build an OSV dataset from Chainguard advisory data
 * [wolfictl advisory rebase](wolfictl_advisory_rebase.md)	 - Apply a package’s latest advisory events to advisory data in another directory
 * [wolfictl advisory secdb](wolfictl_advisory_secdb.md)	 - Build an Alpine-style security database from advisory data
