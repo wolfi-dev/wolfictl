@@ -6,8 +6,9 @@ import (
 
 func cmdAdvisoryAlias() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "alias",
-		Short: "Commands for discovering vulnerability aliases",
+		Use:        "alias",
+		Short:      "Commands for discovering vulnerability aliases",
+		Deprecated: advisoryDeprecationMessage,
 	}
 
 	cmd.AddCommand(

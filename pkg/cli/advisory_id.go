@@ -14,6 +14,7 @@ func cmdAdvisoryID() *cobra.Command {
 		Short:         "Generate a new advisory ID",
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
+		Deprecated:    advisoryDeprecationMessage,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			id, err := cgaid.GenerateCGAID()
 			if err != nil {

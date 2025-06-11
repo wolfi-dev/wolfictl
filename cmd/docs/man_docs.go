@@ -49,7 +49,8 @@ func GenManTreeFromOpts(cmd *cobra.Command, opts GenManTreeOptions) error {
 		header = &GenManHeader{}
 	}
 	for _, c := range cmd.Commands() {
-		if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() {
+		// Include deprecated commands in documentation
+		if (!c.IsAvailableCommand() && c.Deprecated == "") || c.IsAdditionalHelpTopicCommand() {
 			continue
 		}
 		if err := GenManTreeFromOpts(c, opts); err != nil {
@@ -216,7 +217,8 @@ func genMan(cmd *cobra.Command, header *GenManHeader) []byte {
 		children := cmd.Commands()
 		sort.Sort(byName(children))
 		for _, c := range children {
-			if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() {
+			// Include deprecated commands in documentation
+			if (!c.IsAvailableCommand() && c.Deprecated == "") || c.IsAdditionalHelpTopicCommand() {
 				continue
 			}
 			seealso := fmt.Sprintf("**%s-%s(%s)**", dashCommandName, c.Name(), header.Section)

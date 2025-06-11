@@ -63,6 +63,7 @@ More information about these flags is shown in the documentation for each flag.
 If any issues are found in the advisory data, the command will exit 1, and will
 print an error message that specifies where and how the data is invalid.`,
 		SilenceErrors: true,
+		Deprecated:    advisoryDeprecationMessage,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			logger := clog.FromContext(cmd.Context())

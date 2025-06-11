@@ -35,6 +35,7 @@ wolfictl adv rebase ./argo-cd-2.8.yaml ../enterprise-advisories
 wolfictl adv rebase ./argo-cd-2.8.yaml ../enterprise-advisories -V CVE-2021-25743
 `,
 		SilenceErrors: true,
+		Deprecated:    advisoryDeprecationMessage,
 		Args:          cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()

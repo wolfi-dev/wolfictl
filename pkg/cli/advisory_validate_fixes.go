@@ -25,6 +25,7 @@ func cmdAdvisoryValidateFixes() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "fixes",
 		Short:         "Validate fixes recorded in advisories",
+		Deprecated:    advisoryDeprecationMessage,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {

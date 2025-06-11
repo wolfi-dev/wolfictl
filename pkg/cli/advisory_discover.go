@@ -29,6 +29,7 @@ func cmdAdvisoryDiscover() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "discover",
 		Short:         "Automatically create advisories by matching distro packages to vulnerabilities in NVD",
+		Deprecated:    advisoryDeprecationMessage,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {

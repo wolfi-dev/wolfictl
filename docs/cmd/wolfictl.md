@@ -26,5 +26,6 @@ A CLI helper for developing Wolfi
 * [wolfictl ruby](wolfictl_ruby.md)	 - Work with ruby packages
 * [wolfictl scan](wolfictl_scan.md)	 - Scan a package for vulnerabilities
 * [wolfictl version](wolfictl_version.md)	 - Prints the version
+* [wolfictl vex](wolfictl_vex.md)	 - Tools to generate VEX statements for Wolfi packages and images
 * [wolfictl withdraw](wolfictl_withdraw.md)	 - Withdraw packages from an APKINDEX.tar.gz
 
