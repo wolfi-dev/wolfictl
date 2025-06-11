@@ -15,7 +15,6 @@ A CLI helper for developing Wolfi
 
 ### SEE ALSO
 
-* [wolfictl advisory](wolfictl_advisory.md)	 - Commands for consuming and maintaining security advisory data
 * [wolfictl apk](wolfictl_apk.md)	 - 
 * [wolfictl bump](wolfictl_bump.md)	 - Bumps the epoch field in melange configuration files
 * [wolfictl check](wolfictl_check.md)	 - Subcommands used for CI checks in Wolfi
