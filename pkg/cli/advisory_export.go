@@ -21,6 +21,7 @@ func cmdAdvisoryExport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "export",
 		Short:         "Export advisory data (experimental)",
+		Deprecated:    advisoryDeprecationMessage,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		Hidden:        true,

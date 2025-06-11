@@ -16,8 +16,9 @@ import (
 func cmdAdvisoryOSV() *cobra.Command {
 	p := &osvParams{}
 	cmd := &cobra.Command{
-		Use:   "osv",
-		Short: "Build an OSV dataset from Chainguard advisory data",
+		Use:        "osv",
+		Short:      "Build an OSV dataset from Chainguard advisory data",
+		Deprecated: advisoryDeprecationMessage,
 		Long: `Build an OSV dataset from Chainguard advisory data.
 
 This command reads advisory data from one or more directories containing Chainguard

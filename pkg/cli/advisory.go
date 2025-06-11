@@ -22,6 +22,8 @@ import (
 const (
 	envVarNameForDistroDir     = "WOLFICTL_DISTRO_REPO_DIR"
 	envVarNameForAdvisoriesDir = "WOLFICTL_ADVISORIES_REPO_DIR"
+
+	advisoryDeprecationMessage = "Advisory commands are deprecated. Security data remains available in our public feeds at https://github.com/chainguard-dev/vulnerability-scanner-support/blob/7dd4cbf/docs/foundational_concepts.md#security-feeds and full advisory data is available to Chainguard customers."
 )
 
 func cmdAdvisory() *cobra.Command {
@@ -30,6 +32,7 @@ func cmdAdvisory() *cobra.Command {
 		Aliases:       []string{"adv"},
 		SilenceErrors: true,
 		Short:         "Commands for consuming and maintaining security advisory data",
+		Deprecated:    advisoryDeprecationMessage,
 	}
 
 	cmd.AddCommand(

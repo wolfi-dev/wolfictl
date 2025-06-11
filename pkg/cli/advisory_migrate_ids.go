@@ -27,7 +27,7 @@ func cmdAdvisoryMigrateIDs() *cobra.Command {
 		Args:          cobra.NoArgs,
 		Hidden:        true,
 		SilenceErrors: true,
-		Deprecated:    "This will be a one shot command to convert the advisories to use the new CGA IDs. It will be removed soon.",
+		Deprecated:    advisoryDeprecationMessage,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if p.advisoriesRepoDir == "" {
 				if p.doNotDetectDistro {

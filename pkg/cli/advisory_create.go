@@ -22,8 +22,9 @@ import (
 func cmdAdvisoryCreate() *cobra.Command { //nolint:gocyclo
 	p := &createParams{}
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a new advisory",
+		Use:        "create",
+		Short:      "Create a new advisory",
+		Deprecated: advisoryDeprecationMessage,
 		Long: `Create a new advisory.
 
 Use this command to create a new advisory, i.e. when the given

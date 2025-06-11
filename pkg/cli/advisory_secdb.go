@@ -22,6 +22,7 @@ func cmdAdvisorySecDB() *cobra.Command {
 		Aliases:       []string{"db"},
 		Short:         "Build an Alpine-style security database from advisory data",
 		SilenceErrors: true,
+		Deprecated:    advisoryDeprecationMessage,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			logger := clog.NewLogger(slog.Default())

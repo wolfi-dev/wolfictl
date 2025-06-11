@@ -13,8 +13,9 @@ import (
 
 func cmdAdvisoryAliasFind() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "find <vulnerability ID> [<vulnerability ID>...]",
-		Short: "Query upstream data sources for aliases for the given vulnerability ID(s)",
+		Use:        "find <vulnerability ID> [<vulnerability ID>...]",
+		Short:      "Query upstream data sources for aliases for the given vulnerability ID(s)",
+		Deprecated: advisoryDeprecationMessage,
 		Long: `This is a utility command to query upstream data sources to find aliases for 
 the given vulnerability ID(s).
 

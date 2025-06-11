@@ -15,8 +15,9 @@ import (
 func cmdAdvisoryAliasDiscover() *cobra.Command {
 	p := &aliasDiscoverParams{}
 	cmd := &cobra.Command{
-		Use:   "discover",
-		Short: "Discover new aliases for vulnerabilities in the advisory data",
+		Use:        "discover",
+		Short:      "Discover new aliases for vulnerabilities in the advisory data",
+		Deprecated: advisoryDeprecationMessage,
 		Long: `Discover new aliases for vulnerabilities in the advisory data.
 
 This command reads the advisory data and searches for new aliases for the ID

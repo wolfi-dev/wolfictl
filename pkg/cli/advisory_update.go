@@ -52,6 +52,7 @@ adding redundant events to advisories that already have the same type of event.
 If the --no-prompt flag is specified, then the command will fail if any
 required fields are missing.`,
 		SilenceErrors: true,
+		Deprecated:    advisoryDeprecationMessage,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()

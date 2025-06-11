@@ -44,6 +44,7 @@ func cmdAdvisoryGuide() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "guide",
 		Short:         "Launch an interactive guide to help you enter advisory data for a package",
+		Deprecated:    advisoryDeprecationMessage,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()

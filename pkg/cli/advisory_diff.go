@@ -22,6 +22,7 @@ func cmdAdvisoryDiff() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "diff",
 		Short:         "See the advisory data differences introduced by your local changes",
+		Deprecated:    advisoryDeprecationMessage,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {

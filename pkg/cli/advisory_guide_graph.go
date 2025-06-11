@@ -13,6 +13,7 @@ func cmdAdvisoryGuideGraph() *cobra.Command {
 	return &cobra.Command{
 		Use:           "graph",
 		Short:         "Generate a DOT graph of the advisory guide interview questions",
+		Deprecated:    advisoryDeprecationMessage,
 		Args:          cobra.NoArgs,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {

@@ -20,9 +20,10 @@ import (
 func cmdAdvisoryList() *cobra.Command {
 	p := &listParams{}
 	cmd := &cobra.Command{
-		Use:     "list",
-		Aliases: []string{"ls"},
-		Short:   "List advisories for specific packages, vulnerabilities, or the entire data set",
+		Use:        "list",
+		Aliases:    []string{"ls"},
+		Short:      "List advisories for specific packages, vulnerabilities, or the entire data set",
+		Deprecated: advisoryDeprecationMessage,
 		Long: `List advisories for specific packages, vulnerabilities, or the entire data set.
 
 The 'list' (or 'ls') command prints a table of advisories based on the given 
