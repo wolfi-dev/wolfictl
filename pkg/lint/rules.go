@@ -43,6 +43,9 @@ var (
 	hostEditDistanceExceptions = map[string]string{
 		"www.libssh.org": "www.libssh2.org",
 	}
+
+	// Detect background processes that are not redirecting output
+	reBackgroundProcess = regexp.MustCompile(`\s&(?:\s|$)`)
 )
 
 const gitCheckout = "git-checkout"
@@ -454,6 +457,38 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					return nil
 				}
 				return fmt.Errorf("auto-update is disabled but no reason is provided")
+			},
+		},
+		{
+			Name:        "background-process-without-redirect",
+			Description: "test steps should redirect output when running background processes",
+			Severity:    SeverityWarning,
+			LintFunc: func(c config.Configuration) error {
+				checkSteps := func(steps []config.Pipeline) error {
+					for _, s := range steps {
+						if s.Runs == "" {
+							continue
+						}
+						if reBackgroundProcess.MatchString(s.Runs) && !strings.Contains(s.Runs, "2>&1") && !strings.Contains(s.Runs, "&>") {
+							return fmt.Errorf("background process missing output redirect: %s", s.Runs)
+						}
+					}
+					return nil
+				}
+
+				if c.Test != nil {
+					if err := checkSteps(c.Test.Pipeline); err != nil {
+						return err
+					}
+				}
+				for _, sp := range c.Subpackages {
+					if sp.Test != nil {
+						if err := checkSteps(sp.Test.Pipeline); err != nil {
+							return err
+						}
+					}
+				}
+				return nil
 			},
 		},
 		{
