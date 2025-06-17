@@ -469,6 +469,31 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: true,
 			matches: 1,
 		},
+		{
+			file:        "background-process-no-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "background-process-no-redirect",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "background-process-without-redirect",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[background-process-without-redirect]: background process missing output redirect: croc relay --ports=1234 & (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "background-process-with-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
 	}
 
 	for _, tt := range tests {
