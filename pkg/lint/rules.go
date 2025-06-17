@@ -44,8 +44,8 @@ var (
 		"www.libssh.org": "www.libssh2.org",
 	}
 
-	// Detect background processes that are not redirecting output
-	reBackgroundProcess = regexp.MustCompile(`\s&(?:\s|$)`)
+	// Detect background processes (commands ending with '&' or '& sleep ...') that do not redirect output
+	reBackgroundProcess = regexp.MustCompile(`&(?:\s*$|\s+sleep\b)`) // matches 'cmd &' or 'cmd & sleep'
 )
 
 const gitCheckout = "git-checkout"
