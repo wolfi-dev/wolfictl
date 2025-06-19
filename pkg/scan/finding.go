@@ -6,9 +6,7 @@ import (
 
 	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/vulnerability"
-	"github.com/anchore/syft/syft/file"
 	v2 "github.com/chainguard-dev/advisory-schema/pkg/advisory/v2"
-	"github.com/samber/lo"
 )
 
 // Finding represents a vulnerability finding for a single package.
@@ -117,9 +115,19 @@ func mapMatchToFinding(m match.Match, vulnProvider vulnerability.Provider) (*Fin
 		aliases = append(aliases, rel.ID)
 	}
 
-	locations := lo.Map(m.Package.Locations.ToSlice(), func(l file.Location, _ int) string {
-		return "/" + l.RealPath
-	})
+	// Filter locations to only include those marked as "primary evidence"
+	var locations []string
+	for _, l := range m.Package.Locations.ToSlice() {
+		// Check if this location has evidence annotation
+		evidence, hasEvidence := l.Annotations["evidence"]
+
+		// Include if evidence is "primary" or if no evidence annotation exists (backward compatibility)
+		if !hasEvidence || evidence == "primary" {
+			locations = append(locations, "/"+l.RealPath)
+		}
+
+		// Skip locations marked as some other kind of evidence (e.g., "supporting")
+	}
 
 	f := &Finding{
 		Package: Package{

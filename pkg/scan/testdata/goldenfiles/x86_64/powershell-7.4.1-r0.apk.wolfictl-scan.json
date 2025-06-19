@@ -12,7 +12,7 @@
         "Name": "System.IO.Packaging",
         "Version": "8.0.0",
         "Type": "dotnet",
-        "Location": "/usr/lib/powershell/pwsh.deps.json, /usr/lib/powershell/System.IO.Packaging.dll",
+        "Location": "/usr/lib/powershell/pwsh.deps.json",
         "PURL": "pkg:nuget/System.IO.Packaging@8.0.0"
       },
       "Vulnerability": {
@@ -30,7 +30,7 @@
         "Name": "System.IO.Packaging",
         "Version": "8.0.0",
         "Type": "dotnet",
-        "Location": "/usr/lib/powershell/pwsh.deps.json, /usr/lib/powershell/System.IO.Packaging.dll",
+        "Location": "/usr/lib/powershell/pwsh.deps.json",
         "PURL": "pkg:nuget/System.IO.Packaging@8.0.0"
       },
       "Vulnerability": {
