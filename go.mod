@@ -11,7 +11,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v0.28.0
+	chainguard.dev/apko v0.29.0
 	chainguard.dev/melange v0.28.0
 	cloud.google.com/go/storage v1.55.0
 	github.com/adrg/xdg v0.5.3
@@ -67,7 +67,7 @@ require (
 
 require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
-	github.com/chainguard-dev/advisory-schema v0.37.11
+	github.com/chainguard-dev/advisory-schema v0.37.12
 	github.com/spf13/afero v1.14.0
 )
 
