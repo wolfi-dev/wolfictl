@@ -1,0 +1,8 @@
+-   id: wolfictl-lint
+    name: Format files properly using wolfictl lint
+    description: Helps to prevent any linting check failures in CI 
+    entry: wolfictl lint
+    language: golang
+    stages: [pre-commit, manual]
+    types: ["text"]
+    
