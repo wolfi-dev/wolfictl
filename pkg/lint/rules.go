@@ -21,12 +21,12 @@ import (
 )
 
 var (
-       daemonFlags = []string{
-               `--daemon\b`,
-               `--daemonize\b`,
-               `--detach\b`,
-               `-daemon\b`,
-       }
+	daemonFlags = []string{
+		`(?:^|\s)--daemon\b`,
+		`(?:^|\s)--daemonize\b`,
+		`(?:^|\s)--detach\b`,
+		`(?:^|\s)-daemon\b`,
+	}
 
 	redirPatterns = []string{
 		`>\s*\S+`,
