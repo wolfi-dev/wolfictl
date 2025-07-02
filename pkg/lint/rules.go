@@ -494,9 +494,17 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						if s.Runs == "" {
 							continue
 						}
-						needsRedirect := reBackgroundProcess.MatchString(s.Runs) || reDaemonProcess.MatchString(s.Runs)
-						if needsRedirect && !reOutputRedirect.MatchString(s.Runs) {
-							return fmt.Errorf("background process missing output redirect: %s", s.Runs)
+						lines := strings.Split(s.Runs, "\n")
+						for i, line := range lines {
+							checkLine := line
+							if strings.Contains(line, "&") && i+1 < len(lines) {
+								checkLine += "\n" + lines[i+1]
+							}
+
+							needsRedirect := reBackgroundProcess.MatchString(checkLine) || reDaemonProcess.MatchString(line)
+							if needsRedirect && !reOutputRedirect.MatchString(line) {
+								return fmt.Errorf("background process missing output redirect: %s", strings.TrimSpace(line))
+							}
 						}
 					}
 					return nil

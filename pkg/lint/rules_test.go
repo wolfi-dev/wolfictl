@@ -488,6 +488,24 @@ func TestLinter_Rules(t *testing.T) {
 			matches: 1,
 		},
 		{
+			file:        "background-process-multiline-no-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "background-process-multiline-no-redirect",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "background-process-without-redirect",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[background-process-without-redirect]: background process missing output redirect: coredns & (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
 			file:        "background-process-with-redirect.yaml",
 			minSeverity: SeverityWarning,
 			want:        EvalResult{},
