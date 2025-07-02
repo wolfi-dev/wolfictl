@@ -67,7 +67,9 @@ var (
 	}
 
 	// Detect background processes (commands ending with '&' or '& sleep ...') or daemonized commands
-	reBackgroundProcess = regexp.MustCompile(`&(?:\s*$|\s+sleep\b)`) // matches 'cmd &' or 'cmd & sleep'
+	// reBackgroundProcess detects background processes (commands ending with '&' or '& sleep ...')
+	// We explicitly avoid matching '&&' which is commonly used for command chaining.
+	reBackgroundProcess = regexp.MustCompile(`(?:^|[^&])&(?:\s*$|\s+sleep\b)`) // matches 'cmd &' or 'cmd & sleep'
 	reDaemonProcess     = regexp.MustCompile(`.*(?:` + strings.Join(daemonFlags, "|") + `).*`)
 	// Detect output redirection in shell commands
 	reOutputRedirect = regexp.MustCompile(strings.Join(redirPatterns, "|"))
