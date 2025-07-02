@@ -21,6 +21,28 @@ import (
 )
 
 var (
+	daemonFlags = []string{
+		`(?:^|\s)--daemon\b`,
+		`(?:^|\s)--daemonize\b`,
+		`(?:^|\s)--detach\b`,
+		`(?:^|\s)-daemon\b`,
+	}
+
+	redirPatterns = []string{
+		`>\s*\S+`,
+		`>>\s*\S+`,
+		`2>\s*\S+`,
+		`2>>\s*\S+`,
+		`&>\s*\S+`,
+		`&>>\s*\S+`,
+		`>\s*\S+.*2>&1`,
+		`2>&1.*>\s*\S+`,
+		`>\s*/dev/null`,
+		`2>\s*/dev/null`,
+		`&>\s*/dev/null`,
+		`\d+>&\d+`,
+	}
+
 	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
 	reValidSHA1   = regexp.MustCompile(`^[a-fA-F0-9]{40}$`)
@@ -43,6 +65,14 @@ var (
 	hostEditDistanceExceptions = map[string]string{
 		"www.libssh.org": "www.libssh2.org",
 	}
+
+	// Detect background processes (commands ending with '&' or '& sleep ...') or daemonized commands
+	// reBackgroundProcess detects background processes (commands ending with '&' or '& sleep ...')
+	// We explicitly avoid matching '&&' which is commonly used for command chaining.
+	reBackgroundProcess = regexp.MustCompile(`(?:^|[^&])&(?:\s*$|\s+sleep\b)`) // matches 'cmd &' or 'cmd & sleep'
+	reDaemonProcess     = regexp.MustCompile(`.*(?:` + strings.Join(daemonFlags, "|") + `).*`)
+	// Detect output redirection in shell commands
+	reOutputRedirect = regexp.MustCompile(strings.Join(redirPatterns, "|"))
 )
 
 const gitCheckout = "git-checkout"
@@ -454,6 +484,47 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					return nil
 				}
 				return fmt.Errorf("auto-update is disabled but no reason is provided")
+			},
+		},
+		{
+			Name:        "background-process-without-redirect",
+			Description: "test steps should redirect output when running background processes",
+			Severity:    SeverityWarning,
+			LintFunc: func(c config.Configuration) error {
+				checkSteps := func(steps []config.Pipeline) error {
+					for _, s := range steps {
+						if s.Runs == "" {
+							continue
+						}
+						lines := strings.Split(s.Runs, "\n")
+						for i, line := range lines {
+							checkLine := line
+							if strings.Contains(line, "&") && i+1 < len(lines) {
+								checkLine += "\n" + lines[i+1]
+							}
+
+							needsRedirect := reBackgroundProcess.MatchString(checkLine) || reDaemonProcess.MatchString(line)
+							if needsRedirect && !reOutputRedirect.MatchString(line) {
+								return fmt.Errorf("background process missing output redirect: %s", strings.TrimSpace(line))
+							}
+						}
+					}
+					return nil
+				}
+
+				if c.Test != nil {
+					if err := checkSteps(c.Test.Pipeline); err != nil {
+						return err
+					}
+				}
+				for _, sp := range c.Subpackages {
+					if sp.Test != nil {
+						if err := checkSteps(sp.Test.Pipeline); err != nil {
+							return err
+						}
+					}
+				}
+				return nil
 			},
 		},
 		{

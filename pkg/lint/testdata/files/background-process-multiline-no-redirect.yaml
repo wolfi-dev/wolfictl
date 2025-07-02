@@ -1,0 +1,45 @@
+package:
+  name: background-process-multiline-no-redirect
+  version: 1.0.0
+  epoch: 0
+  description: Package with multiline background process without redirect
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://test.com/background/${{package.version}}.tar.gz
+      expected-sha256: ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269
+test:
+  pipeline:
+    - runs: |
+        cat > Corefile <<EOF
+        .:1053 {
+            file /home/build/db.wolfi.dev
+            log
+            errors
+            cache
+        }
+        EOF
+
+        cat > /home/build/db.wolfi.dev <<'EOF'
+        $TTL 3600
+        @    IN SOA ns1.wolfi.dev. admin.wolfi.dev. (
+                  20240101   ; Serial
+                  7200       ; Refresh
+                  3600       ; Retry
+                  1209600    ; Expire
+                  3600 )     ; Negative Cache TTL
+        ;
+        @    IN NS  ns1.wolfi.dev.
+        ;
+        foo.wolfi.dev  IN TXT "hi"
+        EOF
+
+        coredns &
+        sleep 2
+update:
+  enabled: true

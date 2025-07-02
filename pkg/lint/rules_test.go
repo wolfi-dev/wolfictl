@@ -469,6 +469,95 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr: true,
 			matches: 1,
 		},
+		{
+			file:        "background-process-no-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "background-process-no-redirect",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "background-process-without-redirect",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[background-process-without-redirect]: background process missing output redirect: croc relay --ports=1234 & (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "background-process-multiline-no-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "background-process-multiline-no-redirect",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "background-process-without-redirect",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[background-process-without-redirect]: background process missing output redirect: coredns & (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "background-process-with-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "double-ampersand-valid.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "daemon-flag-no-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "daemon-flag-no-redirect",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "background-process-without-redirect",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[background-process-without-redirect]: background process missing output redirect: croc relay --daemon (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "daemon-flag-with-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "avahi-no-daemon.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "cut-d-flag.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
 	}
 
 	for _, tt := range tests {
