@@ -494,6 +494,31 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr:     false,
 			matches:     0,
 		},
+		{
+			file:        "daemon-flag-no-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "daemon-flag-no-redirect",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "background-process-without-redirect",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[background-process-without-redirect]: background process missing output redirect: croc relay --daemon (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "daemon-flag-with-redirect.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
 	}
 
 	for _, tt := range tests {

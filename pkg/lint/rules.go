@@ -21,6 +21,29 @@ import (
 )
 
 var (
+	daemonFlags = []string{
+		`-d\b`,
+		`--daemon\b`,
+		`--daemonize\b`,
+		`--detach\b`,
+		`-daemon\b`,
+	}
+
+	redirPatterns = []string{
+		`>\s*\S+`,
+		`>>\s*\S+`,
+		`2>\s*\S+`,
+		`2>>\s*\S+`,
+		`&>\s*\S+`,
+		`&>>\s*\S+`,
+		`>\s*\S+.*2>&1`,
+		`2>&1.*>\s*\S+`,
+		`>\s*/dev/null`,
+		`2>\s*/dev/null`,
+		`&>\s*/dev/null`,
+		`\d+>&\d+`,
+	}
+
 	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
 	reValidSHA1   = regexp.MustCompile(`^[a-fA-F0-9]{40}$`)
@@ -44,8 +67,11 @@ var (
 		"www.libssh.org": "www.libssh2.org",
 	}
 
-	// Detect background processes (commands ending with '&' or '& sleep ...') that do not redirect output
+	// Detect background processes (commands ending with '&' or '& sleep ...') or daemonized commands
 	reBackgroundProcess = regexp.MustCompile(`&(?:\s*$|\s+sleep\b)`) // matches 'cmd &' or 'cmd & sleep'
+	reDaemonProcess     = regexp.MustCompile(`.*(?:` + strings.Join(daemonFlags, "|") + `).*`)
+	// Detect output redirection in shell commands
+	reOutputRedirect = regexp.MustCompile(strings.Join(redirPatterns, "|"))
 )
 
 const gitCheckout = "git-checkout"
@@ -469,7 +495,8 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						if s.Runs == "" {
 							continue
 						}
-						if reBackgroundProcess.MatchString(s.Runs) && !strings.Contains(s.Runs, "2>&1") && !strings.Contains(s.Runs, "&>") {
+						needsRedirect := reBackgroundProcess.MatchString(s.Runs) || reDaemonProcess.MatchString(s.Runs)
+						if needsRedirect && !reOutputRedirect.MatchString(s.Runs) {
 							return fmt.Errorf("background process missing output redirect: %s", s.Runs)
 						}
 					}
