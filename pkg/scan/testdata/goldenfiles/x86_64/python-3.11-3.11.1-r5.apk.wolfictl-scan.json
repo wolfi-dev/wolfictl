@@ -344,24 +344,6 @@
     },
     {
       "Package": {
-        "ID": "a145349ac56ab1b1",
-        "Name": "setuptools",
-        "Version": "65.5.0",
-        "Type": "python",
-        "Location": "/usr/lib/python3.11/ensurepip/_bundled/setuptools-65.5.0-py3-none-any.whl",
-        "PURL": "pkg:pypi/setuptools@65.5.0"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-cx63-2mw6-8hw5",
-        "Severity": "High",
-        "Aliases": [
-          "CVE-2024-6345"
-        ],
-        "FixedVersion": "70.0.0"
-      }
-    },
-    {
-      "Package": {
         "ID": "fb73f3cf6020c0d4",
         "Name": "python-3.11",
         "Version": "3.11.1-r5",
@@ -426,6 +408,22 @@
     },
     {
       "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-q98g-hxg3-268c",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.11.9-r8"
+      }
+    },
+    {
+      "Package": {
         "ID": "2c8263814eb0e9b8",
         "Name": "pip",
         "Version": "22.3.1",
@@ -444,18 +442,20 @@
     },
     {
       "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+        "ID": "a145349ac56ab1b1",
+        "Name": "setuptools",
+        "Version": "65.5.0",
+        "Type": "python",
+        "Location": "/usr/lib/python3.11/ensurepip/_bundled/setuptools-65.5.0-py3-none-any.whl",
+        "PURL": "pkg:pypi/setuptools@65.5.0"
       },
       "Vulnerability": {
-        "ID": "GHSA-q98g-hxg3-268c",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.9-r8"
+        "ID": "GHSA-cx63-2mw6-8hw5",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-6345"
+        ],
+        "FixedVersion": "70.0.0"
       }
     },
     {
