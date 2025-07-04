@@ -2,6 +2,7 @@ package scan
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/anchore/grype/grype/match"
@@ -155,4 +156,174 @@ func getFixedVersion(vuln vulnerability.Vulnerability) string {
 	}
 
 	return strings.Join(vuln.Fix.Versions, ", ")
+}
+
+// mergeRelatedFindings deduplicates findings that represent the same vulnerability
+// but are reported under different IDs (e.g., CVE vs GHSA).
+func mergeRelatedFindings(findings []Finding) []Finding {
+	if len(findings) <= 1 {
+		return findings
+	}
+
+	// Group findings by package (name, type, location)
+	packageGroups := make(map[packageKey][]Finding)
+	for _, f := range findings {
+		key := packageKey{
+			name:     f.Package.Name,
+			type_:    f.Package.Type,
+			location: f.Package.Location,
+		}
+		packageGroups[key] = append(packageGroups[key], f)
+	}
+
+	// Process each package group
+	var result []Finding
+	for _, group := range packageGroups {
+		if len(group) == 1 {
+			result = append(result, group[0])
+			continue
+		}
+
+		// Find related findings within the package group
+		merged := mergeRelatedInGroup(group)
+		result = append(result, merged...)
+	}
+
+	return result
+}
+
+// packageKey is used to group findings by package
+type packageKey struct {
+	name     string
+	type_    string
+	location string
+}
+
+// mergeRelatedInGroup merges related findings within a single package group
+func mergeRelatedInGroup(findings []Finding) []Finding {
+	// Track which findings have been merged
+	merged := make([]bool, len(findings))
+	var result []Finding
+
+	for i := 0; i < len(findings); i++ {
+		if merged[i] {
+			continue
+		}
+
+		// Start a new group with this finding
+		group := []Finding{findings[i]}
+		merged[i] = true
+
+		// Find all related findings
+		for j := i + 1; j < len(findings); j++ {
+			if merged[j] {
+				continue
+			}
+
+			// Check if this finding is related to any in the current group
+			for _, g := range group {
+				if findingsAreRelated(g, findings[j]) {
+					group = append(group, findings[j])
+					merged[j] = true
+					break
+				}
+			}
+		}
+
+		// Merge the group into a single finding
+		result = append(result, mergeGroup(group))
+	}
+
+	return result
+}
+
+// mergeGroup merges a group of related findings into a single finding
+func mergeGroup(group []Finding) Finding {
+	if len(group) == 1 {
+		return group[0]
+	}
+
+	// Collect all unique aliases
+	aliasSet := make(map[string]struct{})
+	for _, f := range group {
+		// Add all IDs and aliases to the set
+		aliasSet[f.Vulnerability.ID] = struct{}{}
+		for _, alias := range f.Vulnerability.Aliases {
+			aliasSet[alias] = struct{}{}
+		}
+	}
+
+	// Choose the representative finding (prefer GHSA > CVE > others)
+	representative := selectRepresentative(group)
+
+	// Remove the representative's ID from the alias set
+	delete(aliasSet, representative.Vulnerability.ID)
+
+	// Convert alias set to sorted slice
+	var aliases []string
+	for alias := range aliasSet {
+		aliases = append(aliases, alias)
+	}
+	sort.Strings(aliases)
+
+	// Update the representative with all aliases
+	representative.Vulnerability.Aliases = aliases
+	return representative
+}
+
+// selectRepresentative chooses which finding to keep as the representative
+func selectRepresentative(findings []Finding) Finding {
+	// First, prefer the finding with the most aliases
+	maxAliases := -1
+	var candidates []Finding
+
+	for _, f := range findings {
+		aliasCount := len(f.Vulnerability.Aliases)
+		if aliasCount > maxAliases {
+			maxAliases = aliasCount
+			candidates = []Finding{f}
+		} else if aliasCount == maxAliases {
+			candidates = append(candidates, f)
+		}
+	}
+
+	// Among candidates with equal alias counts, prefer GHSA > CVE > others
+	for _, c := range candidates {
+		if strings.HasPrefix(c.Vulnerability.ID, "GHSA-") {
+			return c
+		}
+	}
+	for _, c := range candidates {
+		if strings.HasPrefix(c.Vulnerability.ID, "CVE-") {
+			return c
+		}
+	}
+
+	// Return the first candidate if no preference matches
+	return candidates[0]
+}
+
+// createAliasSet returns a set containing the vulnerability ID and all aliases
+func createAliasSet(f Finding) map[string]struct{} {
+	set := make(map[string]struct{})
+	set[f.Vulnerability.ID] = struct{}{}
+	for _, alias := range f.Vulnerability.Aliases {
+		set[alias] = struct{}{}
+	}
+	return set
+}
+
+// findingsAreRelated checks if two findings reference the same vulnerability
+// by checking if their ID/alias sets overlap
+func findingsAreRelated(f1, f2 Finding) bool {
+	set1 := createAliasSet(f1)
+	set2 := createAliasSet(f2)
+
+	// Check for any overlap
+	for id := range set1 {
+		if _, exists := set2[id]; exists {
+			return true
+		}
+	}
+	return false
 }

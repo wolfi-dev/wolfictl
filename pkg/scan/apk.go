@@ -338,6 +338,9 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 		findings = append(findings, *finding)
 	}
 
+	// Merge related findings that represent the same vulnerability
+	findings = mergeRelatedFindings(findings)
+
 	result := &Result{
 		TargetAPK: apk,
 		Findings:  findings,
