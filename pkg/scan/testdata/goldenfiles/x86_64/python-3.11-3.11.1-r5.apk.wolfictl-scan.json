@@ -424,6 +424,24 @@
     },
     {
       "Package": {
+        "ID": "2c8263814eb0e9b8",
+        "Name": "pip",
+        "Version": "22.3.1",
+        "Type": "python",
+        "Location": "/usr/lib/python3.11/ensurepip/_bundled/pip-22.3.1-py3-none-any.whl",
+        "PURL": "pkg:pypi/pip@22.3.1"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-mq26-g339-26xf",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-5752"
+        ],
+        "FixedVersion": "23.3"
+      }
+    },
+    {
+      "Package": {
         "ID": "a145349ac56ab1b1",
         "Name": "setuptools",
         "Version": "65.5.0",
@@ -456,24 +474,6 @@
           "CVE-2022-40897"
         ],
         "FixedVersion": "65.5.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "2c8263814eb0e9b8",
-        "Name": "pip",
-        "Version": "22.3.1",
-        "Type": "python",
-        "Location": "/usr/lib/python3.11/ensurepip/_bundled/pip-22.3.1-py3-none-any.whl",
-        "PURL": "pkg:pypi/pip@22.3.1"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-mq26-g339-26xf",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2023-5752"
-        ],
-        "FixedVersion": "23.3"
       }
     }
   ],

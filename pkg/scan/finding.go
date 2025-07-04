@@ -189,6 +189,8 @@ func mergeRelatedFindings(findings []Finding) []Finding {
 		result = append(result, merged...)
 	}
 
+	// Sort results to ensure deterministic ordering
+	sort.Sort(Findings(result))
 	return result
 }
 

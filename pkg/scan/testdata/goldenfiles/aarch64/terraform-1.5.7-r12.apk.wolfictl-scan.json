@@ -8,188 +8,6 @@
   "Findings": [
     {
       "Package": {
-        "ID": "604020f9a243bdf0",
-        "Name": "github.com/hashicorp/go-getter",
-        "Version": "v1.7.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/github.com/hashicorp/go-getter@v1.7.4"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-xfhp-jf8p-mh5w",
-        "Severity": "High",
-        "Aliases": [
-          "CVE-2024-6257"
-        ],
-        "FixedVersion": "1.7.5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "d2c28a4da59036a5",
-        "Name": "golang.org/x/crypto",
-        "Version": "v0.21.0",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/golang.org/x/crypto@v0.21.0"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-v778-237x-gjrc",
-        "Severity": "Critical",
-        "Aliases": [
-          "CVE-2024-45337"
-        ],
-        "FixedVersion": "0.31.0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "d2c28a4da59036a5",
-        "Name": "golang.org/x/crypto",
-        "Version": "v0.21.0",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/golang.org/x/crypto@v0.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2025-22869",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.35.0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "3a6df904ce997cce",
-        "Name": "github.com/hashicorp/go-retryablehttp",
-        "Version": "v0.7.2",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/github.com/hashicorp/go-retryablehttp@v0.7.2"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-v6v8-xj6m-xwqh",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2024-6104"
-        ],
-        "FixedVersion": "0.7.7"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24791",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.21.12, 1.22.5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34155",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.22.7, 1.23.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34156",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.22.7, 1.23.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34158",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.22.7, 1.23.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-45336",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-45341",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a5963ac4aad96084",
-        "Name": "stdlib",
-        "Version": "go1.22.4",
-        "Type": "go-module",
-        "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/stdlib@1.22.4"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2025-22866",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
-      }
-    },
-    {
-      "Package": {
         "ID": "4c8bbb3251acb004",
         "Name": "terraform",
         "Version": "1.5.7-r12",
@@ -542,6 +360,112 @@
     },
     {
       "Package": {
+        "ID": "cd36405cb70a38d6",
+        "Name": "github.com/golang-jwt/jwt/v4",
+        "Version": "v4.2.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/golang-jwt/jwt@v4.2.0#v4"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-29wx-vh33-7x7r",
+        "Severity": "Low",
+        "Aliases": [
+          "CVE-2024-51744"
+        ],
+        "FixedVersion": "4.5.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "604020f9a243bdf0",
+        "Name": "github.com/hashicorp/go-getter",
+        "Version": "v1.7.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-getter@v1.7.4"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xfhp-jf8p-mh5w",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-6257"
+        ],
+        "FixedVersion": "1.7.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "3a6df904ce997cce",
+        "Name": "github.com/hashicorp/go-retryablehttp",
+        "Version": "v0.7.2",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-retryablehttp@v0.7.2"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v6v8-xj6m-xwqh",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-6104"
+        ],
+        "FixedVersion": "0.7.7"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a48140a901fca7f7",
+        "Name": "github.com/hashicorp/go-slug",
+        "Version": "v0.11.1",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/github.com/hashicorp/go-slug@v0.11.1"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-wpfp-cm49-9m9q",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2025-0377"
+        ],
+        "FixedVersion": "0.16.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d2c28a4da59036a5",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.21.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22869",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.35.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "d2c28a4da59036a5",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.21.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.21.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v778-237x-gjrc",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-45337"
+        ],
+        "FixedVersion": "0.31.0"
+      }
+    },
+    {
+      "Package": {
         "ID": "d1d9c96e749f7111",
         "Name": "golang.org/x/net",
         "Version": "v0.23.0",
@@ -576,38 +500,114 @@
     },
     {
       "Package": {
-        "ID": "cd36405cb70a38d6",
-        "Name": "github.com/golang-jwt/jwt/v4",
-        "Version": "v4.2.0",
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
         "Type": "go-module",
         "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/github.com/golang-jwt/jwt@v4.2.0#v4"
+        "PURL": "pkg:golang/stdlib@1.22.4"
       },
       "Vulnerability": {
-        "ID": "GHSA-29wx-vh33-7x7r",
-        "Severity": "Low",
-        "Aliases": [
-          "CVE-2024-51744"
-        ],
-        "FixedVersion": "4.5.1"
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.12, 1.22.5"
       }
     },
     {
       "Package": {
-        "ID": "a48140a901fca7f7",
-        "Name": "github.com/hashicorp/go-slug",
-        "Version": "v0.11.1",
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
         "Type": "go-module",
         "Location": "/usr/bin/terraform",
-        "PURL": "pkg:golang/github.com/hashicorp/go-slug@v0.11.1"
+        "PURL": "pkg:golang/stdlib@1.22.4"
       },
       "Vulnerability": {
-        "ID": "GHSA-wpfp-cm49-9m9q",
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
         "Severity": "High",
-        "Aliases": [
-          "CVE-2025-0377"
-        ],
-        "FixedVersion": "0.16.3"
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45336",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45341",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a5963ac4aad96084",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/terraform",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
       }
     }
   ],

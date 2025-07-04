@@ -8,20 +8,20 @@
   "Findings": [
     {
       "Package": {
-        "ID": "68708acc29687484",
-        "Name": "golang.org/x/crypto",
-        "Version": "v0.17.0",
+        "ID": "af23af31d30f3392",
+        "Name": "github.com/Azure/azure-sdk-for-go/sdk/azidentity",
+        "Version": "v1.3.1",
         "Type": "go-module",
         "Location": "/usr/bin/thanos",
-        "PURL": "pkg:golang/golang.org/x/crypto@v0.17.0"
+        "PURL": "pkg:golang/github.com/Azure/azure-sdk-for-go@v1.3.1#sdk/azidentity"
       },
       "Vulnerability": {
-        "ID": "GHSA-v778-237x-gjrc",
-        "Severity": "Critical",
+        "ID": "GHSA-m5vv-6r4h-3vj9",
+        "Severity": "Medium",
         "Aliases": [
-          "CVE-2024-45337"
+          "CVE-2024-35255"
         ],
-        "FixedVersion": "0.31.0"
+        "FixedVersion": "1.6.0"
       }
     },
     {
@@ -42,54 +42,20 @@
     },
     {
       "Package": {
-        "ID": "35a6bdd4df9bc6d9",
-        "Name": "golang.org/x/oauth2",
-        "Version": "v0.11.0",
+        "ID": "68708acc29687484",
+        "Name": "golang.org/x/crypto",
+        "Version": "v0.17.0",
         "Type": "go-module",
         "Location": "/usr/bin/thanos",
-        "PURL": "pkg:golang/golang.org/x/oauth2@v0.11.0"
+        "PURL": "pkg:golang/golang.org/x/crypto@v0.17.0"
       },
       "Vulnerability": {
-        "ID": "CVE-2025-22868",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.27.0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "761d1c96d4f94b57",
-        "Name": "google.golang.org/protobuf",
-        "Version": "v1.31.0",
-        "Type": "go-module",
-        "Location": "/usr/bin/thanos",
-        "PURL": "pkg:golang/google.golang.org/protobuf@v1.31.0"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-8r3f-844c-mc37",
-        "Severity": "Medium",
+        "ID": "GHSA-v778-237x-gjrc",
+        "Severity": "Critical",
         "Aliases": [
-          "CVE-2024-24786"
+          "CVE-2024-45337"
         ],
-        "FixedVersion": "1.33.0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "af23af31d30f3392",
-        "Name": "github.com/Azure/azure-sdk-for-go/sdk/azidentity",
-        "Version": "v1.3.1",
-        "Type": "go-module",
-        "Location": "/usr/bin/thanos",
-        "PURL": "pkg:golang/github.com/Azure/azure-sdk-for-go@v1.3.1#sdk/azidentity"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-m5vv-6r4h-3vj9",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2024-35255"
-        ],
-        "FixedVersion": "1.6.0"
+        "FixedVersion": "0.31.0"
       }
     },
     {
@@ -126,6 +92,40 @@
           "CVE-2024-45338"
         ],
         "FixedVersion": "0.33.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "35a6bdd4df9bc6d9",
+        "Name": "golang.org/x/oauth2",
+        "Version": "v0.11.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/golang.org/x/oauth2@v0.11.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22868",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.27.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "761d1c96d4f94b57",
+        "Name": "google.golang.org/protobuf",
+        "Version": "v1.31.0",
+        "Type": "go-module",
+        "Location": "/usr/bin/thanos",
+        "PURL": "pkg:golang/google.golang.org/protobuf@v1.31.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-8r3f-844c-mc37",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24786"
+        ],
+        "FixedVersion": "1.33.0"
       }
     },
     {

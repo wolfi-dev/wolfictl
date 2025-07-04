@@ -232,6 +232,38 @@
     },
     {
       "Package": {
+        "ID": "efdccf152e0515fe",
+        "Name": "github.com/docker/docker",
+        "Version": "v24.0.9+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-36621",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "26.0.0-rc2, 25.0.5, 23.0.11"
+      }
+    },
+    {
+      "Package": {
+        "ID": "efdccf152e0515fe",
+        "Name": "github.com/docker/docker",
+        "Version": "v24.0.9+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-36623",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "26.0.0-rc1, 25.0.4"
+      }
+    },
+    {
+      "Package": {
         "ID": "384f119e54193e7a",
         "Name": "stdlib",
         "Version": "go1.22.4",
@@ -340,38 +372,6 @@
         "Severity": "Medium",
         "Aliases": null,
         "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "efdccf152e0515fe",
-        "Name": "github.com/docker/docker",
-        "Version": "v24.0.9+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-36621",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "26.0.0-rc2, 25.0.5, 23.0.11"
-      }
-    },
-    {
-      "Package": {
-        "ID": "efdccf152e0515fe",
-        "Name": "github.com/docker/docker",
-        "Version": "v24.0.9+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-36623",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "26.0.0-rc1, 25.0.4"
       }
     }
   ],

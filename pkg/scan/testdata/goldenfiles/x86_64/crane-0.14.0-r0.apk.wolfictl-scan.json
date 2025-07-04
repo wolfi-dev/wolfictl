@@ -8,6 +8,578 @@
   "Findings": [
     {
       "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24557",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24787",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24788",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r6"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24790",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r6"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.19.2-r2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.20.2-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.20.2-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "0.20.2-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45336",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.20.3-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45341",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.20.3-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "0.20.3-r2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-236w-p7wf-5ph8",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r6"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-2jwv-jmq4-4j3r",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-3f6r-qh9c-x6mm",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.20.3-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-3whm-j4xm-rv8x",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.20.3-r2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-49gw-vxvf-fc2g",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r6"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-4v7x-pqxf-cx7m",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-5fq7-4mxc-535h",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-7wrw-r4p8-38rx",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.20.3-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-8xfx-rj4p-23jm",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.20.2-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-crqm-pwhx-j97f",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.20.2-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-hw49-2p59-3mhj",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.2-r2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-j7vj-rw65-4v26",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.20.2-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "1feba3fe8fa8d375",
+        "Name": "crane",
+        "Version": "0.14.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xw73-rw38-6vjc",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "0.19.1-r1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "32b3acd5c71f06ca",
+        "Name": "github.com/docker/distribution",
+        "Version": "v2.8.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/distribution@v2.8.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-hqxw-f8mx-cpmw",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-2253"
+        ],
+        "FixedVersion": "2.8.2-beta.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-36621",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "26.0.0-rc2, 25.0.5, 23.0.11"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-36623",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "26.0.0-rc1, 25.0.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-232p-vwff-86mp",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2023-28840"
+        ],
+        "FixedVersion": "23.0.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-33pg-m6jh-5237",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-28841"
+        ],
+        "FixedVersion": "23.0.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-6wrf-mxfj-pf5p",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2023-28842"
+        ],
+        "FixedVersion": "23.0.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-jq35-85cj-fj4p",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "23.0.8"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-mq39-4gv4-mvpx",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-29018"
+        ],
+        "FixedVersion": "23.0.11"
+      }
+    },
+    {
+      "Package": {
+        "ID": "b1f837467f3053c1",
+        "Name": "github.com/docker/docker",
+        "Version": "v23.0.1+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-xw73-rw38-6vjc",
+        "Severity": "Medium",
+        "Aliases": [
+          "CVE-2024-24557"
+        ],
+        "FixedVersion": "24.0.9"
+      }
+    },
+    {
+      "Package": {
         "ID": "57e92f1396f78859",
         "Name": "stdlib",
         "Version": "go1.20.2",
@@ -596,578 +1168,6 @@
         "Severity": "Medium",
         "Aliases": null,
         "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-45288",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24557",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24787",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24788",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24789",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r6"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24790",
-        "Severity": "Critical",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r6"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24791",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.19.2-r2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34155",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.20.2-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34156",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.20.2-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34158",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "0.20.2-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-45336",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.20.3-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-45341",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.20.3-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2025-22866",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "0.20.3-r2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-236w-p7wf-5ph8",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r6"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-2jwv-jmq4-4j3r",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-3f6r-qh9c-x6mm",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.20.3-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-3whm-j4xm-rv8x",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.20.3-r2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-49gw-vxvf-fc2g",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r6"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-4v7x-pqxf-cx7m",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-5fq7-4mxc-535h",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-7wrw-r4p8-38rx",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.20.3-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-8xfx-rj4p-23jm",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.20.2-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-crqm-pwhx-j97f",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.20.2-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-hw49-2p59-3mhj",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.2-r2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-j7vj-rw65-4v26",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.20.2-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "1feba3fe8fa8d375",
-        "Name": "crane",
-        "Version": "0.14.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/crane@0.14.0-r0?arch=x86_64\u0026origin=crane"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-xw73-rw38-6vjc",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "0.19.1-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-mq39-4gv4-mvpx",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2024-29018"
-        ],
-        "FixedVersion": "23.0.11"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-36621",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "26.0.0-rc2, 25.0.5, 23.0.11"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-36623",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "26.0.0-rc1, 25.0.4"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-232p-vwff-86mp",
-        "Severity": "High",
-        "Aliases": [
-          "CVE-2023-28840"
-        ],
-        "FixedVersion": "23.0.3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-33pg-m6jh-5237",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2023-28841"
-        ],
-        "FixedVersion": "23.0.3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-6wrf-mxfj-pf5p",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2023-28842"
-        ],
-        "FixedVersion": "23.0.3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-jq35-85cj-fj4p",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "23.0.8"
-      }
-    },
-    {
-      "Package": {
-        "ID": "b1f837467f3053c1",
-        "Name": "github.com/docker/docker",
-        "Version": "v23.0.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/docker@v23.0.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-xw73-rw38-6vjc",
-        "Severity": "Medium",
-        "Aliases": [
-          "CVE-2024-24557"
-        ],
-        "FixedVersion": "24.0.9"
-      }
-    },
-    {
-      "Package": {
-        "ID": "32b3acd5c71f06ca",
-        "Name": "github.com/docker/distribution",
-        "Version": "v2.8.1+incompatible",
-        "Type": "go-module",
-        "Location": "/usr/bin/crane",
-        "PURL": "pkg:golang/github.com/docker/distribution@v2.8.1%2Bincompatible"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-hqxw-f8mx-cpmw",
-        "Severity": "High",
-        "Aliases": [
-          "CVE-2023-2253"
-        ],
-        "FixedVersion": "2.8.2-beta.1"
       }
     }
   ],
