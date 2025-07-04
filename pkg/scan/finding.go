@@ -167,13 +167,13 @@ func mergeRelatedFindings(findings []Finding) []Finding {
 
 	// Group findings by package (name, type, location)
 	packageGroups := make(map[packageKey][]Finding)
-	for _, f := range findings {
+	for i := range findings {
 		key := packageKey{
-			name:     f.Package.Name,
-			type_:    f.Package.Type,
-			location: f.Package.Location,
+			name:     findings[i].Package.Name,
+			typ:      findings[i].Package.Type,
+			location: findings[i].Package.Location,
 		}
-		packageGroups[key] = append(packageGroups[key], f)
+		packageGroups[key] = append(packageGroups[key], findings[i])
 	}
 
 	// Process each package group
@@ -195,7 +195,7 @@ func mergeRelatedFindings(findings []Finding) []Finding {
 // packageKey is used to group findings by package
 type packageKey struct {
 	name     string
-	type_    string
+	typ      string
 	location string
 }
 
@@ -221,8 +221,8 @@ func mergeRelatedInGroup(findings []Finding) []Finding {
 			}
 
 			// Check if this finding is related to any in the current group
-			for _, g := range group {
-				if findingsAreRelated(g, findings[j]) {
+			for k := range group {
+				if findingsAreRelated(group[k], findings[j]) {
 					group = append(group, findings[j])
 					merged[j] = true
 					break
@@ -245,10 +245,10 @@ func mergeGroup(group []Finding) Finding {
 
 	// Collect all unique aliases
 	aliasSet := make(map[string]struct{})
-	for _, f := range group {
+	for i := range group {
 		// Add all IDs and aliases to the set
-		aliasSet[f.Vulnerability.ID] = struct{}{}
-		for _, alias := range f.Vulnerability.Aliases {
+		aliasSet[group[i].Vulnerability.ID] = struct{}{}
+		for _, alias := range group[i].Vulnerability.Aliases {
 			aliasSet[alias] = struct{}{}
 		}
 	}
@@ -277,25 +277,25 @@ func selectRepresentative(findings []Finding) Finding {
 	maxAliases := -1
 	var candidates []Finding
 
-	for _, f := range findings {
-		aliasCount := len(f.Vulnerability.Aliases)
+	for i := range findings {
+		aliasCount := len(findings[i].Vulnerability.Aliases)
 		if aliasCount > maxAliases {
 			maxAliases = aliasCount
-			candidates = []Finding{f}
+			candidates = []Finding{findings[i]}
 		} else if aliasCount == maxAliases {
-			candidates = append(candidates, f)
+			candidates = append(candidates, findings[i])
 		}
 	}
 
 	// Among candidates with equal alias counts, prefer GHSA > CVE > others
-	for _, c := range candidates {
-		if strings.HasPrefix(c.Vulnerability.ID, "GHSA-") {
-			return c
+	for i := range candidates {
+		if strings.HasPrefix(candidates[i].Vulnerability.ID, "GHSA-") {
+			return candidates[i]
 		}
 	}
-	for _, c := range candidates {
-		if strings.HasPrefix(c.Vulnerability.ID, "CVE-") {
-			return c
+	for i := range candidates {
+		if strings.HasPrefix(candidates[i].Vulnerability.ID, "CVE-") {
+			return candidates[i]
 		}
 	}
 

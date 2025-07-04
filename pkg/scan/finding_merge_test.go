@@ -472,4 +472,3 @@ func TestFindingsAreRelated(t *testing.T) {
 		})
 	}
 }
-
