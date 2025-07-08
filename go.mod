@@ -11,15 +11,15 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v0.28.0
-	chainguard.dev/melange v0.28.0
+	chainguard.dev/apko v0.29.2
+	chainguard.dev/melange v0.29.0
 	cloud.google.com/go/storage v1.55.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.95.0
 	github.com/anchore/stereoscope v0.1.6
 	github.com/anchore/syft v1.28.0
 	github.com/chainguard-dev/clog v1.7.0
-	github.com/chainguard-dev/yam v0.2.22
+	github.com/chainguard-dev/yam v0.2.23
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.5
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250319133953-166f707985bc
@@ -67,14 +67,14 @@ require (
 
 require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
-	github.com/chainguard-dev/advisory-schema v0.37.11
+	github.com/chainguard-dev/advisory-schema v0.37.12
 	github.com/spf13/afero v1.14.0
 )
 
 require (
 	cel.dev/expr v0.23.1 // indirect
 	chainguard.dev/go-grpc-kit v0.17.10 // indirect
-	chainguard.dev/sdk v0.1.32 // indirect
+	chainguard.dev/sdk v0.1.34 // indirect
 	cloud.google.com/go v0.121.1 // indirect
 	cloud.google.com/go/auth v0.16.2 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
@@ -98,7 +98,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Microsoft/hcsshim v0.13.0 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
-	github.com/ProtonMail/go-crypto v1.2.0 // indirect
+	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/STARRY-S/zip v0.2.1 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
@@ -345,7 +345,7 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/tools v0.34.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
-	google.golang.org/api v0.239.0 // indirect
+	google.golang.org/api v0.240.0 // indirect
 	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250512202823-5a2f75b736a9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
@@ -354,7 +354,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gorm.io/gorm v1.30.0 // indirect
-	k8s.io/apimachinery v0.32.3 // indirect
+	k8s.io/apimachinery v0.33.2 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	modernc.org/libc v1.65.10 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
