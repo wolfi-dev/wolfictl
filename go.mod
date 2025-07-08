@@ -67,7 +67,7 @@ require (
 
 require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
-	github.com/chainguard-dev/advisory-schema v0.37.12
+	github.com/chainguard-dev/advisory-schema v0.37.13
 	github.com/spf13/afero v1.14.0
 )
 
