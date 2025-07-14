@@ -37,6 +37,7 @@ import (
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/charmbracelet/log"
+	"github.com/hako/durafmt"
 	"github.com/spf13/afero"
 	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
@@ -44,6 +45,8 @@ import (
 
 const (
 	mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
+
+	maxRecommendedBuildAge = 48 * time.Hour
 )
 
 var DefaultGrypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
@@ -166,6 +169,12 @@ type Options struct {
 	// except for testing purposes.
 	DisableDatabaseAgeValidation bool
 
+	// MaxAllowedBuildAge defines the maximum allowed age for the vulnerability database.
+	// If the database is older than this duration, it will be considered invalid unless
+	// DisableDatabaseAgeValidation is set to true. If not specified, the default value
+	// of 48 hours will be used.
+	MaxAllowedBuildAge time.Duration
+
 	// DisableSBOMCache controls whether the scanner will cache SBOMs generated from
 	// APKs. If true, the scanner will not cache SBOMs or use existing cached SBOMs.
 	DisableSBOMCache bool
@@ -173,7 +182,10 @@ type Options struct {
 
 // DefaultOptions is the recommended default configuration for a new Scanner.
 // These options are suitable for most use scanning cases.
-var DefaultOptions = Options{}
+var DefaultOptions = Options{
+	// TODO(hectorj2f): This is a temporary change to 120h, ideally we recommend to set that maximum built age to 48h.
+	MaxAllowedBuildAge: 120 * time.Hour,
+}
 
 // NewScanner initializes the grype DB for reuse across multiple scans.
 func NewScanner(opts Options) (*Scanner, error) {
@@ -182,11 +194,16 @@ func NewScanner(opts Options) (*Scanner, error) {
 		dbDestDir = DefaultGrypeDBDir
 	}
 
+	maxAllowedBuildAge := opts.MaxAllowedBuildAge
+	if maxAllowedBuildAge == 0 {
+		maxAllowedBuildAge = 120 * time.Hour
+	}
+
 	installCfg := installation.Config{
 		DBRootDir:               dbDestDir,
 		ValidateChecksum:        true,
 		ValidateAge:             !opts.DisableDatabaseAgeValidation,
-		MaxAllowedBuiltAge:      48 * time.Hour,
+		MaxAllowedBuiltAge:      maxAllowedBuildAge,
 		UpdateCheckMaxFrequency: 1 * time.Hour,
 	}
 
@@ -228,6 +245,14 @@ func NewScanner(opts Options) (*Scanner, error) {
 	vulnProvider, dbStatus, err := grype.LoadVulnerabilityDB(distCfg, installCfg, updateDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
+	}
+
+	// built time is defined in UTC,
+	// we should compare it against UTC
+	now := time.Now().UTC()
+	age := now.Sub(dbStatus.Built)
+	if age > maxRecommendedBuildAge {
+		fmt.Fprintf(os.Stdout, "WARNING: the vulnerability database was built %s ago (max allowed age is %s but the recommended value is %s)\n", durafmt.ParseShort(age), durafmt.ParseShort(maxAllowedBuildAge), durafmt.ParseShort(maxRecommendedBuildAge))
 	}
 
 	if checksum == "" {
