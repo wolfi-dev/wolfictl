@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"chainguard.dev/apko/pkg/apk/apk"
 	"chainguard.dev/apko/pkg/apk/auth"
@@ -235,6 +236,9 @@ func scanEverything(ctx context.Context, p *scanParams, inputs []string, advGett
 	opts := scan.DefaultOptions
 	opts.UseCPEs = p.useCPEMatching
 	opts.PathOfDatabaseArchiveToImport = p.localDBFilePath
+	if p.dbMaxAllowedBuildAge > 0 {
+		opts.MaxAllowedBuildAge = p.dbMaxAllowedBuildAge
+	}
 
 	// Immediately start a goroutine, so we can initialize the vulnerability database.
 	// Once that's finished, we will start to pull sboms off of done as they become ready.
@@ -338,6 +342,7 @@ type scanParams struct {
 	disableSBOMCache     bool
 	remoteScanning       bool
 	useCPEMatching       bool
+	dbMaxAllowedBuildAge time.Duration
 }
 
 func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
@@ -352,6 +357,7 @@ func (p *scanParams) addFlagsTo(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&p.disableSBOMCache, "disable-sbom-cache", "D", false, "don't use the SBOM cache")
 	cmd.Flags().BoolVarP(&p.remoteScanning, "remote", "r", false, "treat input(s) as the name(s) of package(s) in the Wolfi package repository to download and scan the latest versions of")
 	cmd.Flags().BoolVar(&p.useCPEMatching, "use-cpes", false, "turn on all CPE matching in Grype")
+	cmd.Flags().DurationVar(&p.dbMaxAllowedBuildAge, "max-allowed-built-age", 120*time.Hour, "Max allowed age for vulnerability database, age being the time since it was built. Default max age is 120h (or five days)")
 }
 
 func (p *scanParams) resolveInputsToScan(ctx context.Context, args []string) (inputs []string, cleanup func() error, err error) {

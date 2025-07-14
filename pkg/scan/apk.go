@@ -166,6 +166,12 @@ type Options struct {
 	// except for testing purposes.
 	DisableDatabaseAgeValidation bool
 
+	// MaxAllowedBuildAge defines the maximum allowed age for the vulnerability database.
+	// If the database is older than this duration, it will be considered invalid unless
+	// DisableDatabaseAgeValidation is set to true. If not specified, the default value
+	// of 48 hours will be used.
+	MaxAllowedBuildAge time.Duration
+
 	// DisableSBOMCache controls whether the scanner will cache SBOMs generated from
 	// APKs. If true, the scanner will not cache SBOMs or use existing cached SBOMs.
 	DisableSBOMCache bool
@@ -173,7 +179,9 @@ type Options struct {
 
 // DefaultOptions is the recommended default configuration for a new Scanner.
 // These options are suitable for most use scanning cases.
-var DefaultOptions = Options{}
+var DefaultOptions = Options{
+	MaxAllowedBuildAge: 120 * time.Hour,
+}
 
 // NewScanner initializes the grype DB for reuse across multiple scans.
 func NewScanner(opts Options) (*Scanner, error) {
@@ -182,11 +190,16 @@ func NewScanner(opts Options) (*Scanner, error) {
 		dbDestDir = DefaultGrypeDBDir
 	}
 
+	maxAllowedBuildAge := opts.MaxAllowedBuildAge
+	if maxAllowedBuildAge == 0 {
+		maxAllowedBuildAge = 120 * time.Hour
+	}
+
 	installCfg := installation.Config{
 		DBRootDir:               dbDestDir,
 		ValidateChecksum:        true,
 		ValidateAge:             !opts.DisableDatabaseAgeValidation,
-		MaxAllowedBuiltAge:      48 * time.Hour,
+		MaxAllowedBuiltAge:      maxAllowedBuildAge,
 		UpdateCheckMaxFrequency: 1 * time.Hour,
 	}
 
