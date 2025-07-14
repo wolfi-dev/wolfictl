@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
+	"github.com/hako/durafmt"
 	"github.com/anchore/grype/grype"
 	v6 "github.com/anchore/grype/grype/db/v6"
 	"github.com/anchore/grype/grype/db/v6/distribution"
@@ -44,6 +45,8 @@ import (
 
 const (
 	mavenSearchBaseURL = "https://search.maven.org/solrsearch/select"
+
+	maxRecommendedBuildAge = 48 * time.Hour
 )
 
 var DefaultGrypeDBDir = path.Join(xdg.CacheHome, "wolfictl", "grype", "db")
@@ -241,6 +244,14 @@ func NewScanner(opts Options) (*Scanner, error) {
 	vulnProvider, dbStatus, err := grype.LoadVulnerabilityDB(distCfg, installCfg, updateDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load vulnerability database: %w", err)
+	}
+
+	// built time is defined in UTC,
+	// we should compare it against UTC
+	now := time.Now().UTC()
+	age := now.Sub(dbStatus.Built)
+	if age > maxRecommendedBuildAge {
+		fmt.Fprintf(os.Stdout, "WARNING: the vulnerability database was built %s ago (max allowed age is %s but the recommended value is %s)\n", durafmt.ParseShort(age), durafmt.ParseShort(maxAllowedBuildAge), durafmt.ParseShort(maxRecommendedBuildAge))
 	}
 
 	if checksum == "" {
