@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
-	"github.com/hako/durafmt"
 	"github.com/anchore/grype/grype"
 	v6 "github.com/anchore/grype/grype/db/v6"
 	"github.com/anchore/grype/grype/db/v6/distribution"
@@ -38,6 +37,7 @@ import (
 	sbomSyft "github.com/anchore/syft/syft/sbom"
 	"github.com/chainguard-dev/clog"
 	"github.com/charmbracelet/log"
+	"github.com/hako/durafmt"
 	"github.com/spf13/afero"
 	anchorelogger "github.com/wolfi-dev/wolfictl/pkg/anchorelog"
 	"github.com/wolfi-dev/wolfictl/pkg/sbom"
@@ -183,6 +183,7 @@ type Options struct {
 // DefaultOptions is the recommended default configuration for a new Scanner.
 // These options are suitable for most use scanning cases.
 var DefaultOptions = Options{
+	// TODO(hectorj2f): This is a temporary change to 120h, ideally we recommend to set that maximum built age to 48h.
 	MaxAllowedBuildAge: 120 * time.Hour,
 }
 
