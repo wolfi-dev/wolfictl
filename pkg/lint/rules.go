@@ -539,7 +539,95 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return err
 			},
 		},
+
+		// If the git repository URL and update identifiers do not match then we
+		// will fail to auto-update the package automagically.
+		{
+			Name:        "update-identifier-must-match-git-repository",
+			Description: "update identifier must match the git repository",
+			Severity:    SeverityError,
+			LintFunc: func(config config.Configuration) error {
+				// no update configured? no problem
+				if config.Update.GitHubMonitor == nil {
+					return nil
+				}
+
+				// In most of the cases a single package definition will have a single
+				// pipeline that uses git-checkout. However, there are some, drupal-11
+				// being an example, that have a few.
+				pipelines := pickPipelinesUsing(gitCheckout, config.Pipeline)
+				if len(pipelines) == 0 {
+					return nil
+				}
+
+				for _, pipeline := range pipelines {
+					// an error here is serious enough that we return immediatelly,
+					// without even looking at the rest of the pipelines.
+					repositoryURI, err := extractURI(*pipeline)
+					if err != nil {
+						return err
+					}
+
+					ghIdentifier := identifierFromRepoURI(repositoryURI)
+
+					// all we need is a single match, so if we find one then it is the
+					// end of the show.
+					// note that the URI part or the identifier can have mixed case and
+					// still work
+					if strings.EqualFold(ghIdentifier, config.Update.GitHubMonitor.Identifier) {
+						return nil
+					}
+				}
+
+				// at this point we know that none of the repository URIs match the
+				// github identifier, lets let the world know
+				return fmt.Errorf("update identifier does not match the repository URI")
+			},
+		},
 	}
+}
+
+// identifierFromRepoURI peels out the <user>/<project> identifier from a
+// GitHub URL such as: https://github.com/<user>/<project> or the version with
+// trailing ".git" postfix.
+//
+// Returns the identifier or an empty string if is unble to find one.
+func identifierFromRepoURI(repoURI string) string {
+	// the repoURI is a URL so we can explode it on slashes
+	repoURI = strings.TrimSuffix(repoURI, "/")
+	elements := strings.Split(repoURI, "/")
+
+	// a github URL will have at least three elements and we only care about the
+	// two at the end.
+	length := len(elements)
+	if len(elements) < 2 {
+		return ""
+	}
+
+	// lets build the identifier
+	identifier := fmt.Sprintf("%s/%s", elements[length-2], elements[length-1])
+
+	// however, before we return we must trim the unwanted characters to make sure
+	// it has a format of <user>/<project>
+	identifier = strings.TrimSuffix(identifier, ".git")
+	identifier = strings.TrimSuffix(identifier, "/")
+
+	// kthxbye
+	return identifier
+}
+
+// pickPipelinesUsing peels out all of the pipelines that matches the 'uses',
+// if none is found then an empty slice is returned.
+func pickPipelinesUsing(uses string, pipelines []config.Pipeline) []*config.Pipeline {
+	retval := make([]*config.Pipeline, 0, len(pipelines))
+
+	for index := range len(pipelines) {
+		if pipelines[index].Uses == uses {
+			retval = append(retval, &pipelines[index])
+		}
+	}
+
+	return retval
 }
 
 func containsKey(parentNode *yaml.Node, key string) error {
