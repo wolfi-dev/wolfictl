@@ -582,9 +582,9 @@ func TestLinter_Rules(t *testing.T) {
 			require.Len(t, g.Errors, len(tt.want.Errors))
 
 			for i, e := range g.Errors {
-				assert.Equal(t, e.Error, tt.want.Errors[i].Error, "Lint(): Error: got = %v, want %v", e.Error, tt.want.Errors[i].Error)
-				assert.Equal(t, e.Rule.Name, tt.want.Errors[i].Rule.Name, "Lint(): Rule.Name: got = %v, want %v", e.Rule.Name, tt.want.Errors[i].Rule.Name)
-				assert.Equal(t, e.Rule.Severity, tt.want.Errors[i].Rule.Severity, "Lint(): Rule.Severity: got = %v, want %v", e.Rule.Severity, tt.want.Errors[i].Rule.Severity)
+				assert.Equal(t, tt.want.Errors[i].Error, e.Error, "Lint(): Error: got = %v, want %v", e.Error, tt.want.Errors[i].Error)
+				assert.Equal(t, tt.want.Errors[i].Rule.Name, e.Rule.Name, "Lint(): Rule.Name: got = %v, want %v", e.Rule.Name, tt.want.Errors[i].Rule.Name)
+				assert.Equal(t, tt.want.Errors[i].Rule.Severity, e.Rule.Severity, "Lint(): Rule.Severity: got = %v, want %v", e.Rule.Severity, tt.want.Errors[i].Rule.Severity)
 			}
 		})
 	}
