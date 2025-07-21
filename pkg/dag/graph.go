@@ -98,8 +98,7 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 	// the order of adding packages is quite important:
 	// 1. Go through each origin package and add it as a vertex
 	// 2. Go through each of its subpackages and add them as vertices, with the sub dependent on the origin
-	// 3. Add runtime dependencies for each package, as they are much more constrained than the build-time, and only can go to the local repo.
-	// 4. Add environment build-time dependencies
+	// 3. Add environment build-time dependencies
 	for _, c := range pkgs.Packages() {
 		if err := g.addVertex(c); err != nil && !errors.Is(err, graph.ErrVertexAlreadyExists) {
 			errs = append(errs, err)
@@ -123,41 +122,6 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 					errs = append(errs, fmt.Errorf("unable to add edge for subpackage %q from %s-%s: %w", c.String(), subpkgVersion.Name(), subpkgVersion.Version(), err))
 					continue
 				}
-			}
-		}
-	}
-
-	for _, c := range pkgs.Packages() {
-		// add packages from the runtime dependencies
-		resolverKey, err := g.addResolverForRepos(ctx,
-			opts.arch,
-			localRepo,
-			indexes,
-			keys,
-			append(c.Environment.Contents.BuildRepositories, opts.repos...),
-			append(c.Environment.Contents.Keyring, opts.keys...),
-		)
-		if err != nil {
-			return nil, fmt.Errorf("unable to create resolver for %s: %w", c.String(), err)
-		}
-
-		// For runtime packages, it is allowed to resolve itself.
-		addErrs := g.resolvePackages(ctx, c, "runtime", localRepoSource, resolverKey, c.Package.Dependencies.Runtime, true)
-		if len(addErrs) > 0 {
-			errs = append(errs, addErrs...)
-		}
-
-		for _, subpkg := range c.Subpackages { //nolint:gocritic
-			parent := Configuration{
-				Configuration: c.Configuration,
-				Path:          c.Path,
-				name:          subpkg.Name,
-				version:       c.version,
-				pkg:           subpkg.Name,
-			}
-			addErrs := g.resolvePackages(ctx, parent, "runtime", localRepoSource, resolverKey, subpkg.Dependencies.Runtime, true)
-			if len(addErrs) > 0 {
-				errs = append(errs, addErrs...)
 			}
 		}
 	}
@@ -282,9 +246,7 @@ func (g *Graph) addResolverForRepos(ctx context.Context, arch string, localRepo 
 // resolvePackages given a package `parent`, a list of packages `pkgs` and a `resolver`,
 // use the resolver to find all of the packages that fulfill the requirements and add them
 // to the graph as the parent's dependencies.
-// Optionally, can allow self to resolve dependencies or not. This is policy driven/
-// In general, wolfi/os does *not* allow self to resolve for build environment,
-// and *does* allow self to resolve for runtime environment.
+// Optionally, can allow self to resolve dependencies or not. This is policy driven.
 func (g *Graph) resolvePackages(ctx context.Context, parent Package, source, localRepoSource, resolverKey string, pkgs []string, allowSelf bool) (errs []error) {
 	log := clog.FromContext(ctx)
 	for _, buildDep := range pkgs {
