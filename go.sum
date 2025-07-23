@@ -1,7 +1,7 @@
 cel.dev/expr v0.23.1 h1:K4KOtPCJQjVggkARsjG9RWXP6O4R73aHeJMa/dmCQQg=
 cel.dev/expr v0.23.1/go.mod h1:hLPLo1W4QUmuYdA72RBX06QTs6MXw941piREPl3Yfiw=
-chainguard.dev/apko v0.29.8 h1:ftwCPJmCRWLI73VHrqs3o2RCTFxyuWZj0f36EwkPJEE=
-chainguard.dev/apko v0.29.8/go.mod h1:duwNM0y4AtN2YNH4u5z+hgjnfuiTl+rAMzjOKwBkyMw=
+chainguard.dev/apko v0.29.9 h1:6In6pdXnC61+lD2PONC2VO9kEMBTgg7Dvdl3L5gyMds=
+chainguard.dev/apko v0.29.9/go.mod h1:duwNM0y4AtN2YNH4u5z+hgjnfuiTl+rAMzjOKwBkyMw=
 chainguard.dev/go-grpc-kit v0.17.11 h1:m4ZL2yg6sSrdPA593qVh9KHTZ+XOmLwqv3Jt5vT0FuU=
 chainguard.dev/go-grpc-kit v0.17.11/go.mod h1:aYlrvAscMZBtVIA7bykUWfbjhL2fDoUCECHvopC2xWY=
 chainguard.dev/melange v0.29.7 h1:kk59GB8Gedo0M/4g/nKNeWPcsIT9aMagKyyOXHS3rOA=
@@ -795,8 +795,8 @@ github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/chainguard-dev/advisory-schema v0.37.14 h1:A9WFDcWE8aRi8ofRY2G54vRLPIR0bMCvBKA+lS+se5k=
-github.com/chainguard-dev/advisory-schema v0.37.14/go.mod h1:tZibxgKPdvk+DWQF2596DZZfMhzE3zMIgcSgzbbj6Pc=
+github.com/chainguard-dev/advisory-schema v0.37.15 h1:1ObhZ5ULAxm/nm459lyieyfzvslZZrkWIYeu7NT2f18=
+github.com/chainguard-dev/advisory-schema v0.37.15/go.mod h1:SXUDVg+i456fAlHlYtJLhyTZVtTIWuuGalpK3jTgZZ8=
 github.com/chainguard-dev/clog v1.7.0 h1:guPznsK8vLHvzz1QJe2yU6MFeYaiSOFOQBYw4OXu+g8=
 github.com/chainguard-dev/clog v1.7.0/go.mod h1:4+WFhRMsGH79etYXY3plYdp+tCz/KCkU8fAr0HoaPvs=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 h1:XR2vgQC024I9/boh9r1ihVv8Z14+pbvWqXeYMCnZJpc=
