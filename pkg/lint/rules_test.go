@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"testing"
 
+	"chainguard.dev/melange/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -19,6 +20,64 @@ func TestLinter_Rules(t *testing.T) {
 		want        EvalResult
 		wantErr     bool
 	}{
+		{
+			file:        "update-identifier-not-matching-git-checkout-repository.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File: "update-identifier-not-matching-git-checkout-repository",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "update-identifier-must-match-git-repository",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf("[update-identifier-must-match-git-repository]: update identifier does not match the repository URI (ERROR)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "update-identifier-not-matching-git-checkout-repository-nolint.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File:   "update-identifier-not-matching-git-checkout-repository-nolint",
+				Errors: EvalRuleErrors{},
+			},
+			wantErr: false,
+			matches: 0,
+		},
+		{
+			file:        "update-identifier-matching-git-checkout-repository.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File:   "update-identifier-matching-git-checkout-repository",
+				Errors: EvalRuleErrors{},
+			},
+			wantErr: false,
+			matches: 0,
+		},
+		{
+			file:        "update-identifier-matching-git-checkout-repository-mixed-case.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File:   "update-identifier-matching-git-checkout-repository-mixed-case",
+				Errors: EvalRuleErrors{},
+			},
+			wantErr: false,
+			matches: 0,
+		},
+		{
+			file:        "update-identifier-matching-git-checkout-repository-multiple-pipelines.yaml",
+			minSeverity: SeverityError,
+			want: EvalResult{
+				File:   "update-identifier-matching-git-checkout-repository-multiple-pipelines",
+				Errors: EvalRuleErrors{},
+			},
+			wantErr: false,
+			matches: 0,
+		},
 		{
 			file:        "missing-copyright.yaml",
 			minSeverity: SeverityInfo,
@@ -585,6 +644,87 @@ func TestLinter_Rules(t *testing.T) {
 				assert.Equal(t, tt.want.Errors[i].Error, e.Error, "Lint(): Error: got = %v, want %v", e.Error, tt.want.Errors[i].Error)
 				assert.Equal(t, tt.want.Errors[i].Rule.Name, e.Rule.Name, "Lint(): Rule.Name: got = %v, want %v", e.Rule.Name, tt.want.Errors[i].Rule.Name)
 				assert.Equal(t, tt.want.Errors[i].Rule.Severity, e.Rule.Severity, "Lint(): Rule.Severity: got = %v, want %v", e.Rule.Severity, tt.want.Errors[i].Rule.Severity)
+			}
+		})
+	}
+}
+
+func TestIdentifierFromRepoURI(t *testing.T) {
+	cases := []struct {
+		name     string
+		expected string
+	}{
+		{
+			name:     "https://github.com/wolfi-dev/os",
+			expected: "wolfi-dev/os",
+		},
+		{
+			name:     "https://github.com/wolfi-dev/os/",
+			expected: "wolfi-dev/os",
+		},
+		{
+			name:     "https://github.com/wolfi-dev/os.git",
+			expected: "wolfi-dev/os",
+		},
+		{
+			name:     "https://github.com/wolfi-dev/os.git/",
+			expected: "wolfi-dev/os",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := identifierFromRepoURI(c.name)
+			if got != c.expected {
+				assert.Equal(t, c.expected, got, "Error: got = %v, want %v", got, c.expected)
+			}
+		})
+	}
+}
+
+func TestPickPipelinesUsing(t *testing.T) {
+	cases := []struct {
+		name      string
+		pipelines []config.Pipeline
+		expected  int
+	}{
+		{
+			name:      "single pipeline that match",
+			pipelines: []config.Pipeline{{Uses: "desired"}},
+			expected:  1,
+		},
+		{
+			name:      "single pipeline that do not match",
+			pipelines: []config.Pipeline{{Uses: "skipped"}},
+			expected:  0,
+		},
+		{
+			name:      "multiple pipelines that all match",
+			pipelines: []config.Pipeline{{Uses: "desired"}, {Uses: "desired"}, {Uses: "desired"}},
+			expected:  3,
+		},
+		{
+			name:      "multiple pipelines that some match",
+			pipelines: []config.Pipeline{{Uses: "skipped"}, {Uses: "desired"}, {Uses: "desired"}},
+			expected:  2,
+		},
+		{
+			name:      "multiple pipelines that none match",
+			pipelines: []config.Pipeline{{Uses: "skipped"}, {Uses: "skipped"}, {Uses: "skipped"}},
+			expected:  0,
+		},
+		{
+			name:      "no pipelines",
+			pipelines: []config.Pipeline{},
+			expected:  0,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			pipelines := pickPipelinesUsing("desired", c.pipelines)
+			if len(pipelines) != c.expected {
+				assert.Equal(t, c.expected, len(pipelines), "Error: got %d pipelines but expected %d", len(c.pipelines), c.expected)
 			}
 		})
 	}

@@ -1,0 +1,22 @@
+package:
+  name: update-identifier-matching-git-checkout-repository
+  version: 1.0.0
+  epoch: 0
+  description: "a package where git checkout repository matches update identifier"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/chainguard-dev/test-repository
+      expected-commit: 90be8000070debb315ad97900da2f85dff58aced
+      tag: 1.0.0
+
+update:
+  enabled: true
+  github:
+    identifier: chainguard-dev/test-repository
