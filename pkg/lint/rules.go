@@ -90,7 +90,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						return fmt.Errorf("forbidden repository %s is used", repo)
 					}
 				}
-				for _, repo := range config.Environment.Contents.RuntimeRepositories {
+				for _, repo := range config.Environment.Contents.Repositories {
 					if slices.Contains(forbiddenRepositories, repo) {
 						return fmt.Errorf("forbidden repository %s is used", repo)
 					}
@@ -409,7 +409,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						return fmt.Errorf("repository %q is tagged", repo)
 					}
 				}
-				for _, repo := range config.Environment.Contents.RuntimeRepositories {
+				for _, repo := range config.Environment.Contents.Repositories {
 					if repo[0] == '@' {
 						return fmt.Errorf("repository %q is tagged", repo)
 					}
