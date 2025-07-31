@@ -322,7 +322,7 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 	// Find vulnerability matches
 	matchesCollection, _, err := s.vulnerabilityMatcher.FindMatches(grypePkgs, grypePkg.Context{
 		Source: &ssbom.Source,
-		Distro: distro.FromRelease(ssbom.Artifacts.LinuxDistribution),
+		Distro: distro.FromRelease(ssbom.Artifacts.LinuxDistribution, nil),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to find vulnerability matches: %w", err)
