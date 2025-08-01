@@ -19,7 +19,7 @@
         "ID": "CVE-2023-24531",
         "Severity": "Critical",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.21.0-0"
       }
     },
     {
@@ -35,7 +35,7 @@
         "ID": "CVE-2023-39318",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.20.8, 1.21.1"
       }
     },
     {
@@ -51,7 +51,7 @@
         "ID": "CVE-2023-39319",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.20.8, 1.21.1"
       }
     },
     {
@@ -67,7 +67,7 @@
         "ID": "CVE-2023-39320",
         "Severity": "Critical",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.21.1"
       }
     },
     {
@@ -83,7 +83,7 @@
         "ID": "CVE-2023-39321",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.21.1"
       }
     },
     {
@@ -99,7 +99,7 @@
         "ID": "CVE-2023-39322",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.21.1"
       }
     },
     {
@@ -115,7 +115,7 @@
         "ID": "CVE-2023-39323",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.20.9, 1.21.2"
       }
     },
     {
@@ -131,7 +131,7 @@
         "ID": "CVE-2023-39325",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "1.21.3-r0"
+        "FixedVersion": "1.20.10, 1.21.3"
       }
     },
     {
@@ -142,380 +142,412 @@
         "Type": "apk",
         "Location": "/.PKGINFO",
         "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45288",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.9, 1.22.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45289",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.21.8, 1.22.1, 1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45290",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24783",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24784",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24785",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "1.21.8, 1.22.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24787",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.21.10, 1.22.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24789",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.21.11, 1.22.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24790",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "1.21.11, 1.22.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.12, 1.22.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45336",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45341",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "43f5067fde7f8e47",
+        "Name": "go-1.21",
+        "Version": "1.21.0-r0",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39318",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.8, 1.21.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39319",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.8, 1.21.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39320",
+        "Severity": "Critical",
+        "Aliases": null,
+        "FixedVersion": "1.21.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39321",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39322",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39323",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.9, 1.21.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39325",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-39326",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.12, 1.21.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-44487",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "a98bd34056bacc14",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/go",
+        "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
         "ID": "CVE-2023-45283",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "1.21.5-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-45288",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.21.9-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-45289",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-45290",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24783",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24784",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24785",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24787",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.21.10-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24789",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.21.11-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24790",
-        "Severity": "Critical",
-        "Aliases": null,
-        "FixedVersion": "1.21.11-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-24791",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.21.12-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34155",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34156",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-34158",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-45336",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2024-45341",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2025-22866",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-236w-p7wf-5ph8",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.11-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-4374-p667-p6c8",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.3-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-49gw-vxvf-fc2g",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.11-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-4v7x-pqxf-cx7m",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.9-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-5fq7-4mxc-535h",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.10-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-hw49-2p59-3mhj",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.12-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "43f5067fde7f8e47",
-        "Name": "go-1.21",
-        "Version": "1.21.0-r0",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/go-1.21@1.21.0-r0?arch=x86_64\u0026origin=go-1.21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-vvjp-q62m-2vph",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "1.21.5-r0"
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -528,138 +560,10 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
-        "ID": "CVE-2023-39318",
+        "ID": "CVE-2023-45284",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "1.20.8, 1.21.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39319",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.20.8, 1.21.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39320",
-        "Severity": "Critical",
-        "Aliases": null,
-        "FixedVersion": "1.21.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39321",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.21.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39322",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.21.1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39323",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.20.9, 1.21.2"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39325",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.20.10, 1.21.3"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-39326",
-        "Severity": "Medium",
-        "Aliases": null,
-        "FixedVersion": "1.20.12, 1.21.5"
-      }
-    },
-    {
-      "Package": {
-        "ID": "a98bd34056bacc14",
-        "Name": "stdlib",
-        "Version": "go1.21.0",
-        "Type": "go-module",
-        "Location": "/usr/lib/go/bin/go",
-        "PURL": "pkg:golang/stdlib@1.21.0"
-      },
-      "Vulnerability": {
-        "ID": "CVE-2023-44487",
-        "Severity": "High",
-        "Aliases": null,
-        "FixedVersion": "1.20.10, 1.21.3"
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -1088,6 +992,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "78c1998233403ec3",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "78c1998233403ec3",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/bin/gofmt",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -1504,6 +1440,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "4fc4c5af1303e631",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "4fc4c5af1303e631",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/addr2line",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -1920,6 +1888,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "25f5e07e6e27131b",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "25f5e07e6e27131b",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/asm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -2336,6 +2336,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9217bb4637c6d1c4",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "9217bb4637c6d1c4",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/buildid",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -2752,6 +2784,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "227afd710aea609e",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "227afd710aea609e",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cgo",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -3168,6 +3232,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "e5f660479968d534",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "e5f660479968d534",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/compile",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -3584,6 +3680,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7e50ba3e616fcbee",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "7e50ba3e616fcbee",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/covdata",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -4000,6 +4128,38 @@
         "PURL": "pkg:golang/stdlib@1.21.0"
       },
       "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "ff742f1a6c479912",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "ff742f1a6c479912",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/cover",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-45285",
         "Severity": "High",
         "Aliases": null,
@@ -4404,6 +4564,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fbdf7278144cfa52",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fbdf7278144cfa52",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/dist",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -4820,6 +5012,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "bc1e51dd213cb3a8",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "bc1e51dd213cb3a8",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/distpack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -5236,6 +5460,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "3f9d74395b91c27d",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "3f9d74395b91c27d",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/doc",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -5652,6 +5908,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c1592c345bbba2b1",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c1592c345bbba2b1",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/fix",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -6068,6 +6356,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fbf556119f9872da",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fbf556119f9872da",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/link",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -6484,6 +6804,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "353da9d8ac614768",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "353da9d8ac614768",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/nm",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -6900,6 +7252,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "793dfb0cfa636004",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "793dfb0cfa636004",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/objdump",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -7316,6 +7700,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "6b20a8696a009636",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "6b20a8696a009636",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pack",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -7732,6 +8148,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "67684da8d112c9d2",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "67684da8d112c9d2",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/pprof",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -8148,6 +8596,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "e323698977a32bcc",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "e323698977a32bcc",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/test2json",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -8564,6 +9044,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "5eae6e6b20bdf42b",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "5eae6e6b20bdf42b",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/trace",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
@@ -8980,6 +9492,38 @@
         "Severity": "High",
         "Aliases": null,
         "FixedVersion": "1.20.10, 1.21.3"
+      }
+    },
+    {
+      "Package": {
+        "ID": "0ab855cb0097cc22",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45283",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "0ab855cb0097cc22",
+        "Name": "stdlib",
+        "Version": "go1.21.0",
+        "Type": "go-module",
+        "Location": "/usr/lib/go/pkg/tool/linux_amd64/vet",
+        "PURL": "pkg:golang/stdlib@1.21.0"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-45284",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.20.11, 1.21.4"
       }
     },
     {
