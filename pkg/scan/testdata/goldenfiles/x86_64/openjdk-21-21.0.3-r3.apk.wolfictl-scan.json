@@ -19,7 +19,7 @@
         "ID": "CVE-2024-21131",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -35,7 +35,7 @@
         "ID": "CVE-2024-21138",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -51,7 +51,7 @@
         "ID": "CVE-2024-21140",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -67,7 +67,7 @@
         "ID": "CVE-2024-21145",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -83,7 +83,7 @@
         "ID": "CVE-2024-21147",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -99,7 +99,7 @@
         "ID": "CVE-2024-21208",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -115,7 +115,7 @@
         "ID": "CVE-2024-21210",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -131,7 +131,7 @@
         "ID": "CVE-2024-21217",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -147,7 +147,7 @@
         "ID": "CVE-2024-21235",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -163,103 +163,7 @@
         "ID": "CVE-2025-21502",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "21.0.6-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "eeb7c4c0ca34b36c",
-        "Name": "openjdk-21",
-        "Version": "21.0.3-r3",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-46mv-5cpj-wjxv",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "21.0.6-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "eeb7c4c0ca34b36c",
-        "Name": "openjdk-21",
-        "Version": "21.0.3-r3",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-4mqw-v4pq-hg97",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "eeb7c4c0ca34b36c",
-        "Name": "openjdk-21",
-        "Version": "21.0.3-r3",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-4rqr-f9qq-h7w3",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "eeb7c4c0ca34b36c",
-        "Name": "openjdk-21",
-        "Version": "21.0.3-r3",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-7prq-r42m-wfcx",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "eeb7c4c0ca34b36c",
-        "Name": "openjdk-21",
-        "Version": "21.0.3-r3",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-hw83-24q6-v392",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "eeb7c4c0ca34b36c",
-        "Name": "openjdk-21",
-        "Version": "21.0.3-r3",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/openjdk-21@21.0.3-r3?arch=x86_64\u0026origin=openjdk-21"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-v5pp-g8vf-3fxg",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "21.0.4-r0"
+        "FixedVersion": "1.8.0_441, 8.0.441, 11.0.26, 17.0.14, 21.0.6, 23.0.2"
       }
     }
   ],

@@ -75,7 +75,7 @@ golangci-lint:
 	set -e ;\
 
 	# Please keep the installed version in sync with .github/workflows/golangci-lint.yaml
-	GOBIN=$(GOLANGCI_LINT_DIR) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v2.1.6 ;\
+	GOBIN=$(GOLANGCI_LINT_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.6 ;\
 
 .PHONY: fmt
 fmt: ## Format all go files

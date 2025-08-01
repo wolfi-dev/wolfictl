@@ -19,7 +19,7 @@
         "ID": "CVE-2019-7317",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.7.0_231, 1.8.0_221, 7.0.231, 8.0.221, 11.0.4, 12.0.2"
       }
     },
     {
@@ -35,7 +35,7 @@
         "ID": "CVE-2023-21830",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_361, 8.0.361, 11-ea"
       }
     },
     {
@@ -51,7 +51,7 @@
         "ID": "CVE-2023-21835",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "11.0.18, 17.0.5, 19.0.2"
       }
     },
     {
@@ -67,7 +67,7 @@
         "ID": "CVE-2023-21930",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7, 20.0.1"
       }
     },
     {
@@ -83,7 +83,7 @@
         "ID": "CVE-2023-21937",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7, 20.0.1"
       }
     },
     {
@@ -99,7 +99,7 @@
         "ID": "CVE-2023-21938",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7, 20.0.1"
       }
     },
     {
@@ -115,7 +115,7 @@
         "ID": "CVE-2023-21939",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7, 20.0.1"
       }
     },
     {
@@ -131,7 +131,7 @@
         "ID": "CVE-2023-21954",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7"
       }
     },
     {
@@ -147,7 +147,7 @@
         "ID": "CVE-2023-21967",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7, 20.0.1"
       }
     },
     {
@@ -163,7 +163,7 @@
         "ID": "CVE-2023-21968",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_371, 8.0.371, 11.0.19, 17.0.7, 20.0.1"
       }
     },
     {
@@ -179,7 +179,7 @@
         "ID": "CVE-2023-22006",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "11.0.20, 17.0.8, 20.0.2"
       }
     },
     {
@@ -195,7 +195,7 @@
         "ID": "CVE-2023-22036",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "11.0.20, 17.0.8, 20.0.2"
       }
     },
     {
@@ -211,7 +211,7 @@
         "ID": "CVE-2023-22041",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_381, 8.0.381, 11.0.20, 17.0.8, 20.0.2"
       }
     },
     {
@@ -227,7 +227,7 @@
         "ID": "CVE-2023-22045",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_381, 8.0.381, 11.0.20, 17.0.8, 20.0.2"
       }
     },
     {
@@ -243,7 +243,7 @@
         "ID": "CVE-2023-22049",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_381, 8.0.381, 11.0.20, 17.0.8, 20.0.2"
       }
     },
     {
@@ -259,7 +259,7 @@
         "ID": "CVE-2023-22081",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_391, 8.0.391, 11.0.22, 17.0.9, 21.0.1"
       }
     },
     {
@@ -275,7 +275,7 @@
         "ID": "CVE-2023-25193",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "11.0.20, 17.0.8, 20.0.2"
       }
     },
     {
@@ -291,7 +291,7 @@
         "ID": "CVE-2024-20918",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_401, 8.0.401, 11.0.22, 17.0.10, 21.0.2"
       }
     },
     {
@@ -307,7 +307,7 @@
         "ID": "CVE-2024-20919",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_401, 8.0.401, 11.0.22, 17.0.10, 21.0.2"
       }
     },
     {
@@ -323,7 +323,7 @@
         "ID": "CVE-2024-20921",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_401, 8.0.401, 11.0.22, 17.0.10, 21.0.2"
       }
     },
     {
@@ -339,7 +339,7 @@
         "ID": "CVE-2024-20926",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_401, 8.0.401, 11.0.22"
       }
     },
     {
@@ -355,7 +355,7 @@
         "ID": "CVE-2024-20945",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_401, 8.0.401, 11.0.22, 17.0.10, 21.0.2"
       }
     },
     {
@@ -371,7 +371,7 @@
         "ID": "CVE-2024-20952",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_401, 8.0.401, 11.0.22, 17.0.10, 21.0.2"
       }
     },
     {
@@ -387,7 +387,7 @@
         "ID": "CVE-2024-21011",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_411, 8.0.411, 11.0.23, 17.0.11, 21.0.3, 22.0.1"
       }
     },
     {
@@ -403,7 +403,7 @@
         "ID": "CVE-2024-21012",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "11.0.23, 17.0.11, 21.0.3, 22.0.1"
       }
     },
     {
@@ -419,7 +419,7 @@
         "ID": "CVE-2024-21068",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_411, 8.0.411, 11.0.23, 17.0.11, 21.0.3, 22.0.1"
       }
     },
     {
@@ -435,7 +435,7 @@
         "ID": "CVE-2024-21085",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_411, 8.0.411, 11.0.23"
       }
     },
     {
@@ -451,7 +451,7 @@
         "ID": "CVE-2024-21094",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_411, 8.0.411, 11.0.23, 17.0.11, 21.0.3, 22.0.1"
       }
     },
     {
@@ -467,7 +467,7 @@
         "ID": "CVE-2024-21131",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -483,7 +483,7 @@
         "ID": "CVE-2024-21138",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -499,7 +499,7 @@
         "ID": "CVE-2024-21140",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -515,7 +515,7 @@
         "ID": "CVE-2024-21144",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24"
       }
     },
     {
@@ -531,7 +531,7 @@
         "ID": "CVE-2024-21145",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -547,7 +547,7 @@
         "ID": "CVE-2024-21147",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_421, 8.0.421, 11.0.24, 17.0.12, 21.0.4, 22.0.2"
       }
     },
     {
@@ -563,7 +563,7 @@
         "ID": "CVE-2024-21208",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -579,7 +579,7 @@
         "ID": "CVE-2024-21210",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -595,7 +595,7 @@
         "ID": "CVE-2024-21217",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -611,7 +611,7 @@
         "ID": "CVE-2024-21235",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_431, 8.0.431, 11.0.25, 17.0.13, 21.0.5, 23.0.1"
       }
     },
     {
@@ -627,7 +627,7 @@
         "ID": "CVE-2025-21502",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "1.8.0_441, 8.0.441, 11.0.26, 17.0.14, 21.0.6, 23.0.2"
       }
     }
   ],

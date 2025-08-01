@@ -16,10 +16,58 @@
         "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
       },
       "Vulnerability": {
+        "ID": "CVE-2007-4559",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "3.6.16, 3.8.17, 3.9.17, 3.10.12, 3.11.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-24329",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "3.7.17, 3.8.17, 3.9.17, 3.10.12, 3.11.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
         "ID": "CVE-2023-27043",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "3.11.8-r1"
+        "FixedVersion": "3.13.0a1, 3.12.6, 3.11.10, 3.10.15, 3.9.20, 3.8.20"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2023-36632",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": ""
       }
     },
     {
@@ -35,7 +83,7 @@
         "ID": "CVE-2023-40217",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "3.8.18, 3.9.18, 3.10.13, 3.11.5"
       }
     },
     {
@@ -51,7 +99,7 @@
         "ID": "CVE-2023-41105",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "3.12.0rc2, 3.11.5"
       }
     },
     {
@@ -67,7 +115,7 @@
         "ID": "CVE-2023-6597",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "3.11.8-r0"
+        "FixedVersion": "3.8.19, 3.9.19, 3.10.14, 3.11.8, 3.12.1, 3.13.0a3"
       }
     },
     {
@@ -83,7 +131,7 @@
         "ID": "CVE-2024-0397",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "3.8.20, 3.9.20, 3.10.14, 3.11.9, 3.12.3, 3.13.0a5"
       }
     },
     {
@@ -99,7 +147,7 @@
         "ID": "CVE-2024-0450",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "3.11.8-r0"
+        "FixedVersion": "3.8.19, 3.9.19, 3.10.14, 3.11.8, 3.12.2, 3.13.0a3"
       }
     },
     {
@@ -115,7 +163,55 @@
         "ID": "CVE-2024-11168",
         "Severity": "Low",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "3.9.21, 3.10.16, 3.11.4, 3.12.0b1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-3219",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.8.20, 3.9.20, 3.10.15, 3.11.10, 3.12.5, 3.13.0rc1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-3220",
+        "Severity": "Unknown",
+        "Aliases": null,
+        "FixedVersion": "3.14.0"
+      }
+    },
+    {
+      "Package": {
+        "ID": "fb73f3cf6020c0d4",
+        "Name": "python-3.11",
+        "Version": "3.11.1-r5",
+        "Type": "apk",
+        "Location": "/.PKGINFO",
+        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-4030",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "3.8.20, 3.9.20, 3.10.15, 3.11.10, 3.12.4, 3.13.0b1"
       }
     },
     {
@@ -131,7 +227,7 @@
         "ID": "CVE-2024-4032",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "3.11.9-r4"
+        "FixedVersion": "3.8.20, 3.9.20, 3.10.15, 3.11.10, 3.12.4, 3.13.0a6"
       }
     },
     {
@@ -147,7 +243,7 @@
         "ID": "CVE-2024-50602",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "3.11.11-r0"
+        "FixedVersion": "3.13.1, 3.12.8, 3.11.11, 3.10.16, 3.9.21"
       }
     },
     {
@@ -163,7 +259,7 @@
         "ID": "CVE-2024-6232",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "3.11.9-r9"
+        "FixedVersion": "3.13.0rc2, 3.12.6, 3.11.10, 3.10.15, 3.9.20, 3.8.20"
       }
     },
     {
@@ -179,7 +275,7 @@
         "ID": "CVE-2024-6923",
         "Severity": "Medium",
         "Aliases": null,
-        "FixedVersion": "3.11.10-r0"
+        "FixedVersion": "3.8.20, 3.9.20, 3.10.15, 3.11.10, 3.12.5, 3.13.0rc2"
       }
     },
     {
@@ -195,7 +291,7 @@
         "ID": "CVE-2024-7592",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "3.11.9-r9"
+        "FixedVersion": "3.13.0rc2, 3.12.6, 3.11.10, 3.10.15, 3.9.20, 3.8.20"
       }
     },
     {
@@ -211,7 +307,7 @@
         "ID": "CVE-2024-8088",
         "Severity": "Unknown",
         "Aliases": null,
-        "FixedVersion": "3.11.9-r8"
+        "FixedVersion": "3.8.20, 3.9.20, 3.10.15, 3.11.10, 3.12.6, 3.13.0rc2"
       }
     },
     {
@@ -227,7 +323,7 @@
         "ID": "CVE-2024-9287",
         "Severity": "High",
         "Aliases": null,
-        "FixedVersion": "3.11.10-r4"
+        "FixedVersion": "3.9.21, 3.10.16, 3.11.11, 3.12.8, 3.13.1, 3.14.0a2"
       }
     },
     {
@@ -243,7 +339,7 @@
         "ID": "CVE-2025-0938",
         "Severity": "Unknown",
         "Aliases": null,
-        "FixedVersion": ""
+        "FixedVersion": "3.12.9, 3.13.2"
       }
     },
     {
@@ -259,167 +355,7 @@
         "ID": "CVE-2025-1795",
         "Severity": "Unknown",
         "Aliases": null,
-        "FixedVersion": ""
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-5mwm-wccq-xqcp",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.8-r1"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-797f-63wg-8chv",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.8-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-79wf-qgrg-2p6c",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.11-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-7pwv-g7hj-39pr",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.9-r9"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-87qc-q3w7-7m8w",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.10-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-grqq-hcc7-crmr",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.10-r4"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-jm46-725r-hh9v",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.8-r0"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-mh6q-v4mp-2cc7",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.9-r4"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-mmm5-wgvp-wp8r",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.9-r9"
-      }
-    },
-    {
-      "Package": {
-        "ID": "fb73f3cf6020c0d4",
-        "Name": "python-3.11",
-        "Version": "3.11.1-r5",
-        "Type": "apk",
-        "Location": "/.PKGINFO",
-        "PURL": "pkg:apk/wolfi/python-3.11@3.11.1-r5?arch=x86_64\u0026origin=python-3.11"
-      },
-      "Vulnerability": {
-        "ID": "GHSA-q98g-hxg3-268c",
-        "Severity": "Unknown",
-        "Aliases": null,
-        "FixedVersion": "3.11.9-r8"
+        "FixedVersion": "3.11.9, 3.12.3, 3.13.0a5"
       }
     },
     {
