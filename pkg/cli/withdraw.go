@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -18,15 +19,29 @@ import (
 
 func cmdWithdraw() *cobra.Command {
 	key := ""
+	withdrawPackagesFile := ""
 	cmd := &cobra.Command{
 		Use:           "withdraw example-pkg-1.2.3-r4",
 		Short:         "Withdraw packages from an APKINDEX.tar.gz",
 		Example:       "withdraw --signing-key ./foo.rsa example-pkg-1.2.3-r4 also-bad-2.3.4-r1 <old/APKINDEX.tar.gz >new/APKINDEX.tar.gz",
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gone := make(map[string]bool, len(args))
+			gone := make(map[string]bool)
+
+			// Add packages from command line arguments
 			for _, s := range args {
 				gone[strings.TrimSuffix(s, ".apk")] = false
+			}
+
+			// Add packages from file if specified
+			if withdrawPackagesFile != "" {
+				filePackages, err := readPackagesFromFile(withdrawPackagesFile)
+				if err != nil {
+					return fmt.Errorf("reading packages file: %w", err)
+				}
+				for _, pkg := range filePackages {
+					gone[strings.TrimSuffix(pkg, ".apk")] = false
+				}
 			}
 
 			return withdraw(cmd.Context(), cmd.OutOrStdout(), cmd.InOrStdin(), key, gone)
@@ -34,6 +49,7 @@ func cmdWithdraw() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&key, "signing-key", "melange.rsa", "the signing key to use")
+	cmd.Flags().StringVar(&withdrawPackagesFile, "packages-file", "", "file containing list of packages to withdraw (one per line, supports comments with #)")
 
 	return cmd
 }
@@ -94,4 +110,30 @@ func withdraw(ctx context.Context, w io.Writer, r io.Reader, key string, gone ma
 	}
 
 	return nil
+}
+
+// readPackagesFromFile reads package names from a file, skipping blank lines and comments
+func readPackagesFromFile(filename string) ([]string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("opening file: %w", err)
+	}
+	defer file.Close()
+
+	var packages []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// Skip blank lines and comments
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		packages = append(packages, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("reading file: %w", err)
+	}
+
+	return packages, nil
 }
