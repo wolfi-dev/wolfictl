@@ -49,7 +49,7 @@ func cmdWithdraw() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&key, "signing-key", "melange.rsa", "the signing key to use")
-	cmd.Flags().StringVar(&withdrawPackagesFile, "withdrawn-packages", "", "file containing list of packages to withdraw (one per line, supports comments with #)")
+	cmd.Flags().StringVar(&withdrawPackagesFile, "packages-file", "", "file containing list of packages to withdraw (one per line, supports comments with #)")
 
 	return cmd
 }
