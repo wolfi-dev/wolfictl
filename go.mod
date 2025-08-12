@@ -15,7 +15,7 @@ require (
 	chainguard.dev/melange v0.30.6
 	cloud.google.com/go/storage v1.56.0
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/grype v0.97.1
+	github.com/anchore/grype v0.97.2
 	github.com/anchore/stereoscope v0.1.8
 	github.com/anchore/syft v1.30.0
 	github.com/chainguard-dev/clog v1.7.0
@@ -342,7 +342,7 @@ require (
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/tools v0.35.0 // indirect
+	golang.org/x/tools v0.36.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/api v0.246.0 // indirect
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
