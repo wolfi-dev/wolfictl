@@ -73870,7 +73870,7 @@
       }
     },
     {
-      "id": "7359c12fd37f91cd",
+      "id": "f37f38147a248d5b",
       "name": "byte-buddy",
       "version": "1.14.9",
       "type": "java-archive",
@@ -73887,7 +73887,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -74028,7 +74028,7 @@
       }
     },
     {
-      "id": "26ce58dc745322b0",
+      "id": "6c774c7b8d49c6b0",
       "name": "caffeine",
       "version": "3.1.8",
       "type": "java-archive",
@@ -74045,7 +74045,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -75551,7 +75551,7 @@
       }
     },
     {
-      "id": "2bfbda42e35c759f",
+      "id": "feda7febf619b170",
       "name": "commons-beanutils",
       "version": "1.9.4",
       "type": "java-archive",
@@ -75568,7 +75568,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -75737,7 +75737,7 @@
       }
     },
     {
-      "id": "cbe23d9867681881",
+      "id": "dd67aab4d218df16",
       "name": "commons-codec",
       "version": "1.17.0",
       "type": "java-archive",
@@ -75754,7 +75754,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -76121,7 +76121,7 @@
       }
     },
     {
-      "id": "52d4ccadb6783e31",
+      "id": "99c680489768e794",
       "name": "commons-compress",
       "version": "1.26.1",
       "type": "java-archive",
@@ -76138,7 +76138,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -76493,7 +76493,7 @@
       }
     },
     {
-      "id": "e39e2da292ac1af5",
+      "id": "052ea4c778b88c74",
       "name": "commons-fileupload2-core",
       "version": "2.0.0-M2",
       "type": "java-archive",
@@ -76510,7 +76510,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -76671,7 +76671,7 @@
       }
     },
     {
-      "id": "50fbafeef992541c",
+      "id": "19c9b8ac24350c94",
       "name": "commons-fileupload2-javax",
       "version": "2.0.0-M2",
       "type": "java-archive",
@@ -76688,7 +76688,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -76907,7 +76907,7 @@
       }
     },
     {
-      "id": "755cf79ef033d271",
+      "id": "2e51d6d5b00d884e",
       "name": "commons-io",
       "version": "2.16.1",
       "type": "java-archive",
@@ -76924,7 +76924,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -78083,7 +78083,7 @@
       }
     },
     {
-      "id": "3fdc5da921d03780",
+      "id": "d5661b7e15b97e61",
       "name": "commons-lang3",
       "version": "3.13.0",
       "type": "java-archive",
@@ -78100,7 +78100,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -78697,7 +78697,7 @@
       }
     },
     {
-      "id": "493a287d64520fe2",
+      "id": "50117a5f78b83961",
       "name": "commons-text",
       "version": "1.11.0",
       "type": "java-archive",
@@ -78714,7 +78714,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -85878,7 +85878,7 @@
       }
     },
     {
-      "id": "723459eb97e2f4c6",
+      "id": "c412fded67c13188",
       "name": "jackson-annotations",
       "version": "2.17.0",
       "type": "java-archive",
@@ -85895,7 +85895,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -86112,7 +86112,7 @@
       }
     },
     {
-      "id": "b44cfc1f6b55a442",
+      "id": "7822d43bc062df38",
       "name": "jackson-core",
       "version": "2.17.0",
       "type": "java-archive",
@@ -86129,7 +86129,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -86382,7 +86382,7 @@
       }
     },
     {
-      "id": "5260c82cf72ed96c",
+      "id": "c632ce2fe6c5c65d",
       "name": "jackson-databind",
       "version": "2.17.0",
       "type": "java-archive",
@@ -86399,7 +86399,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -86624,7 +86624,7 @@
       }
     },
     {
-      "id": "f3506ca1cd56e318",
+      "id": "3e8e493402868211",
       "name": "jackson-dataformat-cbor",
       "version": "2.17.0",
       "type": "java-archive",
@@ -86641,7 +86641,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -87156,7 +87156,7 @@
       }
     },
     {
-      "id": "ca8db37be9eff269",
+      "id": "0813e51401c01312",
       "name": "jackson-dataformat-yaml",
       "version": "2.17.0",
       "type": "java-archive",
@@ -87173,7 +87173,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -87688,7 +87688,7 @@
       }
     },
     {
-      "id": "5c5edaeb8bca260f",
+      "id": "780536552c812889",
       "name": "jackson-datatype-json-org",
       "version": "2.17.0",
       "type": "java-archive",
@@ -87705,7 +87705,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -88244,7 +88244,7 @@
       }
     },
     {
-      "id": "d65060267ebf81ad",
+      "id": "c52b22bf089762c5",
       "name": "jackson-module-jaxb-annotations",
       "version": "2.17.0",
       "type": "java-archive",
@@ -88261,7 +88261,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -95143,7 +95143,7 @@
       }
     },
     {
-      "id": "6695bafa84cb7c17",
+      "id": "0f72488e207dec57",
       "name": "jcl-over-slf4j",
       "version": "2.0.13",
       "type": "java-archive",
@@ -95160,7 +95160,7 @@
       "licenses": [
         {
           "value": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
