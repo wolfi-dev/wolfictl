@@ -17,7 +17,7 @@ require (
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.97.2
 	github.com/anchore/stereoscope v0.1.8
-	github.com/anchore/syft v1.30.0
+	github.com/anchore/syft v1.31.0
 	github.com/chainguard-dev/clog v1.7.0
 	github.com/chainguard-dev/yam v0.2.28
 	github.com/charmbracelet/bubbles v0.21.0
