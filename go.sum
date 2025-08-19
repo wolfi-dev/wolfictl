@@ -1,7 +1,7 @@
 cel.dev/expr v0.24.0 h1:56OvJKSH3hDGL0ml5uSxZmz3/3Pq4tJ+fb1unVLAFcY=
 cel.dev/expr v0.24.0/go.mod h1:hLPLo1W4QUmuYdA72RBX06QTs6MXw941piREPl3Yfiw=
-chainguard.dev/apko v0.30.4 h1:YAz3MhAFPpBcvNd0SUkxIwBrP2tL2qd98/7wLVXTGF4=
-chainguard.dev/apko v0.30.4/go.mod h1:WWlchAz28M73vw/GIoixD4ywoV5vAjzI1UCpZ9L1XWA=
+chainguard.dev/apko v0.30.5 h1:FbkEqqvS2965PJ9lx/p7a8myFTg7TXrje0grJq20MQk=
+chainguard.dev/apko v0.30.5/go.mod h1:WWlchAz28M73vw/GIoixD4ywoV5vAjzI1UCpZ9L1XWA=
 chainguard.dev/go-grpc-kit v0.17.11 h1:m4ZL2yg6sSrdPA593qVh9KHTZ+XOmLwqv3Jt5vT0FuU=
 chainguard.dev/go-grpc-kit v0.17.11/go.mod h1:aYlrvAscMZBtVIA7bykUWfbjhL2fDoUCECHvopC2xWY=
 chainguard.dev/melange v0.30.6 h1:2t7dreMOKfQeQC5p+bUlxpXFUyTkbrpWFGYKJ1xyWqg=
@@ -798,8 +798,8 @@ github.com/chainguard-dev/clog v1.7.0 h1:guPznsK8vLHvzz1QJe2yU6MFeYaiSOFOQBYw4OX
 github.com/chainguard-dev/clog v1.7.0/go.mod h1:4+WFhRMsGH79etYXY3plYdp+tCz/KCkU8fAr0HoaPvs=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 h1:XR2vgQC024I9/boh9r1ihVv8Z14+pbvWqXeYMCnZJpc=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10/go.mod h1:1p6+MesLcjKeON5BRWa7I87mvAY0QmKjgginIM3w6BI=
-github.com/chainguard-dev/yam v0.2.28 h1:TRy+vKvVqxyJcxZX5wz10bym1HhE+0YDukIgHMzyRG8=
-github.com/chainguard-dev/yam v0.2.28/go.mod h1:FBsSbqX1ryE3iOVhxgDGi4tKi835l27xoH8dYWKa4XM=
+github.com/chainguard-dev/yam v0.2.29 h1:kvcRdrjc2qL9N1smVvJA6BTsvcyNvxpqTy893ceXhPI=
+github.com/chainguard-dev/yam v0.2.29/go.mod h1:FBsSbqX1ryE3iOVhxgDGi4tKi835l27xoH8dYWKa4XM=
 github.com/charmbracelet/bubbles v0.21.0 h1:9TdC97SdRVg/1aaXNVWfFH3nnLAwOXr8Fn6u6mfQdFs=
 github.com/charmbracelet/bubbles v0.21.0/go.mod h1:HF+v6QUR4HkEpz62dx7ym2xc71/KBHg+zKwJtMw+qtg=
 github.com/charmbracelet/bubbletea v1.3.6 h1:VkHIxPJQeDt0aFJIsVxw8BQdh/F/L2KKZGsK6et5taU=
