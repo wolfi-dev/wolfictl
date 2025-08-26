@@ -7825,6 +7825,7 @@
     "id": "(redacted for determinism)",
     "name": "thanos-0.32",
     "version": "0.32.5-r4",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/thanos-0.32-0.32.5-r4.apk"

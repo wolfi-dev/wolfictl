@@ -116,17 +116,30 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 	}
 	log.Debug("synthesized APK package for SBOM", "name", apkPackage.Name, "version", apkPackage.Version, "id", string(apkPackage.ID()))
 
+	syft.SetLogger(anchorelogger.NewSlogAdapter(log.Base()))
+
+	apkPackageMetadata, ok := apkPackage.Metadata.(pkg.ApkDBEntry)
+	if !ok {
+		return nil, fmt.Errorf("expected APK package metadata to be of type pkg.ApkDBEntry, got %T", apkPackage.Metadata)
+	}
+
+	// Syft likes to have an "alias" -- an explicit way to identify the directory source.
+	alias := source.Alias{
+		Name:     fmt.Sprintf("%s/%s", apkPackageMetadata.Architecture, apkPackageMetadata.Package),
+		Version:  apkPackageMetadata.Version,
+		Supplier: "chainguard",
+	}
+
 	src, err := directorysource.New(
 		directorysource.Config{
-			Path: tempDir,
+			Path:  tempDir,
+			Alias: alias,
 		},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create source from directory: %w", err)
 	}
 	log.Debug("created Syft source from directory", "description", src.Describe())
-
-	syft.SetLogger(anchorelogger.NewSlogAdapter(log.Base()))
 
 	cfg := syft.DefaultCreateSBOMConfig().WithCatalogerSelection(
 		pkgcataloging.NewSelectionRequest().WithDefaults(

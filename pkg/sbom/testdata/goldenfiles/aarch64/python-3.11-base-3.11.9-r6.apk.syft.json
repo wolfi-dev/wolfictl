@@ -5389,6 +5389,7 @@
     "id": "(redacted for determinism)",
     "name": "python-3.11-base",
     "version": "3.11.9-r6",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/python-3.11-base-3.11.9-r6.apk"

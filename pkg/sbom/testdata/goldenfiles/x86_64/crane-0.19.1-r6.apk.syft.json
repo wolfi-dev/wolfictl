@@ -790,6 +790,7 @@
     "id": "(redacted for determinism)",
     "name": "crane",
     "version": "0.19.1-r6",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/x86_64/crane-0.19.1-r6.apk"

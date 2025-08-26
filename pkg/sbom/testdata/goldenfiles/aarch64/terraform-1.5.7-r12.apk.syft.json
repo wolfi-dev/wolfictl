@@ -5960,6 +5960,7 @@
     "id": "(redacted for determinism)",
     "name": "terraform",
     "version": "1.5.7-r12",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/terraform-1.5.7-r12.apk"

@@ -196,6 +196,7 @@
     "id": "(redacted for determinism)",
     "name": "openjdk-21",
     "version": "21.0.3-r3",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/openjdk-21-21.0.3-r3.apk"

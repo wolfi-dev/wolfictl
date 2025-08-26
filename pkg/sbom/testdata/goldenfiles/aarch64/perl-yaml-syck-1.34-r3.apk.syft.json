@@ -171,6 +171,7 @@
     "id": "(redacted for determinism)",
     "name": "perl-yaml-syck",
     "version": "1.34-r3",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/perl-yaml-syck-1.34-r3.apk"

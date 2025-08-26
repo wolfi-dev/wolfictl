@@ -5549,6 +5549,7 @@
     "id": "(redacted for determinism)",
     "name": "powershell",
     "version": "7.4.1-r0",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/powershell-7.4.1-r0.apk"
