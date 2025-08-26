@@ -123,7 +123,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 		return nil, fmt.Errorf("expected APK package metadata to be of type pkg.ApkDBEntry, got %T", apkPackage.Metadata)
 	}
 
-	// Syft likes to have an "alias" -- an explicit way to identify the directory source.
+	// Syft logs a scary (but inconsequential) warning if we don't supply an "alias" -- an explicit way to identify the directory source.
 	alias := source.Alias{
 		Name:     fmt.Sprintf("%s/%s", apkPackageMetadata.Architecture, apkPackageMetadata.Package),
 		Version:  apkPackageMetadata.Version,
