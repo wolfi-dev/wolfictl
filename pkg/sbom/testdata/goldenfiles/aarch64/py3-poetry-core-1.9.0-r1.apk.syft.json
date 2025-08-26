@@ -2495,6 +2495,7 @@
     "id": "(redacted for determinism)",
     "name": "py3-poetry-core",
     "version": "1.9.0-r1",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/py3-poetry-core-1.9.0-r1.apk"

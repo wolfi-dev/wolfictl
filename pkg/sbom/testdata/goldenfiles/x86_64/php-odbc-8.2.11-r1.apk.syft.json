@@ -131,6 +131,7 @@
     "id": "(redacted for determinism)",
     "name": "php-odbc",
     "version": "8.2.11-r1",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/x86_64/php-odbc-8.2.11-r1.apk"

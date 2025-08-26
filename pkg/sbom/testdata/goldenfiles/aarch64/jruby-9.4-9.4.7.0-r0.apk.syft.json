@@ -98163,6 +98163,7 @@
     "id": "(redacted for determinism)",
     "name": "jruby-9.4",
     "version": "9.4.7.0-r0",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/aarch64/jruby-9.4-9.4.7.0-r0.apk"

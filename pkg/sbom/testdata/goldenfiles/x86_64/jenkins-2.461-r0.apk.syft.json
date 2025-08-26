@@ -115116,6 +115116,7 @@
     "id": "(redacted for determinism)",
     "name": "jenkins",
     "version": "2.461-r0",
+    "supplier": "chainguard",
     "type": "directory",
     "metadata": {
       "path": "testdata/apks/x86_64/jenkins-2.461-r0.apk"
