@@ -34,6 +34,7 @@ func New() *cobra.Command {
 		cmdLint(),
 		cmdRuby(),
 		cmdLs(),
+		cmdRestore(),
 		cmdSVG(),
 		cmdText(),
 		cmdSBOM(),
