@@ -44,9 +44,9 @@ func TestMakePatchRequest(t *testing.T) {
 		},
 		{
 			name: "server returns 404",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte("Package not found"))
+				_, _ = w.Write([]byte("Package not found"))
 			},
 			authToken:     "test-token",
 			expectError:   true,
@@ -54,9 +54,9 @@ func TestMakePatchRequest(t *testing.T) {
 		},
 		{
 			name: "server returns 500",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte("Internal server error"))
+				_, _ = w.Write([]byte("Internal server error"))
 			},
 			authToken:     "test-token",
 			expectError:   true,
@@ -125,10 +125,14 @@ func TestMakePostRequest(t *testing.T) {
 					RestoredAPKs:   []string{"pkg1-1.0.0-r1", "pkg2-2.0.0-r2"},
 					FailedRestores: []FailedRestore{},
 				}
-				responseBytes, _ := json.Marshal(response)
+				responseBytes, err := json.Marshal(response)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				w.Write(responseBytes)
+				_, _ = w.Write(responseBytes)
 			},
 			authToken:   "test-token",
 			expectError: false,
@@ -136,7 +140,7 @@ func TestMakePostRequest(t *testing.T) {
 		{
 			name:     "response with partial failures",
 			packages: []string{"pkg1-1.0.0-r1", "pkg2-2.0.0-r2", "pkg3-3.0.0-r3"},
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				// Send response with some failures
 				response := BulkRestoreResponse{
 					RestoredAPKs: []string{"pkg1-1.0.0-r1", "pkg3-3.0.0-r3"},
@@ -144,10 +148,14 @@ func TestMakePostRequest(t *testing.T) {
 						{Name: "pkg2-2.0.0-r2", ErrorMessage: "Package not found in repository"},
 					},
 				}
-				responseBytes, _ := json.Marshal(response)
+				responseBytes, err := json.Marshal(response)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				w.Write(responseBytes)
+				_, _ = w.Write(responseBytes)
 			},
 			authToken:   "test-token",
 			expectError: false,
@@ -155,9 +163,9 @@ func TestMakePostRequest(t *testing.T) {
 		{
 			name:     "server returns 400",
 			packages: []string{"invalid-package"},
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("Invalid package format"))
+				_, _ = w.Write([]byte("Invalid package format"))
 			},
 			authToken:     "test-token",
 			expectError:   true,
@@ -166,10 +174,10 @@ func TestMakePostRequest(t *testing.T) {
 		{
 			name:     "server returns invalid JSON",
 			packages: []string{"pkg1-1.0.0-r1"},
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("invalid json"))
+				_, _ = w.Write([]byte("invalid json"))
 			},
 			authToken:     "test-token",
 			expectError:   true,

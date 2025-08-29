@@ -23,6 +23,7 @@ A CLI helper for developing Wolfi
 * [wolfictl gh](wolfictl_gh.md)	 - Commands used to interact with GitHub
 * [wolfictl image](wolfictl_image.md)	 - (Experimental) Commands for working with container images that use Wolfi
 * [wolfictl lint](wolfictl_lint.md)	 - Lint the code
+* [wolfictl restore](wolfictl_restore.md)	 - Restore withdrawn packages in apk.cgr.dev
 * [wolfictl ruby](wolfictl_ruby.md)	 - Work with ruby packages
 * [wolfictl scan](wolfictl_scan.md)	 - Scan a package for vulnerabilities
 * [wolfictl version](wolfictl_version.md)	 - Prints the version

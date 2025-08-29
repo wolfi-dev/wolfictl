@@ -100,11 +100,10 @@ func restorePackages(ctx context.Context, arch string, packages []string) error 
 		// Single package: use PATCH request
 		url := fmt.Sprintf("https://apk.cgr.dev/chainguard/%s/%s", arch, packages[0])
 		return makePatchRequest(ctx, url, authToken)
-	} else {
-		// Multiple packages: use POST request (bulk restore)
-		url := fmt.Sprintf("https://apk.cgr.dev/chainguard/%s/restore", arch)
-		return makePostRequest(ctx, url, authToken, packages)
 	}
+	// Multiple packages: use POST request (bulk restore)
+	url := fmt.Sprintf("https://apk.cgr.dev/chainguard/%s/restore", arch)
+	return makePostRequest(ctx, url, authToken, packages)
 }
 
 func makePatchRequest(ctx context.Context, url, authToken string) error {
@@ -125,7 +124,10 @@ func makePatchRequest(ctx context.Context, url, authToken string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("PATCH request failed with status %d and failed to read response body: %w", resp.StatusCode, err)
+		}
 		return fmt.Errorf("PATCH request failed with status %d: %s", resp.StatusCode, string(body))
 	}
 
