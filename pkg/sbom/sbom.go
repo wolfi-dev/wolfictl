@@ -149,6 +149,7 @@ func Generate(ctx context.Context, inputFilePath string, f io.Reader, distroID s
 			"sbom",
 			// TODO consider how to turn it on https://github.com/chainguard-dev/internal-dev/issues/8731
 			"elf-package",
+			"rpm", // https://github.com/anchore/syft/pull/4150 caused this to break, but we shouldn't need this cataloger anyway.
 		),
 	).WithCatalogers(
 		catalogers.AngularJSReference,
