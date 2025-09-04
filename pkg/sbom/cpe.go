@@ -116,6 +116,10 @@ var pkgNameToWfnAttributes = map[string]wfn.Attributes{
 		Vendor:  "git-scm",
 		Product: "git",
 	},
+	"gitlab-operator": {
+		Vendor:  "gitlab",
+		Product: "gitlab-operator",
+	},
 	"jenkins": {
 		Vendor:  "jenkins",
 		Product: "jenkins",
