@@ -54,7 +54,13 @@ func generateWfnAttributesForAPK(p pkgInfo) *wfn.Attributes {
 		return &attr
 	}
 
-	if strings.HasPrefix(name, "gitlab-") {
+	// Not all gitlab-* packages should be treated as GitLab, but most of them are.
+	// One notable exception is gitlab-operator, which is a Kubernetes operator
+	// for managing GitLab installations, and not part of GitLab itself.
+	// Source @ https://gitlab.com/gitlab-org/cloud-native/gitlab-operator
+	// Adding an explicit exception for this package here.
+	// If more exceptions are found, we might need a more robust way to handle them.
+	if strings.HasPrefix(name, "gitlab-") && name != "gitlab-operator" {
 		attr.Vendor = "gitlab"
 		attr.Product = "gitlab"
 		attr.SWEdition = "community"
