@@ -490,7 +490,6 @@ func (s *Scanner) DatabaseBuiltAt() time.Time {
 	return s.dbStatus.Built
 }
 
-
 // Close closes the scanner's database connection.
 func (s *Scanner) Close() {
 	if s.vulnProvider == nil {
