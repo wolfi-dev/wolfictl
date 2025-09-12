@@ -482,6 +482,15 @@ var trustedCPESources = []cpe.Source{
 
 var regexGolangDateVersion = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 
+// DatabaseBuiltAt returns the time when the vulnerability database was built.
+func (s *Scanner) DatabaseBuiltAt() time.Time {
+	if s.dbStatus == nil {
+		return time.Time{}
+	}
+	return s.dbStatus.Built
+}
+
+
 // Close closes the scanner's database connection.
 func (s *Scanner) Close() {
 	if s.vulnProvider == nil {
