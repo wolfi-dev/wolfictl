@@ -1,0 +1,27 @@
+package:
+  name: var-transform-unused
+  version: 1.2.3
+  epoch: 0
+  description: Test package with unused var-transform
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+
+var-transforms:
+  - from: ${{package.version}}
+    match: \.
+    replace: _
+    to: unused-version
+
+pipeline:
+  - runs: echo "version is ${{package.version}}"
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo

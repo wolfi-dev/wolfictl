@@ -1,0 +1,31 @@
+package:
+  name: var-transform-used-in-with
+  version: 1.2.3
+  epoch: 0
+  description: Test package with var-transform used in pipeline with parameter
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+
+var-transforms:
+  - from: ${{package.version}}
+    match: \.
+    replace: _
+    to: tag-version
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/example/repo
+      tag: v${{vars.tag-version}}
+      expected-commit: abc123def456789012345678901234567890abcd
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo

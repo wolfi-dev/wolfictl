@@ -617,6 +617,142 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr:     false,
 			matches:     0,
 		},
+		// var-transform tests
+		{
+			file:        "var-transform-unused.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "var-transform-unused",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "unused-var-transform",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[unused-var-transform]: var-transform creates unused variable \"unused-version\" (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "var-transform-used.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-multiple-partial-unused.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "var-transform-multiple-partial-unused",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "unused-var-transform",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[unused-var-transform]: var-transform creates unused variables [\"unused-name\" \"another-unused\"] (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "var-transform-used-in-subpackage.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-used-in-with.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-used-in-test-env.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-used-in-test-packages.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-chained-second-unused.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "var-transform-chained-second-unused",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "unused-var-transform",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[unused-var-transform]: var-transform creates unused variable \"second-transform-unused\" (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "var-transform-chained-both-used.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-wrong-syntax-not-matched.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "var-transform-wrong-syntax-not-matched",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "unused-var-transform",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[unused-var-transform]: var-transform creates unused variable \"my-version\" (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "var-transform-used-in-runtime-deps.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-used-in-env-packages.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "var-transform-chained-first-only-in-second.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
 	}
 
 	for _, tt := range tests {

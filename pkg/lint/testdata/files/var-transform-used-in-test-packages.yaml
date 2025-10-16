@@ -1,0 +1,35 @@
+package:
+  name: var-transform-used-in-test-packages
+  version: 1.2.3
+  epoch: 0
+  description: Test package with var-transform used in test environment packages
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+
+var-transforms:
+  - from: ${{package.version}}
+    match: (\d).(\d+).(\d+)
+    replace: "$1.$2"
+    to: short-version
+
+pipeline:
+  - runs: echo "building"
+
+test:
+  environment:
+    contents:
+      packages:
+        - test-dep-${{vars.short-version}}
+  pipeline:
+    - runs: echo "testing"
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo

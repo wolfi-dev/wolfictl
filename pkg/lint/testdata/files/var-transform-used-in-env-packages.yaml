@@ -1,0 +1,29 @@
+package:
+  name: var-transform-used-in-env-packages
+  version: 3.11.2
+  epoch: 0
+  description: Test package with var-transform used in environment packages
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+      - python-${{vars.python-mm}}
+      - python-${{vars.python-mm}}-dev
+
+var-transforms:
+  - from: ${{package.version}}
+    match: ^(\d+\.\d+)\..*
+    replace: $1
+    to: python-mm
+
+pipeline:
+  - runs: echo "building with python ${{vars.python-mm}}"
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo
