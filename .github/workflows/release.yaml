@@ -42,7 +42,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: octo-sts/action@e480437973a6f6ac2e9caa40ecabedc870d76395 # v1.0.1
+      - uses: octo-sts/action@d6c70ad3b9ac85df6da6b9749014d7283987cfec # v1.0.3
         id: octo-sts
         with:
           scope: ${{ github.repository }}
