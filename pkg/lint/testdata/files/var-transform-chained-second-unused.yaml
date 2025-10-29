@@ -1,0 +1,31 @@
+package:
+  name: var-transform-chained-second-unused
+  version: 1.2.3
+  epoch: 0
+  description: Test chained var-transforms where second is unused
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+
+var-transforms:
+  - from: ${{package.version}}
+    match: \.
+    replace: _
+    to: first-transform
+  - from: ${{vars.first-transform}}
+    match: _
+    replace: '-'
+    to: second-transform-unused
+
+pipeline:
+  - runs: 'echo "using first: ${{vars.first-transform}}"'
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo

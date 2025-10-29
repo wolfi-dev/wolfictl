@@ -1,0 +1,35 @@
+package:
+  name: var-transform-wrong-syntax-not-matched
+  version: 1.2.3
+  epoch: 0
+  description: Test that wrong syntax doesn't satisfy the linter
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+
+var-transforms:
+  - from: ${{package.version}}
+    match: \.
+    replace: _
+    to: my-version
+
+pipeline:
+  # These are all WRONG syntax and should NOT satisfy the linter:
+  # Missing 'vars.' prefix
+  - runs: 'echo "wrong1: ${{my-version}}"'
+  # Wrong delimiters (single braces)
+  - runs: 'echo "wrong2: ${vars.my-version}"'
+  # Wrong delimiters (no braces)
+  - runs: 'echo "wrong3: $vars.my-version"'
+  # Shell variable (not template variable)
+  - runs: 'echo "wrong4: ${my_version}"'
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo

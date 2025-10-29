@@ -1,0 +1,33 @@
+package:
+  name: var-transform-chained-both-used
+  version: 1.2.3
+  epoch: 0
+  description: Test chained var-transforms where both are used
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    packages:
+      - build-base
+      - busybox
+
+var-transforms:
+  - from: ${{package.version}}
+    match: \.
+    replace: _
+    to: first-transform
+  - from: ${{vars.first-transform}}
+    match: _
+    replace: '-'
+    to: second-transform
+
+pipeline:
+  - runs: |
+      echo "first: ${{vars.first-transform}}"
+      echo "second: ${{vars.second-transform}}"
+
+update:
+  enabled: true
+  github:
+    identifier: example/repo

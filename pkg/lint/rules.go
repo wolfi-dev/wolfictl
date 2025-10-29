@@ -539,6 +539,43 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return err
 			},
 		},
+		{
+			Name:        "unused-var-transform",
+			Description: "var-transforms that define variables which are never referenced",
+			Severity:    SeverityWarning,
+			LintFunc: func(cfg config.Configuration) error {
+				// We need to check the raw YAML because ParseConfiguration already applies
+				// variable substitutions, so the substituted values would be in the config.
+				var unusedVars []string
+				for _, vt := range cfg.VarTransforms {
+					varRef := fmt.Sprintf("${{vars.%s}}", vt.To)
+
+					// First check if this variable is used as input to another var-transform
+					usedInVarTransform := false
+					for _, other := range cfg.VarTransforms {
+						if other.From == varRef {
+							usedInVarTransform = true
+							break
+						}
+					}
+
+					// If used in another var-transform or found in the raw YAML, it's not unused
+					if usedInVarTransform || isVariableReferencedInRawYAML(cfg.Root(), varRef) {
+						continue
+					}
+
+					unusedVars = append(unusedVars, vt.To)
+				}
+
+				if len(unusedVars) > 0 {
+					if len(unusedVars) == 1 {
+						return fmt.Errorf("var-transform creates unused variable %q", unusedVars[0])
+					}
+					return fmt.Errorf("var-transform creates unused variables %q", unusedVars)
+				}
+				return nil
+			},
+		},
 
 		// If the git repository URL and update identifiers do not match then we
 		// will fail to auto-update the package automagically.
@@ -662,4 +699,68 @@ func extractURI(p config.Pipeline) (string, error) {
 
 	// Most pipelines won't have a URI.
 	return "", nil
+}
+
+// isVariableReferencedInRawYAML checks if a variable reference (e.g., "${{vars.foo}}")
+// appears anywhere in the raw YAML configuration node tree, excluding the var-transforms
+// section itself (where variables are defined, not used).
+// This is necessary because ParseConfiguration applies variable substitutions,
+// so we need to check the original YAML to see if the variable was actually used.
+func isVariableReferencedInRawYAML(root *yaml.Node, varRef string) bool {
+	if root == nil {
+		return false
+	}
+
+	// Recursively walk the YAML node tree
+	var walkNode func(*yaml.Node, int) bool
+	walkNode = func(node *yaml.Node, depth int) bool {
+		if node == nil {
+			return false
+		}
+
+		// For mapping nodes, check keys for "var-transforms"
+		if node.Kind == yaml.MappingNode {
+			for i := 0; i < len(node.Content); i += 2 {
+				key := node.Content[i]
+				value := node.Content[i+1]
+
+				// Skip the entire var-transforms section
+				if key.Kind == yaml.ScalarNode && key.Value == "var-transforms" {
+					continue
+				}
+
+				// Recursively check other sections
+				if walkNode(value, depth+1) {
+					return true
+				}
+			}
+			return false
+		}
+
+		// For sequence nodes, check each element
+		if node.Kind == yaml.SequenceNode {
+			for _, child := range node.Content {
+				if walkNode(child, depth+1) {
+					return true
+				}
+			}
+			return false
+		}
+
+		// Check if this node's value contains the variable reference
+		if node.Kind == yaml.ScalarNode && strings.Contains(node.Value, varRef) {
+			return true
+		}
+
+		// For other node types, check children
+		for _, child := range node.Content {
+			if walkNode(child, depth+1) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return walkNode(root, 0)
 }
