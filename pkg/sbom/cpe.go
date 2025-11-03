@@ -60,7 +60,7 @@ func generateWfnAttributesForAPK(p pkgInfo) *wfn.Attributes {
 	// Source @ https://gitlab.com/gitlab-org/cloud-native/gitlab-operator
 	// Adding an explicit exception for this package here.
 	// If more exceptions are found, we might need a more robust way to handle them.
-	if strings.HasPrefix(name, "gitlab-") && name != "gitlab-operator" {
+	if strings.HasPrefix(name, "gitlab-") && name != "gitlab-operator" && name != "gitlab-operator-fips" {
 		attr.Vendor = "gitlab"
 		attr.Product = "gitlab"
 		attr.SWEdition = "community"
