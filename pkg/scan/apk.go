@@ -353,10 +353,7 @@ func (s *Scanner) APKSBOM(ctx context.Context, ssbom *sbomSyft.SBOM) (*Result, e
 			continue
 		}
 
-		finding, err := mapMatchToFinding(m, s.vulnProvider)
-		if err != nil {
-			return nil, fmt.Errorf("failed to map match to finding: %w", err)
-		}
+		finding := mapMatchToFinding(m)
 		if finding == nil {
 			return nil, fmt.Errorf("failed to map match to finding: nil")
 		}
