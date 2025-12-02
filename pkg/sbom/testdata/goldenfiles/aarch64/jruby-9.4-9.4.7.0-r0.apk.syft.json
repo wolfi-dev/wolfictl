@@ -9475,7 +9475,7 @@
       }
     },
     {
-      "id": "27410a3982c3d8a1",
+      "id": "2d3b7663cb9a900a",
       "name": "bcprov-jdk18on",
       "version": "1.74",
       "type": "java-archive",
@@ -9489,7 +9489,38 @@
           }
         }
       ],
-      "licenses": [],
+      "licenses": [
+        {
+          "value": "sha256:156e0dd51df96c6c72bc9b9bfbc9e26d5da2c8bd2e731581da3631262d393be2",
+          "spdxExpression": "",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
+              "accessPath": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "sha256:f9e6b01128a66b9887432db0397034793bcb1667770990c27fd4fd04ffc0c12a",
+          "spdxExpression": "",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
+              "accessPath": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        }
+      ],
       "language": "java",
       "cpes": [
         {
@@ -81926,7 +81957,7 @@
       }
     },
     {
-      "id": "3467473051163fd3",
+      "id": "bf59e8cc0d42baea",
       "name": "jline",
       "version": "2.14.6",
       "type": "java-archive",
@@ -81960,7 +81991,19 @@
       "language": "java",
       "cpes": [
         {
+          "cpe": "cpe:2.3:a:org.sonatype.oss:jline:2.14.6:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:sonatype:jline:2.14.6:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
           "cpe": "cpe:2.3:a:jline:jline:2.14.6:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:oss:jline:2.14.6:*:*:*:*:*:*:*",
           "source": "syft-generated"
         }
       ],
@@ -82038,6 +82081,18 @@
           "groupId": "jline",
           "artifactId": "jline",
           "version": "2.14.6"
+        },
+        "pomProject": {
+          "path": "META-INF/maven/jline/jline/pom.xml",
+          "parent": {
+            "groupId": "org.sonatype.oss",
+            "artifactId": "oss-parent",
+            "version": "9"
+          },
+          "groupId": "jline",
+          "artifactId": "jline",
+          "version": "2.14.6",
+          "name": "JLine"
         },
         "digest": [
           {
@@ -90359,7 +90414,7 @@
       }
     },
     {
-      "id": "2f955381b287dd0d",
+      "id": "ca3cac6d54c39b80",
       "name": "jruby-base",
       "version": "9.4.7.0",
       "type": "java-archive",
@@ -90491,6 +90546,18 @@
           "groupId": "org.jruby",
           "artifactId": "jruby-base",
           "version": "9.4.7.0"
+        },
+        "pomProject": {
+          "path": "META-INF/maven/org.jruby/jruby-base/pom.xml",
+          "parent": {
+            "groupId": "org.jruby",
+            "artifactId": "jruby-parent",
+            "version": "9.4.7.0"
+          },
+          "groupId": "org.jruby",
+          "artifactId": "jruby-base",
+          "version": "9.4.7.0",
+          "name": "JRuby Base"
         },
         "digest": [
           {
@@ -96522,7 +96589,7 @@
       }
     },
     {
-      "id": "0661654678647081",
+      "id": "1b21aa01656f7670",
       "name": "snakeyaml-engine",
       "version": "2.7",
       "type": "java-archive",
@@ -96702,6 +96769,15 @@
           "groupId": "org.snakeyaml",
           "artifactId": "snakeyaml-engine",
           "version": "2.7"
+        },
+        "pomProject": {
+          "path": "META-INF/maven/org.snakeyaml/snakeyaml-engine/pom.xml",
+          "groupId": "org.snakeyaml",
+          "artifactId": "snakeyaml-engine",
+          "version": "2.7",
+          "name": "SnakeYAML Engine",
+          "description": "Core YAML 1.2 parser and emitter for Java",
+          "url": "https://bitbucket.org/snakeyaml/snakeyaml-engine"
         },
         "digest": [
           {
