@@ -1,7 +1,6 @@
 package scan
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -84,36 +83,16 @@ type TriageAssessment struct {
 	Reason string
 }
 
-func mapMatchToFinding(m match.Match, vulnProvider vulnerability.Provider) (*Finding, error) {
-	metadata, err := vulnProvider.VulnerabilityMetadata(m.Vulnerability.Reference)
-	if err != nil {
-		return nil, fmt.Errorf("retrieving metadata for vulnerability %s (%s): %w", m.Vulnerability.ID, m.Vulnerability.Namespace, err)
-	}
-
-	var relatedMetadatas []*vulnerability.Metadata
-	for _, relatedRef := range m.Vulnerability.RelatedVulnerabilities {
-		relatedMetadata, err := vulnProvider.VulnerabilityMetadata(relatedRef)
-		if err != nil {
-			return nil, fmt.Errorf("retrieving metadata for related vulnerability %s (%s): %w", relatedRef.ID, relatedRef.Namespace, err)
-		}
-		if relatedMetadata == nil {
-			continue
-		}
-		relatedMetadatas = append(relatedMetadatas, relatedMetadata)
-	}
-
+func mapMatchToFinding(m match.Match) *Finding {
 	var aliases []string
-	for _, rel := range relatedMetadatas {
-		if rel == nil {
-			continue
-		}
-		if rel.ID == m.Vulnerability.ID {
+	for _, relatedRef := range m.Vulnerability.RelatedVulnerabilities {
+		if relatedRef.ID == m.Vulnerability.ID {
 			// Don't count the matched vulnerability ID as its own alias. In v0.88.0, Grype
 			// began listing vulnerabilities as their own related vulnerabilities, and we
 			// filed a bug here: https://github.com/anchore/grype/issues/2514
 			continue
 		}
-		aliases = append(aliases, rel.ID)
+		aliases = append(aliases, relatedRef.ID)
 	}
 
 	// Filter locations to only include those marked as "primary evidence"
@@ -141,13 +120,13 @@ func mapMatchToFinding(m match.Match, vulnProvider vulnerability.Provider) (*Fin
 		},
 		Vulnerability: Vulnerability{
 			ID:           m.Vulnerability.ID,
-			Severity:     metadata.Severity,
+			Severity:     m.Vulnerability.Metadata.Severity,
 			Aliases:      aliases,
 			FixedVersion: getFixedVersion(m.Vulnerability),
 		},
 	}
 
-	return f, nil
+	return f
 }
 
 func getFixedVersion(vuln vulnerability.Vulnerability) string {
