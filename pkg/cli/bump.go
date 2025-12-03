@@ -118,9 +118,13 @@ func bumpEpoch(ctx context.Context, opts bumpOptions, path string) error {
 	old := fmt.Sprintf(epochPattern, cfg.Package.Epoch)
 	for scanner.Scan() {
 		line := scanner.Text()
-		nocomment, _, _ := strings.Cut(line, "#")
+		nocomment, comment, _ := strings.Cut(line, "#")
 		if strings.TrimSpace(nocomment) == old {
 			found = true
+			comment = strings.TrimSpace(comment)
+			if strings.HasPrefix(comment, "CVE-") || strings.HasPrefix(comment, "GHSA-") {
+				line = strings.TrimRight(nocomment, " ")
+			}
 			newFile = append(
 				newFile, strings.ReplaceAll(line, old, fmt.Sprintf(epochPattern, cfg.Package.Epoch+1)),
 			)
