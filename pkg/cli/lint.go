@@ -40,53 +40,62 @@ func cmdLint() *cobra.Command {
 }
 
 func (o lintOptions) LintCmd(ctx context.Context) error {
-	linter := lint.New(o.makeLintOptions()...)
+	// only count errors as failures, not warnings.
+	failed := false
 
-	// If the list flag is set, print the list of available rules and exit.
-	if o.list {
-		linter.PrintRules(ctx)
-		return nil
-	}
+	for _, opts := range o.makeLintOptions() {
+		linter := lint.New(opts...)
 
-	// Run the linter.
-	minSeverity := lint.SeverityWarning
-	switch o.severity {
-	case "error", "ERROR":
-		minSeverity = lint.SeverityError
-	case "info", "INFO":
-		minSeverity = lint.SeverityInfo
-	}
-	result, err := linter.Lint(ctx, minSeverity)
-	if err != nil {
-		return err
-	}
-	if result.HasErrors() {
-		linter.Print(ctx, result)
-		// only count errors as failures, not warnings.
-		failed := false
-		for _, res := range result {
-			for _, e := range res.Errors {
-				if e.Rule.Severity.Value == lint.SeverityErrorLevel {
-					failed = true
-					break
+		// If the list flag is set, print the list of available rules and exit.
+		if o.list {
+			linter.PrintRules(ctx)
+			return nil
+		}
+
+		// Run the linter.
+		minSeverity := lint.SeverityWarning
+		switch o.severity {
+		case "error", "ERROR":
+			minSeverity = lint.SeverityError
+		case "info", "INFO":
+			minSeverity = lint.SeverityInfo
+		}
+		result, err := linter.Lint(ctx, minSeverity)
+		if err != nil {
+			return err
+		}
+		if result.HasErrors() {
+			linter.Print(ctx, result)
+			for _, res := range result {
+				for _, e := range res.Errors {
+					if e.Rule.Severity.Value == lint.SeverityErrorLevel {
+						failed = true
+						break
+					}
 				}
 			}
 		}
-		if failed {
-			return errors.New("linting failed")
-		}
 	}
+
+	if failed {
+		return errors.New("linting failed")
+	}
+
 	return nil
 }
 
-func (o lintOptions) makeLintOptions() []lint.Option {
+func (o lintOptions) makeLintOptions() [][]lint.Option {
 	if len(o.args) == 0 {
 		// Lint the current directory by default.
 		o.args = []string{"."}
 	}
 
-	return []lint.Option{
-		lint.WithPath(o.args[0]),
-		lint.WithSkipRules(o.skipRules),
+	opts := make([][]lint.Option, 0, len(o.args))
+	for _, path := range o.args {
+		opts = append(opts, []lint.Option{
+			lint.WithPath(path),
+			lint.WithSkipRules(o.skipRules),
+		})
 	}
+	return opts
 }
