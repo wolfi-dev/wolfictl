@@ -11,7 +11,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v1.0.1
+	chainguard.dev/apko v1.0.2
 	chainguard.dev/melange v0.37.5
 	cloud.google.com/go/storage v1.59.0
 	github.com/adrg/xdg v0.5.3
@@ -75,7 +75,7 @@ require (
 require (
 	cel.dev/expr v0.24.0 // indirect
 	chainguard.dev/go-grpc-kit v0.17.15 // indirect
-	chainguard.dev/sdk v0.1.45 // indirect
+	chainguard.dev/sdk v0.1.46 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.18.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
