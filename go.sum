@@ -1,11 +1,11 @@
 cel.dev/expr v0.24.0 h1:56OvJKSH3hDGL0ml5uSxZmz3/3Pq4tJ+fb1unVLAFcY=
 cel.dev/expr v0.24.0/go.mod h1:hLPLo1W4QUmuYdA72RBX06QTs6MXw941piREPl3Yfiw=
-chainguard.dev/apko v1.0.2 h1:98ITEiKALBeHrwZ8Ar/Y4dN/CptSUSJx+/biZhi34sc=
-chainguard.dev/apko v1.0.2/go.mod h1:mMkTz1tG+TvnagPq1jp3turEJah84mB/z4R72Q/neys=
+chainguard.dev/apko v1.0.3 h1:wFFXYyNx5mpcvLL3eQ59r1hEMiY+aDPOx2y6lDaaves=
+chainguard.dev/apko v1.0.3/go.mod h1:hiAOfLcuA+U2uwmwU1DPORZ7UJAdlooKmNI0qwYsyM4=
 chainguard.dev/go-grpc-kit v0.17.15 h1:y+FBjta2lsC0XxlkG+W5P1VxYl0zG74GRvoYN2o+p7s=
 chainguard.dev/go-grpc-kit v0.17.15/go.mod h1:1wAVAX2CCamtFlfMs9PFzfgQQxX1/TQyF6cbWApbJ2U=
-chainguard.dev/melange v0.37.5 h1:YHfjmFa7uhxb+g6+JoP1q7OZYHYkXBzVMJfLMWGnCmA=
-chainguard.dev/melange v0.37.5/go.mod h1:qQYCCevJkXqYpDxMfIpmTi6twCEGc9BMySAD2w5jDWg=
+chainguard.dev/melange v0.38.0 h1:H+PSvQ/UHI0F0qZ9GFJ/mOiMGLkzZWW5mHefdBbbiAQ=
+chainguard.dev/melange v0.38.0/go.mod h1:iF1xqL92+SicbQiQFuEvqK4XToLNs7mw2Cd7Xa2XIbg=
 chainguard.dev/sdk v0.1.46 h1:tDyxr/VtSlSdAoQJjtN0iHqMYrkShDM2sk4xJpzMYBg=
 chainguard.dev/sdk v0.1.46/go.mod h1:b4isqRFaCBaRuVcHUrFeaqvt3d8J9GNOMS0RAyoawXw=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -622,8 +622,8 @@ github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510/go.mod h1:pupxD2MaaD3
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/googleapis/enterprise-certificate-proxy v0.3.7 h1:zrn2Ee/nWmHulBx5sAVrGgAa0f2/R35S4DJwfFaUPFQ=
-github.com/googleapis/enterprise-certificate-proxy v0.3.7/go.mod h1:MkHOF77EYAE7qfSuSS9PU6g4Nt4e11cnsDUowfwewLA=
+github.com/googleapis/enterprise-certificate-proxy v0.3.9 h1:TOpi/QG8iDcZlkQlGlFUti/ZtyLkliXvHDcyUIMuFrU=
+github.com/googleapis/enterprise-certificate-proxy v0.3.9/go.mod h1:MkHOF77EYAE7qfSuSS9PU6g4Nt4e11cnsDUowfwewLA=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/googleapis/gax-go/v2 v2.1.0/go.mod h1:Q3nei7sK6ybPYH7twZdmQpAd1MKb7pfu6SK+H1/DsU0=
@@ -1533,8 +1533,8 @@ google.golang.org/api v0.57.0/go.mod h1:dVPlbZyBo2/OjBpmvNdpn2GRm6rPy75jyU7bmhdr
 google.golang.org/api v0.59.0/go.mod h1:sT2boj7M9YJxZzgeZqXogmhfmRWDtPzT31xkieUbuZU=
 google.golang.org/api v0.61.0/go.mod h1:xQRti5UdCmoCEqFxcz93fTl338AVqDgyaDRuOZ3hg9I=
 google.golang.org/api v0.62.0/go.mod h1:dKmwPCydfsad4qCH08MSdgWjfHOyfpd4VtDGgRFdavw=
-google.golang.org/api v0.259.0 h1:90TaGVIxScrh1Vn/XI2426kRpBqHwWIzVBzJsVZ5XrQ=
-google.golang.org/api v0.259.0/go.mod h1:LC2ISWGWbRoyQVpxGntWwLWN/vLNxxKBK9KuJRI8Te4=
+google.golang.org/api v0.260.0 h1:XbNi5E6bOVEj/uLXQRlt6TKuEzMD7zvW/6tNwltE4P4=
+google.golang.org/api v0.260.0/go.mod h1:Shj1j0Phr/9sloYrKomICzdYgsSDImpTxME8rGLaZ/o=
 google.golang.org/appengine v1.1.0/go.mod h1:EbEs0AVv82hx2wNQdGPgUI5lhzA/G0D9YwlJXL52JkM=
 google.golang.org/appengine v1.4.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7/EB5XEv4=
 google.golang.org/appengine v1.5.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7/EB5XEv4=
