@@ -1,3 +1,4 @@
+#nolint:fetch-templating
 package:
   name: forbidden-keyring
   version: 1.0.0

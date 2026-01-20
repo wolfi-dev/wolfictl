@@ -1,0 +1,30 @@
+package:
+  name: fetch-templating-single-untemplated
+  version: 1.2.3
+  epoch: 0
+  description: Package with single untemplated fetch URL
+  copyright:
+    - license: Apache-2.0
+      paths:
+        - "*"
+
+environment:
+  contents:
+    packages:
+      - ca-certificates-bundle
+
+update:
+  enabled: true
+  manual: false
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://example.com/package-1.2.3.tar.gz
+      expected-sha256: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+  - runs: |
+      echo "build"
+
+test:
+  pipeline:
+    - runs: "echo 'test'"

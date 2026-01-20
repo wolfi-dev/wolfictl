@@ -1,0 +1,30 @@
+package:
+  name: fetch-templating-manual-updates
+  version: 1.2.3
+  epoch: 0
+  description: Package with manual updates enabled (should not validate)
+  copyright:
+    - license: Apache-2.0
+      paths:
+        - "*"
+
+environment:
+  contents:
+    packages:
+      - ca-certificates-bundle
+
+update:
+  enabled: true
+  manual: true
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://example.com/package-1.2.3.tar.gz
+      expected-sha256: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+  - runs: |
+      echo "build"
+
+test:
+  pipeline:
+    - runs: "echo 'test'"

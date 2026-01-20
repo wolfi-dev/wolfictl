@@ -7,17 +7,17 @@ import (
 	"regexp"
 	"strings"
 
-	"chainguard.dev/melange/pkg/renovate"
-	"github.com/github/go-spdx/v2/spdxexp"
-	"github.com/texttheater/golang-levenshtein/levenshtein"
-	"github.com/wolfi-dev/wolfictl/pkg/versions"
-
-	"github.com/dprotaso/go-yit"
-	"gopkg.in/yaml.v3"
-
 	"golang.org/x/exp/slices"
 
 	"chainguard.dev/melange/pkg/config"
+	"chainguard.dev/melange/pkg/renovate"
+	"github.com/dprotaso/go-yit"
+	"github.com/github/go-spdx/v2/spdxexp"
+	"github.com/texttheater/golang-levenshtein/levenshtein"
+	"gopkg.in/yaml.v3"
+
+	"github.com/wolfi-dev/wolfictl/pkg/lint/fetch"
+	"github.com/wolfi-dev/wolfictl/pkg/versions"
 )
 
 var (
@@ -619,6 +619,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				// at this point we know that none of the repository URIs match the
 				// github identifier, lets let the world know
 				return fmt.Errorf("update identifier does not match the repository URI")
+			},
+		},
+		{
+			Name:        "fetch-templating",
+			Description: "fetch URLs and git sources should use version templates to avoid drift",
+			Severity:    SeverityWarning,
+			LintFunc: func(config config.Configuration) error {
+				return fetch.ValidateFetchTemplating(&config)
 			},
 		},
 	}

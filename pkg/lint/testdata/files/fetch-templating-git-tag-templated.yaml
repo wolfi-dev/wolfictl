@@ -1,0 +1,33 @@
+package:
+  name: fetch-templating-git-tag-templated
+  version: 1.2.3
+  epoch: 0
+  description: Package with templated git tag
+  copyright:
+    - license: Apache-2.0
+      paths:
+        - "*"
+
+environment:
+  contents:
+    packages:
+      - ca-certificates-bundle
+
+update:
+  enabled: true
+  manual: false
+  github:
+    identifier: example/package
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/example/package
+      tag: v${{package.version}}
+      expected-commit: 1234567890abcdef1234567890abcdef12345678
+  - runs: |
+      echo "build"
+
+test:
+  pipeline:
+    - runs: "echo 'test'"

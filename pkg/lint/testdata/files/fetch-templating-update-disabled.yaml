@@ -1,0 +1,30 @@
+#nolint:update-disabled-reason
+package:
+  name: fetch-templating-update-disabled
+  version: 1.2.3
+  epoch: 0
+  description: Package with hardcoded URL but update disabled (should not warn)
+  copyright:
+    - license: Apache-2.0
+      paths:
+        - "*"
+
+environment:
+  contents:
+    packages:
+      - ca-certificates-bundle
+
+update:
+  enabled: false
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://example.com/package-1.2.3.tar.gz
+      expected-sha256: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+  - runs: |
+      echo "build"
+
+test:
+  pipeline:
+    - runs: "echo 'test'"

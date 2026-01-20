@@ -753,6 +753,103 @@ func TestLinter_Rules(t *testing.T) {
 			wantErr:     false,
 			matches:     0,
 		},
+		// fetch-templating tests
+		{
+			file:        "fetch-templating-single-untemplated.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "fetch-templating-single-untemplated",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "fetch-templating",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[fetch-templating]: source lacks templated variables: (fetch URL) https://example.com/package-1.2.3.tar.gz (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "fetch-templating-single-templated.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "fetch-templating-multiple-no-template.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "fetch-templating-multiple-no-template",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "fetch-templating",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[fetch-templating]: no templated variables found in any sources:\n- fetch URL: https://example.com/package-1.2.3.tar.gz\n- git tag: v1.2.3\nAt least one origin should use templates like ${{package.version}} to avoid version drift (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "fetch-templating-multiple-with-template.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "fetch-templating-hardcoded-version.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "fetch-templating-hardcoded-version",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "fetch-templating",
+							Severity: SeverityWarning,
+						},
+						Error: fmt.Errorf("[fetch-templating]: fetch URL contains hardcoded package version '1.2.3' for 'fetch-templating-hardcoded-version': https://example.com/fetch-templating-hardcoded-version-1.2.3.tar.gz; check whether this should be derived from ${{package.version}} (or a transform) (WARNING)"),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "fetch-templating-git-tag-templated.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "fetch-templating-update-disabled.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "fetch-templating-vars-version.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "fetch-templating-manual-updates.yaml",
+			minSeverity: SeverityWarning,
+			want:        EvalResult{},
+			wantErr:     false,
+			matches:     0,
+		},
 	}
 
 	for _, tt := range tests {
