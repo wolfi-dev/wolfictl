@@ -624,7 +624,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 		{
 			Name:        "depends-on-unversioned-py-provides",
 			Description: "packages should not depend on unversioned py3- provides for python multi-version packages",
-			Severity:    SeverityError,
+			Severity:    SeverityWarning,
 			LintFunc: func(cfg config.Configuration) error {
 				var violations []string
 
