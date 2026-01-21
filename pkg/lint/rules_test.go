@@ -962,3 +962,170 @@ func TestPickPipelinesUsing(t *testing.T) {
 		})
 	}
 }
+
+func TestIsUnversionedPy3Dependency(t *testing.T) {
+	cases := []struct {
+		name     string
+		dep      string
+		expected bool
+	}{
+		// Should be flagged as unversioned
+		{
+			name:     "py3-pip",
+			dep:      "py3-pip",
+			expected: true,
+		},
+		{
+			name:     "py3-setuptools",
+			dep:      "py3-setuptools",
+			expected: true,
+		},
+		{
+			name:     "py3-pandas",
+			dep:      "py3-pandas",
+			expected: true,
+		},
+		{
+			name:     "py3-attrs",
+			dep:      "py3-attrs",
+			expected: true,
+		},
+		{
+			name:     "py3-cryptography",
+			dep:      "py3-cryptography",
+			expected: true,
+		},
+		{
+			name:     "py3-foo-bar-baz",
+			dep:      "py3-foo-bar-baz",
+			expected: true,
+		},
+		// Version constraints should be stripped
+		{
+			name:     "py3-foo with tilde constraint",
+			dep:      "py3-foo~1.2.3",
+			expected: true,
+		},
+		{
+			name:     "py3-foo with >= constraint",
+			dep:      "py3-foo>=1.0.0",
+			expected: true,
+		},
+		{
+			name:     "py3-foo with < constraint",
+			dep:      "py3-foo<2.0.0",
+			expected: true,
+		},
+		{
+			name:     "py3-foo with = constraint",
+			dep:      "py3-foo=1.2.3",
+			expected: true,
+		},
+		// Should NOT be flagged - py3-supported-* packages
+		{
+			name:     "py3-supported-pip",
+			dep:      "py3-supported-pip",
+			expected: false,
+		},
+		{
+			name:     "py3-supported-setuptools",
+			dep:      "py3-supported-setuptools",
+			expected: false,
+		},
+		{
+			name:     "py3-supported-build-base",
+			dep:      "py3-supported-build-base",
+			expected: false,
+		},
+		{
+			name:     "py3-supported-python",
+			dep:      "py3-supported-python",
+			expected: false,
+		},
+		// Should NOT be flagged - versioned py3.X-* packages
+		{
+			name:     "py3.10-pip",
+			dep:      "py3.10-pip",
+			expected: false,
+		},
+		{
+			name:     "py3.11-setuptools",
+			dep:      "py3.11-setuptools",
+			expected: false,
+		},
+		{
+			name:     "py3.12-pandas",
+			dep:      "py3.12-pandas",
+			expected: false,
+		},
+		{
+			name:     "py3.13-attrs",
+			dep:      "py3.13-attrs",
+			expected: false,
+		},
+		{
+			name:     "py3.14-foo",
+			dep:      "py3.14-foo",
+			expected: false,
+		},
+		// Should NOT be flagged - different patterns
+		{
+			name:     "python3",
+			dep:      "python3",
+			expected: false,
+		},
+		{
+			name:     "python-3",
+			dep:      "python-3",
+			expected: false,
+		},
+		{
+			name:     "python-3.12-base",
+			dep:      "python-3.12-base",
+			expected: false,
+		},
+		{
+			name:     "python-3.12-base-dev",
+			dep:      "python-3.12-base-dev",
+			expected: false,
+		},
+		{
+			name:     "busybox",
+			dep:      "busybox",
+			expected: false,
+		},
+		{
+			name:     "build-base",
+			dep:      "build-base",
+			expected: false,
+		},
+		// Edge cases
+		{
+			name:     "empty string",
+			dep:      "",
+			expected: false,
+		},
+		{
+			name:     "just py3-",
+			dep:      "py3-",
+			expected: true,
+		},
+		{
+			name:     "py3 without dash",
+			dep:      "py3",
+			expected: false,
+		},
+		{
+			name:     "py3.X without dash after",
+			dep:      "py3.12",
+			expected: false,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := isUnversionedPy3Dependency(c.dep)
+			assert.Equal(t, c.expected, got, "isUnversionedPy3Dependency(%q) = %v, want %v", c.dep, got, c.expected)
+		})
+	}
+}
