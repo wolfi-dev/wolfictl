@@ -189,7 +189,7 @@ func TestExtractRawPipelineDataEmpty(t *testing.T) {
 			}
 
 			sources := extractRawPipelineData(root)
-			if !sources.isEmpty() {
+			if !hasNoSources(sources) {
 				t.Errorf("Expected empty sources, got %+v", sources)
 			}
 		})

@@ -13,12 +13,21 @@ Validation Rule:
   - Reports hardcoded versions in fetch URLs and git tags when templates are present elsewhere
 */
 
+// Checks if sourceData contains any version-bearing sources
+func hasNoSources(sources sourceData) bool {
+	return len(sources.fetchURLs) == 0 && len(sources.gitTags) == 0 && len(sources.gitBranches) == 0
+}
+
 // Creates a validator with compiled patterns for the package
-func newValidator(pkg packageInfo) *validator {
+func newValidator(pkg packageInfo) (*validator, error) {
+	patterns, err := buildPackagePatterns(pkg.name, pkg.version)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build patterns: %w", err)
+	}
 	return &validator{
 		pkg:      pkg,
-		patterns: buildPackagePatterns(pkg.name, pkg.version),
-	}
+		patterns: patterns,
+	}, nil
 }
 
 // ValidateFetchTemplating validates that package sources use proper templating to avoid version drift.
@@ -33,7 +42,7 @@ func ValidateFetchTemplating(cfg *config.Configuration) error {
 	}
 
 	sources := extractRawPipelineData(cfg.Root())
-	if sources.isEmpty() {
+	if hasNoSources(sources) {
 		return nil
 	}
 
@@ -42,7 +51,10 @@ func ValidateFetchTemplating(cfg *config.Configuration) error {
 		version: strings.TrimSpace(cfg.Package.Version),
 	}
 
-	validator := newValidator(pkg)
+	validator, err := newValidator(pkg)
+	if err != nil {
+		return fmt.Errorf("failed to create validator: %w", err)
+	}
 	return validator.validateAll(sources)
 }
 
@@ -78,12 +90,8 @@ func (v *validator) validateSources(sources sourceData) []string {
 			untemplatedSources = append(untemplatedSources, fmt.Sprintf("fetch URL: %s", uri))
 
 			// Also check for hardcoded versions in non-templated URLs
-			if v.patterns != nil {
-				if v.patterns.exactVersionURL.MatchString(uri) {
-					hardcodedIssues = append(hardcodedIssues, fmt.Sprintf("fetch URL contains hardcoded package version '%s' for '%s': %s", v.pkg.version, v.pkg.name, uri))
-				} else if v.patterns.anyVersionURL.MatchString(uri) {
-					hardcodedIssues = append(hardcodedIssues, fmt.Sprintf("fetch URL contains '%s' with hardcoded version (may be out of sync with package.version): %s", v.pkg.name, uri))
-				}
+			if v.patterns.anyVersionURL.MatchString(uri) {
+				hardcodedIssues = append(hardcodedIssues, fmt.Sprintf("fetch URL contains hardcoded version: %s", uri))
 			}
 		}
 	}
@@ -99,12 +107,8 @@ func (v *validator) validateSources(sources sourceData) []string {
 			untemplatedSources = append(untemplatedSources, fmt.Sprintf("git tag: %s", tag))
 
 			// Also check for hardcoded versions in non-templated git tags
-			if v.patterns != nil {
-				if v.patterns.exactVersionTag.MatchString(tag) {
-					hardcodedIssues = append(hardcodedIssues, fmt.Sprintf("git tag contains hardcoded package version: %s", tag))
-				} else if v.patterns.packageVersionTag.MatchString(tag) {
-					hardcodedIssues = append(hardcodedIssues, fmt.Sprintf("git tag contains '%s' with hardcoded version (may be out of sync with package.version): %s", v.pkg.name, tag))
-				}
+			if v.patterns.exactVersionTag.MatchString(tag) {
+				hardcodedIssues = append(hardcodedIssues, fmt.Sprintf("git tag contains hardcoded version: %s", tag))
 			}
 		}
 	}

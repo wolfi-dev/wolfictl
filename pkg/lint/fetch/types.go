@@ -11,10 +11,8 @@ type gitRefInfo struct {
 
 // Holds compiled regex patterns for a specific package
 type packagePatterns struct {
-	exactVersionURL   *regexp.Regexp
-	anyVersionURL     *regexp.Regexp
-	exactVersionTag   *regexp.Regexp
-	packageVersionTag *regexp.Regexp
+	anyVersionURL   *regexp.Regexp
+	exactVersionTag *regexp.Regexp
 }
 
 // Holds extracted pipeline data
@@ -34,9 +32,4 @@ type packageInfo struct {
 type validator struct {
 	pkg      packageInfo
 	patterns *packagePatterns
-}
-
-// Checks if sourceData contains any data
-func (s sourceData) isEmpty() bool {
-	return len(s.fetchURLs) == 0 && len(s.gitTags) == 0 && len(s.gitBranches) == 0
 }

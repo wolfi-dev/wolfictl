@@ -815,7 +815,7 @@ func TestLinter_Rules(t *testing.T) {
 							Name:     "fetch-templating",
 							Severity: SeverityWarning,
 						},
-						Error: fmt.Errorf("[fetch-templating]: fetch URL contains hardcoded package version '1.2.3' for 'fetch-templating-hardcoded-version': https://example.com/fetch-templating-hardcoded-version-1.2.3.tar.gz; check whether this should be derived from ${{package.version}} (or a transform) (WARNING)"),
+						Error: fmt.Errorf("[fetch-templating]: fetch URL contains hardcoded version: https://example.com/fetch-templating-hardcoded-version-1.2.3.tar.gz; check whether this should be derived from ${{package.version}} (or a transform) (WARNING)"),
 					},
 				},
 			},

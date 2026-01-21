@@ -40,13 +40,13 @@ func TestBuildPackagePatterns(t *testing.T) {
 			expectTagMatch: true,
 		},
 		{
-			name:           "no_match_different_version",
+			name:           "match_different_version",
 			packageName:    "test-package",
 			packageVersion: "1.2.3",
 			testURL:        "https://example.com/test-package-2.0.0.tar.gz",
 			testTag:        "v2.0.0",
-			expectURLMatch: false,
-			expectTagMatch: false,
+			expectURLMatch: true,  // anyVersionURL should match any version
+			expectTagMatch: false, // exactVersionTag should NOT match different version
 		},
 		{
 			name:           "no_match_different_package",
@@ -70,12 +70,12 @@ func TestBuildPackagePatterns(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			patterns := buildPackagePatterns(tt.packageName, tt.packageVersion)
-			if patterns == nil {
-				t.Fatal("buildPackagePatterns returned nil")
+			patterns, err := buildPackagePatterns(tt.packageName, tt.packageVersion)
+			if err != nil {
+				t.Fatalf("buildPackagePatterns returned error: %v", err)
 			}
 
-			urlMatch := patterns.exactVersionURL.MatchString(tt.testURL)
+			urlMatch := patterns.anyVersionURL.MatchString(tt.testURL)
 			if urlMatch != tt.expectURLMatch {
 				t.Errorf("URL match: expected %v, got %v for URL: %s", tt.expectURLMatch, urlMatch, tt.testURL)
 			}
@@ -101,7 +101,10 @@ func TestBuildPackagePatternsNilInputs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			patterns := buildPackagePatterns(tt.packageName, tt.packageVersion)
+			patterns, err := buildPackagePatterns(tt.packageName, tt.packageVersion)
+			if err == nil {
+				t.Errorf("Expected error for invalid inputs, got patterns: %v", patterns)
+			}
 			if patterns != nil {
 				t.Errorf("Expected nil patterns for invalid inputs, got %v", patterns)
 			}
