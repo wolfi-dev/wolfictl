@@ -1,3 +1,4 @@
+#nolint:fetch-templating
 package:
   name: wrong-pipeline-git-checkout-commit
   version: 1.0.0

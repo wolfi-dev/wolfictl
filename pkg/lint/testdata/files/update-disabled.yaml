@@ -1,3 +1,4 @@
+#nolint:fetch-templating
 package:
   name: update-disabled
   version: 1.0.0
