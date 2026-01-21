@@ -621,6 +621,43 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				return fmt.Errorf("update identifier does not match the repository URI")
 			},
 		},
+		{
+			Name:        "depends-on-unversioned-py-provides",
+			Description: "packages should not depend on unversioned py3- provides for python multi-version packages",
+			Severity:    SeverityWarning,
+			LintFunc: func(cfg config.Configuration) error {
+				var violations []string
+
+				// Main package runtime deps
+				for _, dep := range cfg.Package.Dependencies.Runtime {
+					if isUnversionedPy3Dependency(dep) {
+						violations = append(violations, dep)
+					}
+				}
+
+				// Build-time environment packages
+				for _, pkg := range cfg.Environment.Contents.Packages {
+					if isUnversionedPy3Dependency(pkg) {
+						violations = append(violations, pkg)
+					}
+				}
+
+				// Subpackage runtime deps
+				for _, subPkg := range cfg.Subpackages {
+					for _, dep := range subPkg.Dependencies.Runtime {
+						if isUnversionedPy3Dependency(dep) {
+							violations = append(violations, dep)
+						}
+					}
+				}
+
+				if len(violations) > 0 {
+					return fmt.Errorf("found unversioned py3-* dependencies: %s (use py3.X-* or py3-supported-* instead)", strings.Join(violations, ", "))
+				}
+
+				return nil
+			},
+		},
 	}
 }
 
@@ -763,4 +800,19 @@ func isVariableReferencedInRawYAML(root *yaml.Node, varRef string) bool {
 	}
 
 	return walkNode(root, 0)
+}
+
+// isUnversionedPy3Dependency checks if a dependency is an unversioned py3-* package
+func isUnversionedPy3Dependency(dep string) bool {
+	if !strings.HasPrefix(dep, "py3-") {
+		return false
+	}
+
+	// Exception: py3-supported-* packages
+	if strings.HasPrefix(dep, "py3-supported-") {
+		return false
+	}
+
+	// ...unversioned py3-* dep
+	return true
 }
