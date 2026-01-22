@@ -16,7 +16,7 @@ require (
 	cloud.google.com/go/storage v1.59.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/grype v0.104.1
-	github.com/anchore/stereoscope v0.1.13
+	github.com/anchore/stereoscope v0.1.18
 	github.com/anchore/syft v1.38.0
 	github.com/chainguard-dev/clog v1.8.0
 	github.com/chainguard-dev/yam v0.2.45
@@ -85,8 +85,6 @@ require (
 	cyphar.com/go-pathrs v0.2.1 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
-	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20250520111509-a70c2aa677fa // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/CycloneDX/cyclonedx-go v0.9.3 // indirect
@@ -100,7 +98,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/Microsoft/hcsshim v0.13.0 // indirect
+	github.com/Microsoft/hcsshim v0.14.0-rc.1 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
 	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/STARRY-S/zip v0.2.3 // indirect
@@ -148,7 +146,7 @@ require (
 	github.com/bitnami/go-version v0.0.0-20250505154626-452e8c5ee607 // indirect
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb // indirect
 	github.com/bmatcuk/doublestar/v2 v2.0.4 // indirect
-	github.com/bmatcuk/doublestar/v4 v4.9.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.9.2 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.1 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
@@ -165,16 +163,16 @@ require (
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cncf/xds/go v0.0.0-20251022180443-0feb69152e9f // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
-	github.com/containerd/cgroups/v3 v3.0.5 // indirect
-	github.com/containerd/containerd v1.7.29 // indirect
-	github.com/containerd/containerd/api v1.9.0 // indirect
-	github.com/containerd/containerd/v2 v2.1.5 // indirect
+	github.com/containerd/cgroups/v3 v3.1.2 // indirect
+	github.com/containerd/containerd/api v1.10.0 // indirect
+	github.com/containerd/containerd/v2 v2.2.1 // indirect
 	github.com/containerd/continuity v0.4.5 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/fifo v1.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
-	github.com/containerd/platforms v1.0.0-rc.1 // indirect
+	github.com/containerd/platforms v1.0.0-rc.2 // indirect
+	github.com/containerd/plugin v1.0.0 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.18.1 // indirect
 	github.com/containerd/ttrpc v1.2.7 // indirect
 	github.com/containerd/typeurl/v2 v2.2.3 // indirect
@@ -188,7 +186,6 @@ require (
 	github.com/docker/docker v28.5.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.4 // indirect
 	github.com/docker/go-connections v0.6.0 // indirect
-	github.com/docker/go-events v0.0.0-20250114142523-c867878c5e32 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
 	github.com/elliotchance/phpserialize v1.4.0 // indirect
@@ -200,7 +197,7 @@ require (
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/glebarez/sqlite v1.11.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
@@ -294,8 +291,8 @@ require (
 	github.com/olekukonko/tablewriter v1.1.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
-	github.com/opencontainers/runtime-spec v1.2.1 // indirect
-	github.com/opencontainers/selinux v1.13.0 // indirect
+	github.com/opencontainers/runtime-spec v1.3.0 // indirect
+	github.com/opencontainers/selinux v1.13.1 // indirect
 	github.com/pandatix/go-cvss v0.6.2 // indirect
 	github.com/pavlo-v-chernykh/keystore-go/v4 v4.5.0 // indirect
 	github.com/pborman/indent v1.2.1 // indirect
@@ -352,7 +349,7 @@ require (
 	github.com/yookoala/realpath v1.0.0 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
-	go.etcd.io/bbolt v1.4.2 // indirect
+	go.etcd.io/bbolt v1.4.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.38.0 // indirect
