@@ -1,9 +1,0 @@
-schema-version: "2"
-
-package:
-  name: scenario-1
-
-advisories:
-  - id: CGA-xoxo-xoxo-xoxo
-    aliases:
-      - CVE-2222-2222

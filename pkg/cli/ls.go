@@ -7,12 +7,17 @@ import (
 
 	"chainguard.dev/melange/pkg/config"
 	"github.com/spf13/cobra"
+	"github.com/wolfi-dev/wolfictl/pkg/cli/styles"
 	"github.com/wolfi-dev/wolfictl/pkg/configs"
 	buildconfigs "github.com/wolfi-dev/wolfictl/pkg/configs/build"
 	rwos "github.com/wolfi-dev/wolfictl/pkg/configs/rwfs/os"
 	"github.com/wolfi-dev/wolfictl/pkg/distro"
 	"github.com/wolfi-dev/wolfictl/pkg/ls"
 )
+
+func renderDetectedDistro(d distro.Distro) string {
+	return styles.Secondary().Render("Auto-detected distro: ") + d.Absolute.Name + "\n\n"
+}
 
 func cmdLs() *cobra.Command {
 	p := &lsParams{}
