@@ -1,0 +1,15 @@
+{
+  "TargetAPK": {
+    "Name": "py3-poetry-core",
+    "Version": "1.8.0-r0",
+    "OriginPackageName": "py3-poetry-core",
+    "Arch": "x86_64"
+  },
+  "Findings": null,
+  "DataSource": {
+    "Kind": "grype-db",
+    "Schema": "v6.0.2",
+    "Integrity": "imported_db_archive_checksum=sha256:cb212d2776d099cb8635d5d238fcb3894ea81c0285b27911585c7556fbcb412f",
+    "Date": "2025-03-06T04:06:38Z"
+  }
+}

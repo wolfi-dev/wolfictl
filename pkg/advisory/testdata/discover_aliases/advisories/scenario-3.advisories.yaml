@@ -1,0 +1,7 @@
+schema-version: "2"
+
+package:
+  name: scenario-3
+
+advisories:
+  - id: FOO-2222-2222

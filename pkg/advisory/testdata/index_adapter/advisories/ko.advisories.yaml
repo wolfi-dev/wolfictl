@@ -1,0 +1,23 @@
+schema-version: "2"
+
+package:
+  name: ko
+
+advisories:
+  - id: CGA-5f5c-53mg-6p2v
+    aliases:
+      - GHSA-33pg-m6jh-5237
+    events:
+      - timestamp: 2023-05-04T14:34:34Z
+        type: fixed
+        data:
+          fixed-version: 0.13.0-r3
+
+  - id: CGA-4j8r-gcwr-9w6v
+    aliases:
+      - GHSA-232p-vwff-86mp
+    events:
+      - timestamp: 2023-05-04T14:34:34Z
+        type: fixed
+        data:
+          fixed-version: 0.13.0-r5

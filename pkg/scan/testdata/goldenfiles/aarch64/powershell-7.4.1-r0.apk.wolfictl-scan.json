@@ -1,0 +1,52 @@
+{
+  "TargetAPK": {
+    "Name": "powershell",
+    "Version": "7.4.1-r0",
+    "OriginPackageName": "powershell",
+    "Arch": "aarch64"
+  },
+  "Findings": [
+    {
+      "Package": {
+        "ID": "c983536e68d81c77",
+        "Name": "System.IO.Packaging",
+        "Version": "8.0.0",
+        "Type": "dotnet",
+        "Location": "/usr/lib/powershell/pwsh.deps.json",
+        "PURL": "pkg:nuget/System.IO.Packaging@8.0.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-f32c-w444-8ppv",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-43484"
+        ],
+        "FixedVersion": "8.0.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "c983536e68d81c77",
+        "Name": "System.IO.Packaging",
+        "Version": "8.0.0",
+        "Type": "dotnet",
+        "Location": "/usr/lib/powershell/pwsh.deps.json",
+        "PURL": "pkg:nuget/System.IO.Packaging@8.0.0"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-qj66-m88j-hmgj",
+        "Severity": "High",
+        "Aliases": [
+          "CVE-2024-43483"
+        ],
+        "FixedVersion": "8.0.1"
+      }
+    }
+  ],
+  "DataSource": {
+    "Kind": "grype-db",
+    "Schema": "v6.0.2",
+    "Integrity": "imported_db_archive_checksum=sha256:cb212d2776d099cb8635d5d238fcb3894ea81c0285b27911585c7556fbcb412f",
+    "Date": "2025-03-06T04:06:38Z"
+  }
+}

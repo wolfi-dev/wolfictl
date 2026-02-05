@@ -25,6 +25,7 @@ func New() *cobra.Command {
 	cmd.PersistentFlags().Var(&level, "log-level", "log level (e.g. debug, info, warn, error)")
 
 	cmd.AddCommand(
+		cmdAdvisory(),
 		cmdApk(),
 		cmdBump(),
 		cmdCheck(),
@@ -35,6 +36,8 @@ func New() *cobra.Command {
 		cmdLs(),
 		cmdSVG(),
 		cmdText(),
+		cmdSBOM(),
+		cmdScan(),
 		cmdVEX(),
 		cmdWithdraw(),
 		version.Version(),

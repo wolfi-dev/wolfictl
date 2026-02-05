@@ -1,0 +1,50 @@
+{
+  "modified": "2023-05-04T14:34:34Z",
+  "id": "CGA-5f5c-53mg-6p2v",
+  "related": [
+    "CGA-5f5c-53mg-6p2v",
+    "GHSA-33pg-m6jh-5237"
+  ],
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "Chainguard",
+        "name": "ko",
+        "purl": "pkg:apk/chainguard/ko"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "0.13.0-r3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Wolfi",
+        "name": "ko",
+        "purl": "pkg:apk/wolfi/ko"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "0.13.0-r3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

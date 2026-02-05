@@ -1,0 +1,178 @@
+{
+  "TargetAPK": {
+    "Name": "crane",
+    "Version": "0.19.1-r6",
+    "OriginPackageName": "crane",
+    "Arch": "aarch64"
+  },
+  "Findings": [
+    {
+      "Package": {
+        "ID": "efdccf152e0515fe",
+        "Name": "github.com/docker/docker",
+        "Version": "v24.0.9+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-36621",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "26.0.0-rc2, 25.0.5, 23.0.11"
+      }
+    },
+    {
+      "Package": {
+        "ID": "efdccf152e0515fe",
+        "Name": "github.com/docker/docker",
+        "Version": "v24.0.9+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-36623",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "26.0.0-rc1, 25.0.4"
+      }
+    },
+    {
+      "Package": {
+        "ID": "efdccf152e0515fe",
+        "Name": "github.com/docker/docker",
+        "Version": "v24.0.9+incompatible",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/github.com/docker/docker@v24.0.9%2Bincompatible"
+      },
+      "Vulnerability": {
+        "ID": "GHSA-v23v-6jw2-98fq",
+        "Severity": "Critical",
+        "Aliases": [
+          "CVE-2024-41110"
+        ],
+        "FixedVersion": "25.0.6"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-24791",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.21.12, 1.22.5"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34155",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34156",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-34158",
+        "Severity": "High",
+        "Aliases": null,
+        "FixedVersion": "1.22.7, 1.23.1"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45336",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2024-45341",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.11, 1.23.5, 1.24.0-rc.2"
+      }
+    },
+    {
+      "Package": {
+        "ID": "384f119e54193e7a",
+        "Name": "stdlib",
+        "Version": "go1.22.4",
+        "Type": "go-module",
+        "Location": "/usr/bin/crane",
+        "PURL": "pkg:golang/stdlib@1.22.4"
+      },
+      "Vulnerability": {
+        "ID": "CVE-2025-22866",
+        "Severity": "Medium",
+        "Aliases": null,
+        "FixedVersion": "1.22.12, 1.23.6, 1.24.0-rc.3"
+      }
+    }
+  ],
+  "DataSource": {
+    "Kind": "grype-db",
+    "Schema": "v6.0.2",
+    "Integrity": "imported_db_archive_checksum=sha256:cb212d2776d099cb8635d5d238fcb3894ea81c0285b27911585c7556fbcb412f",
+    "Date": "2025-03-06T04:06:38Z"
+  }
+}
