@@ -15,7 +15,7 @@ require (
 	chainguard.dev/melange v0.42.0
 	cloud.google.com/go/storage v1.59.1
 	github.com/adrg/xdg v0.5.3
-	github.com/anchore/stereoscope v0.1.18
+	github.com/anchore/stereoscope v0.1.20
 	github.com/anchore/syft v1.38.0
 	github.com/chainguard-dev/clog v1.8.0
 	github.com/chainguard-dev/yam v0.2.48
@@ -136,7 +136,7 @@ require (
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bitnami/go-version v0.0.0-20250505154626-452e8c5ee607 // indirect
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb // indirect
-	github.com/bmatcuk/doublestar/v4 v4.9.2 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.10.0 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.1 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect

@@ -158,8 +158,8 @@ github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 h1:rmZG77uXgE
 github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4/go.mod h1:Bkc+JYWjMCF8OyZ340IMSIi2Ebf3uwByOk6ho4wne1E=
 github.com/anchore/packageurl-go v0.1.1-0.20250220190351-d62adb6e1115 h1:ZyRCmiEjnoGJZ1+Ah0ZZ/mKKqNhGcUZBl0s7PTTDzvY=
 github.com/anchore/packageurl-go v0.1.1-0.20250220190351-d62adb6e1115/go.mod h1:KoYIv7tdP5+CC9VGkeZV4/vGCKsY55VvoG+5dadg4YI=
-github.com/anchore/stereoscope v0.1.18 h1:Mj34pRtxwfdFJkYKtKjiO9Xn7qs0RTCi59ofRYTSCEU=
-github.com/anchore/stereoscope v0.1.18/go.mod h1:y8P4BURfBj0DVRly9cPHsSuZdI/AsZs3ee/x/HusEe4=
+github.com/anchore/stereoscope v0.1.20 h1:32720yZ/YtvzF5tvsoRL/ibdAJzOdIaR444fDXW4arQ=
+github.com/anchore/stereoscope v0.1.20/go.mod h1:6Ef0xQAuN2Ito7eV9A9pYjD1x/0cX5fy56MwgEGyrB4=
 github.com/anchore/syft v1.38.0 h1:iIA2h0EQQaLciL8LRuFK0tgGAjxp/0Q+DGEfmk4W/rQ=
 github.com/anchore/syft v1.38.0/go.mod h1:ZotgYAy4xlyqRZqEeHgwT0lkdKw7eQO49kn+IdkROU0=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
@@ -236,8 +236,8 @@ github.com/bitnami/go-version v0.0.0-20250505154626-452e8c5ee607 h1:lBg3tHGquFyS
 github.com/bitnami/go-version v0.0.0-20250505154626-452e8c5ee607/go.mod h1:9iglf1GG4oNRJ39bZ5AZrjgAFD2RwQbXw6Qf7Cs47wo=
 github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb h1:m935MPodAbYS46DG4pJSv7WO+VECIWUQ7OJYSoTrMh4=
 github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb/go.mod h1:PkYb9DJNAwrSvRx5DYA+gUcOIgTGVMNkfSCbZM8cWpI=
-github.com/bmatcuk/doublestar/v4 v4.9.2 h1:b0mc6WyRSYLjzofB2v/0cuDUZ+MqoGyH3r0dVij35GI=
-github.com/bmatcuk/doublestar/v4 v4.9.2/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
+github.com/bmatcuk/doublestar/v4 v4.10.0 h1:zU9WiOla1YA122oLM6i4EXvGW62DvKZVxIe6TYWexEs=
+github.com/bmatcuk/doublestar/v4 v4.10.0/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
 github.com/bodgit/plumbing v1.3.0 h1:pf9Itz1JOQgn7vEOE7v7nlEfBykYqvUYioC61TwWCFU=
 github.com/bodgit/plumbing v1.3.0/go.mod h1:JOTb4XiRu5xfnmdnDJo6GmSbSbtSyufrsyZFByMtKEs=
 github.com/bodgit/sevenzip v1.6.1 h1:kikg2pUMYC9ljU7W9SaqHXhym5HyKm8/M/jd31fYan4=
