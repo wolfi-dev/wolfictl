@@ -76,6 +76,7 @@ var (
 )
 
 const gitCheckout = "git-checkout"
+const sccacheEnable = "sccache/enable"
 
 // AllRules is a list of all available rules to evaluate.
 var AllRules = func(l *Linter) Rules { //nolint:gocyclo
@@ -528,6 +529,17 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			},
 		},
 		{
+			Name:        "sccache-enabled",
+			Description: "sccache/enable is for local devel-use only",
+			Severity:    SeverityError,
+			LintFunc: func(c config.Configuration) error {
+				if anyPipelineUses(c, sccacheEnable) {
+					return fmt.Errorf("scacche/enable pipeline exists")
+				}
+				return nil
+			},
+		},
+		{
 			Name:        "valid-update-schedule",
 			Description: "update schedule config should contain a valid period",
 			Severity:    SeverityError,
@@ -628,6 +640,37 @@ func pickPipelinesUsing(uses string, pipelines []config.Pipeline) []*config.Pipe
 	}
 
 	return retval
+}
+
+func anyPipelineUses(c config.Configuration, uses string) bool {
+	for index := range len(c.Pipeline) {
+		if c.Pipeline[index].Uses == uses {
+			return true
+		}
+	}
+	if c.Test != nil {
+		for index := range len(c.Test.Pipeline) {
+			if c.Test.Pipeline[index].Uses == uses {
+				return true
+			}
+		}
+	}
+	for spindex := range c.Subpackages {
+		sp := c.Subpackages[spindex]
+		for index := range len(sp.Pipeline) {
+			if sp.Pipeline[index].Uses == uses {
+				return true
+			}
+		}
+		if sp.Test != nil {
+			for index := range len(sp.Test.Pipeline) {
+				if sp.Test.Pipeline[index].Uses == uses {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func containsKey(parentNode *yaml.Node, key string) error {
