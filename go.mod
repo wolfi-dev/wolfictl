@@ -30,8 +30,8 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/facebookincubator/nvdtools v0.1.5
 	github.com/github/go-spdx/v2 v2.4.0
-	github.com/go-git/go-billy/v5 v5.7.0
-	github.com/go-git/go-git/v5 v5.16.5
+	github.com/go-git/go-billy/v5 v5.8.0
+	github.com/go-git/go-git/v5 v5.17.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v58 v58.0.0
 	github.com/google/uuid v1.6.0 // indirect
