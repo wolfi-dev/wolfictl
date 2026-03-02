@@ -41,7 +41,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.3.0
 	github.com/muesli/reflow v0.3.0
 	github.com/package-url/packageurl-go v0.1.4
-	github.com/samber/lo v1.52.0
+	github.com/samber/lo v1.53.0
 	github.com/savioxavier/termlink v1.4.3
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.10.2
