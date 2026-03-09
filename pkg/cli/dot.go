@@ -21,7 +21,8 @@ import (
 )
 
 func cmdSVG() *cobra.Command { //nolint:gocyclo
-	var dir, pipelineDir string
+	var dir string
+	var pipelineDirs []string
 	var showDependents, recursive, span, web bool
 	var extraKeys, extraRepos []string
 	d := &cobra.Command{
@@ -47,11 +48,11 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			if pipelineDir == "" {
-				pipelineDir = filepath.Join(dir, "pipelines")
+			if len(pipelineDirs) == 0 {
+				pipelineDirs = []string{filepath.Join(dir, "pipelines")}
 			}
 
-			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDirs)
 			if err != nil {
 				return fmt.Errorf("NewPackages: %w", err)
 			}
@@ -298,7 +299,7 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 		},
 	}
 	d.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
-	d.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	d.Flags().StringSliceVar(&pipelineDirs, "pipeline-dir", nil, "directory used to extend defined built-in pipelines")
 	d.Flags().BoolVarP(&showDependents, "show-dependents", "D", false, "show packages that depend on these packages, instead of these packages' dependencies")
 	d.Flags().BoolVarP(&recursive, "recursive", "R", false, "recurse through package dependencies")
 	d.Flags().BoolVarP(&span, "spanning-tree", "S", false, "does something like a spanning tree to avoid a huge number of edges")

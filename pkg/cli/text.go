@@ -13,7 +13,8 @@ import (
 )
 
 func cmdText() *cobra.Command {
-	var dir, pipelineDir, arch, t string
+	var dir, arch, t string
+	var pipelineDirs []string
 	var extraKeys, extraRepos []string
 	text := &cobra.Command{
 		Use:   "text",
@@ -27,13 +28,13 @@ If this fails, there may be an unsatisfiable dependency or a cycle in the graph.
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
-			if pipelineDir == "" {
-				pipelineDir = filepath.Join(dir, "pipelines")
+			if len(pipelineDirs) == 0 {
+				pipelineDirs = []string{filepath.Join(dir, "pipelines")}
 			}
 
 			arch := types.ParseArchitecture(arch).ToAPK()
 
-			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDir)
+			pkgs, err := dag.NewPackages(ctx, os.DirFS(dir), dir, pipelineDirs)
 			if err != nil {
 				return fmt.Errorf("constructing new package set from directory %q: %w", dir, err)
 			}
@@ -49,7 +50,7 @@ If this fails, there may be an unsatisfiable dependency or a cycle in the graph.
 		},
 	}
 	text.Flags().StringVarP(&dir, "dir", "d", ".", "directory to search for melange configs")
-	text.Flags().StringVar(&pipelineDir, "pipeline-dir", "", "directory used to extend defined built-in pipelines")
+	text.Flags().StringSliceVar(&pipelineDirs, "pipeline-dir", nil, "directory used to extend defined built-in pipelines")
 	text.Flags().StringVarP(&arch, "arch", "a", "x86_64", "architecture to build for")
 	text.Flags().StringVarP(&t, "type", "t", string(typeTarget), fmt.Sprintf("What type of text to emit; values can be one of: %v", textTypes))
 	text.Flags().StringSliceVarP(&extraKeys, "keyring-append", "k", []string{"https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"}, "path to extra keys to include in the build environment keyring")

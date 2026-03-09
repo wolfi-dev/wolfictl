@@ -144,11 +144,11 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 // The input is any fs.FS filesystem implementation. Given a directory path, you
 // can call NewPackages like this:
 //
-// NewPackages(ctx, os.DirFS("/path/to/dir"), "/path/to/dir", "./pipelines")
+// NewPackages(ctx, os.DirFS("/path/to/dir"), "/path/to/dir", []string{"./pipelines"})
 //
 // The repetition of the path is necessary because of how the upstream parser in
 // melange requires the full path to the directory to be passed in.
-func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (*Packages, error) {
+func NewPackages(ctx context.Context, fsys fs.FS, dirPath string, pipelineDirs []string) (*Packages, error) {
 	log := clog.FromContext(ctx)
 
 	pkgs := &Packages{
@@ -240,7 +240,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath, pipelineDir string) (
 			// Resolve all `uses` used by the pipeline. This updates the set of
 			// .environment.contents.packages so the next block can include those as build deps.
 			build := &build.Build{
-				PipelineDirs:  []string{pipelineDir},
+				PipelineDirs:  pipelineDirs,
 				Configuration: c.Configuration,
 			}
 			if err := build.Compile(ctx); err != nil {

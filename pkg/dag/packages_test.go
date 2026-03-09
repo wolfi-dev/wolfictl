@@ -12,7 +12,7 @@ func TestNewPackages(t *testing.T) {
 	ctx := context.Background()
 
 	testdir := "testdata/multiple"
-	pkgs, err := NewPackages(ctx, os.DirFS(testdir), testdir, "")
+	pkgs, err := NewPackages(ctx, os.DirFS(testdir), testdir, nil)
 	require.NoError(t, err)
 
 	t.Run("loads data correctly", func(t *testing.T) {
@@ -31,7 +31,7 @@ func TestNewPackages(t *testing.T) {
 
 	t.Run("multiple configurations using the same package name", func(t *testing.T) {
 		testdir = "testdata/duplicate"
-		pkgs, err = NewPackages(ctx, os.DirFS(testdir), testdir, "")
+		pkgs, err = NewPackages(ctx, os.DirFS(testdir), testdir, nil)
 		if err == nil {
 			t.Error("should yield an error but got nil")
 		}
