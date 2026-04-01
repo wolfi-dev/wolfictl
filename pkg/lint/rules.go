@@ -353,14 +353,17 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			},
 		},
 		{
-			Name:        "valid-pipeline-git-checkout-tag",
-			Description: "every git-checkout pipeline should have a tag",
+			Name:        "valid-pipeline-git-checkout-tag-or-branch",
+			Description: "every git-checkout pipeline should have a tag or branch",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, p := range config.Pipeline {
 					if p.Uses == gitCheckout {
-						if _, ok := p.With["tag"]; !ok {
-							return fmt.Errorf("tag is missing")
+						_, hasTag := p.With["tag"]
+						_, hasBranch := p.With["branch"]
+						// "branch" and "tag" are mutually exclusive
+						if !hasTag && !hasBranch {
+							return fmt.Errorf("tag or branch is missing")
 						}
 					}
 				}

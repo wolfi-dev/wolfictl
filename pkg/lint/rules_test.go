@@ -312,17 +312,17 @@ func TestLinter_Rules(t *testing.T) {
 			matches: 1,
 		},
 		{
-			file:        "wrong-pipeline-git-checkout-tag.yaml",
+			file:        "wrong-pipeline-git-checkout-tag-or-branch.yaml",
 			minSeverity: SeverityWarning,
 			want: EvalResult{
-				File: "wrong-pipeline-git-checkout-tag",
+				File: "wrong-pipeline-git-checkout-tag-or-branch",
 				Errors: EvalRuleErrors{
 					{
 						Rule: Rule{
-							Name:     "valid-pipeline-git-checkout-tag",
+							Name:     "valid-pipeline-git-checkout-tag-or-branch",
 							Severity: SeverityError,
 						},
-						Error: fmt.Errorf("[valid-pipeline-git-checkout-tag]: tag is missing (ERROR)"),
+						Error: fmt.Errorf("[valid-pipeline-git-checkout-tag-or-branch]: tag or branch is missing (ERROR)"),
 					},
 				},
 			},
