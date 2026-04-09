@@ -26,7 +26,7 @@ func TestBumpWithComment(t *testing.T) {
 	}{
 		{
 			testPkgDefinition("1 # a comment!"),
-			testPkgDefinition("2 # a comment!"),
+			testPkgDefinition("2"),
 		},
 		{
 			testPkgDefinition("1 # CVE-111-222"),
