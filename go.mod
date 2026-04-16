@@ -13,7 +13,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 require (
 	chainguard.dev/apko v1.2.3
 	chainguard.dev/melange v0.50.0
-	cloud.google.com/go/storage v1.61.3
+	cloud.google.com/go/storage v1.62.1
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/stereoscope v0.1.22
 	github.com/anchore/syft v1.38.0
@@ -73,7 +73,7 @@ require (
 	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
-	cloud.google.com/go/iam v1.5.3 // indirect
+	cloud.google.com/go/iam v1.7.0 // indirect
 	cloud.google.com/go/monitoring v1.24.3 // indirect
 	cyphar.com/go-pathrs v0.2.1 // indirect
 	dario.cat/mergo v1.0.2 // indirect
