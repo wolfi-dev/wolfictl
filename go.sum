@@ -1,11 +1,11 @@
 cel.dev/expr v0.25.1 h1:1KrZg61W6TWSxuNZ37Xy49ps13NUovb66QLprthtwi4=
 cel.dev/expr v0.25.1/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
-chainguard.dev/apko v1.2.7 h1:Wlw6HJjbNnYy29dcTPz5lGdWpRhpEuwYtQapAPaAFWo=
-chainguard.dev/apko v1.2.7/go.mod h1:JzjuFno6z5Up2BctVE/sZevJoGjBAu3OtuYwwJd6f58=
+chainguard.dev/apko v1.2.8 h1:K6iGkbHibac6SgahBtfOQTaepzPRm0WP7VkMbu46WCM=
+chainguard.dev/apko v1.2.8/go.mod h1:JzjuFno6z5Up2BctVE/sZevJoGjBAu3OtuYwwJd6f58=
 chainguard.dev/go-grpc-kit v0.17.16 h1:Y9RKwZCnrYR3S0K8BiazyOoBrZF+Q7bJWDacfKXz2zg=
 chainguard.dev/go-grpc-kit v0.17.16/go.mod h1:0vrfIBJguXNa+EKOUEhx1Fj2aBp8o6A8gAHoidiF8ps=
-chainguard.dev/melange v0.50.1 h1:5O473zINi9UBPKo3emW0T4c9XEnkMHgWIpAaKex3txs=
-chainguard.dev/melange v0.50.1/go.mod h1:wh+31ykOZcFrshHFxzCsUKsmqM6r3rqyIhZJiEE8I1E=
+chainguard.dev/melange v0.50.3 h1:ans3I7Ba1Btr6UYoivnSG3Utp6HF14aYtU3NNk4TH9s=
+chainguard.dev/melange v0.50.3/go.mod h1:H4LrddDiJqDlSWezGWKVVcEPLBmdnXYkzfylSyoPkh8=
 chainguard.dev/sdk v0.1.52 h1:G1wmZHU8v5E78YlCHuwQH0Hwt4NBBCvCNAFad5FUanQ=
 chainguard.dev/sdk v0.1.52/go.mod h1:IZIiUyuNaxTao6mpC/BROsw/dwjl/DmCR/raIT7eK4c=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -261,8 +261,8 @@ github.com/chainguard-dev/clog v1.8.0 h1:frlTMEdg3XQR+ioQ6O9i92uigY8GTUcWKpuCFkh
 github.com/chainguard-dev/clog v1.8.0/go.mod h1:5MQOZi+Iu7fV7GcJG8ag8rCB5elEOpqRMKEASgnGVdo=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10 h1:XR2vgQC024I9/boh9r1ihVv8Z14+pbvWqXeYMCnZJpc=
 github.com/chainguard-dev/go-pkgconfig v0.0.0-20240404163941-6351b37b2a10/go.mod h1:1p6+MesLcjKeON5BRWa7I87mvAY0QmKjgginIM3w6BI=
-github.com/chainguard-dev/yam v0.2.56 h1:ZUrqBMOjQT7zj7QJdD6qr3JTCTdQ6Evb+aDBz033YLQ=
-github.com/chainguard-dev/yam v0.2.56/go.mod h1:Sbt8pVO8DbHoVly44oF5gg03NRxl9AhEImOkqGyoQCs=
+github.com/chainguard-dev/yam v0.2.57 h1:v1qCjl96/s5jT+zJrMgRDRPb74qr/SW0ubsh9Zx8GoM=
+github.com/chainguard-dev/yam v0.2.57/go.mod h1:Sbt8pVO8DbHoVly44oF5gg03NRxl9AhEImOkqGyoQCs=
 github.com/charmbracelet/bubbles v1.0.0 h1:12J8/ak/uCZEMQ6KU7pcfwceyjLlWsDLAxB5fXonfvc=
 github.com/charmbracelet/bubbles v1.0.0/go.mod h1:9d/Zd5GdnauMI5ivUIVisuEm3ave1XwXtD1ckyV6r3E=
 github.com/charmbracelet/bubbletea v1.3.10 h1:otUDHWMMzQSB0Pkc87rm691KZ3SWa4KUlvF9nRvCICw=
