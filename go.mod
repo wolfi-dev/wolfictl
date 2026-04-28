@@ -11,14 +11,14 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v1.2.7
-	chainguard.dev/melange v0.50.1
+	chainguard.dev/apko v1.2.9
+	chainguard.dev/melange v0.50.4
 	cloud.google.com/go/storage v1.62.1
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/stereoscope v0.1.22
 	github.com/anchore/syft v1.38.0
 	github.com/chainguard-dev/clog v1.8.0
-	github.com/chainguard-dev/yam v0.2.56
+	github.com/chainguard-dev/yam v0.2.57
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250319133953-166f707985bc
@@ -40,7 +40,7 @@ require (
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/lucasb-eyer/go-colorful v1.4.0
 	github.com/muesli/reflow v0.3.0
-	github.com/package-url/packageurl-go v0.1.5
+	github.com/package-url/packageurl-go v0.1.6
 	github.com/samber/lo v1.53.0
 	github.com/savioxavier/termlink v1.4.3
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
@@ -67,8 +67,8 @@ require (
 
 require (
 	cel.dev/expr v0.25.1 // indirect
-	chainguard.dev/go-grpc-kit v0.17.16 // indirect
-	chainguard.dev/sdk v0.1.52 // indirect
+	chainguard.dev/go-grpc-kit v0.17.17 // indirect
+	chainguard.dev/sdk v0.1.54 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
@@ -170,7 +170,7 @@ require (
 	github.com/deitch/magic v0.0.0-20240306090643-c67ab88f10cb // indirect
 	github.com/diskfs/go-diskfs v1.7.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/cli v29.4.0+incompatible // indirect
+	github.com/docker/cli v29.4.1+incompatible // indirect
 	github.com/docker/docker v28.5.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.5 // indirect
 	github.com/docker/go-connections v0.6.0 // indirect
