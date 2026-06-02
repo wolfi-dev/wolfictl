@@ -89,7 +89,11 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 		opts.arch = "x86_64"
 	}
 
-	localRepo := pkgs.Repository(opts.arch)
+	localRepo, err := pkgs.Repository(opts.arch)
+	if err != nil {
+		return nil, fmt.Errorf("creating local repository: %w", err)
+	}
+
 	localRepoSource := localRepo.Source()
 	localOnlyResolver := apk.NewPkgResolver(ctx, []apk.NamedIndex{localRepo})
 	g.resolvers[localRepoSource] = localOnlyResolver

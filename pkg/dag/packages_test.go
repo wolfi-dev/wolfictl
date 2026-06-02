@@ -37,3 +37,54 @@ func TestNewPackages(t *testing.T) {
 		}
 	})
 }
+
+func TestPackagesRepositoryPreservesSubpackageProviderPriority(t *testing.T) {
+	ctx := context.Background()
+	testdir := "testdata/provider-priority"
+
+	pkgs, err := NewPackages(ctx, os.DirFS(testdir), testdir, nil)
+	require.NoError(t, err)
+
+	repo, err := pkgs.Repository("x86_64")
+	require.NoError(t, err)
+
+	priorities := map[string]uint64{}
+	for _, pkg := range repo.Packages() {
+		priorities[pkg.Name] = pkg.ProviderPriority
+	}
+
+	require.Equal(t, map[string]uint64{
+		"gdal":            0,
+		"gdal-py3.13-dev": 313,
+		"gdal-compat":     0,
+	}, priorities)
+}
+
+func TestParseProviderPriority(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    uint64
+		wantErr string
+	}{
+		{name: "empty", input: "", want: 0},
+		{name: "positive", input: "313", want: 313},
+		{name: "negative clamps to zero", input: "-1", want: 0},
+		{name: "non-numeric", input: "invalid", wantErr: `parsing "invalid"`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseProviderPriority(tt.input)
+
+			if tt.wantErr != "" {
+				require.ErrorContains(t, err, tt.wantErr)
+				require.Zero(t, got)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}

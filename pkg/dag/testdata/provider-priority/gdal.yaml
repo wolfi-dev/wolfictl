@@ -1,0 +1,29 @@
+package:
+  name: gdal
+  version: "3.13.0"
+  epoch: 0
+  description: Geospatial Data Abstraction Library
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+        - "*"
+      attestation:
+      license: MIT
+environment:
+  contents:
+    packages:
+      - build-base
+pipeline:
+  - runs: |
+      echo "pretending to build gdal"
+
+subpackages:
+  - name: gdal-py3.13-dev
+    dependencies:
+      provides:
+        - gdal-dev
+      provider-priority: 313
+  - name: gdal-compat
+    dependencies:
+      provider-priority: -1
