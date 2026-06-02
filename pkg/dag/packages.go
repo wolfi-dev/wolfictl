@@ -432,7 +432,7 @@ func (p *Packages) WithArch(arch string) (*Packages, error) {
 
 // Repository provide the Packages as a apk.RepositoryWithIndex. To be used in other places that require
 // using alpine/go structs instead of ours.
-func (p *Packages) Repository(arch string) apk.NamedIndex {
+func (p *Packages) Repository(arch string) (apk.NamedIndex, error) {
 	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
 
 	// Precompute the number of packages to avoid growslice.
@@ -448,7 +448,8 @@ func (p *Packages) Repository(arch string) apk.NamedIndex {
 	for _, byVersion := range p.packages {
 		for _, cfg := range byVersion {
 			cfg := cfg
-			packages = append(packages, &apk.Package{
+
+			pkg := &apk.Package{
 				Arch:         arch,
 				Name:         cfg.Package.Name,
 				Version:      fullVersion(&cfg.Package),
@@ -459,10 +460,19 @@ func (p *Packages) Repository(arch string) apk.NamedIndex {
 				Dependencies: cfg.Environment.Contents.Packages,
 				Provides:     cfg.Package.Dependencies.Provides,
 				RepoCommit:   cfg.Package.Commit,
-			})
+			}
+
+			priority, err := parseProviderPriority(cfg.Package.Dependencies.ProviderPriority)
+			if err != nil {
+				return nil, fmt.Errorf("%s provider-priority: %w", cfg.Package.Name, err)
+			}
+			pkg.ProviderPriority = priority
+
+			packages = append(packages, pkg)
+
 			for i := range cfg.Subpackages {
 				sub := cfg.Subpackages[i]
-				packages = append(packages, &apk.Package{
+				subpkg := &apk.Package{
 					Arch:         arch,
 					Name:         sub.Name,
 					Version:      fullVersion(&cfg.Package),
@@ -473,7 +483,15 @@ func (p *Packages) Repository(arch string) apk.NamedIndex {
 					Dependencies: cfg.Environment.Contents.Packages,
 					Provides:     sub.Dependencies.Provides,
 					RepoCommit:   sub.Commit,
-				})
+				}
+
+				priority, err := parseProviderPriority(sub.Dependencies.ProviderPriority)
+				if err != nil {
+					return nil, fmt.Errorf("%s subpackage %s provider-priority: %w", cfg.Package.Name, sub.Name, err)
+				}
+				subpkg.ProviderPriority = priority
+
+				packages = append(packages, subpkg)
 			}
 		}
 	}
@@ -482,7 +500,7 @@ func (p *Packages) Repository(arch string) apk.NamedIndex {
 		Packages:    packages,
 	}
 
-	return apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
+	return apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index)), nil
 }
 
 func packageNameFromProvides(prov string) (name, version string) {
@@ -499,4 +517,24 @@ func packageNameFromProvides(prov string) (name, version string) {
 
 func fullVersion(pkg *config.Package) string {
 	return pkg.Version + "-r" + strconv.FormatUint(pkg.Epoch, 10)
+}
+
+// parseProviderPriority parses a melange provider-priority. melange permits a
+// signed integer, and a negative value resolves to the default priority of zero
+// in the built index, so treat it as zero here rather than rejecting it.
+func parseProviderPriority(val string) (uint64, error) {
+	if val == "" {
+		return 0, nil
+	}
+
+	priority, err := strconv.Atoi(val)
+	if err != nil {
+		return 0, fmt.Errorf("parsing %q: %w", val, err)
+	}
+
+	if priority < 0 {
+		return 0, nil
+	}
+
+	return uint64(priority), nil
 }
