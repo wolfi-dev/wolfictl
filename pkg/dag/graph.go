@@ -13,7 +13,6 @@ import (
 	"path"
 	"reflect"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/dominikbraun/graph"
@@ -104,8 +103,6 @@ func NewGraph(ctx context.Context, pkgs *Packages, options ...GraphOptions) (*Gr
 			errs = append(errs, err)
 			continue
 		}
-		// add the origin package as its own resolver, so that the subpackage can resolve to it
-		g.resolvers[c.String()] = singlePackageResolver(ctx, c, opts.arch)
 		for i := range c.Subpackages {
 			subpkg := pkgs.Config(c.Subpackages[i].Name, false)
 			for _, subpkgVersion := range subpkg {
@@ -865,46 +862,6 @@ func getKeyMaterial(key string) ([]byte, error) {
 		return nil, fmt.Errorf("key scheme %s not supported", asURL.Scheme)
 	}
 	return b, nil
-}
-
-func getPriority(pkg *Configuration) uint64 {
-	val := pkg.Package.Dependencies.ProviderPriority
-	if val == "" {
-		return 0
-	}
-	priority, err := strconv.ParseUint(val, 10, 64)
-	if err != nil {
-		// I don't care to plumb this error around, sorry everyone.
-		// There are other places that will catch this not being an integer.
-		return 0
-	}
-	return priority
-}
-
-func singlePackageResolver(ctx context.Context, pkg *Configuration, arch string) *apk.PkgResolver {
-	repo := apk.NewRepositoryFromComponents(Local, "latest", "", arch)
-
-	packages := []*apk.Package{
-		{
-			Arch:             arch,
-			Name:             pkg.Package.Name,
-			Version:          fullVersion(&pkg.Package),
-			Description:      pkg.Package.Description,
-			License:          pkg.Package.LicenseExpression(),
-			Origin:           pkg.Package.Name,
-			URL:              pkg.Package.URL,
-			Dependencies:     pkg.Environment.Contents.Packages,
-			ProviderPriority: getPriority(pkg),
-			Provides:         pkg.Package.Dependencies.Provides,
-			RepoCommit:       pkg.Package.Commit,
-		},
-	}
-	index := &apk.APKIndex{
-		Description: pkg.String(),
-		Packages:    packages,
-	}
-	idx := apk.NewNamedRepositoryWithIndex("", repo.WithIndex(index))
-	return apk.NewPkgResolver(ctx, []apk.NamedIndex{idx})
 }
 
 // Targets returns a subgraph that flattens subpackages into their origins.
