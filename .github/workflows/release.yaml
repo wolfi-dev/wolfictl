@@ -60,6 +60,10 @@ jobs:
         with:
           go-version-file: 'go.mod'
           check-latest: true
+          # Disable the Go build/module cache on this signed-release flow: a
+          # cache poisoned by a PR-reachable build could otherwise be restored
+          # into the tag/dispatch release that goreleaser signs and publishes.
+          cache: false
 
       - name: Check if any changes since last tag
         id: check
