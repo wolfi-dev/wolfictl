@@ -17,8 +17,9 @@ runs:
     - id: build
       shell: bash
       run: |
-        cd wolfictl-setup-gha
-        make wolfictl
-        mv wolfictl /home/runner/go/bin/
-        cd ..
+        (
+          cd wolfictl-setup-gha || exit
+          make wolfictl
+          mv wolfictl /home/runner/go/bin/
+        )
         rm -rf wolfictl-setup-gha
