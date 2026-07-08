@@ -5,6 +5,7 @@ runs:
   steps:
     - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
+        persist-credentials: false
         repository: wolfi-dev/wolfictl
         path: wolfictl-setup-gha
 
@@ -16,8 +17,9 @@ runs:
     - id: build
       shell: bash
       run: |
-        cd wolfictl-setup-gha
-        make wolfictl
-        mv wolfictl /home/runner/go/bin/
-        cd ..
+        (
+          cd wolfictl-setup-gha || exit
+          make wolfictl
+          mv wolfictl /home/runner/go/bin/
+        )
         rm -rf wolfictl-setup-gha

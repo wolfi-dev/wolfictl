@@ -50,6 +50,7 @@ jobs:
 
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          persist-credentials: false
           fetch-depth: 0 # fetch all history for all tags and branches
           token: ${{ steps.octo-sts.outputs.token }}
 
@@ -59,6 +60,10 @@ jobs:
         with:
           go-version-file: 'go.mod'
           check-latest: true
+          # Disable the Go build/module cache on this signed-release flow: a
+          # cache poisoned by a PR-reachable build could otherwise be restored
+          # into the tag/dispatch release that goreleaser signs and publishes.
+          cache: false
 
       - name: Check if any changes since last tag
         id: check
