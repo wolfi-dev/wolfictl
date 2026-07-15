@@ -134,6 +134,14 @@ func TestSoNameOptions_checkSonamesMatch(t *testing.T) {
 			name: "ignore_non_standard_version_suffix", existingSonameFiles: []string{"libgs.so.10.02.debug"}, newSonameFiles: []string{"libgs.so.10.02.debug"},
 			wantErr: assert.NoError,
 		},
+		{
+			name: "existing_dt_soname_without_so", existingSonameFiles: []string{"libevil"}, newSonameFiles: []string{"foo.so.1"},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "new_dt_soname_without_so", existingSonameFiles: []string{"foo.so.1"}, newSonameFiles: []string{"badsoname"},
+			wantErr: assert.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
