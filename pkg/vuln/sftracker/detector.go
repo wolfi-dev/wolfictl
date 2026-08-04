@@ -147,7 +147,7 @@ type packageResponse struct {
 	CPEMatch []cpeMatch `json:"cpeMatch"`
 }
 
-//nolint:revive,stylecheck // we don't have control over JSON fields here
+//nolint:revive // we don't have control over JSON fields here
 type cpeMatch struct {
 	Context          string `json:"@context"`
 	CPEUri           string `json:"cpeUri"`
@@ -215,7 +215,7 @@ func parseVersionRange(match cpeMatch) (vuln.VersionRange, error) {
 	return r, nil
 }
 
-//nolint:revive,stylecheck // we don't have control over JSON fields here
+//nolint:revive // we don't have control over JSON fields here
 type branchResponse struct {
 	Context string `json:"@context"`
 	Id      string `json:"id"`
