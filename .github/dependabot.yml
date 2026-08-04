@@ -8,15 +8,11 @@ updates:
       - "/.github/actions/*"
     schedule:
       interval: "daily"
-    cooldown:
-      default-days: 3
 
   - package-ecosystem: gomod
     directory: "/"
     schedule:
       interval: "daily"
-    cooldown:
-      default-days: 3
     groups:
       chainguard:
         patterns:
