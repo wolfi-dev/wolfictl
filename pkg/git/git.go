@@ -172,21 +172,40 @@ func SetGitSignOptions(repoPath string) error {
 	if gitAuthorName == "" || gitAuthorEmail == "" {
 		return fmt.Errorf("missing GIT_AUTHOR_NAME and/or GIT_AUTHOR_EMAIL environment variable, please set")
 	}
+	if err := checkConfigValue("GIT_AUTHOR_NAME", gitAuthorName); err != nil {
+		return err
+	}
+	if err := checkConfigValue("GIT_AUTHOR_EMAIL", gitAuthorEmail); err != nil {
+		return err
+	}
 
-	cmd = exec.Command("git", "config", "--local", "user.name", gitAuthorName)
+	cmd = exec.Command("git", "config", "--local", "user.name", gitAuthorName) //nolint:gosec // value validated by checkConfigValue
 	cmd.Dir = repoPath
 	rs, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("failed to set git config user.name %q: %w", rs, err)
 	}
 
-	cmd = exec.Command("git", "config", "--local", "user.email", gitAuthorEmail)
+	cmd = exec.Command("git", "config", "--local", "user.email", gitAuthorEmail) //nolint:gosec // value validated by checkConfigValue
 	cmd.Dir = repoPath
 	rs, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("failed to set git config user.email %q: %w", rs, err)
 	}
 
+	return nil
+}
+
+// checkConfigValue rejects values that git would not treat as a plain config
+// value. A leading "-" is parsed as an option rather than a value, and NUL or
+// newlines would split the value across config lines.
+func checkConfigValue(name, value string) error {
+	if strings.HasPrefix(value, "-") {
+		return fmt.Errorf("%s must not begin with %q", name, "-")
+	}
+	if strings.ContainsAny(value, "\x00\n\r") {
+		return fmt.Errorf("%s must not contain NUL or newline characters", name)
+	}
 	return nil
 }
 

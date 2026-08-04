@@ -142,36 +142,11 @@ func cmdCp() *cobra.Command {
 			}
 
 			// Update the local index for all the apks currently in the outDir.
-			index.Packages = nil
-
-			if err := filepath.WalkDir(filepath.Join(outDir, arch), func(path string, _ fs.DirEntry, err error) error {
-				if err != nil {
-					return err
-				}
-				if !strings.HasSuffix(path, ".apk") {
-					return nil
-				}
-
-				f, err := os.Open(path)
-				if err != nil {
-					return err
-				}
-				defer f.Close()
-
-				stat, err := f.Stat()
-				if err != nil {
-					return err
-				}
-
-				pkg, err := apk.ParsePackage(ctx, f, uint64(stat.Size())) //nolint:gosec
-				if err != nil {
-					return err
-				}
-				index.Packages = append(index.Packages, pkg)
-				return nil
-			}); err != nil {
+			index.Packages, err = parseAPKDir(ctx, filepath.Join(outDir, arch))
+			if err != nil {
 				return err
 			}
+
 			fn := filepath.Join(outDir, arch, "APKINDEX.tar.gz")
 			log.Printf("writing index: %s (%d total packages)", fn, len(index.Packages))
 			f, err := os.Create(fn)
@@ -197,6 +172,48 @@ func cmdCp() *cobra.Command {
 	cmd.Flags().BoolVar(&latest, "latest", true, "copy only the latest version of each package")
 	cmd.Flags().StringVar(&gcsPath, "gcs", "", "copy objects from a GCS bucket")
 	return cmd
+}
+
+// parseAPKDir parses every .apk under dir into a package list. The directory is
+// walked through an os.Root so that a symlink swapped in mid-walk cannot
+// redirect a read outside dir.
+func parseAPKDir(ctx context.Context, dir string) ([]*apk.Package, error) {
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		return nil, err
+	}
+	defer root.Close()
+
+	var pkgs []*apk.Package
+	if err := fs.WalkDir(root.FS(), ".", func(path string, _ fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !strings.HasSuffix(path, ".apk") {
+			return nil
+		}
+
+		f, err := root.Open(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		stat, err := f.Stat()
+		if err != nil {
+			return err
+		}
+
+		pkg, err := apk.ParsePackage(ctx, f, uint64(stat.Size())) //nolint:gosec
+		if err != nil {
+			return err
+		}
+		pkgs = append(pkgs, pkg)
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	return pkgs, nil
 }
 
 func cmdApkLs() *cobra.Command {

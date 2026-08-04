@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "56fa2671e3823910",
+      "id": "248b39341d0bbdaf",
       "name": "abbrev",
       "version": "0.1.0",
       "type": "gem",
@@ -98,7 +98,7 @@
       }
     },
     {
-      "id": "d07b3528ac7db1cf",
+      "id": "e7f9a9f9af9936eb",
       "name": "backport9",
       "version": "1.13",
       "type": "java-archive",
@@ -184,7 +184,7 @@
       }
     },
     {
-      "id": "b11d893b62726552",
+      "id": "1e2c90148795ff4a",
       "name": "base64",
       "version": "0.1.1",
       "type": "gem",
@@ -274,7 +274,7 @@
       }
     },
     {
-      "id": "41b9e6f0b0683812",
+      "id": "cead27d7679e3dbf",
       "name": "bcpkix-jdk18on",
       "version": "1.74",
       "type": "java-archive",
@@ -9475,7 +9475,7 @@
       }
     },
     {
-      "id": "2d3b7663cb9a900a",
+      "id": "14bc2a07c451610a",
       "name": "bcprov-jdk18on",
       "version": "1.74",
       "type": "java-archive",
@@ -9489,38 +9489,7 @@
           }
         }
       ],
-      "licenses": [
-        {
-          "value": "sha256:156e0dd51df96c6c72bc9b9bfbc9e26d5da2c8bd2e731581da3631262d393be2",
-          "spdxExpression": "",
-          "type": "concluded",
-          "urls": [],
-          "locations": [
-            {
-              "path": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
-              "accessPath": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
-              "annotations": {
-                "evidence": "primary"
-              }
-            }
-          ]
-        },
-        {
-          "value": "sha256:f9e6b01128a66b9887432db0397034793bcb1667770990c27fd4fd04ffc0c12a",
-          "spdxExpression": "",
-          "type": "concluded",
-          "urls": [],
-          "locations": [
-            {
-              "path": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
-              "accessPath": "usr/share/jruby/lib/ruby/stdlib/org/bouncycastle/bcprov-jdk18on/1.74/bcprov-jdk18on-1.74.jar",
-              "annotations": {
-                "evidence": "primary"
-              }
-            }
-          ]
-        }
-      ],
+      "licenses": [],
       "language": "java",
       "cpes": [
         {
@@ -61977,7 +61946,7 @@
       }
     },
     {
-      "id": "1ae25c96e060fba5",
+      "id": "0930a717fdc38b20",
       "name": "bctls-jdk18on",
       "version": "1.74",
       "type": "java-archive",
@@ -71808,7 +71777,7 @@
       }
     },
     {
-      "id": "dabf6f4b4148887c",
+      "id": "eb05a7a2c18b4dd1",
       "name": "bcutil-jdk18on",
       "version": "1.74",
       "type": "java-archive",
@@ -77869,7 +77838,7 @@
       }
     },
     {
-      "id": "040d7447aa36c369",
+      "id": "38583750368b2aab",
       "name": "benchmark",
       "version": "0.2.0",
       "type": "gem",
@@ -77967,7 +77936,7 @@
       }
     },
     {
-      "id": "b7b8bbf28eac7011",
+      "id": "5746e8983cc903d7",
       "name": "bigdecimal",
       "version": "3.1.4",
       "type": "gem",
@@ -78082,7 +78051,7 @@
       }
     },
     {
-      "id": "0e575cd494826bfe",
+      "id": "d89b50f937158e1e",
       "name": "bundler",
       "version": "2.3.26",
       "type": "gem",
@@ -78578,7 +78547,7 @@
       }
     },
     {
-      "id": "c62f38838a697b2f",
+      "id": "e536dd43b6cafc62",
       "name": "cgi",
       "version": "0.3.6",
       "type": "gem",
@@ -78656,7 +78625,7 @@
       }
     },
     {
-      "id": "760d1ba6329640fb",
+      "id": "e306ce68d30d7f08",
       "name": "cparse-jruby",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -78723,7 +78692,7 @@
       }
     },
     {
-      "id": "ec40ea4ba8a077f8",
+      "id": "4b3933c81acde06d",
       "name": "csv",
       "version": "3.2.5",
       "type": "gem",
@@ -78858,7 +78827,7 @@
       }
     },
     {
-      "id": "667fef55a794882d",
+      "id": "44db437f997b3f12",
       "name": "date",
       "version": "3.3.3",
       "type": "gem",
@@ -78923,7 +78892,7 @@
       }
     },
     {
-      "id": "62740bb7b96eaba4",
+      "id": "8da7d672f2a27c92",
       "name": "debug",
       "version": "0.2.1",
       "type": "gem",
@@ -79019,7 +78988,7 @@
       }
     },
     {
-      "id": "9c9ba262cad43b54",
+      "id": "9d9e1856f53e2698",
       "name": "delegate",
       "version": "0.2.0",
       "type": "gem",
@@ -79116,7 +79085,7 @@
       }
     },
     {
-      "id": "a6dae24364a3bdf5",
+      "id": "fbd7d1ab13045586",
       "name": "did_you_mean",
       "version": "1.6.1",
       "type": "gem",
@@ -79306,7 +79275,7 @@
       }
     },
     {
-      "id": "93db99d8c2783866",
+      "id": "cf2f1993e1a97484",
       "name": "digest",
       "version": "3.1.0",
       "type": "gem",
@@ -79412,7 +79381,7 @@
       }
     },
     {
-      "id": "ca3b1fc509a28bf6",
+      "id": "8bcf3ac27ecda84d",
       "name": "digest",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -79459,7 +79428,7 @@
       }
     },
     {
-      "id": "81f84a4fe059dc07",
+      "id": "58de5f7905ec6fb7",
       "name": "dirgra",
       "version": "0.3",
       "type": "java-archive",
@@ -79547,7 +79516,7 @@
       }
     },
     {
-      "id": "7acbb34d77e319fb",
+      "id": "71341e717d22d8c8",
       "name": "drb",
       "version": "2.1.0",
       "type": "gem",
@@ -79650,7 +79619,7 @@
       }
     },
     {
-      "id": "24748926d66ad843",
+      "id": "f3cbaad151b7fd45",
       "name": "english",
       "version": "0.7.1",
       "type": "gem",
@@ -79747,7 +79716,7 @@
       }
     },
     {
-      "id": "9f9cbaf23607213b",
+      "id": "9ae6011781a6756b",
       "name": "erb",
       "version": "2.2.3",
       "type": "gem",
@@ -79847,7 +79816,7 @@
       }
     },
     {
-      "id": "7139b90ade7c130f",
+      "id": "20819d7f5f48b9b6",
       "name": "error_highlight",
       "version": "0.3.0",
       "type": "gem",
@@ -79971,7 +79940,7 @@
       }
     },
     {
-      "id": "53180d1afd5d5ed6",
+      "id": "4f5fb8d86faa6bed",
       "name": "escape",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -80018,7 +79987,7 @@
       }
     },
     {
-      "id": "9f9630ad9bce6291",
+      "id": "49aecf71555e5293",
       "name": "ffi",
       "version": "1.16.3",
       "type": "gem",
@@ -80198,7 +80167,7 @@
       }
     },
     {
-      "id": "b63c19b997e71fe2",
+      "id": "c365f83c549cc8fc",
       "name": "ffi-binary-libfixposix",
       "version": "0.5.1.1",
       "type": "gem",
@@ -80375,7 +80344,7 @@
       }
     },
     {
-      "id": "7c877448dfa71e83",
+      "id": "c4a8dc20e580c82d",
       "name": "ffi-bindings-libfixposix",
       "version": "0.5.1.0",
       "type": "gem",
@@ -80501,7 +80470,7 @@
       }
     },
     {
-      "id": "c26f0fee9ca32960",
+      "id": "c2a84a834a206199",
       "name": "fileutils",
       "version": "1.6.0",
       "type": "gem",
@@ -80577,7 +80546,7 @@
       }
     },
     {
-      "id": "2b18a142ba0d0074",
+      "id": "ff179a2483f22530",
       "name": "find",
       "version": "0.1.1",
       "type": "gem",
@@ -80674,7 +80643,7 @@
       }
     },
     {
-      "id": "077f86e8ace3292a",
+      "id": "bc807bd7e16c0bc7",
       "name": "forwardable",
       "version": "1.3.2",
       "type": "gem",
@@ -80764,7 +80733,7 @@
       }
     },
     {
-      "id": "06cb34f206cd0768",
+      "id": "acb10686e51bff25",
       "name": "generator",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -80811,7 +80780,7 @@
       }
     },
     {
-      "id": "ad61b0a4e5490efb",
+      "id": "c2f72fd655772c9f",
       "name": "getoptlong",
       "version": "0.1.1",
       "type": "gem",
@@ -80907,7 +80876,7 @@
       }
     },
     {
-      "id": "6e04b22756b0b917",
+      "id": "a67e0afe5d28378d",
       "name": "invokebinder",
       "version": "1.13",
       "type": "java-archive",
@@ -80994,7 +80963,7 @@
       }
     },
     {
-      "id": "0a67ea1f550fc98b",
+      "id": "8b996b41e7eeba2b",
       "name": "io-console",
       "version": "0.7.2",
       "type": "gem",
@@ -81133,7 +81102,7 @@
       }
     },
     {
-      "id": "3acd44807fa1df90",
+      "id": "4a94dcea22b34c14",
       "name": "io-wait",
       "version": "0.3.0",
       "type": "gem",
@@ -81282,7 +81251,7 @@
       }
     },
     {
-      "id": "54c08c1277e629f7",
+      "id": "f1cca4c50fcd80fd",
       "name": "ipaddr",
       "version": "1.2.4",
       "type": "gem",
@@ -81382,7 +81351,7 @@
       }
     },
     {
-      "id": "044d445815e00b78",
+      "id": "39e098b3c8df2ee7",
       "name": "irb",
       "version": "1.4.2",
       "type": "gem",
@@ -81534,7 +81503,7 @@
       }
     },
     {
-      "id": "7912ab5d691f33b9",
+      "id": "8a637a02e3f578f4",
       "name": "jar-dependencies",
       "version": "0.4.1",
       "type": "gem",
@@ -81681,7 +81650,7 @@
       }
     },
     {
-      "id": "0a70377d540e8314",
+      "id": "d1f8ca0f5ae22f87",
       "name": "jcodings",
       "version": "1.0.58",
       "type": "java-archive",
@@ -81768,7 +81737,7 @@
       }
     },
     {
-      "id": "98f881d1a04866f4",
+      "id": "355e3fb12e21e602",
       "name": "jffi",
       "version": "1.3.13",
       "type": "java-archive",
@@ -81877,7 +81846,7 @@
       }
     },
     {
-      "id": "7b1109fb645350d7",
+      "id": "7c9ba086d0287c93",
       "name": "jitescript",
       "version": "0.4.1",
       "type": "java-archive",
@@ -81957,7 +81926,7 @@
       }
     },
     {
-      "id": "bf59e8cc0d42baea",
+      "id": "ee3b1c6e44371d97",
       "name": "jline",
       "version": "2.14.6",
       "type": "java-archive",
@@ -82103,7 +82072,7 @@
       }
     },
     {
-      "id": "c5eaa70779e4798a",
+      "id": "3597802d63c9ac46",
       "name": "jnr-a64asm",
       "version": "1.0.0",
       "type": "java-archive",
@@ -82262,7 +82231,7 @@
       }
     },
     {
-      "id": "98ddefedff795b03",
+      "id": "5674a9c92459df5f",
       "name": "jnr-constants",
       "version": "0.10.4",
       "type": "java-archive",
@@ -82422,7 +82391,7 @@
       }
     },
     {
-      "id": "457ef76f2d585f1c",
+      "id": "6522ad56d2cb155c",
       "name": "jnr-enxio",
       "version": "0.32.17",
       "type": "java-archive",
@@ -82582,7 +82551,7 @@
       }
     },
     {
-      "id": "d70257516ceb910b",
+      "id": "0a072a74e375f14a",
       "name": "jnr-ffi",
       "version": "2.2.16",
       "type": "java-archive",
@@ -82742,7 +82711,7 @@
       }
     },
     {
-      "id": "3778a8199bee31ff",
+      "id": "fa03ea45c0618375",
       "name": "jnr-netdb",
       "version": "1.2.0",
       "type": "java-archive",
@@ -82902,7 +82871,7 @@
       }
     },
     {
-      "id": "7aab83aedd85a77e",
+      "id": "dacb52b6944cc161",
       "name": "jnr-posix",
       "version": "3.1.19",
       "type": "java-archive",
@@ -83095,7 +83064,7 @@
       }
     },
     {
-      "id": "193c25ca5b4a61fd",
+      "id": "ea5f5b9e5dd82917",
       "name": "jnr-unixsocket",
       "version": "0.38.22",
       "type": "java-archive",
@@ -83255,7 +83224,7 @@
       }
     },
     {
-      "id": "81e2194cce8fefb2",
+      "id": "05ff2db0af710970",
       "name": "jnr-x86asm",
       "version": "1.0.2",
       "type": "java-archive",
@@ -83415,7 +83384,7 @@
       }
     },
     {
-      "id": "cd53500293b0a779",
+      "id": "f3818bbe49bfa8a0",
       "name": "joda-time",
       "version": "2.12.7",
       "type": "java-archive",
@@ -83498,7 +83467,7 @@
       }
     },
     {
-      "id": "f9546ad400a0314b",
+      "id": "1db5235baa9d7a4c",
       "name": "joni",
       "version": "2.2.1",
       "type": "java-archive",
@@ -83585,7 +83554,7 @@
       }
     },
     {
-      "id": "0690fc6ad7e28850",
+      "id": "63a112571f61287a",
       "name": "jopenssl",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -83644,7 +83613,7 @@
       }
     },
     {
-      "id": "77af78e5973dfeda",
+      "id": "423aef6fc1a40865",
       "name": "jruby-9.4",
       "version": "9.4.7.0-r0",
       "type": "apk",
@@ -90414,7 +90383,7 @@
       }
     },
     {
-      "id": "ca3cac6d54c39b80",
+      "id": "561eec8470ab76df",
       "name": "jruby-base",
       "version": "9.4.7.0",
       "type": "java-archive",
@@ -90568,7 +90537,7 @@
       }
     },
     {
-      "id": "6034ce017f127564",
+      "id": "d17861af06ef3700",
       "name": "jruby-core",
       "version": "9.4.7.0",
       "type": "java-archive",
@@ -90644,7 +90613,7 @@
       }
     },
     {
-      "id": "2dcc79216489ad12",
+      "id": "b20deef6d2a7ed43",
       "name": "jruby-openssl",
       "version": "0.14.5",
       "type": "gem",
@@ -90848,7 +90817,7 @@
       }
     },
     {
-      "id": "c556c086c58824e7",
+      "id": "534504ff00fff859",
       "name": "jruby-openssl",
       "version": "0.14.5",
       "type": "java-archive",
@@ -90965,7 +90934,7 @@
       }
     },
     {
-      "id": "d0c0eb2fff591a9c",
+      "id": "416c3733ea69f912",
       "name": "jruby-readline",
       "version": "1.3.7",
       "type": "gem",
@@ -91116,7 +91085,7 @@
       }
     },
     {
-      "id": "f301610243639750",
+      "id": "321d9f04563e9421",
       "name": "jruby-readline",
       "version": "1.3.7",
       "type": "java-archive",
@@ -91233,7 +91202,7 @@
       }
     },
     {
-      "id": "5533782db2ad1f26",
+      "id": "6843a7e769204234",
       "name": "json",
       "version": "2.7.1",
       "type": "gem",
@@ -91268,6 +91237,10 @@
       "cpes": [
         {
           "cpe": "cpe:2.3:a:json_project:json:2.7.1:*:*:*:*:ruby:*:*",
+          "source": "nvd-cpe-dictionary"
+        },
+        {
+          "cpe": "cpe:2.3:a:ruby-lang:json:2.7.1:*:*:*:*:ruby:*:*",
           "source": "nvd-cpe-dictionary"
         }
       ],
@@ -91310,7 +91283,7 @@
       }
     },
     {
-      "id": "eca144c9b6414b46",
+      "id": "8a7cb5d15755594a",
       "name": "jzlib",
       "version": "1.1.5",
       "type": "java-archive",
@@ -91398,7 +91371,7 @@
       }
     },
     {
-      "id": "956850cfb2f7a12a",
+      "id": "073b18c1c021789e",
       "name": "logger",
       "version": "1.5.1",
       "type": "gem",
@@ -91502,7 +91475,7 @@
       }
     },
     {
-      "id": "f17cd4449783f7c3",
+      "id": "687e37fabe1807f5",
       "name": "matrix",
       "version": "0.4.2",
       "type": "gem",
@@ -91587,7 +91560,7 @@
       }
     },
     {
-      "id": "7c22103cf00ccff6",
+      "id": "bff479b7c4e1a989",
       "name": "minitest",
       "version": "5.15.0",
       "type": "gem",
@@ -91666,7 +91639,7 @@
       }
     },
     {
-      "id": "53c6a7e75f54dfec",
+      "id": "47424b1751b44b15",
       "name": "mutex_m",
       "version": "0.1.1",
       "type": "gem",
@@ -91799,7 +91772,7 @@
       }
     },
     {
-      "id": "d6292411f2709cb1",
+      "id": "68001cf0d36244c9",
       "name": "net-ftp",
       "version": "0.1.3",
       "type": "gem",
@@ -91924,7 +91897,7 @@
       }
     },
     {
-      "id": "c6d5f07f66d66d37",
+      "id": "d235a972db5d7435",
       "name": "net-http",
       "version": "0.3.0",
       "type": "gem",
@@ -92074,7 +92047,7 @@
       }
     },
     {
-      "id": "ee043d2b08b8b1fc",
+      "id": "fa47c11fdf4d81c1",
       "name": "net-imap",
       "version": "0.2.3",
       "type": "gem",
@@ -92139,7 +92112,7 @@
       }
     },
     {
-      "id": "2771219d7d2409b9",
+      "id": "5194ffd0a5713cca",
       "name": "net-pop",
       "version": "0.1.1",
       "type": "gem",
@@ -92264,7 +92237,7 @@
       }
     },
     {
-      "id": "3c5e85a82e53fdfd",
+      "id": "24f7bd7325a1e19d",
       "name": "net-protocol",
       "version": "0.1.2",
       "type": "gem",
@@ -92402,7 +92375,7 @@
       }
     },
     {
-      "id": "dff65eddcf463d46",
+      "id": "ad5bc4f74e70b166",
       "name": "net-smtp",
       "version": "0.3.1",
       "type": "gem",
@@ -92527,7 +92500,7 @@
       }
     },
     {
-      "id": "9acba0f851738dcb",
+      "id": "57cb8c3264801d3e",
       "name": "nkf",
       "version": "0.2.0",
       "type": "gem",
@@ -92680,7 +92653,7 @@
       }
     },
     {
-      "id": "e92dbf6abeb30a01",
+      "id": "23379aa04ecd9a5e",
       "name": "nkf",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -92727,7 +92700,7 @@
       }
     },
     {
-      "id": "54bfcf6d58a251d9",
+      "id": "0c8624511dd509aa",
       "name": "observer",
       "version": "0.1.1",
       "type": "gem",
@@ -92824,7 +92797,7 @@
       }
     },
     {
-      "id": "29a96061cdd4e1ff",
+      "id": "7529321f5e7a3132",
       "name": "open-uri",
       "version": "0.3.0",
       "type": "gem",
@@ -92954,7 +92927,7 @@
       }
     },
     {
-      "id": "b9aa8419b45b2b69",
+      "id": "9beddfc1f04a3740",
       "name": "open3",
       "version": "0.1.2",
       "type": "gem",
@@ -93055,7 +93028,7 @@
       }
     },
     {
-      "id": "372502c6772e5448",
+      "id": "9d654bed77b85451",
       "name": "options",
       "version": "1.6",
       "type": "java-archive",
@@ -93142,7 +93115,7 @@
       }
     },
     {
-      "id": "7e936a2405bd93fa",
+      "id": "4f0e3e81b0180a31",
       "name": "optparse",
       "version": "0.2.0",
       "type": "gem",
@@ -93302,7 +93275,7 @@
       }
     },
     {
-      "id": "0d4280525b81b1bf",
+      "id": "e215d772daaf7352",
       "name": "ostruct",
       "version": "0.5.5",
       "type": "gem",
@@ -93398,7 +93371,7 @@
       }
     },
     {
-      "id": "0574714b5d2a9798",
+      "id": "a9d4831a65b9010a",
       "name": "parser",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -93445,7 +93418,7 @@
       }
     },
     {
-      "id": "d52ae968a676b5bd",
+      "id": "0a3e554d9e84950c",
       "name": "power_assert",
       "version": "2.0.1",
       "type": "gem",
@@ -93573,7 +93546,7 @@
       }
     },
     {
-      "id": "0ddf9996251347f3",
+      "id": "7d47e95b9c405964",
       "name": "pp",
       "version": "0.3.0",
       "type": "gem",
@@ -93663,7 +93636,7 @@
       }
     },
     {
-      "id": "a54f76c5ca45650f",
+      "id": "2669c8e652b0a2f3",
       "name": "prettyprint",
       "version": "0.1.1",
       "type": "gem",
@@ -93760,7 +93733,7 @@
       }
     },
     {
-      "id": "a307c7d029905f30",
+      "id": "8bfe52601ace1e69",
       "name": "prime",
       "version": "0.1.2",
       "type": "gem",
@@ -93845,7 +93818,7 @@
       }
     },
     {
-      "id": "d1ea8fd6a583384c",
+      "id": "25e4e3f0a85c7da5",
       "name": "pstore",
       "version": "0.1.1",
       "type": "gem",
@@ -93942,7 +93915,7 @@
       }
     },
     {
-      "id": "7f241cef373bff69",
+      "id": "bd0305eba86efc06",
       "name": "psych",
       "version": "5.1.1.1",
       "type": "gem",
@@ -94090,7 +94063,7 @@
       }
     },
     {
-      "id": "07451d4a303dd21b",
+      "id": "2261f233c42807c5",
       "name": "psych",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -94137,7 +94110,7 @@
       }
     },
     {
-      "id": "245b0518b29a8cf6",
+      "id": "afaa6ebc78f5a16f",
       "name": "racc",
       "version": "1.6.0",
       "type": "gem",
@@ -94269,7 +94242,7 @@
       }
     },
     {
-      "id": "7cdb69bd9fb78310",
+      "id": "49af2b64ca27d3bd",
       "name": "rake",
       "version": "13.0.6",
       "type": "gem",
@@ -94324,7 +94297,7 @@
       }
     },
     {
-      "id": "19f8383aff9f9e6c",
+      "id": "5efcd664661b14da",
       "name": "rake-ant",
       "version": "1.0.6",
       "type": "gem",
@@ -94472,7 +94445,7 @@
       }
     },
     {
-      "id": "c9b982df1c7126aa",
+      "id": "bbc2604777236f31",
       "name": "rdoc",
       "version": "6.4.1.1",
       "type": "gem",
@@ -94724,7 +94697,7 @@
       }
     },
     {
-      "id": "94b80ad56435c328",
+      "id": "3de6575dab7ca43c",
       "name": "readline",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -94783,7 +94756,7 @@
       }
     },
     {
-      "id": "bae8121b2e6c063c",
+      "id": "47824fa6974bf664",
       "name": "reline",
       "version": "0.4.2",
       "type": "gem",
@@ -94874,7 +94847,7 @@
       }
     },
     {
-      "id": "2047e6b92a3de00b",
+      "id": "9857d54f46ac5907",
       "name": "resolv",
       "version": "0.4.0",
       "type": "gem",
@@ -94959,7 +94932,7 @@
       }
     },
     {
-      "id": "a8c5f61d9c6a04fb",
+      "id": "19a24d37b65d86e1",
       "name": "resolv-replace",
       "version": "0.1.0",
       "type": "gem",
@@ -95095,7 +95068,7 @@
       }
     },
     {
-      "id": "50ec1b58fe12f737",
+      "id": "bec6fda91ed76914",
       "name": "rexml",
       "version": "3.2.5",
       "type": "gem",
@@ -95162,7 +95135,7 @@
       }
     },
     {
-      "id": "344ce7525f87dca0",
+      "id": "67f0386fa6444bf5",
       "name": "rinda",
       "version": "0.1.1",
       "type": "gem",
@@ -95261,7 +95234,7 @@
       }
     },
     {
-      "id": "d27cff8ef932cf78",
+      "id": "f6bffa027acb97a0",
       "name": "rss",
       "version": "0.2.9",
       "type": "gem",
@@ -95331,7 +95304,7 @@
       }
     },
     {
-      "id": "cb577c58a5bb8585",
+      "id": "fa0380d2068da42f",
       "name": "ruby2_keywords",
       "version": "0.0.5",
       "type": "gem",
@@ -95467,7 +95440,7 @@
       }
     },
     {
-      "id": "b8205e625bb0ea65",
+      "id": "34d14609808063f5",
       "name": "rubygems-update",
       "version": "3.3.26",
       "type": "gem",
@@ -96296,7 +96269,7 @@
       }
     },
     {
-      "id": "6c5694198564e4bc",
+      "id": "a4515f76b9843efa",
       "name": "securerandom",
       "version": "0.2.0",
       "type": "gem",
@@ -96395,7 +96368,7 @@
       }
     },
     {
-      "id": "69a3add1df46961b",
+      "id": "a5750dcca4e782c1",
       "name": "shellwords",
       "version": "0.1.0",
       "type": "gem",
@@ -96492,7 +96465,7 @@
       }
     },
     {
-      "id": "fa6326c15e040f55",
+      "id": "312e78c327387575",
       "name": "singleton",
       "version": "0.1.1",
       "type": "gem",
@@ -96589,7 +96562,7 @@
       }
     },
     {
-      "id": "1b21aa01656f7670",
+      "id": "6720b88a8fe90d19",
       "name": "snakeyaml-engine",
       "version": "2.7",
       "type": "java-archive",
@@ -96606,7 +96579,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -96788,7 +96761,7 @@
       }
     },
     {
-      "id": "3f0e120670ca99bc",
+      "id": "e25fec47aafcfacf",
       "name": "stringio",
       "version": "3.0.8",
       "type": "gem",
@@ -96887,7 +96860,7 @@
       }
     },
     {
-      "id": "071fec914e5d69a3",
+      "id": "5a4d66df139fb069",
       "name": "stringio",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -96934,7 +96907,7 @@
       }
     },
     {
-      "id": "b87dd8fe3ab2ac83",
+      "id": "4fd8dc0003659f5b",
       "name": "strscan",
       "version": "3.1.0",
       "type": "gem",
@@ -97043,7 +97016,7 @@
       }
     },
     {
-      "id": "99dd0533f450d0ea",
+      "id": "1de9cc82d9a91803",
       "name": "strscan",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -97090,7 +97063,7 @@
       }
     },
     {
-      "id": "4ac8d8bc5aff5f40",
+      "id": "2cd96419b1d00613",
       "name": "subspawn",
       "version": "0.1.1",
       "type": "gem",
@@ -97209,7 +97182,7 @@
       }
     },
     {
-      "id": "18b74a527dcff8a9",
+      "id": "37d47381505903b8",
       "name": "subspawn-posix",
       "version": "0.1.1",
       "type": "gem",
@@ -97370,7 +97343,7 @@
       }
     },
     {
-      "id": "4a4d507cc6da17ea",
+      "id": "e3bd03aa9d4b018b",
       "name": "test-unit",
       "version": "3.5.3",
       "type": "gem",
@@ -97527,7 +97500,7 @@
       }
     },
     {
-      "id": "dec51383f124c8ad",
+      "id": "de976e432fb162c2",
       "name": "time",
       "version": "0.2.2",
       "type": "gem",
@@ -97605,7 +97578,7 @@
       }
     },
     {
-      "id": "00dd59269a89fc5b",
+      "id": "c56531309839e114",
       "name": "timeout",
       "version": "0.3.2",
       "type": "gem",
@@ -97697,7 +97670,7 @@
       }
     },
     {
-      "id": "8297995d9a2918f9",
+      "id": "6eabe1d9d554c082",
       "name": "tsort",
       "version": "0.1.0",
       "type": "gem",
@@ -97794,7 +97767,7 @@
       }
     },
     {
-      "id": "ccc43a031bf98c3c",
+      "id": "4fd8c168c78d8d67",
       "name": "un",
       "version": "0.2.0",
       "type": "gem",
@@ -97890,7 +97863,7 @@
       }
     },
     {
-      "id": "6108c8fad04008c2",
+      "id": "d2b552b8077efd63",
       "name": "uri",
       "version": "0.12.2",
       "type": "gem",
@@ -97982,7 +97955,7 @@
       }
     },
     {
-      "id": "d51bfd47d9abf7bb",
+      "id": "fcc3f8e58a4cd449",
       "name": "wait",
       "version": "UNKNOWN",
       "type": "java-archive",
@@ -98029,7 +98002,7 @@
       }
     },
     {
-      "id": "7509de29d6064474",
+      "id": "9ab40b77c6b266ab",
       "name": "weakref",
       "version": "0.1.1",
       "type": "gem",
@@ -98126,7 +98099,7 @@
       }
     },
     {
-      "id": "39275e0eaeecc4d4",
+      "id": "09ef75d0f479ed06",
       "name": "yaml",
       "version": "0.2.0",
       "type": "gem",

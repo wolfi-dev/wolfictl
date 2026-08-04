@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -822,6 +823,28 @@ func (g Graph) NodesByName(name string) (pkgs []Package, err error) {
 	return
 }
 
+// fileURI converts a local filesystem path into a file:// URI. It mirrors the
+// behavior of the uri.New/uri.File helpers that were removed in
+// go.lsp.dev/uri v1.0.1: an input that is already a file:// URI is returned
+// unchanged, otherwise the path is made absolute and rendered as a file:// URL.
+func fileURI(s string) uri.URI {
+	if u, err := url.PathUnescape(s); err == nil {
+		s = u
+	}
+
+	if strings.HasPrefix(s, "file://") {
+		return uri.URI(s)
+	}
+
+	p := s
+	if abs, err := filepath.Abs(p); err == nil {
+		p = abs
+	}
+
+	u := url.URL{Scheme: "file", Path: filepath.ToSlash(p)}
+	return uri.URI(u.String())
+}
+
 func getKeyMaterial(key string) ([]byte, error) {
 	var (
 		b     []byte
@@ -834,7 +857,7 @@ func getKeyMaterial(key string) ([]byte, error) {
 			return nil, fmt.Errorf("failed to parse key %s as URI: %w", key, err)
 		}
 	} else {
-		asURI = uri.New(key)
+		asURI = fileURI(key)
 	}
 	asURL, err := url.Parse(string(asURI))
 	if err != nil {

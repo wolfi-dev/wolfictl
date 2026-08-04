@@ -148,8 +148,18 @@ func (p *Packages) addProvides(c *Configuration, provides []string) error {
 //
 // The repetition of the path is necessary because of how the upstream parser in
 // melange requires the full path to the directory to be passed in.
-func NewPackages(ctx context.Context, fsys fs.FS, dirPath string, pipelineDirs []string) (*Packages, error) {
+//
+// See WithCompileOnly to limit the (dominant) cost of compiling definitions to
+// a subset of the packages.
+func NewPackages(ctx context.Context, fsys fs.FS, dirPath string, pipelineDirs []string, opts ...PackagesOption) (*Packages, error) {
 	log := clog.FromContext(ctx)
+
+	var options packagesOptions
+	for _, opt := range opts {
+		if err := opt(&options); err != nil {
+			return nil, err
+		}
+	}
 
 	pkgs := &Packages{
 		configs:  make(map[string][]*Configuration),
@@ -237,6 +247,15 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath string, pipelineDirs [
 
 				// TODO: resolve deps via `uses` for subpackage pipelines.
 			}
+			// Everything this definition contributes to the local index -- the
+			// package, its subpackages and its provides -- is registered above,
+			// before compiling, so skipping the compile below leaves resolution
+			// unaffected.
+			if _, ok := options.compileOnly[name]; options.compileOnly != nil && !ok {
+				log.With("package", name).Debug("skipping compile, not in the compile-only set")
+				return nil
+			}
+
 			// Resolve all `uses` used by the pipeline. This updates the set of
 			// .environment.contents.packages so the next block can include those as build deps.
 			build := &build.Build{

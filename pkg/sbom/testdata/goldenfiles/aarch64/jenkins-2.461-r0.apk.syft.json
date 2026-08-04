@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "7e2415fd15716c36",
+      "id": "7ce3c2ba2ff64ec2",
       "name": "access-modifier-annotation",
       "version": "1.33",
       "type": "java-archive",
@@ -158,7 +158,7 @@
       }
     },
     {
-      "id": "0b3143e2880aa799",
+      "id": "b6d5db75ae413423",
       "name": "angus-activation",
       "version": "2.0.2",
       "type": "java-archive",
@@ -175,7 +175,7 @@
       "licenses": [
         {
           "value": "http://www.eclipse.org/org/documents/edl-v10.php",
-          "spdxExpression": "",
+          "spdxExpression": "BSD-3-Clause",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -397,7 +397,7 @@
       }
     },
     {
-      "id": "46635c7fa37f04c4",
+      "id": "e268c544d5e599a9",
       "name": "angus-core",
       "version": "2.0.3",
       "type": "java-archive",
@@ -501,7 +501,7 @@
       }
     },
     {
-      "id": "11d0edebb129bd42",
+      "id": "01df05ae67f2f81b",
       "name": "angus-mail",
       "version": "2.0.3",
       "type": "java-archive",
@@ -743,7 +743,7 @@
       }
     },
     {
-      "id": "d4df100da9cd7279",
+      "id": "fe4a44049a0eeec3",
       "name": "annotation-indexer",
       "version": "1.17",
       "type": "java-archive",
@@ -880,7 +880,7 @@
       }
     },
     {
-      "id": "d6fbb285a7a1986a",
+      "id": "345851efd9a0bc90",
       "name": "annotation-indexer",
       "version": "1.17",
       "type": "java-archive",
@@ -995,7 +995,7 @@
       }
     },
     {
-      "id": "c4b5c9e14222c957",
+      "id": "208b4678976bc328",
       "name": "ant",
       "version": "1.10.14",
       "type": "java-archive",
@@ -1102,7 +1102,7 @@
       }
     },
     {
-      "id": "2bd740955bf84b63",
+      "id": "c56c0673ab7b2cc6",
       "name": "ant-launcher",
       "version": "1.10.14",
       "type": "java-archive",
@@ -1181,7 +1181,7 @@
       }
     },
     {
-      "id": "5e6a84fbb273d652",
+      "id": "14ef394756182944",
       "name": "antisamy-markup-formatter",
       "version": "162.v0e6ec0fcfcf6",
       "type": "jenkins-plugin",
@@ -1416,7 +1416,7 @@
       }
     },
     {
-      "id": "e925fdcce6c47455",
+      "id": "338e133d628aaef5",
       "name": "antisamy-markup-formatter",
       "version": "162.v0e6ec0fcfcf6",
       "type": "jenkins-plugin",
@@ -1651,7 +1651,7 @@
       }
     },
     {
-      "id": "2da3962c890b153b",
+      "id": "dc95eb8708bfa104",
       "name": "antlr4-runtime",
       "version": "4.13.1",
       "type": "java-archive",
@@ -1846,7 +1846,7 @@
       }
     },
     {
-      "id": "b746beed8b51c077",
+      "id": "8373261f760b18d7",
       "name": "apache-httpcomponents-client-4-api",
       "version": "4.5.14-208.v438351942757",
       "type": "jenkins-plugin",
@@ -2017,7 +2017,7 @@
       }
     },
     {
-      "id": "d48e8ac72eeb2f84",
+      "id": "6eabf68e35ffe1a5",
       "name": "apache-httpcomponents-client-4-api",
       "version": "4.5.14-208.v438351942757",
       "type": "jenkins-plugin",
@@ -2188,7 +2188,7 @@
       }
     },
     {
-      "id": "712f83c1f1703df1",
+      "id": "29c952c58d7733bf",
       "name": "args4j",
       "version": "2.33",
       "type": "java-archive",
@@ -2338,7 +2338,7 @@
       }
     },
     {
-      "id": "1c469a8da107be20",
+      "id": "b64e3fc84f8ce34e",
       "name": "args4j",
       "version": "2.33",
       "type": "java-archive",
@@ -2386,7 +2386,7 @@
       }
     },
     {
-      "id": "3f0972c08c0cb03d",
+      "id": "7315d40e0fcfc98b",
       "name": "asm",
       "version": "9.7",
       "type": "java-archive",
@@ -2493,7 +2493,7 @@
       }
     },
     {
-      "id": "30a287cafe762dc8",
+      "id": "756fd94744c7662e",
       "name": "asm-analysis",
       "version": "9.7",
       "type": "java-archive",
@@ -2736,7 +2736,7 @@
       }
     },
     {
-      "id": "0150cd1c6d13fa04",
+      "id": "094215db2dc26c93",
       "name": "asm-api",
       "version": "9.7-33.v4d23ef79fcc8",
       "type": "jenkins-plugin",
@@ -2939,7 +2939,7 @@
       }
     },
     {
-      "id": "c4ee82d882020956",
+      "id": "537d2229e42c33d4",
       "name": "asm-api",
       "version": "9.7-33.v4d23ef79fcc8",
       "type": "jenkins-plugin",
@@ -3142,7 +3142,7 @@
       }
     },
     {
-      "id": "8e3aacba227181ec",
+      "id": "6ae141cf986dc625",
       "name": "asm-commons",
       "version": "9.7",
       "type": "java-archive",
@@ -3341,7 +3341,7 @@
       }
     },
     {
-      "id": "fee2e41a949df5ae",
+      "id": "321f41271dd6ba22",
       "name": "asm-tree",
       "version": "9.7",
       "type": "java-archive",
@@ -3540,7 +3540,7 @@
       }
     },
     {
-      "id": "444d311782db4130",
+      "id": "1046120e02983304",
       "name": "asm-util",
       "version": "9.7",
       "type": "java-archive",
@@ -3739,7 +3739,7 @@
       }
     },
     {
-      "id": "5098ceea720752fd",
+      "id": "428105739ea74309",
       "name": "bcpkix-jdk18on",
       "version": "1.78.1",
       "type": "java-archive",
@@ -12958,7 +12958,7 @@
       }
     },
     {
-      "id": "040227257270aca7",
+      "id": "0c32c9aec776addf",
       "name": "bcprov-jdk18on",
       "version": "1.78.1",
       "type": "java-archive",
@@ -12972,38 +12972,7 @@
           }
         }
       ],
-      "licenses": [
-        {
-          "value": "sha256:156e0dd51df96c6c72bc9b9bfbc9e26d5da2c8bd2e731581da3631262d393be2",
-          "spdxExpression": "",
-          "type": "concluded",
-          "urls": [],
-          "locations": [
-            {
-              "path": "usr/share/java/jenkins/jenkins.war",
-              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/detached-plugins/bouncycastle-api.hpi:WEB-INF/optional-lib/bcprov-jdk18on-1.78.1.jar",
-              "annotations": {
-                "evidence": "primary"
-              }
-            }
-          ]
-        },
-        {
-          "value": "sha256:f9e6b01128a66b9887432db0397034793bcb1667770990c27fd4fd04ffc0c12a",
-          "spdxExpression": "",
-          "type": "concluded",
-          "urls": [],
-          "locations": [
-            {
-              "path": "usr/share/java/jenkins/jenkins.war",
-              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/detached-plugins/bouncycastle-api.hpi:WEB-INF/optional-lib/bcprov-jdk18on-1.78.1.jar",
-              "annotations": {
-                "evidence": "primary"
-              }
-            }
-          ]
-        }
-      ],
+      "licenses": [],
       "language": "java",
       "cpes": [
         {
@@ -66802,7 +66771,7 @@
       }
     },
     {
-      "id": "0797426b10a9c086",
+      "id": "8b0de8a574b75e3f",
       "name": "bcutil-jdk18on",
       "version": "1.78.1",
       "type": "java-archive",
@@ -73051,7 +73020,7 @@
       }
     },
     {
-      "id": "744fa39a116c6083",
+      "id": "aea6694f8312c89f",
       "name": "bootstrap5-api",
       "version": "5.3.3-1",
       "type": "jenkins-plugin",
@@ -73254,7 +73223,7 @@
       }
     },
     {
-      "id": "705d072f893cfb7e",
+      "id": "fd4e24cc26260204",
       "name": "bootstrap5-api",
       "version": "5.3.3-1",
       "type": "jenkins-plugin",
@@ -73457,7 +73426,7 @@
       }
     },
     {
-      "id": "165035d704c733a4",
+      "id": "5216a4f424196311",
       "name": "bouncycastle-api",
       "version": "2.30.1.78.1-233.vfdcdeb_0a_08a_a_",
       "type": "jenkins-plugin",
@@ -73680,7 +73649,7 @@
       }
     },
     {
-      "id": "d1c83d900760fb35",
+      "id": "ece9db9fdf13fa91",
       "name": "bouncycastle-api",
       "version": "2.30.1.78.1-233.vfdcdeb_0a_08a_a_",
       "type": "jenkins-plugin",
@@ -73903,7 +73872,7 @@
       }
     },
     {
-      "id": "70d3505ea7c15bcd",
+      "id": "6ff57575fd4f3bd2",
       "name": "bridge-method-annotation",
       "version": "1.29",
       "type": "java-archive",
@@ -74068,7 +74037,7 @@
       }
     },
     {
-      "id": "5c2a9d682b9b6088",
+      "id": "347c38d889b70824",
       "name": "byte-buddy",
       "version": "1.14.9",
       "type": "java-archive",
@@ -74239,7 +74208,7 @@
       }
     },
     {
-      "id": "6c774c7b8d49c6b0",
+      "id": "faf465adad1f28b1",
       "name": "caffeine",
       "version": "3.1.8",
       "type": "java-archive",
@@ -74414,7 +74383,7 @@
       }
     },
     {
-      "id": "b5d428987b71dba9",
+      "id": "d0e9ee6f651a4c69",
       "name": "caffeine-api",
       "version": "3.1.8-133.v17b_1ff2e0599",
       "type": "jenkins-plugin",
@@ -74617,7 +74586,7 @@
       }
     },
     {
-      "id": "2af50daa2bfbd577",
+      "id": "4fcf0b9e3323dc3d",
       "name": "caffeine-api",
       "version": "3.1.8-133.v17b_1ff2e0599",
       "type": "jenkins-plugin",
@@ -74820,7 +74789,7 @@
       }
     },
     {
-      "id": "c2a930f9b190319e",
+      "id": "6b356df958ae418a",
       "name": "checks-api",
       "version": "2.2.0",
       "type": "jenkins-plugin",
@@ -75023,7 +74992,7 @@
       }
     },
     {
-      "id": "ec3bb3803d9aefda",
+      "id": "9dc81506c92be479",
       "name": "checks-api",
       "version": "2.2.0",
       "type": "jenkins-plugin",
@@ -75226,7 +75195,7 @@
       }
     },
     {
-      "id": "dca7d1b347eebbeb",
+      "id": "fa15de6732a68647",
       "name": "cli",
       "version": "2.461",
       "type": "java-archive",
@@ -75387,7 +75356,7 @@
       }
     },
     {
-      "id": "8a5b625d234e3aaa",
+      "id": "b81622fb6f713209",
       "name": "command-launcher",
       "version": "107.v773860566e2e",
       "type": "jenkins-plugin",
@@ -75606,7 +75575,7 @@
       }
     },
     {
-      "id": "bc5addf9a07eec49",
+      "id": "111a53c3c684b092",
       "name": "command-launcher",
       "version": "107.v773860566e2e",
       "type": "jenkins-plugin",
@@ -75825,7 +75794,7 @@
       }
     },
     {
-      "id": "2edc5fbcb8826135",
+      "id": "ed05a74901e04863",
       "name": "commons-beanutils",
       "version": "1.9.4",
       "type": "java-archive",
@@ -76025,7 +75994,7 @@
       }
     },
     {
-      "id": "8a7cc7d06fe3b94b",
+      "id": "87e2196e8576cf2f",
       "name": "commons-codec",
       "version": "1.17.0",
       "type": "java-archive",
@@ -76205,7 +76174,7 @@
       }
     },
     {
-      "id": "bfcd14c26dcb460b",
+      "id": "e7cb7fde3f3a33df",
       "name": "commons-collections",
       "version": "3.2.2",
       "type": "java-archive",
@@ -76222,7 +76191,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -76409,7 +76378,7 @@
       }
     },
     {
-      "id": "98b86700daae2898",
+      "id": "ef1f58fde5959a58",
       "name": "commons-compress",
       "version": "1.26.1",
       "type": "java-archive",
@@ -76617,7 +76586,7 @@
       }
     },
     {
-      "id": "b43dc1b26d008d7d",
+      "id": "77de1d58f315be7c",
       "name": "commons-discovery",
       "version": "0.5",
       "type": "java-archive",
@@ -76634,7 +76603,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -76809,7 +76778,7 @@
       }
     },
     {
-      "id": "1f2f55cb07dc0a93",
+      "id": "d95812cc3d9ccdfe",
       "name": "commons-fileupload2-core",
       "version": "2.0.0-M2",
       "type": "java-archive",
@@ -77000,7 +76969,7 @@
       }
     },
     {
-      "id": "8e3f4377d5b69607",
+      "id": "20e0f5032c0f2e9d",
       "name": "commons-fileupload2-javax",
       "version": "2.0.0-M2",
       "type": "java-archive",
@@ -77191,7 +77160,7 @@
       }
     },
     {
-      "id": "9f937ec2872be4fd",
+      "id": "eb16e4dae47c98d4",
       "name": "commons-io",
       "version": "2.16.1",
       "type": "java-archive",
@@ -77249,7 +77218,7 @@
       }
     },
     {
-      "id": "e22f895631a3ec31",
+      "id": "ab949d161d9d3a77",
       "name": "commons-io",
       "version": "2.16.1",
       "type": "java-archive",
@@ -77429,7 +77398,7 @@
       }
     },
     {
-      "id": "ca1b28e58f8a6ae3",
+      "id": "79fd0a9aa21f6618",
       "name": "commons-jelly",
       "version": "1.1-jenkins-20240510",
       "type": "java-archive",
@@ -77576,7 +77545,7 @@
       }
     },
     {
-      "id": "a43a769404bdf924",
+      "id": "8686f5e98ddfa14d",
       "name": "commons-jelly-tags-define",
       "version": "1.1-jenkins-20240510",
       "type": "java-archive",
@@ -77755,7 +77724,7 @@
       }
     },
     {
-      "id": "181c7cbbe4a9969d",
+      "id": "e549c586e78a047c",
       "name": "commons-jelly-tags-fmt",
       "version": "1.0",
       "type": "java-archive",
@@ -77926,7 +77895,7 @@
       }
     },
     {
-      "id": "a2c11c77e8f163a8",
+      "id": "d9b6c99c5b4a5cc1",
       "name": "commons-jelly-tags-xml",
       "version": "1.1",
       "type": "java-archive",
@@ -78097,7 +78066,7 @@
       }
     },
     {
-      "id": "130c30a7088a45fc",
+      "id": "5080c456d71c9828",
       "name": "commons-jexl",
       "version": "1.1-jenkins-20111212",
       "type": "java-archive",
@@ -78234,7 +78203,7 @@
       }
     },
     {
-      "id": "14c102e5e7b178df",
+      "id": "5e6f902b11d7cbe9",
       "name": "commons-lang",
       "version": "2.6",
       "type": "java-archive",
@@ -78292,7 +78261,7 @@
       }
     },
     {
-      "id": "320d546a30b851ab",
+      "id": "20d7d134cec84cbd",
       "name": "commons-lang",
       "version": "2.6",
       "type": "java-archive",
@@ -78309,7 +78278,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -78480,7 +78449,7 @@
       }
     },
     {
-      "id": "d3f0e3a6ba317443",
+      "id": "106ad79954d30dbe",
       "name": "commons-lang3",
       "version": "3.13.0",
       "type": "java-archive",
@@ -78656,7 +78625,7 @@
       }
     },
     {
-      "id": "67dcfbcf217b0b13",
+      "id": "3cdff8e754d818dc",
       "name": "commons-lang3-api",
       "version": "3.13.0-62.v7d18e55f51e2",
       "type": "jenkins-plugin",
@@ -78891,7 +78860,7 @@
       }
     },
     {
-      "id": "1246fea9df4d5eb8",
+      "id": "bd4ccf11df1d31a9",
       "name": "commons-lang3-api",
       "version": "3.13.0-62.v7d18e55f51e2",
       "type": "jenkins-plugin",
@@ -79126,7 +79095,7 @@
       }
     },
     {
-      "id": "f541c9e1b366c2f4",
+      "id": "9596a6c445b8fcba",
       "name": "commons-text",
       "version": "1.11.0",
       "type": "java-archive",
@@ -79310,7 +79279,7 @@
       }
     },
     {
-      "id": "35a668792ea9539e",
+      "id": "3f1df8a0fc02ba40",
       "name": "commons-text-api",
       "version": "1.11.0-109.vfe16c66636eb_",
       "type": "jenkins-plugin",
@@ -79541,7 +79510,7 @@
       }
     },
     {
-      "id": "9908a08fd6bc240e",
+      "id": "b2bd23178d81b919",
       "name": "commons-text-api",
       "version": "1.11.0-109.vfe16c66636eb_",
       "type": "jenkins-plugin",
@@ -79772,7 +79741,7 @@
       }
     },
     {
-      "id": "bbbed477d93ca638",
+      "id": "0ab4d90a67ef4e24",
       "name": "constant-pool-scanner",
       "version": "1.2",
       "type": "java-archive",
@@ -79932,7 +79901,7 @@
       }
     },
     {
-      "id": "f7686942c9ab66fe",
+      "id": "fa1493ee95d28a92",
       "name": "crypto-util",
       "version": "1.9",
       "type": "java-archive",
@@ -80089,7 +80058,7 @@
       }
     },
     {
-      "id": "cc80901b75a3a819",
+      "id": "3c28663b58373918",
       "name": "display-url-api",
       "version": "2.204.vf6fddd8a_8b_e9",
       "type": "jenkins-plugin",
@@ -80320,7 +80289,7 @@
       }
     },
     {
-      "id": "f7975e92278241ba",
+      "id": "27414abf8d7a41cd",
       "name": "display-url-api",
       "version": "2.204.vf6fddd8a_8b_e9",
       "type": "jenkins-plugin",
@@ -80551,7 +80520,7 @@
       }
     },
     {
-      "id": "e535c739c93753d6",
+      "id": "a28e6c55e2788ed7",
       "name": "dom4j",
       "version": "2.1.4",
       "type": "java-archive",
@@ -80602,7 +80571,7 @@
       }
     },
     {
-      "id": "da478d349fc8939c",
+      "id": "8c72d150f2949d05",
       "name": "echarts-api",
       "version": "5.5.0-1",
       "type": "jenkins-plugin",
@@ -80769,7 +80738,7 @@
       }
     },
     {
-      "id": "8270c4924da7aacc",
+      "id": "28f340cf044df881",
       "name": "echarts-api",
       "version": "5.5.0-1",
       "type": "jenkins-plugin",
@@ -80936,7 +80905,7 @@
       }
     },
     {
-      "id": "5c00cc324d872f77",
+      "id": "eda97ca34025f98d",
       "name": "eddsa",
       "version": "0.3.0",
       "type": "java-archive",
@@ -81087,7 +81056,7 @@
       }
     },
     {
-      "id": "e206e2132291dd0a",
+      "id": "e257fce6a9df4352",
       "name": "eddsa",
       "version": "0.3.0",
       "type": "java-archive",
@@ -81238,7 +81207,7 @@
       }
     },
     {
-      "id": "47e7c70792b71428",
+      "id": "22572a43a4cb089d",
       "name": "eddsa",
       "version": "0.3.0",
       "type": "java-archive",
@@ -81313,7 +81282,7 @@
       }
     },
     {
-      "id": "89b69e3892dbc8d4",
+      "id": "855dbc0397e8d724",
       "name": "eddsa-api",
       "version": "0.3.0-4.v84c6f0f4969e",
       "type": "jenkins-plugin",
@@ -81516,7 +81485,7 @@
       }
     },
     {
-      "id": "bd5fde2ed87e5f8b",
+      "id": "e7f2f39eb98ef063",
       "name": "eddsa-api",
       "version": "0.3.0-4.v84c6f0f4969e",
       "type": "jenkins-plugin",
@@ -81719,7 +81688,7 @@
       }
     },
     {
-      "id": "84f672d6707a893d",
+      "id": "3b385096ad11862f",
       "name": "embedded_su4j",
       "version": "1.1",
       "type": "java-archive",
@@ -81854,7 +81823,7 @@
       }
     },
     {
-      "id": "7df0a76c8f071212",
+      "id": "7805fba943586086",
       "name": "error_prone_annotations",
       "version": "2.18.0",
       "type": "java-archive",
@@ -82062,7 +82031,7 @@
       }
     },
     {
-      "id": "9690696649920da2",
+      "id": "1dbce6ba9616f4bd",
       "name": "failureaccess",
       "version": "1.0.2",
       "type": "java-archive",
@@ -82079,7 +82048,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -82213,7 +82182,7 @@
       }
     },
     {
-      "id": "a7498e2149c2ac73",
+      "id": "2f61d81069c5ea14",
       "name": "fluent-hc",
       "version": "4.5.14",
       "type": "java-archive",
@@ -82345,7 +82314,7 @@
       }
     },
     {
-      "id": "faeaa2a3beab79ef",
+      "id": "59bb14931a115cd8",
       "name": "font-awesome-api",
       "version": "6.5.2-1",
       "type": "jenkins-plugin",
@@ -82564,7 +82533,7 @@
       }
     },
     {
-      "id": "b4a585f94beccdf6",
+      "id": "1744d8122570300c",
       "name": "font-awesome-api",
       "version": "6.5.2-1",
       "type": "jenkins-plugin",
@@ -82783,7 +82752,261 @@
       }
     },
     {
-      "id": "f8cb1440966ee59d",
+      "id": "eafeae03698c9a39",
+      "name": "groovy-all",
+      "version": "2.4.21",
+      "type": "java-archive",
+      "foundBy": "java-archive-cataloger",
+      "locations": [
+        {
+          "path": "usr/share/java/jenkins/jenkins.war",
+          "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/groovy-all-2.4.21.jar",
+          "annotations": {
+            "evidence": "primary"
+          }
+        }
+      ],
+      "licenses": [
+        {
+          "value": "Apache-2.0",
+          "spdxExpression": "Apache-2.0",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/groovy-all-2.4.21.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        },
+        {
+          "value": "CC-BY-2.5",
+          "spdxExpression": "CC-BY-2.5",
+          "type": "concluded",
+          "urls": [],
+          "locations": [
+            {
+              "path": "usr/share/java/jenkins/jenkins.war",
+              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/groovy-all-2.4.21.jar",
+              "annotations": {
+                "evidence": "primary"
+              }
+            }
+          ]
+        }
+      ],
+      "language": "java",
+      "cpes": [
+        {
+          "cpe": "cpe:2.3:a:apache-software-foundation:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apache-software-foundation:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apache_software_foundation:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apache_software_foundation:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apache-software-foundation:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:apache_software_foundation:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:org.codehaus.groovy:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:org.codehaus.groovy:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:org.codehaus.groovy:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy-all:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy-all:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy_all:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy_all:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:codehaus:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:codehaus:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy-all:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy:groovy-all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy:groovy_all:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy_all:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:codehaus:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        },
+        {
+          "cpe": "cpe:2.3:a:groovy:groovy:2.4.21:*:*:*:*:*:*:*",
+          "source": "syft-generated"
+        }
+      ],
+      "purl": "pkg:maven/org.codehaus.groovy/groovy-all@2.4.21",
+      "metadataType": "java-archive",
+      "metadata": {
+        "virtualPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/groovy-all-2.4.21.jar",
+        "manifest": {
+          "main": [
+            {
+              "key": "Manifest-Version",
+              "value": "1.0"
+            },
+            {
+              "key": "Ant-Version",
+              "value": "Apache Ant 1.9.6"
+            },
+            {
+              "key": "Created-By",
+              "value": "1.8.0_191 (Oracle Corporation)"
+            },
+            {
+              "key": "Bundle-SymbolicName",
+              "value": "groovy-all"
+            },
+            {
+              "key": "Built-By",
+              "value": "Paul King"
+            },
+            {
+              "key": "Specification-Title",
+              "value": "Groovy: a powerful, dynamic language for the JVM"
+            },
+            {
+              "key": "Eclipse-BuddyPolicy",
+              "value": "dependent"
+            },
+            {
+              "key": "Import-Package",
+              "value": "com.thoughtworks.qdox;resolution:=optional,com.thoughtworks.qdox.model;resolution:=optional,com.thoughtworks.xstream;resolution:=optional;version=\"[1.4,2)\",com.thoughtworks.xstream.io;resolution:=optional;version=\"[1.4,2)\",com.thoughtworks.xstream.io.xml;resolution:=optional;version=\"[1.4,2)\",groovyjarjarasm.asm.tree.analysis;resolution:=optional,javax.management;resolution:=optional,javax.management.modelmbean;resolution:=optional,javax.management.remote;resolution:=optional,javax.management.remote.rmi;resolution:=optional,javax.management.timer;resolution:=optional,javax.print.attribute.standard;resolution:=optional,javax.rmi.ssl;resolution:=optional,javax.script;resolution:=optional,javax.servlet;resolution:=optional,javax.servlet.http;resolution:=optional,javax.servlet.jsp;resolution:=optional,javax.sql;resolution:=optional,javax.swing;resolution:=optional,javax.swing.border;resolution:=optional,javax.swing.event;resolution:=optional,javax.swing.filechooser;resolution:=optional,javax.swing.plaf;resolution:=optional,javax.swing.plaf.metal;resolution:=optional,javax.swing.table;resolution:=optional,javax.swing.text;resolution:=optional,javax.swing.text.html;resolution:=optional,javax.swing.tree;resolution:=optional,javax.swing.undo;resolution:=optional,javax.xml.namespace;resolution:=optional,javax.xml.parsers;resolution:=optional,javax.xml.transform;resolution:=optional,javax.xml.transform.dom;resolution:=optional,javax.xml.transform.stream;resolution:=optional,javax.xml.validation;resolution:=optional,javax.xml.xpath;resolution:=optional,jline;resolution:=optional,jline.console;resolution:=optional,jline.console.completer;resolution:=optional,jline.console.history;resolution:=optional,jline.internal;resolution:=optional,junit.framework;resolution:=optional,junit.textui;resolution:=optional,org.apache.bsf;resolution:=optional,org.apache.bsf.util;resolution:=optional,org.apache.commons.cli;resolution:=optional,org.apache.ivy;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.cache;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.event;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.event.download;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.event.resolve;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.module.descriptor;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.module.id;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.report;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.resolve;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.core.settings;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.plugins.matcher;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.plugins.resolver;resolution:=optional;version=\"[2.0,3)\",org.apache.ivy.util;resolution:=optional;version=\"[2.0,3)\",org.apache.tools.ant;resolution:=optional,org.apache.tools.ant.dispatch;resolution:=optional,org.apache.tools.ant.helper;resolution:=optional,org.apache.tools.ant.taskdefs;resolution:=optional,org.apache.tools.ant.types;resolution:=optional,org.apache.tools.ant.util;resolution:=optional,org.fusesource.jansi;resolution:=optional;version=\"[1.11,2)\",org.junit;resolution:=optional,org.w3c.dom;resolution:=optional,org.xml.sax;resolution:=optional,org.xml.sax.ext;resolution:=optional,org.xml.sax.helpers;resolution:=optional,sun.misc;resolution:=optional"
+            },
+            {
+              "key": "Require-Capability",
+              "value": "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=1.7))\""
+            },
+            {
+              "key": "DynamicImport-Package",
+              "value": "*"
+            },
+            {
+              "key": "Main-class",
+              "value": "groovy.ui.GroovyMain"
+            },
+            {
+              "key": "Export-Package",
+              "value": "groovy.beans;version=\"2.4.21\",groovy.grape;version=\"2.4.21\",groovy.inspect;version=\"2.4.21\",groovy.inspect.swingui;version=\"2.4.21\",groovy.io;version=\"2.4.21\",groovy.jmx.builder;version=\"2.4.21\",groovy.json;version=\"2.4.21\",groovy.json.internal;version=\"2.4.21\",groovy.lang;version=\"2.4.21\",groovy.mock.interceptor;version=\"2.4.21\",groovy.model;version=\"2.4.21\",groovy.security;version=\"2.4.21\",groovy.servlet;version=\"2.4.21\",groovy.sql;version=\"2.4.21\",groovy.swing;version=\"2.4.21\",groovy.swing.binding;version=\"2.4.21\",groovy.swing.factory;version=\"2.4.21\",groovy.swing.impl;version=\"2.4.21\",groovy.test;version=\"2.4.21\",groovy.text;version=\"2.4.21\",groovy.text.markup;version=\"2.4.21\",groovy.time;version=\"2.4.21\",groovy.transform;version=\"2.4.21\",groovy.transform.builder;version=\"2.4.21\",groovy.transform.stc;version=\"2.4.21\",groovy.ui;version=\"2.4.21\",groovy.ui.icons;version=\"2.4.21\",groovy.ui.text;version=\"2.4.21\",groovy.ui.view;version=\"2.4.21\",groovy.util;version=\"2.4.21\",groovy.util.logging;version=\"2.4.21\",groovy.util.slurpersupport;version=\"2.4.21\",groovy.xml;version=\"2.4.21\",groovy.xml.dom;version=\"2.4.21\",groovy.xml.streamingmarkupsupport;version=\"2.4.21\",groovyjarjarantlr;version=\"2.4.21\",groovyjarjarantlr.ASdebug;version=\"2.4.21\",groovyjarjarantlr.actions.cpp;version=\"2.4.21\",groovyjarjarantlr.actions.csharp;version=\"2.4.21\",groovyjarjarantlr.actions.java;version=\"2.4.21\",groovyjarjarantlr.actions.python;version=\"2.4.21\",groovyjarjarantlr.build;version=\"2.4.21\",groovyjarjarantlr.collections;version=\"2.4.21\",groovyjarjarantlr.collections.impl;version=\"2.4.21\",groovyjarjarantlr.debug;version=\"2.4.21\",groovyjarjarantlr.debug.misc;version=\"2.4.21\",groovyjarjarantlr.preprocessor;version=\"2.4.21\",groovyjarjarasm.asm;version=\"2.4.21\",groovyjarjarasm.asm.commons;version=\"2.4.21\",groovyjarjarasm.asm.signature;version=\"2.4.21\",groovyjarjarasm.asm.tree;version=\"2.4.21\",groovyjarjarasm.asm.util;version=\"2.4.21\",groovyjarjarcommonscli;version=\"2.4.21\",org.apache.groovy.io;version=\"2.4.21\",org.apache.groovy.util;version=\"2.4.21\",org.codehaus.groovy;version=\"2.4.21\",org.codehaus.groovy.ant;version=\"2.4.21\",org.codehaus.groovy.antlr;version=\"2.4.21\",org.codehaus.groovy.antlr.java;version=\"2.4.21\",org.codehaus.groovy.antlr.parser;version=\"2.4.21\",org.codehaus.groovy.antlr.treewalker;version=\"2.4.21\",org.codehaus.groovy.ast;version=\"2.4.21\",org.codehaus.groovy.ast.builder;version=\"2.4.21\",org.codehaus.groovy.ast.expr;version=\"2.4.21\",org.codehaus.groovy.ast.stmt;version=\"2.4.21\",org.codehaus.groovy.ast.tools;version=\"2.4.21\",org.codehaus.groovy.binding;version=\"2.4.21\",org.codehaus.groovy.bsf;version=\"2.4.21\",org.codehaus.groovy.classgen;version=\"2.4.21\",org.codehaus.groovy.classgen.asm;version=\"2.4.21\",org.codehaus.groovy.classgen.asm.indy;version=\"2.4.21\",org.codehaus.groovy.classgen.asm.sc;version=\"2.4.21\",org.codehaus.groovy.cli;version=\"2.4.21\",org.codehaus.groovy.control;version=\"2.4.21\",org.codehaus.groovy.control.customizers;version=\"2.4.21\",org.codehaus.groovy.control.customizers.builder;version=\"2.4.21\",org.codehaus.groovy.control.io;version=\"2.4.21\",org.codehaus.groovy.control.messages;version=\"2.4.21\",org.codehaus.groovy.groovydoc;version=\"2.4.21\",org.codehaus.groovy.jsr223;version=\"2.4.21\",org.codehaus.groovy.plugin;version=\"2.4.21\",org.codehaus.groovy.reflection;version=\"2.4.21\",org.codehaus.groovy.reflection.android;version=\"2.4.21\",org.codehaus.groovy.reflection.stdclasses;version=\"2.4.21\",org.codehaus.groovy.reflection.v7;version=\"2.4.21\",org.codehaus.groovy.runtime;version=\"2.4.21\",org.codehaus.groovy.runtime.callsite;version=\"2.4.21\",org.codehaus.groovy.runtime.dgmimpl;version=\"2.4.21\",org.codehaus.groovy.runtime.dgmimpl.arrays;version=\"2.4.21\",org.codehaus.groovy.runtime.m12n;version=\"2.4.21\",org.codehaus.groovy.runtime.memoize;version=\"2.4.21\",org.codehaus.groovy.runtime.metaclass;version=\"2.4.21\",org.codehaus.groovy.runtime.powerassert;version=\"2.4.21\",org.codehaus.groovy.runtime.typehandling;version=\"2.4.21\",org.codehaus.groovy.runtime.wrappers;version=\"2.4.21\",org.codehaus.groovy.syntax;version=\"2.4.21\",org.codehaus.groovy.testng;version=\"2.4.21\",org.codehaus.groovy.tools;version=\"2.4.21\",org.codehaus.groovy.tools.ast;version=\"2.4.21\",org.codehaus.groovy.tools.groovydoc;version=\"2.4.21\",org.codehaus.groovy.tools.groovydoc.gstringTemplates;version=\"2.4.21\",org.codehaus.groovy.tools.groovydoc.gstringTemplates.classLevel;version=\"2.4.21\",org.codehaus.groovy.tools.groovydoc.gstringTemplates.packageLevel;version=\"2.4.21\",org.codehaus.groovy.tools.groovydoc.gstringTemplates.topLevel;version=\"2.4.21\",org.codehaus.groovy.tools.gse;version=\"2.4.21\",org.codehaus.groovy.tools.javac;version=\"2.4.21\",org.codehaus.groovy.tools.shell;version=\"2.4.21\",org.codehaus.groovy.tools.shell.commands;version=\"2.4.21\",org.codehaus.groovy.tools.shell.completion;version=\"2.4.21\",org.codehaus.groovy.tools.shell.util;version=\"2.4.21\",org.codehaus.groovy.tools.xml;version=\"2.4.21\",org.codehaus.groovy.transform;version=\"2.4.21\",org.codehaus.groovy.transform.sc;version=\"2.4.21\",org.codehaus.groovy.transform.sc.transformers;version=\"2.4.21\",org.codehaus.groovy.transform.stc;version=\"2.4.21\",org.codehaus.groovy.transform.tailrec;version=\"2.4.21\",org.codehaus.groovy.transform.trait;version=\"2.4.21\",org.codehaus.groovy.util;version=\"2.4.21\",org.codehaus.groovy.vmplugin;version=\"2.4.21\",org.codehaus.groovy.vmplugin.v5;version=\"2.4.21\",org.codehaus.groovy.vmplugin.v6;version=\"2.4.21\",org.codehaus.groovy.vmplugin.v7;version=\"2.4.21\",org.codehaus.groovy.vmplugin.v8;version=\"2.4.21\",overview.html;version=\"2.4.21\",overviewj.html;version=\"2.4.21\""
+            },
+            {
+              "key": "Bundle-Name",
+              "value": "Groovy Runtime"
+            },
+            {
+              "key": "Extension-Name",
+              "value": "groovy"
+            },
+            {
+              "key": "Implementation-Title",
+              "value": "Groovy: a powerful, dynamic language for the JVM"
+            },
+            {
+              "key": "Bundle-Description",
+              "value": "Groovy Runtime"
+            },
+            {
+              "key": "Implementation-Version",
+              "value": "2.4.21"
+            },
+            {
+              "key": "Bundle-ManifestVersion",
+              "value": "2"
+            },
+            {
+              "key": "Specification-Vendor",
+              "value": "The Apache Software Foundation"
+            },
+            {
+              "key": "Bundle-Vendor",
+              "value": "The Apache Software Foundation"
+            },
+            {
+              "key": "Tool",
+              "value": "Bnd-2.4.0.201411031534"
+            },
+            {
+              "key": "Implementation-Vendor",
+              "value": "The Apache Software Foundation"
+            },
+            {
+              "key": "Originally-Created-By",
+              "value": "1.8.0_191-b12 (Oracle Corporation)"
+            },
+            {
+              "key": "Bundle-Version",
+              "value": "2.4.21"
+            },
+            {
+              "key": "Bundle-ClassPath",
+              "value": "."
+            },
+            {
+              "key": "Specification-Version",
+              "value": "2.4.21"
+            }
+          ]
+        },
+        "digest": [
+          {
+            "algorithm": "sha1",
+            "value": "8e4f4c30dbb9123fbf703f256cd721bbac5c902a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a095a963016ccb48",
       "name": "groovy-sandbox",
       "version": "1.34",
       "type": "java-archive",
@@ -82904,7 +83127,7 @@
       }
     },
     {
-      "id": "f1fb23d901265171",
+      "id": "177df9d91477d343",
       "name": "gson",
       "version": "2.11.0",
       "type": "java-archive",
@@ -83070,7 +83293,7 @@
       }
     },
     {
-      "id": "38930548e82b05ea",
+      "id": "884cd1ffd8b242a8",
       "name": "gson-api",
       "version": "2.11.0-41.v019fcf6125dc",
       "type": "jenkins-plugin",
@@ -83273,7 +83496,7 @@
       }
     },
     {
-      "id": "432b9bda7875943f",
+      "id": "d78f5440d7c04e28",
       "name": "gson-api",
       "version": "2.11.0-41.v019fcf6125dc",
       "type": "jenkins-plugin",
@@ -83476,7 +83699,7 @@
       }
     },
     {
-      "id": "1042e3d3d97663c1",
+      "id": "eaf4973d1b391f44",
       "name": "guava",
       "version": "33.2.1-jre",
       "type": "java-archive",
@@ -83493,7 +83716,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -83620,7 +83843,7 @@
       }
     },
     {
-      "id": "e408d1e9046f8959",
+      "id": "e1a462320b968aa8",
       "name": "guice",
       "version": "6.0.0",
       "type": "java-archive",
@@ -83637,7 +83860,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -83787,7 +84010,7 @@
       }
     },
     {
-      "id": "3ac7d9b5040b4636",
+      "id": "d483e13a99633c9d",
       "name": "hawtjni-runtime",
       "version": "1.8",
       "type": "java-archive",
@@ -83892,7 +84115,7 @@
       }
     },
     {
-      "id": "1045f1e356531622",
+      "id": "90fffb8a6fa2efaa",
       "name": "http2-common",
       "version": "10.0.20",
       "type": "java-archive",
@@ -84008,7 +84231,7 @@
       }
     },
     {
-      "id": "02e0b2afd4c6d0e3",
+      "id": "2498187ef5c12e97",
       "name": "http2-hpack",
       "version": "10.0.20",
       "type": "java-archive",
@@ -84124,7 +84347,7 @@
       }
     },
     {
-      "id": "b0dfbf4ef0e0b657",
+      "id": "f0e6788f571c1205",
       "name": "http2-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -84240,7 +84463,7 @@
       }
     },
     {
-      "id": "477fdb0ce736830d",
+      "id": "72b55769172ca965",
       "name": "httpasyncclient",
       "version": "4.1.5",
       "type": "java-archive",
@@ -84368,7 +84591,7 @@
       }
     },
     {
-      "id": "7936718535f3f6c6",
+      "id": "9d17ccc332203623",
       "name": "httpasyncclient-cache",
       "version": "4.1.5",
       "type": "java-archive",
@@ -84500,7 +84723,7 @@
       }
     },
     {
-      "id": "393e7e82f52df1c7",
+      "id": "6ae088a5bc213d3f",
       "name": "httpclient",
       "version": "4.5.14",
       "type": "java-archive",
@@ -84628,7 +84851,7 @@
       }
     },
     {
-      "id": "54e6d1d4c22d2d23",
+      "id": "4658de391cbc72cf",
       "name": "httpclient-cache",
       "version": "4.5.14",
       "type": "java-archive",
@@ -84760,7 +84983,7 @@
       }
     },
     {
-      "id": "d0cfba11b75200cf",
+      "id": "f089425a90c85b48",
       "name": "httpcore",
       "version": "4.4.16",
       "type": "java-archive",
@@ -84904,7 +85127,7 @@
       }
     },
     {
-      "id": "e18e2f4a04a0c6d8",
+      "id": "027cde5d965d2f5a",
       "name": "httpcore-nio",
       "version": "4.4.16",
       "type": "java-archive",
@@ -85036,7 +85259,7 @@
       }
     },
     {
-      "id": "c30d79631f7c3ff1",
+      "id": "c7b3ac44e092122e",
       "name": "httpmime",
       "version": "4.5.14",
       "type": "java-archive",
@@ -85164,7 +85387,7 @@
       }
     },
     {
-      "id": "8f843f1590413547",
+      "id": "8c72188ef9a270c6",
       "name": "imap",
       "version": "2.0.3",
       "type": "java-archive",
@@ -85224,7 +85447,7 @@
       }
     },
     {
-      "id": "06ed44c94c5d1a13",
+      "id": "37c77579e2f654a3",
       "name": "instance-identity",
       "version": "185.v303dc7c645f9",
       "type": "java-archive",
@@ -85451,7 +85674,7 @@
       }
     },
     {
-      "id": "ad0273238fa7b560",
+      "id": "625538349fdef28a",
       "name": "instance-identity",
       "version": "185.v303dc7c645f9",
       "type": "java-archive",
@@ -85678,7 +85901,7 @@
       }
     },
     {
-      "id": "6017ebe474cd7193",
+      "id": "7d3b40db52392515",
       "name": "ionicons-api",
       "version": "74.v93d5eb_813d5f",
       "type": "jenkins-plugin",
@@ -85881,7 +86104,7 @@
       }
     },
     {
-      "id": "23c54501cbe37ba1",
+      "id": "939e427d69dea924",
       "name": "ionicons-api",
       "version": "74.v93d5eb_813d5f",
       "type": "jenkins-plugin",
@@ -86084,7 +86307,7 @@
       }
     },
     {
-      "id": "caf11945241ba50b",
+      "id": "2c16b8b5bb7e5901",
       "name": "istack-commons-runtime",
       "version": "3.0.12",
       "type": "java-archive",
@@ -86212,7 +86435,7 @@
       }
     },
     {
-      "id": "8b0a58479b2331da",
+      "id": "796d4abf86a972e9",
       "name": "j-interop",
       "version": "2.0.8-kohsuke-1",
       "type": "java-archive",
@@ -86334,7 +86557,7 @@
       }
     },
     {
-      "id": "da240976917188ed",
+      "id": "5d0d534dca140fad",
       "name": "j-interopdeps",
       "version": "2.0.8-kohsuke-1",
       "type": "java-archive",
@@ -86456,7 +86679,7 @@
       }
     },
     {
-      "id": "9e545177879293a8",
+      "id": "90e1d652e9737801",
       "name": "jackson-annotations",
       "version": "2.17.0",
       "type": "java-archive",
@@ -86716,7 +86939,7 @@
       }
     },
     {
-      "id": "795e62b72b095603",
+      "id": "6c05bd7a1d0940fc",
       "name": "jackson-core",
       "version": "2.17.0",
       "type": "java-archive",
@@ -87016,7 +87239,7 @@
       }
     },
     {
-      "id": "1c190afa0b649efe",
+      "id": "26302aaf10f5c7b3",
       "name": "jackson-databind",
       "version": "2.17.0",
       "type": "java-archive",
@@ -87284,7 +87507,7 @@
       }
     },
     {
-      "id": "6c57509c014d6d72",
+      "id": "b606df3db07ffbe0",
       "name": "jackson-dataformat-cbor",
       "version": "2.17.0",
       "type": "java-archive",
@@ -87564,7 +87787,7 @@
       }
     },
     {
-      "id": "9eadc269265407b6",
+      "id": "e26843782b52f201",
       "name": "jackson-dataformat-xml",
       "version": "2.17.0",
       "type": "java-archive",
@@ -87581,7 +87804,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -87856,7 +88079,7 @@
       }
     },
     {
-      "id": "c6307b03629a372c",
+      "id": "9d7577b7031b4692",
       "name": "jackson-dataformat-yaml",
       "version": "2.17.0",
       "type": "java-archive",
@@ -88136,7 +88359,7 @@
       }
     },
     {
-      "id": "29692616dab9b21b",
+      "id": "bec56b7d7e601e4a",
       "name": "jackson-datatype-jdk8",
       "version": "2.17.0",
       "type": "java-archive",
@@ -88153,7 +88376,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -88439,7 +88662,7 @@
       }
     },
     {
-      "id": "57dbbcf127ccb791",
+      "id": "74c3847531af3503",
       "name": "jackson-datatype-json-org",
       "version": "2.17.0",
       "type": "java-archive",
@@ -88743,7 +88966,7 @@
       }
     },
     {
-      "id": "8625d10d290d81c9",
+      "id": "0cc23673699fe254",
       "name": "jackson-datatype-jsr310",
       "version": "2.17.0",
       "type": "java-archive",
@@ -88760,7 +88983,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -89046,7 +89269,7 @@
       }
     },
     {
-      "id": "582d9f391471fa78",
+      "id": "7750b446b7dad1f4",
       "name": "jackson-module-jaxb-annotations",
       "version": "2.17.0",
       "type": "java-archive",
@@ -89350,7 +89573,7 @@
       }
     },
     {
-      "id": "0b90e13952166acb",
+      "id": "3ff6854b41d7bd0d",
       "name": "jackson-module-parameter-names",
       "version": "2.17.0",
       "type": "java-archive",
@@ -89367,7 +89590,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -89653,7 +89876,7 @@
       }
     },
     {
-      "id": "a48326f9dad47fa6",
+      "id": "31cefdd23fe9d020",
       "name": "jackson2-api",
       "version": "2.17.0-379.v02de8ec9f64c",
       "type": "jenkins-plugin",
@@ -89876,7 +90099,7 @@
       }
     },
     {
-      "id": "567b788e91dfa25e",
+      "id": "cc0dc43c71144805",
       "name": "jackson2-api",
       "version": "2.17.0-379.v02de8ec9f64c",
       "type": "jenkins-plugin",
@@ -90099,7 +90322,7 @@
       }
     },
     {
-      "id": "5f1d7c65b53ab700",
+      "id": "785e7fd12a3af568",
       "name": "jakarta-activation-api",
       "version": "2.1.3-1",
       "type": "jenkins-plugin",
@@ -90318,7 +90541,7 @@
       }
     },
     {
-      "id": "1551243a69830019",
+      "id": "89cc4814a847e21c",
       "name": "jakarta-activation-api",
       "version": "2.1.3-1",
       "type": "jenkins-plugin",
@@ -90537,7 +90760,7 @@
       }
     },
     {
-      "id": "415a35e387424f9a",
+      "id": "348ba1a651501407",
       "name": "jakarta-mail-api",
       "version": "2.1.3-1",
       "type": "jenkins-plugin",
@@ -90760,7 +90983,7 @@
       }
     },
     {
-      "id": "80a8049292ab5264",
+      "id": "2fae71acdd32586e",
       "name": "jakarta-mail-api",
       "version": "2.1.3-1",
       "type": "jenkins-plugin",
@@ -90983,7 +91206,7 @@
       }
     },
     {
-      "id": "1a885d117806fbfd",
+      "id": "8cf242177c9fa644",
       "name": "jakarta.activation-api",
       "version": "2.1.3",
       "type": "java-archive",
@@ -91000,7 +91223,7 @@
       "licenses": [
         {
           "value": "http://www.eclipse.org/org/documents/edl-v10.php",
-          "spdxExpression": "",
+          "spdxExpression": "BSD-3-Clause",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -91235,7 +91458,7 @@
       }
     },
     {
-      "id": "c211273034482f1e",
+      "id": "6f58b693c778a93b",
       "name": "jakarta.annotation-api",
       "version": "3.0.0",
       "type": "java-archive",
@@ -91507,7 +91730,7 @@
       }
     },
     {
-      "id": "48c887d45068bc13",
+      "id": "9f44ccc1ebf922b8",
       "name": "jakarta.inject-api",
       "version": "2.0.1",
       "type": "java-archive",
@@ -91524,7 +91747,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -91723,7 +91946,7 @@
       }
     },
     {
-      "id": "316a314922678cee",
+      "id": "f97a8619dba6ed61",
       "name": "jakarta.mail-api",
       "version": "2.1.3",
       "type": "java-archive",
@@ -91974,7 +92197,7 @@
       }
     },
     {
-      "id": "043b6fc0e66d9d5c",
+      "id": "cdd9916dd7e55246",
       "name": "jakarta.servlet.jsp.jstl-api",
       "version": "1.2.7",
       "type": "java-archive",
@@ -92234,7 +92457,7 @@
       }
     },
     {
-      "id": "dbd1faf1403107a0",
+      "id": "fa8a0e1c43d9e54a",
       "name": "jakarta.websocket-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -92304,7 +92527,7 @@
       }
     },
     {
-      "id": "df3fe34b1134ae5a",
+      "id": "fd670d8631ce1eb1",
       "name": "jakarta.websocket-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -92374,7 +92597,7 @@
       }
     },
     {
-      "id": "18a0ba5bba0dde83",
+      "id": "810f194bdd4adfda",
       "name": "jakarta.websocket-client-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -92460,7 +92683,7 @@
       }
     },
     {
-      "id": "410ac1690300da0b",
+      "id": "1055ce20f1042fa2",
       "name": "jakarta.websocket-client-api",
       "version": "2.1.1",
       "type": "java-archive",
@@ -92546,7 +92769,7 @@
       }
     },
     {
-      "id": "bd8b658aed997a7c",
+      "id": "60d30e534af43781",
       "name": "jansi",
       "version": "1.11",
       "type": "java-archive",
@@ -92563,7 +92786,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -92737,7 +92960,7 @@
       }
     },
     {
-      "id": "f7f481c8e794b85d",
+      "id": "bb2acf7f3a6e7767",
       "name": "jansi-native",
       "version": "1.5",
       "type": "java-archive",
@@ -92873,7 +93096,7 @@
       }
     },
     {
-      "id": "44ab99dce54bb5c1",
+      "id": "d9cf6730beed148a",
       "name": "javax-activation-api",
       "version": "1.2.0-7",
       "type": "jenkins-plugin",
@@ -93092,7 +93315,7 @@
       }
     },
     {
-      "id": "bd73493edf4b2fbe",
+      "id": "001bbddd26e46d11",
       "name": "javax-activation-api",
       "version": "1.2.0-7",
       "type": "jenkins-plugin",
@@ -93311,7 +93534,7 @@
       }
     },
     {
-      "id": "83748bd87cf1d288",
+      "id": "480dc4bd46987e55",
       "name": "javax-mail-api",
       "version": "1.6.2-10",
       "type": "jenkins-plugin",
@@ -93538,7 +93761,7 @@
       }
     },
     {
-      "id": "404561adfff42640",
+      "id": "2c3c97a11dccea42",
       "name": "javax-mail-api",
       "version": "1.6.2-10",
       "type": "jenkins-plugin",
@@ -93765,7 +93988,7 @@
       }
     },
     {
-      "id": "92c743021a485a7c",
+      "id": "c8c8e0bac97b4c6e",
       "name": "javax.activation",
       "version": "1.2.0",
       "type": "java-archive",
@@ -94043,7 +94266,7 @@
       }
     },
     {
-      "id": "32b9ab3ff5cbb650",
+      "id": "99b3bfaa1f155ead",
       "name": "javax.annotation-api",
       "version": "1.3.2",
       "type": "java-archive",
@@ -94299,7 +94522,7 @@
       }
     },
     {
-      "id": "572094db92f7109a",
+      "id": "008627a87c063485",
       "name": "javax.mail",
       "version": "1.6.2",
       "type": "java-archive",
@@ -94581,7 +94804,7 @@
       }
     },
     {
-      "id": "2f55b3f9e8d95316",
+      "id": "b61ce95798d6f816",
       "name": "jaxb",
       "version": "2.3.9-1",
       "type": "jenkins-plugin",
@@ -94760,7 +94983,7 @@
       }
     },
     {
-      "id": "9239a9d7f86bda3c",
+      "id": "14babc048236a20e",
       "name": "jaxb",
       "version": "2.3.9-1",
       "type": "jenkins-plugin",
@@ -94939,7 +95162,7 @@
       }
     },
     {
-      "id": "d2c52eee450ca087",
+      "id": "1513b316aeb7f2fc",
       "name": "jaxb-api",
       "version": "2.3.1",
       "type": "java-archive",
@@ -95173,7 +95396,7 @@
       }
     },
     {
-      "id": "e572c1fd110c046e",
+      "id": "3a14cb42baedd0c2",
       "name": "jaxb-impl",
       "version": "2.3.9",
       "type": "java-archive",
@@ -95190,7 +95413,7 @@
       "licenses": [
         {
           "value": "http://www.eclipse.org/org/documents/edl-v10.php",
-          "spdxExpression": "",
+          "spdxExpression": "BSD-3-Clause",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -95461,7 +95684,7 @@
       }
     },
     {
-      "id": "9e0c9db72ec2b042",
+      "id": "47ae467dca293c97",
       "name": "jaxb-runtime",
       "version": "2.3.9",
       "type": "java-archive",
@@ -95627,7 +95850,7 @@
       }
     },
     {
-      "id": "c693680ce785f98f",
+      "id": "cf2c176c3a4e9f85",
       "name": "jaxen",
       "version": "2.0.0",
       "type": "java-archive",
@@ -95774,7 +95997,7 @@
       }
     },
     {
-      "id": "4818f46a3b9bfb1c",
+      "id": "ec429cdc7b09611b",
       "name": "jbcrypt",
       "version": "1.0.0",
       "type": "java-archive",
@@ -95817,7 +96040,7 @@
       }
     },
     {
-      "id": "530158ec2590ff56",
+      "id": "d5c439814e8e3bba",
       "name": "jbcrypt",
       "version": "1.0.2",
       "type": "java-archive",
@@ -95860,7 +96083,7 @@
       }
     },
     {
-      "id": "c8d7b4388af8cf2a",
+      "id": "fa80ab2b270c0909",
       "name": "jboss-marshalling",
       "version": "2.1.3.Final",
       "type": "java-archive",
@@ -96087,7 +96310,7 @@
       }
     },
     {
-      "id": "969896503c070882",
+      "id": "48c2be8a125c9abb",
       "name": "jboss-marshalling-river",
       "version": "2.1.3.Final",
       "type": "java-archive",
@@ -96294,7 +96517,7 @@
       }
     },
     {
-      "id": "8a61b955433289c0",
+      "id": "1bb30a4f50d34d98",
       "name": "jcifs",
       "version": "1.3.18-kohsuke-1",
       "type": "java-archive",
@@ -96395,7 +96618,7 @@
       }
     },
     {
-      "id": "fe3751d25c55d9b3",
+      "id": "48cb9b5bb92e0912",
       "name": "jcip-annotations",
       "version": "1.0",
       "type": "java-archive",
@@ -96466,7 +96689,7 @@
       }
     },
     {
-      "id": "af915d4248f25605",
+      "id": "47d884ab4d46018a",
       "name": "jcl-over-slf4j",
       "version": "2.0.13",
       "type": "java-archive",
@@ -96586,7 +96809,7 @@
       }
     },
     {
-      "id": "2fd0a73a82c6e91b",
+      "id": "e35fd5f268409236",
       "name": "jcl-over-slf4j",
       "version": "2.0.13",
       "type": "java-archive",
@@ -96798,7 +97021,7 @@
       }
     },
     {
-      "id": "ab8983d1bc844e79",
+      "id": "2ee344e90e623ff1",
       "name": "jcommon",
       "version": "1.0.23",
       "type": "java-archive",
@@ -96814,10 +97037,12 @@
       ],
       "licenses": [
         {
-          "value": "sha256:31abb695f8d7cffc6e2268e7162d64892557287e6c0723a4a2e38634d05dcd23",
+          "value": "GNU Lesser General Public Licence",
           "spdxExpression": "",
-          "type": "concluded",
-          "urls": [],
+          "type": "declared",
+          "urls": [
+            "http://www.gnu.org/licenses/lgpl.txt"
+          ],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -96914,7 +97139,7 @@
       }
     },
     {
-      "id": "6d7082194853b432",
+      "id": "0a7458eb6eefb3ac",
       "name": "jdk-tool",
       "version": "73.vddf737284550",
       "type": "jenkins-plugin",
@@ -97133,7 +97358,7 @@
       }
     },
     {
-      "id": "fbb5da65a0e9458e",
+      "id": "ef899bc023cd4e99",
       "name": "jdk-tool",
       "version": "73.vddf737284550",
       "type": "jenkins-plugin",
@@ -97352,7 +97577,7 @@
       }
     },
     {
-      "id": "af111f13757b2710",
+      "id": "6e81f91e0333fd08",
       "name": "jenkins",
       "version": "2.461-r0",
       "type": "apk",
@@ -97447,7 +97672,7 @@
       }
     },
     {
-      "id": "8875c1ac79844af4",
+      "id": "8c32b25523e82e18",
       "name": "jenkins-core",
       "version": "2.461",
       "type": "java-archive",
@@ -97463,10 +97688,12 @@
       ],
       "licenses": [
         {
-          "value": "MIT",
-          "spdxExpression": "MIT",
-          "type": "concluded",
-          "urls": [],
+          "value": "The MIT license",
+          "spdxExpression": "",
+          "type": "declared",
+          "urls": [
+            "https://opensource.org/licenses/MIT"
+          ],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -97610,7 +97837,7 @@
       }
     },
     {
-      "id": "ecad85a438f1b920",
+      "id": "cd279c20458680a3",
       "name": "jenkins-stapler-support",
       "version": "1.1",
       "type": "java-archive",
@@ -97778,7 +98005,7 @@
       }
     },
     {
-      "id": "ad8612f11b9cafea",
+      "id": "6b0b453c433951bc",
       "name": "jenkins-war",
       "version": "2.461",
       "type": "java-archive",
@@ -97794,10 +98021,12 @@
       ],
       "licenses": [
         {
-          "value": "MIT",
-          "spdxExpression": "MIT",
-          "type": "concluded",
-          "urls": [],
+          "value": "The MIT license",
+          "spdxExpression": "",
+          "type": "declared",
+          "urls": [
+            "https://opensource.org/licenses/MIT"
+          ],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -97949,7 +98178,7 @@
       }
     },
     {
-      "id": "fe0e4c44b1fc0ea6",
+      "id": "a49e91cba0478f30",
       "name": "jetty-alpn-java-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98101,7 +98330,7 @@
       }
     },
     {
-      "id": "5dd266a764866e3a",
+      "id": "c6aa856ba74a76c0",
       "name": "jetty-alpn-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98229,7 +98458,7 @@
       }
     },
     {
-      "id": "b994df2cd4692513",
+      "id": "c3160dca8fc0bac3",
       "name": "jetty-http",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98333,7 +98562,7 @@
       }
     },
     {
-      "id": "2a9c1649ffb6a46d",
+      "id": "1edcdf167c4f559e",
       "name": "jetty-io",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98437,7 +98666,7 @@
       }
     },
     {
-      "id": "18c9812482d1df54",
+      "id": "3267ef3ad74c16cf",
       "name": "jetty-jmx",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98542,7 +98771,7 @@
       }
     },
     {
-      "id": "5a7b8b481d937ebe",
+      "id": "92b2c4d37c2302c5",
       "name": "jetty-security",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98647,7 +98876,7 @@
       }
     },
     {
-      "id": "f168b872ce58c987",
+      "id": "287409c69f15cbc1",
       "name": "jetty-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98752,7 +98981,7 @@
       }
     },
     {
-      "id": "9e9369bc5b832f9b",
+      "id": "573745e32dea1df0",
       "name": "jetty-servlet",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98857,7 +99086,7 @@
       }
     },
     {
-      "id": "9a3781d356c185d8",
+      "id": "421c8f1e29132fa4",
       "name": "jetty-unixdomain-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -98986,7 +99215,7 @@
       }
     },
     {
-      "id": "8886743f9b327a05",
+      "id": "b77743b6f6262b5c",
       "name": "jetty-util",
       "version": "10.0.20",
       "type": "java-archive",
@@ -99091,7 +99320,7 @@
       }
     },
     {
-      "id": "89e3c771cc8e4980",
+      "id": "29bbd5b482326ad3",
       "name": "jetty-webapp",
       "version": "10.0.20",
       "type": "java-archive",
@@ -99196,7 +99425,7 @@
       }
     },
     {
-      "id": "43a1c6d6ab0c9189",
+      "id": "4679fd0ebe53b5d1",
       "name": "jetty-xml",
       "version": "10.0.20",
       "type": "java-archive",
@@ -99301,7 +99530,7 @@
       }
     },
     {
-      "id": "8103093d0dcb71b1",
+      "id": "82ef09ec77e9bbe3",
       "name": "jfreechart",
       "version": "1.0.19",
       "type": "java-archive",
@@ -99419,7 +99648,7 @@
       }
     },
     {
-      "id": "9e85e0f8239a3999",
+      "id": "c092acc4747d5e6e",
       "name": "jline",
       "version": "2.14.6",
       "type": "java-archive",
@@ -99565,7 +99794,7 @@
       }
     },
     {
-      "id": "656903078fcd571d",
+      "id": "c3a1c48ba1ae5386",
       "name": "jna",
       "version": "5.14.0",
       "type": "java-archive",
@@ -99739,7 +99968,7 @@
       }
     },
     {
-      "id": "ee78f29c5bc219c2",
+      "id": "0924d22462a9e4c7",
       "name": "jquery3-api",
       "version": "3.7.1-2",
       "type": "jenkins-plugin",
@@ -99942,7 +100171,7 @@
       }
     },
     {
-      "id": "e83a9ccd693f15f2",
+      "id": "1f1a78ef0f300f66",
       "name": "jquery3-api",
       "version": "3.7.1-2",
       "type": "jenkins-plugin",
@@ -100145,7 +100374,7 @@
       }
     },
     {
-      "id": "12d2956a5c7e7b30",
+      "id": "96afb5ae7254b2ac",
       "name": "json",
       "version": "20240303",
       "type": "java-archive",
@@ -100276,7 +100505,7 @@
       }
     },
     {
-      "id": "0862d623de717803",
+      "id": "ccc016a9659c6560",
       "name": "json-api",
       "version": "20240303-41.v94e11e6de726",
       "type": "jenkins-plugin",
@@ -100479,7 +100708,7 @@
       }
     },
     {
-      "id": "e8247ba58e26dbad",
+      "id": "442e63502f0b141a",
       "name": "json-api",
       "version": "20240303-41.v94e11e6de726",
       "type": "jenkins-plugin",
@@ -100682,7 +100911,7 @@
       }
     },
     {
-      "id": "13361c9c92b15ace",
+      "id": "10a45f925023b739",
       "name": "json-lib",
       "version": "2.4-jenkins-7",
       "type": "java-archive",
@@ -100839,7 +101068,7 @@
       }
     },
     {
-      "id": "8a20ecaef6a7280e",
+      "id": "c413bbc26d731b78",
       "name": "junit",
       "version": "1265.v65b_14fa_f12f0",
       "type": "jenkins-plugin",
@@ -101006,7 +101235,7 @@
       }
     },
     {
-      "id": "5efe00d8c69dca6e",
+      "id": "ec35a9d612aba874",
       "name": "junit",
       "version": "1265.v65b_14fa_f12f0",
       "type": "jenkins-plugin",
@@ -101173,7 +101402,7 @@
       }
     },
     {
-      "id": "c864ff5fe3b7cb24",
+      "id": "8a0a143c6b769f32",
       "name": "jzlib",
       "version": "1.1.3-kohsuke-1",
       "type": "java-archive",
@@ -101274,7 +101503,7 @@
       }
     },
     {
-      "id": "3924bf79b130aa50",
+      "id": "2d09e826402c2b18",
       "name": "listenablefuture",
       "version": "9999.0-empty-to-avoid-conflict-with-guava",
       "type": "java-archive",
@@ -101361,7 +101590,7 @@
       }
     },
     {
-      "id": "f28fd43a95aa5176",
+      "id": "e71b522e76f2fb2d",
       "name": "localizer",
       "version": "1.31",
       "type": "java-archive",
@@ -101417,7 +101646,7 @@
       }
     },
     {
-      "id": "66fe6c6ecaf2aa7f",
+      "id": "27e3b1aebdd0c35b",
       "name": "localizer",
       "version": "1.31",
       "type": "java-archive",
@@ -101495,7 +101724,7 @@
       }
     },
     {
-      "id": "34f672506fdc8b0a",
+      "id": "e8fcdf7e15f8b79d",
       "name": "log4j-over-slf4j",
       "version": "2.0.13",
       "type": "java-archive",
@@ -101512,7 +101741,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -101703,7 +101932,7 @@
       }
     },
     {
-      "id": "27ccb370b3b66610",
+      "id": "027000cc225f6999",
       "name": "logging-mailhandler",
       "version": "2.0.3",
       "type": "java-archive",
@@ -101795,7 +102024,7 @@
       }
     },
     {
-      "id": "fb25d68af79bf0b3",
+      "id": "b23a0e23ffa5b68b",
       "name": "mailer",
       "version": "472.vf7c289a_4b_420",
       "type": "jenkins-plugin",
@@ -101970,7 +102199,7 @@
       }
     },
     {
-      "id": "61425b1c9f821017",
+      "id": "fa685c2c70d000bf",
       "name": "mailer",
       "version": "472.vf7c289a_4b_420",
       "type": "jenkins-plugin",
@@ -102145,7 +102374,7 @@
       }
     },
     {
-      "id": "bfa56df9edfd714c",
+      "id": "cc7f3f5bcfed5f6c",
       "name": "matrix-auth",
       "version": "3.2.2",
       "type": "jenkins-plugin",
@@ -102316,7 +102545,7 @@
       }
     },
     {
-      "id": "d3a7db0ac6400e24",
+      "id": "511e4d990f4d8e75",
       "name": "matrix-auth",
       "version": "3.2.2",
       "type": "jenkins-plugin",
@@ -102487,7 +102716,7 @@
       }
     },
     {
-      "id": "2d5ec608b5773b05",
+      "id": "1cf6f92d016da4e6",
       "name": "matrix-project",
       "version": "832.va_66e270d2946",
       "type": "jenkins-plugin",
@@ -102654,7 +102883,7 @@
       }
     },
     {
-      "id": "c8337baa282e95c0",
+      "id": "43b54dc4ca8be08d",
       "name": "matrix-project",
       "version": "832.va_66e270d2946",
       "type": "jenkins-plugin",
@@ -102821,7 +103050,7 @@
       }
     },
     {
-      "id": "22fb0c342f0881e9",
+      "id": "6850dfca147f8911",
       "name": "memory-monitor",
       "version": "1.12",
       "type": "java-archive",
@@ -102994,7 +103223,7 @@
       }
     },
     {
-      "id": "99bb3f93171534fe",
+      "id": "0a7fbafe17d7bd66",
       "name": "mina-sshd-api-common",
       "version": "2.12.1-101.v85b_e08b_780dd",
       "type": "jenkins-plugin",
@@ -103229,7 +103458,7 @@
       }
     },
     {
-      "id": "4ab99d5149c7a63d",
+      "id": "a983d81ca62c2d5c",
       "name": "mina-sshd-api-common",
       "version": "2.12.1-101.v85b_e08b_780dd",
       "type": "jenkins-plugin",
@@ -103464,7 +103693,7 @@
       }
     },
     {
-      "id": "6869b267e057d6ca",
+      "id": "b70d0b183d24870e",
       "name": "mina-sshd-api-core",
       "version": "2.12.1-101.v85b_e08b_780dd",
       "type": "jenkins-plugin",
@@ -103699,7 +103928,7 @@
       }
     },
     {
-      "id": "cb4dfdac90e92794",
+      "id": "09ce842d2f22b48b",
       "name": "mina-sshd-api-core",
       "version": "2.12.1-101.v85b_e08b_780dd",
       "type": "jenkins-plugin",
@@ -103934,7 +104163,7 @@
       }
     },
     {
-      "id": "4f8e56c0baa99ca8",
+      "id": "33b5736bdcebd005",
       "name": "mxparser",
       "version": "1.2.2",
       "type": "java-archive",
@@ -104157,7 +104386,7 @@
       }
     },
     {
-      "id": "b41a16c3e0daeadb",
+      "id": "161a653b5b9543c2",
       "name": "owasp-java-html-sanitizer",
       "version": "20220608.1",
       "type": "java-archive",
@@ -104174,7 +104403,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -104368,7 +104597,7 @@
       }
     },
     {
-      "id": "f788d369050ce27b",
+      "id": "33ddc9b68d170afb",
       "name": "plugin-util-api",
       "version": "4.1.0",
       "type": "jenkins-plugin",
@@ -104583,7 +104812,7 @@
       }
     },
     {
-      "id": "0cebfe2cf9201de3",
+      "id": "7db7c6af3dd656d7",
       "name": "plugin-util-api",
       "version": "4.1.0",
       "type": "jenkins-plugin",
@@ -104798,7 +105027,7 @@
       }
     },
     {
-      "id": "1a255dba4eaec6a9",
+      "id": "fcadbcdf945c9f61",
       "name": "pop3",
       "version": "2.0.3",
       "type": "java-archive",
@@ -104858,7 +105087,7 @@
       }
     },
     {
-      "id": "c8a2f3ab808c755d",
+      "id": "28903a2564fbcc75",
       "name": "relaxngDatatype",
       "version": "20020414",
       "type": "java-archive",
@@ -104933,7 +105162,7 @@
       }
     },
     {
-      "id": "949edf5faf8cf256",
+      "id": "9d0f9bc56be176d5",
       "name": "remoting",
       "version": "3248.v65ecb_254c298",
       "type": "java-archive",
@@ -105079,7 +105308,7 @@
       }
     },
     {
-      "id": "55f0f7c716bc3c46",
+      "id": "b7c34702a0a78cba",
       "name": "robust-http-client",
       "version": "1.2",
       "type": "java-archive",
@@ -105224,7 +105453,7 @@
       }
     },
     {
-      "id": "82bebc871863422a",
+      "id": "9d69ecf1787f00b1",
       "name": "scm-api",
       "version": "690.vfc8b_54395023",
       "type": "jenkins-plugin",
@@ -105447,7 +105676,7 @@
       }
     },
     {
-      "id": "e7ec70c71c0c5346",
+      "id": "c403def555dc3ae8",
       "name": "scm-api",
       "version": "690.vfc8b_54395023",
       "type": "jenkins-plugin",
@@ -105670,7 +105899,7 @@
       }
     },
     {
-      "id": "c58d2ee02f52c60f",
+      "id": "dd178fd4c60f3cfd",
       "name": "script-security",
       "version": "1341.va_2819b_414686",
       "type": "jenkins-plugin",
@@ -105837,7 +106066,7 @@
       }
     },
     {
-      "id": "ba5794b9ffdbf1e2",
+      "id": "0d05a82349eeb794",
       "name": "script-security",
       "version": "1341.va_2819b_414686",
       "type": "jenkins-plugin",
@@ -106004,7 +106233,7 @@
       }
     },
     {
-      "id": "e6a61b72ae6663e0",
+      "id": "944ad6b526600600",
       "name": "sezpoz",
       "version": "1.13",
       "type": "java-archive",
@@ -106106,7 +106335,7 @@
       }
     },
     {
-      "id": "06516832cc0e1356",
+      "id": "f3f76a8dcc60964e",
       "name": "slf4j-api",
       "version": "2.0.13",
       "type": "java-archive",
@@ -106184,7 +106413,7 @@
       }
     },
     {
-      "id": "2f7e453b724ff109",
+      "id": "96b0fc51bf1c66c3",
       "name": "slf4j-api",
       "version": "2.0.13",
       "type": "java-archive",
@@ -106368,7 +106597,7 @@
       }
     },
     {
-      "id": "dc4ac008f11b7a44",
+      "id": "273e89357f847ad5",
       "name": "slf4j-api",
       "version": "2.0.13",
       "type": "java-archive",
@@ -106446,7 +106675,7 @@
       }
     },
     {
-      "id": "c3e72a68883efadf",
+      "id": "0a8e7d2995bdfd54",
       "name": "slf4j-jdk14",
       "version": "2.0.13",
       "type": "java-archive",
@@ -106524,7 +106753,7 @@
       }
     },
     {
-      "id": "2bb7d0d8ae4c135f",
+      "id": "a339d889fe82ad1b",
       "name": "slf4j-jdk14",
       "version": "2.0.13",
       "type": "java-archive",
@@ -106716,7 +106945,7 @@
       }
     },
     {
-      "id": "0c979e1af0ab7935",
+      "id": "af7f9ec193d206cd",
       "name": "slf4j-jdk14",
       "version": "2.0.13",
       "type": "java-archive",
@@ -106794,7 +107023,7 @@
       }
     },
     {
-      "id": "184ab5aacfc1d4a4",
+      "id": "79f140fa6e711cd4",
       "name": "smtp",
       "version": "2.0.3",
       "type": "java-archive",
@@ -106854,7 +107083,7 @@
       }
     },
     {
-      "id": "ecfe3e0efa971476",
+      "id": "81e08fa1e977f203",
       "name": "snakeyaml",
       "version": "2.2",
       "type": "java-archive",
@@ -106871,7 +107100,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -106997,7 +107226,7 @@
       }
     },
     {
-      "id": "ce2a4e75791a57bc",
+      "id": "29fa3b5984046dc3",
       "name": "snakeyaml-api",
       "version": "2.2-111.vc6598e30cc65",
       "type": "jenkins-plugin",
@@ -107200,7 +107429,7 @@
       }
     },
     {
-      "id": "8fd5804c4c0e3c9f",
+      "id": "a1eeb8492f0ada9c",
       "name": "snakeyaml-api",
       "version": "2.2-111.vc6598e30cc65",
       "type": "jenkins-plugin",
@@ -107403,7 +107632,7 @@
       }
     },
     {
-      "id": "e2d98664a65b16f7",
+      "id": "401879c53b42da23",
       "name": "spotbugs-annotations",
       "version": "4.8.5",
       "type": "java-archive",
@@ -107566,7 +107795,7 @@
       }
     },
     {
-      "id": "89c911b233fbe42d",
+      "id": "2cda5dbf25deecc8",
       "name": "spring-aop",
       "version": "5.3.36",
       "type": "java-archive",
@@ -107692,7 +107921,7 @@
       }
     },
     {
-      "id": "68c122a06f783acf",
+      "id": "bc958f31c63748b2",
       "name": "spring-beans",
       "version": "5.3.36",
       "type": "java-archive",
@@ -107818,7 +108047,7 @@
       }
     },
     {
-      "id": "5ae8a65676147ce4",
+      "id": "f0490bdeb537a51e",
       "name": "spring-context",
       "version": "5.3.36",
       "type": "java-archive",
@@ -107944,7 +108173,7 @@
       }
     },
     {
-      "id": "d811960c74892946",
+      "id": "cb8463124d67086c",
       "name": "spring-core",
       "version": "5.3.36",
       "type": "java-archive",
@@ -108258,7 +108487,7 @@
       }
     },
     {
-      "id": "81e2729b1393c3ec",
+      "id": "3553462711442141",
       "name": "spring-expression",
       "version": "5.3.36",
       "type": "java-archive",
@@ -108384,7 +108613,7 @@
       }
     },
     {
-      "id": "676ad26b76e55930",
+      "id": "dcb5d994d48adf3e",
       "name": "spring-security-core",
       "version": "5.8.12",
       "type": "java-archive",
@@ -108583,7 +108812,7 @@
       }
     },
     {
-      "id": "217457c54ab6122f",
+      "id": "38094d14df9c96bc",
       "name": "spring-security-crypto",
       "version": "5.8.12",
       "type": "java-archive",
@@ -108734,7 +108963,7 @@
       }
     },
     {
-      "id": "0594a4f5a76c959a",
+      "id": "c7641e241979629a",
       "name": "spring-security-web",
       "version": "5.8.12",
       "type": "java-archive",
@@ -108885,7 +109114,7 @@
       }
     },
     {
-      "id": "051aef5b6d5c1a84",
+      "id": "c619bd957d3326f6",
       "name": "spring-web",
       "version": "5.3.36",
       "type": "java-archive",
@@ -109011,7 +109240,7 @@
       }
     },
     {
-      "id": "cefb910ca534ddea",
+      "id": "10a9cb01cda729e6",
       "name": "sshd",
       "version": "3.322.v159e91f6a_550",
       "type": "java-archive",
@@ -109198,7 +109427,7 @@
       }
     },
     {
-      "id": "b4a5961afb71c126",
+      "id": "95170c551649d31a",
       "name": "sshd",
       "version": "3.322.v159e91f6a_550",
       "type": "java-archive",
@@ -109385,7 +109614,7 @@
       }
     },
     {
-      "id": "08ba5f7f7c573010",
+      "id": "1805bf1da2d935e6",
       "name": "sshd-common",
       "version": "2.12.1",
       "type": "java-archive",
@@ -109515,7 +109744,7 @@
       }
     },
     {
-      "id": "236eac47288fb32a",
+      "id": "a0b7c03fc268756c",
       "name": "sshd-common",
       "version": "2.12.1",
       "type": "java-archive",
@@ -109571,7 +109800,7 @@
       }
     },
     {
-      "id": "544746b35e6f9d76",
+      "id": "60bf39e8a2f268b1",
       "name": "sshd-core",
       "version": "2.12.1",
       "type": "java-archive",
@@ -109701,7 +109930,7 @@
       }
     },
     {
-      "id": "40fb5fae82ddaef2",
+      "id": "a31dd42028f8d299",
       "name": "sshd-core",
       "version": "2.12.1",
       "type": "java-archive",
@@ -109757,7 +109986,7 @@
       }
     },
     {
-      "id": "97b8d92d50e8f346",
+      "id": "b8d690d3199fdaaf",
       "name": "stapler",
       "version": "1872.ve203fa_6b_b_98d",
       "type": "java-archive",
@@ -109870,7 +110099,7 @@
       }
     },
     {
-      "id": "1e822d310bae6eb6",
+      "id": "cba250154374137d",
       "name": "stapler-adjunct-codemirror",
       "version": "1.3",
       "type": "java-archive",
@@ -109886,25 +110115,12 @@
       ],
       "licenses": [
         {
-          "value": "BSD-3-Clause",
-          "spdxExpression": "BSD-3-Clause",
-          "type": "concluded",
-          "urls": [],
-          "locations": [
-            {
-              "path": "usr/share/java/jenkins/jenkins.war",
-              "accessPath": "usr/share/java/jenkins/jenkins.war:WEB-INF/lib/stapler-adjunct-codemirror-1.3.jar",
-              "annotations": {
-                "evidence": "primary"
-              }
-            }
-          ]
-        },
-        {
-          "value": "MIT",
-          "spdxExpression": "MIT",
-          "type": "concluded",
-          "urls": [],
+          "value": "MIT License",
+          "spdxExpression": "",
+          "type": "declared",
+          "urls": [
+            "http://codemirror.net/LICENSE"
+          ],
           "locations": [
             {
               "path": "usr/share/java/jenkins/jenkins.war",
@@ -110054,7 +110270,7 @@
       }
     },
     {
-      "id": "ea4ca95a04f3f125",
+      "id": "a33f795ac5ba704d",
       "name": "stapler-groovy",
       "version": "1872.ve203fa_6b_b_98d",
       "type": "java-archive",
@@ -110215,7 +110431,7 @@
       }
     },
     {
-      "id": "1f8d8f5d3e0f972b",
+      "id": "6eb9b82ad6ada270",
       "name": "stapler-jelly",
       "version": "1872.ve203fa_6b_b_98d",
       "type": "java-archive",
@@ -110376,7 +110592,7 @@
       }
     },
     {
-      "id": "da940649a125fc5f",
+      "id": "4b53d3d5c384d7a4",
       "name": "stax2-api",
       "version": "4.2.2",
       "type": "java-archive",
@@ -110628,7 +110844,7 @@
       }
     },
     {
-      "id": "4a26af95325e8135",
+      "id": "7cae3bac0857eb43",
       "name": "structs",
       "version": "337.v1b_04ea_4df7c8",
       "type": "jenkins-plugin",
@@ -110662,24 +110878,8 @@
       "language": "java",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:org.jenkins-ci.plugins:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:jenkins-ci:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:jenkins_ci:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:jenkins:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:structs:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:jenkins:structs:337.v1b_04ea_4df7c8:*:*:*:*:jenkins:*:*",
+          "source": "nvd-cpe-dictionary"
         }
       ],
       "purl": "pkg:maven/org.jenkins-ci.plugins/structs@337.v1b_04ea_4df7c8",
@@ -110807,7 +111007,7 @@
       }
     },
     {
-      "id": "9968ca4c72b5943f",
+      "id": "34a701e0433b1acb",
       "name": "structs",
       "version": "337.v1b_04ea_4df7c8",
       "type": "jenkins-plugin",
@@ -110841,24 +111041,8 @@
       "language": "java",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:org.jenkins-ci.plugins:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:jenkins-ci:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:jenkins_ci:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:jenkins:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
-        },
-        {
-          "cpe": "cpe:2.3:a:structs:structs:337.v1b_04ea_4df7c8:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:jenkins:structs:337.v1b_04ea_4df7c8:*:*:*:*:jenkins:*:*",
+          "source": "nvd-cpe-dictionary"
         }
       ],
       "purl": "pkg:maven/org.jenkins-ci.plugins/structs@337.v1b_04ea_4df7c8",
@@ -110986,7 +111170,7 @@
       }
     },
     {
-      "id": "84f768bc6e7a5014",
+      "id": "b51f301aa275eb84",
       "name": "support-log-formatter",
       "version": "1.2",
       "type": "java-archive",
@@ -111109,7 +111293,7 @@
       }
     },
     {
-      "id": "7a609f4d8bee6b3b",
+      "id": "3fb46331857fd218",
       "name": "symbol-annotation",
       "version": "1.24",
       "type": "java-archive",
@@ -111246,7 +111430,7 @@
       }
     },
     {
-      "id": "e0a4342ee7435bb2",
+      "id": "237a00c7c5486a7e",
       "name": "task-reactor",
       "version": "1.8",
       "type": "java-archive",
@@ -111383,7 +111567,7 @@
       }
     },
     {
-      "id": "c771633b13fe0e8c",
+      "id": "cee58b91734fd974",
       "name": "tiger-types",
       "version": "2.2",
       "type": "java-archive",
@@ -111510,7 +111694,7 @@
       }
     },
     {
-      "id": "1ccf150ae849e9e5",
+      "id": "031d3de7f50b43d8",
       "name": "tink",
       "version": "1.10.0",
       "type": "java-archive",
@@ -111589,7 +111773,7 @@
       }
     },
     {
-      "id": "88ae7667f7877b71",
+      "id": "3465f02e4996ab2e",
       "name": "trilead-api",
       "version": "2.147.vb_73cc728a_32e",
       "type": "jenkins-plugin",
@@ -111816,7 +112000,7 @@
       }
     },
     {
-      "id": "8c8078e60783bd21",
+      "id": "841470747e0db72f",
       "name": "trilead-api",
       "version": "2.147.vb_73cc728a_32e",
       "type": "jenkins-plugin",
@@ -112043,7 +112227,7 @@
       }
     },
     {
-      "id": "93d11aaa0e7e9aca",
+      "id": "35494f026a580f6e",
       "name": "trilead-putty-extension",
       "version": "1.2",
       "type": "java-archive",
@@ -112175,7 +112359,7 @@
       }
     },
     {
-      "id": "7184985954b6bf1d",
+      "id": "b9abafd52453df4b",
       "name": "trilead-ssh2",
       "version": "build-217-jenkins-274.276.v58da_75159cb_7",
       "type": "java-archive",
@@ -112290,7 +112474,7 @@
       }
     },
     {
-      "id": "b4e18cea3f8911bd",
+      "id": "c5961d5ab7e95b92",
       "name": "trilead-ssh2-build",
       "version": "217-jenkins-274.276.v58da_75159cb_7",
       "type": "java-archive",
@@ -112397,7 +112581,7 @@
       }
     },
     {
-      "id": "3ea9a84f0b9efd3a",
+      "id": "dfbae2d95d6ebd10",
       "name": "txw2",
       "version": "2.3.9",
       "type": "java-archive",
@@ -112479,7 +112663,7 @@
       }
     },
     {
-      "id": "fe1deff94d029ba9",
+      "id": "f8b71434535a2bcf",
       "name": "txw2",
       "version": "20110809",
       "type": "java-archive",
@@ -112569,7 +112753,7 @@
       }
     },
     {
-      "id": "9a6b7c05956ed75c",
+      "id": "e606841c5b1e8545",
       "name": "tyrus-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -112673,7 +112857,7 @@
       }
     },
     {
-      "id": "16a17b013b2d1e4b",
+      "id": "0921597c6bd20f0e",
       "name": "tyrus-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -112777,7 +112961,7 @@
       }
     },
     {
-      "id": "559fef1c75000074",
+      "id": "1b5a85cda2991e63",
       "name": "tyrus-container-jdk-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -112929,7 +113113,7 @@
       }
     },
     {
-      "id": "e92110fb5df31696",
+      "id": "2e8bb0f0146f571b",
       "name": "tyrus-container-jdk-client",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113081,7 +113265,7 @@
       }
     },
     {
-      "id": "b943739be7da2647",
+      "id": "57648906aea8f10d",
       "name": "tyrus-core",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113185,7 +113369,7 @@
       }
     },
     {
-      "id": "0ade144e201a48f5",
+      "id": "0cabcbb584ca87e8",
       "name": "tyrus-core",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113289,7 +113473,7 @@
       }
     },
     {
-      "id": "203c20f2323ea967",
+      "id": "6bc0d8afe1141a36",
       "name": "tyrus-spi",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113393,7 +113577,7 @@
       }
     },
     {
-      "id": "9d6a0074dc311e51",
+      "id": "029b5ad2cbe45c58",
       "name": "tyrus-spi",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113497,7 +113681,7 @@
       }
     },
     {
-      "id": "6ac10420edd2695e",
+      "id": "8a9505c0a300fb94",
       "name": "tyrus-standalone-client-jdk",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113661,7 +113845,7 @@
       }
     },
     {
-      "id": "9065f13faf84c16b",
+      "id": "5403112775c105e3",
       "name": "tyrus-standalone-client-jdk",
       "version": "2.1.5",
       "type": "java-archive",
@@ -113825,7 +114009,7 @@
       }
     },
     {
-      "id": "1ec3e835527efe99",
+      "id": "c2882e6160164960",
       "name": "version-number",
       "version": "1.11",
       "type": "java-archive",
@@ -113962,7 +114146,7 @@
       }
     },
     {
-      "id": "6730eefb16501780",
+      "id": "1b5233f9713c9a7d",
       "name": "websocket-core-common",
       "version": "10.0.20",
       "type": "java-archive",
@@ -114102,7 +114286,7 @@
       }
     },
     {
-      "id": "152f309684afa304",
+      "id": "96aaa471a0516577",
       "name": "websocket-core-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -114242,7 +114426,7 @@
       }
     },
     {
-      "id": "ad0cda5912b3ec30",
+      "id": "6d3b25fabc6f966b",
       "name": "websocket-jetty-api",
       "version": "10.0.20",
       "type": "java-archive",
@@ -114382,7 +114566,7 @@
       }
     },
     {
-      "id": "0f9cc66205678a49",
+      "id": "09ea2f1b78c7d07a",
       "name": "websocket-jetty-common",
       "version": "10.0.20",
       "type": "java-archive",
@@ -114522,7 +114706,7 @@
       }
     },
     {
-      "id": "7cd1bfaa9a771f77",
+      "id": "5b458e8f6b531694",
       "name": "websocket-jetty-server",
       "version": "10.0.20",
       "type": "java-archive",
@@ -114662,7 +114846,7 @@
       }
     },
     {
-      "id": "86d71c88ae946b85",
+      "id": "74b998939cb6d897",
       "name": "websocket-jetty10",
       "version": "2.461",
       "type": "java-archive",
@@ -114827,7 +115011,7 @@
       }
     },
     {
-      "id": "b9de694298573274",
+      "id": "5801175f3938a883",
       "name": "websocket-servlet",
       "version": "10.0.20",
       "type": "java-archive",
@@ -114943,7 +115127,7 @@
       }
     },
     {
-      "id": "cd24141663b792d8",
+      "id": "9b0efa911bc37d1d",
       "name": "websocket-spi",
       "version": "2.461",
       "type": "java-archive",
@@ -115108,7 +115292,7 @@
       }
     },
     {
-      "id": "6c079e72f0a447d5",
+      "id": "b5023eebb905bd80",
       "name": "windows-package-checker",
       "version": "1.2",
       "type": "java-archive",
@@ -115238,7 +115422,7 @@
       }
     },
     {
-      "id": "2d04f5eebddf7536",
+      "id": "fc764fa616a8383e",
       "name": "winp",
       "version": "1.30",
       "type": "java-archive",
@@ -115343,7 +115527,7 @@
       }
     },
     {
-      "id": "36cf1f11f4cd69b9",
+      "id": "f9a5846ee8a4e8d2",
       "name": "winstone",
       "version": "6.19",
       "type": "java-archive",
@@ -115540,7 +115724,7 @@
       }
     },
     {
-      "id": "aa73a12836ca695a",
+      "id": "028e12fa43a92343",
       "name": "woodstox-core",
       "version": "6.6.1",
       "type": "java-archive",
@@ -115557,7 +115741,7 @@
       "licenses": [
         {
           "value": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "spdxExpression": "",
+          "spdxExpression": "Apache-2.0",
           "type": "declared",
           "urls": [],
           "locations": [
@@ -115800,7 +115984,7 @@
       }
     },
     {
-      "id": "946dc56625a3f888",
+      "id": "35aa3ae51064b3cb",
       "name": "workflow-api",
       "version": "1316.v33eb_726c50b_a_",
       "type": "jenkins-plugin",
@@ -116019,7 +116203,7 @@
       }
     },
     {
-      "id": "cc9dd4536446e7af",
+      "id": "7c9e02e5a5621339",
       "name": "workflow-api",
       "version": "1316.v33eb_726c50b_a_",
       "type": "jenkins-plugin",
@@ -116238,7 +116422,7 @@
       }
     },
     {
-      "id": "6165359a2657b060",
+      "id": "51b3ed9b60ffcd5e",
       "name": "workflow-step-api",
       "version": "657.v03b_e8115821b_",
       "type": "jenkins-plugin",
@@ -116477,7 +116661,7 @@
       }
     },
     {
-      "id": "b5f5a6d1f790c180",
+      "id": "35d55110d3f14a53",
       "name": "workflow-step-api",
       "version": "657.v03b_e8115821b_",
       "type": "jenkins-plugin",
@@ -116716,7 +116900,7 @@
       }
     },
     {
-      "id": "5ca2b83c51b54140",
+      "id": "5ae2fe1061bfb860",
       "name": "workflow-support",
       "version": "907.v6713a_ed8a_573",
       "type": "jenkins-plugin",
@@ -116891,7 +117075,7 @@
       }
     },
     {
-      "id": "052875ce52bb3235",
+      "id": "d3df59d48b4650f9",
       "name": "workflow-support",
       "version": "907.v6713a_ed8a_573",
       "type": "jenkins-plugin",
@@ -117066,7 +117250,7 @@
       }
     },
     {
-      "id": "53862966ed128fc0",
+      "id": "1fae677ead92f52e",
       "name": "xpp3",
       "version": "1.1.4c",
       "type": "java-archive",
@@ -117117,7 +117301,7 @@
       }
     },
     {
-      "id": "346a2a8605c2afc5",
+      "id": "9f491384aad67a5d",
       "name": "xsdlib",
       "version": "2022.7",
       "type": "java-archive",
@@ -117198,7 +117382,7 @@
       }
     },
     {
-      "id": "44f19b6c7d94df96",
+      "id": "f9997838debb7d62",
       "name": "xstream",
       "version": "1.4.20",
       "type": "java-archive",

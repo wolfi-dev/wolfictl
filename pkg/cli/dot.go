@@ -244,17 +244,21 @@ Open browser to explore crane's deps recursively, only showing a minimum subgrap
 
 					out, err := render(nodes)
 					if err != nil {
-						fmt.Fprintf(w, "error rendering %v: %v", nodes, err)
+						// Don't echo the query back: it would reflect
+						// caller-controlled markup into the response.
+						http.Error(w, "error rendering graph", http.StatusInternalServerError)
 						log.Fatal(err)
 					}
 
-					log.Printf("%s: rendering %v", r.URL, nodes)
+					// %q escapes control characters, so a crafted query can't
+					// forge extra log lines.
+					log.Printf("%q: rendering %q", r.URL.String(), nodes) //nolint:gosec // G706: %q escapes control characters
 					cmd := exec.Command("dot", "-Tsvg")
 					cmd.Stdin = strings.NewReader(out.String())
 					cmd.Stdout = w
 
 					if err := cmd.Run(); err != nil {
-						fmt.Fprintf(w, "error rendering %v: %v", nodes, err)
+						http.Error(w, "error rendering graph", http.StatusInternalServerError)
 						log.Fatal(err)
 					}
 				})
