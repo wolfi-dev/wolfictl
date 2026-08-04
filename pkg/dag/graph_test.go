@@ -296,3 +296,64 @@ func TestTargets(t *testing.T) {
 		assert.ElementsMatch(t, want, keys, "unexpected dependencies for %s", k)
 	}
 }
+
+func TestFileURI(t *testing.T) {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+
+	for _, tt := range []struct {
+		name string
+		key  string
+		want string
+	}{
+		{
+			name: "absolute path",
+			key:  "/etc/apk/keys/wolfi-signing.rsa.pub",
+			want: "file:///etc/apk/keys/wolfi-signing.rsa.pub",
+		},
+		{
+			name: "relative path is made absolute",
+			key:  key,
+			want: "file://" + filepath.Join(cwd, key),
+		},
+		{
+			name: "existing file URI is left alone",
+			key:  "file:///etc/apk/keys/wolfi-signing.rsa.pub",
+			want: "file:///etc/apk/keys/wolfi-signing.rsa.pub",
+		},
+		{
+			name: "percent-encoded path is unescaped",
+			key:  "/etc/apk/keys/wolfi%20signing.rsa.pub",
+			want: "file:///etc/apk/keys/wolfi%20signing.rsa.pub",
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, string(fileURI(tt.key)))
+		})
+	}
+}
+
+func TestGetKeyMaterial(t *testing.T) {
+	absKey, err := filepath.Abs(key)
+	require.NoError(t, err)
+
+	for _, tt := range []struct {
+		name    string
+		key     string
+		wantNil bool
+	}{
+		{name: "relative path", key: key},
+		{name: "absolute path", key: absKey},
+		{name: "missing file", key: "testdata/packages/does-not-exist.rsa.pub", wantNil: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := getKeyMaterial(tt.key)
+			require.NoError(t, err)
+			if tt.wantNil {
+				assert.Nil(t, b)
+				return
+			}
+			assert.NotEmpty(t, b)
+		})
+	}
+}

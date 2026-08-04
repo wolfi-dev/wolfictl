@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "e53b033316bed0e3",
+      "id": "2d5babe84f568b7d",
       "name": "crane",
       "version": "0.19.1-r6",
       "type": "apk",
@@ -86,7 +86,7 @@
       }
     },
     {
-      "id": "b71d6e12c1805958",
+      "id": "0bf32517c742760c",
       "name": "github.com/containerd/stargz-snapshotter/estargz",
       "version": "v0.14.3",
       "type": "go-module",
@@ -112,7 +112,7 @@
           "source": "syft-generated"
         }
       ],
-      "purl": "pkg:golang/github.com/containerd/stargz-snapshotter@v0.14.3#estargz",
+      "purl": "pkg:golang/github.com/containerd/stargz-snapshotter/estargz@v0.14.3",
       "metadataType": "go-module-buildinfo-entry",
       "metadata": {
         "goCompiledVersion": "go1.22.4",
@@ -122,7 +122,7 @@
       }
     },
     {
-      "id": "b6de8a2fb85cf4a8",
+      "id": "648ef717544c2a9d",
       "name": "github.com/docker/cli",
       "version": "v24.0.0+incompatible",
       "type": "go-module",
@@ -154,7 +154,7 @@
       }
     },
     {
-      "id": "fff6d726d96d72aa",
+      "id": "453ba3ae574810a7",
       "name": "github.com/docker/distribution",
       "version": "v2.8.2+incompatible",
       "type": "go-module",
@@ -186,7 +186,7 @@
       }
     },
     {
-      "id": "efdccf152e0515fe",
+      "id": "6a5b42d8f29a34af",
       "name": "github.com/docker/docker",
       "version": "v24.0.9+incompatible",
       "type": "go-module",
@@ -218,7 +218,7 @@
       }
     },
     {
-      "id": "c0144ae4dd8d4924",
+      "id": "3e165fb9403eee69",
       "name": "github.com/docker/docker-credential-helpers",
       "version": "v0.7.0",
       "type": "go-module",
@@ -254,7 +254,7 @@
       }
     },
     {
-      "id": "1cebfae819fc38a2",
+      "id": "8d00589c760d04fe",
       "name": "github.com/google/go-cmp",
       "version": "v0.5.9",
       "type": "go-module",
@@ -290,7 +290,7 @@
       }
     },
     {
-      "id": "3c4227189c98474c",
+      "id": "133219c47e54084f",
       "name": "github.com/google/go-containerregistry",
       "version": "v0.19.1",
       "type": "go-module",
@@ -375,7 +375,7 @@
       }
     },
     {
-      "id": "0e9c5750d3318e06",
+      "id": "0df6e3722400db1e",
       "name": "github.com/klauspost/compress",
       "version": "v1.16.5",
       "type": "go-module",
@@ -407,7 +407,7 @@
       }
     },
     {
-      "id": "5bb392a057586b5b",
+      "id": "288337bb2628450b",
       "name": "github.com/mitchellh/go-homedir",
       "version": "v1.1.0",
       "type": "go-module",
@@ -443,7 +443,7 @@
       }
     },
     {
-      "id": "3ce41a3bb1a4f1fa",
+      "id": "1dbcc80ee997742f",
       "name": "github.com/opencontainers/go-digest",
       "version": "v1.0.0",
       "type": "go-module",
@@ -479,7 +479,7 @@
       }
     },
     {
-      "id": "0152f892c55c4fa3",
+      "id": "579aade77e678e92",
       "name": "github.com/opencontainers/image-spec",
       "version": "v1.1.0-rc3",
       "type": "go-module",
@@ -515,7 +515,7 @@
       }
     },
     {
-      "id": "8ac7d661b95eb66a",
+      "id": "c03a9629b906a374",
       "name": "github.com/pkg/errors",
       "version": "v0.9.1",
       "type": "go-module",
@@ -547,7 +547,7 @@
       }
     },
     {
-      "id": "af2b4bec5c8d6859",
+      "id": "647b0365704dc28e",
       "name": "github.com/sirupsen/logrus",
       "version": "v1.9.1",
       "type": "go-module",
@@ -565,8 +565,8 @@
       "language": "go",
       "cpes": [
         {
-          "cpe": "cpe:2.3:a:sirupsen:logrus:v1.9.1:*:*:*:*:*:*:*",
-          "source": "syft-generated"
+          "cpe": "cpe:2.3:a:turbopuffer:logrus:v1.9.1:*:*:*:*:go:*:*",
+          "source": "nvd-cpe-dictionary"
         }
       ],
       "purl": "pkg:golang/github.com/sirupsen/logrus@v1.9.1",
@@ -579,7 +579,7 @@
       }
     },
     {
-      "id": "c3ee699036a9a51e",
+      "id": "983d315fe4f9ff59",
       "name": "github.com/spf13/cobra",
       "version": "v1.7.0",
       "type": "go-module",
@@ -611,7 +611,7 @@
       }
     },
     {
-      "id": "593447f5e2fbe61e",
+      "id": "363d7d67a63b2641",
       "name": "github.com/spf13/pflag",
       "version": "v1.0.5",
       "type": "go-module",
@@ -643,7 +643,7 @@
       }
     },
     {
-      "id": "3538537f8f22027f",
+      "id": "5c8c5a7fc4c06ab8",
       "name": "github.com/vbatts/tar-split",
       "version": "v0.11.3",
       "type": "go-module",
@@ -679,7 +679,7 @@
       }
     },
     {
-      "id": "ecac9d51c963d1c1",
+      "id": "bf738a46c9878641",
       "name": "golang.org/x/sync",
       "version": "v0.2.0",
       "type": "go-module",
@@ -711,7 +711,7 @@
       }
     },
     {
-      "id": "0e6f41974359ed40",
+      "id": "3410b0ee38a3987b",
       "name": "golang.org/x/sys",
       "version": "v0.15.0",
       "type": "go-module",
@@ -743,7 +743,7 @@
       }
     },
     {
-      "id": "384f119e54193e7a",
+      "id": "50a963fc52fd2528",
       "name": "stdlib",
       "version": "go1.22.4",
       "type": "go-module",

@@ -81,6 +81,11 @@ linters:
     gosec:
       config:
         G306: "0644"
+    govet:
+      # "cannot inline: type parameter inference is not yet supported" reports a
+      # limitation of the analyzer, not a problem with the code under analysis.
+      disable:
+        - inline
     nolintlint:
       require-explanation: false
       require-specific: true

@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "id": "85d42e0e57aab361",
+      "id": "14a691dc5843b2e5",
       "name": "pip",
       "version": "24.0",
       "type": "python",
@@ -87,7 +87,7 @@
       "purl": "pkg:pypi/pip@24.0"
     },
     {
-      "id": "9bc9cc1c80f202a3",
+      "id": "68a7d35c6763bded",
       "name": "python-3.11-base",
       "version": "3.11.9-r6",
       "type": "apk",
@@ -5362,7 +5362,7 @@
       }
     },
     {
-      "id": "a145349ac56ab1b1",
+      "id": "59c6d1d47783d575",
       "name": "setuptools",
       "version": "65.5.0",
       "type": "python",

@@ -17,7 +17,9 @@ func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	if err := c.Ratelimiter.Wait(req.Context()); err != nil {
 		return nil, err
 	}
-	return c.Client.Do(req)
+	// The request is supplied by the caller, so the destination is theirs to
+	// choose; this wrapper only adds rate limiting.
+	return c.Client.Do(req) //nolint:gosec // G704: no URL is derived from untrusted input here
 }
 
 // NewClient returns a rate limited http client.

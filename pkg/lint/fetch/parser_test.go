@@ -1,35 +1,11 @@
 package fetch
 
 import (
+	"slices"
 	"testing"
 
 	"gopkg.in/yaml.v3"
 )
-
-// Helper functions for testing
-func equalStringSlices(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func equalGitRefSlices(a, b []gitRefInfo) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
-}
 
 func TestFindYamlValue(t *testing.T) {
 	yamlData := `
@@ -149,19 +125,19 @@ func TestProcessPipelineSteps(t *testing.T) {
 		"https://example.com/another-file.tar.gz",
 		"https://example.com/nested-fetch.tar.gz",
 	}
-	if !equalStringSlices(sources.fetchURLs, expectedFetchURLs) {
+	if !slices.Equal(sources.fetchURLs, expectedFetchURLs) {
 		t.Errorf("fetchURLs: expected %v, got %v", expectedFetchURLs, sources.fetchURLs)
 	}
 
 	expectedGitTags := []string{"v1.0.0"}
-	if !equalStringSlices(sources.gitTags, expectedGitTags) {
+	if !slices.Equal(sources.gitTags, expectedGitTags) {
 		t.Errorf("gitTags: expected %v, got %v", expectedGitTags, sources.gitTags)
 	}
 
 	expectedGitBranches := []gitRefInfo{
 		{Ref: "def456"},
 	}
-	if !equalGitRefSlices(sources.gitBranches, expectedGitBranches) {
+	if !slices.Equal(sources.gitBranches, expectedGitBranches) {
 		t.Errorf("gitBranches: expected %v, got %v", expectedGitBranches, sources.gitBranches)
 	}
 }
@@ -244,12 +220,12 @@ subpackages:
 		"https://example.com/deeply-nested.tar.gz",
 		"https://example.com/sub1.tar.gz",
 	}
-	if !equalStringSlices(sources.fetchURLs, expectedFetchURLs) {
+	if !slices.Equal(sources.fetchURLs, expectedFetchURLs) {
 		t.Errorf("fetchURLs: expected %v, got %v", expectedFetchURLs, sources.fetchURLs)
 	}
 
 	expectedGitTags := []string{"v2.0.0", "v3.0.0"}
-	if !equalStringSlices(sources.gitTags, expectedGitTags) {
+	if !slices.Equal(sources.gitTags, expectedGitTags) {
 		t.Errorf("gitTags: expected %v, got %v", expectedGitTags, sources.gitTags)
 	}
 }
