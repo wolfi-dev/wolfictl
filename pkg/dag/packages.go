@@ -167,6 +167,13 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath string, pipelineDirs [
 		index:    make(map[string]*Configuration),
 	}
 
+	// Resolved here because the walk below shadows the build package with a
+	// local of the same name.
+	var compileOpts []build.CompileOption
+	if options.dependenciesOnly {
+		compileOpts = append(compileOpts, build.WithDependenciesOnly())
+	}
+
 	var g errgroup.Group
 	g.SetLimit(runtime.GOMAXPROCS(0))
 	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
@@ -262,7 +269,7 @@ func NewPackages(ctx context.Context, fsys fs.FS, dirPath string, pipelineDirs [
 				PipelineDirs:  pipelineDirs,
 				Configuration: c.Configuration,
 			}
-			if err := build.Compile(ctx); err != nil {
+			if err := build.Compile(ctx, compileOpts...); err != nil {
 				return fmt.Errorf("compiling build: %w", err)
 			}
 			c.Environment.Contents.Packages = build.Configuration.Environment.Contents.Packages
@@ -514,6 +521,22 @@ func (p *Packages) Repository(arch string) (apk.NamedIndex, error) {
 			}
 		}
 	}
+	// The packages were gathered by walking a map, so their order varies per
+	// run. That order decides which of several equal providers of a virtual
+	// name the resolver picks, and so which dependency edges a graph ends up
+	// with, which is why it is fixed here -- the same reason Packages() sorts.
+	// Origin disambiguates a subpackage from the origin package it came from,
+	// which can share a version.
+	sort.Slice(packages, func(i, j int) bool {
+		if packages[i].Name != packages[j].Name {
+			return packages[i].Name < packages[j].Name
+		}
+		if packages[i].Version != packages[j].Version {
+			return packages[i].Version < packages[j].Version
+		}
+		return packages[i].Origin < packages[j].Origin
+	})
+
 	index := &apk.APKIndex{
 		Description: "local repository",
 		Packages:    packages,

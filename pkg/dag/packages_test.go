@@ -147,3 +147,76 @@ func TestNewPackagesWithCompileOnly(t *testing.T) {
 		require.Equal(t, buildDeps(t, all, "two"), buildDeps(t, none, "two"))
 	})
 }
+
+// subpackageRuns returns the `runs:` body of the named package's first
+// subpackage pipeline step.
+func subpackageRuns(t *testing.T, p *Packages, name string) string {
+	t.Helper()
+	cfgs := p.Config(name, true)
+	require.Len(t, cfgs, 1)
+	for i := range cfgs[0].Subpackages {
+		sp := &cfgs[0].Subpackages[i]
+		if len(sp.Pipeline) > 0 && sp.Pipeline[0].Runs != "" {
+			return sp.Pipeline[0].Runs
+		}
+	}
+	t.Fatalf("no subpackage pipeline with a runs body in %q", name)
+	return ""
+}
+
+func TestNewPackagesWithDependenciesOnly(t *testing.T) {
+	ctx := context.Background()
+	testdir := "testdata/multiple"
+
+	all, err := NewPackages(ctx, os.DirFS(testdir), testdir, nil)
+	require.NoError(t, err)
+
+	deps, err := NewPackages(ctx, os.DirFS(testdir), testdir, nil, WithDependenciesOnly())
+	require.NoError(t, err)
+
+	t.Run("resolved build dependencies are unchanged", func(t *testing.T) {
+		// This is what the option must not disturb: it is the whole reason a
+		// caller compiles at all.
+		for _, name := range all.PackageNames() {
+			require.Equal(t, buildDeps(t, all, name), buildDeps(t, deps, name), "build deps for %q", name)
+		}
+	})
+
+	t.Run("runnable pipelines are not produced", func(t *testing.T) {
+		// A full compile normalizes the script and drops its comments; this
+		// option leaves it as written. Asserting both directions keeps the test
+		// from passing if compilation stopped stripping comments entirely.
+		require.NotContains(t, subpackageRuns(t, all, "one"), "# a comment")
+		require.Contains(t, subpackageRuns(t, deps, "one"), "# a comment")
+	})
+
+	t.Run("local index is unaffected", func(t *testing.T) {
+		require.ElementsMatch(t, all.PackageNames(), deps.PackageNames())
+
+		for _, name := range []string{
+			"two", "two-provides-implicit", "two-provides-explicit",
+			"one-sub1", "one-sub2", "one-subp-provides-implicit",
+		} {
+			require.NotEmpty(t, deps.Config(name, false), "%q missing from index", name)
+		}
+	})
+
+	t.Run("composes with WithCompileOnly", func(t *testing.T) {
+		// The two options answer different questions: WithCompileOnly chooses
+		// which definitions are compiled, this one how much of each compile is
+		// done. Adding it must not change the first answer.
+		scoped, err := NewPackages(ctx, os.DirFS(testdir), testdir, nil, WithCompileOnly("one"))
+		require.NoError(t, err)
+
+		both, err := NewPackages(ctx, os.DirFS(testdir), testdir, nil,
+			WithCompileOnly("one"), WithDependenciesOnly())
+		require.NoError(t, err)
+
+		require.Equal(t, buildDeps(t, all, "one"), buildDeps(t, both, "one"),
+			"the named definition still resolves its dependencies")
+		require.Equal(t, buildDeps(t, scoped, "two"), buildDeps(t, both, "two"),
+			"a definition outside the set is still not compiled at all")
+		require.Contains(t, subpackageRuns(t, both, "one"), "# a comment",
+			"the named definition is still compiled without a runnable pipeline")
+	})
+}
