@@ -1,11 +1,11 @@
 cel.dev/expr v0.25.2 h1:K6j46C81hXtZQfuX60cVWQFBJahKSE2gfRbNuvr5bFs=
 cel.dev/expr v0.25.2/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
-chainguard.dev/apko v1.2.33 h1:KdMVBNOeCbq/e1pA/F+kquuBObgXQL9qm32JnKCtyA0=
-chainguard.dev/apko v1.2.33/go.mod h1:rZDihDy6oDIV9q+/AJ5ne4/OCS0nDOPOD4xxkNvsTjg=
+chainguard.dev/apko v1.2.35 h1:YP9a8gM2r/mDZslhcPAcquJH23BYcJGvo8/wd62Vy9s=
+chainguard.dev/apko v1.2.35/go.mod h1:rZDihDy6oDIV9q+/AJ5ne4/OCS0nDOPOD4xxkNvsTjg=
 chainguard.dev/go-grpc-kit v0.18.0 h1:kr451ml4eBgNcc0ytqcSSPZ3KGtyfHRrrBcYxW/oZwI=
 chainguard.dev/go-grpc-kit v0.18.0/go.mod h1:N1ZZiV3KkNHFlIS6RPhLT9ppfObC7aa1hqWMPmNiTA0=
-chainguard.dev/melange v0.57.0 h1:u+QgoM9VXtGT/heOjDIG4NN7bn71V7ewwDghZbzUrvI=
-chainguard.dev/melange v0.57.0/go.mod h1:DrESA43hVmjx1EUW7UiuRi3kxaqV19cFpA8WTFeMXkM=
+chainguard.dev/melange v0.58.0 h1:RS1NeZSnFW/sL2Ji/nda5HTsIIw7+ix1Z2yOaBjLtCs=
+chainguard.dev/melange v0.58.0/go.mod h1:DrESA43hVmjx1EUW7UiuRi3kxaqV19cFpA8WTFeMXkM=
 chainguard.dev/sdk v0.1.170 h1:MJ1blus6XCfdfCvOwnXYgybA/gF4HXWRgFlgo3mGqiU=
 chainguard.dev/sdk v0.1.170/go.mod h1:y5AGo04erWjKtEyGX7fO9zZA4vtj9cLGXZjgIYxeMdo=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
