@@ -16,7 +16,7 @@ require (
 	cloud.google.com/go/storage v1.64.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/stereoscope v0.3.0
-	github.com/anchore/syft v1.50.0
+	github.com/anchore/syft v1.51.0
 	github.com/chainguard-dev/clog v1.8.1
 	github.com/chainguard-dev/yam v0.2.65
 	github.com/charmbracelet/bubbles v1.0.0
