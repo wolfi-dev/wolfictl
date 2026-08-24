@@ -42,7 +42,7 @@ require (
 	github.com/knqyf263/go-apk-version v0.0.0-20200609155635-041fdbb8563f
 	github.com/lucasb-eyer/go-colorful v1.4.1
 	github.com/muesli/reflow v0.3.0
-	github.com/package-url/packageurl-go v0.1.6
+	github.com/package-url/packageurl-go v0.1.7
 	github.com/samber/lo v1.53.0
 	github.com/savioxavier/termlink v1.4.3
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
