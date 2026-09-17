@@ -21,9 +21,9 @@ require (
 	github.com/chainguard-dev/yam v0.2.65
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
-	github.com/charmbracelet/lipgloss v1.1.1-0.20250319133953-166f707985bc
+	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
 	github.com/charmbracelet/log v1.0.0
-	github.com/cli/go-gh/v2 v2.13.0
+	github.com/cli/go-gh/v2 v2.16.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/dominikbraun/graph v0.23.0
 	// Pinned: later revisions switch from gopkg.in/yaml.v3 to go.yaml.in/yaml/v4,
