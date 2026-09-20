@@ -189,6 +189,13 @@ func (o *SoNameOptions) checkSonamesMatch(ctx context.Context, existingPackages 
 		log.Infof("checking soname file %s", soname)
 		sonameParts := strings.Split(soname, ".so")
 
+		// DT_SONAME is arbitrary metadata and isn't required to contain ".so",
+		// in which case there's no version to compare against.
+		if len(sonameParts) < 2 {
+			log.Infof("no version found in soname %s, skipping", soname)
+			continue
+		}
+
 		// Find the version and optional qualifier
 		matches := r.FindStringSubmatch(sonameParts[1])
 		if len(matches) > 0 {
@@ -203,6 +210,11 @@ func (o *SoNameOptions) checkSonamesMatch(ctx context.Context, existingPackages 
 	// now iterate over new soname files and compare with existing files
 	for _, soname := range newSonameFiles {
 		sonameParts := strings.Split(soname, ".so")
+		if len(sonameParts) < 2 {
+			log.Infof("no version found in soname %s, skipping", soname)
+			continue
+		}
+
 		name := sonameParts[0]
 		versionStr := strings.TrimPrefix(sonameParts[1], ".")
 		existingVersionStr := existingSonameMap[name]
