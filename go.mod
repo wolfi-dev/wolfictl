@@ -54,7 +54,7 @@ require (
 	go.lsp.dev/uri v1.0.1
 	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
 	golang.org/x/oauth2 v0.37.0
-	golang.org/x/sync v0.22.0
+	golang.org/x/sync v0.23.0
 	golang.org/x/term v0.46.0
 	golang.org/x/text v0.41.0
 	golang.org/x/time v0.16.0
