@@ -409,12 +409,12 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				for _, repo := range config.Environment.Contents.BuildRepositories {
-					if repo[0] == '@' {
+					if strings.HasPrefix(repo, "@") {
 						return fmt.Errorf("repository %q is tagged", repo)
 					}
 				}
 				for _, repo := range config.Environment.Contents.Repositories {
-					if repo[0] == '@' {
+					if strings.HasPrefix(repo, "@") {
 						return fmt.Errorf("repository %q is tagged", repo)
 					}
 				}

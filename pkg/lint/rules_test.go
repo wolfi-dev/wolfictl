@@ -115,6 +115,17 @@ func TestLinter_Rules(t *testing.T) {
 			matches: 1,
 		},
 		{
+			// an empty entry used to panic the rule on repo[0]
+			file:        "empty-repository-entry.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File:   "empty-repository-entry",
+				Errors: EvalRuleErrors{},
+			},
+			wantErr: false,
+			matches: 0,
+		},
+		{
 			file:        "forbidden-repository-tagged.yaml",
 			minSeverity: SeverityWarning,
 			want: EvalResult{
