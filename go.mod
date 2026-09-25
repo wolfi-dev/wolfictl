@@ -1,6 +1,6 @@
 module github.com/wolfi-dev/wolfictl
 
-go 1.26.3
+go 1.26.8
 
 // https://github.com/anchore/grype/blob/v0.80.1/go.mod#L266-L269
 // Pull in a fix for an unpatched CVE. mholt/archiver appears inactive/unmaintained.
@@ -156,7 +156,7 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/containerd/cgroups/v3 v3.1.3 // indirect
 	github.com/containerd/containerd/api v1.11.1 // indirect
-	github.com/containerd/containerd/v2 v2.3.5 // indirect
+	github.com/containerd/containerd/v2 v2.3.6 // indirect
 	github.com/containerd/continuity v0.5.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
