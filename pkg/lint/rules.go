@@ -334,6 +334,19 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			},
 		},
 		{
+			Name:        "prefer-git-checkout",
+			Description: "prefer git-checkout over fetch to get sources from the upstream repository",
+			Severity:    SeverityWarning,
+			LintFunc: func(config config.Configuration) error {
+				for _, p := range config.Pipeline {
+					if p.Uses == "fetch" {
+						return fmt.Errorf("fetch pipeline for %q should use git-checkout instead", p.With["uri"])
+					}
+				}
+				return nil
+			},
+		},
+		{
 			Name:        "valid-pipeline-git-checkout-commit",
 			Description: "every git-checkout pipeline should have a valid expected-commit",
 			Severity:    SeverityError,

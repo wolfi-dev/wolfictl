@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"chainguard.dev/melange/pkg/config"
@@ -1126,6 +1127,44 @@ func TestIsUnversionedPy3Dependency(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			got := isUnversionedPy3Dependency(c.dep)
 			assert.Equal(t, c.expected, got, "isUnversionedPy3Dependency(%q) = %v, want %v", c.dep, got, c.expected)
+		})
+	}
+}
+
+func TestLinter_PreferGitCheckout(t *testing.T) {
+	cases := []struct {
+		file string
+		want []string
+	}{
+		{
+			file: "prefer-git-checkout-fetch.yaml",
+			want: []string{`[prefer-git-checkout]: fetch pipeline for "https://test.com/foo/bar/baz.tar.gz" should use git-checkout instead (WARNING)`},
+		},
+		{
+			file: "prefer-git-checkout-fetch-nolint.yaml",
+		},
+		{
+			file: "update-identifier-matching-git-checkout-repository.yaml",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.file, func(t *testing.T) {
+			// Don't use newTestLinterWithFile, which skips this rule.
+			l := New(WithPath(filepath.Join("testdata/files/", c.file)))
+			got, err := l.Lint(context.Background(), SeverityWarning)
+			require.NoError(t, err)
+
+			var msgs []string
+			for _, res := range got {
+				for _, e := range res.Errors {
+					if e.Rule.Name == "prefer-git-checkout" {
+						assert.Equal(t, SeverityWarning, e.Rule.Severity)
+						msgs = append(msgs, e.Error.Error())
+					}
+				}
+			}
+			assert.Equal(t, c.want, msgs)
 		})
 	}
 }

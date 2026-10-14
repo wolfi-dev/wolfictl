@@ -10,12 +10,16 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
+// prefer-git-checkout warns on every fetch pipeline, which most fixtures use, so
+// skip it by default to keep each fixture focused on the rule it's testing.
+var defaultTestSkipRules = []string{"prefer-git-checkout"}
+
 func newTestLinterWithDir(path string) *Linter {
-	return New(WithPath(filepath.Join("testdata", path)))
+	return New(WithPath(filepath.Join("testdata", path)), WithSkipRules(defaultTestSkipRules))
 }
 
 func newTestLinterWithFile(path string) *Linter {
-	return New(WithPath(filepath.Join("testdata/files/", path)))
+	return New(WithPath(filepath.Join("testdata/files/", path)), WithSkipRules(defaultTestSkipRules))
 }
 
 // EquateErrorsByString allows errors to be equated if their strings match but errors.Is returns false
