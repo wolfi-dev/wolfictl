@@ -46,6 +46,8 @@ var (
 	reValidSHA256 = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	reValidSHA512 = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
 	reValidSHA1   = regexp.MustCompile(`^[a-fA-F0-9]{40}$`)
+	// Version-streamed package names, e.g. "foo-1.2" -> ("foo", "1.2")
+	reVersionStreamName = regexp.MustCompile(`^(.+)-(\d+(?:\.\d+)*)$`)
 	// Be stricter than Go to promote consistency and avoid homograph attacks
 	reValidHostname = regexp.MustCompile(`^[a-z0-9][a-z0-9\.\-]+\.[a-z]{2,6}$`)
 
@@ -670,6 +672,35 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					return fmt.Errorf("found unversioned py3-* dependencies: %s (use py3.X-* or py3-supported-* instead)", strings.Join(violations, ", "))
 				}
 
+				return nil
+			},
+		},
+		{
+			Name:        "valid-version-stream-provides",
+			Description: "a version-streamed package should provide its base name at its own version or a version in its stream",
+			Severity:    SeverityError,
+			LintFunc: func(cfg config.Configuration) error {
+				m := reVersionStreamName.FindStringSubmatch(cfg.Package.Name)
+				if m == nil {
+					return nil
+				}
+				base, stream := m[1], m[2]
+				// Templates like ${{package.full-version}} are already substituted here.
+				for _, p := range cfg.Package.Dependencies.Provides {
+					name, version, ok := strings.Cut(p, "=")
+					if !ok || name != base {
+						continue
+					}
+					// The suffix isn't always the package's own version (e.g. pg-partman-14
+					// is built for postgres 14), so accept the package's own version too.
+					if version == cfg.Package.Version || version == cfg.Package.FullVersion() {
+						continue
+					}
+					if version == stream || strings.HasPrefix(version, stream+".") || strings.HasPrefix(version, stream+"-") {
+						continue
+					}
+					return fmt.Errorf("provides %q does not match the package version or the %s stream, use %s=${{package.full-version}}", p, stream, base)
+				}
 				return nil
 			},
 		},

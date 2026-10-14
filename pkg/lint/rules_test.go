@@ -21,6 +21,43 @@ func TestLinter_Rules(t *testing.T) {
 		wantErr     bool
 	}{
 		{
+			file:        "version-stream-provides-mismatch-1.23.yaml",
+			minSeverity: SeverityWarning,
+			want: EvalResult{
+				File: "version-stream-provides-mismatch-1.23",
+				Errors: EvalRuleErrors{
+					{
+						Rule: Rule{
+							Name:     "valid-version-stream-provides",
+							Severity: SeverityError,
+						},
+						Error: fmt.Errorf(`[valid-version-stream-provides]: provides "version-stream-provides-mismatch=1.25" does not match the package version or the 1.23 stream, use version-stream-provides-mismatch=${{package.full-version}} (ERROR)`),
+					},
+				},
+			},
+			wantErr: false,
+			matches: 1,
+		},
+		{
+			file:        "version-stream-provides-literal-1.23.yaml",
+			minSeverity: SeverityWarning,
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			file:        "version-stream-provides-templated-1.23.yaml",
+			minSeverity: SeverityWarning,
+			wantErr:     false,
+			matches:     0,
+		},
+		{
+			// the suffix is what it's built for (like pg-partman-14), not its version
+			file:        "version-stream-provides-built-for-14.yaml",
+			minSeverity: SeverityWarning,
+			wantErr:     false,
+			matches:     0,
+		},
+		{
 			file:        "update-identifier-not-matching-git-checkout-repository.yaml",
 			minSeverity: SeverityError,
 			want: EvalResult{
