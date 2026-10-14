@@ -12,7 +12,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
 	chainguard.dev/apko v1.4.11
-	chainguard.dev/melange v0.62.0
+	chainguard.dev/melange v0.62.1
 	cloud.google.com/go/storage v1.68.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/go-logger v0.2.0
@@ -20,7 +20,7 @@ require (
 	github.com/anchore/syft v1.52.0
 	github.com/chainguard-dev/advisory-schema v0.37.35
 	github.com/chainguard-dev/clog v1.8.1
-	github.com/chainguard-dev/yam v0.2.68
+	github.com/chainguard-dev/yam v0.2.69
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
