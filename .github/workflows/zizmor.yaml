@@ -19,6 +19,10 @@ on:
       - '.github/dependabot.yml'
       - '.github/zizmor.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions: {}
 
 jobs:

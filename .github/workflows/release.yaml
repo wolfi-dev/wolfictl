@@ -33,8 +33,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
-      id-token: write
+      contents: read # Clone the repository
+      id-token: write # Federate with octo-sts and sign releases with cosign keyless
 
     steps:
       - name: Harden Runner
@@ -51,13 +51,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # fetch all history for all tags and branches
+          persist-credentials: true # Needed to push the release tag with the octo-sts token
           token: ${{ steps.octo-sts.outputs.token }}
 
       - uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62 # v3.10.0
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version-file: 'go.mod'
+          go-version: '1.27'
           check-latest: true
           # Disable the Go build/module cache on this signed-release flow: a
           # cache poisoned by a PR-reachable build could otherwise be restored
