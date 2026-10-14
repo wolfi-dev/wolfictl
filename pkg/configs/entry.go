@@ -43,7 +43,6 @@ func (e entry[T]) id() string {
 	return e.path
 }
 
-//nolint:unused // linter is just wrong? This is used in yaml.go.
 func (e entry[T]) yamlASTRoot() *yaml.Node {
 	return e.yamlRoot
 }
