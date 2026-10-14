@@ -5,12 +5,16 @@ on:
     branches:
       - 'main'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions: {}
 
 jobs:
   golangci:
     permissions:
-      contents: read
+      contents: read # Clone the repository
 
     name: lint
     runs-on: ubuntu-latest
@@ -26,7 +30,7 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version-file: 'go.mod'
+          go-version: '1.27'
           check-latest: true
           cache: false
 
