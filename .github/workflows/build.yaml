@@ -35,7 +35,7 @@ jobs:
           go-version: '1.27'
           check-latest: true
 
-      - uses: chainguard-dev/actions/goimports@84b1be4c638f12d4256ddddef17af98853b6d0d9 # v1.6.40
+      - uses: chainguard-dev/actions/goimports@3403a578b543fd3f0debdaef9dd989ae54e3fcef # v1.6.41
       - run: make wolfictl
       - run: make test
 
