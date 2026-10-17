@@ -17,7 +17,7 @@ require (
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/go-logger v0.2.0
 	github.com/anchore/stereoscope v0.3.4
-	github.com/anchore/syft v1.52.0
+	github.com/anchore/syft v1.54.1
 	github.com/chainguard-dev/advisory-schema v0.37.35
 	github.com/chainguard-dev/clog v1.8.1
 	github.com/chainguard-dev/yam v0.2.69
@@ -98,7 +98,7 @@ require (
 	github.com/anchore/go-homedir v0.1.1 // indirect
 	github.com/anchore/go-lzo v0.1.1 // indirect
 	github.com/anchore/go-macholibre v0.1.1 // indirect
-	github.com/anchore/go-rpmdb v0.2.0 // indirect
+	github.com/anchore/go-rpmdb v0.2.2 // indirect
 	github.com/anchore/go-struct-converter v0.2.1 // indirect
 	github.com/anchore/go-sync v0.1.2 // indirect
 	github.com/anchore/go-version v1.2.2-0.20210903204242-51efa5b487c4 // indirect
@@ -190,7 +190,6 @@ require (
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
-	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.5 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.5 // indirect
@@ -225,7 +224,7 @@ require (
 	github.com/hashicorp/go-getter v1.8.9 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
-	github.com/hashicorp/hcl/v2 v2.24.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.25.0 // indirect
 	github.com/henvic/httpretty v0.2.0 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
@@ -273,7 +272,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nix-community/go-nix v0.0.0-20250101154619-4bdde671e0a1 // indirect
-	github.com/nwaples/rardecode/v2 v2.3.0 // indirect
+	github.com/nwaples/rardecode/v2 v2.4.1 // indirect
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
 	github.com/olekukonko/errors v1.3.0 // indirect
 	github.com/olekukonko/ll v0.1.8 // indirect
