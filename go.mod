@@ -13,7 +13,7 @@ replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 require (
 	chainguard.dev/apko v1.4.11
 	chainguard.dev/melange v0.62.1
-	cloud.google.com/go/storage v1.68.0
+	cloud.google.com/go/storage v1.69.0
 	github.com/adrg/xdg v0.5.3
 	github.com/anchore/go-logger v0.2.0
 	github.com/anchore/stereoscope v0.3.4
@@ -351,7 +351,7 @@ require (
 	github.com/zealic/xignore v0.3.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/contrib/detectors/gcp v1.44.0 // indirect
+	go.opentelemetry.io/contrib/detectors/gcp v1.45.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.71.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.71.0 // indirect
 	go.opentelemetry.io/otel v1.47.0 // indirect
