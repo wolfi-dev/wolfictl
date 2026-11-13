@@ -1,0 +1,38 @@
+package:
+  name: check-subpipeline-version-matches-after-range
+  version: 0.9.0
+  epoch: 0
+  description: "a package with an out of date comment after a ranged subpackage"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+pipeline:
+  - runs: |
+      # CHECK-WHEN-VERSION-CHANGES: 0.9.0
+      echo "this should be checked each time the version is bumped"
+
+data:
+  - name: flavors
+    items:
+      first: "the first flavor"
+      second: "the second flavor"
+
+subpackages:
+  - range: flavors
+    name: ${{package.name}}-${{range.key}}
+    description: ${{range.value}}
+    pipeline:
+      - runs: |
+          # CHECK-WHEN-VERSION-CHANGES: 0.9.0
+          echo "this should be checked each time the version is bumped"
+
+  - name: subpackage
+    description: "a package with an out of date comment"
+    pipeline:
+      - runs: |
+          # CHECK-WHEN-VERSION-CHANGES: 0.8.0
+          echo "this should be checked each time the version is bumped"
+update:
+  enabled: true
