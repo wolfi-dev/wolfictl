@@ -3,6 +3,7 @@ package lint
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"sort"
 
 	"golang.org/x/exp/slices"
@@ -89,9 +90,17 @@ func (l *Linter) Lint(ctx context.Context, minSeverity Severity) (Result, error)
 				if rule.Severity.Value <= minSeverity.Value {
 					msg := fmt.Sprintf("[%s]: %s (%s)", rule.Name, err.Error(), rule.Severity.Name)
 
+					line := errorLine(err)
+					if line == 0 {
+						// Fall back to the package block for errors that
+						// aren't attributed to a specific line.
+						line = lineOf(namesToPkg[name].Config.Root(), "package")
+					}
+
 					failedRules = append(failedRules, EvalRuleError{
 						Rule:  rule,
 						Error: fmt.Errorf("%s", msg),
+						Line:  line,
 					})
 				}
 			}
@@ -100,6 +109,7 @@ func (l *Linter) Lint(ctx context.Context, minSeverity Severity) (Result, error)
 		if failedRules.WrapErrors() != nil {
 			results = append(results, EvalResult{
 				File:   name,
+				Path:   filepath.Join(l.options.Path, namesToPkg[name].Filename),
 				Errors: failedRules,
 			})
 		}
@@ -112,9 +122,13 @@ func (l *Linter) Print(ctx context.Context, result Result) {
 	log := clog.FromContext(ctx)
 	foundAny := false
 	for _, res := range result {
-		if res.Errors.WrapErrors() != nil {
+		for _, e := range res.Errors {
 			foundAny = true
-			log.Errorf("Package: %s: %s", res.File, res.Errors.WrapErrors())
+			if e.Line > 0 {
+				log.Errorf("Package: %s: %s:%d: %s", res.File, res.Path, e.Line, e.Error)
+			} else {
+				log.Errorf("Package: %s: %s", res.File, e.Error)
+			}
 		}
 	}
 	if !foundAny {

@@ -58,6 +58,11 @@ type EvalRuleError struct {
 
 	// Error is the error that occurred.
 	Error error
+
+	// Line is the line of the configuration file the error is attributed to.
+	// Errors that don't relate to a specific line are attributed to the line
+	// of the package block. It is 0 if the line is unknown.
+	Line int
 }
 
 // EvalRuleErrors returns a list of EvalError.
@@ -67,6 +72,9 @@ type EvalRuleErrors []EvalRuleError
 type EvalResult struct {
 	// File is the name of the file that was evaluated against.
 	File string
+
+	// Path is the path to the file that was evaluated against.
+	Path string
 
 	// Errors is a list of validation errors for each rule.
 	Errors EvalRuleErrors

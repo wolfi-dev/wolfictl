@@ -1,13 +1,18 @@
 package lint
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"log/slog"
 	"path/filepath"
 	"testing"
 
+	"github.com/chainguard-dev/clog"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // prefer-git-checkout warns on every fetch pipeline, which most fixtures use, so
@@ -58,6 +63,7 @@ func TestLinter_Dir(t *testing.T) {
 			want: Result{
 				{
 					File: "tld-swap",
+					Path: "testdata/dirs/tld-swap/tld-swap.yaml",
 					Errors: EvalRuleErrors{
 						EvalRuleError{
 							Rule: Rule{
@@ -66,6 +72,7 @@ func TestLinter_Dir(t *testing.T) {
 								Severity:    SeverityError,
 							},
 							Error: fmt.Errorf("[uri-mimic]: \"test.org\" shares components with \"test.com\" (ERROR)"),
+							Line:  15,
 						},
 					},
 				},
@@ -78,6 +85,7 @@ func TestLinter_Dir(t *testing.T) {
 			want: Result{
 				{
 					File: "libssh2",
+					Path: "testdata/dirs/similar-domains/libssh2.yaml",
 					Errors: EvalRuleErrors{
 						EvalRuleError{
 							Rule: Rule{
@@ -86,6 +94,7 @@ func TestLinter_Dir(t *testing.T) {
 								Severity:    SeverityError,
 							},
 							Error: fmt.Errorf("[uri-mimic]: \"www.libssh2.org\" too similar to \"www.libshh2.org\" (ERROR)"),
+							Line:  14,
 						},
 					},
 				},
@@ -106,4 +115,17 @@ func TestLinter_Dir(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLinter_Print(t *testing.T) {
+	var buf bytes.Buffer
+	ctx := clog.WithLogger(context.Background(), clog.NewLogger(slog.New(slog.NewTextHandler(&buf, nil))))
+
+	l := newTestLinterWithFile("bad-version.yaml")
+	result, err := l.Lint(ctx, SeverityWarning)
+	require.NoError(t, err)
+
+	l.Print(ctx, result)
+
+	assert.Contains(t, buf.String(), `msg="Package: bad-version: testdata/files/bad-version.yaml:3: [bad-version]: invalid version 1.0.0rc1, could not parse (ERROR)"`)
 }
