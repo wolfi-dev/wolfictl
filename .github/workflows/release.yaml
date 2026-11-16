@@ -54,7 +54,7 @@ jobs:
           persist-credentials: true # Needed to push the release tag with the octo-sts token
           token: ${{ steps.octo-sts.outputs.token }}
 
-      - uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62 # v3.10.0
+      - uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
