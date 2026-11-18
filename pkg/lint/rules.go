@@ -88,14 +88,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "do not specify a forbidden repository",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, repo := range config.Environment.Contents.BuildRepositories {
+				for i, repo := range config.Environment.Contents.BuildRepositories {
 					if slices.Contains(forbiddenRepositories, repo) {
-						return fmt.Errorf("forbidden repository %s is used", repo)
+						return errorAt(config, fmt.Errorf("forbidden repository %s is used", repo), "environment", "contents", "build_repositories", i)
 					}
 				}
-				for _, repo := range config.Environment.Contents.Repositories {
+				for i, repo := range config.Environment.Contents.Repositories {
 					if slices.Contains(forbiddenRepositories, repo) {
-						return fmt.Errorf("forbidden repository %s is used", repo)
+						return errorAt(config, fmt.Errorf("forbidden repository %s is used", repo), "environment", "contents", "repositories", i)
 					}
 				}
 				return nil
@@ -106,9 +106,9 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "do not specify a forbidden keyring",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, keyring := range config.Environment.Contents.Keyring {
+				for i, keyring := range config.Environment.Contents.Keyring {
 					if slices.Contains(forbiddenKeyrings, keyring) {
-						return fmt.Errorf("forbidden keyring %s is used", keyring)
+						return errorAt(config, fmt.Errorf("forbidden keyring %s is used", keyring), "environment", "contents", "keyring", i)
 					}
 				}
 				return nil
@@ -122,9 +122,9 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				if len(config.Package.Copyright) == 0 {
 					return fmt.Errorf("copyright header is missing")
 				}
-				for _, c := range config.Package.Copyright {
+				for i, c := range config.Package.Copyright {
 					if c.License == "" {
-						return fmt.Errorf("license is missing")
+						return errorAt(config, fmt.Errorf("license is missing"), "package", "copyright", i)
 					}
 				}
 				return nil
@@ -182,20 +182,20 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every fetch pipeline should have a valid uri",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					uri, err := extractURI(p)
 					if err != nil {
-						return err
+						return errorAt(config, err, "pipeline", i, "with")
 					}
 					if uri == "" {
 						continue
 					}
 					u, err := url.ParseRequestURI(uri)
 					if err != nil {
-						return fmt.Errorf("uri is invalid URL structure")
+						return errorAt(config, fmt.Errorf("uri is invalid URL structure"), "pipeline", i, "with", uriKey(p.Uses))
 					}
 					if !reValidHostname.MatchString(u.Host) {
-						return fmt.Errorf("uri hostname %q is invalid", u.Host)
+						return errorAt(config, fmt.Errorf("uri hostname %q is invalid", u.Host), "pipeline", i, "with", uriKey(p.Uses))
 					}
 				}
 				return nil
@@ -206,7 +206,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every config should use a consistent hostname",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					uri := p.With["uri"]
 					if uri == "" {
 						continue
@@ -227,14 +227,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 							continue
 						}
 						if dist <= minhostEditDistance {
-							return fmt.Errorf("%q too similar to %q", host, k)
+							return errorAt(config, fmt.Errorf("%q too similar to %q", host, k), "pipeline", i, "with", "uri")
 						}
 
 						// Detect TLD swaps
 						hostParts := strings.Split(host, ".")
 						kParts := strings.Split(k, ".")
 						if strings.Join(hostParts[:len(hostParts)-1], ".") == strings.Join(kParts[:len(kParts)-1], ".") {
-							return fmt.Errorf("%q shares components with %q", host, k)
+							return errorAt(config, fmt.Errorf("%q shares components with %q", host, k), "pipeline", i, "with", "uri")
 						}
 					}
 					seenHosts[host] = true
@@ -248,23 +248,23 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every fetch pipeline should have a valid digest",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					if p.Uses == "fetch" {
 						hashGiven := false
 						if sha256, ok := p.With["expected-sha256"]; ok {
 							if !reValidSHA256.MatchString(sha256) {
-								return fmt.Errorf("expected-sha256 is not valid SHA256")
+								return errorAt(config, fmt.Errorf("expected-sha256 is not valid SHA256"), "pipeline", i, "with", "expected-sha256")
 							}
 							hashGiven = true
 						}
 						if sha512, ok := p.With["expected-sha512"]; ok {
 							if !reValidSHA512.MatchString(sha512) {
-								return fmt.Errorf("expected-sha512 is not valid SHA512")
+								return errorAt(config, fmt.Errorf("expected-sha512 is not valid SHA512"), "pipeline", i, "with", "expected-sha512")
 							}
 							hashGiven = true
 						}
 						if !hashGiven {
-							return fmt.Errorf("expected-sha256 or expected-sha512 is missing")
+							return errorAt(config, fmt.Errorf("expected-sha256 or expected-sha512 is missing"), "pipeline", i, "with")
 						}
 					}
 				}
@@ -277,9 +277,9 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
 				seen := map[string]struct{}{}
-				for _, p := range config.Environment.Contents.Packages {
+				for i, p := range config.Environment.Contents.Packages {
 					if _, ok := seen[p]; ok {
-						return fmt.Errorf("package %s is duplicated in environment", p)
+						return errorAt(config, fmt.Errorf("package %s is duplicated in environment", p), "environment", "contents", "packages", i)
 					}
 					seen[p] = struct{}{}
 				}
@@ -307,16 +307,16 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					return nil
 				}
 
-				for _, s := range config.Pipeline {
+				for i, s := range config.Pipeline {
 					if err := hasBadVar(s.Runs); err != nil {
-						return err
+						return errorAt(config, err, "pipeline", i, "runs")
 					}
 				}
 
-				for _, subPkg := range config.Subpackages {
-					for _, subPipeline := range subPkg.Pipeline {
+				for i, subPkg := range config.Subpackages {
+					for j, subPipeline := range subPkg.Pipeline {
 						if err := hasBadVar(subPipeline.Runs); err != nil {
-							return err
+							return errorAt(config, err, append(subpackagePath(config, i), "pipeline", j, "runs")...)
 						}
 					}
 				}
@@ -330,7 +330,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			LintFunc: func(config config.Configuration) error {
 				version := config.Package.Version
 				if err := versions.ValidateWithoutEpoch(version); err != nil {
-					return fmt.Errorf("invalid version %s, could not parse", version)
+					return errorAt(config, fmt.Errorf("invalid version %s, could not parse", version), "package", "version")
 				}
 				return nil
 			},
@@ -340,9 +340,9 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "prefer git-checkout over fetch to get sources from the upstream repository",
 			Severity:    SeverityWarning,
 			LintFunc: func(config config.Configuration) error {
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					if p.Uses == "fetch" {
-						return fmt.Errorf("fetch pipeline for %q should use git-checkout instead", p.With["uri"])
+						return errorAt(config, fmt.Errorf("fetch pipeline for %q should use git-checkout instead", p.With["uri"]), "pipeline", i, "uses")
 					}
 				}
 				return nil
@@ -353,14 +353,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every git-checkout pipeline should have a valid expected-commit",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					if p.Uses == gitCheckout {
 						if commit, ok := p.With["expected-commit"]; ok {
 							if !reValidSHA1.MatchString(commit) {
-								return fmt.Errorf("expected-commit is not valid SHA1")
+								return errorAt(config, fmt.Errorf("expected-commit is not valid SHA1"), "pipeline", i, "with", "expected-commit")
 							}
 						} else {
-							return fmt.Errorf("expected-commit is missing")
+							return errorAt(config, fmt.Errorf("expected-commit is missing"), "pipeline", i, "with")
 						}
 					}
 				}
@@ -372,13 +372,13 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every git-checkout pipeline should have a tag or branch",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					if p.Uses == gitCheckout {
 						_, hasTag := p.With["tag"]
 						_, hasBranch := p.With["branch"]
 						// "branch" and "tag" are mutually exclusive
 						if !hasTag && !hasBranch {
-							return fmt.Errorf("tag or branch is missing")
+							return errorAt(config, fmt.Errorf("tag or branch is missing"), "pipeline", i, "with")
 						}
 					}
 				}
@@ -403,15 +403,15 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					}
 					return nil
 				}
-				for _, p := range config.Pipeline {
+				for i, p := range config.Pipeline {
 					if err := checkString(p.Runs); err != nil {
-						return err
+						return errorAt(config, err, "pipeline", i, "runs")
 					}
 				}
-				for _, subPkg := range config.Subpackages {
-					for _, subPipeline := range subPkg.Pipeline {
+				for i, subPkg := range config.Subpackages {
+					for j, subPipeline := range subPkg.Pipeline {
 						if err := checkString(subPipeline.Runs); err != nil {
-							return err
+							return errorAt(config, err, append(subpackagePath(config, i), "pipeline", j, "runs")...)
 						}
 					}
 				}
@@ -423,14 +423,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "remove tagged repositories like @local from the repositories block",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, repo := range config.Environment.Contents.BuildRepositories {
+				for i, repo := range config.Environment.Contents.BuildRepositories {
 					if strings.HasPrefix(repo, "@") {
-						return fmt.Errorf("repository %q is tagged", repo)
+						return errorAt(config, fmt.Errorf("repository %q is tagged", repo), "environment", "contents", "build_repositories", i)
 					}
 				}
-				for _, repo := range config.Environment.Contents.Repositories {
+				for i, repo := range config.Environment.Contents.Repositories {
 					if strings.HasPrefix(repo, "@") {
-						return fmt.Errorf("repository %q is tagged", repo)
+						return errorAt(config, fmt.Errorf("repository %q is tagged", repo), "environment", "contents", "repositories", i)
 					}
 				}
 				return nil
@@ -444,7 +444,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				for _, p := range config.Pipeline {
 					if p.Uses == gitCheckout && strings.HasPrefix(p.With["repository"], "https://github.com/") {
 						if config.Update.Enabled && config.Update.GitHubMonitor == nil && config.Update.GitMonitor == nil {
-							return fmt.Errorf("configure update.github/update.git when using git-checkout")
+							return errorAt(config, fmt.Errorf("configure update.github/update.git when using git-checkout"), "update")
 						}
 					}
 				}
@@ -456,14 +456,14 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "every package should have a valid SPDX license",
 			Severity:    SeverityError,
 			LintFunc: func(config config.Configuration) error {
-				for _, c := range config.Package.Copyright {
+				for i, c := range config.Package.Copyright {
 					switch c.License {
 					// Allow wicked licenses
 					case "custom", "PROPRIETARY":
 						continue
 					}
 					if valid, _ := spdxexp.ValidateLicenses([]string{c.License}); !valid {
-						return fmt.Errorf("license %q is not valid SPDX license", c.License)
+						return errorAt(config, fmt.Errorf("license %q is not valid SPDX license", c.License), "package", "copyright", i, "license")
 					}
 				}
 				return nil
@@ -502,7 +502,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				if !cfg.Enabled && cfg.ExcludeReason != "" {
 					return nil
 				}
-				return fmt.Errorf("auto-update is disabled but no reason is provided")
+				return errorAt(c, fmt.Errorf("auto-update is disabled but no reason is provided"), "update", "enabled")
 			},
 		},
 		{
@@ -510,8 +510,8 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Description: "test steps should redirect output when running background processes",
 			Severity:    SeverityWarning,
 			LintFunc: func(c config.Configuration) error {
-				checkSteps := func(steps []config.Pipeline) error {
-					for _, s := range steps {
+				checkSteps := func(steps []config.Pipeline, path ...any) error {
+					for step, s := range steps {
 						if s.Runs == "" {
 							continue
 						}
@@ -524,7 +524,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 
 							needsRedirect := reBackgroundProcess.MatchString(checkLine) || reDaemonProcess.MatchString(line)
 							if needsRedirect && !reOutputRedirect.MatchString(line) {
-								return fmt.Errorf("background process missing output redirect: %s", strings.TrimSpace(line))
+								return errorAt(c, fmt.Errorf("background process missing output redirect: %s", strings.TrimSpace(line)), append(path, "pipeline", step, "runs")...)
 							}
 						}
 					}
@@ -532,13 +532,13 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				}
 
 				if c.Test != nil {
-					if err := checkSteps(c.Test.Pipeline); err != nil {
+					if err := checkSteps(c.Test.Pipeline, "test"); err != nil {
 						return err
 					}
 				}
-				for _, sp := range c.Subpackages {
+				for i, sp := range c.Subpackages {
 					if sp.Test != nil {
-						if err := checkSteps(sp.Test.Pipeline); err != nil {
+						if err := checkSteps(sp.Test.Pipeline, append(subpackagePath(c, i), "test")...); err != nil {
 							return err
 						}
 					}
@@ -565,8 +565,10 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				if config.Update.Schedule == nil {
 					return nil
 				}
-				_, err := config.Update.Schedule.GetScheduleMessage()
-				return err
+				if _, err := config.Update.Schedule.GetScheduleMessage(); err != nil {
+					return errorAt(config, err, "update", "schedule")
+				}
+				return nil
 			},
 		},
 		{
@@ -577,7 +579,8 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				// We need to check the raw YAML because ParseConfiguration already applies
 				// variable substitutions, so the substituted values would be in the config.
 				var unusedVars []string
-				for _, vt := range cfg.VarTransforms {
+				firstUnused := 0
+				for i, vt := range cfg.VarTransforms {
 					varRef := fmt.Sprintf("${{vars.%s}}", vt.To)
 
 					// First check if this variable is used as input to another var-transform
@@ -594,14 +597,17 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 						continue
 					}
 
+					if len(unusedVars) == 0 {
+						firstUnused = i
+					}
 					unusedVars = append(unusedVars, vt.To)
 				}
 
 				if len(unusedVars) > 0 {
 					if len(unusedVars) == 1 {
-						return fmt.Errorf("var-transform creates unused variable %q", unusedVars[0])
+						return errorAt(cfg, fmt.Errorf("var-transform creates unused variable %q", unusedVars[0]), "var-transforms", firstUnused)
 					}
-					return fmt.Errorf("var-transform creates unused variables %q", unusedVars)
+					return errorAt(cfg, fmt.Errorf("var-transform creates unused variables %q", unusedVars), "var-transforms", firstUnused)
 				}
 				return nil
 			},
@@ -648,7 +654,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 
 				// at this point we know that none of the repository URIs match the
 				// github identifier, lets let the world know
-				return fmt.Errorf("update identifier does not match the repository URI")
+				return errorAt(config, fmt.Errorf("update identifier does not match the repository URI"), "update", "github", "identifier")
 			},
 		},
 		{
@@ -657,32 +663,40 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 			Severity:    SeverityWarning,
 			LintFunc: func(cfg config.Configuration) error {
 				var violations []string
+				// The error is reported at the first violation.
+				var firstViolation []any
+				addViolation := func(dep string, path ...any) {
+					if len(violations) == 0 {
+						firstViolation = path
+					}
+					violations = append(violations, dep)
+				}
 
 				// Main package runtime deps
-				for _, dep := range cfg.Package.Dependencies.Runtime {
+				for i, dep := range cfg.Package.Dependencies.Runtime {
 					if isUnversionedPy3Dependency(dep) {
-						violations = append(violations, dep)
+						addViolation(dep, "package", "dependencies", "runtime", i)
 					}
 				}
 
 				// Build-time environment packages
-				for _, pkg := range cfg.Environment.Contents.Packages {
+				for i, pkg := range cfg.Environment.Contents.Packages {
 					if isUnversionedPy3Dependency(pkg) {
-						violations = append(violations, pkg)
+						addViolation(pkg, "environment", "contents", "packages", i)
 					}
 				}
 
 				// Subpackage runtime deps
-				for _, subPkg := range cfg.Subpackages {
-					for _, dep := range subPkg.Dependencies.Runtime {
+				for i, subPkg := range cfg.Subpackages {
+					for j, dep := range subPkg.Dependencies.Runtime {
 						if isUnversionedPy3Dependency(dep) {
-							violations = append(violations, dep)
+							addViolation(dep, append(subpackagePath(cfg, i), "dependencies", "runtime", j)...)
 						}
 					}
 				}
 
 				if len(violations) > 0 {
-					return fmt.Errorf("found unversioned py3-* dependencies: %s (use py3.X-* or py3-supported-* instead)", strings.Join(violations, ", "))
+					return errorAt(cfg, fmt.Errorf("found unversioned py3-* dependencies: %s (use py3.X-* or py3-supported-* instead)", strings.Join(violations, ", ")), firstViolation...)
 				}
 
 				return nil
@@ -699,7 +713,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 				}
 				base, stream := m[1], m[2]
 				// Templates like ${{package.full-version}} are already substituted here.
-				for _, p := range cfg.Package.Dependencies.Provides {
+				for i, p := range cfg.Package.Dependencies.Provides {
 					name, version, ok := strings.Cut(p, "=")
 					if !ok || name != base {
 						continue
@@ -712,7 +726,7 @@ var AllRules = func(l *Linter) Rules { //nolint:gocyclo
 					if version == stream || strings.HasPrefix(version, stream+".") || strings.HasPrefix(version, stream+"-") {
 						continue
 					}
-					return fmt.Errorf("provides %q does not match the package version or the %s stream, use %s=${{package.full-version}}", p, stream, base)
+					return errorAt(cfg, fmt.Errorf("provides %q does not match the package version or the %s stream, use %s=${{package.full-version}}", p, stream, base), "package", "dependencies", "provides", i)
 				}
 				return nil
 			},
@@ -814,26 +828,30 @@ func containsKey(parentNode *yaml.Node, key string) error {
 }
 
 func extractURI(p config.Pipeline) (string, error) {
-	if p.Uses == "fetch" {
-		uri, ok := p.With["uri"]
-		if !ok {
-			return "", fmt.Errorf("uri is missing in fetch pipeline")
-		}
-
-		return uri, nil
+	key := uriKey(p.Uses)
+	if key == "" {
+		// Most pipelines won't have a URI.
+		return "", nil
 	}
 
-	if p.Uses == "git-checkout" {
-		repo, ok := p.With["repository"]
-		if !ok {
-			return "", fmt.Errorf("repository is missing in git-checkout pipeline")
-		}
-
-		return repo, nil
+	uri, ok := p.With[key]
+	if !ok {
+		return "", fmt.Errorf("%s is missing in %s pipeline", key, p.Uses)
 	}
 
-	// Most pipelines won't have a URI.
-	return "", nil
+	return uri, nil
+}
+
+// uriKey returns the "with" key that holds the source URI of a pipeline step
+// with the given uses, or an empty string if that step doesn't fetch sources.
+func uriKey(uses string) string {
+	switch uses {
+	case "fetch":
+		return "uri"
+	case gitCheckout:
+		return "repository"
+	}
+	return ""
 }
 
 // isVariableReferencedInRawYAML checks if a variable reference (e.g., "${{vars.foo}}")
