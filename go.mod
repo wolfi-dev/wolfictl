@@ -20,7 +20,7 @@ require (
 	github.com/anchore/syft v1.57.2
 	github.com/chainguard-dev/advisory-schema v0.37.35
 	github.com/chainguard-dev/clog v1.8.1
-	github.com/chainguard-dev/yam v0.2.71
+	github.com/chainguard-dev/yam v0.2.72
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
