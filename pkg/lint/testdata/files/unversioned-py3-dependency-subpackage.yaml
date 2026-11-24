@@ -1,0 +1,31 @@
+package:
+  name: unversioned-py3-dependency-subpackage
+  version: 1.0.0
+  epoch: 0
+  description: "a package whose subpackage depends on an unversioned py3- provide"
+  copyright:
+    - paths:
+        - "*"
+      attestation: TODO
+      license: GPL-2.0-only
+  dependencies:
+    runtime:
+      - busybox
+
+pipeline:
+  - runs: |
+      echo "hello"
+
+subpackages:
+  - name: ${{package.name}}-python
+    description: "python bindings"
+    dependencies:
+      runtime:
+        - py3.12-pip
+        - py3-foo
+    pipeline:
+      - runs: |
+          echo "hello"
+
+update:
+  enabled: true
