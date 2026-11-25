@@ -11,7 +11,7 @@ replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
 replace modernc.org/sqlite v1.33.0 => modernc.org/sqlite v1.32.0
 
 require (
-	chainguard.dev/apko v1.5.1
+	chainguard.dev/apko v1.5.2
 	chainguard.dev/melange v0.65.0
 	cloud.google.com/go/storage v1.71.0
 	github.com/adrg/xdg v0.5.3
@@ -20,7 +20,7 @@ require (
 	github.com/anchore/syft v1.57.2
 	github.com/chainguard-dev/advisory-schema v0.37.35
 	github.com/chainguard-dev/clog v1.8.1
-	github.com/chainguard-dev/yam v0.2.71
+	github.com/chainguard-dev/yam v0.2.72
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
@@ -65,7 +65,7 @@ require (
 	cel.dev/expr v0.25.3 // indirect
 	chainguard.dev/go-grpc-kit v0.20.0 // indirect
 	chainguard.dev/license v0.1.2 // indirect
-	chainguard.dev/sdk v0.1.481 // indirect
+	chainguard.dev/sdk v0.2.2 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.24.4 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.3.1 // indirect
@@ -373,13 +373,13 @@ require (
 	golang.org/x/tools v0.52.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
-	google.golang.org/api v0.312.0 // indirect
+	google.golang.org/api v0.315.0 // indirect
 	google.golang.org/genproto v0.0.0-20261012220534-4341edf3f941 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261110000943-09e21b237f2c // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261110000943-09e21b237f2c // indirect
 	google.golang.org/grpc v1.85.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
-	gopkg.in/ini.v1 v1.67.3 // indirect
+	gopkg.in/ini.v1 v1.68.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	howett.net/plist v1.0.1 // indirect
 	k8s.io/apimachinery v0.37.2 // indirect
